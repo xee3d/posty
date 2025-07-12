@@ -1,0 +1,46 @@
+# Node modules - NEVER commit these!
+node_modules/
+
+# Build outputs
+android/build/
+android/app/build/
+android/.gradle/
+*.apk
+*.aab
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.metro-health-check*
+
+# Local environment files
+.env.local
+.env.*.local
+local.properties
+
+# Android keystore files (except debug)
+*.keystore
+*.jks
+!debug.keystore
+
+# Gradle
+.gradle/
+gradle-wrapper.jar
+
+# Metro
+.metro-cache/
+metro-cache/
+
+# React Native cache
+.cache/

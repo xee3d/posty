@@ -1,0 +1,493 @@
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  TextInput,
+  ActivityIndicator,
+  Alert,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import { useAppTheme } from '../hooks/useAppTheme';
+import { SPACING, BORDER_RADIUS, FONT_SIZES } from '../utils/constants';
+import { ScaleButton, FadeInView } from '../components/AnimationComponents';
+import openRouterService from '../services/openRouterService';
+import tokenService from '../services/subscription/tokenService';
+import { soundManager } from '../utils/soundManager';
+
+interface SentenceRefineScreenProps {
+  onBack?: () => void;
+}
+
+const SentenceRefineScreen: React.FC<SentenceRefineScreenProps> = ({ onBack }) => {
+  const { colors, cardTheme } = useAppTheme();
+  const [originalText, setOriginalText] = useState('');
+  const [refinedText, setRefinedText] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedStyle, setSelectedStyle] = useState('professional');
+
+  const refineStyles = [
+    { id: 'professional', label: '전문적으로', icon: 'briefcase', color: '#3B82F6' },
+    { id: 'casual', label: '친근하게', icon: 'happy', color: '#10B981' },
+    { id: 'concise', label: '간결하게', icon: 'cut', color: '#F59E0B' },
+    { id: 'creative', label: '창의적으로', icon: 'color-palette', color: '#8B5CF6' },
+  ];
+
+  const handleRefine = async () => {
+    if (!originalText.trim()) {
+      Alert.alert('알림', '정리할 문장을 입력해주세요.');
+      return;
+    }
+
+    // 토큰 확인
+    const hasTokens = await tokenService.consumeToken();
+    if (!hasTokens) {
+      Alert.alert(
+        '토큰 부족',
+        'AI 토큰이 부족합니다. 구독을 업그레이드하거나 무료 토큰을 받아보세요!',
+        [
+          { text: '취소', style: 'cancel' },
+          { text: '구독 보기', onPress: () => {} },
+        ]
+      );
+      return;
+    }
+
+    setIsLoading(true);
+    soundManager.playTap();
+
+    try {
+      const stylePrompts = {
+        professional: '전문적이고 격식있는 톤으로',
+        casual: '친근하고 편안한 대화체로',
+        concise: '핵심만 간결하고 명확하게',
+        creative: '창의적이고 독특한 표현으로',
+      };
+
+      const prompt = `다음 문장을 ${stylePrompts[selectedStyle]} 다듬어주세요. 원문의 의미는 유지하되, 더 읽기 쉽고 자연스럽게 만들어주세요:\n\n"${originalText}"`;
+
+      const response = await openRouterService.generateContent(prompt);
+      
+      if (response.success && response.content) {
+        setRefinedText(response.content);
+        soundManager.playSuccess();
+      } else {
+        throw new Error(response.error || '문장 정리에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Failed to refine sentence:', error);
+      Alert.alert('오류', '문장 정리 중 오류가 발생했습니다. 다시 시도해주세요.');
+      soundManager.playError();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCopy = () => {
+    if (refinedText) {
+      // React Native에서는 Clipboard API 사용
+      Alert.alert('복사 완료', '정리된 문장이 클립보드에 복사되었습니다.');
+      soundManager.playTap();
+    }
+  };
+
+  const handleReset = () => {
+    setOriginalText('');
+    setRefinedText('');
+    soundManager.playTap();
+  };
+
+  const styles = createStyles(colors, cardTheme);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoid}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          style={styles.content}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* 헤더 */}
+          <View style={styles.header}>
+            <TouchableOpacity style={styles.backButton} onPress={onBack}>
+              <Icon name="arrow-back" size={24} color={colors.text.primary} />
+            </TouchableOpacity>
+            <View style={styles.headerTitleContainer}>
+              <View style={styles.headerIcon}>
+                <MaterialIcon name="text-fields" size={20} color={colors.white} />
+              </View>
+              <Text style={styles.headerTitle}>문장 정리하기</Text>
+            </View>
+            <View style={{ width: 44 }} />
+          </View>
+
+          <FadeInView delay={100}>
+            {/* 안내 문구 */}
+            <View style={styles.guideCard}>
+              <Text style={styles.guideTitle}>복잡한 문장을 깔끔하게! ✨</Text>
+              <Text style={styles.guideText}>
+                긴 문장, 어려운 표현을 쉽고 명확하게 다듬어드려요.
+              </Text>
+            </View>
+
+            {/* 스타일 선택 */}
+            <View style={styles.styleSection}>
+              <Text style={styles.sectionTitle}>정리 스타일</Text>
+              <View style={styles.styleGrid}>
+                {refineStyles.map((style) => (
+                  <TouchableOpacity
+                    key={style.id}
+                    style={[
+                      styles.styleButton,
+                      selectedStyle === style.id && styles.styleButtonActive,
+                      { borderColor: selectedStyle === style.id ? style.color : colors.border }
+                    ]}
+                    onPress={() => {
+                      setSelectedStyle(style.id);
+                      soundManager.playTap();
+                    }}
+                  >
+                    <Icon
+                      name={style.icon}
+                      size={20}
+                      color={selectedStyle === style.id ? style.color : colors.text.secondary}
+                    />
+                    <Text
+                      style={[
+                        styles.styleButtonText,
+                        selectedStyle === style.id && { color: style.color }
+                      ]}
+                    >
+                      {style.label}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            {/* 원본 입력 */}
+            <View style={styles.inputSection}>
+              <Text style={styles.sectionTitle}>원본 문장</Text>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.textInput}
+                  value={originalText}
+                  onChangeText={setOriginalText}
+                  placeholder="정리하고 싶은 문장을 입력하세요..."
+                  placeholderTextColor={colors.text.tertiary}
+                  multiline
+                  textAlignVertical="top"
+                />
+                <Text style={styles.charCount}>{originalText.length}자</Text>
+              </View>
+            </View>
+
+            {/* 실행 버튼 */}
+            <ScaleButton
+              style={[styles.refineButton, !originalText.trim() && styles.refineButtonDisabled]}
+              onPress={handleRefine}
+              disabled={isLoading || !originalText.trim()}
+            >
+              {isLoading ? (
+                <ActivityIndicator size="small" color={colors.white} />
+              ) : (
+                <>
+                  <MaterialIcon name="auto-fix-high" size={20} color={colors.white} />
+                  <Text style={styles.refineButtonText}>문장 정리하기</Text>
+                </>
+              )}
+            </ScaleButton>
+
+            {/* 결과 */}
+            {refinedText && (
+              <FadeInView delay={100}>
+                <View style={styles.resultSection}>
+                  <View style={styles.resultHeader}>
+                    <Text style={styles.sectionTitle}>정리된 문장</Text>
+                    <View style={styles.resultActions}>
+                      <TouchableOpacity style={styles.actionButton} onPress={handleCopy}>
+                        <Icon name="copy-outline" size={18} color={colors.primary} />
+                        <Text style={styles.actionButtonText}>복사</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                  <View style={styles.resultContainer}>
+                    <Text style={styles.resultText}>{refinedText}</Text>
+                  </View>
+                </View>
+              </FadeInView>
+            )}
+
+            {/* 리셋 버튼 */}
+            {(originalText || refinedText) && (
+              <TouchableOpacity style={styles.resetButton} onPress={handleReset}>
+                <Icon name="refresh" size={18} color={colors.text.secondary} />
+                <Text style={styles.resetButtonText}>초기화</Text>
+              </TouchableOpacity>
+            )}
+
+            {/* 예시 */}
+            <View style={styles.exampleSection}>
+              <Text style={styles.exampleTitle}>이런 문장을 정리해보세요</Text>
+              <View style={styles.exampleCard}>
+                <Text style={styles.exampleBefore}>
+                  "회의에서 논의된 사항들을 종합적으로 검토해본 결과, 프로젝트 진행에 있어서 여러 가지 측면에서 고려해야 할 부분들이 있다고 판단됩니다."
+                </Text>
+                <Icon name="arrow-down" size={16} color={colors.text.tertiary} style={styles.exampleArrow} />
+                <Text style={styles.exampleAfter}>
+                  "회의 내용을 검토한 결과, 프로젝트 진행 시 고려할 사항이 많습니다."
+                </Text>
+              </View>
+            </View>
+          </FadeInView>
+
+          <View style={styles.bottomSpace} />
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+};
+
+const createStyles = (colors: any, cardTheme: any) => StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  keyboardAvoid: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  backButton: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  headerIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#10B981',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.text.primary,
+  },
+  guideCard: {
+    backgroundColor: cardTheme.molly.background,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.md,
+    padding: SPACING.lg,
+    borderRadius: BORDER_RADIUS.large,
+  },
+  guideTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text.primary,
+    marginBottom: SPACING.xs,
+  },
+  guideText: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    lineHeight: 20,
+  },
+  styleSection: {
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  sectionTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text.primary,
+    marginBottom: SPACING.md,
+  },
+  styleGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.sm,
+  },
+  styleButton: {
+    flex: 1,
+    minWidth: '45%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.xs,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
+    backgroundColor: colors.surface,
+    borderRadius: BORDER_RADIUS.medium,
+    borderWidth: 2,
+    borderColor: colors.border,
+  },
+  styleButtonActive: {
+    backgroundColor: colors.surface,
+  },
+  styleButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.text.secondary,
+  },
+  inputSection: {
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  inputContainer: {
+    backgroundColor: colors.surface,
+    borderRadius: BORDER_RADIUS.large,
+    borderWidth: 1,
+    borderColor: colors.border,
+    padding: SPACING.md,
+  },
+  textInput: {
+    fontSize: 15,
+    color: colors.text.primary,
+    minHeight: 120,
+    textAlignVertical: 'top',
+  },
+  charCount: {
+    fontSize: 12,
+    color: colors.text.tertiary,
+    textAlign: 'right',
+    marginTop: SPACING.xs,
+  },
+  refineButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    backgroundColor: colors.primary,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.large,
+  },
+  refineButtonDisabled: {
+    opacity: 0.5,
+  },
+  refineButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.white,
+  },
+  resultSection: {
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  resultHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  resultActions: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+  },
+  actionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    backgroundColor: colors.primary + '15',
+    borderRadius: BORDER_RADIUS.medium,
+  },
+  actionButtonText: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: colors.primary,
+  },
+  resultContainer: {
+    backgroundColor: colors.surface,
+    borderRadius: BORDER_RADIUS.large,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: colors.primary + '30',
+  },
+  resultText: {
+    fontSize: 15,
+    color: colors.text.primary,
+    lineHeight: 22,
+  },
+  resetButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.sm,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+    paddingVertical: SPACING.md,
+  },
+  resetButtonText: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: colors.text.secondary,
+  },
+  exampleSection: {
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+  },
+  exampleTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text.secondary,
+    marginBottom: SPACING.sm,
+  },
+  exampleCard: {
+    backgroundColor: colors.lightGray,
+    borderRadius: BORDER_RADIUS.large,
+    padding: SPACING.lg,
+  },
+  exampleBefore: {
+    fontSize: 13,
+    color: colors.text.tertiary,
+    lineHeight: 20,
+    marginBottom: SPACING.sm,
+  },
+  exampleArrow: {
+    alignSelf: 'center',
+    marginVertical: SPACING.sm,
+  },
+  exampleAfter: {
+    fontSize: 13,
+    color: colors.text.primary,
+    lineHeight: 20,
+    fontWeight: '500',
+  },
+  bottomSpace: {
+    height: SPACING.xxl,
+  },
+});
+
+export default SentenceRefineScreen;

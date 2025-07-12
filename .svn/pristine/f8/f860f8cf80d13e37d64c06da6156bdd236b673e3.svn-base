@@ -1,0 +1,533 @@
+Index: PROJECT_STATUS.md
+===================================================================
+--- PROJECT_STATUS.md	(revision 59)
++++ PROJECT_STATUS.md	(working copy)
+@@ -1,255 +1,39 @@
+-# 📋 Posty 앱 개발 현황 및 남은 작업
++# Project Status - React Native 0.74.5
+ 
+-## 📊 전체 진행률: 75%
++## 🚀 현재 상태: React Native 0.74.5 업그레이드 완료
+ 
+-## ✅ 완료된 작업
++**마지막 업데이트**: 2025년 7월 11일
+ 
+-### 1. 핵심 기능
+-- ✅ AI 콘텐츠 생성 (OpenAI GPT-4o-mini API 연동)
+-- ✅ 다중 플랫폼 최적화 (Instagram, Facebook, Twitter, LinkedIn, Blog)
+-- ✅ 톤 변환 기능 (친근한, 전문적인, 유머러스한, GenZ, 감성적, 밀레니얼, 미니멀 등)
+-- ✅ 이미지 기반 콘텐츠 생성 (react-native-image-picker)
+-- ✅ 복사 및 SNS 공유 기능
+-- ✅ SNS 앱 직접 실행 (Instagram, Facebook, X)
+-- ✅ 플랫폼별 글자수 제한 적용
++### ✅ 완료된 작업
++- React Native 0.72.17 → 0.74.5 업그레이드
++- Firebase v20.4.0 완전 호환 설정
++- Navigation 6.1.18 최신 버전 적용
++- TypeScript 5.0.4 업그레이드
++- 불필요한 파일 정리 및 문서화
+ 
+-### 2. UI/UX
+-- ✅ 5개 메인 화면 구현 (홈, AI작성, 트렌드, 내스타일, 설정)
+-- ✅ 다크 모드 지원
+-- ✅ 애니메이션 효과 (Animated API)
+-- ✅ 반응형 디자인
+-- ✅ TabNavigator (하단 네비게이션)
+-- ✅ 사운드 효과 시스템 (react-native-sound)
+-- ✅ 햅틱 피드백
+-- ✅ 스켈레톤 로더
+-- ✅ 플랫폼별 브랜드 컬러 적용
++### 🔧 기술 스택
++- **React Native**: 0.74.5
++- **React**: 18.2.0
++- **TypeScript**: 5.0.4
++- **Firebase**: v20.4.0
++- **Navigation**: 6.1.18
++- **State Management**: Redux Toolkit 2.2.7
+ 
+-### 3. 설정 및 환경
+-- ✅ 설정 화면 (사운드, 진동, 테마, 프로필 등)
+-- ✅ AsyncStorage 데이터 저장
+-- ✅ 프로필 편집 모달
+-- ✅ 테마 시스템 (라이트/다크)
+-- ✅ 환경 변수 설정 (.env)
++### 📦 핵심 의존성
++모든 의존성은 `DEPENDENCY_COMPATIBILITY_MATRIX.md` 문서에 명시된 정확한 버전 사용
+ 
+-### 4. 수익화 준비
+-- ✅ Google AdMob 통합 (react-native-google-mobile-ads)
+-- ✅ 네이티브 광고 컴포넌트
+-- ✅ 인앱 구매 준비 (react-native-iap)
+-- ✅ 구독 화면 UI
+-- ✅ 토큰 시스템 기본 구조
++### 🎯 다음 단계
++1. [ ] npm install 실행
++2. [ ] Android 빌드 테스트
++3. [ ] Firebase 연결 확인
++4. [ ] 기존 기능 마이그레이션
++5. [ ] 성능 테스트
+ 
+-### 5. 문서화
+-- ✅ 사운드 가이드 (SOUND_GUIDE.md)
+-- ✅ 앱 아이콘 가이드 (APP_ICON_GUIDE.md)
+-- ✅ 광고 수익화 가이드 (HYBRID_REVENUE_MODEL.md)
+-- ✅ 이용약관 및 개인정보 처리방침
+-- ✅ 사용자 가이드
+-- ✅ 개발 상태 문서
++### 📚 참고 문서
++- `REACT_NATIVE_074_UPGRADE_REPORT.md`: 상세 업그레이드 보고서
++- `DEPENDENCY_COMPATIBILITY_MATRIX.md`: 호환 의존성 매트릭스
++- `FIREBASE_SETUP_GUIDE.md`: Firebase 설정 가이드
+ 
+-### 6. 컴포넌트 구조
+-- ✅ GeneratedContentDisplay (플랫폼별 콘텐츠 표시)
+-- ✅ ProfileEditModal (프로필 편집)
+-- ✅ EarnTokenModal (토큰 획득)
+-- ✅ AnimatedScreenWrapper (화면 전환 애니메이션)
+-- ✅ ThemeProvider (테마 관리)
+-
+-## 🚧 진행 중인 작업
+-
+-### 1. 사운드 시스템
+-- ⏳ 사운드 파일 적용 완료 (MP3 변환 및 복사 완료)
+-- ⏳ 빌드 및 테스트 필요
+-- ⏳ iOS 사운드 파일 링크 필요
+-
+-### 2. 앱 아이콘
+-- ⏳ 디자인 옵션 제공됨
+-- ⏳ 실제 아이콘 생성 및 적용 필요
+-- ⏳ iOS/Android 각 해상도별 아이콘 생성 필요
+-
+-## 📝 남은 주요 작업
+-
+-### 1. 🔐 API 키 보안 (최우선!)
+-```javascript
+-// 현재: .env 파일 사용 (클라이언트 노출)
+-// 필요: 서버 측 프록시 또는 환경 변수 암호화
+-```
+-- [ ] API 키 서버 프록시 구현
+-- [ ] 환경 변수 암호화
+-- [ ] API 사용량 제한 설정
+-- [ ] 보안 토큰 시스템 구현
+-
+-### 2. 📊 사용자 분석 및 통계
+-- [ ] 콘텐츠 생성 통계
+-- [ ] 사용 패턴 분석
+-- [ ] 인기 톤/플랫폼 트래킹
+-- [ ] Firebase Analytics 통합
+-- [ ] 로컬 분석 서비스 활성화
+-
+-### 3. 💾 로컬 데이터 관리
+-- [ ] 생성 기록 저장 (PostListScreen 활성화)
+-- [ ] 즐겨찾기 기능
+-- [ ] 최근 사용 톤/플랫폼 기억
+-- [ ] 오프라인 모드 지원
+-- [ ] SQLite 또는 Realm 통합
+-
+-### 4. 🎨 MyStyle 기능 구현
+-```javascript
+-// MyStyleScreen - 사용자 맞춤 스타일 학습
+-- [ ] 사용자 선호 스타일 분석
+-- [ ] 맞춤형 톤 생성
+-- [ ] 스타일 템플릿 저장
+-- [ ] AI 학습 데이터 수집
+-- [ ] 스타일 추천 알고리즘
+-```
+-
+-### 5. 📈 트렌드 기능 강화
+-```javascript
+-// TrendScreen - 실시간 트렌드 분석
+-- [ ] 실시간 해시태그 트렌드
+-- [ ] 인기 콘텐츠 분석
+-- [ ] 업계별 트렌드 필터
+-- [ ] 트렌드 기반 콘텐츠 제안
+-- [ ] Google Trends API 연동
+-```
+-
+-### 6. 💳 구독 시스템 완성
+-- [ ] 구독 플랜 UI 개선
+-- [ ] 결제 프로세스 구현
+-- [ ] 구독 상태 관리
+-- [ ] 무료/프리미엄 기능 분리
+-- [ ] 영수증 검증 시스템
+-
+-### 7. 🔔 알림 시스템
+-- [ ] 푸시 알림 설정 (FCM/APNs)
+-- [ ] 콘텐츠 생성 완료 알림
+-- [ ] 트렌드 알림
+-- [ ] 앱 업데이트 알림
+-- [ ] 로컬 알림 스케줄링
+-
+-### 8. 🌐 네트워크 처리
+-- [ ] 오프라인 감지
+-- [ ] 재시도 로직
+-- [ ] 로딩 상태 개선
+-- [ ] 에러 메시지 사용자 친화적으로
+-- [ ] API 응답 캐싱
+-
+-### 9. 🎯 성능 최적화
+-- [ ] 이미지 최적화 (압축, 캐싱)
+-- [ ] 메모리 누수 점검
+-- [ ] 번들 크기 최소화
+-- [ ] 시작 시간 단축
+-- [ ] 리렌더링 최적화
+-
+-### 10. 🧪 테스트
+-- [ ] 단위 테스트 작성 (Jest)
+-- [ ] 통합 테스트
+-- [ ] E2E 테스트 (Detox)
+-- [ ] 사용성 테스트
+-- [ ] 성능 테스트
+-
+-## 🚀 출시 준비
+-
+-### Android
+-- [ ] 앱 서명 키 생성
+-- [ ] ProGuard 설정
+-- [ ] 앱 번들 (.aab) 생성
+-- [ ] Play Console 설정
+-- [ ] 스크린샷 및 설명 준비
+-- [ ] 64비트 빌드 확인
+-
+-### iOS
+-- [ ] Xcode 프로젝트 설정
+-- [ ] 인증서 및 프로비저닝
+-- [ ] App Store Connect 설정
+-- [ ] 앱 심사 준비
+-- [ ] TestFlight 베타 테스트
+-
+-### 마케팅
+-- [ ] 앱 스토어 최적화 (ASO)
+-- [ ] 랜딩 페이지
+-- [ ] 소셜 미디어 계정
+-- [ ] 프레스 킷
+-- [ ] 프로모션 비디오
+-
+-## 🎯 우선순위 작업 (권장)
+-
+-### 1단계: 핵심 기능 완성 (1주)
+-1. **API 키 보안** - 가장 중요!
+-2. **생성 기록 저장** - 사용자 경험 향상
+-3. **오프라인 처리** - 안정성 확보
+-
+-### 2단계: 수익화 (1주)
+-1. **구독 시스템** - 수익 모델 구축
+-2. **광고 최적화** - 광고 위치 조정
+-3. **프리미엄 기능** - 차별화
+-
+-### 3단계: 성장 기능 (1주)
+-1. **트렌드 분석** - 사용자 유입
+-2. **MyStyle** - 사용자 유지
+-3. **알림 시스템** - 재방문율 향상
+-
+-## 💡 추가 아이디어
+-
+-### 1. AI 기능 확장
+-- 이미지 생성 (DALL-E API)
+-- 음성 입력 지원
+-- 다국어 번역
+-- SEO 최적화 제안
+-- 자동 리라이팅
+-
+-### 2. 소셜 기능
+-- 커뮤니티 게시판
+-- 콘텐츠 공유 피드
+-- 사용자 간 팔로우
+-- 인기 콘텐츠 랭킹
+-- 댓글 및 좋아요
+-
+-### 3. 비즈니스 기능
+-- 팀 협업 기능
+-- 콘텐츠 승인 워크플로우
+-- 브랜드 가이드라인 설정
+-- 일정 예약 발행
+-- 멀티 계정 관리
+-
+-## 📌 즉시 해야 할 작업
+-
+-1. **빌드 테스트**
+-   ```bash
+-   # Android
+-   npx react-native run-android
+-   
+-   # iOS
+-   cd ios && pod install
+-   npx react-native run-ios
+-   ```
+-
+-2. **API 키 보안 조치**
+-   - posty-server 디렉토리의 서버 활성화
+-   - 프로덕션용 키 분리
+-
+-3. **앱 아이콘 적용**
+-   ```bash
+-   # 아이콘 생성 스크립트 실행
+-   setup-app-icon.bat
+-   ```
+-
+-4. **기본 테스트**
+-   - 모든 화면 동작 확인
+-   - 에러 상황 테스트
+-   - 사운드 효과 확인
+-
+-## 📱 기술 스택
+-- **Framework**: React Native 0.72.6
+-- **Language**: TypeScript 4.8.4
+-- **State Management**: React Hooks
+-- **Storage**: AsyncStorage
+-- **AI Service**: OpenAI API (GPT-4o-mini)
+-- **광고**: Google AdMob
+-- **결제**: React Native IAP
+-- **아이콘**: React Native Vector Icons
+-
+ ---
+ 
+-**예상 완성도**: 현재 약 75% 완성
+-**MVP 달성**: ✅ (기본 기능 작동)
+-**출시 가능 시점**: 핵심 작업 완료 시 2-3주 예상
+-**최종 업데이트**: 2025-01-21
++**이전 내용은 temp 폴더로 이동됨**
+Index: android/app/build.gradle
+===================================================================
+--- android/app/build.gradle	(revision 59)
++++ android/app/build.gradle	(working copy)
+@@ -1,5 +1,7 @@
+ apply plugin: "com.android.application"
++apply plugin: "org.jetbrains.kotlin.android"
+ apply plugin: "com.facebook.react"
++// apply plugin: "com.google.gms.google-services"  // Firebase 설정 파일이 있을 때 활성화
+ 
+ /**
+  * This is the configuration block to customize your React Native Android app.
+@@ -73,9 +75,9 @@
+ 
+     compileSdkVersion rootProject.ext.compileSdkVersion
+ 
+-    namespace "com.molly"
++    namespace "com.posty"
+     defaultConfig {
+-        applicationId "com.molly"
++        applicationId "com.posty"
+         minSdkVersion rootProject.ext.minSdkVersion
+         targetSdkVersion rootProject.ext.targetSdkVersion
+         versionCode 1
+@@ -108,13 +110,9 @@
+ dependencies {
+     // The version of react-native is set by the React Native Gradle Plugin
+     implementation("com.facebook.react:react-android")
++    implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
++    // implementation platform('com.google.firebase:firebase-bom:33.6.0')  // Firebase 사용시 활성화
+ 
+-    debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
+-    debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
+-        exclude group:'com.squareup.okhttp3', module:'okhttp'
+-    }
+-
+-    debugImplementation("com.facebook.flipper:flipper-fresco-plugin:${FLIPPER_VERSION}")
+     if (hermesEnabled.toBoolean()) {
+         implementation("com.facebook.react:hermes-android")
+     } else {
+Index: android/build.gradle
+===================================================================
+--- android/build.gradle	(revision 59)
++++ android/build.gradle	(working copy)
+@@ -6,10 +6,8 @@
+         minSdkVersion = 23
+         compileSdkVersion = 34
+         targetSdkVersion = 34
+-        kotlinVersion = "1.8.0"
+-
+-        // We use NDK 23 which has both M1 support and is the side-by-side NDK version from AGP.
+-        ndkVersion = "23.1.7779620"
++        kotlinVersion = "1.9.0"
++        ndkVersion = "25.1.8937393"
+     }
+     repositories {
+         google()
+@@ -16,8 +14,9 @@
+         mavenCentral()
+     }
+     dependencies {
+-        classpath("com.android.tools.build:gradle")
++        classpath("com.android.tools.build:gradle:8.1.1")
+         classpath("com.facebook.react:react-native-gradle-plugin")
+         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
++        // classpath("com.google.gms:google-services:4.4.2")  // Firebase 사용시 활성화
+     }
+ }
+Index: android/gradle/wrapper/gradle-wrapper.properties
+===================================================================
+--- android/gradle/wrapper/gradle-wrapper.properties	(revision 59)
++++ android/gradle/wrapper/gradle-wrapper.properties	(working copy)
+@@ -1,6 +1,6 @@
+ distributionBase=GRADLE_USER_HOME
+ distributionPath=wrapper/dists
+-distributionUrl=https\://services.gradle.org/distributions/gradle-8.0.1-all.zip
++distributionUrl=https\://services.gradle.org/distributions/gradle-8.3-all.zip
+ networkTimeout=10000
+ zipStoreBase=GRADLE_USER_HOME
+ zipStorePath=wrapper/dists
+Index: android/gradle.properties
+===================================================================
+--- android/gradle.properties	(revision 59)
++++ android/gradle.properties	(working copy)
+@@ -24,8 +24,8 @@
+ # Automatically convert third-party libraries to use AndroidX
+ android.enableJetifier=true
+ 
+-# Version of flipper SDK to use with React Native
+-FLIPPER_VERSION=0.182.0
++# Flipper is no longer supported in React Native 0.74.5
++# FLIPPER_VERSION=0.182.0
+ 
+ # Use this property to specify which architecture you want to build.
+ # You can also override it from the CLI using
+Index: app.json
+===================================================================
+--- app.json	(revision 59)
++++ app.json	(working copy)
+@@ -1,5 +1,5 @@
+ {
+-  "name": "Molly",
++  "name": "Posty",
+   "displayName": "Posty",
+   "react-native-google-mobile-ads": {
+     "android_app_id": "ca-app-pub-3940256099942544~3347511713",
+Index: babel.config.js
+===================================================================
+--- babel.config.js	(revision 59)
++++ babel.config.js	(working copy)
+@@ -1,5 +1,5 @@
+ module.exports = {
+-  presets: ['module:metro-react-native-babel-preset'],
++  presets: ['module:@react-native/babel-preset'],
+   plugins: [
+     ['module:react-native-dotenv', {
+       moduleName: '@env',
+@@ -6,6 +6,7 @@
+       path: '.env',
+       safe: false,
+       allowUndefined: true,
+-    }]
++    }],
++    'react-native-reanimated/plugin',
+   ],
+ };
+Index: index.js
+===================================================================
+--- index.js	(revision 59)
++++ index.js	(working copy)
+@@ -2,6 +2,7 @@
+ const originalToString = Object.prototype.toString;
+ Object.freeze(Object.prototype);
+ 
++import 'react-native-gesture-handler';
+ import {AppRegistry} from 'react-native';
+ import App from './App';
+ import {name as appName} from './app.json';
+Index: package.json
+===================================================================
+--- package.json	(revision 59)
++++ package.json	(working copy)
+@@ -1,11 +1,13 @@
+ {
+-  "name": "Molly",
++  "name": "Posty",
+   "version": "1.0.0",
+   "private": true,
+   "scripts": {
+-    "android": "cd android && gradlew assembleDebug && gradlew installDebug",
++    "android": "react-native run-android",
+     "ios": "react-native run-ios",
+-    "start": "npx metro start",
++    "start": "react-native start",
++    "start:clean": "react-native start --reset-cache",
++    "android:dev": "react-native run-android",
+     "test": "jest",
+     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+     "version": "react-native-version --never-amend",
+@@ -14,42 +16,57 @@
+     "version:major": "npm version major --no-git-tag-version && react-native-version --never-amend"
+   },
+   "dependencies": {
+-    "@react-native-async-storage/async-storage": "^1.19.8",
+-    "@react-native-clipboard/clipboard": "^1.16.3",
+-    "crypto-js": "^4.2.0",
+     "react": "18.2.0",
+-    "react-native": "0.72.17",
+-    "react-native-device-info": "^14.0.4",
+-    "react-native-dotenv": "^3.4.11",
+-    "react-native-google-mobile-ads": "^12.2.0",
+-    "react-native-image-picker": "^4.10.3",
+-    "react-native-sound": "^0.11.2",
+-    "react-native-vector-icons": "^10.0.0"
++    "react-native": "0.74.5",
++    "@react-native-async-storage/async-storage": "1.24.0",
++    "@react-native-clipboard/clipboard": "1.16.3",
++    "crypto-js": "4.2.0",
++    "react-native-device-info": "10.13.2",
++    "react-native-dotenv": "3.4.11",
++    "react-native-google-mobile-ads": "14.2.0",
++    "react-native-image-picker": "7.1.2",
++    "react-native-sound": "0.11.2",
++    "react-native-vector-icons": "10.2.0",
++    "@react-navigation/native": "6.1.18",
++    "@react-navigation/native-stack": "6.11.0",
++    "@react-navigation/bottom-tabs": "6.6.1",
++    "react-native-screens": "3.34.0",
++    "react-native-safe-area-context": "4.11.0",
++    "react-native-gesture-handler": "2.18.1",
++    "@react-native-firebase/app": "20.4.0",
++    "@react-native-firebase/auth": "20.4.0",
++    "@react-native-firebase/firestore": "20.4.0",
++    "react-native-reanimated": "3.15.0",
++    "@reduxjs/toolkit": "2.2.7",
++    "react-redux": "9.1.2",
++    "axios": "1.7.7"
+   },
+   "devDependencies": {
+     "@babel/core": "^7.20.0",
+     "@babel/preset-env": "^7.20.0",
+     "@babel/runtime": "^7.20.0",
+-    "@react-native-community/cli": "^11.3.0",
+-    "@react-native-community/cli-platform-android": "^11.3.0",
+-    "@react-native/eslint-config": "^0.72.2",
+-    "@react-native/metro-config": "^0.72.11",
+-    "@tsconfig/react-native": "^3.0.0",
+-    "@types/react": "^18.0.24",
+-    "@types/react-native": "^0.72.3",
++    "@react-native/babel-preset": "0.74.87",
++    "@react-native/eslint-config": "0.74.87",
++    "@react-native/metro-config": "0.74.87",
++    "@react-native/typescript-config": "0.74.87",
++    "@react-native-community/cli": "13.6.9",
++    "@react-native-community/cli-platform-android": "13.6.9",
++    "@react-native-community/cli-platform-ios": "13.6.9",
++    "@types/react": "^18.2.6",
++    "@types/react-native": "^0.73.0",
+     "@types/react-native-vector-icons": "^6.4.18",
+-    "@typescript-eslint/eslint-plugin": "^5.62.0",
+-    "@typescript-eslint/parser": "^5.62.0",
+-    "babel-jest": "^29.2.1",
++    "@typescript-eslint/eslint-plugin": "^6.10.0",
++    "@typescript-eslint/parser": "^6.10.0",
++    "babel-jest": "^29.6.3",
+     "eslint": "^8.19.0",
+-    "jest": "^29.2.1",
+-    "metro-react-native-babel-preset": "0.76.8",
+-    "prettier": "^2.8.8",
++    "jest": "^29.6.3",
++
++    "prettier": "2.8.8",
+     "react-native-version": "^4.0.0",
+     "react-test-renderer": "18.2.0",
+-    "typescript": "4.8.4"
++    "typescript": "5.0.4"
+   },
+   "engines": {
+-    "node": ">=16"
++    "node": ">=18"
+   }
+-}
++}
+\ No newline at end of file

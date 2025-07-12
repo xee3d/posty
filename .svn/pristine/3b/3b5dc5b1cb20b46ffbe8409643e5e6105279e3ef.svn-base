@@ -1,0 +1,17 @@
+{
+  "name": "posty-server",
+  "version": "1.0.0",
+  "description": "Posty App Backend Server",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "vercel": "^32.0.0"
+  }
+}
