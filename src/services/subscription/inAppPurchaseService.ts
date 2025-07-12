@@ -1,60 +1,97 @@
-import { Platform, Alert } from 'react-native';
-import RNIap, {
-  Product,
-  ProductPurchase,
-  PurchaseError,
+import {
+  purchaseErrorListener,
+  purchaseUpdatedListener,
+  type ProductPurchase,
+  type PurchaseError,
+  type SubscriptionPurchase,
+  type Purchase,
   finishTransaction,
   getProducts,
   initConnection,
-  purchaseErrorListener,
-  purchaseUpdatedListener,
+  endConnection,
   requestPurchase,
   requestSubscription,
-  getSubscriptions,
+  getAvailablePurchases,
+  type Product,
+  flushFailedPurchasesCachedAsPendingAndroid,
+  acknowledgePurchaseAndroid,
   validateReceiptIos,
-  validateReceiptAndroid,
-  endConnection,
+  getReceiptIOS,
 } from 'react-native-iap';
+import { Platform, EmitterSubscription, Alert } from 'react-native';
 import serverSubscriptionService from './serverSubscriptionService';
+import tokenService from './tokenService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import mockPurchaseService from './mockPurchaseService';
 
-// 상품 ID (App Store Connect / Google Play Console에 등록된 ID)
-const itemSkus = Platform.select({
-  ios: {
-    'premium_monthly': 'com.posty.premium.monthly',
-    'premium_yearly': 'com.posty.premium.yearly',
-    'pro_monthly': 'com.posty.pro.monthly',
-    'pro_yearly': 'com.posty.pro.yearly',
-    'tokens_50': 'com.posty.tokens.50',
-    'tokens_100': 'com.posty.tokens.100',
-    'tokens_200': 'com.posty.tokens.200',
-  },
-  android: {
-    'premium_monthly': 'premium_monthly',
-    'premium_yearly': 'premium_yearly',
-    'pro_monthly': 'pro_monthly',
-    'pro_yearly': 'pro_yearly',
-    'tokens_50': 'tokens_50',
-    'tokens_100': 'tokens_100',
-    'tokens_200': 'tokens_200',
-  },
+// 개발 모드에서는 Mock 서비스 사용
+const USE_MOCK = __DEV__ && true; // 프로덕션에서는 false로 변경
+
+// 상품 ID 정의
+const productIds = Platform.select({
+  ios: [
+    'com.posty.premium.monthly',
+    'com.posty.premium.yearly',
+    'com.posty.pro.monthly',
+    'com.posty.pro.yearly',
+    'com.posty.tokens.50',
+    'com.posty.tokens.100',
+    'com.posty.tokens.200',
+  ],
+  android: [
+    'premium_monthly',
+    'premium_yearly', 
+    'pro_monthly',
+    'pro_yearly',
+    'tokens_50',
+    'tokens_100',
+    'tokens_200',
+  ],
+  default: [],
+});
+
+const subscriptionIds = Platform.select({
+  ios: [
+    'com.posty.premium.monthly',
+    'com.posty.premium.yearly',
+    'com.posty.pro.monthly',
+    'com.posty.pro.yearly',
+  ],
+  android: [
+    'premium_monthly',
+    'premium_yearly',
+    'pro_monthly',
+    'pro_yearly',
+  ],
+  default: [],
 });
 
 class InAppPurchaseService {
-  private purchaseUpdateSubscription: any = null;
-  private purchaseErrorSubscription: any = null;
+  private purchaseUpdateSubscription: EmitterSubscription | null = null;
+  private purchaseErrorSubscription: EmitterSubscription | null = null;
   private products: Product[] = [];
-  private subscriptions: Product[] = [];
-  
+  private isInitialized = false;
+
   /**
    * 인앱 결제 초기화
    */
   async initialize(): Promise<void> {
+    if (USE_MOCK) {
+      // 개발 모드: Mock 서비스 사용
+      console.log('🎭 Using Mock Purchase Service (Development Mode)');
+      return mockPurchaseService.initialize();
+    }
+
+    if (this.isInitialized) return;
+
     try {
-      // RNIap 연결
-      const connected = await initConnection();
-      if (!connected) {
-        throw new Error('Store connection failed');
+      // 연결 초기화
+      const result = await initConnection();
+      console.log('IAP Connection result:', result);
+
+      // Android의 경우 실패한 구매 처리
+      if (Platform.OS === 'android') {
+        await flushFailedPurchasesCachedAsPendingAndroid();
       }
 
       // 상품 정보 로드
@@ -63,12 +100,10 @@ class InAppPurchaseService {
       // 구매 리스너 설정
       this.setupPurchaseListeners();
 
-      // 미완료 거래 처리
-      await this.handlePendingPurchases();
-
+      this.isInitialized = true;
       console.log('IAP initialized successfully');
     } catch (error) {
-      console.error('IAP initialization failed:', error);
+      console.error('Failed to initialize IAP:', error);
       throw error;
     }
   }
@@ -78,30 +113,20 @@ class InAppPurchaseService {
    */
   private async loadProducts(): Promise<void> {
     try {
-      const productIds = Object.values(itemSkus || {});
-      const subscriptionIds = productIds.filter(id => 
-        id.includes('monthly') || id.includes('yearly')
-      );
-      const consumableIds = productIds.filter(id => 
-        id.includes('tokens')
-      );
-
-      // 구독 상품 로드
-      if (subscriptionIds.length > 0) {
-        this.subscriptions = await getSubscriptions({ skus: subscriptionIds });
-      }
-
-      // 소비성 상품 로드 (토큰)
-      if (consumableIds.length > 0) {
-        this.products = await getProducts({ skus: consumableIds });
-      }
-
-      console.log('Products loaded:', {
-        subscriptions: this.subscriptions.length,
-        consumables: this.products.length,
-      });
+      const products = await getProducts({ skus: productIds });
+      this.products = products;
+      console.log('Products loaded:', products.length);
+      
+      // 로컬에 캐싱
+      await AsyncStorage.setItem('@iap_products', JSON.stringify(products));
     } catch (error) {
       console.error('Failed to load products:', error);
+      
+      // 캐시된 상품 정보 사용
+      const cached = await AsyncStorage.getItem('@iap_products');
+      if (cached) {
+        this.products = JSON.parse(cached);
+      }
     }
   }
 
@@ -109,40 +134,40 @@ class InAppPurchaseService {
    * 구매 리스너 설정
    */
   private setupPurchaseListeners(): void {
-    // 구매 완료 리스너
+    // 구매 업데이트 리스너
     this.purchaseUpdateSubscription = purchaseUpdatedListener(
-      async (purchase: ProductPurchase) => {
+      async (purchase: Purchase) => {
         console.log('Purchase updated:', purchase);
-
-        const receipt = purchase.transactionReceipt;
-        if (receipt) {
-          try {
-            // 영수증 검증
-            const isValid = await this.validatePurchase(purchase);
-            
-            if (isValid) {
-              // 서버에 구매 정보 전송
-              await this.processPurchase(purchase);
-              
-              // 거래 완료 처리
-              await finishTransaction({ purchase });
-              
-              Alert.alert(
-                '구매 완료',
-                '구매가 성공적으로 완료되었습니다.',
-                [{ text: '확인' }]
-              );
-            } else {
-              throw new Error('Invalid receipt');
-            }
-          } catch (error) {
-            console.error('Purchase processing failed:', error);
-            Alert.alert(
-              '구매 실패',
-              '구매 처리 중 문제가 발생했습니다.',
-              [{ text: '확인' }]
-            );
+        
+        try {
+          // 영수증 검증
+          const receipt = purchase.purchaseToken || purchase.transactionReceipt;
+          if (!receipt) {
+            throw new Error('No receipt found');
           }
+
+          // 서버에서 검증
+          const isValid = await this.verifyPurchase(purchase);
+          
+          if (isValid) {
+            // 구매 완료 처리
+            await this.handleSuccessfulPurchase(purchase);
+            
+            // 트랜잭션 완료
+            await finishTransaction({ 
+              purchase,
+              isConsumable: this.isConsumable(purchase.productId),
+            });
+          } else {
+            throw new Error('Invalid purchase');
+          }
+        } catch (error) {
+          console.error('Purchase processing error:', error);
+          Alert.alert(
+            '구매 오류',
+            '구매 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.',
+            [{ text: '확인' }]
+          );
         }
       }
     );
@@ -150,16 +175,16 @@ class InAppPurchaseService {
     // 구매 에러 리스너
     this.purchaseErrorSubscription = purchaseErrorListener(
       (error: PurchaseError) => {
-        console.warn('Purchase error:', error);
+        console.error('Purchase error:', error);
         
         if (error.code === 'E_USER_CANCELLED') {
-          // 사용자가 취소한 경우
+          // 사용자가 취소한 경우 - 별도 알림 없음
           return;
         }
 
         Alert.alert(
           '구매 실패',
-          '구매 중 오류가 발생했습니다. 다시 시도해주세요.',
+          error.message || '구매를 완료할 수 없습니다.',
           [{ text: '확인' }]
         );
       }
@@ -170,151 +195,134 @@ class InAppPurchaseService {
    * 구독 구매
    */
   async purchaseSubscription(planId: string, isYearly: boolean = false): Promise<void> {
+    if (USE_MOCK) {
+      return mockPurchaseService.purchaseSubscription(planId, isYearly);
+    }
     try {
-      const sku = isYearly 
-        ? itemSkus?.[`${planId}_yearly`] 
-        : itemSkus?.[`${planId}_monthly`];
-
-      if (!sku) {
-        throw new Error('Invalid product ID');
+      const sku = this.getSubscriptionSku(planId, isYearly);
+      const product = this.products.find(p => p.productId === sku);
+      
+      if (!product) {
+        throw new Error('Product not found');
       }
 
-      // 구독 상품 찾기
-      const subscription = this.subscriptions.find(s => s.productId === sku);
-      if (!subscription) {
-        throw new Error('Subscription not found');
-      }
+      console.log('Purchasing subscription:', sku);
 
-      // 구매 요청
       if (Platform.OS === 'ios') {
-        await requestSubscription({ sku });
-      } else {
         await requestSubscription({
           sku,
-          subscriptionOffers: subscription.subscriptionOfferDetails?.map(
-            offer => ({ sku, offerId: offer.offerId })
-          ),
+          andDangerouslyFinishTransactionAutomaticallyIOS: false,
+        });
+      } else {
+        await requestSubscription({
+          subscriptionOffers: [{
+            sku,
+            offerToken: '', // Google Play에서 자동 처리
+          }],
         });
       }
-    } catch (error: any) {
-      if (error.code !== 'E_USER_CANCELLED') {
-        console.error('Purchase subscription error:', error);
-        throw error;
-      }
+    } catch (error) {
+      console.error('Purchase subscription error:', error);
+      throw error;
     }
   }
 
   /**
    * 토큰 구매
    */
-  async purchaseTokens(tokenAmount: number): Promise<void> {
+  async purchaseTokens(packageId: string): Promise<void> {
+    if (USE_MOCK) {
+      return mockPurchaseService.purchaseTokens(packageId);
+    }
     try {
-      const sku = itemSkus?.[`tokens_${tokenAmount}`];
-      if (!sku) {
-        throw new Error('Invalid token amount');
-      }
-
-      // 상품 찾기
+      const sku = this.getTokenSku(packageId);
       const product = this.products.find(p => p.productId === sku);
+      
       if (!product) {
         throw new Error('Product not found');
       }
 
-      // 구매 요청
-      await requestPurchase({ sku });
-    } catch (error: any) {
-      if (error.code !== 'E_USER_CANCELLED') {
-        console.error('Purchase tokens error:', error);
-        throw error;
-      }
+      console.log('Purchasing tokens:', sku);
+
+      await requestPurchase({
+        skus: [sku],
+        andDangerouslyFinishTransactionAutomaticallyIOS: false,
+      });
+    } catch (error) {
+      console.error('Purchase tokens error:', error);
+      throw error;
     }
   }
 
   /**
-   * 영수증 검증
+   * 구매 검증
    */
-  private async validatePurchase(purchase: ProductPurchase): Promise<boolean> {
+  private async verifyPurchase(purchase: Purchase): Promise<boolean> {
     try {
+      // iOS의 경우 로컬 검증 먼저
       if (Platform.OS === 'ios') {
-        // iOS 영수증 검증
-        const receiptBody = {
-          'receipt-data': purchase.transactionReceipt,
-          password: process.env.IOS_SHARED_SECRET, // App Store Connect 공유 암호
-        };
-
-        const result = await validateReceiptIos(receiptBody, __DEV__);
-        return result.status === 0;
-      } else {
-        // Android 영수증 검증
-        const result = await validateReceiptAndroid({
-          packageName: 'com.posty',
-          productId: purchase.productId,
-          purchaseToken: purchase.purchaseToken || '',
-          subscription: purchase.productId.includes('monthly') || purchase.productId.includes('yearly'),
+        const receiptBody = await validateReceiptIos({
+          receiptBody: {
+            'receipt-data': await getReceiptIOS(),
+            password: process.env.IOS_SHARED_SECRET || '',
+          },
+          isTest: __DEV__,
         });
-
-        return result.isValid;
+        
+        if (receiptBody.status !== 0) {
+          console.error('iOS receipt validation failed:', receiptBody);
+          return false;
+        }
       }
+
+      // 서버 검증
+      const response = await serverSubscriptionService.purchaseSubscription(
+        purchase.productId,
+        purchase.purchaseToken || purchase.transactionReceipt || '',
+        Platform.OS as 'ios' | 'android'
+      );
+
+      return response.status === 'active';
     } catch (error) {
-      console.error('Receipt validation failed:', error);
+      console.error('Verification error:', error);
       return false;
     }
   }
 
   /**
-   * 구매 처리
+   * 구매 성공 처리
    */
-  private async processPurchase(purchase: ProductPurchase): Promise<void> {
-    const { productId, purchaseToken, transactionId } = purchase;
+  private async handleSuccessfulPurchase(purchase: Purchase): Promise<void> {
+    const productId = purchase.productId;
 
-    if (productId.includes('tokens')) {
-      // 토큰 구매 처리
-      const tokenAmount = parseInt(productId.split('_')[1]);
-      await this.processTokenPurchase(tokenAmount, transactionId);
+    // 구독 상품인지 확인
+    if (subscriptionIds.includes(productId)) {
+      // 구독 처리
+      const planId = this.getPlanIdFromSku(productId);
+      await tokenService.upgradeSubscription(planId);
+      
+      Alert.alert(
+        '구독 완료! 🎉',
+        '프리미엄 기능을 이용할 수 있습니다.',
+        [{ text: '확인' }]
+      );
     } else {
-      // 구독 구매 처리
-      const planId = productId.includes('premium') ? 'premium' : 'pro';
-      await serverSubscriptionService.purchaseSubscription(
-        planId,
-        purchaseToken || transactionId,
-        Platform.OS as 'ios' | 'android'
+      // 토큰 구매 처리
+      const tokens = this.getTokensFromSku(productId);
+      await tokenService.addPurchasedTokens(tokens);
+      
+      Alert.alert(
+        '토큰 구매 완료! 🎉',
+        `${tokens}개의 토큰이 추가되었습니다.`,
+        [{ text: '확인' }]
       );
     }
-  }
 
-  /**
-   * 토큰 구매 처리
-   */
-  private async processTokenPurchase(amount: number, transactionId: string): Promise<void> {
-    // 토큰 추가
-    const currentTokens = await AsyncStorage.getItem('@user_tokens');
-    const tokens = currentTokens ? parseInt(currentTokens) : 0;
-    const newTokens = tokens + amount;
-
-    await AsyncStorage.setItem('@user_tokens', newTokens.toString());
-
-    // 서버에 알림
-    await serverSubscriptionService.syncTokenUsage(-amount, `purchase_${transactionId}`);
-  }
-
-  /**
-   * 미완료 거래 처리
-   */
-  private async handlePendingPurchases(): Promise<void> {
-    try {
-      const purchases = await RNIap.getAvailablePurchases();
-      
-      for (const purchase of purchases) {
-        // 이미 처리된 거래인지 확인
-        const processed = await AsyncStorage.getItem(`@purchase_${purchase.transactionId}`);
-        if (!processed) {
-          await this.processPurchase(purchase);
-          await finishTransaction({ purchase });
-          await AsyncStorage.setItem(`@purchase_${purchase.transactionId}`, 'true');
-        }
-      }
-    } catch (error) {
-      console.error('Failed to handle pending purchases:', error);
+    // Android acknowledge
+    if (Platform.OS === 'android' && purchase.purchaseToken) {
+      await acknowledgePurchaseAndroid({
+        purchaseToken: purchase.purchaseToken,
+      });
     }
   }
 
@@ -322,33 +330,45 @@ class InAppPurchaseService {
    * 구독 복원
    */
   async restorePurchases(): Promise<void> {
+    if (USE_MOCK) {
+      return mockPurchaseService.restorePurchases();
+    }
     try {
-      const purchases = await RNIap.getAvailablePurchases();
+      console.log('Restoring purchases...');
+      const purchases = await getAvailablePurchases();
       
       if (purchases.length === 0) {
         Alert.alert(
           '복원할 구매 없음',
-          '복원할 구매 내역이 없습니다.',
+          '복원할 수 있는 구매 내역이 없습니다.',
           [{ text: '확인' }]
         );
         return;
       }
 
       // 가장 최근 구독 찾기
-      const subscription = purchases
-        .filter(p => !p.productId.includes('tokens'))
-        .sort((a, b) => b.transactionDate - a.transactionDate)[0];
+      const subscriptions = purchases
+        .filter(p => subscriptionIds.includes(p.productId))
+        .sort((a, b) => (b.transactionDate || 0) - (a.transactionDate || 0));
 
-      if (subscription) {
-        await this.processPurchase(subscription);
+      if (subscriptions.length > 0) {
+        const latestSubscription = subscriptions[0];
+        await this.handleSuccessfulPurchase(latestSubscription);
+        
         Alert.alert(
-          '구독 복원 완료',
+          '복원 완료! 🎉',
           '구독이 성공적으로 복원되었습니다.',
+          [{ text: '확인' }]
+        );
+      } else {
+        Alert.alert(
+          '구독 없음',
+          '활성화된 구독을 찾을 수 없습니다.',
           [{ text: '확인' }]
         );
       }
     } catch (error) {
-      console.error('Restore purchases failed:', error);
+      console.error('Restore error:', error);
       Alert.alert(
         '복원 실패',
         '구매 복원 중 문제가 발생했습니다.',
@@ -358,28 +378,29 @@ class InAppPurchaseService {
   }
 
   /**
-   * 지역별 가격 정보 가져오기
+   * 상품 정보 가져오기
    */
-  getLocalizedPrices(): Map<string, string> {
-    const prices = new Map<string, string>();
-
-    // 구독 상품 가격
-    this.subscriptions.forEach(subscription => {
-      prices.set(subscription.productId, subscription.localizedPrice);
-    });
-
-    // 토큰 상품 가격
-    this.products.forEach(product => {
-      prices.set(product.productId, product.localizedPrice);
-    });
-
-    return prices;
+  getProducts(): Product[] {
+    if (USE_MOCK) {
+      return mockPurchaseService.getProducts() as Product[];
+    }
+    return this.products;
   }
 
   /**
-   * 연결 해제
+   * 특정 상품 정보 가져오기
+   */
+  getProduct(productId: string): Product | undefined {
+    return this.products.find(p => p.productId === productId);
+  }
+
+  /**
+   * 연결 종료
    */
   async disconnect(): Promise<void> {
+    if (USE_MOCK) {
+      return mockPurchaseService.disconnect();
+    }
     if (this.purchaseUpdateSubscription) {
       this.purchaseUpdateSubscription.remove();
       this.purchaseUpdateSubscription = null;
@@ -391,6 +412,37 @@ class InAppPurchaseService {
     }
 
     await endConnection();
+    this.isInitialized = false;
+  }
+
+  // 헬퍼 메서드들
+  private getSubscriptionSku(planId: string, isYearly: boolean): string {
+    const period = isYearly ? 'yearly' : 'monthly';
+    const prefix = Platform.OS === 'ios' ? 'com.posty.' : '';
+    return `${prefix}${planId}.${period}`;
+  }
+
+  private getTokenSku(packageId: string): string {
+    const prefix = Platform.OS === 'ios' ? 'com.posty.' : '';
+    return `${prefix}tokens.${packageId}`;
+  }
+
+  private getPlanIdFromSku(sku: string): 'premium' | 'pro' {
+    if (sku.includes('premium')) return 'premium';
+    if (sku.includes('pro')) return 'pro';
+    throw new Error('Invalid SKU');
+  }
+
+  private getTokensFromSku(sku: string): number {
+    if (sku.includes('50')) return 50;
+    if (sku.includes('100')) return 100;
+    if (sku.includes('200')) return 200;
+    return 0;
+  }
+
+  private isConsumable(productId: string): boolean {
+    // 토큰 상품은 소비 가능
+    return productId.includes('tokens');
   }
 }
 
