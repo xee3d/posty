@@ -1,9 +1,0 @@
-# Molly 앱 최소 설정 (현재 필요한 것만)
-
-# OpenRouter API Key - AI 글쓰기 기능에 필요
-OPENROUTER_API_KEY=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
-
-# 선택사항 - 다른 AI 모델 사용하고 싶을 때
-# AI_MODEL=openai/gpt-4o-mini  # 유료 모델
-# AI_MODEL=anthropic/claude-3-haiku  # 유료 모델
-AI_MODEL=mistralai/mistral-7b-instruct:free  # 무료 모델 (기본값)

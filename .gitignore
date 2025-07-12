@@ -81,3 +81,6 @@ yarn-error.log
 .env.local
 .env.production
 .env.development
+
+# SVN
+.svn/
