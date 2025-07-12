@@ -41,6 +41,7 @@ import {
 import localAnalyticsService from '../services/analytics/localAnalyticsService';
 import simplePostService from '../services/simplePostService';
 import { PLATFORM_STYLES, getRandomEndingStyle, transformContentForPlatform, generateHashtags } from '../utils/platformStyles';
+import missionService from '../services/missionService';
 
 type WriteMode = 'text' | 'photo' | 'polish';
 
@@ -318,6 +319,18 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         });
         
         console.log('Content saved successfully');
+        
+        // 미션 업데이트
+        const missionResult = await missionService.trackAction('create');
+        if (missionResult.rewardsEarned > 0) {
+          setTimeout(() => {
+            Alert.alert(
+              '미션 완료! 🎯',
+              `콘텐츠 생성 미션을 완료하여 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`,
+              [{ text: '확인', onPress: () => handleEarnTokens(missionResult.rewardsEarned) }]
+            );
+          }, 1000);
+        }
       }
     } catch (error) {
       console.error('Generation error:', error);

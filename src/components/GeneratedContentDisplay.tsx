@@ -18,6 +18,7 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { ScaleButton } from './AnimationComponents';
 import { launchSNSApp } from '../utils/snsLauncher';
 import { soundManager } from '../utils/soundManager';
+import missionService from '../services/missionService';
 
 interface GeneratedContentProps {
   originalContent: string | any; // 일단 any로 처리하여 에러 방지
@@ -176,6 +177,17 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     } else {
       // 특정 플랫폼 탭에서는 해당 앱 바로 실행
       await launchSNSApp(activePlatform as any, content);
+    }
+    
+    // 미션 업데이트 (공유 액션)
+    const missionResult = await missionService.trackAction('share');
+    if (missionResult.rewardsEarned > 0) {
+      setTimeout(() => {
+        Alert.alert(
+          '미션 완료! 🎯',
+          `공유 미션을 완료하여 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`
+        );
+      }, 1000);
     }
   };
 

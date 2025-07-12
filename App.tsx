@@ -31,6 +31,8 @@ import adService from './src/services/adService';
 import subscriptionService from './src/services/subscriptionService';
 import soundManager from './src/utils/soundManager';
 import socialAuthService from './src/services/auth/socialAuthService';
+import inAppPurchaseService from './src/services/subscription/inAppPurchaseService';
+import tokenService from './src/services/subscription/tokenService';
 
 const { width } = Dimensions.get('window');
 
@@ -56,8 +58,13 @@ const App: React.FC = () => {
 
     const initializeServices = async () => {
       try {
+        // 기본 서비스 초기화
         await adService.initialize();
         await subscriptionService.initialize();
+        
+        // 토큰 시스템 초기화
+        await tokenService.initialize();
+        
         console.log('✅ Services initialized successfully');
       } catch (error) {
         console.error('❌ Failed to initialize services:', error);
@@ -66,6 +73,17 @@ const App: React.FC = () => {
     
     initializeServices();
   }, []);
+
+  // 인앱 결제 초기화 (로그인 후에만)
+  useEffect(() => {
+    if (isAuthenticated && !isCheckingAuth) {
+      inAppPurchaseService.initialize().catch(console.error);
+      
+      return () => {
+        inAppPurchaseService.disconnect();
+      };
+    }
+  }, [isAuthenticated, isCheckingAuth]);
 
   // 로그인 상태 확인
   useEffect(() => {

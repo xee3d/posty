@@ -29,8 +29,10 @@ import { resetUser } from '../store/slices/userSlice';
 import { UserGuideScreen, TermsOfServiceScreen, PrivacyPolicyScreen, ContactScreen } from './documents';
 import FirebaseAuthTest from './FirebaseAuthTest';
 import { soundManager } from '../utils/soundManager';
-// import EarnTokenModal from '../components/EarnTokenModal'; // 구독 화면으로 이동
 import tokenService from '../services/subscription/tokenService';
+import inAppPurchaseService from '../services/subscription/inAppPurchaseService';
+import TokenManagementSection from '../components/token/TokenManagementSection';
+import { resetAllMissionData, resetAdData, debugMissionData } from '../utils/missionUtils';
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
@@ -67,7 +69,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const [showContact, setShowContact] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showFirebaseTest, setShowFirebaseTest] = useState(false);
-  // const [showEarnTokenModal, setShowEarnTokenModal] = useState(false); // 구독 화면으로 이동
   
   // AI 토큰 및 통계
   const [stats, setStats] = useState({
@@ -174,8 +175,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       const parsedStats = todayStats ? JSON.parse(todayStats) : { generated: 0 };
       
       // tokenService를 사용하여 실제 토큰 수 가져오기
-      const remainingTokens = await tokenService.getRemainingTokens();
       const subscription = await tokenService.getSubscription();
+      const tokenInfo = await tokenService.getTokenInfo();
+      const remainingTokens = tokenInfo.total;
       
       // AI 토큰 계산
       let tokensTotal = 10;
@@ -333,6 +335,35 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const handleUpgradePlan = () => {
     if (onNavigate) {
       onNavigate('subscription');
+    }
+  };
+
+  const handleRestorePurchases = async () => {
+    try {
+      Alert.alert(
+        '구매 복원',
+        '이전에 구매한 구독을 복원하시겠습니까?',
+        [
+          { text: '취소', style: 'cancel' },
+          {
+            text: '복원하기',
+            onPress: async () => {
+              try {
+                await inAppPurchaseService.restorePurchases();
+              } catch (error) {
+                console.error('Restore error:', error);
+                Alert.alert(
+                  '복원 실패',
+                  '구매 복원에 실패했습니다. 다시 시도해주세요.',
+                  [{ text: '확인' }]
+                );
+              }
+            },
+          },
+        ]
+      );
+    } catch (error) {
+      console.error('Restore purchases error:', error);
     }
   };
 
@@ -761,18 +792,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
               </View>
             </View>
 
-            {/* 구독 관리 버튼 - 모든 플랜에서 표시 */}
-            <TouchableOpacity style={styles.upgradePrompt} onPress={handleUpgradePlan}>
-              <Icon name="rocket-outline" size={16} color={colors.primary} />
-              <Text style={styles.upgradePromptText}>
-                {subscriptionPlan === 'free' 
-                  ? 'Pro로 업그레이드하고 무제한으로 사용하세요'
-                  : '구독 관리 및 토큰 확인'
-                }
-              </Text>
-              <Icon name="chevron-forward" size={16} color={colors.primary} />
-            </TouchableOpacity>
           </View>
+        </View>
+
+        {/* 토큰 관리 섹션 */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>토큰 관리</Text>
+          <TokenManagementSection 
+            onNavigateToSubscription={handleUpgradePlan}
+            onTokensUpdated={loadStats}
+          />
         </View>
 
         {/* 계정 연결 섹션 */}
@@ -907,6 +936,33 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
             </Text>
           </TouchableOpacity>
           
+          <TouchableOpacity
+            style={[styles.testButton, { backgroundColor: '#14B8A6' + '20', marginTop: SPACING.xs }]}
+            onPress={async () => {
+              await resetAllMissionData();
+              await resetAdData();
+              Alert.alert('초기화 완료', '미션 및 광고 데이터가 초기화되었습니다.');
+            }}
+          >
+            <Icon name="refresh-outline" size={20} color="#14B8A6" />
+            <Text style={[styles.testButtonText, { color: '#14B8A6' }]}>
+              미션 데이터 초기화 (개발용)
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.testButton, { backgroundColor: '#EC4899' + '20', marginTop: SPACING.xs }]}
+            onPress={async () => {
+              await debugMissionData();
+              Alert.alert('디버그', '콘솔에서 미션 데이터를 확인하세요.');
+            }}
+          >
+            <Icon name="bug-outline" size={20} color="#EC4899" />
+            <Text style={[styles.testButtonText, { color: '#EC4899' }]}>
+              미션 데이터 확인 (개발용)
+            </Text>
+          </TouchableOpacity>
+          
           <View style={styles.themeSection}>
             <View style={styles.settingHeader}>
               <Icon name="color-palette-outline" size={20} color={colors.text.secondary} />
@@ -987,6 +1043,19 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
         {/* 기타 메뉴 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>지원</Text>
+          
+          {/* 구독 복원 버튼 */}
+          <TouchableOpacity
+            style={styles.menuItem}
+            onPress={handleRestorePurchases}
+          >
+            <View style={styles.menuItemLeft}>
+              <Icon name="refresh-circle-outline" size={20} color={colors.text.secondary} />
+              <Text style={styles.menuItemLabel}>구독 복원</Text>
+            </View>
+            <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
+          </TouchableOpacity>
+          
           {menuItems.map((item, index) => (
             <TouchableOpacity
               key={index}

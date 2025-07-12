@@ -8,6 +8,7 @@ import TrendScreen from '../screens/TrendScreen';
 import FeedWithAdsExample from '../screens/FeedWithAdsExample';
 import SubscriptionScreen from '../screens/SubscriptionScreen';
 import CostMonitorScreen from '../screens/CostMonitorScreen';
+import MissionScreen from '../screens/MissionScreen';
 import TabBar from '../components/TabBar';
 import { COLORS } from '../utils/constants';
 import { AnimatedCard, SlideInView } from '../components/AnimationComponents';
@@ -57,6 +58,7 @@ const AppNavigator: React.FC = () => {
           <AIWriteScreen 
             initialMode={aiWriteMode}
             initialContent={preparedContent}
+            onNavigate={handleTabChange}
           />
         );
       case 'my-style':
@@ -70,7 +72,9 @@ const AppNavigator: React.FC = () => {
       case 'feed-ads':
         return <FeedWithAdsExample />;
       case 'subscription':
-        return <SubscriptionScreen />;
+        return <SubscriptionScreen navigation={{ navigate: handleTabChange }} />;
+      case 'mission':
+        return <MissionScreen />;
       default:
         return <HomeScreen onNavigate={handleTabChange} />;
     }

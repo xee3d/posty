@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   RefreshControl,
   Alert,
+  Modal,
+  Switch,
 } from 'react-native';
 import { COLORS, SPACING } from '../utils/constants';
 import NativeAdView from '../components/ads/NativeAdView';
@@ -18,6 +20,8 @@ import { NativeAd } from '../utils/adConfig';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import DeviceInfo from 'react-native-device-info';
 import { Platform } from 'react-native';
+import { useAppTheme } from '../hooks/useAppTheme';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface FeedItem {
   id: string;
@@ -31,11 +35,14 @@ interface FeedWithAdsExampleProps {
 }
 
 export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigation }) => {
+  const { colors } = useAppTheme();
   const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [remainingUsage, setRemainingUsage] = useState<number>(0);
   const [showAds, setShowAds] = useState(true);
   const [remainingTokens, setRemainingTokens] = useState<number>(0);
+  const [showPlanModal, setShowPlanModal] = useState(false);
+  const [currentPlan, setCurrentPlan] = useState<'free' | 'premium' | 'pro'>('free');
 
   useEffect(() => {
     initializeFeed();
@@ -47,6 +54,10 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
     try {
       const tokens = await tokenService.getRemainingTokens();
       setRemainingTokens(tokens);
+      
+      // 현재 구독 플랜도 가져오기
+      const tokenInfo = await tokenService.getTokenInfo();
+      setCurrentPlan(tokenInfo.plan);
     } catch (error) {
       console.error('Failed to load token info:', error);
     }
@@ -118,6 +129,39 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
     await loadFeedData();
     await loadTokenInfo();
     setRefreshing(false);
+  };
+
+  // 테스트용 구독 플랜 변경 함수
+  const handleChangePlan = async (plan: 'free' | 'premium' | 'pro') => {
+    try {
+      await tokenService.upgradeSubscription(plan);
+      
+      // 토큰 수 조정
+      const subscription = await tokenService.getSubscription();
+      if (plan === 'free') {
+        subscription.dailyTokens = 10;
+        subscription.purchasedTokens = 0;
+        subscription.monthlyTokensRemaining = 0;
+      } else if (plan === 'premium') {
+        subscription.dailyTokens = 0;
+        subscription.purchasedTokens = 0;
+        subscription.monthlyTokensRemaining = 100;
+      } else if (plan === 'pro') {
+        subscription.dailyTokens = 0;
+        subscription.purchasedTokens = 0;
+        subscription.monthlyTokensRemaining = -1;
+      }
+      
+      await AsyncStorage.setItem('USER_SUBSCRIPTION', JSON.stringify(subscription));
+      await checkSubscription();
+      await loadTokenInfo();
+      
+      setShowPlanModal(false);
+      Alert.alert('성공', `${plan.toUpperCase()} 플랜으로 변경되었습니다!`);
+    } catch (error) {
+      console.error('Failed to change plan:', error);
+      Alert.alert('오류', '플랜 변경에 실패했습니다.');
+    }
   };
 
   // 테스트용 토큰 추가 함수
@@ -255,6 +299,13 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
         </View>
         <View style={styles.headerButtons}>
           <TouchableOpacity 
+            style={styles.planButton}
+            onPress={() => setShowPlanModal(true)}
+          >
+            <Icon name="settings" size={20} color={COLORS.text} />
+            <Text style={styles.planButtonText}>{currentPlan.toUpperCase()}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
             style={styles.tokenButton}
             onPress={handleAddTestTokens}
           >
@@ -322,6 +373,105 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
         <Icon name="add" size={24} color={COLORS.white} />
         <Text style={styles.generateButtonText}>콘텐츠 생성</Text>
       </TouchableOpacity>
+
+      {/* 구독 플랜 변경 모달 */}
+      <Modal
+        visible={showPlanModal}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setShowPlanModal(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: colors.text.primary }]}>
+                테스트 플랜 변경
+              </Text>
+              <TouchableOpacity onPress={() => setShowPlanModal(false)}>
+                <Icon name="close" size={24} color={colors.text.secondary} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.planOptions}>
+              <TouchableOpacity
+                style={[
+                  styles.planOption,
+                  currentPlan === 'free' && styles.planOptionActive,
+                  { borderColor: currentPlan === 'free' ? COLORS.primary : colors.border }
+                ]}
+                onPress={() => handleChangePlan('free')}
+              >
+                <View style={styles.planOptionHeader}>
+                  <Text style={[styles.planOptionTitle, { color: colors.text.primary }]}>FREE</Text>
+                  {currentPlan === 'free' && (
+                    <View style={styles.currentBadge}>
+                      <Text style={styles.currentBadgeText}>현재</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={[styles.planOptionDesc, { color: colors.text.secondary }]}>
+                  매일 10개 토큰 무료 충전
+                </Text>
+                <Text style={[styles.planOptionDesc, { color: colors.text.secondary }]}>
+                  광고 표시
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.planOption,
+                  currentPlan === 'premium' && styles.planOptionActive,
+                  { borderColor: currentPlan === 'premium' ? '#8B5CF6' : colors.border }
+                ]}
+                onPress={() => handleChangePlan('premium')}
+              >
+                <View style={styles.planOptionHeader}>
+                  <Text style={[styles.planOptionTitle, { color: colors.text.primary }]}>PREMIUM</Text>
+                  {currentPlan === 'premium' && (
+                    <View style={[styles.currentBadge, { backgroundColor: '#8B5CF6' }]}>
+                      <Text style={styles.currentBadgeText}>현재</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={[styles.planOptionDesc, { color: colors.text.secondary }]}>
+                  매월 100개 토큰
+                </Text>
+                <Text style={[styles.planOptionDesc, { color: colors.text.secondary }]}>
+                  광고 표시
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.planOption,
+                  currentPlan === 'pro' && styles.planOptionActive,
+                  { borderColor: currentPlan === 'pro' ? '#F59E0B' : colors.border }
+                ]}
+                onPress={() => handleChangePlan('pro')}
+              >
+                <View style={styles.planOptionHeader}>
+                  <Text style={[styles.planOptionTitle, { color: colors.text.primary }]}>PRO</Text>
+                  {currentPlan === 'pro' && (
+                    <View style={[styles.currentBadge, { backgroundColor: '#F59E0B' }]}>
+                      <Text style={styles.currentBadgeText}>현재</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={[styles.planOptionDesc, { color: colors.text.secondary }]}>
+                  무제한 토큰
+                </Text>
+                <Text style={[styles.planOptionDesc, { color: colors.text.secondary }]}>
+                  광고 제거
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text style={[styles.modalNote, { color: colors.text.tertiary }]}>
+              ⚠️ 테스트 목적으로만 사용하세요
+            </Text>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -350,6 +500,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
+  },
+  planButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.lightGray,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  planButtonText: {
+    marginLeft: 4,
+    color: COLORS.text,
+    fontWeight: '600',
+    fontSize: 13,
   },
   tokenButton: {
     flexDirection: 'row',
@@ -483,6 +647,69 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.gray,
     marginTop: 2,
+  },
+  // 모달 스타일
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    padding: SPACING.large,
+    paddingBottom: SPACING.xl,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.large,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+  },
+  planOptions: {
+    gap: SPACING.medium,
+  },
+  planOption: {
+    padding: SPACING.medium,
+    borderRadius: 12,
+    borderWidth: 2,
+  },
+  planOptionActive: {
+    borderWidth: 2,
+  },
+  planOptionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.small,
+  },
+  planOptionTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  planOptionDesc: {
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  currentBadge: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  currentBadgeText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  modalNote: {
+    textAlign: 'center',
+    marginTop: SPACING.large,
+    fontSize: 14,
   },
 });
 

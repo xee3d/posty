@@ -211,6 +211,27 @@ export const {
   resetUser,
 } = userSlice.actions;
 
+// 추가 액션들
+export const setTokens = (tokens: number) => (dispatch: any, getState: any) => {
+  // 현재 상태 가져오기
+  const currentState = getState().user;
+  const currentTokens = currentState.currentTokens || 0;
+  
+  // 토큰 차이 계산 (NaN 방지)
+  const difference = (tokens || 0) - (currentTokens || 0);
+  
+  if (difference !== 0 && !isNaN(difference)) {
+    dispatch(userSlice.actions.earnTokens({ 
+      amount: difference,
+      description: 'Token sync' 
+    }));
+  }
+};
+
+export const setSubscriptionPlan = (plan: 'free' | 'premium' | 'pro') => (dispatch: any) => {
+  dispatch(updateSubscription({ plan }));
+};
+
 export default userSlice.reducer;
 
 // 선택자 (Selectors)
