@@ -77,56 +77,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
     >
-      {/* Hero Section */}
-      <View style={styles.hero}>
-        <LinearGradient
-          colors={['#6366F1', '#8B5CF6']}
-          style={styles.heroGradient}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <Text style={styles.heroTitle}>토큰 스토어</Text>
-          <Text style={styles.heroSubtitle}>
-            더 많은 토큰으로 창의력을 발휘하세요
-          </Text>
-        </LinearGradient>
-      </View>
 
-      {/* Value Proposition Cards */}
-      <View style={styles.valueSection}>
-        <LinearGradient
-          colors={['#6366F1', '#818CF8']}
-          style={styles.valueCard}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <Icon name="all-inclusive" size={28} color="#FFFFFF" />
-          <Text style={styles.valueText}>구독 없음</Text>
-          <Text style={styles.valueDesc}>일회성 구매</Text>
-        </LinearGradient>
-        
-        <LinearGradient
-          colors={['#10B981', '#34D399']}
-          style={styles.valueCard}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <Icon name="schedule" size={28} color="#FFFFFF" />
-          <Text style={styles.valueText}>영구 소장</Text>
-          <Text style={styles.valueDesc}>만료 없음</Text>
-        </LinearGradient>
-        
-        <LinearGradient
-          colors={['#F59E0B', '#FCD34D']}
-          style={styles.valueCard}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <Icon name="flash-on" size={28} color="#FFFFFF" />
-          <Text style={styles.valueText}>즉시 충전</Text>
-          <Text style={styles.valueDesc}>바로 사용</Text>
-        </LinearGradient>
-      </View>
 
       {/* Token Packages */}
       <View style={styles.packagesContainer}>
@@ -350,54 +301,8 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 40,
-  },
-  hero: {
-    paddingHorizontal: 24,
     paddingTop: 20,
-    paddingBottom: 24,
-  },
-  heroGradient: {
-    padding: 24,
-    borderRadius: 20,
-    alignItems: 'center',
-  },
-  heroTitle: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    letterSpacing: -0.5,
-    marginBottom: 8,
-  },
-  heroSubtitle: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
-    lineHeight: 24,
-    textAlign: 'center',
-  },
-  valueSection: {
-    flexDirection: 'row',
-    paddingHorizontal: 24,
-    marginBottom: 32,
-    gap: 12,
-  },
-  valueCard: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 16,
-    alignItems: 'center',
-    gap: 8,
-  },
-  valueText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    textAlign: 'center',
-  },
-  valueDesc: {
-    fontSize: 11,
-    color: 'rgba(255,255,255,0.8)',
-    textAlign: 'center',
+    paddingBottom: 40,
   },
   packagesContainer: {
     paddingHorizontal: 24,
