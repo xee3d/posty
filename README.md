@@ -168,3 +168,4 @@ npm run ios
 <p align="center">
   Made with ❤️ by Posty Team
 </p>
+"# Posty" 
