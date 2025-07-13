@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface UserState {
   // 사용자 정보
+  uid: string | null; // Firebase UID
   userId: string | null;
   email: string | null;
   displayName: string | null;
@@ -10,17 +11,37 @@ interface UserState {
   provider: 'google' | 'naver' | 'kakao' | 'email' | null;
   
   // 구독 정보
-  subscriptionPlan: 'free' | 'premium' | 'pro';
+  subscription: {
+    plan: 'free' | 'basic' | 'premium';
+    status: 'active' | 'expired' | 'cancelled';
+    startedAt?: any;
+    expiresAt?: any;
+    autoRenew: boolean;
+  };
+  subscriptionPlan: 'free' | 'premium' | 'pro'; // 호환성을 위해 잘시 유지
   subscriptionExpiresAt: string | null; // ISO 날짜 문자열
   
   // 토큰 정보
-  currentTokens: number; // 현재 보유 토큰
+  tokens: {
+    current: number;
+    total: number;
+    lastUpdated?: any;
+  };
+  currentTokens: number; // 현재 보유 토큰 (호환성)
   purchasedTokens: number; // 구매한 토큰 (이월됨)
   freeTokens: number; // 무료 충전 토큰 (매일 리셋)
   lastTokenResetDate: string; // 마지막 무료 토큰 리셋 날짜
   
   // 토큰 사용 내역
   tokenHistory: TokenHistory[];
+  
+  // 설정
+  settings: {
+    theme: 'light' | 'dark' | 'system';
+    language: string;
+    notifications: boolean;
+    soundEnabled: boolean;
+  };
 }
 
 interface TokenHistory {
@@ -33,18 +54,34 @@ interface TokenHistory {
 }
 
 const initialState: UserState = {
+  uid: null,
   userId: null,
   email: null,
   displayName: null,
   photoURL: null,
   provider: null,
+  subscription: {
+    plan: 'free',
+    status: 'active',
+    autoRenew: false,
+  },
   subscriptionPlan: 'free',
   subscriptionExpiresAt: null,
+  tokens: {
+    current: 10,
+    total: 0,
+  },
   currentTokens: 10, // 기본 10개
   purchasedTokens: 0,
   freeTokens: 10,
   lastTokenResetDate: new Date().toISOString().split('T')[0],
   tokenHistory: [],
+  settings: {
+    theme: 'system',
+    language: 'ko',
+    notifications: true,
+    soundEnabled: true,
+  },
 };
 
 const userSlice = createSlice({
@@ -198,6 +235,42 @@ const userSlice = createSlice({
     
     // 상태 초기화
     resetUser: () => initialState,
+    
+    // Firestore에서 전체 사용자 데이터 설정
+    setUserData: (state, action: PayloadAction<any>) => {
+      const data = action.payload;
+      if (data.uid) state.uid = data.uid;
+      if (data.email) state.email = data.email;
+      if (data.displayName) state.displayName = data.displayName;
+      if (data.photoURL !== undefined) state.photoURL = data.photoURL;
+      if (data.provider) state.provider = data.provider;
+      
+      if (data.tokens) {
+        state.tokens = data.tokens;
+        state.currentTokens = data.tokens.current;
+      }
+      
+      if (data.subscription) {
+        state.subscription = data.subscription;
+        state.subscriptionPlan = data.subscription.plan === 'basic' ? 'premium' : data.subscription.plan;
+      }
+      
+      if (data.settings) {
+        state.settings = data.settings;
+      }
+    },
+    
+    // 토큰 정보만 업데이트
+    updateTokens: (state, action: PayloadAction<{ current: number; total: number }>) => {
+      state.tokens.current = action.payload.current;
+      state.tokens.total = action.payload.total;
+      state.currentTokens = action.payload.current;
+    },
+    
+    // 설정 업데이트
+    updateSettings: (state, action: PayloadAction<Partial<UserState['settings']>>) => {
+      state.settings = { ...state.settings, ...action.payload };
+    },
   },
 });
 
@@ -209,6 +282,9 @@ export const {
   resetDailyTokens,
   earnTokens,
   resetUser,
+  setUserData,
+  updateTokens,
+  updateSettings,
 } = userSlice.actions;
 
 // 추가 액션들

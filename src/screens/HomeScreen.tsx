@@ -17,6 +17,7 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { AnimatedCard, SlideInView, FadeInView, ScaleButton } from '../components/AnimationComponents';
 import { TokenBadge, SectionHeader } from '../components/common';
 import { getSavedContents, SavedContent } from '../utils/storage';
+import PostListScreen from './PostListScreen';
 import { APP_TEXT, getText } from '../utils/textConstants';
 import dailyTipsService from '../services/dailyTipsService';
 import simplePostService from '../services/simplePostService';
@@ -25,6 +26,10 @@ import { resetDailyTokens } from '../store/slices/userSlice';
 import { useTokenManagement } from '../hooks/useTokenManagement';
 import EarnTokenModal from '../components/EarnTokenModal';
 import { LowTokenPrompt } from '../components/LowTokenPrompt';
+import auth from '@react-native-firebase/auth';
+import firestoreService from '../services/firebase/firestoreService';
+import { Post as FirestorePost } from '../types/firestore';
+import { SyncIndicator } from '../components/SyncIndicator';
 
 interface HomeScreenProps {
   onNavigate: (tab: string, content?: any) => void;
@@ -52,6 +57,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [coachingTip, setCoachingTip] = useState<any>(null);
   const [tipIndex, setTipIndex] = useState(0);
+  const [showPostList, setShowPostList] = useState(false);
+  const [recentPosts, setRecentPosts] = useState<SavedContent[]>([]);
+  const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
 
   // 앱 시작 시 매일 토큰 리셋 체크
   useEffect(() => {
@@ -127,9 +135,69 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     setTipIndex((prevIndex) => (prevIndex + 1) % predefinedTips.length);
   };
 
+  // 날짜 포맷팅 함수
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) {
+      const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+      if (diffHours === 0) {
+        const diffMinutes = Math.floor(diffTime / (1000 * 60));
+        return diffMinutes === 0 ? '방금 전' : `${diffMinutes}분 전`;
+      }
+      return `${diffHours}시간 전`;
+    }
+    if (diffDays === 1) return '어제';
+    if (diffDays < 7) return `${diffDays}일 전`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)}주 전`;
+    return `${Math.floor(diffDays / 30)}개월 전`;
+  };
+
   useEffect(() => {
     setPosts(samplePosts);
     loadCoachingTip();
+  }, []);
+
+  // 최근 게시물 불러오기
+  const loadRecentPosts = async () => {
+    try {
+      const posts = await getSavedContents();
+      setRecentPosts(posts.slice(0, 5)); // 최근 5개만
+    } catch (error) {
+      console.error('Failed to load recent posts:', error);
+    }
+  };
+
+  // Firestore에서 실시간 데이터 구독
+  useEffect(() => {
+    // 비로그인 상태에서도 로컬 데이터 표시
+    loadRecentPosts();
+    
+    // 로그인한 경우 Firestore 데이터 구독
+    if (auth().currentUser) {
+      const unsubscribe = firestoreService.subscribeToUserPosts(
+        5, // limit
+        (posts: FirestorePost[]) => {
+          // Firestore 데이터를 SavedContent 형식으로 변환
+          const convertedPosts: SavedContent[] = posts.map(post => ({
+            id: post.id,
+            content: post.content,
+            hashtags: post.hashtags,
+            tone: post.tone,
+            length: post.length,
+            platform: post.platform,
+            createdAt: post.createdAt.toDate ? post.createdAt.toDate().toISOString() : new Date().toISOString(),
+            prompt: post.originalPrompt,
+          }));
+          setRecentPosts(convertedPosts);
+        }
+      );
+      
+      return () => unsubscribe();
+    }
   }, []);
 
   const onRefresh = async () => {
@@ -137,6 +205,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     try {
       setPosts(samplePosts);
       loadCoachingTip();
+      // 로그인 상태에 따라 적절히 새로고침
+      if (!auth().currentUser) {
+        await loadRecentPosts();
+      }
+      // Firestore 구독은 자동으로 업데이트됨
     } catch (error) {
       console.error('Failed to refresh:', error);
     } finally {
@@ -228,6 +301,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
             </View>
           </View>
         </FadeInView>
+
+        {/* 동기화 상태 표시 */}
+        <View style={styles.syncIndicatorContainer}>
+          <SyncIndicator />
+        </View>
 
         {/* Molly 인사 배너 */}
         <FadeInView delay={50} duration={200}>
@@ -482,8 +560,87 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </View>
         </SlideInView>
 
+        {/* 최근 게시물 섹션 */}
+        {recentPosts.length > 0 && (
+          <SlideInView direction="up" delay={700}>
+            <View style={styles.recentPostsSection}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>내 게시물</Text>
+                <TouchableOpacity onPress={() => setShowPostList(true)}>
+                  <Text style={styles.moreText}>전체보기</Text>
+                </TouchableOpacity>
+              </View>
+              
+              {recentPosts.slice(0, 3).map((post, index) => (
+                <AnimatedCard key={post.id} delay={750 + index * 50} style={styles.postCard}>
+                  <TouchableOpacity 
+                    onPress={() => setExpandedPostId(expandedPostId === post.id ? null : post.id)}
+                    activeOpacity={0.8}
+                  >
+                    <View style={styles.postHeader}>
+                      <View style={styles.postMeta}>
+                        <Icon 
+                          name={post.platform === 'instagram' ? 'logo-instagram' : 
+                                post.platform === 'facebook' ? 'logo-facebook' : 
+                                post.platform === 'twitter' ? 'logo-twitter' : 'globe'} 
+                          size={16} 
+                          color={post.platform === 'instagram' ? '#E4405F' : 
+                                 post.platform === 'facebook' ? '#1877F2' : 
+                                 post.platform === 'twitter' ? '#000000' : colors.text.secondary} 
+                        />
+                        <Text style={styles.postDate}>
+                          {formatDate(post.createdAt)}
+                        </Text>
+                      </View>
+                      <Icon 
+                        name={expandedPostId === post.id ? "chevron-up" : "chevron-down"} 
+                        size={16} 
+                        color={colors.text.tertiary} 
+                      />
+                    </View>
+                    
+                    <Text 
+                      style={styles.postContent} 
+                      numberOfLines={expandedPostId === post.id ? undefined : 2}
+                    >
+                      {post.content}
+                    </Text>
+                    
+                    {post.hashtags && post.hashtags.length > 0 && (
+                      <View style={styles.postHashtags}>
+                        {post.hashtags.slice(0, 3).map((tag, tagIndex) => (
+                          <Text key={tagIndex} style={styles.postHashtag}>#{tag}</Text>
+                        ))}
+                        {post.hashtags.length > 3 && (
+                          <Text style={styles.moreHashtags}>+{post.hashtags.length - 3}</Text>
+                        )}
+                      </View>
+                    )}
+                  </TouchableOpacity>
+                </AnimatedCard>
+              ))}
+              
+              {recentPosts.length > 3 && (
+                <TouchableOpacity
+                  style={styles.viewAllButton}
+                  onPress={() => setShowPostList(true)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.viewAllText}>전체 {recentPosts.length}개 게시물 보기</Text>
+                  <Icon name="arrow-forward" size={16} color={colors.primary} />
+                </TouchableOpacity>
+              )}
+            </View>
+          </SlideInView>
+        )}
+
         <View style={styles.bottomSpace} />
       </ScrollView>
+      
+      {/* PostListScreen 모달 */}
+      {showPostList && (
+        <PostListScreen onClose={() => setShowPostList(false)} />
+      )}
       
       {/* 무료 토큰 받기 모달 */}
       <EarnTokenModal
@@ -888,6 +1045,67 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   bottomSpace: {
     height: SPACING.xxl,
   },
+  recentPostsSection: {
+    paddingHorizontal: SPACING.lg,
+    marginTop: SPACING.xl,
+  },
+  postCard: {
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    padding: SPACING.md,
+    marginBottom: SPACING.sm,
+    ...cardTheme.default.shadow,
+  },
+  postHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.xs,
+  },
+  postMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs,
+  },
+  postDate: {
+    fontSize: 12,
+    color: colors.text.tertiary,
+  },
+  postContent: {
+    fontSize: 14,
+    color: colors.text.primary,
+    lineHeight: 20,
+    marginBottom: SPACING.xs,
+  },
+  postHashtags: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.xs,
+    marginTop: SPACING.xs,
+  },
+  postHashtag: {
+    fontSize: 12,
+    color: colors.primary,
+  },
+  moreHashtags: {
+    fontSize: 12,
+    color: colors.text.tertiary,
+  },
+  viewAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.xs,
+    paddingVertical: SPACING.md,
+    marginTop: SPACING.xs,
+    backgroundColor: colors.lightGray,
+    borderRadius: 8,
+  },
+  viewAllText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primary,
+  },
   subscriptionCardFull: {
     flex: 1,
   },
@@ -911,6 +1129,12 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     fontSize: 14,
     color: colors.text.primary,
     fontWeight: '500',
+  },
+  syncIndicatorContainer: {
+    position: 'absolute',
+    top: -10,
+    right: SPACING.lg,
+    zIndex: 10,
   },
   });
 };

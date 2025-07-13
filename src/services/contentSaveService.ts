@@ -30,7 +30,7 @@ class ContentSaveService {
       const extractedHashtags = extractHashtags(content);
       const adjustedHashtags = generateHashtags(extractedHashtags, platform);
       
-      // storage.ts에 저장
+      // 1. storage.ts를 통해 저장 (Firestore + 로컬 자동 처리)
       await saveContent({
         content,
         hashtags: adjustedHashtags,
@@ -40,7 +40,7 @@ class ContentSaveService {
         prompt,
       });
       
-      // simplePostService에 저장 (분석용)
+      // 2. simplePostService에 저장 (로컬 분석용)
       await simplePostService.savePost({
         content,
         hashtags: adjustedHashtags,
@@ -123,6 +123,8 @@ class ContentSaveService {
       return false;
     }
   }
+
+
 }
 
 export default new ContentSaveService();

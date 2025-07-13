@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 개발 중에는 인증된 사용자에게 모든 권한 부여
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+    
+    // 프로덕션용 규칙 (나중에 적용)
+    /*
+    // 사용자는 자신의 데이터만 읽기/쓰기 가능
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // 게시물은 작성자만 읽기/쓰기 가능
+    match /posts/{postId} {
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null && 
+        request.auth.uid == request.resource.data.userId;
+      allow update, delete: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+    }
+    
+    // 분석 데이터는 본인만 접근 가능
+    match /analytics/{userId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == userId;
+    }
+    
+    // 미션 데이터는 본인만 접근 가능
+    match /missions/{userId} {
+      allow read, write: if request.auth != null && 
+        request.auth.uid == userId;
+    }
+    
+    // 거래 내역은 본인만 읽기 가능, 쓰기는 모두 가능 (임시)
+    match /transactions/{transactionId} {
+      allow read: if request.auth != null && 
+        request.auth.uid == resource.data.userId;
+      allow write: if request.auth != null;
+    }
+    */
+  }
+}

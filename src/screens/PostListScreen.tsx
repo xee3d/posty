@@ -16,301 +16,80 @@ import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '../utils/constants';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { ScaleButton, FadeInView, AnimatedCard } from '../components/AnimationComponents';
 import localAnalyticsService from '../services/analytics/localAnalyticsService';
+import { storage } from '../utils/storage';
+import auth from '@react-native-firebase/auth';
+import firestoreService from '../services/firebase/firestoreService';
+import { Post as FirestorePost } from '../types/firestore';
 
 interface PostListScreenProps {
   onClose: () => void;
 }
 
-interface PostEditModalProps {
-  post: any;
-  onClose: () => void;
-  onSave: () => void;
-}
 
-const PostEditModal: React.FC<PostEditModalProps> = ({ post, onClose, onSave }) => {
-  const { colors } = useAppTheme();
-  const [metrics, setMetrics] = useState({
-    likes: post.metrics.likes.toString(),
-    comments: post.metrics.comments.toString(),
-    shares: post.metrics.shares.toString(),
-    reach: post.metrics.reach.toString(),
-  });
-  const [isSaving, setIsSaving] = useState(false);
-
-  const handleSave = async () => {
-    setIsSaving(true);
-    try {
-      await localAnalyticsService.updatePostMetrics(post.id, {
-        likes: parseInt(metrics.likes) || 0,
-        comments: parseInt(metrics.comments) || 0,
-        shares: parseInt(metrics.shares) || 0,
-        reach: parseInt(metrics.reach) || 0,
-      });
-      
-      Alert.alert('성공', '성과 지표가 업데이트되었습니다!', [
-        { text: '확인', onPress: () => {
-          onSave();
-          onClose();
-        }}
-      ]);
-    } catch (error) {
-      Alert.alert('오류', '업데이트 중 문제가 발생했습니다.');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: 'rgba(0,0,0,0.5)',
-      justifyContent: 'center',
-      padding: SPACING.lg,
-    },
-    modal: {
-      backgroundColor: colors.background,
-      borderRadius: 16,
-      padding: SPACING.xl,
-      maxHeight: '80%',
-    },
-    header: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      marginBottom: SPACING.lg,
-    },
-    title: {
-      fontSize: 18,
-      fontWeight: '600',
-      color: colors.text.primary,
-    },
-    closeButton: {
-      padding: SPACING.xs,
-    },
-    content: {
-      marginBottom: SPACING.lg,
-    },
-    contentText: {
-      fontSize: 14,
-      color: colors.text.primary,
-      lineHeight: 20,
-      marginBottom: SPACING.sm,
-    },
-    hashtags: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: SPACING.xs,
-    },
-    hashtag: {
-      fontSize: 12,
-      color: colors.primary,
-    },
-    metricsSection: {
-      marginTop: SPACING.lg,
-    },
-    sectionTitle: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: colors.text.primary,
-      marginBottom: SPACING.md,
-    },
-    metricsGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: SPACING.sm,
-    },
-    metricItem: {
-      flex: 1,
-      minWidth: '45%',
-      backgroundColor: colors.surface,
-      borderRadius: 12,
-      padding: SPACING.md,
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    metricHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.xs,
-      marginBottom: SPACING.xs,
-    },
-    metricLabel: {
-      fontSize: 13,
-      color: colors.text.secondary,
-    },
-    metricInput: {
-      fontSize: 20,
-      fontWeight: '600',
-      color: colors.text.primary,
-      padding: 0,
-    },
-    actions: {
-      flexDirection: 'row',
-      gap: SPACING.sm,
-      marginTop: SPACING.xl,
-    },
-    cancelButton: {
-      flex: 1,
-      backgroundColor: colors.surface,
-      paddingVertical: SPACING.md,
-      borderRadius: 12,
-      alignItems: 'center',
-      borderWidth: 1,
-      borderColor: colors.border,
-    },
-    cancelButtonText: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: colors.text.secondary,
-    },
-    saveButton: {
-      flex: 1,
-      backgroundColor: colors.primary,
-      paddingVertical: SPACING.md,
-      borderRadius: 12,
-      alignItems: 'center',
-    },
-    saveButtonText: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: colors.white,
-    },
-  });
-
-  return (
-    <Modal
-      transparent
-      visible={true}
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <TouchableOpacity style={styles.container} activeOpacity={1} onPress={onClose}>
-        <TouchableOpacity activeOpacity={1} onPress={e => e.stopPropagation()}>
-          <View style={styles.modal}>
-            <View style={styles.header}>
-              <Text style={styles.title}>성과 업데이트</Text>
-              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-                <Icon name="close" size={24} color={colors.text.primary} />
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.content}>
-              <Text style={styles.contentText} numberOfLines={3}>
-                {post.content}
-              </Text>
-              <View style={styles.hashtags}>
-                {post.hashtags.map((tag: string, index: number) => (
-                  <Text key={index} style={styles.hashtag}>#{tag}</Text>
-                ))}
-              </View>
-            </View>
-
-            <View style={styles.metricsSection}>
-              <Text style={styles.sectionTitle}>성과 지표 입력</Text>
-              <View style={styles.metricsGrid}>
-                <View style={styles.metricItem}>
-                  <View style={styles.metricHeader}>
-                    <Icon name="heart" size={16} color="#EF4444" />
-                    <Text style={styles.metricLabel}>좋아요</Text>
-                  </View>
-                  <TextInput
-                    style={styles.metricInput}
-                    value={metrics.likes}
-                    onChangeText={(text) => setMetrics({...metrics, likes: text})}
-                    keyboardType="number-pad"
-                    placeholder="0"
-                    placeholderTextColor={colors.text.tertiary}
-                  />
-                </View>
-
-                <View style={styles.metricItem}>
-                  <View style={styles.metricHeader}>
-                    <Icon name="chatbubble" size={16} color="#3B82F6" />
-                    <Text style={styles.metricLabel}>댓글</Text>
-                  </View>
-                  <TextInput
-                    style={styles.metricInput}
-                    value={metrics.comments}
-                    onChangeText={(text) => setMetrics({...metrics, comments: text})}
-                    keyboardType="number-pad"
-                    placeholder="0"
-                    placeholderTextColor={colors.text.tertiary}
-                  />
-                </View>
-
-                <View style={styles.metricItem}>
-                  <View style={styles.metricHeader}>
-                    <Icon name="share-social" size={16} color="#10B981" />
-                    <Text style={styles.metricLabel}>공유</Text>
-                  </View>
-                  <TextInput
-                    style={styles.metricInput}
-                    value={metrics.shares}
-                    onChangeText={(text) => setMetrics({...metrics, shares: text})}
-                    keyboardType="number-pad"
-                    placeholder="0"
-                    placeholderTextColor={colors.text.tertiary}
-                  />
-                </View>
-
-                <View style={styles.metricItem}>
-                  <View style={styles.metricHeader}>
-                    <Icon name="people" size={16} color="#8B5CF6" />
-                    <Text style={styles.metricLabel}>도달</Text>
-                  </View>
-                  <TextInput
-                    style={styles.metricInput}
-                    value={metrics.reach}
-                    onChangeText={(text) => setMetrics({...metrics, reach: text})}
-                    keyboardType="number-pad"
-                    placeholder="0"
-                    placeholderTextColor={colors.text.tertiary}
-                  />
-                </View>
-              </View>
-            </View>
-
-            <View style={styles.actions}>
-              <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-                <Text style={styles.cancelButtonText}>취소</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={styles.saveButton} 
-                onPress={handleSave}
-                disabled={isSaving}
-              >
-                <Text style={styles.saveButtonText}>
-                  {isSaving ? '저장 중...' : '저장'}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </TouchableOpacity>
-      </TouchableOpacity>
-    </Modal>
-  );
-};
 
 const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
   const { colors, cardTheme } = useAppTheme();
   const [posts, setPosts] = useState<any[]>([]);
-  const [selectedPost, setSelectedPost] = useState<any>(null);
-  const [showEditModal, setShowEditModal] = useState(false);
+  const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
 
   useEffect(() => {
+    // 초기 데이터 로드
     loadPosts();
+    
+    // 로그인한 경우 실시간 구독
+    if (auth().currentUser) {
+      const unsubscribe = firestoreService.subscribeToUserPosts(
+        50, // 더 많은 게시물 표시
+        (firestorePosts: FirestorePost[]) => {
+          // Firestore 데이터를 기존 포맷으로 변환
+          const formattedPosts = firestorePosts.map(post => ({
+            id: post.id,
+            content: post.content,
+            hashtags: post.hashtags,
+            platform: post.platform,
+            category: post.category || getCategoryFromTone(post.tone),
+            tone: post.tone,
+            createdAt: post.createdAt.toDate ? post.createdAt.toDate().toISOString() : new Date().toISOString(),
+          }));
+          
+          setPosts(formattedPosts);
+        }
+      );
+      
+      return () => unsubscribe();
+    }
   }, []);
 
   const loadPosts = async () => {
     try {
-      const allPosts = await localAnalyticsService.getAllPosts();
-      // 최신순으로 정렬
-      const sortedPosts = allPosts.sort((a, b) => 
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
-      setPosts(sortedPosts);
+      // 비로그인 상태에서만 로컬 데이터 로드
+      if (!auth().currentUser) {
+        const savedContents = await storage.getSavedContents();
+        
+        // SavedContent를 기존 포맷으로 변환
+        const formattedPosts = savedContents.map(content => ({
+          id: content.id,
+          content: content.content,
+          hashtags: content.hashtags,
+          platform: content.platform || 'instagram',
+          category: getCategoryFromTone(content.tone),
+          tone: content.tone,
+          createdAt: content.createdAt,
+        }));
+        
+        // 최신순으로 정렬
+        const sortedPosts = formattedPosts.sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        
+        setPosts(sortedPosts);
+      }
+      // 로그인 상태에서는 구독으로 자동 업데이트
     } catch (error) {
       console.error('Failed to load posts:', error);
+      // 오류 시 로컬 데이터만 사용
+      const localPosts = await localAnalyticsService.getAllPosts();
+      setPosts(localPosts);
     }
   };
 
@@ -327,9 +106,7 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
     return `${Math.floor(diffDays / 30)}개월 전`;
   };
 
-  const getTotalEngagement = (metrics: any) => {
-    return metrics.likes + metrics.comments + metrics.shares;
-  };
+
 
   const platformIcons = {
     instagram: { name: 'logo-instagram', color: '#E4405F' },
@@ -362,10 +139,8 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
         {posts.map((post, index) => (
           <AnimatedCard key={post.id} delay={index * 50} style={styles.postCard}>
             <TouchableOpacity 
-              onPress={() => {
-                setSelectedPost(post);
-                setShowEditModal(true);
-              }}
+              onPress={() => setExpandedPostId(expandedPostId === post.id ? null : post.id)}
+              activeOpacity={0.8}
             >
               <View style={styles.postHeader}>
                 <View style={styles.postMeta}>
@@ -379,10 +154,17 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
                     <Text style={styles.categoryText}>{post.category}</Text>
                   </View>
                 </View>
-                <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
+                <Icon 
+                  name={expandedPostId === post.id ? "chevron-up" : "chevron-down"} 
+                  size={20} 
+                  color={colors.text.tertiary} 
+                />
               </View>
 
-              <Text style={styles.postContent} numberOfLines={2}>
+              <Text 
+                style={styles.postContent} 
+                numberOfLines={expandedPostId === post.id ? undefined : 2}
+              >
                 {post.content}
               </Text>
 
@@ -395,45 +177,13 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
                 )}
               </View>
 
-              <View style={styles.postMetrics}>
-                <View style={styles.metricItem}>
-                  <Icon name="heart" size={14} color="#EF4444" />
-                  <Text style={styles.metricValue}>{post.metrics.likes}</Text>
-                </View>
-                <View style={styles.metricItem}>
-                  <Icon name="chatbubble" size={14} color="#3B82F6" />
-                  <Text style={styles.metricValue}>{post.metrics.comments}</Text>
-                </View>
-                <View style={styles.metricItem}>
-                  <Icon name="share-social" size={14} color="#10B981" />
-                  <Text style={styles.metricValue}>{post.metrics.shares}</Text>
-                </View>
-                <View style={[styles.metricItem, styles.totalEngagement]}>
-                  <Icon name="flame" size={14} color={colors.primary} />
-                  <Text style={[styles.metricValue, styles.totalValue]}>
-                    {getTotalEngagement(post.metrics)}
-                  </Text>
-                </View>
-              </View>
+
             </TouchableOpacity>
           </AnimatedCard>
         ))}
 
         <View style={styles.bottomSpace} />
       </ScrollView>
-
-      {showEditModal && selectedPost && (
-        <PostEditModal
-          post={selectedPost}
-          onClose={() => {
-            setShowEditModal(false);
-            setSelectedPost(null);
-          }}
-          onSave={() => {
-            loadPosts();
-          }}
-        />
-      )}
     </SafeAreaView>
   );
 };
@@ -530,33 +280,27 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       fontSize: 12,
       color: colors.text.tertiary,
     },
-    postMetrics: {
-      flexDirection: 'row',
-      gap: SPACING.md,
-      paddingTop: SPACING.sm,
-      borderTopWidth: 1,
-      borderTopColor: colors.border,
-    },
-    metricItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 4,
-    },
-    metricValue: {
-      fontSize: 12,
-      color: colors.text.secondary,
-      fontWeight: '500',
-    },
-    totalEngagement: {
-      marginLeft: 'auto',
-    },
-    totalValue: {
-      color: colors.primary,
-      fontWeight: '600',
-    },
+
     bottomSpace: {
       height: SPACING.xxl,
     },
   });
+
+// 톤에서 카테고리 추출 헬퍼 함수
+function getCategoryFromTone(tone: string): string {
+  const toneToCategory: { [key: string]: string } = {
+    'casual': '일상',
+    'professional': '비즈니스',
+    'humorous': '유머',
+    'emotional': '감성',
+    'genz': '트렌드',
+    'millennial': '라이프스타일',
+    'minimalist': '미니멀',
+    'storytelling': '스토리',
+    'motivational': '동기부여',
+  };
+  
+  return toneToCategory[tone] || '일상';
+}
 
 export default PostListScreen;

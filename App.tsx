@@ -20,6 +20,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
+import { loadUserFromFirestore, subscribeToFirestoreUser } from './src/store/middleware/firestoreSyncMiddleware';
+import auth from '@react-native-firebase/auth';
 
 // Import screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -44,6 +46,8 @@ import soundManager from './src/utils/soundManager';
 import socialAuthService from './src/services/auth/socialAuthService';
 import inAppPurchaseService from './src/services/subscription/inAppPurchaseService';
 import tokenService from './src/services/subscription/tokenService';
+import autoMigrationService from './src/services/firebase/autoMigrationService';
+import offlineSyncService from './src/services/offline/offlineSyncService';
 
 const { width } = Dimensions.get('window');
 
@@ -91,6 +95,7 @@ const App: React.FC = () => {
             adService.initialize(),
             subscriptionService.initialize(),
             tokenService.initialize(),
+            offlineSyncService.initialize(),
           ]);
           
           console.log('✅ Services initialized successfully');
@@ -115,6 +120,13 @@ const App: React.FC = () => {
       };
     }
   }, [isAuthenticated, isCheckingAuth]);
+  
+  // 앱 종료 시 오프라인 동기화 서비스 정리
+  useEffect(() => {
+    return () => {
+      offlineSyncService.destroy();
+    };
+  }, []);
 
   // 로그인 상태 확인
   useEffect(() => {
@@ -128,6 +140,25 @@ const App: React.FC = () => {
       // 로그인된 경우 홈으로, 아니면 로그인 화면으로
       if (!SKIP_LOGIN && !user && activeTab !== 'login') {
         setActiveTab('login');
+      }
+      
+      // 로그인된 경우 처리
+      if (user) {
+        InteractionManager.runAfterInteractions(async () => {
+          // Firestore에서 사용자 데이터 로드
+          await loadUserFromFirestore(store.dispatch);
+          
+          // 실시간 구독 시작
+          const unsubscribeFirestore = subscribeToFirestoreUser(store.dispatch);
+          
+          // 자동 마이그레이션 체크
+          autoMigrationService.silentMigration();
+          
+          // 컴포넌트 언마운트 시 cleanup
+          return () => {
+            unsubscribeFirestore();
+          };
+        });
       }
     });
 

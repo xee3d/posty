@@ -27,7 +27,7 @@ import socialAuthService from '../services/auth/socialAuthService';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { resetUser } from '../store/slices/userSlice';
 import { UserGuideScreen, TermsOfServiceScreen, PrivacyPolicyScreen, ContactScreen } from './documents';
-import FirebaseAuthTest from './FirebaseAuthTest';
+import FirebaseTestScreen from './FirebaseTestScreen';
 import { soundManager } from '../utils/soundManager';
 import tokenService from '../services/subscription/tokenService';
 import inAppPurchaseService from '../services/subscription/inAppPurchaseService';
@@ -713,7 +713,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   }
   
   if (showFirebaseTest) {
-    return <FirebaseAuthTest onBack={() => setShowFirebaseTest(false)} />;
+    return <FirebaseTestScreen onNavigate={onNavigate} />;
   }
 
   if (loading) {
@@ -932,7 +932,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
           >
             <Icon name="flame-outline" size={20} color="#F59E0B" />
             <Text style={[styles.testButtonText, { color: '#F59E0B' }]}>
-              Firebase 인증 테스트
+              Firebase 통합 테스트
             </Text>
           </TouchableOpacity>
           
