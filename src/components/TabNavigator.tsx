@@ -11,9 +11,7 @@ import Animated, {
   useAnimatedStyle,
   withSpring,
   withTiming,
-  interpolate,
-  Extrapolation,
-  runOnUI,
+  Easing,
 } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -36,25 +34,12 @@ interface TabConfig {
   isMaterial?: boolean;
 }
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
-
 const TabNavigator: React.FC<TabNavigatorProps> = ({ activeTab, onTabPress }) => {
   const { colors } = useAppTheme();
   
-  // Shared values for animations
+  // Shared value for indicator animation
   const indicatorPosition = useSharedValue(0);
-  const scaleValues = {
-    home: useSharedValue(activeTab === 'home' ? 1 : 0.9),
-    'ai-write': useSharedValue(activeTab === 'ai-write' ? 1 : 0.9),
-    'my-style': useSharedValue(activeTab === 'my-style' ? 1 : 0.9),
-    settings: useSharedValue(activeTab === 'settings' ? 1 : 0.9),
-  };
-  const translateYValues = {
-    home: useSharedValue(0),
-    'ai-write': useSharedValue(activeTab === 'ai-write' ? -10 : 0),
-    'my-style': useSharedValue(0),
-    settings: useSharedValue(0),
-  };
+  const indicatorWidth = useSharedValue(TAB_WIDTH);
 
   const tabs: TabConfig[] = useMemo(() => [
     { key: 'home', icon: 'home-outline', activeIcon: 'home', label: '홈' },
@@ -63,76 +48,40 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ activeTab, onTabPress }) =>
     { key: 'settings', icon: 'settings-outline', activeIcon: 'settings', label: '설정' },
   ], []);
 
-  // Update animations when active tab changes
+  // Update indicator position with smooth animation
   useEffect(() => {
     const tabIndex = tabs.findIndex(tab => tab.key === activeTab);
+    
+    // 빠르고 부드러운 스프링 애니메이션
     indicatorPosition.value = withSpring(tabIndex * TAB_WIDTH, {
-      damping: 15,
-      stiffness: 120,
+      damping: 20,
+      stiffness: 300,
+      mass: 0.8,
+      overshootClamping: true,
+      restDisplacementThreshold: 0.01,
+      restSpeedThreshold: 0.01,
     });
-
-    // Update scale and translateY for all tabs
-    tabs.forEach((tab) => {
-      const isActive = activeTab === tab.key;
-      scaleValues[tab.key].value = withSpring(isActive ? 1 : 0.9, {
-        damping: 15,
-        stiffness: 150,
-      });
-
-      if (tab.key === 'ai-write') {
-        translateYValues[tab.key].value = withSpring(isActive ? -10 : 0, {
-          damping: 15,
-          stiffness: 150,
-        });
-      }
-    });
-  }, [activeTab, tabs, indicatorPosition, scaleValues, translateYValues]);
+  }, [activeTab, tabs, indicatorPosition]);
 
   // Animated style for indicator
   const indicatorStyle = useAnimatedStyle(() => {
     return {
       transform: [{ translateX: indicatorPosition.value }],
+      width: indicatorWidth.value,
     };
   });
 
-  // Create animated styles for each tab
-  const createTabAnimatedStyle = (tabKey: string) => {
-    return useAnimatedStyle(() => {
-      const scale = scaleValues[tabKey].value;
-      const translateY = translateYValues[tabKey].value;
-      const isActive = activeTab === tabKey;
-      const opacity = interpolate(
-        scale,
-        [0.9, 1],
-        [0.7, 1],
-        Extrapolation.CLAMP
-      );
-
-      return {
-        transform: [
-          { scale },
-          { translateY },
-        ],
-        opacity: isActive ? 1 : opacity,
-      };
-    });
-  };
-
   const handleTabPress = (tabKey: string) => {
-    'worklet';
-    // Animate scale for pressed tab
-    runOnUI(() => {
-      scaleValues[tabKey].value = withSpring(0.85, {
-        damping: 10,
+    if (activeTab === tabKey) return;
+    
+    // 인디케이터 너비 애니메이션 (선택적)
+    indicatorWidth.value = withTiming(TAB_WIDTH * 0.8, { duration: 100 }, () => {
+      indicatorWidth.value = withSpring(TAB_WIDTH, {
+        damping: 15,
         stiffness: 200,
-      }, () => {
-        scaleValues[tabKey].value = withSpring(1, {
-          damping: 15,
-          stiffness: 150,
-        });
       });
-    })();
-
+    });
+    
     onTabPress(tabKey);
   };
 
@@ -143,34 +92,23 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ activeTab, onTabPress }) =>
       <Animated.View style={[styles.indicator, indicatorStyle]} />
       {tabs.map((tab) => {
         const isActive = activeTab === tab.key;
-        const animatedStyle = createTabAnimatedStyle(tab.key);
         const IconComponent = tab.isMaterial ? MaterialIcon : Icon;
         const iconName = isActive ? tab.activeIcon : tab.icon;
 
         return (
-          <AnimatedTouchable
+          <TouchableOpacity
             key={tab.key}
-            style={[styles.tab]}
+            style={styles.tab}
             onPress={() => handleTabPress(tab.key)}
-            activeOpacity={0.8}
+            activeOpacity={0.6}
           >
-            <Animated.View style={animatedStyle}>
-              {tab.key === 'ai-write' && isActive ? (
-                <View style={styles.aiWriteActiveIcon}>
-                  <Icon 
-                    name="create" 
-                    size={24} 
-                    color="#FFFFFF" 
-                  />
-                </View>
-              ) : (
-                <IconComponent
-                  name={iconName}
-                  size={24}
-                  color={isActive ? colors.primary : colors.text.tertiary}
-                />
-              )}
-            </Animated.View>
+            <View style={[styles.iconContainer, isActive && styles.iconContainerActive]}>
+              <IconComponent
+                name={iconName}
+                size={24}
+                color={isActive ? colors.primary : colors.text.tertiary}
+              />
+            </View>
             <Text
               style={[
                 styles.tabText,
@@ -180,7 +118,7 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ activeTab, onTabPress }) =>
             >
               {tab.label}
             </Text>
-          </AnimatedTouchable>
+          </TouchableOpacity>
         );
       })}
     </View>
@@ -208,6 +146,14 @@ const createStyles = (colors: typeof COLORS) =>
       justifyContent: 'center',
       paddingVertical: SPACING.sm,
     },
+    iconContainer: {
+      transform: [{ scale: 1 }],
+      opacity: 0.7,
+    },
+    iconContainerActive: {
+      transform: [{ scale: 1.1 }],
+      opacity: 1,
+    },
     tabText: {
       fontSize: 11,
       marginTop: 4,
@@ -224,19 +170,6 @@ const createStyles = (colors: typeof COLORS) =>
       backgroundColor: colors.primary,
       borderTopLeftRadius: 3,
       borderTopRightRadius: 3,
-    },
-    aiWriteActiveIcon: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
-      backgroundColor: colors.primary,
-      justifyContent: 'center',
-      alignItems: 'center',
-      shadowColor: colors.primary,
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
-      shadowRadius: 8,
-      elevation: 8,
     },
   });
 

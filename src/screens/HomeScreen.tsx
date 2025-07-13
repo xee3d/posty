@@ -298,19 +298,31 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
             <View style={styles.subActions}>
               {/* 개발 환경에서만 표시 - 출시 시 주석 처리 */}
               {__DEV__ && (
-                <AnimatedCard delay={400} style={styles.subActionCard}>
-                  <TouchableOpacity 
-                    style={styles.subActionContent}
-                    onPress={() => handleQuickAction('광고 테스트')}
-                  >
-                    <MaterialIcon name="monetization-on" size={20} color={colors.text.secondary} />
-                    <Text style={styles.subActionText}>광고 테스트</Text>
-                  </TouchableOpacity>
-                </AnimatedCard>
+                <>
+                  <AnimatedCard delay={400} style={styles.subActionCard}>
+                    <TouchableOpacity 
+                      style={styles.subActionContent}
+                      onPress={() => handleQuickAction('광고 테스트')}
+                    >
+                      <MaterialIcon name="monetization-on" size={20} color={colors.text.secondary} />
+                      <Text style={styles.subActionText}>광고 테스트</Text>
+                    </TouchableOpacity>
+                  </AnimatedCard>
+                  
+                  <AnimatedCard delay={450} style={styles.subActionCard}>
+                    <TouchableOpacity 
+                      style={styles.subActionContent}
+                      onPress={() => onNavigate('animation-examples')}
+                    >
+                      <MaterialIcon name="animation" size={20} color={colors.text.secondary} />
+                      <Text style={styles.subActionText}>애니메이션</Text>
+                    </TouchableOpacity>
+                  </AnimatedCard>
+                </>
               )}
               
               {/* 구독 버튼 - 항상 표시 */}
-              <AnimatedCard delay={__DEV__ ? 450 : 400} style={[styles.subActionCard, !__DEV__ && styles.subscriptionCardFull]}>
+              <AnimatedCard delay={__DEV__ ? 500 : 400} style={[styles.subActionCard, !__DEV__ && styles.subscriptionCardFull]}>
                 <TouchableOpacity 
                   style={styles.subActionContent}
                   onPress={() => handleQuickAction('구독')}

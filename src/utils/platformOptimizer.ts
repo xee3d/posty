@@ -57,7 +57,9 @@ export const optimizeForPlatform = (
   const contentWithoutHashtags = originalContent.replace(hashtagRegex, '').trim();
   
   let optimizedContent = contentWithoutHashtags;
-  let optimizedHashtags = originalHashtags.map(tag => tag.replace('#', ''));
+  let optimizedHashtags = originalHashtags && originalHashtags.length > 0 
+    ? originalHashtags.map(tag => tag.replace('#', ''))
+    : [];
   
   // 플랫폼별 최적화
   switch (platform) {
@@ -423,23 +425,26 @@ const transformToTwitter = (content: string, tone: string): string => {
   return transformed;
 };
 
-const adjustHashtagsForInstagram = (hashtags: string[]): string[] => {
+const adjustHashtagsForInstagram = (hashtags: string[] = []): string[] => {
   // 인스타그램용 추가 해시태그
   const additionalTags = [
     '일상', '일상스타그램', '데일리', '오늘', '감성', 
     '소통', '좋아요', '팔로우', '맞팔', '선팔하면맞팔'
   ];
   
+  // hashtags가 undefined일 경우 빈 배열로 초기화
+  const safeHashtags = hashtags || [];
+  
   // 기존 해시태그가 부족하면 추가
-  while (hashtags.length < 8 && additionalTags.length > 0) {
+  while (safeHashtags.length < 8 && additionalTags.length > 0) {
     const randomIndex = Math.floor(Math.random() * additionalTags.length);
     const tag = additionalTags.splice(randomIndex, 1)[0];
-    if (!hashtags.includes(tag)) {
-      hashtags.push(tag);
+    if (!safeHashtags.includes(tag)) {
+      safeHashtags.push(tag);
     }
   }
   
-  return hashtags.slice(0, 15);
+  return safeHashtags.slice(0, 15);
 };
 
 export const getPlatformTips = (platform: string): string => {

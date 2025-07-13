@@ -26,7 +26,8 @@ class AIService {
   async generateContent(params: GenerateContentParams): Promise<GeneratedContent> {
     console.log('AIService: Generating content with params:', {
       ...params,
-      prompt: params.prompt.substring(0, 50) + '...'
+      prompt: params.prompt ? params.prompt.substring(0, 50) + '...' : 'undefined',
+      hashtags: params.hashtags || 'undefined'
     });
 
     try {
@@ -36,6 +37,7 @@ class AIService {
           console.log('Using OpenAI provider...');
           const result = await this.provider.generateContent(params);
           console.log('OpenAI generation successful');
+          console.log('Result hashtags:', result.hashtags);
           return result;
         } catch (openAIError) {
           console.error('OpenAI failed, falling back to mock:', openAIError);

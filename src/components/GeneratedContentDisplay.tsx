@@ -132,8 +132,10 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     const platformData = platformContents[activePlatform];
     if (!platformData) return '';
     
-    const hashtagString = platformData.hashtags.map(tag => `#${tag}`).join(' ');
-    return `${platformData.content}\n\n${hashtagString}`;
+    const hashtagString = platformData.hashtags && platformData.hashtags.length > 0 
+      ? platformData.hashtags.map(tag => `#${tag}`).join(' ')
+      : '';
+    return hashtagString ? `${platformData.content}\n\n${hashtagString}` : platformData.content;
   };
 
   const handleCopy = async () => {

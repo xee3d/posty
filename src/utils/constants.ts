@@ -120,22 +120,18 @@ export const SPACING = {
   xxlarge: 48,
 };
 
-// 글꼴 스타일
+// 글꼴 스타일 - fontFamily 제거하여 시스템 기본 폰트 사용
 export const FONTS = {
   regular: {
-    fontFamily: 'System',
     fontWeight: '400' as const,
   },
   medium: {
-    fontFamily: 'System',
     fontWeight: '500' as const,
   },
   semibold: {
-    fontFamily: 'System',
     fontWeight: '600' as const,
   },
   bold: {
-    fontFamily: 'System',
     fontWeight: '700' as const,
   },
 };

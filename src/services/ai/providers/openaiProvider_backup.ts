@@ -247,38 +247,24 @@ ${polishPrompts[params.polishType || 'refine']}
   }
 
   private createSystemPrompt(params: GenerateContentParams, examples: ContentExample[]): string {
-    try {
-      const tonePattern = this.contentStrategy.getTonePattern(params.tone);
-      
-      // examples 배열 안전 체크
-      const examplesSection = examples && examples.length > 0 
-        ? examples.map((ex, idx) => {
-            const successFactorsText = ex.successFactors && Array.isArray(ex.successFactors) 
-              ? ex.successFactors.join(', ') 
-              : '성공 요인 없음';
-            
-            return `
-예시 ${idx + 1} (좋아요 ${ex.engagement?.likes || 0}개):
-"${ex.content || ''}"
-성공 요인: ${successFactorsText}
-`;
-          }).join('\n')
-        : '예시 없음';
-      
-      // tonePattern 안전 체크
-      const toneGuideSection = tonePattern ? `
-톤 가이드 (${params.tone}):
-- 주요 어휘: ${tonePattern.vocabulary ? tonePattern.vocabulary.join(', ') : ''}
-- 문장 끝: ${tonePattern.sentenceEndings ? tonePattern.sentenceEndings.join(', ') : ''}
-- 표현: ${tonePattern.expressions ? tonePattern.expressions.join(', ') : ''}
-` : '';
-      
-      return `당신은 한국의 인기 SNS 크리에이터입니다.
+    const tonePattern = this.contentStrategy.getTonePattern(params.tone);
+    
+    return `당신은 한국의 인기 SNS 크리에이터입니다.
 ${params.userProfile?.type === 'business_manager' ? `${params.userProfile.businessType || '소상공인'} 사장님으로서` : '일반 사용자로서'} 자연스럽고 진정성 있는 글을 작성합니다.
 
 성공적인 콘텐츠 예시들:
-${examplesSection}
-${toneGuideSection}
+${examples.map((ex, idx) => `
+예시 ${idx + 1} (좋아요 ${ex.engagement.likes}개):
+"${ex.content}"
+성공 요인: ${ex.successFactors.join(', ')}
+`).join('\n')}
+
+${tonePattern ? `
+톤 가이드 (${params.tone}):
+- 주요 어휘: ${tonePattern.vocabulary.join(', ')}
+- 문장 끝: ${tonePattern.sentenceEndings.join(', ')}
+- 표현: ${tonePattern.expressions.join(', ')}
+` : ''}
 
 작성 원칙:
 1. 진정성: 완벽하지 않아도 됩니다. 진짜 사람이 쓴 것처럼
@@ -292,12 +278,6 @@ ${toneGuideSection}
 - 억지스러운 참여 유도
 - 기계적인 문장 구조
 - 뻔한 클리셰`;
-    } catch (error) {
-      console.error('Error in createSystemPrompt:', error);
-      console.error('params:', params);
-      console.error('examples:', examples);
-      throw error;
-    }
   }
 
   private createUserPrompt(params: GenerateContentParams, timeStrategy: any): string {

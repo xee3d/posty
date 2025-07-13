@@ -42,7 +42,7 @@ export class MockProvider implements AIProvider {
 
     return {
       content,
-      hashtags,
+      hashtags: hashtags || [],
       platform: params.platform || 'instagram',
       estimatedEngagement,
       metadata: {
@@ -93,7 +93,7 @@ export class MockProvider implements AIProvider {
 
     return {
       content: polishedContent,
-      hashtags,
+      hashtags: hashtags || [],
       platform: params.platform || 'instagram',
       estimatedEngagement: this.engagementStrategy.calculateEngagement(
         polishedContent,

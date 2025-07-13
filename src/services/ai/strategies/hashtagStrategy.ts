@@ -44,6 +44,11 @@ export class HashtagStrategy {
     tone: ToneType,
     userProfile?: UserProfile
   ): string[] {
+    // 안전성 체크
+    if (!content || typeof content !== 'string') {
+      return [];
+    }
+    
     const hashtags: Set<string> = new Set();
     
     // 1. 콘텐츠 기반 키워드 추출
@@ -72,7 +77,7 @@ export class HashtagStrategy {
     const hashtagArray = Array.from(hashtags);
     
     // 우선순위: 콘텐츠 키워드 > 톤 태그 > 플랫폼 태그
-    return this.prioritizeAndLimit(hashtagArray, optimalCount);
+    return this.prioritizeAndLimit(hashtagArray, optimalCount) || [];
   }
 
   // 키워드 추출
@@ -170,7 +175,7 @@ export class HashtagStrategy {
       return a.length - b.length;
     });
     
-    return sorted.slice(0, limit);
+    return sorted.slice(0, limit) || [];
   }
 
   // 해시태그 포맷팅

@@ -1,37 +1,43 @@
 import React from 'react';
 import Animated, {
   Layout,
+  FadeInDown,
+  FadeOutUp,
+  ZoomIn,
+  ZoomOut,
   FadeIn,
   FadeOut,
   SlideInRight,
   SlideOutLeft,
-  ZoomIn,
-  ZoomOut,
-  FadeInDown,
-  FadeOutUp,
   BounceIn,
   BounceOut,
 } from 'react-native-reanimated';
-import { StyleSheet, ViewStyle } from 'react-native';
+import { ViewStyle } from 'react-native';
 
-export type ScreenAnimation = 'fade' | 'slide' | 'scale' | 'slideVertical' | 'bounce';
+export type AnimationType =
+  | 'fade'
+  | 'slide'
+  | 'scale'
+  | 'bounce'
+  | 'slideVertical'
+  | 'custom';
 
-interface AnimatedScreenWrapperProps {
+interface AnimatedWrapperProps {
   children: React.ReactNode;
-  animation?: ScreenAnimation;
+  animation?: AnimationType;
   duration?: number;
   delay?: number;
   style?: ViewStyle;
 }
 
-const AnimatedScreenWrapper: React.FC<AnimatedScreenWrapperProps> = ({
+const AnimatedWrapper: React.FC<AnimatedWrapperProps> = ({
   children,
   animation = 'fade',
   duration = 300,
   delay = 0,
   style,
 }) => {
-  const getAnimations = () => {
+  const getAnimation = () => {
     switch (animation) {
       case 'fade':
         return {
@@ -40,18 +46,18 @@ const AnimatedScreenWrapper: React.FC<AnimatedScreenWrapperProps> = ({
         };
       case 'slide':
         return {
-          entering: SlideInRight.duration(duration).delay(delay).springify(),
+          entering: SlideInRight.duration(duration).delay(delay),
           exiting: SlideOutLeft.duration(duration),
-        };
-      case 'scale':
-        return {
-          entering: ZoomIn.duration(duration).delay(delay).springify(),
-          exiting: ZoomOut.duration(duration),
         };
       case 'slideVertical':
         return {
-          entering: FadeInDown.duration(duration).delay(delay).springify(),
+          entering: FadeInDown.duration(duration).delay(delay),
           exiting: FadeOutUp.duration(duration),
+        };
+      case 'scale':
+        return {
+          entering: ZoomIn.duration(duration).delay(delay),
+          exiting: ZoomOut.duration(duration),
         };
       case 'bounce':
         return {
@@ -66,24 +72,18 @@ const AnimatedScreenWrapper: React.FC<AnimatedScreenWrapperProps> = ({
     }
   };
 
-  const { entering, exiting } = getAnimations();
+  const { entering, exiting } = getAnimation();
 
   return (
     <Animated.View
       entering={entering}
       exiting={exiting}
       layout={Layout.springify()}
-      style={[styles.container, style]}
+      style={style}
     >
       {children}
     </Animated.View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-
-export default AnimatedScreenWrapper;
+export default AnimatedWrapper;
