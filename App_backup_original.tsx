@@ -1,23 +1,12 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   StyleSheet,
   StatusBar,
+  Animated,
   Dimensions,
   ActivityIndicator,
-  InteractionManager,
 } from 'react-native';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  withSpring,
-  runOnJS,
-  interpolate,
-  Easing,
-  FadeIn,
-  FadeOut,
-} from 'react-native-reanimated';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
 
@@ -47,20 +36,6 @@ import tokenService from './src/services/subscription/tokenService';
 
 const { width } = Dimensions.get('window');
 
-// Reanimated 3 애니메이션 설정
-const ANIMATION_CONFIG = {
-  FADE_DURATION: 80,
-  SLIDE_DURATION: 80,
-  FADE_IN_DURATION: 100,
-  SLIDE_DISTANCE: 15,
-  SPRING: {
-    damping: 15,
-    stiffness: 150,
-    mass: 1,
-  },
-  EASING: Easing.out(Easing.cubic),
-};
-
 const App: React.FC = () => {
   const { colors, isDark } = useAppTheme();
   const [activeTab, setActiveTab] = useState('home');
@@ -70,45 +45,39 @@ const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   
-  // Reanimated shared values
-  const opacity = useSharedValue(1);
-  const translateX = useSharedValue(0);
-  const scale = useSharedValue(1);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const translateXAnim = useRef(new Animated.Value(0)).current;
 
-  // 광고 및 구독 서비스 초기화 (InteractionManager 사용)
+  // 광고 및 구독 서비스 초기화
   useEffect(() => {
+    // 개발 모드에서 경고 확인
     if (__DEV__) {
       console.log('🚀 Posty App Started in Development Mode');
       console.log('React Native Version:', require('react-native/package.json').version);
-      console.log('✨ Using Reanimated 3 for animations');
     }
 
-    // 초기 렌더링 후 서비스 초기화
-    InteractionManager.runAfterInteractions(() => {
-      const initializeServices = async () => {
-        try {
-          await Promise.all([
-            adService.initialize(),
-            subscriptionService.initialize(),
-            tokenService.initialize(),
-          ]);
-          
-          console.log('✅ Services initialized successfully');
-        } catch (error) {
-          console.error('❌ Failed to initialize services:', error);
-        }
-      };
-      
-      initializeServices();
-    });
+    const initializeServices = async () => {
+      try {
+        // 기본 서비스 초기화
+        await adService.initialize();
+        await subscriptionService.initialize();
+        
+        // 토큰 시스템 초기화
+        await tokenService.initialize();
+        
+        console.log('✅ Services initialized successfully');
+      } catch (error) {
+        console.error('❌ Failed to initialize services:', error);
+      }
+    };
+    
+    initializeServices();
   }, []);
 
-  // 인앱 결제 초기화 최적화
+  // 인앱 결제 초기화 (로그인 후에만)
   useEffect(() => {
     if (isAuthenticated && !isCheckingAuth) {
-      InteractionManager.runAfterInteractions(() => {
-        inAppPurchaseService.initialize().catch(console.error);
-      });
+      inAppPurchaseService.initialize().catch(console.error);
       
       return () => {
         inAppPurchaseService.disconnect();
@@ -134,24 +103,8 @@ const App: React.FC = () => {
     return unsubscribe;
   }, [activeTab]);
 
-  // Reanimated animated style
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-      transform: [
-        { translateX: translateX.value },
-        { scale: scale.value },
-      ],
-    };
-  });
-
-  // 애니메이션 완료 콜백
-  const onAnimationComplete = useCallback(() => {
-    setIsAnimating(false);
-  }, []);
-
-  // handleTabPress with Reanimated 3
-  const handleTabPress = useCallback((tab: string, data?: any) => {
+  const handleTabPress = (tab: string, data?: any) => {
+    // console.log('handleTabPress called with:', { tab, data });
     if (isAnimating || (tab === activeTab && tab !== 'ai-write-photo')) return;
     
     // 전달받은 데이터 저장
@@ -172,50 +125,49 @@ const App: React.FC = () => {
     const nextIndex = tabs.indexOf(tab);
     const direction = nextIndex > currentIndex ? 1 : -1;
     
-    // Reanimated 3 애니메이션 시작
-    opacity.value = withTiming(0, {
-      duration: ANIMATION_CONFIG.FADE_DURATION,
-      easing: ANIMATION_CONFIG.EASING,
-    }, (finished) => {
-      if (finished) {
-        runOnJS(setActiveTab)(tab);
-        
-        // 새 화면 초기 위치 설정
-        translateX.value = direction * ANIMATION_CONFIG.SLIDE_DISTANCE;
-        
-        // 페이드 인 및 슬라이드 애니메이션
-        opacity.value = withTiming(1, {
-          duration: ANIMATION_CONFIG.FADE_IN_DURATION,
-          easing: ANIMATION_CONFIG.EASING,
-        });
-        
-        translateX.value = withSpring(0, ANIMATION_CONFIG.SPRING);
-        
-        // 스케일 애니메이션 추가 (미묘한 효과)
-        scale.value = withTiming(0.98, { duration: 50 }, () => {
-          scale.value = withSpring(1, {
-            damping: 20,
-            stiffness: 200,
-          }, (finished) => {
-            if (finished) {
-              runOnJS(onAnimationComplete)();
-            }
-          });
-        });
-      }
+    // 현재 화면 페이드 아웃
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 100, // 150에서 100으로 단축
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateXAnim, {
+        toValue: -direction * 20, // 30에서 20으로 감소
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      // 화면 전환
+      setActiveTab(tab);
+      
+      // 새 화면 초기 위치 설정
+      translateXAnim.setValue(direction * 20);
+      
+      // 새 화면 페이드 인
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 150, // 200에서 150으로 단축
+          useNativeDriver: true,
+        }),
+        Animated.spring(translateXAnim, {
+          toValue: 0,
+          friction: 10, // 8에서 10으로 증가 (더 빠른 정지)
+          tension: 80, // 40에서 80으로 증가 (더 빠른 스프링)
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setIsAnimating(false);
+      });
     });
     
-    // 슬라이드 아웃 애니메이션
-    translateX.value = withTiming(-direction * ANIMATION_CONFIG.SLIDE_DISTANCE, {
-      duration: ANIMATION_CONFIG.SLIDE_DURATION,
-      easing: ANIMATION_CONFIG.EASING,
-    });
-  }, [activeTab, isAnimating, opacity, translateX, scale, onAnimationComplete]);
+    // 사용 후 데이터 초기화 - 애니메이션 완료 후에만
+    // setNavigationData(null); // 주석 처리 - 불필요한 리렌더링 방지
+  };
 
-  const styles = useMemo(() => createStyles(colors), [colors]);
-
-  // renderScreen을 useMemo로 최적화
-  const renderScreen = useMemo(() => {
+  const renderScreen = () => {
+    // 로그인 확인 중
     if (isCheckingAuth) {
       return (
         <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
@@ -223,9 +175,6 @@ const App: React.FC = () => {
         </View>
       );
     }
-
-    // 각 스크린에 key prop 최적화
-    const screenKey = `${activeTab}-${photoMode ? 'photo' : 'text'}`;
 
     switch (activeTab) {
       case 'login':
@@ -235,7 +184,7 @@ const App: React.FC = () => {
       case 'ai-write':
         return (
           <AIWriteScreen 
-            key={screenKey}
+            key={`ai-write-${activeTab}`} 
             onNavigate={handleTabPress} 
             initialMode={navigationData?.initialMode || (photoMode ? 'photo' : 'text')} 
             initialText={navigationData?.content}
@@ -243,27 +192,16 @@ const App: React.FC = () => {
             initialTitle={navigationData?.title}
           />
         );
+      // case 'trend':
+      //   return <TrendScreen key="trend" onNavigate={handleTabPress} />;
       case 'my-style':
         return <MyStyleScreen key="my-style" onNavigate={handleTabPress} />;
       case 'settings':
         return <SettingsScreen key="settings" onNavigate={handleTabPress} />;
       case 'feed-ads':
-        return (
-          <FeedWithAdsExample 
-            key="feed-ads" 
-            navigation={{ navigate: handleTabPress }} 
-          />
-        );
+        return <FeedWithAdsExample key="feed-ads" navigation={{ navigate: handleTabPress }} />;
       case 'subscription':
-        return (
-          <SubscriptionScreen 
-            key="subscription" 
-            navigation={{ 
-              goBack: () => handleTabPress('home'), 
-              navigate: handleTabPress 
-            }} 
-          />
-        );
+        return <SubscriptionScreen key="subscription" navigation={{ goBack: () => handleTabPress('home'), navigate: handleTabPress }} />;
       case 'terms':
         return <TermsOfServiceScreen key="terms" onNavigate={handleTabPress} />;
       case 'privacy':
@@ -271,8 +209,9 @@ const App: React.FC = () => {
       default:
         return <HomeScreen key="home" onNavigate={handleTabPress} />;
     }
-  }, [activeTab, isCheckingAuth, colors.background, colors.primary, handleTabPress, 
-      navigationData, photoMode, styles]);
+  };
+
+  const styles = createStyles(colors);
 
   return (
     <Provider store={store}>
@@ -281,8 +220,16 @@ const App: React.FC = () => {
           backgroundColor={colors.surface} 
           barStyle={isDark ? "light-content" : "dark-content"} 
         />
-        <Animated.View style={[styles.content, animatedStyle]}>
-          {renderScreen}
+        <Animated.View 
+          style={[
+            styles.content,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateX: translateXAnim }],
+            },
+          ]}
+        >
+          {renderScreen()}
         </Animated.View>
         {activeTab !== 'login' && (
           <TabNavigator 
