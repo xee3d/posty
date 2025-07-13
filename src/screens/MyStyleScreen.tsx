@@ -325,6 +325,31 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     
     if (onNavigate) {
       let content = '';
+      let tone = 'casual'; // 기본 톤
+      
+      // 템플릿 ID에서 톤 추출
+      switch (template.id) {
+        case 'minimalist':
+          tone = 'minimalist';
+          break;
+        case 'emotional':
+          tone = 'emotional';
+          break;
+        case 'humorous':
+          tone = 'humorous';
+          break;
+        case 'storytelling':
+          tone = 'storytelling';
+          break;
+        case 'professional':
+          tone = 'professional';
+          break;
+        case 'motivational':
+          tone = 'motivational';
+          break;
+        default:
+          tone = 'casual';
+      }
       
       if (template.characteristics?.examples) {
         content = template.characteristics.examples[0];
@@ -335,7 +360,8 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       }
       
       onNavigate('ai-write', {
-        content: content,
+        initialText: content,
+        initialTone: tone,
         title: template.name,
         style: template.id,
         tips: template.tips

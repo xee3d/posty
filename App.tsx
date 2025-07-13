@@ -238,9 +238,12 @@ const App: React.FC = () => {
             key={screenKey}
             onNavigate={handleTabPress} 
             initialMode={navigationData?.initialMode || (photoMode ? 'photo' : 'text')} 
-            initialText={navigationData?.content}
+            initialText={navigationData?.initialText || navigationData?.content}
             initialHashtags={navigationData?.hashtags}
             initialTitle={navigationData?.title}
+            initialTone={navigationData?.initialTone}
+            style={navigationData?.style}
+            tips={navigationData?.tips}
           />
         );
       case 'my-style':

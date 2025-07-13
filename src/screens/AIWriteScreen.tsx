@@ -42,6 +42,7 @@ import localAnalyticsService from '../services/analytics/localAnalyticsService';
 import simplePostService from '../services/simplePostService';
 import { PLATFORM_STYLES, getRandomEndingStyle, transformContentForPlatform, generateHashtags } from '../utils/platformStyles';
 import missionService from '../services/missionService';
+import improvedStyleService, { STYLE_TEMPLATES } from '../services/improvedStyleService';
 
 type WriteMode = 'text' | 'photo' | 'polish';
 
@@ -51,9 +52,12 @@ interface AIWriteScreenProps {
   initialText?: string;
   initialHashtags?: string[];
   initialTitle?: string;
+  initialTone?: string;
+  style?: string;
+  tips?: string[];
 }
 
-const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode = 'text', initialText, initialHashtags, initialTitle }) => {
+const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode = 'text', initialText, initialHashtags, initialTitle, initialTone, style, tips }) => {
   // console.log('AIWriteScreen mounted with:', { initialText, initialHashtags, initialTitle });
   const { colors, cardTheme, isDark } = useAppTheme();
   
@@ -73,6 +77,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   
   const [writeMode, setWriteMode] = useState<WriteMode>(initialMode);
   const [prompt, setPrompt] = useState(initialText || '');
+  const [styleInfo, setStyleInfo] = useState<any>(null);
+  const [showStyleGuide, setShowStyleGuide] = useState(false);
+  const [styleGuideCollapsed, setStyleGuideCollapsed] = useState(false);
   
   // initialText 변경 시 prompt 업데이트
   useEffect(() => {
@@ -81,8 +88,26 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       setPrompt(initialText);
     }
   }, [initialText]);
-  const [selectedTone, setSelectedTone] = useState('casual');
-  const [selectedLength, setSelectedLength] = useState('medium');
+  
+  // 스타일 정보 로드
+  useEffect(() => {
+    if (style) {
+      const templateInfo = STYLE_TEMPLATES.find(t => t.id === style);
+      if (templateInfo) {
+        setStyleInfo(templateInfo);
+        // 스타일 가이드를 계속 표시
+        setShowStyleGuide(true);
+      }
+    }
+  }, [style]);
+  
+  const [selectedTone, setSelectedTone] = useState(initialTone || 'casual');
+  const [selectedLength, setSelectedLength] = useState(() => {
+    // 스타일에 따른 기본 길이 설정
+    if (style === 'minimalist') return 'short';
+    if (style === 'storyteller') return 'long';
+    return 'medium';
+  });
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -92,17 +117,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   const [imageAnalysis, setImageAnalysis] = useState<string>('');
   const [imageAnalysisResult, setImageAnalysisResult] = useState<any>(null);
 
-  // initialText가 있을 때 자동으로 콘텐츠 생성
-  useEffect(() => {
-    if (initialText && currentTokens > 0) {
-      // 약간의 딜레이 후 자동 생성
-      const timer = setTimeout(() => {
-        handleGenerate();
-      }, 500);
-      
-      return () => clearTimeout(timer);
-    }
-  }, []); // 컴포넌트 마운트 시 한 번만 실행
+  // initialText가 있을 때 자동으로 콘텐츠 생성 - 제거됨
+  // 사용자가 직접 생성 버튼을 눌러야 함
 
   const tones = [
     { id: 'casual', label: '캐주얼', icon: '😊' },
@@ -122,9 +138,41 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     { id: 'long', label: '🥼', count: '길게', desc: '~300자' },
   ];
 
-  // promptUtils로 이동됨
+  // 스타일에 맞는 placeholder 생성
+  const getStyleBasedPlaceholder = () => {
+    if (styleInfo) {
+      const examples = styleInfo.characteristics.examples;
+      if (examples && examples.length > 0) {
+        // 랜덤하게 예시 중 하나 선택
+        return `예: ${examples[Math.floor(Math.random() * examples.length)]}`;
+      }
+    }
+    return getPlaceholderText();
+  };
 
-  const quickPrompts = getTimeBasedPrompts();
+  // 스타일에 맞는 빠른 주제 생성
+  const getStyleBasedPrompts = () => {
+    if (styleInfo) {
+      // 스타일별 특화된 주제
+      switch (styleInfo.id) {
+        case 'minimalist':
+          return ['오늘의 한 마디', '고요한 순간', '단순한 행복', '평온한 일상'];
+        case 'storyteller':
+          return ['잘 못났던 그날 밤', '처음 만났던 순간', '잊지 못할 대화', '추억의 그 장소'];
+        case 'trendsetter':
+          return ['요즘 핫한 아이템', '새로 오픈한 카페', 'MZ 필수템', '핸플 탐방기'];
+        case 'philosopher':
+          return ['삶의 의미를 찾아서', '행복에 대한 생각', '오늘의 깨달음', '성찰의 시간'];
+        case 'humorist':
+          return ['오늘 있었던 웃긴 일', '나만 이러나?', '웃프다 웃픈', '일상 생활 개그'];
+        default:
+          return getTimeBasedPrompts();
+      }
+    }
+    return getTimeBasedPrompts();
+  };
+  
+  const quickPrompts = getStyleBasedPrompts();
 
   const handleSelectImage = () => {
     Alert.alert(
@@ -262,8 +310,19 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       
       if (writeMode === 'text') {
         console.log('Generating text content with prompt:', prompt);
+        
+        // 스타일 템플릿 정보를 프롬프트에 추가
+        let enhancedPrompt = prompt.trim();
+        if (styleInfo) {
+          enhancedPrompt += `\n\n스타일: ${styleInfo.name} - ${styleInfo.description}`;
+          enhancedPrompt += `\n특징: ${styleInfo.characteristics.structure.join(', ')}`;
+          if (tips && tips.length > 0) {
+            enhancedPrompt += `\n팁: ${tips.join(', ')}`;
+          }
+        }
+        
         const response = await aiService.generateContent({
-          prompt: prompt.trim(),
+          prompt: enhancedPrompt,
           tone: selectedTone as any,
           length: selectedLength,
           hashtags: initialHashtagsList.length > 0 ? initialHashtagsList : undefined,
@@ -400,6 +459,56 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
             </View>
           </FadeInView>
 
+          {/* 스타일 가이드 배너 */}
+          {styleInfo && showStyleGuide && (
+            <SlideInView direction="down" delay={100}>
+              <TouchableOpacity
+                style={styles.styleGuideBanner}
+                onPress={() => setStyleGuideCollapsed(!styleGuideCollapsed)}
+                activeOpacity={0.9}
+              >
+                <View style={[styles.styleGuideIcon, { backgroundColor: styleInfo.color + '20' }]}>
+                  <Icon name={styleInfo.icon} size={20} color={styleInfo.color} />
+                </View>
+                <View style={styles.styleGuideContent}>
+                  <View style={styles.styleGuideHeader}>
+                    <Text style={[styles.styleGuideTitle, { marginBottom: styleGuideCollapsed ? 0 : 4 }]}>
+                      {styleInfo.name} 스타일로 작성 중
+                    </Text>
+                    <Icon 
+                      name={styleGuideCollapsed ? "chevron-down" : "chevron-up"} 
+                      size={16} 
+                      color={colors.text.secondary} 
+                    />
+                  </View>
+                  {!styleGuideCollapsed && (
+                    <>
+                      <Text style={styles.styleGuideDescription}>
+                        {styleInfo.description}
+                      </Text>
+                      {tips && tips.length > 0 && (
+                        <View style={styles.styleGuideTips}>
+                          {tips.map((tip, index) => (
+                            <Text key={index} style={styles.styleGuideTip}>• {tip}</Text>
+                          ))}
+                        </View>
+                      )}
+                    </>
+                  )}
+                </View>
+                <TouchableOpacity
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    setShowStyleGuide(false);
+                  }}
+                  style={styles.styleGuideCloseButton}
+                >
+                  <Icon name="close" size={16} color={colors.text.tertiary} />
+                </TouchableOpacity>
+              </TouchableOpacity>
+            </SlideInView>
+          )}
+
           {/* 모드 선택 */}
           <SlideInView direction="up" delay={100}>
             <ScrollView 
@@ -469,7 +578,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                   <View style={styles.inputContainer}>
                     <TextInput
                       style={styles.input}
-                      placeholder={getPlaceholderText()}
+                      placeholder={getStyleBasedPlaceholder()}
                       placeholderTextColor={colors.text.tertiary}
                       value={prompt}
                       onChangeText={setPrompt}
@@ -1269,6 +1378,56 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
   },
   generateButtonContainer: {
     marginHorizontal: SPACING.lg,
+  },
+  styleGuideBanner: {
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.md,
+    backgroundColor: cardTheme.molly.background,
+    borderRadius: 12,
+    padding: SPACING.md,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: SPACING.sm,
+    borderWidth: 1,
+    borderColor: colors.primary + '20',
+  },
+  styleGuideIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  styleGuideContent: {
+    flex: 1,
+  },
+  styleGuideHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  styleGuideTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text.primary,
+    flex: 1,
+  },
+  styleGuideDescription: {
+    fontSize: 13,
+    color: colors.text.secondary,
+    marginBottom: SPACING.xs,
+  },
+  styleGuideTips: {
+    marginTop: SPACING.xs,
+  },
+  styleGuideTip: {
+    fontSize: 12,
+    color: colors.text.secondary,
+    marginBottom: 2,
+  },
+  styleGuideCloseButton: {
+    padding: SPACING.xs,
+    marginLeft: SPACING.sm,
   },
   subscribeHint: {
     marginTop: SPACING.sm,

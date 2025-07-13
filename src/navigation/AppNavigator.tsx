@@ -63,12 +63,15 @@ const AppNavigator: React.FC = () => {
           <AIWriteScreen 
             key={`ai-write-${aiWriteMode}`}
             initialMode={aiWriteMode}
-            initialContent={preparedContent}
+            initialText={preparedContent?.initialText || preparedContent?.content || preparedContent}
+            initialTone={preparedContent?.initialTone}
+            initialHashtags={preparedContent?.hashtags}
+            initialTitle={preparedContent?.title}
             onNavigate={handleTabChange}
           />
         );
       case 'my-style':
-        return <MyStyleScreen key="my-style" />;
+        return <MyStyleScreen key="my-style" onNavigate={handleNavigate} />;
       case 'cost-monitor':
         return <CostMonitorScreen key="cost-monitor" />;
       case 'settings':
