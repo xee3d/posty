@@ -24,7 +24,7 @@ import { LowTokenPrompt } from '../components/LowTokenPrompt';
 import { AnimatedCard, SlideInView, FadeInView, ScaleButton } from '../components/AnimationComponents';
 import { TokenBadge, CharacterCount } from '../components/common';
 import GeneratedContentDisplay from '../components/GeneratedContentDisplay';
-import aiService from '../services/aiService';
+import aiService from '../services/ai';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { saveContent } from '../utils/storage';
 import contentSaveService from '../services/contentSaveService';
