@@ -12,15 +12,19 @@ React Native Firebase v22.4.0으로 패키지는 업데이트했지만, 코드�
 
 ## 📝 마이그레이션 단계
 
-### Phase 1: Core Services (우선순위: 높음)
-- [ ] `src/services/firebase/index.ts` - 핵심 Firebase 서비스
-  - [ ] Auth 관련 함수들 마이그레이션
-  - [ ] Firestore 관련 함수들 마이그레이션
-  - [ ] 초기화 로직 업데이트
+### Phase 1: Core Services (우선순위: 높음) ✅ 완료 (2025-07-14)
+- [x] `src/services/firebase/index.ts` - 핵심 Firebase 서비스
+  - [x] Auth 관련 함수들 마이그레이션
+  - [x] Firestore 관련 함수들 마이그레이션
+  - [x] 초기화 로직 업데이트
+  - [x] 타입 정의 개선
+  - [x] 테스트 파일 생성 (`migrationTest.ts`)
+  - [x] 백업 파일 생성 (`index.namespace.ts`)
 
-### Phase 2: Screen Components (우선순위: 중간)
-- [ ] `src/screens/FirebaseAuthTest.tsx`
-- [ ] `src/screens/FirebaseTestScreen.tsx`
+### Phase 2: Screen Components (우선순위: 중간) ✅ 완료 (2025-07-14)
+- [x] `src/screens/FirebaseAuthTest.tsx` - 모듈러 API로 전환
+- [x] `src/screens/FirebaseTestScreen.tsx` - firestoreService 통해 간접 사용
+- [x] `src/services/firebase/firestoreService.ts` - 모듈러 API로 전환
 - [ ] 기타 Firebase를 사용하는 화면 컴포넌트
 
 ### Phase 3: Feature Modules (우선순위: 낮음)

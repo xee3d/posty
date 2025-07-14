@@ -9,8 +9,25 @@ import {
   TextInput,
   ActivityIndicator,
 } from 'react-native';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+// 모듈러 API 임포트
+import { 
+  getAuth, 
+  onAuthStateChanged, 
+  signInAnonymously as firebaseSignInAnonymously,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  User
+} from '@react-native-firebase/auth';
+import { 
+  getFirestore, 
+  collection, 
+  doc, 
+  setDoc, 
+  getDoc,
+  serverTimestamp 
+} from '@react-native-firebase/firestore';
+import { getApp } from '@react-native-firebase/app';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, SPACING } from '../utils/constants';
 
@@ -19,8 +36,13 @@ interface FirebaseAuthTestProps {
 }
 
 const FirebaseAuthTest: React.FC<FirebaseAuthTestProps> = ({ onBack }) => {
+  // Firebase 인스턴스
+  const app = getApp();
+  const auth = getAuth(app);
+  const firestore = getFirestore(app);
+
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(auth().currentUser);
+  const [user, setUser] = useState<User | null>(auth.currentUser);
   const [email, setEmail] = useState('test@example.com');
   const [password, setPassword] = useState('test123456');
   const [testResults, setTestResults] = useState<{[key: string]: string}>({
@@ -31,8 +53,8 @@ const FirebaseAuthTest: React.FC<FirebaseAuthTestProps> = ({ onBack }) => {
   });
 
   useEffect(() => {
-    // Auth state listener
-    const unsubscribe = auth().onAuthStateChanged((currentUser) => {
+    // Auth state listener - 모듈러 API 사용
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       console.log('Auth state changed:', currentUser?.uid);
     });
@@ -46,17 +68,19 @@ const FirebaseAuthTest: React.FC<FirebaseAuthTestProps> = ({ onBack }) => {
   const testFirebaseConnection = async () => {
     try {
       // Test Auth connection
-      const authTest = auth().app ? '✅ Connected' : '❌ Not connected';
+      const authTest = auth.app ? '✅ Connected' : '❌ Not connected';
       
-      // Test Firestore connection
+      // Test Firestore connection - 모듈러 API 사용
       let firestoreTest = '❌ Not connected';
       try {
-        await firestore().collection('test').doc('ping').set({
-          timestamp: firestore.FieldValue.serverTimestamp(),
+        const testCollection = collection(firestore, 'test');
+        const testDoc = doc(testCollection, 'ping');
+        await setDoc(testDoc, {
+          timestamp: serverTimestamp(),
           test: true,
         });
         firestoreTest = '✅ Connected';
-      } catch (error) {
+      } catch (error: any) {
         firestoreTest = `❌ Error: ${error.message}`;
       }
 
@@ -74,10 +98,10 @@ const FirebaseAuthTest: React.FC<FirebaseAuthTestProps> = ({ onBack }) => {
     setLoading(true);
     try {
       if (user) {
-        await auth().signOut();
+        await firebaseSignOut(auth);
       }
       
-      const userCredential = await auth().signInAnonymously();
+      const userCredential = await firebaseSignInAnonymously(auth);
       setTestResults(prev => ({
         ...prev,
         anonymous: `✅ Success: ${userCredential.user.uid}`,
@@ -98,12 +122,12 @@ const FirebaseAuthTest: React.FC<FirebaseAuthTestProps> = ({ onBack }) => {
     setLoading(true);
     try {
       if (user) {
-        await auth().signOut();
+        await firebaseSignOut(auth);
       }
 
       // Try to create account first
       try {
-        const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         setTestResults(prev => ({
           ...prev,
           email: `✅ Account created: ${userCredential.user.email}`,
@@ -112,7 +136,7 @@ const FirebaseAuthTest: React.FC<FirebaseAuthTestProps> = ({ onBack }) => {
       } catch (createError: any) {
         if (createError.code === 'auth/email-already-in-use') {
           // Try to sign in
-          const userCredential = await auth().signInWithEmailAndPassword(email, password);
+          const userCredential = await signInWithEmailAndPassword(auth, email, password);
           setTestResults(prev => ({
             ...prev,
             email: `✅ Signed in: ${userCredential.user.email}`,
@@ -141,17 +165,18 @@ const FirebaseAuthTest: React.FC<FirebaseAuthTestProps> = ({ onBack }) => {
 
     setLoading(true);
     try {
-      const docRef = await firestore()
-        .collection('users')
-        .doc(user.uid)
-        .set({
-          email: user.email || 'anonymous',
-          lastLogin: firestore.FieldValue.serverTimestamp(),
-          testData: {
-            platform: 'React Native 0.74.5',
-            timestamp: new Date().toISOString(),
-          },
-        });
+      // 모듈러 API를 사용한 Firestore 쓰기
+      const usersCollection = collection(firestore, 'users');
+      const userDoc = doc(usersCollection, user.uid);
+      
+      await setDoc(userDoc, {
+        email: user.email || 'anonymous',
+        lastLogin: serverTimestamp(),
+        testData: {
+          platform: 'React Native 0.74.5',
+          timestamp: new Date().toISOString(),
+        },
+      });
 
       Alert.alert('Success', 'Data written to Firestore!');
     } catch (error: any) {
@@ -169,13 +194,13 @@ const FirebaseAuthTest: React.FC<FirebaseAuthTestProps> = ({ onBack }) => {
 
     setLoading(true);
     try {
-      const doc = await firestore()
-        .collection('users')
-        .doc(user.uid)
-        .get();
+      // 모듈러 API를 사용한 Firestore 읽기
+      const usersCollection = collection(firestore, 'users');
+      const userDoc = doc(usersCollection, user.uid);
+      const docSnap = await getDoc(userDoc);
 
-      if (doc.exists) {
-        Alert.alert('Success', `Data: ${JSON.stringify(doc.data(), null, 2)}`);
+      if (docSnap.exists()) {
+        Alert.alert('Success', `Data: ${JSON.stringify(docSnap.data(), null, 2)}`);
       } else {
         Alert.alert('Info', 'No data found for this user');
       }
@@ -189,7 +214,7 @@ const FirebaseAuthTest: React.FC<FirebaseAuthTestProps> = ({ onBack }) => {
   const signOut = async () => {
     setLoading(true);
     try {
-      await auth().signOut();
+      await firebaseSignOut(auth);
       setTestResults(prev => ({
         ...prev,
         anonymous: 'Not tested',
@@ -216,7 +241,7 @@ const FirebaseAuthTest: React.FC<FirebaseAuthTestProps> = ({ onBack }) => {
       <View style={styles.header}>
         <Icon name="local-fire-department" size={40} color={COLORS.warning} />
         <Text style={styles.title}>Firebase Auth Test</Text>
-        <Text style={styles.subtitle}>React Native 0.74.5</Text>
+        <Text style={styles.subtitle}>React Native 0.74.5 - Modular API</Text>
       </View>
 
       {/* Connection Status */}

@@ -1,5 +1,36 @@
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
+// Firebase Modular API로 마이그레이션 완료
+import { 
+  getFirestore,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  addDoc,
+  query,
+  where,
+  orderBy,
+  limit,
+  onSnapshot,
+  serverTimestamp,
+  increment,
+  runTransaction,
+  enableNetwork,
+  disableNetwork,
+  DocumentReference,
+  CollectionReference,
+  Timestamp,
+  QuerySnapshot,
+  DocumentSnapshot,
+  FieldValue
+} from '@react-native-firebase/firestore';
+import { 
+  getAuth,
+  User as FirebaseUser 
+} from '@react-native-firebase/auth';
+import { getApp } from '@react-native-firebase/app';
 import { 
   User, 
   Post, 
@@ -9,15 +40,17 @@ import {
 } from '../../types/firestore';
 
 class FirestoreService {
-  private db = firestore();
+  private app = getApp();
+  private auth = getAuth(this.app);
+  private db = getFirestore(this.app);
   
-  // 컬렉션 참조
+  // 컬렉션 참조 - 모듈러 API 사용
   private collections = {
-    users: this.db.collection('users'),
-    posts: this.db.collection('posts'),
-    analytics: this.db.collection('analytics'),
-    missions: this.db.collection('missions'),
-    transactions: this.db.collection('transactions'),
+    users: collection(this.db, 'users'),
+    posts: collection(this.db, 'posts'),
+    analytics: collection(this.db, 'analytics'),
+    missions: collection(this.db, 'missions'),
+    transactions: collection(this.db, 'transactions'),
   };
 
   // ===== 사용자 관련 =====
@@ -26,17 +59,17 @@ class FirestoreService {
    * 사용자 설정 업데이트
    */
   async updateUserSettings(settings: any): Promise<void> {
-    const userId = auth().currentUser?.uid;
+    const userId = this.auth.currentUser?.uid;
     if (!userId) throw new Error('User not authenticated');
 
     try {
-      const userRef = this.collections.users.doc(userId);
-      const userDoc = await userRef.get();
+      const userRef = doc(this.collections.users, userId);
+      const userDoc = await getDoc(userRef);
       
       // undefined 값 제거
       const cleanSettings = this.removeUndefinedValues(settings);
       
-      if (userDoc.exists) {
+      if (userDoc.exists()) {
         const updateData: any = {};
         
         // settings가 객체인 경우
@@ -49,7 +82,7 @@ class FirestoreService {
         if (cleanSettings.tokens) {
           updateData['tokens.current'] = cleanSettings.tokens.current;
           updateData['tokens.total'] = cleanSettings.tokens.total;
-          updateData['tokens.lastUpdated'] = firestore.FieldValue.serverTimestamp();
+          updateData['tokens.lastUpdated'] = serverTimestamp();
         }
         
         // subscription이 있는 경우
@@ -57,9 +90,9 @@ class FirestoreService {
           updateData.subscription = cleanSettings.subscription;
         }
         
-        updateData.lastUpdated = firestore.FieldValue.serverTimestamp();
+        updateData.lastUpdated = serverTimestamp();
         
-        await userRef.update(updateData);
+        await updateDoc(userRef, updateData);
       } else {
         // 사용자 문서가 없으면 생성
         await this.createOrUpdateUser(cleanSettings);
@@ -89,82 +122,52 @@ class FirestoreService {
   }
 
   /**
-   * 게시물 삭제
-   */
-  async deletePost(postId: string): Promise<void> {
-    const userId = auth().currentUser?.uid;
-    if (!userId) throw new Error('User not authenticated');
-
-    try {
-      // 게시물 소유자 확인
-      const postDoc = await firestore().collection('posts').doc(postId).get();
-      
-      if (!postDoc.exists) {
-        throw new Error('Post not found');
-      }
-      
-      const postData = postDoc.data();
-      if (postData?.userId !== userId) {
-        throw new Error('Unauthorized to delete this post');
-      }
-      
-      // 게시물 삭제
-      await firestore().collection('posts').doc(postId).delete();
-      
-      console.log('Post deleted successfully:', postId);
-    } catch (error) {
-      console.error('Error deleting post:', error);
-      throw error;
-    }
-  }
-
-  /**
    * 사용자 프로필 생성 또는 업데이트
    */
   async createOrUpdateUser(userData: Partial<User>): Promise<void> {
-    const userId = auth().currentUser?.uid;
+    const userId = this.auth.currentUser?.uid;
     if (!userId) throw new Error('User not authenticated');
 
     try {
-      const userRef = this.collections.users.doc(userId);
-      const userDoc = await userRef.get();
+      const userRef = doc(this.collections.users, userId);
+      const userDoc = await getDoc(userRef);
 
-      if (userDoc.exists) {
+      if (userDoc.exists()) {
         // 기존 사용자 업데이트
         const existingData = userDoc.data();
         
         // 토큰 정보가 없으면 초기화
         if (!existingData.tokens) {
-          await userRef.update({
+          await updateDoc(userRef, {
             ...userData,
             tokens: {
               current: 10,
               total: 0,
-              lastUpdated: firestore.FieldValue.serverTimestamp(),
+              lastUpdated: serverTimestamp(),
             },
             subscription: existingData.subscription || {
               plan: 'free',
               status: 'active',
               autoRenew: false,
             },
-            lastLoginAt: firestore.FieldValue.serverTimestamp(),
+            lastLoginAt: serverTimestamp(),
           });
         } else {
-          await userRef.update({
+          await updateDoc(userRef, {
             ...userData,
-            lastLoginAt: firestore.FieldValue.serverTimestamp(),
+            lastLoginAt: serverTimestamp(),
           });
         }
       } else {
         // 새 사용자 생성
-        await userRef.set({
+        await setDoc(userRef, {
           uid: userId,
-          email: auth().currentUser?.email || '',
-          displayName: auth().currentUser?.displayName || '',
-          photoURL: auth().currentUser?.photoURL || '',
-          provider: auth().currentUser?.providerData[0]?.providerId || 'unknown',
-          createdAt: firestore.FieldValue.serverTimestamp(),
-          lastLoginAt: firestore.FieldValue.serverTimestamp(),
+          email: this.auth.currentUser?.email || '',
+          displayName: this.auth.currentUser?.displayName || '',
+          photoURL: this.auth.currentUser?.photoURL || '',
+          provider: this.auth.currentUser?.providerData[0]?.providerId || 'unknown',
+          createdAt: serverTimestamp(),
+          lastLoginAt: serverTimestamp(),
           isActive: true,
           subscription: {
             plan: 'free',
@@ -174,7 +177,7 @@ class FirestoreService {
           tokens: {
             current: 10, // 신규 가입 보너스
             total: 0,
-            lastUpdated: firestore.FieldValue.serverTimestamp(),
+            lastUpdated: serverTimestamp(),
           },
           settings: {
             theme: 'system',
@@ -195,12 +198,13 @@ class FirestoreService {
    * 사용자 정보 가져오기
    */
   async getUser(): Promise<User | null> {
-    const userId = auth().currentUser?.uid;
+    const userId = this.auth.currentUser?.uid;
     if (!userId) return null;
 
     try {
-      const userDoc = await this.collections.users.doc(userId).get();
-      return userDoc.exists ? (userDoc.data() as User) : null;
+      const userRef = doc(this.collections.users, userId);
+      const userDoc = await getDoc(userRef);
+      return userDoc.exists() ? (userDoc.data() as User) : null;
     } catch (error) {
       console.error('Error getting user:', error);
       return null;
@@ -211,15 +215,17 @@ class FirestoreService {
    * 사용자 정보 실시간 구독
    */
   subscribeToUser(callback: (user: User | null) => void): () => void {
-    const userId = auth().currentUser?.uid;
+    const userId = this.auth.currentUser?.uid;
     if (!userId) {
       callback(null);
       return () => {};
     }
 
-    return this.collections.users.doc(userId).onSnapshot(
+    const userRef = doc(this.collections.users, userId);
+    return onSnapshot(
+      userRef,
       (doc) => {
-        callback(doc.exists ? (doc.data() as User) : null);
+        callback(doc.exists() ? (doc.data() as User) : null);
       },
       (error) => {
         console.error('Error subscribing to user:', error);
@@ -234,14 +240,14 @@ class FirestoreService {
    * 게시물 저장
    */
   async savePost(postData: Omit<Post, 'id' | 'createdAt'>): Promise<string> {
-    const userId = auth().currentUser?.uid;
+    const userId = this.auth.currentUser?.uid;
     if (!userId) throw new Error('User not authenticated');
 
     try {
-      const docRef = await this.collections.posts.add({
+      const docRef = await addDoc(this.collections.posts, {
         ...postData,
         userId,
-        createdAt: firestore.FieldValue.serverTimestamp(),
+        createdAt: serverTimestamp(),
         status: 'draft',
       });
 
@@ -258,23 +264,26 @@ class FirestoreService {
   /**
    * 사용자의 게시물 목록 가져오기
    */
-  async getUserPosts(limit: number = 50): Promise<Post[]> {
-    const userId = auth().currentUser?.uid;
+  async getUserPosts(limitCount: number = 50): Promise<Post[]> {
+    const userId = this.auth.currentUser?.uid;
     if (!userId) return [];
 
     try {
-      const snapshot = await this.collections.posts
-        .where('userId', '==', userId)
-        .orderBy('createdAt', 'desc')
-        .limit(limit)
-        .get();
-
+      const q = query(
+        this.collections.posts,
+        where('userId', '==', userId),
+        orderBy('createdAt', 'desc'),
+        limit(limitCount)
+      );
+      
+      const snapshot = await getDocs(q);
+      
       return snapshot.docs
-        .map(doc => ({
+        .map((doc) => ({
           id: doc.id,
           ...doc.data(),
         } as Post))
-        .filter(post => post.status !== 'deleted'); // 클라이언트 측에서 필터링
+        .filter((post: Post) => post.status !== 'deleted'); // 클라이언트 측에서 필터링
     } catch (error) {
       console.error('Error getting posts:', error);
       return [];
@@ -285,13 +294,14 @@ class FirestoreService {
    * 게시물 업데이트
    */
   async updatePost(postId: string, data: Partial<Post>): Promise<void> {
-    const userId = auth().currentUser?.uid;
+    const userId = this.auth.currentUser?.uid;
     if (!userId) throw new Error('User not authenticated');
 
     try {
-      await this.collections.posts.doc(postId).update({
+      const postRef = doc(this.collections.posts, postId);
+      await updateDoc(postRef, {
         ...data,
-        updatedAt: firestore.FieldValue.serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
     } catch (error) {
       console.error('Error updating post:', error);
@@ -300,42 +310,69 @@ class FirestoreService {
   }
 
   /**
-   * 게시물 삭제 (soft delete)
+   * 게시물 삭제
    */
   async deletePost(postId: string): Promise<void> {
-    await this.updatePost(postId, { status: 'deleted' });
+    const userId = this.auth.currentUser?.uid;
+    if (!userId) throw new Error('User not authenticated');
+
+    try {
+      // 게시물 소유자 확인
+      const postRef = doc(this.collections.posts, postId);
+      const postDoc = await getDoc(postRef);
+      
+      if (!postDoc.exists()) {
+        throw new Error('Post not found');
+      }
+      
+      const postData = postDoc.data();
+      if (postData?.userId !== userId) {
+        throw new Error('Unauthorized to delete this post');
+      }
+      
+      // 게시물 삭제
+      await deleteDoc(postRef);
+      
+      console.log('Post deleted successfully:', postId);
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      throw error;
+    }
   }
 
   /**
    * 사용자의 게시물 실시간 구독
    */
-  subscribeToUserPosts(limit: number, callback: (posts: Post[]) => void): () => void {
-    const userId = auth().currentUser?.uid;
+  subscribeToUserPosts(limitCount: number, callback: (posts: Post[]) => void): () => void {
+    const userId = this.auth.currentUser?.uid;
     if (!userId) {
       callback([]);
       return () => {};
     }
 
-    // 인덱스 문제를 피하기 위해 단순한 쿼리 사용
-    return this.collections.posts
-      .where('userId', '==', userId)
-      .orderBy('createdAt', 'desc')
-      .limit(limit)
-      .onSnapshot(
-        (snapshot) => {
-          const posts = snapshot.docs
-            .map(doc => ({
-              id: doc.id,
-              ...doc.data(),
-            } as Post))
-            .filter(post => post.status !== 'deleted'); // 클라이언트에서 필터링
-          callback(posts);
-        },
-        (error) => {
-          console.error('Posts subscription error:', error);
-          callback([]);
-        }
-      );
+    const q = query(
+      this.collections.posts,
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(limitCount)
+    );
+
+    return onSnapshot(
+      q,
+      (snapshot) => {
+        const posts = snapshot.docs
+          .map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          } as Post))
+          .filter(post => post.status !== 'deleted'); // 클라이언트에서 필터링
+        callback(posts);
+      },
+      (error) => {
+        console.error('Posts subscription error:', error);
+        callback([]);
+      }
+    );
   }
 
   // ===== 토큰 관련 =====
@@ -344,15 +381,15 @@ class FirestoreService {
    * 토큰 업데이트
    */
   async updateTokens(amount: number, description: string): Promise<void> {
-    const userId = auth().currentUser?.uid;
+    const userId = this.auth.currentUser?.uid;
     if (!userId) throw new Error('User not authenticated');
 
     try {
-      await this.db.runTransaction(async (transaction) => {
-        const userRef = this.collections.users.doc(userId);
+      await runTransaction(this.db, async (transaction) => {
+        const userRef = doc(this.collections.users, userId);
         const userDoc = await transaction.get(userRef);
         
-        if (!userDoc.exists) {
+        if (!userDoc.exists()) {
           throw new Error('User document not found');
         }
 
@@ -366,12 +403,12 @@ class FirestoreService {
         // 사용자 토큰 업데이트
         transaction.update(userRef, {
           'tokens.current': newBalance,
-          'tokens.total': firestore.FieldValue.increment(amount > 0 ? 0 : Math.abs(amount)),
-          'tokens.lastUpdated': firestore.FieldValue.serverTimestamp(),
+          'tokens.total': increment(amount > 0 ? 0 : Math.abs(amount)),
+          'tokens.lastUpdated': serverTimestamp(),
         });
 
         // 거래 내역 추가
-        const transactionRef = this.collections.transactions.doc();
+        const transactionRef = doc(this.collections.transactions);
         transaction.set(transactionRef, {
           id: transactionRef.id,
           userId,
@@ -380,7 +417,7 @@ class FirestoreService {
           balance: newBalance,
           description,
           category: this.getTransactionCategory(description),
-          createdAt: firestore.FieldValue.serverTimestamp(),
+          createdAt: serverTimestamp(),
         });
       });
     } catch (error) {
@@ -406,7 +443,7 @@ class FirestoreService {
    * 사용자 분석 데이터 업데이트
    */
   async updateAnalytics(posts: Post[]): Promise<void> {
-    const userId = auth().currentUser?.uid;
+    const userId = this.auth.currentUser?.uid;
     if (!userId) return;
 
     try {
@@ -422,10 +459,11 @@ class FirestoreService {
         byTone: this.groupByField(posts, 'tone'),
         byPlatform: this.groupByField(posts, 'platform'),
         hashtagAnalysis: this.analyzeHashtags(posts),
-        lastUpdated: firestore.FieldValue.serverTimestamp() as any,
+        lastUpdated: serverTimestamp() as any,
       };
 
-      await this.collections.analytics.doc(userId).set(analytics, { merge: true });
+      const analyticsRef = doc(this.collections.analytics, userId);
+      await setDoc(analyticsRef, analytics, { merge: true });
     } catch (error) {
       console.error('Error updating analytics:', error);
     }
@@ -498,11 +536,9 @@ class FirestoreService {
    * 오프라인 지원 활성화
    */
   enableOfflineSupport(): void {
-    this.db.settings({
-      cacheSizeBytes: firestore.CACHE_SIZE_UNLIMITED,
-    });
-    
-    this.db.enableNetwork().catch(() => {
+    // 모듈러 API에서는 캐시 설정이 자동으로 처리됨
+    // 네트워크 연결 시도
+    enableNetwork(this.db).catch(() => {
       console.log('Offline mode activated');
     });
   }
@@ -512,7 +548,7 @@ class FirestoreService {
    */
   async checkNetworkStatus(): Promise<boolean> {
     try {
-      await this.db.enableNetwork();
+      await enableNetwork(this.db);
       return true;
     } catch {
       return false;

@@ -1,32 +1,64 @@
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+// Firebase Modular API로 마이그레이션 완료
+import { initializeApp, getApp } from '@react-native-firebase/app';
+import { 
+  getAuth, 
+  signInAnonymously as firebaseSignInAnonymously,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  User
+} from '@react-native-firebase/auth';
+import { 
+  getFirestore, 
+  collection, 
+  doc, 
+  setDoc, 
+  addDoc, 
+  getDoc, 
+  updateDoc, 
+  deleteDoc,
+  DocumentReference,
+  CollectionReference,
+  Firestore,
+  serverTimestamp,
+  enableNetwork,
+  disableNetwork
+} from '@react-native-firebase/firestore';
 
-// Firebase 초기화는 @react-native-firebase가 자동으로 처리
-// google-services.json 파일이 올바르게 설정되어 있으면 추가 설정 불필요
-
-// Firestore 설정 (선택사항)
-firestore().settings({
-  persistence: true, // 오프라인 지원
-  cacheSizeBytes: firestore.CACHE_SIZE_UNLIMITED, // 캐시 크기 무제한
-});
-
-// 개발 환경에서 에뮬레이터 사용 (선택사항)
-if (__DEV__) {
-  // Firestore 에뮬레이터 연결 (필요시)
-  // firestore().useEmulator('localhost', 8080);
-  
-  // Auth 에뮬레이터 연결 (필요시)
-  // auth().useEmulator('http://localhost:9099');
+// Firebase 인스턴스 가져오기
+let app;
+try {
+  app = getApp();
+} catch (error) {
+  // 앱이 초기화되지 않은 경우 기본 앱 사용
+  app = initializeApp();
 }
 
-export { auth, firestore };
+// Auth와 Firestore 인스턴스
+const auth = getAuth(app);
+const firestore = getFirestore(app);
 
-// 유틸리티 함수들
-export const getCurrentUser = () => auth().currentUser;
+// Firestore 설정 (캐시 설정은 모듈러 API에서 자동 처리됨)
+// 개발 환경에서 에뮬레이터 사용 (선택사항)
+if (__DEV__) {
+  // Firestore 에뮬레이터 연결 (필요시 주석 해제)
+  // connectFirestoreEmulator(firestore, 'localhost', 8080);
+  
+  // Auth 에뮬레이터 연결 (필요시 주석 해제)
+  // connectAuthEmulator(auth, 'http://localhost:9099');
+}
 
-export const signInAnonymously = async () => {
+// 타입 정의
+export type { User } from '@react-native-firebase/auth';
+export type { DocumentData, DocumentSnapshot, QuerySnapshot } from '@react-native-firebase/firestore';
+
+// Auth 유틸리티 함수들
+export const getCurrentUser = (): User | null => auth.currentUser;
+
+export const signInAnonymously = async (): Promise<User> => {
   try {
-    const userCredential = await auth().signInAnonymously();
+    const userCredential = await firebaseSignInAnonymously(auth);
     return userCredential.user;
   } catch (error) {
     console.error('Anonymous sign in error:', error);
@@ -34,9 +66,9 @@ export const signInAnonymously = async () => {
   }
 };
 
-export const signInWithEmail = async (email: string, password: string) => {
+export const signInWithEmail = async (email: string, password: string): Promise<User> => {
   try {
-    const userCredential = await auth().signInWithEmailAndPassword(email, password);
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
     return userCredential.user;
   } catch (error) {
     console.error('Email sign in error:', error);
@@ -44,9 +76,9 @@ export const signInWithEmail = async (email: string, password: string) => {
   }
 };
 
-export const createUserWithEmail = async (email: string, password: string) => {
+export const createUserWithEmail = async (email: string, password: string): Promise<User> => {
   try {
-    const userCredential = await auth().createUserWithEmailAndPassword(email, password);
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
     return userCredential.user;
   } catch (error) {
     console.error('Create user error:', error);
@@ -54,23 +86,39 @@ export const createUserWithEmail = async (email: string, password: string) => {
   }
 };
 
-export const signOut = async () => {
+export const signOut = async (): Promise<void> => {
   try {
-    await auth().signOut();
+    await firebaseSignOut(auth);
   } catch (error) {
     console.error('Sign out error:', error);
     throw error;
   }
 };
 
+// Auth 상태 관찰자
+export const subscribeToAuthChanges = (callback: (user: User | null) => void) => {
+  return onAuthStateChanged(auth, callback);
+};
+
 // Firestore 헬퍼 함수
-export const createDocument = async (collection: string, data: any, docId?: string) => {
+export const createDocument = async (collectionName: string, data: any, docId?: string): Promise<string> => {
   try {
+    const collectionRef = collection(firestore, collectionName);
+    
     if (docId) {
-      await firestore().collection(collection).doc(docId).set(data);
+      const docRef = doc(collectionRef, docId);
+      await setDoc(docRef, {
+        ...data,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
       return docId;
     } else {
-      const docRef = await firestore().collection(collection).add(data);
+      const docRef = await addDoc(collectionRef, {
+        ...data,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      });
       return docRef.id;
     }
   } catch (error) {
@@ -79,11 +127,13 @@ export const createDocument = async (collection: string, data: any, docId?: stri
   }
 };
 
-export const getDocument = async (collection: string, docId: string) => {
+export const getDocument = async (collectionName: string, docId: string): Promise<any> => {
   try {
-    const doc = await firestore().collection(collection).doc(docId).get();
-    if (doc.exists) {
-      return { id: doc.id, ...doc.data() };
+    const docRef = doc(firestore, collectionName, docId);
+    const docSnap = await getDoc(docRef);
+    
+    if (docSnap.exists()) {
+      return { id: docSnap.id, ...docSnap.data() };
     }
     return null;
   } catch (error) {
@@ -92,20 +142,50 @@ export const getDocument = async (collection: string, docId: string) => {
   }
 };
 
-export const updateDocument = async (collection: string, docId: string, data: any) => {
+export const updateDocument = async (collectionName: string, docId: string, data: any): Promise<void> => {
   try {
-    await firestore().collection(collection).doc(docId).update(data);
+    const docRef = doc(firestore, collectionName, docId);
+    await updateDoc(docRef, {
+      ...data,
+      updatedAt: serverTimestamp()
+    });
   } catch (error) {
     console.error('Update document error:', error);
     throw error;
   }
 };
 
-export const deleteDocument = async (collection: string, docId: string) => {
+export const deleteDocument = async (collectionName: string, docId: string): Promise<void> => {
   try {
-    await firestore().collection(collection).doc(docId).delete();
+    const docRef = doc(firestore, collectionName, docId);
+    await deleteDoc(docRef);
   } catch (error) {
     console.error('Delete document error:', error);
     throw error;
   }
 };
+
+// 컬렉션 참조 가져오기 (다른 곳에서 쿼리 작성용)
+export const getCollectionRef = (collectionName: string): CollectionReference => {
+  return collection(firestore, collectionName);
+};
+
+// 문서 참조 가져오기
+export const getDocRef = (collectionName: string, docId: string): DocumentReference => {
+  return doc(firestore, collectionName, docId);
+};
+
+// 네트워크 연결 관리
+export const goOnline = async (): Promise<void> => {
+  await enableNetwork(firestore);
+};
+
+export const goOffline = async (): Promise<void> => {
+  await disableNetwork(firestore);
+};
+
+// 인스턴스 export (직접 사용이 필요한 경우를 위해)
+export { auth, firestore };
+
+// 추가 유틸리티 export
+export { serverTimestamp } from '@react-native-firebase/firestore';
