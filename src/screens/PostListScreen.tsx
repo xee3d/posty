@@ -1,18 +1,20 @@
-import React, { useState, useEffect } from 'react';
+// src/screens/PostListScreen.tsx
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
-  ScrollView,
+  FlatList,
   Alert,
   SafeAreaView,
-  Modal,
-  TextInput,
+  ActivityIndicator,
+  RefreshControl,
+  ListRenderItem,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '../utils/constants';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, CARD_THEME } from '../utils/constants';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { ScaleButton, FadeInView, AnimatedCard } from '../components/AnimationComponents';
 import localAnalyticsService from '../services/analytics/localAnalyticsService';
@@ -25,23 +27,166 @@ interface PostListScreenProps {
   onClose: () => void;
 }
 
+interface PostItem {
+  id: string;
+  content: string;
+  hashtags: string[];
+  platform: string;
+  category: string;
+  tone: string;
+  createdAt: string;
+}
 
+// 톤에서 카테고리 추출 헬퍼 함수
+const getCategoryFromTone = (tone: string): string => {
+  const toneToCategory: { [key: string]: string } = {
+    'casual': '일상',
+    'professional': '비즈니스',
+    'humorous': '유머',
+    'emotional': '감성',
+    'genz': '트렌드',
+    'millennial': '라이프스타일',
+    'minimalist': '미니멀',
+    'storytelling': '스토리',
+    'motivational': '동기부여',
+  };
+  
+  return toneToCategory[tone] || '일상';
+};
+
+// 날짜 포맷 함수 메모이제이션
+const formatDate = (dateString: string) => {
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffTime = Math.abs(now.getTime() - date.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays === 0) return '오늘';
+  if (diffDays === 1) return '어제';
+  if (diffDays < 7) return `${diffDays}일 전`;
+  if (diffDays < 30) return `${Math.floor(diffDays / 7)}주 전`;
+  return `${Math.floor(diffDays / 30)}개월 전`;
+};
+
+// 플랫폼 아이콘 상수
+const PLATFORM_ICONS = {
+  instagram: { name: 'logo-instagram', color: '#E4405F' },
+  facebook: { name: 'logo-facebook', color: '#1877F2' },
+  twitter: { name: 'logo-twitter', color: '#000000' },
+};
+
+// 게시물 아이템 컴포넌트 - 최적화를 위해 분리
+const PostItemComponent = React.memo<{
+  item: PostItem;
+  index: number;
+  expandedPostId: string | null;
+  onToggleExpand: (id: string) => void;
+  colors: typeof COLORS;
+  cardTheme: any;
+}>(({ item, index, expandedPostId, onToggleExpand, colors, cardTheme }) => {
+  const isExpanded = expandedPostId === item.id;
+  const styles = useMemo(() => createPostStyles(colors, cardTheme), [colors, cardTheme]);
+
+  return (
+    <AnimatedCard delay={index * 50} style={styles.postCard}>
+      <TouchableOpacity 
+        onPress={() => onToggleExpand(item.id)}
+        activeOpacity={0.8}
+      >
+        <View style={styles.postHeader}>
+          <View style={styles.postMeta}>
+            <Icon 
+              name={PLATFORM_ICONS[item.platform]?.name || 'globe'} 
+              size={16} 
+              color={PLATFORM_ICONS[item.platform]?.color || colors.text.secondary} 
+            />
+            <Text style={styles.postDate}>{formatDate(item.createdAt)}</Text>
+            <View style={styles.categoryBadge}>
+              <Text style={styles.categoryText}>{item.category}</Text>
+            </View>
+          </View>
+          <Icon 
+            name={isExpanded ? "chevron-up" : "chevron-down"} 
+            size={20} 
+            color={colors.text.tertiary} 
+          />
+        </View>
+
+        <Text 
+          style={styles.postContent} 
+          numberOfLines={isExpanded ? undefined : 2}
+        >
+          {item.content}
+        </Text>
+
+        <View style={styles.postHashtags}>
+          {item.hashtags.slice(0, 3).map((tag: string, tagIndex: number) => (
+            <Text key={tagIndex} style={styles.hashtag}>#{tag}</Text>
+          ))}
+          {item.hashtags.length > 3 && (
+            <Text style={styles.moreHashtags}>+{item.hashtags.length - 3}</Text>
+          )}
+        </View>
+      </TouchableOpacity>
+    </AnimatedCard>
+  );
+});
+
+PostItemComponent.displayName = 'PostItemComponent';
 
 const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
   const { colors, cardTheme } = useAppTheme();
-  const [posts, setPosts] = useState<any[]>([]);
+  const [posts, setPosts] = useState<PostItem[]>([]);
   const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  
+  // 메인 스타일 메모이제이션
+  const styles = useMemo(() => createStyles(colors, cardTheme), [colors, cardTheme]);
 
+  // 게시물 로드
+  const loadPosts = useCallback(async (showLoading = true) => {
+    if (showLoading) setIsLoading(true);
+    
+    try {
+      if (!auth().currentUser) {
+        // 비로그인 상태에서 로컬 데이터 로드
+        const savedContents = await storage.getSavedContents();
+        
+        const formattedPosts = savedContents.map(content => ({
+          id: content.id,
+          content: content.content,
+          hashtags: content.hashtags,
+          platform: content.platform || 'instagram',
+          category: getCategoryFromTone(content.tone),
+          tone: content.tone,
+          createdAt: content.createdAt,
+        }));
+        
+        const sortedPosts = formattedPosts.sort((a, b) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        
+        setPosts(sortedPosts);
+      }
+    } catch (error) {
+      console.error('Failed to load posts:', error);
+      const localPosts = await localAnalyticsService.getAllPosts();
+      setPosts(localPosts);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  }, []);
+
+  // 초기 로드 및 실시간 구독
   useEffect(() => {
-    // 초기 데이터 로드
     loadPosts();
     
-    // 로그인한 경우 실시간 구독
     if (auth().currentUser) {
       const unsubscribe = firestoreService.subscribeToUserPosts(
-        50, // 더 많은 게시물 표시
+        50,
         (firestorePosts: FirestorePost[]) => {
-          // Firestore 데이터를 기존 포맷으로 변환
           const formattedPosts = firestorePosts.map(post => ({
             id: post.id,
             content: post.content,
@@ -53,68 +198,80 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
           }));
           
           setPosts(formattedPosts);
+          setIsLoading(false);
         }
       );
       
       return () => unsubscribe();
     }
+  }, [loadPosts]);
+
+  // 새로고침 핸들러
+  const handleRefresh = useCallback(() => {
+    setIsRefreshing(true);
+    loadPosts(false);
+  }, [loadPosts]);
+
+  // 확장/축소 토글
+  const handleToggleExpand = useCallback((postId: string) => {
+    setExpandedPostId(prev => prev === postId ? null : postId);
   }, []);
 
-  const loadPosts = async () => {
-    try {
-      // 비로그인 상태에서만 로컬 데이터 로드
-      if (!auth().currentUser) {
-        const savedContents = await storage.getSavedContents();
-        
-        // SavedContent를 기존 포맷으로 변환
-        const formattedPosts = savedContents.map(content => ({
-          id: content.id,
-          content: content.content,
-          hashtags: content.hashtags,
-          platform: content.platform || 'instagram',
-          category: getCategoryFromTone(content.tone),
-          tone: content.tone,
-          createdAt: content.createdAt,
-        }));
-        
-        // 최신순으로 정렬
-        const sortedPosts = formattedPosts.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        
-        setPosts(sortedPosts);
-      }
-      // 로그인 상태에서는 구독으로 자동 업데이트
-    } catch (error) {
-      console.error('Failed to load posts:', error);
-      // 오류 시 로컬 데이터만 사용
-      const localPosts = await localAnalyticsService.getAllPosts();
-      setPosts(localPosts);
-    }
-  };
+  // 렌더 아이템 최적화
+  const renderItem: ListRenderItem<PostItem> = useCallback(({ item, index }) => (
+    <PostItemComponent
+      item={item}
+      index={index}
+      expandedPostId={expandedPostId}
+      onToggleExpand={handleToggleExpand}
+      colors={colors}
+      cardTheme={cardTheme}
+    />
+  ), [expandedPostId, handleToggleExpand, colors, cardTheme]);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return '오늘';
-    if (diffDays === 1) return '어제';
-    if (diffDays < 7) return `${diffDays}일 전`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)}주 전`;
-    return `${Math.floor(diffDays / 30)}개월 전`;
-  };
+  // 키 추출기
+  const keyExtractor = useCallback((item: PostItem) => item.id, []);
 
+  // 아이템 레이아웃 최적화
+  const getItemLayout = useCallback((data: PostItem[] | null | undefined, index: number) => ({
+    length: 150, // 예상 아이템 높이
+    offset: 150 * index,
+    index,
+  }), []);
 
+  // 헤더 컴포넌트
+  const ListHeaderComponent = useMemo(() => (
+    <View style={styles.summary}>
+      <Text style={styles.summaryText}>
+        총 <Text style={styles.summaryNumber}>{posts.length}</Text>개의 게시물
+      </Text>
+    </View>
+  ), [posts.length, styles]);
 
-  const platformIcons = {
-    instagram: { name: 'logo-instagram', color: '#E4405F' },
-    facebook: { name: 'logo-facebook', color: '#1877F2' },
-    twitter: { name: 'logo-twitter', color: '#000000' },
-  };
+  // 빈 목록 컴포넌트
+  const ListEmptyComponent = useMemo(() => (
+    <View style={styles.emptyContainer}>
+      <Icon name="document-text-outline" size={48} color={colors.text.tertiary} />
+      <Text style={styles.emptyText}>아직 작성한 게시물이 없습니다</Text>
+    </View>
+  ), [styles, colors]);
 
-  const styles = createStyles(colors, cardTheme);
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+            <Icon name="close" size={24} color={colors.text.primary} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>내 게시물</Text>
+          <View style={{ width: 44 }} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -126,69 +283,34 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
         <View style={{ width: 44 }} />
       </View>
 
-      <ScrollView 
-        style={styles.content}
+      <FlatList
+        data={posts}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        ListHeaderComponent={ListHeaderComponent}
+        ListEmptyComponent={ListEmptyComponent}
+        contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.summary}>
-          <Text style={styles.summaryText}>
-            총 <Text style={styles.summaryNumber}>{posts.length}</Text>개의 게시물
-          </Text>
-        </View>
-
-        {posts.map((post, index) => (
-          <AnimatedCard key={post.id} delay={index * 50} style={styles.postCard}>
-            <TouchableOpacity 
-              onPress={() => setExpandedPostId(expandedPostId === post.id ? null : post.id)}
-              activeOpacity={0.8}
-            >
-              <View style={styles.postHeader}>
-                <View style={styles.postMeta}>
-                  <Icon 
-                    name={platformIcons[post.platform]?.name || 'globe'} 
-                    size={16} 
-                    color={platformIcons[post.platform]?.color || colors.text.secondary} 
-                  />
-                  <Text style={styles.postDate}>{formatDate(post.createdAt)}</Text>
-                  <View style={styles.categoryBadge}>
-                    <Text style={styles.categoryText}>{post.category}</Text>
-                  </View>
-                </View>
-                <Icon 
-                  name={expandedPostId === post.id ? "chevron-up" : "chevron-down"} 
-                  size={20} 
-                  color={colors.text.tertiary} 
-                />
-              </View>
-
-              <Text 
-                style={styles.postContent} 
-                numberOfLines={expandedPostId === post.id ? undefined : 2}
-              >
-                {post.content}
-              </Text>
-
-              <View style={styles.postHashtags}>
-                {post.hashtags.slice(0, 3).map((tag: string, tagIndex: number) => (
-                  <Text key={tagIndex} style={styles.hashtag}>#{tag}</Text>
-                ))}
-                {post.hashtags.length > 3 && (
-                  <Text style={styles.moreHashtags}>+{post.hashtags.length - 3}</Text>
-                )}
-              </View>
-
-
-            </TouchableOpacity>
-          </AnimatedCard>
-        ))}
-
-        <View style={styles.bottomSpace} />
-      </ScrollView>
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={10}
+        updateCellsBatchingPeriod={50}
+        windowSize={10}
+        initialNumToRender={5}
+        getItemLayout={getItemLayout}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            colors={[colors.primary]}
+            tintColor={colors.primary}
+          />
+        }
+      />
     </SafeAreaView>
   );
 };
 
-const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => 
+const createStyles = (colors: typeof COLORS, cardTheme: any) => 
   StyleSheet.create({
     container: {
       flex: 1,
@@ -211,8 +333,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       fontWeight: '600',
       color: colors.text.primary,
     },
-    content: {
-      flex: 1,
+    listContent: {
+      paddingBottom: SPACING.xxl,
     },
     summary: {
       paddingHorizontal: SPACING.lg,
@@ -226,6 +348,26 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       fontWeight: '600',
       color: colors.text.primary,
     },
+    loadingContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: SPACING.xxl * 2,
+    },
+    emptyText: {
+      marginTop: SPACING.md,
+      fontSize: 16,
+      color: colors.text.tertiary,
+    },
+  });
+
+const createPostStyles = (colors: typeof COLORS, cardTheme: any) =>
+  StyleSheet.create({
     postCard: {
       backgroundColor: colors.surface,
       marginHorizontal: SPACING.lg,
@@ -280,27 +422,6 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       fontSize: 12,
       color: colors.text.tertiary,
     },
-
-    bottomSpace: {
-      height: SPACING.xxl,
-    },
   });
-
-// 톤에서 카테고리 추출 헬퍼 함수
-function getCategoryFromTone(tone: string): string {
-  const toneToCategory: { [key: string]: string } = {
-    'casual': '일상',
-    'professional': '비즈니스',
-    'humorous': '유머',
-    'emotional': '감성',
-    'genz': '트렌드',
-    'millennial': '라이프스타일',
-    'minimalist': '미니멀',
-    'storytelling': '스토리',
-    'motivational': '동기부여',
-  };
-  
-  return toneToCategory[tone] || '일상';
-}
 
 export default PostListScreen;
