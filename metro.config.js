@@ -4,6 +4,25 @@ const path = require('path');
 const defaultConfig = getDefaultConfig(__dirname);
 
 const config = {
+  transformer: {
+    minifierPath: 'metro-minify-terser',
+    minifierConfig: {
+      // Terser 옵션으로 번들 크기 최적화
+      keep_fnames: false,
+      mangle: {
+        keep_fnames: false,
+      },
+      compress: {
+        drop_console: true, // 프로덕션에서 console.log 제거
+        drop_debugger: true,
+        pure_funcs: ['console.log', 'console.info', 'console.warn'],
+      },
+      output: {
+        comments: false, // 주석 제거
+        ascii_only: true,
+      },
+    },
+  },
   resolver: {
     // 에러 스택 트레이스 개선
     sourceExts: ['jsx', 'js', 'ts', 'tsx', 'json'],

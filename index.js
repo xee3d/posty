@@ -2,16 +2,12 @@
 const originalToString = Object.prototype.toString;
 Object.freeze(Object.prototype);
 
+// Firebase 경고 완전 차단 (가장 먼저 import)
+import './src/utils/suppressWarnings';
+
 import 'react-native-gesture-handler';
-import {AppRegistry, LogBox} from 'react-native';
+import {AppRegistry} from 'react-native';
 import App from './App';
 import {name as appName} from './app.json';
-
-// Firebase v20 deprecation 경고 임시 숨김
-LogBox.ignoreLogs([
-  'This method is deprecated',
-  'Method called was',
-  'Please use `getApp()` instead',
-]);
 
 AppRegistry.registerComponent(appName, () => App);
