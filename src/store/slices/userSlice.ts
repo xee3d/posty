@@ -125,7 +125,46 @@ const userSlice = createSlice({
     },
     
     // 토큰 사용
-    useTokens: (state, action: PayloadAction<{
+    useTokens: (state, action: PayloadAction<number>) => {
+      if (state.subscriptionPlan === 'pro') {
+        // 프로 플랜은 토큰 차감 없음
+        return;
+      }
+      
+      const amount = action.payload;
+      if (state.currentTokens >= amount) {
+        state.currentTokens -= amount;
+        state.tokens.current = state.currentTokens;
+        
+        // 무료 토큰부터 차감
+        if (state.freeTokens >= amount) {
+          state.freeTokens -= amount;
+        } else {
+          // 무료 토큰 다 쓰고 구매 토큰에서 차감
+          const remaining = amount - state.freeTokens;
+          state.freeTokens = 0;
+          state.purchasedTokens = Math.max(0, state.purchasedTokens - remaining);
+        }
+        
+        // 히스토리 추가
+        state.tokenHistory.unshift({
+          id: Date.now().toString(),
+          date: new Date().toISOString(),
+          type: 'use',
+          amount: -amount,
+          description: 'AI 콘텐츠 생성',
+          balance: state.currentTokens,
+        });
+        
+        // 최대 50개 히스토리만 유지
+        if (state.tokenHistory.length > 50) {
+          state.tokenHistory = state.tokenHistory.slice(0, 50);
+        }
+      }
+    },
+    
+    // 토큰 사용 (설명 포함 - 기존 코드와 호환성)
+    useTokensWithDescription: (state, action: PayloadAction<{
       amount: number;
       description: string;
     }>) => {

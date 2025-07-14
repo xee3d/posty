@@ -69,6 +69,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const [showContact, setShowContact] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showFirebaseTest, setShowFirebaseTest] = useState(false);
+  const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
   
   // AI 토큰 및 통계
   const [stats, setStats] = useState({
@@ -85,14 +86,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
     loadAllData();
   }, []);
 
-  // 5초마다 토큰 정보 업데이트 (화면이 보이는 동안)
+  // Redux 상태 변경 시 토큰 정보 업데이트
   useEffect(() => {
-    const interval = setInterval(() => {
-      loadStats();
-    }, 5000); // 5초마다 업데이트
-
-    return () => clearInterval(interval);
-  }, []);
+    if (reduxUser.tokens?.current !== undefined) {
+      setStats(prev => ({
+        ...prev,
+        aiTokensRemaining: reduxUser.tokens.current,
+      }));
+    }
+  }, [reduxUser.tokens]); // Redux 토큰 정보가 변경될 때마다 업데이트
 
   const loadAllData = async () => {
     try {
@@ -177,14 +179,31 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       // tokenService를 사용하여 실제 토큰 수 가져오기
       const subscription = await tokenService.getSubscription();
       const tokenInfo = await tokenService.getTokenInfo();
-      const remainingTokens = tokenInfo.total;
       
-      // AI 토큰 계산
+      // Redux 상태에서 토큰 정보 확인 (우선)
+      const reduxTokens = reduxUser.tokens?.current;
+      
+      // 실제 남은 토큰 수 계산
+      let remainingTokens = 0;
       let tokensTotal = 10;
+      
       if (subscription.plan === 'pro') {
+        // 프로 플랜은 무제한
         tokensTotal = 999;
+        remainingTokens = 999;
       } else if (subscription.plan === 'premium') {
-        tokensTotal = 50;
+        // 프리미엄 플랜
+        tokensTotal = 100;
+        remainingTokens = reduxTokens !== undefined ? reduxTokens : (subscription.monthlyTokensRemaining || 0);
+      } else {
+        // Free 플랜
+        tokensTotal = 10;
+        // Redux 상태가 있으면 사용, 없으면 daily tokens 사용
+        if (reduxTokens !== undefined) {
+          remainingTokens = reduxTokens;
+        } else {
+          remainingTokens = subscription.dailyTokens || 10;
+        }
       }
       
       setStats({
@@ -192,7 +211,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
         weeklyGenerated: 18,
         monthlyGenerated: 127,
         totalSaved: 45,
-        aiTokensRemaining: remainingTokens === -1 ? 999 : remainingTokens,
+        aiTokensRemaining: remainingTokens,
         aiTokensTotal: tokensTotal,
         joinDays,
       });
@@ -201,6 +220,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       setSubscriptionPlan(subscription.plan);
     } catch (error) {
       console.error('Failed to load stats:', error);
+      // 오류 시 기본값 설정
+      setStats({
+        todayGenerated: 0,
+        weeklyGenerated: 0,
+        monthlyGenerated: 0,
+        totalSaved: 0,
+        aiTokensRemaining: reduxUser.tokens?.current || 10,
+        aiTokensTotal: 10,
+        joinDays: 0,
+      });
     }
   };
 

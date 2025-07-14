@@ -22,10 +22,15 @@ export const firestoreSyncMiddleware: Middleware<{}, RootState> = store => next 
   
   const state = store.getState();
   
+  // 디버깅을 위해 액션 타입 로깅
+  console.log('[Firestore Sync] Action:', action.type);
+  
   // 토큰 관련 액션 처리 (사용자가 직접 변경한 경우만)
   if (action.type === 'user/useTokens' || 
       action.type === 'user/earnTokens' || 
       action.type === 'user/purchaseTokens') {
+    console.log('[Firestore Sync] Token action detected:', action.type, action.payload);
+    
     // 디바운싱을 위한 타이머
     if ((global as any).tokenSyncTimer) {
       clearTimeout((global as any).tokenSyncTimer);
@@ -33,16 +38,21 @@ export const firestoreSyncMiddleware: Middleware<{}, RootState> = store => next 
     
     (global as any).tokenSyncTimer = setTimeout(async () => {
       try {
+        const currentState = store.getState();
+        const tokensToSync = {
+          current: currentState.user.currentTokens,
+          total: currentState.user.currentTokens,
+        };
+        
+        console.log('[Firestore Sync] Syncing tokens to Firestore:', tokensToSync);
+        
         await firestoreService.updateUserSettings({
-          tokens: {
-            current: state.user.tokens.current,
-            total: state.user.tokens.total,
-          }
+          tokens: tokensToSync
         });
         
-        console.log('Token synced to Firestore:', state.user.tokens.current);
+        console.log('[Firestore Sync] Token synced successfully');
       } catch (error) {
-        console.error('Token sync error:', error);
+        console.error('[Firestore Sync] Token sync error:', error);
       }
     }, 1000); // 1초 후 동기화
   }

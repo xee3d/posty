@@ -12,6 +12,7 @@ import { useAppTheme } from '../../hooks/useAppTheme';
 import { SPACING } from '../../utils/constants';
 import tokenService from '../../services/subscription/tokenService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAppSelector } from '../../hooks/redux';
 
 interface TokenManagementSectionProps {
   onNavigateToSubscription: () => void;
@@ -23,6 +24,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
   onTokensUpdated,
 }) => {
   const { colors } = useAppTheme();
+  const reduxUser = useAppSelector(state => state.user);
   const [loading, setLoading] = useState(true);
   const [tokenInfo, setTokenInfo] = useState({
     current: 0,
@@ -35,6 +37,18 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
     loadTokenInfo();
   }, []);
 
+  // Redux 상태 변경 시 다시 로드
+  useEffect(() => {
+    loadTokenInfo();
+  }, [reduxUser.tokens]);
+
+  // 토큰 정보가 변경될 때 onTokensUpdated 호출
+  useEffect(() => {
+    if (onTokensUpdated && !loading) {
+      onTokensUpdated();
+    }
+  }, [tokenInfo.current, loading]);
+
   const loadTokenInfo = async () => {
     try {
       setLoading(true);
@@ -46,8 +60,17 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
       const todayStats = await AsyncStorage.getItem(`stats_${today}`);
       const todayUsed = todayStats ? JSON.parse(todayStats).generated || 0 : 0;
       
+      // 실제 남은 토큰 수 계산 (Redux 상태를 우선 참조)
+      let currentTokens = reduxUser.tokens?.current !== undefined 
+        ? reduxUser.tokens.current 
+        : (info.current || info.total);
+      
+      if (info.plan === 'pro') {
+        currentTokens = 999;
+      }
+      
       setTokenInfo({
-        current: info.total === -1 ? 999 : info.total,
+        current: currentTokens === -1 ? 999 : currentTokens,
         total: info.plan === 'pro' ? 999 : (info.plan === 'premium' ? 100 : 10),
         plan: info.plan,
         todayUsed,

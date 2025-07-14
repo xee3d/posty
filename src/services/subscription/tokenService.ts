@@ -4,8 +4,15 @@ import {
   setTokens, 
   setSubscriptionPlan,
   selectCurrentTokens,
-  selectSubscriptionPlan 
+  selectSubscriptionPlan,
+  useTokens as useTokensAction,
+  purchaseTokens,
+  earnTokens,
+  updateSubscription,
+  resetDailyTokens
 } from '../../store/slices/userSlice';
+import auth from '@react-native-firebase/auth';
+import firestoreService from '../firebase/firestoreService';
 
 export interface TokenUsage {
   timestamp: string;
@@ -34,7 +41,24 @@ class TokenService {
    */
   async initialize(): Promise<void> {
     try {
-      // 구독 정보 확인
+      // 로그인된 사용자가 있으면 Firestore에서 데이터 가져오기
+      const currentUser = auth().currentUser;
+      if (currentUser) {
+        const userData = await firestoreService.getUser();
+        if (userData && userData.tokens) {
+          // Firestore의 토큰 정보를 Redux에 저장
+          store.dispatch(setTokens(userData.tokens.current || 10));
+          store.dispatch(setSubscriptionPlan(userData.subscription?.plan || 'free'));
+          
+          console.log('Token service initialized from Firestore:', {
+            tokens: userData.tokens.current,
+            plan: userData.subscription?.plan || 'free',
+          });
+          return;
+        }
+      }
+      
+      // Firestore에 데이터가 없으면 로컬 스토리지 확인
       const subscription = await this.getSubscription();
       
       // 일일 리셋 체크
@@ -42,18 +66,16 @@ class TokenService {
       
       // Redux 상태 업데이트
       const totalTokens = this.calculateTotalTokens(subscription);
-      // NaN 체크 및 기본값 처리
       const validTokens = !isNaN(totalTokens) && totalTokens >= 0 ? totalTokens : 10;
       store.dispatch(setTokens(validTokens));
       store.dispatch(setSubscriptionPlan(subscription.subscriptionPlan));
       
-      console.log('Token service initialized:', {
+      console.log('Token service initialized from local:', {
         plan: subscription.subscriptionPlan,
         tokens: validTokens,
       });
     } catch (error) {
       console.error('Token initialization error:', error);
-      // 기본값으로 초기화
       await this.resetToDefault();
     }
   }
@@ -63,6 +85,24 @@ class TokenService {
    */
   async getSubscription(): Promise<UserTokenData> {
     try {
+      // Redux 상태를 우선적으로 확인
+      const state = store.getState().user;
+      const reduxTokens = state.tokens?.current || state.currentTokens;
+      const reduxPlan = state.subscription?.plan || state.subscriptionPlan || 'free';
+      
+      if (reduxTokens !== undefined) {
+        return {
+          dailyTokens: state.freeTokens || 10,
+          purchasedTokens: state.purchasedTokens || 0,
+          lastResetDate: state.lastTokenResetDate || new Date().toISOString(),
+          tokensUsedToday: 0,
+          subscriptionPlan: reduxPlan as 'free' | 'premium' | 'pro',
+          monthlyTokensRemaining: reduxPlan === 'premium' ? 100 : 0,
+          tokenHistory: [],
+        };
+      }
+      
+      // Redux에 없으면 로컬 스토리지 확인
       const data = await AsyncStorage.getItem(this.SUBSCRIPTION_KEY);
       if (data) {
         const parsed = JSON.parse(data);
@@ -91,45 +131,27 @@ class TokenService {
    */
   async useTokens(amount: number, action: string): Promise<boolean> {
     try {
-      const subscription = await this.getSubscription();
-      const totalTokens = this.calculateTotalTokens(subscription);
-
+      // Redux에서 현재 토큰 수 확인
+      const currentTokens = store.getState().user.tokens?.current || store.getState().user.currentTokens || 0;
+      const subscriptionPlan = store.getState().user.subscription?.plan || 'free';
+      
       // 무제한 체크
-      if (subscription.subscriptionPlan === 'pro') {
+      if (subscriptionPlan === 'pro') {
         await this.recordUsage(amount, action);
         return true;
       }
-
+      
       // 토큰 부족 체크
-      if (totalTokens < amount) {
+      if (currentTokens < amount) {
         return false;
       }
-
-      // 토큰 차감 (구매 토큰 우선 사용)
-      if (subscription.purchasedTokens >= amount) {
-        subscription.purchasedTokens -= amount;
-      } else {
-        const remaining = amount - subscription.purchasedTokens;
-        subscription.purchasedTokens = 0;
-        
-        if (subscription.subscriptionPlan === 'premium' && subscription.monthlyTokensRemaining) {
-          subscription.monthlyTokensRemaining -= remaining;
-        } else {
-          subscription.dailyTokens -= remaining;
-        }
-      }
-
-      subscription.tokensUsedToday += amount;
-
+      
+      // Redux 상태 업데이트 (이것이 Firestore로 자동 동기화됨)
+      store.dispatch(useTokensAction(amount));
+      
       // 사용 기록
       await this.recordUsage(amount, action);
       
-      // 저장
-      await this.saveSubscription(subscription);
-      
-      // Redux 업데이트
-      store.dispatch(setTokens(this.calculateTotalTokens(subscription)));
-
       return true;
     } catch (error) {
       console.error('Failed to use tokens:', error);
@@ -142,11 +164,11 @@ class TokenService {
    */
   async addPurchasedTokens(amount: number): Promise<void> {
     try {
-      const subscription = await this.getSubscription();
-      subscription.purchasedTokens += amount;
-      
-      await this.saveSubscription(subscription);
-      store.dispatch(setTokens(this.calculateTotalTokens(subscription)));
+      // Redux 상태 업데이트 (이것이 Firestore로 자동 동기화됨)
+      store.dispatch(purchaseTokens({
+        amount,
+        price: 0, // 가격 정보는 별도로 처리
+      }));
     } catch (error) {
       console.error('Failed to add purchased tokens:', error);
     }
@@ -157,22 +179,8 @@ class TokenService {
    */
   async upgradeSubscription(plan: 'premium' | 'pro'): Promise<void> {
     try {
-      const subscription = await this.getSubscription();
-      subscription.subscriptionPlan = plan;
-      
-      // 플랜별 월간 토큰 설정
-      if (plan === 'premium') {
-        subscription.monthlyTokensRemaining = 100;
-      } else if (plan === 'pro') {
-        subscription.monthlyTokensRemaining = -1; // 무제한
-      }
-      
-      // 무료 일일 토큰 제거
-      subscription.dailyTokens = 0;
-      
-      await this.saveSubscription(subscription);
-      store.dispatch(setSubscriptionPlan(plan));
-      store.dispatch(setTokens(this.calculateTotalTokens(subscription)));
+      // Redux 상태 업데이트
+      store.dispatch(updateSubscription({ plan }));
     } catch (error) {
       console.error('Failed to upgrade subscription:', error);
     }
@@ -183,11 +191,11 @@ class TokenService {
    */
   async earnTokensFromAd(amount: number): Promise<void> {
     try {
-      const subscription = await this.getSubscription();
-      subscription.dailyTokens += amount;
-      
-      await this.saveSubscription(subscription);
-      store.dispatch(setTokens(this.calculateTotalTokens(subscription)));
+      // Redux 상태 업데이트 (이것이 Firestore로 자동 동기화됨)
+      store.dispatch(earnTokens({
+        amount,
+        description: '광고 시청 리워드',
+      }));
     } catch (error) {
       console.error('Failed to earn tokens from ad:', error);
     }
@@ -202,15 +210,8 @@ class TokenService {
     
     // 날짜가 다르면 리셋
     if (now.toDateString() !== lastReset.toDateString()) {
-      subscription.tokensUsedToday = 0;
-      subscription.lastResetDate = now.toISOString();
-      
-      // 무료 플랜은 일일 토큰 충전
-      if (subscription.subscriptionPlan === 'free') {
-        subscription.dailyTokens = 10;
-      }
-      
-      await this.saveSubscription(subscription);
+      // Redux에서 일일 토큰 리셋
+      store.dispatch(resetDailyTokens());
     }
   }
 
@@ -258,6 +259,13 @@ class TokenService {
       }
       
       await AsyncStorage.setItem(historyKey, JSON.stringify(history));
+      
+      // 오늘 사용량 통계 업데이트
+      const todayStatsKey = `stats_${today}`;
+      const todayStats = await AsyncStorage.getItem(todayStatsKey);
+      const stats = todayStats ? JSON.parse(todayStats) : { generated: 0 };
+      stats.generated = (stats.generated || 0) + 1;
+      await AsyncStorage.setItem(todayStatsKey, JSON.stringify(stats));
     } catch (error) {
       console.error('Failed to record usage:', error);
     }
@@ -269,7 +277,7 @@ class TokenService {
   private calculateTotalTokens(subscription: UserTokenData): number {
     // Pro 플랜은 무제한
     if (subscription.subscriptionPlan === 'pro') {
-      return -1;
+      return 999;
     }
 
     // NaN 방지를 위한 기본값 처리
@@ -355,29 +363,37 @@ class TokenService {
    * 남은 토큰 수 가져오기 (간단한 버전)
    */
   async getRemainingTokens(): Promise<number> {
-    const subscription = await this.getSubscription();
-    return this.calculateTotalTokens(subscription);
+    // Redux에서 직접 가져오기
+    const state = store.getState().user;
+    return state.tokens?.current || state.currentTokens || 0;
   }
 
   /**
    * 남은 토큰 정보 (상세 버전)
    */
   async getTokenInfo(): Promise<{
-    total: number;
+    current: number; // 현재 남은 토큰
+    total: number; // 총 사용 가능 토큰 (deprecated, current와 동일)
     daily: number;
     purchased: number;
     monthly?: number;
     plan: 'free' | 'premium' | 'pro';
   }> {
+    // Redux에서 현재 상태 가져오기
+    const state = store.getState().user;
+    const currentTokens = state.tokens?.current || state.currentTokens || 0;
+    const subscriptionPlan = state.subscription?.plan || state.subscriptionPlan || 'free';
+    
+    // 로컬 스토리지에서 추가 정보 가져오기 (필요한 경우)
     const subscription = await this.getSubscription();
-    const total = this.calculateTotalTokens(subscription);
     
     return {
-      total: isNaN(total) ? 0 : total,
-      daily: isNaN(subscription.dailyTokens) ? 0 : subscription.dailyTokens,
-      purchased: isNaN(subscription.purchasedTokens) ? 0 : subscription.purchasedTokens,
+      current: currentTokens,
+      total: currentTokens, // 호환성을 위해 유지
+      daily: state.freeTokens || subscription.dailyTokens || 0,
+      purchased: state.purchasedTokens || subscription.purchasedTokens || 0,
       monthly: subscription.monthlyTokensRemaining,
-      plan: subscription.subscriptionPlan || 'free',
+      plan: subscriptionPlan as 'free' | 'premium' | 'pro',
     };
   }
 }
