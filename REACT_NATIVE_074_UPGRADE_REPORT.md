@@ -45,9 +45,10 @@
   "react-native-screens": "3.34.0",
   "react-native-safe-area-context": "4.11.0",
   "react-native-gesture-handler": "2.18.1",
-  "@react-native-firebase/app": "20.4.0",
-  "@react-native-firebase/auth": "20.4.0",
-  "@react-native-firebase/firestore": "20.4.0",
+  "@react-native-firebase/app": "22.4.0",
+  "@react-native-firebase/auth": "22.4.0",
+  "@react-native-firebase/firestore": "22.4.0",
+  "@react-native-firebase/analytics": "22.4.0",
   "react-native-reanimated": "3.15.0",
   "@reduxjs/toolkit": "2.2.7",
   "react-redux": "9.1.2"
@@ -87,6 +88,7 @@
 3. **index.js 수정**: react-native-gesture-handler 임포트 추가
 
 ### **Firebase 호환성**
-- React Native Firebase v20.4.0으로 완전 호환
+- React Native Firebase v22.4.0으로 업데이트 완료
 - 기존 0.72.x 버전에서 발생하던 빌드 오류 해결
 - Android minSdkVersion 23 요구사항 충족
+- ⚠️ 주의: 코드는 아직 네임스페이스 API 사용 중 (모듈러 API 마이그레이션 필요)
