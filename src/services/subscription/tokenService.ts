@@ -45,9 +45,9 @@ class TokenService {
       
       // 1. Redux persist에서 복원된 데이터 확인
       const state = store.getState().user;
-      const persistedTokens = state.tokens?.current || state.currentTokens;
+      const persistedTokens = state.currentTokens;
       
-      if (persistedTokens !== undefined && persistedTokens !== null) {
+      if (persistedTokens !== undefined && persistedTokens !== null && persistedTokens !== 0) {
         console.log('TokenService: Using persisted tokens from Redux:', persistedTokens);
         // Redux persist에 이미 데이터가 있으면 그대로 사용
         return;
@@ -133,8 +133,8 @@ class TokenService {
     try {
       // Redux 상태를 우선적으로 확인
       const state = store.getState().user;
-      const reduxTokens = state.tokens?.current || state.currentTokens;
-      const reduxPlan = state.subscription?.plan || state.subscriptionPlan || 'free';
+      const reduxTokens = state.currentTokens;
+      const reduxPlan = state.subscriptionPlan || 'free';
       
       if (reduxTokens !== undefined) {
         return {
@@ -178,8 +178,8 @@ class TokenService {
   async useTokens(amount: number, action: string): Promise<boolean> {
     try {
       // Redux에서 현재 토큰 수 확인
-      const currentTokens = store.getState().user.tokens?.current || store.getState().user.currentTokens || 0;
-      const subscriptionPlan = store.getState().user.subscription?.plan || 'free';
+      const currentTokens = store.getState().user.currentTokens || 0;
+      const subscriptionPlan = store.getState().user.subscriptionPlan || 'free';
       
       // 무제한 체크
       if (subscriptionPlan === 'pro') {
@@ -466,8 +466,8 @@ class TokenService {
   }> {
     // Redux에서 현재 상태 가져오기
     const state = store.getState().user;
-    const currentTokens = state.tokens?.current || state.currentTokens || 0;
-    const subscriptionPlan = state.subscription?.plan || state.subscriptionPlan || 'free';
+    const currentTokens = state.currentTokens || 0;
+    const subscriptionPlan = state.subscriptionPlan || 'free';
     
     // 로컬 스토리지에서 추가 정보 가져오기 (필요한 경우)
     const subscription = await this.getSubscription();

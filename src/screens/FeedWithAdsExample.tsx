@@ -174,9 +174,7 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
         { 
           text: '+5 토큰', 
           onPress: async () => {
-            const subscription = await tokenService.getSubscription();
-            subscription.dailyTokens += 5;
-            await tokenService['saveSubscription'](subscription);
+            await tokenService.earnTokensFromAd(5);
             await loadTokenInfo();
             Alert.alert('완료', '5개의 토큰이 추가되었습니다!');
           }
@@ -184,9 +182,7 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
         { 
           text: '+10 토큰', 
           onPress: async () => {
-            const subscription = await tokenService.getSubscription();
-            subscription.dailyTokens += 10;
-            await tokenService['saveSubscription'](subscription);
+            await tokenService.earnTokensFromAd(10);
             await loadTokenInfo();
             Alert.alert('완료', '10개의 토큰이 추가되었습니다!');
           }
@@ -194,7 +190,7 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
         { 
           text: '무제한 설정', 
           onPress: async () => {
-            await tokenService.updatePlan('pro');
+            await tokenService.upgradeSubscription('pro');
             await loadTokenInfo();
             Alert.alert('완료', '무제한 토큰으로 설정되었습니다!');
           }

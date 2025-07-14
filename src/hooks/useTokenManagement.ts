@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppSelector, useAppDispatch } from './redux';
-import { selectCurrentTokens, selectSubscriptionPlan, useTokens } from '../store/slices/userSlice';
+import { selectCurrentTokens, selectSubscriptionPlan, useTokens, earnTokens } from '../store/slices/userSlice';
 import tokenService from '../services/subscription/tokenService';
 
 interface UseTokenManagementProps {
@@ -70,10 +70,18 @@ export const useTokenManagement = ({ onNavigate }: UseTokenManagementProps = {})
   // 토큰 추가 (보상)
   const handleEarnTokens = useCallback(async (tokens: number) => {
     try {
-      const subscription = await tokenService.getSubscription();
-      subscription.dailyTokens = Math.min(subscription.dailyTokens + tokens, 30);
-      await AsyncStorage.setItem('USER_SUBSCRIPTION', JSON.stringify(subscription));
+      console.log('Earning tokens:', tokens);
       
+      // Redux 스토어 업데이트 (한 번만 호출)
+      dispatch(earnTokens({
+        amount: tokens,
+        description: '미션 보상'
+      }));
+      
+      // tokenService.earnTokensFromAd는 내부적으로 Redux를 업데이트하므로 제거
+      // await tokenService.earnTokensFromAd(tokens);
+      
+      // 성공 알림
       Alert.alert(
         '토큰 획득! 🎉',
         `${tokens}개의 토큰을 받았어요!`,
@@ -83,9 +91,10 @@ export const useTokenManagement = ({ onNavigate }: UseTokenManagementProps = {})
       return true;
     } catch (error) {
       console.error('Failed to add tokens:', error);
+      Alert.alert('오류', '토큰 지급에 실패했습니다.');
       return false;
     }
-  }, []);
+  }, [dispatch]);
 
   // 토큰 부족 시 처리
   const handleLowToken = useCallback(() => {

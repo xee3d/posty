@@ -2,8 +2,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import simplePostService from './simplePostService';
 
-// 사전 정의된 스타일 템플릿
-export const STYLE_TEMPLATES = [
+import { UNIFIED_STYLES } from '../utils/unifiedStyleConstants';
+
+// 사전 정의된 스타일 템플릿 - 통합된 스타일 사용
+export const STYLE_TEMPLATES = UNIFIED_STYLES;
+
+// 기존 호환성을 위해 남겨둠 수도 있음
+const OLD_STYLE_TEMPLATES = [
   {
     id: 'minimalist',
     name: '미니멀리스트',
@@ -242,7 +247,7 @@ class ImprovedStyleService {
   private calculateStyleScores(posts: any[]): Record<string, number> {
     const scores: Record<string, number> = {};
     
-    STYLE_TEMPLATES.forEach(template => {
+    UNIFIED_STYLES.forEach(template => {
       let score = 0;
       
       posts.forEach(post => {

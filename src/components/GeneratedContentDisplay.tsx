@@ -138,6 +138,14 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     return hashtagString ? `${platformData.content}\n\n${hashtagString}` : platformData.content;
   };
 
+  // 본문 길이 계산 (해시태그 제외)
+  const getContentLength = () => {
+    const content = getCurrentContent();
+    // 해시태그 부분 제거
+    const mainContent = content.split('#')[0].trim();
+    return mainContent.length;
+  };
+
   const handleCopy = async () => {
     const content = getCurrentContent();
     if (content) {
@@ -254,6 +262,11 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
 
       {/* 콘텐츠 표시 영역 */}
       <View style={styles.contentContainer}>
+        <View style={styles.contentHeader}>
+          <Text style={styles.contentLengthText}>
+            본문 {getContentLength()}자
+          </Text>
+        </View>
         <Text style={styles.contentText}>{getCurrentContent()}</Text>
       </View>
 
@@ -366,6 +379,21 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       borderRadius: 12,
       borderWidth: 1,
       borderColor: colors.border,
+    },
+    contentHeader: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      marginBottom: SPACING.sm,
+    },
+    contentLengthText: {
+      fontSize: 12,
+      fontFamily: 'System',
+      fontWeight: '500' as const,
+      color: colors.text.tertiary,
+      backgroundColor: colors.background,
+      paddingHorizontal: SPACING.sm,
+      paddingVertical: 2,
+      borderRadius: 10,
     },
 
     contentText: {

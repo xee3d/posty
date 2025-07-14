@@ -13,6 +13,7 @@ import { SPACING } from '../../utils/constants';
 import tokenService from '../../services/subscription/tokenService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppSelector } from '../../hooks/redux';
+import { selectCurrentTokens, selectSubscriptionPlan } from '../../store/slices/userSlice';
 
 interface TokenManagementSectionProps {
   onNavigateToSubscription: () => void;
@@ -24,59 +25,41 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
   onTokensUpdated,
 }) => {
   const { colors } = useAppTheme();
-  const reduxUser = useAppSelector(state => state.user);
-  const [loading, setLoading] = useState(true);
-  const [tokenInfo, setTokenInfo] = useState({
-    current: 0,
-    total: 10,
-    plan: 'free' as 'free' | 'premium' | 'pro',
-    todayUsed: 0,
-  });
+  const currentTokens = useAppSelector(selectCurrentTokens);
+  const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
+  const [loading, setLoading] = useState(false);
+  const [todayUsed, setTodayUsed] = useState(0);
 
+  // Redux에서 직접 토큰 정보 계산
+  const tokenInfo = {
+    current: subscriptionPlan === 'pro' ? 999 : currentTokens,
+    total: subscriptionPlan === 'pro' ? 999 : (subscriptionPlan === 'premium' ? 100 : 10),
+    plan: subscriptionPlan,
+    todayUsed,
+  };
+
+  // 오늘 사용량만 별도로 로드
   useEffect(() => {
-    loadTokenInfo();
+    loadTodayUsage();
   }, []);
-
-  // Redux 상태 변경 시 다시 로드
-  useEffect(() => {
-    loadTokenInfo();
-  }, [reduxUser.tokens]);
 
   // 토큰 정보가 변경될 때 onTokensUpdated 호출
   useEffect(() => {
-    if (onTokensUpdated && !loading) {
+    if (onTokensUpdated) {
       onTokensUpdated();
     }
-  }, [tokenInfo.current, loading]);
+  }, [currentTokens]);
 
-  const loadTokenInfo = async () => {
+  const loadTodayUsage = async () => {
     try {
       setLoading(true);
-      const subscription = await tokenService.getSubscription();
-      const info = await tokenService.getTokenInfo();
-      
       // 오늘 사용량
       const today = new Date().toDateString();
       const todayStats = await AsyncStorage.getItem(`stats_${today}`);
-      const todayUsed = todayStats ? JSON.parse(todayStats).generated || 0 : 0;
-      
-      // 실제 남은 토큰 수 계산 (Redux 상태를 우선 참조)
-      let currentTokens = reduxUser.tokens?.current !== undefined 
-        ? reduxUser.tokens.current 
-        : (info.current || info.total);
-      
-      if (info.plan === 'pro') {
-        currentTokens = 999;
-      }
-      
-      setTokenInfo({
-        current: currentTokens === -1 ? 999 : currentTokens,
-        total: info.plan === 'pro' ? 999 : (info.plan === 'premium' ? 100 : 10),
-        plan: info.plan,
-        todayUsed,
-      });
+      const used = todayStats ? JSON.parse(todayStats).generated || 0 : 0;
+      setTodayUsed(used);
     } catch (error) {
-      console.error('Failed to load token info:', error);
+      console.error('Failed to load today usage:', error);
     } finally {
       setLoading(false);
     }

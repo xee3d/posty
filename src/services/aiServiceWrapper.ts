@@ -8,6 +8,7 @@ import {
   ImageAnalysis 
 } from './ai/types/ai.types';
 import { extractHashtags } from '../utils/promptUtils';
+import { enhancePromptForPlatform, validateContentForPlatform } from '../utils/platformUtils';
 
 class AIServiceWrapper {
   // 콘텐츠 생성
@@ -15,15 +16,47 @@ class AIServiceWrapper {
     console.log('AIServiceWrapper: Generating content with params:', params);
     
     try {
+      // 플랫폼별로 프롬프트 강화
+      const platform = params.platform || 'instagram';
+      const enhancedPrompt = enhancePromptForPlatform(
+        params.prompt || '',
+        platform as any,
+        params.tone
+      );
+      
+      // 길이 옵션에 따른 추가 지시
+      let lengthInstruction = '';
+      switch (params.length) {
+        case 'short':
+          lengthInstruction = '\n[길이: 50자 이내로 짧고 간결하게 작성해주세요]';
+          break;
+        case 'medium':
+          lengthInstruction = '\n[길이: 100-150자 사이로 적당한 길이로 작성해주세요]';
+          break;
+        case 'long':
+          lengthInstruction = '\n[길이: 200-300자로 자세하고 풍부하게 작성해주세요]';
+          break;
+      }
+      
+      const finalPrompt = enhancedPrompt + lengthInstruction;
+      
+      console.log('Enhanced prompt for platform:', platform, finalPrompt);
+      
       // 서버 API 호출
       const content = await serverAIService.generateContent({
-        prompt: params.prompt || '',
+        prompt: finalPrompt,
         tone: params.tone || 'casual',
         platform: params.platform,
         length: params.length,
       });
       
       console.log('AIServiceWrapper received content:', content);
+      
+      // 플랫폼별 콘텐츠 검증
+      const validation = validateContentForPlatform(content, platform as any);
+      if (!validation.valid) {
+        console.warn('Content validation warning:', validation.message);
+      }
       
       // 해시태그 추출 (서버에서 안 하면 클라이언트에서)
       const hashtags = params.hashtags || extractHashtags(content);

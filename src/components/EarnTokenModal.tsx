@@ -60,6 +60,10 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
     const savedTasks = await AsyncStorage.getItem(`token_tasks_${today}`);
     const taskData = savedTasks ? JSON.parse(savedTasks) : {};
     
+    // 영구 완료 데이터 (날짜와 무관하게 유지)
+    const permanentTasks = await AsyncStorage.getItem('token_tasks_permanent');
+    const permanentData = permanentTasks ? JSON.parse(permanentTasks) : {};
+    
     // 데이터 무결성 검증
     const deviceId = await getDeviceId();
     const isValidData = await validateTaskData(taskData, deviceId, today);
@@ -74,7 +78,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
       {
         id: 'watch_ad',
         title: '광고 보기',
-        description: '30초 광고를 시청하고 토큰을 받으세요',
+        description: '30초 광고를 시청하고 2개의 토큰을 받으세요',
         icon: 'play-circle',
         iconType: 'ionicon',
         tokens: 2,
@@ -86,7 +90,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
       {
         id: 'invite_friend',
         title: '친구 초대',
-        description: '친구를 초대하고 토큰을 받으세요',
+        description: '친구를 초대하고 5개의 토큰을 받으세요',
         icon: 'person-add',
         iconType: 'ionicon',
         tokens: 5,
@@ -97,18 +101,18 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
       },
       {
         id: 'rate_app',
-        title: '앱 평가하기',
-        description: '스토어에서 앱을 평가해주세요',
+        title: '앱 평가하기 (한 번만)',
+        description: '스토어에서 평가하고 10개의 토큰을 받으세요',
         icon: 'star',
         iconType: 'ionicon',
         tokens: 10,
-        available: !taskData.rate_app?.completed,
-        completed: taskData.rate_app?.completed || false,
+        available: !permanentData.rate_app?.completed,
+        completed: permanentData.rate_app?.completed || false,
       },
       {
         id: 'share_social',
         title: 'SNS 공유',
-        description: 'Posty를 SNS에 공유해주세요',
+        description: 'Posty를 SNS에 공유하고 3개의 토큰을 받으세요',
         icon: 'share-social',
         iconType: 'ionicon',
         tokens: 3,
@@ -120,7 +124,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
       {
         id: 'daily_login',
         title: '일일 출석',
-        description: '매일 앱을 방문하세요',
+        description: '매일 앱을 방문하고 1개의 토큰을 받으세요',
         icon: 'event-available',
         iconType: 'material',
         tokens: 1,
@@ -193,35 +197,49 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
       const savedTasks = await AsyncStorage.getItem(`token_tasks_${today}`);
       const taskData = savedTasks ? JSON.parse(savedTasks) : {};
       
+      // 영구 데이터 가져오기
+      const permanentTasks = await AsyncStorage.getItem('token_tasks_permanent');
+      const permanentData = permanentTasks ? JSON.parse(permanentTasks) : {};
+      
       // 무결성 검증용 해시 생성
       const deviceId = await getDeviceId();
       const hash = await generateHash(`${deviceId}-${task.id}-${today}`);
 
-      if (task.dailyLimit) {
+      // 영구 보상 미션 처리 (앱 평가하기)
+      if (task.id === 'rate_app') {
+        permanentData[task.id] = {
+          completed: true,
+          completedAt: new Date().toISOString(),
+        };
+        await AsyncStorage.setItem('token_tasks_permanent', JSON.stringify(permanentData));
+      } else if (task.dailyLimit) {
+        // 일일 제한이 있는 미션
         taskData[task.id] = {
           count: (taskData[task.id]?.count || 0) + 1,
           lastCompleted: new Date().toISOString(),
           hash: hash,
         };
+        await AsyncStorage.setItem(`token_tasks_${today}`, JSON.stringify(taskData));
       } else {
+        // 일일 단회성 미션
         taskData[task.id] = {
           completed: true,
           completedAt: new Date().toISOString(),
           hash: hash,
         };
+        await AsyncStorage.setItem(`token_tasks_${today}`, JSON.stringify(taskData));
       }
-
-      await AsyncStorage.setItem(`token_tasks_${today}`, JSON.stringify(taskData));
 
       // 토큰 지급
       onTokensEarned(task.tokens);
       soundManager.playSuccess();
 
-      Alert.alert(
-        '토큰 획득! 🎉',
-        `${task.tokens}개의 토큰을 받았어요!`,
-        [{ text: '확인' }]
-      );
+      // Alert는 handleEarnTokens에서 처리하므로 여기서는 주석 처리
+      // Alert.alert(
+      //   '토큰 획득! 🎉',
+      //   `${task.tokens}개의 토큰을 받았어요!`,
+      //   [{ text: '확인' }]
+      // );
 
       // 상태 업데이트
       await loadTaskStatus();
@@ -479,7 +497,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
             <View style={styles.infoBox}>
               <Icon name="information-circle" size={20} color={colors.primary} />
               <Text style={styles.infoText}>
-                매일 자정에 미션이 초기화됩니다. 꾸준히 방문해서 토큰을 모아보세요!
+                매일 미션은 자정에 초기화됩니다. '앱 평가하기'는 한 번만 받을 수 있어요!
               </Text>
             </View>
 

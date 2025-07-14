@@ -1014,6 +1014,20 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
             </Text>
           </TouchableOpacity>
           
+          <TouchableOpacity
+            style={[styles.testButton, { backgroundColor: '#8B5CF6' + '20', marginTop: SPACING.xs }]}
+            onPress={() => {
+              if (onNavigate) {
+                onNavigate('token-debug');
+              }
+            }}
+          >
+            <Icon name="code-outline" size={20} color="#8B5CF6" />
+            <Text style={[styles.testButtonText, { color: '#8B5CF6' }]}>
+              토큰 디버그 정보 (개발용)
+            </Text>
+          </TouchableOpacity>
+          
           <View style={styles.themeSection}>
             <View style={styles.settingHeader}>
               <Icon name="color-palette-outline" size={20} color={colors.text.secondary} />

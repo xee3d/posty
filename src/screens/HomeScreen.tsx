@@ -57,6 +57,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     canShowEarnButton,
   } = useTokenManagement({ onNavigate });
   
+  // 디버깅용 - Redux 상태 확인
+  const reduxState = useAppSelector(state => state.user);
+  useEffect(() => {
+    console.log('=== Token Debug Info ===');
+    console.log('currentTokens from hook:', currentTokens);
+    console.log('Redux user.currentTokens:', reduxState.currentTokens);
+    console.log('Redux user.tokens:', reduxState.tokens);
+    console.log('Redux user.freeTokens:', reduxState.freeTokens);
+    console.log('Redux user.purchasedTokens:', reduxState.purchasedTokens);
+  }, [currentTokens, reduxState]);
+  
   const [posts, setPosts] = useState<Post[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [coachingTip, setCoachingTip] = useState<any>(null);

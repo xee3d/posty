@@ -70,7 +70,7 @@ class ServerAIService {
           'X-App-Version': '1.0.0',
         },
         body: JSON.stringify({
-          prompt: params.prompt,
+          prompt: this.enhancePromptWithLength(params.prompt, params.length),
           tone: params.tone,
           platform: params.platform || 'instagram',
           language: 'ko', // getCurrentLanguage(), // 현재 언어 추가
@@ -129,25 +129,29 @@ class ServerAIService {
   // 이미지 분석 (서버 API 호출)
   async analyzeImage(imageBase64: string): Promise<string> {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/analyze-image`, {
+      const response = await fetch(getApiUrl('/analyze-image'), {
         method: 'POST',
         headers: getAuthHeader(),
         body: JSON.stringify({
-          image: imageBase64,
+          imageBase64: imageBase64,
+          platform: 'instagram',
+          tone: 'casual'
         }),
       });
       
       const data = await response.json();
       
-      if (!response.ok) {
-        throw new Error(data.error || 'Image analysis failed');
+      if (!response.ok || !data.success) {
+        console.log('Image analysis failed, using fallback');
+        return '멋진 사진이네요! 이 순간을 포착하신 센스가 돋보입니다.';
       }
       
       return data.data.description;
       
     } catch (error) {
       console.error('Image analysis error:', error);
-      throw error;
+      // 에러 시 기본 응답
+      return '아름다운 사진이네요! 오늘의 특별한 순간을 담으셨군요.';
     }
   }
 
@@ -185,6 +189,18 @@ class ServerAIService {
       console.error('Test generate error:', error);
       throw error;
     }
+  }
+
+  // 길이에 따라 프롬프트 보강
+  private enhancePromptWithLength(prompt: string, length?: string): string {
+    if (length === 'long') {
+      return `${prompt} (자세히 300-400자로 설명해주세요. 구체적인 예시와 상세한 설명을 포함해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
+    } else if (length === 'short') {
+      return `${prompt} (간결하게 30-50자로 작성해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
+    } else if (length === 'medium') {
+      return `${prompt} (적당히 100-200자로 작성해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
+    }
+    return prompt;
   }
 }
 

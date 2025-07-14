@@ -44,6 +44,7 @@ import simplePostService from '../services/simplePostService';
 import { PLATFORM_STYLES, getRandomEndingStyle, transformContentForPlatform, generateHashtags } from '../utils/platformStyles';
 import missionService from '../services/missionService';
 import improvedStyleService, { STYLE_TEMPLATES } from '../services/improvedStyleService';
+import { UNIFIED_STYLES, getStyleById, getStyleByAiTone } from '../utils/unifiedStyleConstants';
 
 type WriteMode = 'text' | 'photo' | 'polish';
 
@@ -93,11 +94,13 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   // 스타일 정보 로드
   useEffect(() => {
     if (style) {
-      const templateInfo = STYLE_TEMPLATES.find(t => t.id === style);
+      const templateInfo = getStyleById(style);
       if (templateInfo) {
         setStyleInfo(templateInfo);
         // 스타일 가이드를 계속 표시
         setShowStyleGuide(true);
+        // 스타일에 맞는 톤 설정
+        setSelectedTone(templateInfo.aiTone);
       }
     }
   }, [style]);
@@ -105,8 +108,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   const [selectedTone, setSelectedTone] = useState(initialTone || 'casual');
   const [selectedLength, setSelectedLength] = useState(() => {
     // 스타일에 따른 기본 길이 설정
-    if (style === 'minimalist') return 'short';
-    if (style === 'storyteller') return 'long';
+    const styleInfo = style ? getStyleById(style) : null;
+    if (styleInfo?.characteristics.avgLength.includes('50')) return 'short';
+    if (styleInfo?.characteristics.avgLength.includes('200')) return 'long';
     return 'medium';
   });
   const [generatedContent, setGeneratedContent] = useState('');
@@ -174,12 +178,13 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     }
   };
 
+  // 기본 톤 정의 (11가지 스타일에 매핑되는 9가지 톤)
   const tones = [
     { id: 'casual', label: '캐주얼', icon: '😊' },
     { id: 'professional', label: '전문적', icon: '💼' },
     { id: 'humorous', label: '유머러스', icon: '😄' },
     { id: 'emotional', label: '감성적', icon: '💕' },
-    { id: 'genz', label: 'GenZ', icon: '🔥' },
+    { id: 'genz', label: 'Gen Z', icon: '🔥' },
     { id: 'millennial', label: '밀레니얼', icon: '☕' },
     { id: 'minimalist', label: '미니멀', icon: '⚪' },
     { id: 'storytelling', label: '스토리텔링', icon: '📖' },

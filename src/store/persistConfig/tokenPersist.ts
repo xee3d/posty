@@ -55,20 +55,35 @@ export const restoreTokenData = async (): Promise<boolean> => {
       
       // Redux 상태 복원 - setUserData를 사용하여 전체 토큰 정보 설정
       const { setUserData } = require('../slices/userSlice');
+      
+      // 현재 토큰을 기준으로 freeTokens 계산
+      const currentTokens = tokenData.currentTokens || 10;
+      const purchasedTokens = tokenData.purchasedTokens || 0;
+      const calculatedFreeTokens = Math.max(0, currentTokens - purchasedTokens);
+      
       store.dispatch(setUserData({
+        currentTokens: currentTokens,
         tokens: {
-          current: tokenData.currentTokens || 10,
-          total: tokenData.tokens?.total || tokenData.currentTokens || 10,
+          current: currentTokens,
+          total: tokenData.tokens?.total || currentTokens,
         },
-        purchasedTokens: tokenData.purchasedTokens || 0,
-        freeTokens: tokenData.freeTokens || 10,
+        purchasedTokens: purchasedTokens,
+        freeTokens: calculatedFreeTokens,
         lastTokenResetDate: tokenData.lastTokenResetDate || new Date().toISOString().split('T')[0],
       }));
       
-      console.log('Token data restored:', {
+      console.log('Token data restored from AsyncStorage:', {
         currentTokens: tokenData.currentTokens,
         purchasedTokens: tokenData.purchasedTokens,
         freeTokens: tokenData.freeTokens,
+        tokens: tokenData.tokens,
+      });
+      
+      // 복원 후 Redux 상태 확인
+      const restoredState = store.getState().user;
+      console.log('Redux state after restore:', {
+        currentTokens: restoredState.currentTokens,
+        tokens: restoredState.tokens,
       });
     } else {
       // 저장된 데이터가 없으면 기본값 설정

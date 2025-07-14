@@ -35,6 +35,7 @@ import SubscriptionScreen from './src/screens/SubscriptionScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import { TermsOfServiceScreen, PrivacyPolicyScreen } from './src/screens/documents';
 import TabNavigator from './src/components/TabNavigator';
+import TokenDebugScreen from './src/screens/debug/TokenDebugScreen';
 
 // Import constants and hooks
 import { COLORS } from './src/utils/constants';
@@ -52,6 +53,7 @@ import offlineSyncService from './src/services/offline/offlineSyncService';
 import analyticsService from './src/services/analytics/analyticsService';
 import notificationService from './src/services/notification/notificationService';
 import { restoreTokenData, setupTokenPersistence, checkDailyResetAfterRestore } from './src/store/persistConfig/tokenPersist';
+import { fixTokenInconsistency } from './src/utils/tokenFix';
 
 const { width } = Dimensions.get('window');
 
@@ -102,6 +104,11 @@ const App: React.FC = () => {
         
         // 3. 토큰 지속성 설정
         setupTokenPersistence();
+        
+        // 4. 토큰 불일치 수정 (개발 환경에서만)
+        if (__DEV__) {
+          await fixTokenInconsistency();
+        }
         
         console.log('✅ Token data restored successfully');
       } catch (error) {
@@ -339,6 +346,8 @@ const App: React.FC = () => {
         return <TermsOfServiceScreen key="terms" onNavigate={handleTabPress} />;
       case 'privacy':
         return <PrivacyPolicyScreen key="privacy" onNavigate={handleTabPress} />;
+      case 'token-debug':
+        return <TokenDebugScreen key="token-debug" />;
       default:
         return <HomeScreen key="home" onNavigate={handleTabPress} />;
     }

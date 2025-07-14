@@ -20,6 +20,7 @@ import { ScaleButton } from '../components/AnimationComponents';
 import { LoadingScreen, EmptyState } from '../components/common';
 import simplePostService from '../services/simplePostService';
 import improvedStyleService, { STYLE_TEMPLATES, STYLE_CHALLENGES } from '../services/improvedStyleService';
+import { UNIFIED_STYLES, getStyleById, STYLE_CATEGORIES } from '../utils/unifiedStyleConstants';
 import { soundManager } from '../utils/soundManager';
 import { saveContent } from '../utils/storage';
 
@@ -79,8 +80,8 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       // 인사이트 생성
       generateInsights(analysis, posts);
       
-      // 템플릿 설정
-      setTemplates(STYLE_TEMPLATES);
+      // 통합된 템플릿 설정
+      setTemplates(UNIFIED_STYLES);
       
       // 활성 챌린지 확인
       const savedChallenge = await AsyncStorage.getItem('USER_STYLE_CHALLENGES');
@@ -282,12 +283,12 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   };
 
   const getStyleIcon = (styleId: string): string => {
-    const template = STYLE_TEMPLATES.find(t => t.id === styleId);
+    const template = getStyleById(styleId);
     return template?.icon || 'help-circle-outline';
   };
 
   const getStyleColor = (styleId: string): string => {
-    const template = STYLE_TEMPLATES.find(t => t.id === styleId);
+    const template = getStyleById(styleId);
     return template?.color || colors.primary;
   };
 
@@ -305,12 +306,13 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       ) || STYLE_CHALLENGES[0];
       handleStartChallenge(recommendedChallenge.id);
     } else if (insight.action === '이 스타일로 계속 발전하기' && onNavigate) {
-      const template = STYLE_TEMPLATES.find(t => t.id === styleAnalysis.dominantStyle);
+      const template = getStyleById(styleAnalysis.dominantStyle);
       if (template) {
         onNavigate('ai-write', {
           title: `${template.name} 스타일`,
           content: template.characteristics.examples[0],
-          style: template.id
+          style: template.id,
+          initialTone: template.aiTone // AI 톤 추가
         });
       }
     } else if (onNavigate) {
@@ -325,31 +327,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     
     if (onNavigate) {
       let content = '';
-      let tone = 'casual'; // 기본 톤
       
-      // 템플릿 ID에서 톤 추출
-      switch (template.id) {
-        case 'minimalist':
-          tone = 'minimalist';
-          break;
-        case 'emotional':
-          tone = 'emotional';
-          break;
-        case 'humorous':
-          tone = 'humorous';
-          break;
-        case 'storytelling':
-          tone = 'storytelling';
-          break;
-        case 'professional':
-          tone = 'professional';
-          break;
-        case 'motivational':
-          tone = 'motivational';
-          break;
-        default:
-          tone = 'casual';
-      }
+      // 통합 스타일에서 aiTone 가져오기
+      const tone = template.aiTone || 'casual';
       
       if (template.characteristics?.examples) {
         content = template.characteristics.examples[0];
@@ -616,7 +596,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요
       </Text>
       
-      {STYLE_TEMPLATES.map((template) => (
+      {templates.map((template) => (
         <TouchableOpacity
           key={template.id}
           style={[styles.templateCard, cardTheme.card]}
@@ -645,18 +625,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         </TouchableOpacity>
       ))}
       
-      <TouchableOpacity
-        style={[styles.createTemplateButton, { borderColor: colors.primary }]}
-        onPress={() => {
-          soundManager.playTap();
-          Alert.alert('Coming Soon', '템플릿 만들기 기능이 곧 추가됩니다!');
-        }}
-      >
-        <Icon name="add-circle-outline" size={24} color={colors.primary} />
-        <Text style={[styles.createTemplateText, { color: colors.primary }]}>
-          새 템플릿 만들기
-        </Text>
-      </TouchableOpacity>
+
       
       {/* 스타일 챌린지 */}
       <View style={styles.challengeSection}>

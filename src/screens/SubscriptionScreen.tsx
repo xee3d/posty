@@ -288,10 +288,6 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     );
   };
 
-  const handleCompleteMission = () => {
-    // 미션 화면으로 이동
-    navigation.navigate('Mission');
-  };
 
   const handleSubscribe = async () => {
     if (selectedPlan === 'free') {
@@ -466,13 +462,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             </Text>
           </View>
 
-          {/* 현재 보유 토큰 정보만 간단히 표시 */}
-          <View style={styles.tokenInfoBanner}>
-            <Icon name="info-outline" size={16} color={colors.text.secondary} />
-            <Text style={styles.tokenInfoText}>
-              현재 {stats.totalTokens}개의 토큰을 보유하고 있습니다
-            </Text>
-          </View>
+          {/* 현재 보유 토큰 정보 표시 제거 - 불필요한 중복 정보 */}
 
           {/* 무료 토큰 받기 목록 */}
           <View style={styles.earnTokensSection}>
@@ -543,20 +533,6 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 <View style={styles.earnTokenInfo}>
                   <Text style={styles.earnTokenTitle}>앱 평가하기</Text>
                   <Text style={styles.earnTokenDesc}>+10 토큰 (1회)</Text>
-                </View>
-                <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
-              </TouchableOpacity>
-
-              <TouchableOpacity 
-                style={styles.earnTokenItem}
-                onPress={() => handleCompleteMission()}
-              >
-                <View style={[styles.earnTokenIcon, { backgroundColor: '#14B8A6' + '20' }]}>
-                  <Icon name="task-alt" size={24} color="#14B8A6" />
-                </View>
-                <View style={styles.earnTokenInfo}>
-                  <Text style={styles.earnTokenTitle}>미션 완료</Text>
-                  <Text style={styles.earnTokenDesc}>+3 토큰 (일일 미션)</Text>
                 </View>
                 <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
               </TouchableOpacity>
