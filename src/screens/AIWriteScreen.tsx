@@ -30,6 +30,7 @@ import { saveContent } from '../utils/storage';
 import contentSaveService from '../services/contentSaveService';
 import { APP_TEXT, getText } from '../utils/textConstants';
 import { soundManager } from '../utils/soundManager';
+import trendService from '../services/trendService';
 import { getPlaceholderText, getTimeBasedPrompts, getCategoryFromTone, extractHashtags } from '../utils/promptUtils';
 import {
   launchImageLibrary,
@@ -116,9 +117,62 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   const [initialHashtagsList, setInitialHashtagsList] = useState<string[]>(initialHashtags || []);
   const [imageAnalysis, setImageAnalysis] = useState<string>('');
   const [imageAnalysisResult, setImageAnalysisResult] = useState<any>(null);
+  const [trendingHashtags, setTrendingHashtags] = useState<string[]>([]);
+  const [selectedHashtags, setSelectedHashtags] = useState<string[]>([]);
+  const [trendingPrompts, setTrendingPrompts] = useState<string[]>([]);
 
   // initialText가 있을 때 자동으로 콘텐츠 생성 - 제거됨
   // 사용자가 직접 생성 버튼을 눌러야 함
+
+  // 트렌드 해시태그 및 주제 로드
+  useEffect(() => {
+    loadTrendingData();
+    
+    // 30분마다 업데이트 (트렌드가 업데이트되면 반영)
+    const interval = setInterval(() => {
+      loadTrendingData();
+    }, 30 * 60 * 1000); // 30분
+    
+    return () => clearInterval(interval);
+  }, []);
+
+  const loadTrendingData = async () => {
+    try {
+      const trends = await trendService.getAllTrends();
+      
+      // 트렌드에서 해시태그 추출 (최대 10개)
+      const hashtags = new Set<string>();
+      trends.forEach(trend => {
+        if (trend.hashtags) {
+          trend.hashtags.forEach(tag => {
+            if (hashtags.size < 10) {
+              hashtags.add(tag.replace('#', ''));
+            }
+          });
+        }
+      });
+      setTrendingHashtags(Array.from(hashtags));
+      
+      // 트렌드 제목을 그대로 주제로 사용 (최대 8개)
+      const prompts = trends
+        .slice(0, 8)
+        .map(trend => trend.title)
+        .filter(title => title && title.length > 0);
+      
+      setTrendingPrompts(prompts);
+      
+      // 부족하면 기본 키워드 추가
+      if (prompts.length < 6) {
+        const defaultWords = getDefaultKeywords();
+        prompts.push(...defaultWords.slice(0, 6 - prompts.length));
+        setTrendingPrompts(prompts);
+      }
+    } catch (error) {
+      console.error('Failed to load trending data:', error);
+      // 오류 시 기본 키워드 사용
+      setTrendingPrompts(getDefaultKeywords());
+    }
+  };
 
   const tones = [
     { id: 'casual', label: '캐주얼', icon: '😊' },
@@ -138,6 +192,21 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     { id: 'long', label: '🥼', count: '길게', desc: '~300자' },
   ];
 
+  // 기본 키워드 목록
+  const getDefaultKeywords = () => {
+    const hour = new Date().getHours();
+    
+    if (hour >= 6 && hour < 12) {
+      return ['모닝루틴', '카페', '출근', '아침', '커피', '운동'];
+    } else if (hour >= 12 && hour < 18) {
+      return ['점심', '일상', '오후', '휴식', '산책', '카페'];
+    } else if (hour >= 18 && hour < 22) {
+      return ['저녁', '퇴근', '운동', '취미', '휴식', '맛집'];
+    } else {
+      return ['야식', '넷플릭스', '휴식', '일상', '취미', '새벽'];
+    }
+  };
+
   // 스타일에 맞는 placeholder 생성
   const getStyleBasedPlaceholder = () => {
     if (styleInfo) {
@@ -150,26 +219,14 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     return getPlaceholderText();
   };
 
-  // 스타일에 맞는 빠른 주제 생성
+  // 스타일에 맞는 빠른 주제 생성 (트렌드 우선)
   const getStyleBasedPrompts = () => {
-    if (styleInfo) {
-      // 스타일별 특화된 주제
-      switch (styleInfo.id) {
-        case 'minimalist':
-          return ['오늘의 한 마디', '고요한 순간', '단순한 행복', '평온한 일상'];
-        case 'storyteller':
-          return ['잘 못났던 그날 밤', '처음 만났던 순간', '잊지 못할 대화', '추억의 그 장소'];
-        case 'trendsetter':
-          return ['요즘 핫한 아이템', '새로 오픈한 카페', 'MZ 필수템', '핸플 탐방기'];
-        case 'philosopher':
-          return ['삶의 의미를 찾아서', '행복에 대한 생각', '오늘의 깨달음', '성찰의 시간'];
-        case 'humorist':
-          return ['오늘 있었던 웃긴 일', '나만 이러나?', '웃프다 웃픈', '일상 생활 개그'];
-        default:
-          return getTimeBasedPrompts();
-      }
+    // 트렌드 주제가 있으면 우선 사용
+    if (trendingPrompts.length > 0) {
+      return trendingPrompts;
     }
-    return getTimeBasedPrompts();
+    
+    return getDefaultKeywords();
   };
   
   const quickPrompts = getStyleBasedPrompts();
@@ -325,7 +382,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
           prompt: enhancedPrompt,
           tone: selectedTone as any,
           length: selectedLength,
-          hashtags: initialHashtagsList.length > 0 ? initialHashtagsList : undefined,
+          hashtags: selectedHashtags.length > 0 ? selectedHashtags : (initialHashtagsList.length > 0 ? initialHashtagsList : undefined),
         });
         // 객체에서 content 문자열만 추출
         result = response.content;
@@ -347,7 +404,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
           prompt: photoPrompt.trim(),
           tone: selectedTone as any,
           length: selectedLength,
-          hashtags: initialHashtagsList.length > 0 ? initialHashtagsList : undefined,
+          hashtags: selectedHashtags.length > 0 ? selectedHashtags : (initialHashtagsList.length > 0 ? initialHashtagsList : undefined),
         });
         result = response.content;
       }
@@ -595,14 +652,19 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                     style={styles.quickPromptsScroll}
                   >
                     {quickPrompts.map((quickPrompt, index) => (
-                      <AnimatedCard
+                      <TouchableOpacity
                         key={index}
-                        delay={300 + index * 50}
-                        style={styles.quickPromptChip}
+                        style={[
+                          styles.hashtagChip,
+                          trendingPrompts.includes(quickPrompt) && styles.hashtagChipActive
+                        ]}
                         onPress={() => handleQuickPrompt(quickPrompt)}
                       >
-                        <Text style={styles.quickPromptText}>{quickPrompt}</Text>
-                      </AnimatedCard>
+                        <Text style={[
+                          styles.hashtagText,
+                          trendingPrompts.includes(quickPrompt) && styles.hashtagTextActive
+                        ]}>{quickPrompt}</Text>
+                      </TouchableOpacity>
                     ))}
                   </ScrollView>
                 </View>
@@ -869,6 +931,29 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
             </View>
           </SlideInView>
 
+          {/* 선택된 해시태그 표시 */}
+          {selectedHashtags.length > 0 && (
+            <SlideInView direction="up" delay={1100}>
+              <View style={styles.selectedHashtagsSection}>
+                <Text style={styles.selectedHashtagsTitle}>선택된 해시태그 ({selectedHashtags.length})</Text>
+                <View style={styles.selectedHashtagsContainer}>
+                  {selectedHashtags.map((hashtag, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={styles.selectedHashtagChip}
+                      onPress={() => {
+                        setSelectedHashtags(prev => prev.filter(h => h !== hashtag));
+                      }}
+                    >
+                      <Text style={styles.selectedHashtagText}>#{hashtag}</Text>
+                      <Icon name="close-circle" size={16} color={colors.white} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            </SlideInView>
+          )}
+
           {/* 생성 버튼 */}
           <FadeInView delay={1200}>
             <View style={styles.generateButtonContainer}>
@@ -1131,18 +1216,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     color: colors.white,
   },
   quickPromptsScroll: {
+    flexDirection: 'row',
     marginTop: SPACING.sm,
-  },
-  quickPromptChip: {
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    borderRadius: 20,
-    marginRight: SPACING.sm,
-  },
-  quickPromptText: {
-    fontSize: 14,
-    color: '#6B7280',
   },
   photoSection: {
     paddingHorizontal: SPACING.lg,
@@ -1437,6 +1512,69 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     fontSize: 13,
     color: colors.primary,
     textDecorationLine: 'underline',
+  },
+  hashtagSection: {
+    marginTop: SPACING.lg,
+  },
+  hashtagTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text.secondary,
+    marginBottom: SPACING.sm,
+  },
+  hashtagScroll: {
+    flexDirection: 'row',
+  },
+  hashtagChip: {
+    backgroundColor: colors.surface,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: 8,
+    borderRadius: 20,
+    marginRight: SPACING.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    maxWidth: 200, // 최대 너비 제한
+  },
+  hashtagChipActive: {
+    backgroundColor: cardTheme.molly.background,
+    borderColor: colors.primary,
+  },
+  hashtagText: {
+    fontSize: 13,
+    color: colors.text.secondary,
+    fontWeight: '500',
+  },
+  hashtagTextActive: {
+    color: colors.primary,
+  },
+  selectedHashtagsSection: {
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.md,
+  },
+  selectedHashtagsTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.text.secondary,
+    marginBottom: SPACING.sm,
+  },
+  selectedHashtagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: SPACING.xs,
+  },
+  selectedHashtagChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.primary,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  selectedHashtagText: {
+    fontSize: 12,
+    color: colors.white,
+    fontWeight: '500',
   },
   tokenCostBadge: {
     flexDirection: 'row',

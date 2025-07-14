@@ -1,3 +1,20 @@
 declare module '@env' {
-  export const OPENAI_API_KEY: string;
+  export const NEWS_API_KEY: string;
+  export const GOOGLE_WEB_CLIENT_ID: string;
+  export const NAVER_CONSUMER_KEY: string;
+  export const NAVER_CONSUMER_SECRET: string;
+  export const NAVER_APP_NAME: string;
+  export const NAVER_SERVICE_URL_SCHEME: string;
+  export const KAKAO_APP_KEY: string;
+  export const KAKAO_APP_SCHEME: string;
+  export const FIREBASE_API_KEY: string;
+  export const FIREBASE_AUTH_DOMAIN: string;
+  export const FIREBASE_PROJECT_ID: string;
+  export const FIREBASE_STORAGE_BUCKET: string;
+  export const FIREBASE_MESSAGING_SENDER_ID: string;
+  export const FIREBASE_APP_ID: string;
+  export const GOOGLE_ANALYTICS_ID: string;
+  export const FCM_SERVER_KEY: string;
+  export const VERCEL_API_URL: string;
+  export const VERCEL_APP_SECRET: string;
 }

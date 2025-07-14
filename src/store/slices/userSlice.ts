@@ -289,6 +289,11 @@ const userSlice = createSlice({
         state.currentTokens = data.tokens.current;
       }
       
+      // 추가 토큰 필드 처리
+      if (data.purchasedTokens !== undefined) state.purchasedTokens = data.purchasedTokens;
+      if (data.freeTokens !== undefined) state.freeTokens = data.freeTokens;
+      if (data.lastTokenResetDate !== undefined) state.lastTokenResetDate = data.lastTokenResetDate;
+      
       if (data.subscription) {
         state.subscription = data.subscription;
         state.subscriptionPlan = data.subscription.plan === 'basic' ? 'premium' : data.subscription.plan;

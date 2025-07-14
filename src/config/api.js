@@ -16,6 +16,9 @@ const API_CONFIG = {
   
   // 앱 시크릿 (환경변수로 관리하는 것이 좋음)
   APP_SECRET: 'posty-secret-key-change-this-in-production', // Vercel 환경변수와 일치해야 함
+  
+  // NewsAPI 키 (무료: newsapi.org에서 받을 수 있음)
+  NEWS_API_KEY: process.env.NEWS_API_KEY || ''
 };
 
 // 개발 모드에서 로컬 서버 사용 (현재는 주석 처리)
@@ -36,6 +39,11 @@ export const getAuthHeader = () => {
     'Authorization': `Bearer ${API_CONFIG.APP_SECRET}`,
     'Content-Type': 'application/json',
   };
+};
+
+// NewsAPI 키 가져오기 함수
+export const getNewsApiKey = () => {
+  return API_CONFIG.NEWS_API_KEY;
 };
 
 export default API_CONFIG;

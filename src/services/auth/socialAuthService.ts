@@ -157,25 +157,52 @@ class SocialAuthService {
   async signOut(): Promise<void> {
     try {
       if (!DEV_MODE) {
-        // 각 소셜 로그인 SDK 로그아웃
+        // 현재 로그인된 사용자 확인
         const currentUser = auth().currentUser;
+        
         if (currentUser) {
+          // 각 소셜 로그인 SDK 로그아웃
           const providerId = currentUser.providerData[0]?.providerId;
           
-          if (providerId?.includes('google')) {
-            await GoogleSignin.signOut();
-          } else if (providerId?.includes('naver')) {
-            await NaverLogin.logout();
+          try {
+            if (providerId?.includes('google')) {
+              await GoogleSignin.signOut();
+            } else if (providerId?.includes('naver')) {
+              await NaverLogin.logout();
+            }
+          } catch (socialError) {
+            console.warn('소셜 로그아웃 오류 (무시됨):', socialError);
           }
+          
+          // Firebase 로그아웃
+          await auth().signOut();
+        } else {
+          console.log('로그인된 사용자가 없음 - 로컬 데이터만 정리');
         }
-        
-        // Firebase 로그아웃
-        await auth().signOut();
       }
       
-      // 로컬 저장소 정리
+      // 로컬 저장소 정리 (항상 실행)
       await AsyncStorage.removeItem('@user_profile');
-    } catch (error) {
+      
+      // 추가 로컬 데이터 정리
+      const keysToRemove = [
+        '@posty:persisted_tokens',
+        '@posty:persisted_subscription',
+        'USER_SUBSCRIPTION',
+        'SOCIAL_MEDIA_TOKENS'
+      ];
+      
+      await AsyncStorage.multiRemove(keysToRemove);
+      
+    } catch (error: any) {
+      // Firebase auth 오류 중 no-current-user는 무시
+      if (error?.code === 'auth/no-current-user') {
+        console.log('이미 로그아웃된 상태');
+        // 로컬 데이터는 정리
+        await AsyncStorage.removeItem('@user_profile');
+        return;
+      }
+      
       console.error('로그아웃 실패:', error);
       throw error;
     }

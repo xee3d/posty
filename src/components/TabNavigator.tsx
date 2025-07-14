@@ -19,7 +19,7 @@ import { COLORS, FONTS, SPACING } from '../utils/constants';
 import { useAppTheme } from '../hooks/useAppTheme';
 
 const { width } = Dimensions.get('window');
-const TAB_WIDTH = width / 4;
+const TAB_WIDTH = width / 5;
 
 interface TabNavigatorProps {
   activeTab: string;
@@ -44,6 +44,7 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ activeTab, onTabPress }) =>
   const tabs: TabConfig[] = useMemo(() => [
     { key: 'home', icon: 'home-outline', activeIcon: 'home', label: '홈' },
     { key: 'ai-write', icon: 'create-outline', activeIcon: 'create', label: '글쓰기' },
+    { key: 'trend', icon: 'trending-up-outline', activeIcon: 'trending-up', label: '트렌드' },
     { key: 'my-style', icon: 'palette', activeIcon: 'palette', label: '내 스타일', isMaterial: true },
     { key: 'settings', icon: 'settings-outline', activeIcon: 'settings', label: '설정' },
   ], []);

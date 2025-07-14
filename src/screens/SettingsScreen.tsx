@@ -73,7 +73,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   
   // AI 토큰 및 통계
   const [stats, setStats] = useState({
-    todayGenerated: 0,
     weeklyGenerated: 0,
     monthlyGenerated: 0,
     totalSaved: 0,
@@ -95,6 +94,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       }));
     }
   }, [reduxUser.tokens]); // Redux 토큰 정보가 변경될 때마다 업데이트
+
+  // 통계 업데이트는 loadStats()에서 처리
 
   const loadAllData = async () => {
     try {
@@ -174,7 +175,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       // 오늘 통계
       const today = new Date().toDateString();
       const todayStats = await AsyncStorage.getItem(`stats_${today}`);
-      const parsedStats = todayStats ? JSON.parse(todayStats) : { generated: 0 };
+      // 오늘 생성 개수 제거
       
       // tokenService를 사용하여 실제 토큰 수 가져오기
       const subscription = await tokenService.getSubscription();
@@ -187,11 +188,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       let remainingTokens = 0;
       let tokensTotal = 10;
       
-      if (subscription.plan === 'pro') {
+      if (subscription.subscriptionPlan === 'pro') {
         // 프로 플랜은 무제한
         tokensTotal = 999;
         remainingTokens = 999;
-      } else if (subscription.plan === 'premium') {
+      } else if (subscription.subscriptionPlan === 'premium') {
         // 프리미엄 플랜
         tokensTotal = 100;
         remainingTokens = reduxTokens !== undefined ? reduxTokens : (subscription.monthlyTokensRemaining || 0);
@@ -207,7 +208,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       }
       
       setStats({
-        todayGenerated: parsedStats.generated || 0,
+        // todayGenerated 제거
         weeklyGenerated: 18,
         monthlyGenerated: 127,
         totalSaved: 45,
@@ -217,12 +218,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       });
       
       // 구독 플랜도 업데이트
-      setSubscriptionPlan(subscription.plan);
+      setSubscriptionPlan(subscription.subscriptionPlan);
     } catch (error) {
       console.error('Failed to load stats:', error);
       // 오류 시 기본값 설정
       setStats({
-        todayGenerated: 0,
         weeklyGenerated: 0,
         monthlyGenerated: 0,
         totalSaved: 0,
@@ -465,18 +465,45 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
           style: 'destructive',
           onPress: async () => {
             try {
-              // 소셜 로그인 로그아웃
-              await socialAuthService.signOut();
+              // 소셜 로그인 로그아웃 (에러 무시)
+              await socialAuthService.signOut().catch(err => {
+                console.log('로그아웃 에러 (continued):', err);
+              });
               
               // Redux 상태 초기화
               dispatch(resetUser());
               
+              // 모든 로컬 데이터 초기화
+              const authKeys = [
+                '@user_profile',
+                '@posty:persisted_tokens',
+                '@posty:persisted_subscription',
+                'USER_SUBSCRIPTION',
+                'SOCIAL_MEDIA_TOKENS',
+                'posty_join_date'
+              ];
+              
+              await AsyncStorage.multiRemove(authKeys).catch(err => {
+                console.log('로컬 데이터 삭제 에러:', err);
+              });
+              
               // 로그인 화면으로 이동
               if (onNavigate) {
-                onNavigate('login');
+                setTimeout(() => {
+                  onNavigate('login');
+                }, 100);
               }
+              
+              Alert.alert('알림', '로그아웃되었습니다.');
             } catch (error) {
-              Alert.alert('오류', '로그아웃에 실패했어요.');
+              console.error('로그아웃 중 예상치 못한 에러:', error);
+              // 그래도 로그아웃 처리
+              dispatch(resetUser());
+              if (onNavigate) {
+                setTimeout(() => {
+                  onNavigate('login');
+                }, 100);
+              }
             }
           },
         },
@@ -805,11 +832,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
 
             {/* 간단한 통계 */}
             <View style={styles.miniStats}>
-              <View style={styles.miniStatItem}>
-                <Text style={styles.miniStatValue}>{stats.todayGenerated}</Text>
-                <Text style={styles.miniStatLabel}>오늘 생성</Text>
-              </View>
-              <View style={styles.miniStatDivider} />
               <View style={styles.miniStatItem}>
                 <Text style={styles.miniStatValue}>{stats.totalSaved}</Text>
                 <Text style={styles.miniStatLabel}>저장된 콘텐츠</Text>

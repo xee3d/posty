@@ -8,14 +8,17 @@ import {
   SafeAreaView,
   RefreshControl,
   ActivityIndicator,
+  Image,
 } from 'react-native';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, BRAND } from '../utils/constants';
 import Icon from 'react-native-vector-icons/Ionicons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../hooks/useAppTheme';
-import improvedUserTrendsService from '../services/improvedUserTrendsService';
 import { soundManager } from '../utils/soundManager';
+import trendService from '../services/trendService';
+import { AnimatedCard, SlideInView, FadeInView } from '../components/AnimationComponents';
 
-type TrendPeriod = 'today' | 'week' | 'month';
+type TrendCategory = 'all' | 'news' | 'social' | 'keywords';
 
 interface TrendScreenProps {
   onNavigate?: (tab: string, data?: any) => void;
@@ -23,25 +26,30 @@ interface TrendScreenProps {
 
 const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   const { colors, isDark } = useAppTheme();
-  const [selectedPeriod, setSelectedPeriod] = useState<TrendPeriod>('week');
+  const [selectedCategory, setSelectedCategory] = useState<TrendCategory>('all');
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [trendsData, setTrendsData] = useState<any>(null);
+  const [trends, setTrends] = useState<any[]>([]);
+  const [userTrends, setUserTrends] = useState<any>(null);
 
-  const loadUserTrends = async () => {
+  const loadTrends = async () => {
     try {
       setIsLoading(true);
-      const trends = await improvedUserTrendsService.analyzeTrends(selectedPeriod);
-      setTrendsData(trends);
+      
+      // 외부 트렌드 데이터 가져오기
+      const trendData = await trendService.getAllTrends();
+      setTrends(trendData);
+      
+      // 사용자 트렌드 분석 (기존 서비스 사용)
+      try {
+        const improvedUserTrendsService = require('../services/improvedUserTrendsService').default;
+        const userTrendData = await improvedUserTrendsService.analyzeTrends('week');
+        setUserTrends(userTrendData);
+      } catch (error) {
+        console.log('User trends not available');
+      }
     } catch (error) {
       console.error('Failed to load trends:', error);
-      setTrendsData({
-        hashtags: [],
-        categories: [],
-        bestTimes: [],
-        insights: [],
-        stats: { totalPosts: 0, activeUsers: 0, trendingUp: 0, trendingDown: 0 }
-      });
     } finally {
       setIsLoading(false);
       setRefreshing(false);
@@ -49,29 +57,39 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   };
 
   useEffect(() => {
-    loadUserTrends();
-  }, [selectedPeriod]);
+    loadTrends();
+  }, []);
 
   const onRefresh = async () => {
     soundManager.playRefresh();
     setRefreshing(true);
-    await loadUserTrends();
+    await loadTrends();
   };
 
-  const handlePeriodChange = (period: TrendPeriod) => {
+  const handleCategoryChange = (category: TrendCategory) => {
     soundManager.playTap();
-    setSelectedPeriod(period);
+    setSelectedCategory(category);
   };
 
-  const handleHashtagPress = (hashtag: string) => {
+  const handleTrendPress = (trend: any) => {
     soundManager.playTap();
     if (onNavigate) {
+      const prompt = trend.title || trendService.generatePromptFromTrend(trend);
       onNavigate('ai-write', {
-        content: `#${hashtag} `,
-        hashtags: [hashtag],
+        initialText: prompt,
+        initialHashtags: trend.hashtags || [],
       });
     }
   };
+
+  const filteredTrends = selectedCategory === 'all' 
+    ? trends 
+    : trends.filter(trend => {
+        if (selectedCategory === 'news') return trend.source === 'news';
+        if (selectedCategory === 'social') return trend.source === 'social';
+        if (selectedCategory === 'keywords') return trend.source === 'naver' || trend.source === 'google';
+        return true;
+      });
 
   const styles = createStyles(colors, isDark);
 
@@ -80,7 +98,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>트렌드 분석 중...</Text>
+          <Text style={styles.loadingText}>실시간 트렌드를 가져오는 중...</Text>
         </View>
       </SafeAreaView>
     );
@@ -100,136 +118,176 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
           />
         }
       >
-        {/* 심플한 헤더 */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>트렌드</Text>
-        </View>
-
-        {/* 기간 선택 - 심플한 버튼 */}
-        <View style={styles.periodContainer}>
-          {(['today', 'week', 'month'] as TrendPeriod[]).map((period) => (
-            <TouchableOpacity
-              key={period}
-              style={[
-                styles.periodButton,
-                selectedPeriod === period && styles.periodButtonActive,
-              ]}
-              onPress={() => handlePeriodChange(period)}
-            >
-              <Text
-                style={[
-                  styles.periodButtonText,
-                  selectedPeriod === period && styles.periodButtonTextActive,
-                ]}
-              >
-                {period === 'today' ? '오늘' : period === 'week' ? '이번 주' : '이번 달'}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* TOP 해시태그 - 큰 카드 하나 */}
-        {trendsData?.hashtags?.[0] && (
-          <TouchableOpacity
-            style={styles.topHashtagCard}
-            onPress={() => handleHashtagPress(trendsData.hashtags[0].hashtag)}
-            activeOpacity={0.95}
-          >
-            <View style={styles.topBadge}>
-              <Text style={styles.topBadgeText}>TOP 1</Text>
+        {/* 헤더 */}
+        <FadeInView delay={0}>
+          <View style={styles.header}>
+            <View style={styles.headerTop}>
+              <View style={styles.mollyBadge}>
+                <Text style={styles.mollyBadgeText}>T</Text>
+              </View>
+              <Text style={styles.headerTitle}>실시간 트렌드</Text>
             </View>
-            <Text style={styles.topHashtag}>#{trendsData.hashtags[0].hashtag}</Text>
-            <View style={styles.topStats}>
-              <Text style={styles.topStatText}>{trendsData.hashtags[0].count}회 사용</Text>
-              {trendsData.hashtags[0].growth > 0 && (
-                <View style={styles.growthIndicator}>
-                  <Icon name="trending-up" size={16} color={colors.success} />
-                  <Text style={styles.growthText}>+{trendsData.hashtags[0].growth}%</Text>
-                </View>
-              )}
-            </View>
-          </TouchableOpacity>
-        )}
-
-        {/* 나머지 해시태그 - 심플한 리스트 */}
-        {trendsData?.hashtags && trendsData.hashtags.length > 1 && (
-          <View style={styles.hashtagList}>
-            <Text style={styles.sectionTitle}>자주 사용한 태그</Text>
-            {trendsData.hashtags.slice(1, 6).map((trend: any, index: number) => (
-              <TouchableOpacity
-                key={trend.hashtag}
-                style={styles.hashtagItem}
-                onPress={() => handleHashtagPress(trend.hashtag)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.hashtagLeft}>
-                  <Text style={styles.hashtagRank}>{index + 2}</Text>
-                  <Text style={styles.hashtagText}>#{trend.hashtag}</Text>
-                </View>
-                <View style={styles.hashtagRight}>
-                  <Text style={styles.hashtagCount}>{trend.count}회</Text>
-                  {trend.growth !== 0 && (
-                    <Icon 
-                      name={trend.growth > 0 ? 'arrow-up' : 'arrow-down'} 
-                      size={14} 
-                      color={trend.growth > 0 ? colors.success : colors.error} 
-                    />
-                  )}
-                </View>
-              </TouchableOpacity>
-            ))}
+            <Text style={styles.headerSubtitle}>지금 사람들이 이야기하는 주제들이에요</Text>
           </View>
-        )}
+        </FadeInView>
 
-        {/* 추천 섹션 - 간단한 칩 스타일 */}
-        {(trendsData?.seasonal || trendsData?.weeklyChallenge) && (
-          <View style={styles.recommendSection}>
-            <Text style={styles.sectionTitle}>추천</Text>
-            
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.chipContainer}>
-              {trendsData?.weeklyChallenge && (
+        {/* 카테고리 선택 */}
+        <SlideInView direction="left" delay={100}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            style={styles.categoryScroll}
+          >
+            <View style={styles.categoryContainer}>
+              {[
+                { id: 'all', label: '전체', icon: 'globe' },
+                { id: 'news', label: '뉴스', icon: 'newspaper' },
+                { id: 'social', label: '소셜', icon: 'people' },
+                { id: 'keywords', label: '검색어', icon: 'search' },
+              ].map((category) => (
                 <TouchableOpacity
-                  style={[styles.chip, styles.challengeChip]}
-                  onPress={() => handleHashtagPress(trendsData.weeklyChallenge.hashtag)}
+                  key={category.id}
+                  style={[
+                    styles.categoryButton,
+                    selectedCategory === category.id && styles.categoryButtonActive,
+                  ]}
+                  onPress={() => handleCategoryChange(category.id as TrendCategory)}
                 >
-                  <Icon name="flash" size={14} color={colors.primary} />
-                  <Text style={styles.chipText}>#{trendsData.weeklyChallenge.hashtag}</Text>
-                </TouchableOpacity>
-              )}
-              
-              {trendsData?.seasonal?.hashtags.map((tag: string, idx: number) => (
-                <TouchableOpacity
-                  key={idx}
-                  style={styles.chip}
-                  onPress={() => handleHashtagPress(tag)}
-                >
-                  <Text style={styles.chipText}>#{tag}</Text>
+                  <Icon 
+                    name={category.icon} 
+                    size={16} 
+                    color={selectedCategory === category.id ? colors.white : colors.text.secondary} 
+                  />
+                  <Text
+                    style={[
+                      styles.categoryButtonText,
+                      selectedCategory === category.id && styles.categoryButtonTextActive,
+                    ]}
+                  >
+                    {category.label}
+                  </Text>
                 </TouchableOpacity>
               ))}
-            </ScrollView>
-          </View>
+            </View>
+          </ScrollView>
+        </SlideInView>
+
+        {/* 내 트렌드 요약 (있는 경우) */}
+        {userTrends && userTrends.hashtags?.length > 0 && (
+          <SlideInView direction="right" delay={200}>
+            <View style={styles.myTrendsSection}>
+              <Text style={styles.sectionTitle}>내가 자주 쓴 태그</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                {userTrends.hashtags.slice(0, 5).map((tag: any, index: number) => (
+                  <AnimatedCard
+                    key={tag.hashtag}
+                    delay={250 + index * 50}
+                    style={styles.myHashtagChip}
+                    onPress={() => handleTrendPress({ 
+                      title: `#${tag.hashtag}`, 
+                      hashtags: [tag.hashtag] 
+                    })}
+                  >
+                    <Text style={styles.myHashtagText}>#{tag.hashtag}</Text>
+                    <Text style={styles.myHashtagCount}>{tag.count}</Text>
+                  </AnimatedCard>
+                ))}
+              </ScrollView>
+            </View>
+          </SlideInView>
         )}
 
-        {/* 최적 시간 - 심플한 정보 카드 */}
-        <View style={styles.timeSection}>
-          <Text style={styles.sectionTitle}>최적 포스팅 시간</Text>
-          <View style={styles.timeCard}>
-            <Icon name="time-outline" size={24} color={colors.primary} />
-            <View style={styles.timeInfo}>
-              <Text style={styles.timeText}>오후 7-9시</Text>
-              <Text style={styles.timeSubtext}>가장 활발한 시간대</Text>
+        {/* 실시간 트렌드 리스트 */}
+        <View style={styles.trendsSection}>
+          <Text style={styles.sectionTitle}>
+            {selectedCategory === 'all' ? '전체 트렌드' :
+             selectedCategory === 'news' ? '뉴스' :
+             selectedCategory === 'social' ? '커뮤니티' : '인기 검색어'}
+          </Text>
+
+          {filteredTrends.length > 0 ? (
+            filteredTrends.map((trend, index) => (
+              <AnimatedCard
+                key={trend.id}
+                delay={300 + index * 50}
+                style={styles.trendCard}
+                onPress={() => handleTrendPress(trend)}
+              >
+                <View style={styles.trendHeader}>
+                  <View style={styles.trendRank}>
+                    <Text style={styles.trendRankText}>{index + 1}</Text>
+                  </View>
+                  <View style={styles.trendContent}>
+                    <Text style={styles.trendTitle} numberOfLines={2}>
+                      {trend.title}
+                    </Text>
+                    {trend.hashtags && trend.hashtags.length > 0 && (
+                      <View style={styles.trendHashtags}>
+                        {trend.hashtags.slice(0, 3).map((tag: string, idx: number) => (
+                          <Text key={idx} style={styles.trendHashtag}>#{tag}</Text>
+                        ))}
+                      </View>
+                    )}
+                  </View>
+                  {trend.volume && (
+                    <View style={styles.trendStats}>
+                      <Icon name="eye-outline" size={14} color={colors.text.tertiary} />
+                      <Text style={styles.trendVolume}>{trend.volume}</Text>
+                    </View>
+                  )}
+                </View>
+                <View style={styles.trendFooter}>
+                  <View style={styles.trendSource}>
+                    <Icon 
+                      name={
+                        trend.source === 'news' ? 'newspaper-outline' :
+                        trend.source === 'social' ? 'people-outline' :
+                        'trending-up-outline'
+                      } 
+                      size={12} 
+                      color={colors.text.tertiary} 
+                    />
+                    <Text style={styles.trendSourceText}>
+                      {trend.source === 'news' ? '뉴스' :
+                       trend.source === 'social' ? '커뮤니티' :
+                       trend.source === 'naver' ? '네이버' : '검색어'}
+                    </Text>
+                  </View>
+                  <TouchableOpacity 
+                    style={styles.writeButton}
+                    onPress={() => handleTrendPress(trend)}
+                  >
+                    <MaterialIcon name="edit" size={14} color={colors.primary} />
+                    <Text style={styles.writeButtonText}>글쓰기</Text>
+                  </TouchableOpacity>
+                </View>
+              </AnimatedCard>
+            ))
+          ) : (
+            <View style={styles.emptyState}>
+              <Icon name="trending-up-outline" size={48} color={colors.text.tertiary} />
+              <Text style={styles.emptyText}>트렌드를 불러올 수 없어요</Text>
+              <Text style={styles.emptySubtext}>잠시 후 다시 시도해주세요</Text>
             </View>
-          </View>
+          )}
         </View>
 
-        {/* 빈 상태 */}
-        {(!trendsData?.hashtags || trendsData.hashtags.length === 0) && (
-          <View style={styles.emptyState}>
-            <Icon name="bar-chart-outline" size={48} color={colors.text.tertiary} />
-            <Text style={styles.emptyText}>아직 트렌드 데이터가 없어요</Text>
-            <Text style={styles.emptySubtext}>게시물을 작성하면 분석이 시작됩니다</Text>
+        {/* 트렌드 팁 */}
+        <FadeInView delay={500}>
+          <View style={styles.tipCard}>
+            <View style={styles.tipIcon}>
+              <MaterialIcon name="tips-and-updates" size={20} color={colors.primary} />
+            </View>
+            <View style={styles.tipContent}>
+              <Text style={styles.tipTitle}>트렌드 활용 팁</Text>
+              <Text style={styles.tipText}>
+                트렌드를 클릭하면 AI가 해당 주제로 글을 작성해드려요. 키워드를 바탕으로 나만의 스타일로 수정해보세요!
+              </Text>
+            </View>
           </View>
-        )}
+        </FadeInView>
+
+        <View style={styles.bottomSpace} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -256,93 +314,71 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
     },
     header: {
       paddingHorizontal: SPACING.lg,
-      paddingTop: SPACING.lg,
-      paddingBottom: SPACING.sm,
+      paddingTop: SPACING.xl,
+      paddingBottom: SPACING.lg,
+    },
+    headerTop: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: SPACING.sm,
+    },
+    mollyBadge: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.primary,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: SPACING.sm,
+    },
+    mollyBadgeText: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.white,
     },
     headerTitle: {
-      fontSize: 32,
+      fontSize: 28,
       fontWeight: '700',
       color: colors.text.primary,
       letterSpacing: -0.5,
     },
-    periodContainer: {
+    headerSubtitle: {
+      fontSize: 15,
+      color: colors.text.secondary,
+      lineHeight: 22,
+    },
+    categoryScroll: {
+      marginBottom: SPACING.lg,
+    },
+    categoryContainer: {
       flexDirection: 'row',
       paddingHorizontal: SPACING.lg,
-      marginBottom: SPACING.xl,
       gap: SPACING.sm,
     },
-    periodButton: {
+    categoryButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: SPACING.xs,
       paddingVertical: SPACING.sm,
-      paddingHorizontal: SPACING.lg,
+      paddingHorizontal: SPACING.md,
       borderRadius: 24,
       backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
     },
-    periodButtonActive: {
+    categoryButtonActive: {
       backgroundColor: colors.primary,
       borderColor: colors.primary,
     },
-    periodButtonText: {
+    categoryButtonText: {
       fontSize: 14,
       fontWeight: '500',
       color: colors.text.secondary,
     },
-    periodButtonTextActive: {
+    categoryButtonTextActive: {
       color: colors.white,
     },
-    topHashtagCard: {
-      marginHorizontal: SPACING.lg,
-      marginBottom: SPACING.xl,
-      padding: SPACING.xl,
-      backgroundColor: colors.surface,
-      borderRadius: 24,
-      alignItems: 'center',
-      shadowColor: colors.black,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: isDark ? 0.2 : 0.05,
-      shadowRadius: 8,
-      elevation: 3,
-    },
-    topBadge: {
-      backgroundColor: colors.primary + '15',
-      paddingHorizontal: SPACING.md,
-      paddingVertical: SPACING.xs,
-      borderRadius: 16,
-      marginBottom: SPACING.md,
-    },
-    topBadgeText: {
-      fontSize: 11,
-      fontWeight: '600',
-      color: colors.primary,
-      letterSpacing: 0.5,
-    },
-    topHashtag: {
-      fontSize: 28,
-      fontWeight: '700',
-      color: colors.text.primary,
-      marginBottom: SPACING.sm,
-    },
-    topStats: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.md,
-    },
-    topStatText: {
-      fontSize: 14,
-      color: colors.text.secondary,
-    },
-    growthIndicator: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 4,
-    },
-    growthText: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: colors.success,
-    },
-    hashtagList: {
+    myTrendsSection: {
       marginBottom: SPACING.xl,
     },
     sectionTitle: {
@@ -352,89 +388,147 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       marginBottom: SPACING.md,
       paddingHorizontal: SPACING.lg,
     },
-    hashtagItem: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      paddingVertical: SPACING.md,
-      paddingHorizontal: SPACING.lg,
-      borderBottomWidth: 1,
-      borderBottomColor: colors.border,
-    },
-    hashtagLeft: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.md,
-    },
-    hashtagRank: {
-      fontSize: 14,
-      fontWeight: '600',
-      color: colors.text.tertiary,
-      width: 20,
-    },
-    hashtagText: {
-      fontSize: 16,
-      color: colors.text.primary,
-    },
-    hashtagRight: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.sm,
-    },
-    hashtagCount: {
-      fontSize: 14,
-      color: colors.text.secondary,
-    },
-    recommendSection: {
-      marginBottom: SPACING.xl,
-    },
-    chipContainer: {
-      paddingHorizontal: SPACING.lg,
-    },
-    chip: {
+    myHashtagChip: {
       flexDirection: 'row',
       alignItems: 'center',
       gap: SPACING.xs,
+      backgroundColor: colors.primary + '15',
       paddingVertical: SPACING.sm,
       paddingHorizontal: SPACING.md,
-      backgroundColor: colors.surface,
       borderRadius: 20,
-      marginRight: SPACING.sm,
+      marginLeft: SPACING.sm,
+      borderWidth: 1,
+      borderColor: colors.primary + '30',
+    },
+    myHashtagText: {
+      fontSize: 14,
+      fontWeight: '500',
+      color: colors.primary,
+    },
+    myHashtagCount: {
+      fontSize: 12,
+      color: colors.primary,
+      opacity: 0.7,
+    },
+    trendsSection: {
+      paddingHorizontal: SPACING.lg,
+      marginBottom: SPACING.xl,
+    },
+    trendCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: SPACING.md,
+      marginBottom: SPACING.sm,
       borderWidth: 1,
       borderColor: colors.border,
     },
-    challengeChip: {
-      borderColor: colors.primary + '30',
-      backgroundColor: colors.primary + '10',
-    },
-    chipText: {
-      fontSize: 14,
-      color: colors.text.primary,
-    },
-    timeSection: {
-      marginBottom: SPACING.xl,
-    },
-    timeCard: {
+    trendHeader: {
       flexDirection: 'row',
-      alignItems: 'center',
-      gap: SPACING.md,
-      marginHorizontal: SPACING.lg,
-      padding: SPACING.lg,
-      backgroundColor: colors.surface,
-      borderRadius: 16,
+      alignItems: 'flex-start',
+      marginBottom: SPACING.sm,
     },
-    timeInfo: {
+    trendRank: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: colors.primary + '10',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: SPACING.sm,
+    },
+    trendRankText: {
+      fontSize: 14,
+      fontWeight: '700',
+      color: colors.primary,
+    },
+    trendContent: {
       flex: 1,
     },
-    timeText: {
-      fontSize: 16,
-      fontWeight: '600',
+    trendTitle: {
+      fontSize: 15,
+      fontWeight: '500',
       color: colors.text.primary,
+      lineHeight: 22,
     },
-    timeSubtext: {
+    trendHashtags: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      gap: SPACING.xs,
+      marginTop: SPACING.xs,
+    },
+    trendHashtag: {
+      fontSize: 12,
+      color: colors.primary,
+    },
+    trendStats: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      marginLeft: SPACING.sm,
+    },
+    trendVolume: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+    },
+    trendFooter: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    trendSource: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    trendSourceText: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+    },
+    writeButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: colors.primary + '10',
+      paddingVertical: 6,
+      paddingHorizontal: 12,
+      borderRadius: 16,
+    },
+    writeButtonText: {
+      fontSize: 12,
+      fontWeight: '500',
+      color: colors.primary,
+    },
+    tipCard: {
+      marginHorizontal: SPACING.lg,
+      marginBottom: SPACING.xl,
+      backgroundColor: colors.primary + '10',
+      borderRadius: 16,
+      padding: SPACING.md,
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      gap: SPACING.sm,
+    },
+    tipIcon: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.primary + '20',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    tipContent: {
+      flex: 1,
+    },
+    tipTitle: {
       fontSize: 14,
+      fontWeight: '600',
+      color: colors.primary,
+      marginBottom: 4,
+    },
+    tipText: {
+      fontSize: 13,
       color: colors.text.secondary,
-      marginTop: 2,
+      lineHeight: 19,
     },
     emptyState: {
       alignItems: 'center',
@@ -450,6 +544,9 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       fontSize: 14,
       color: colors.text.tertiary,
       marginTop: SPACING.xs,
+    },
+    bottomSpace: {
+      height: SPACING.xxl,
     },
   });
 

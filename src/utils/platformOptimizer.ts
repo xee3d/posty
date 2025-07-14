@@ -181,52 +181,61 @@ const transformToInstagram = (content: string, tone: string): string => {
     }
   }
   
-  // 다양한 종결 방식 - 더 자연스럽고 다양하게
-  const endingStyles = {
-    // 감성적 마무리 (가장 빈번)
-    emotional: [
-      '', // 종결 없이 끝내기
-      '\n\n🌸', // 이모티콘만
-      '\n\n✨', 
-      '\n\n💕',
-      '\n\n오늘도 좋은 하루 ✨',
-      '\n\n그냥, 오늘의 기록.',
-      '\n\n이런 순간들.',
-      '\n\n오늘의 작은 행복.'      
-    ],
-    // 시적 표현 (간혹)
-    poetic: [
-      '\n\n.\n.\n그냥 그런 날.',
-      '\n\n하루의 끝,\n또 다른 시작.',
-      '\n\n-',
-      '\n\n·\n·\n·',
-      '\n\n계속되는 이야기.'
-    ],
-    // CTA (드물게)
-    cta: [
-      '\n\n👇 댓글로 여러분의 이야기도 들려주세요!',
-      '\n\n📌 나중에 다시 보고 싶다면 저장!',
-      '\n\n여러분의 오늘은 어땠나요?'
-    ]
-  };
+  // 종결 방식 - 내용의 톤에 맞춰서 선택 (40% 확률로만 추가)
+  const shouldAddEnding = Math.random() < 0.4;
   
-  // 확률적으로 종결 스타일 선택
-  const random = Math.random();
-  let selectedEndings;
-  
-  if (random < 0.6) { // 60% - 감성적 마무리
-    selectedEndings = endingStyles.emotional;
-  } else if (random < 0.8) { // 20% - 시적 표현
-    selectedEndings = endingStyles.poetic;
-  } else if (random < 0.95) { // 15% - CTA
-    selectedEndings = endingStyles.cta;
-  } else { // 5% - 종결 없음
-    selectedEndings = [''];
-  }
-  
-  const selectedEnding = selectedEndings[Math.floor(Math.random() * selectedEndings.length)];
-  if (selectedEnding) { // 빈 문자열이 아닌 경우만 추가
-    transformed += selectedEnding;
+  if (shouldAddEnding) {
+    // 원본 내용의 감정/스타일 분석
+    const hasQuestion = transformed.includes('?');
+    const hasExclamation = transformed.includes('!');
+    const isShort = transformed.length < 100;
+    
+    // 이미 특정 방식으로 끝났다면 추가 종결 없음
+    if (transformed.trim().endsWith('?') || 
+        transformed.trim().endsWith('!') || 
+        transformed.trim().endsWith('...')) {
+      return transformed;
+    }
+    
+    let endingOptions = [];
+    
+    if (tone === 'emotional' || tone === 'minimalist') {
+      // 감성적이거나 미니멀한 톤은 간단하게
+      endingOptions = [
+        '\n\n✨',
+        '\n\n🌸',
+        '\n\n-',
+        '' // 종결 없이
+      ];
+    } else if (tone === 'genz' || tone === 'humorous') {
+      // GenZ나 유머러스한 톤은 활발하게
+      endingOptions = [
+        '\n\n💯',
+        '\n\nㅋㅋㅋㅋ',
+        '\n\n이상 오늘의 TMI',
+        '' // 종결 없이
+      ];
+    } else if (isShort) {
+      // 짧은 글은 간단한 종결만
+      endingOptions = [
+        '\n\n.',
+        '\n\n✨',
+        '' // 종결 없이
+      ];
+    } else {
+      // 일반적인 경우
+      endingOptions = [
+        '\n\n오늘의 기록.',
+        '\n\n그냥 그런 날.',
+        '', // 종결 없이
+        '\n\n.' // 마침표만
+      ];
+    }
+    
+    const ending = endingOptions[Math.floor(Math.random() * endingOptions.length)];
+    if (ending) {
+      transformed += ending;
+    }
   }
   
   return transformed;
@@ -235,58 +244,150 @@ const transformToInstagram = (content: string, tone: string): string => {
 const transformToFacebook = (content: string, tone: string): string => {
   let transformed = content;
   
-  // 스토리텔링 형식으로 확장 (더 다양한 시작)
-  const storyStarters = [
-    '여러분, 오늘 정말 특별한 경험을 했어요.\n\n',
-    '이런 일이 있을 줄 누가 알았겠어요?\n\n',
-    '잠깐, 이 이야기 들어보세요!\n\n',
-    '오늘 하루를 돌아보니...\n\n',
-    '문득 이런 생각이 들었어요.\n\n',
-    '얼마 전 있었던 일인데요,\n\n',
-    '평범한 일상 속에서 발견한 것.\n\n',
-    '오래전부터 나누고 싶었던 이야기.\n\n'
-  ];
+  // 페이스북은 원본 내용을 존중하면서 자연스럽게 확장
+  // 스토리 시작은 20% 확률로만 추가 (tone에 따라)
+  const shouldAddStarter = Math.random() < 0.2;
   
-  if (tone !== 'professional' && tone !== 'minimalist') {
-    transformed = storyStarters[Math.floor(Math.random() * storyStarters.length)] + transformed;
+  if (shouldAddStarter && tone !== 'professional' && tone !== 'minimalist') {
+    // 원본 내용의 첫 문장을 분석해서 어울리는 시작만 선택
+    const firstSentence = content.split(/[.!?]/)[0].toLowerCase();
+    
+    // 특정 키워드가 있으면 시작 문구 추가하지 않음
+    const skipKeywords = ['오늘', '어제', '방금', '이미', '드디어', '결국', '처음', '마침내'];
+    const hasSkipKeyword = skipKeywords.some(keyword => firstSentence.includes(keyword));
+    
+    if (!hasSkipKeyword) {
+      const contextualStarters = [
+        '이런 생각이 들었어요.\n\n',
+        '문득 떠오른 이야기.\n\n',
+        '공유하고 싶은 순간.\n\n'
+      ];
+      transformed = contextualStarters[Math.floor(Math.random() * contextualStarters.length)] + transformed;
+    }
   }
   
-  // 페이스북은 항상 비질문형 종결만 사용
-  const endings = [
-    '\n\n오늘도 좋은 하루 보내세요! 😊',
-    '\n\n이런 작은 순간들이 모여 행복이 되는 것 같아요.',
-    '\n\n여러분의 하루도 특별하길 바라요.',
-    '\n\n함께 해주셔서 감사합니다.',
-    '\n\n이런 순간들을 기억하고 싶어요.',
-    '\n\n오늘의 깨달음을 나누고 싶었어요.',
-    '\n\n작지만 확실한 행복, 바로 이런 것 같아요.',
-    '\n\n매일의 작은 발견들이 모여 큰 기쁨이 되네요.',
-    '\n\n오늘 하루도 의미 있는 시간이었습니다.',
-    '\n\n이런 경험들이 쌓여서 성장하는 것 같네요.',
-    '\n\n오늘도 감사한 마음으로 하루를 마무리합니다.',
-    '\n\n작은 순간들이 모여 큰 추억이 되네요.',
-    '\n\n매일 조금씩 나아지고 있어요.',
-    '\n\n이런 일상이 쌓여 행복이 되는 것 같아요.',
-    '\n\n오늘의 소중한 기록을 남깁니다.'
-  ];
-  transformed += endings[Math.floor(Math.random() * endings.length)];
+  // 종결부는 내용과 tone을 고려해서 추가 (50% 확률)
+  const shouldAddEnding = Math.random() < 0.5;
   
-  // 문단 구분 추가 (긴 텍스트의 경우) - 개선
-  if (transformed.length > 150) {
-    // 문장 단위로 분리 (마침표를 포함하여 처리)
-    const sentences = transformed.split(/(?<=[.!?])\s*/); 
+  if (shouldAddEnding) {
+    // 원본 내용의 감정 분석
+    const negativeWords = ['힘들', '어려', '슬프', '아프', '우울', '지치', '못', '안', '실패', '포기'];
+    const positiveWords = ['좋', '행복', '기쁘', '감사', '사랑', '성공', '해냈', '이뤘', '달성'];
+    const questionWords = ['어떻게', '뭐가', '왜', '언제', '어디', '누가', '있을까', '일까', '할까'];
     
-    if (sentences.length >= 3) {
-      const third = Math.floor(sentences.length / 3);
-      const part1 = sentences.slice(0, third).join(' ').trim();
-      const part2 = sentences.slice(third, third * 2).join(' ').trim();
-      const part3 = sentences.slice(third * 2).join(' ').trim();
+    const hasNegative = negativeWords.some(word => transformed.includes(word));
+    const hasPositive = positiveWords.some(word => transformed.includes(word));
+    const hasQuestion = questionWords.some(word => transformed.includes(word));
+    
+    // 이미 질문으로 끝나면 추가 종결 없음
+    if (transformed.trim().endsWith('?')) {
+      return transformed;
+    }
+    
+    let selectedEndings = [];
+    
+    if (hasNegative && !hasPositive) {
+      // 부정적인 내용일 때는 공감이나 위로
+      selectedEndings = [
+        '\n\n모두가 비슷한 경험을 하며 살아가고 있어요.',
+        '\n\n함께 이겨낼 수 있을 거예요.',
+        '\n\n내일은 더 나은 날이 되길.',
+        '' // 종결 없이
+      ];
+    } else if (hasPositive && !hasNegative) {
+      // 긍정적인 내용일 때만 긍정적 종결
+      selectedEndings = [
+        '\n\n이런 순간들이 모여 행복이 되는 것 같아요.',
+        '\n\n오늘도 감사한 하루였네요.',
+        '\n\n작지만 확실한 행복.',
+        '' // 종결 없이
+      ];
+    } else if (hasQuestion) {
+      // 질문이 포함된 경우 대화 유도
+      selectedEndings = [
+        '\n\n여러분의 생각은 어떠신가요?',
+        '\n\n댓글로 의견을 나눠주세요.',
+        '' // 종결 없이
+      ];
+    } else {
+      // 중립적이거나 복합적인 경우
+      selectedEndings = [
+        '\n\n오늘의 기록을 남깁니다.',
+        '\n\n이런 일상의 한 페이지.',
+        '' // 종결 없이
+      ];
+    }
+    
+    const ending = selectedEndings[Math.floor(Math.random() * selectedEndings.length)];
+    if (ending) {
+      transformed += ending;
+    }
+  }
+  
+  // 문단 구분 추가 (긴 텍스트의 경우) - 의미 단위로 개선
+  if (transformed.length > 150) {
+    const sentences = transformed.split(/(?<=[.!?])\s+/);
+    
+    if (sentences.length >= 4) {
+      // 의미 단위로 문단 나누기
+      const transitionWords = ['그런데', '하지만', '그래서', '그러나', '그리고', '또한', '한편', '결국', '드디어'];
+      const timeWords = ['오늘', '어제', '그때', '이제', '나중에', '처음', '마침내'];
       
-      // 질문 부분을 보존하면서 문단 구분
-      if (part3.includes('어떻게') || part3.includes('계신가요') || part3.includes('여러분')) {
-        transformed = `${part1}\n\n${part2}\n\n${part3}`;
-      } else {
-        transformed = `${part1}\n\n${part2}\n\n${part3}`;
+      let paragraphs = [];
+      let currentParagraph = [];
+      
+      sentences.forEach((sentence, index) => {
+        const trimmed = sentence.trim();
+        if (!trimmed) return;
+        
+        // 첫 문장은 무조건 추가
+        if (index === 0) {
+          currentParagraph.push(trimmed);
+          return;
+        }
+        
+        // 전환점 확인
+        const hasTransition = transitionWords.some(word => trimmed.startsWith(word));
+        const hasTimeShift = timeWords.some(word => trimmed.includes(word));
+        const isParagraphLong = currentParagraph.join(' ').length > 100;
+        
+        // 새 문단 시작 조건
+        if ((hasTransition || hasTimeShift || isParagraphLong) && currentParagraph.length > 0) {
+          paragraphs.push(currentParagraph.join(' '));
+          currentParagraph = [trimmed];
+        } else {
+          currentParagraph.push(trimmed);
+        }
+      });
+      
+      // 마지막 문단 추가
+      if (currentParagraph.length > 0) {
+        paragraphs.push(currentParagraph.join(' '));
+      }
+      
+      // 너무 많은 문단은 합치기 (최대 4개)
+      while (paragraphs.length > 4) {
+        // 가장 짧은 문단을 찾아서 인접 문단과 합치기
+        let shortestIndex = 0;
+        let shortestLength = paragraphs[0].length;
+        
+        for (let i = 1; i < paragraphs.length - 1; i++) {
+          if (paragraphs[i].length < shortestLength) {
+            shortestIndex = i;
+            shortestLength = paragraphs[i].length;
+          }
+        }
+        
+        // 앞 문단과 합치기
+        if (shortestIndex > 0) {
+          paragraphs[shortestIndex - 1] += ' ' + paragraphs[shortestIndex];
+          paragraphs.splice(shortestIndex, 1);
+        }
+      }
+      
+      // 문단이 2개 미만이면 그대로 유지
+      if (paragraphs.length >= 2) {
+        transformed = paragraphs.join('\n\n');
       }
     }
   }
@@ -400,26 +501,51 @@ const transformToTwitter = (content: string, tone: string): string => {
     transformed = twitterStyles[tone](transformed);
   }
   
-  // 스레드 훅 또는 다른 마무리 (랜덤)
-  const random = Math.random();
+  // 트위터 특유의 마무리 (30% 확률로만 추가)
+  const shouldAddEnding = Math.random() < 0.3;
   
-  // 스레드 표시는 실제로 긴 글일 때만 (원본이 280자 이상)
-  const originalLength = content.length;
-  if (originalLength > 280 && random > 0.7) {
-    // 실제 필요한 스레드 수 계산
-    const threadCount = Math.ceil(originalLength / 260); // 여유있게 계산
-    transformed += `\n\n🧵 (1/${Math.min(threadCount, 5)})`; // 최대 5개로 제한
-  } else if (random > 0.6) {
-    // 다른 트위터 스타일 마무리
-    const twitterEndings = [
-      '\n\n그게 다야',
-      '\n\nRT는 공감',
-      '\n\n이상 끝.',
-      '\n\n내가 하고 싶은 말은 이게 다야',
-      '\n\n나만 이런가',
-      '\n\n팩트체크 필요'
-    ];
-    transformed += twitterEndings[Math.floor(Math.random() * twitterEndings.length)];
+  if (shouldAddEnding) {
+    // 원본이 실제로 긴 글인지 확인
+    const originalLength = content.length;
+    const isActuallyLong = originalLength > 280;
+    
+    // 이미 특정 방식으로 끝났다면 추가하지 않음
+    if (transformed.trim().endsWith(')') || transformed.trim().endsWith('.')) {
+      return transformed;
+    }
+    
+    let endingOptions = [];
+    
+    if (isActuallyLong && Math.random() > 0.5) {
+      // 실제로 긴 글일 때만 스레드 표시 (50% 확률)
+      const threadCount = Math.ceil(originalLength / 260);
+      endingOptions = [`\n\n🧵 (1/${Math.min(threadCount, 5)})`];
+    } else if (tone === 'genz') {
+      endingOptions = [
+        '\n\n이상 TMI',
+        '\n\nㅂㅂ',
+        '' // 종결 없이
+      ];
+    } else if (tone === 'humorous') {
+      endingOptions = [
+        '\n\n(웃프다)',
+        '\n\n이게 팩트',
+        '' // 종결 없이
+      ];
+    } else {
+      // 일반적인 경우 - 더 자제된 종결
+      endingOptions = [
+        '', // 종결 없이 (50%)
+        '', // 종결 없이 (확률 높이기)
+        '\n\n그게 다야',
+        '\n\n끝.'
+      ];
+    }
+    
+    const ending = endingOptions[Math.floor(Math.random() * endingOptions.length)];
+    if (ending) {
+      transformed += ending;
+    }
   }
   
   return transformed;

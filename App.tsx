@@ -19,14 +19,15 @@ import Animated, {
   FadeOut,
 } from 'react-native-reanimated';
 import { Provider } from 'react-redux';
-import { store } from './src/store';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store, persistor } from './src/store';
 import { loadUserFromFirestore, subscribeToFirestoreUser } from './src/store/middleware/firestoreSyncMiddleware';
 import auth from '@react-native-firebase/auth';
 
 // Import screens
 import HomeScreen from './src/screens/HomeScreen';
 import AIWriteScreen from './src/screens/AIWriteScreen';
-// import TrendScreen from './src/screens/TrendScreen'; // 트렌드 탭 제거
+import TrendScreen from './src/screens/TrendScreen';
 import MyStyleScreen from './src/screens/MyStyleScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import FeedWithAdsExample from './src/screens/FeedWithAdsExample';
@@ -50,6 +51,7 @@ import autoMigrationService from './src/services/firebase/autoMigrationService';
 import offlineSyncService from './src/services/offline/offlineSyncService';
 import analyticsService from './src/services/analytics/analyticsService';
 import notificationService from './src/services/notification/notificationService';
+import { restoreTokenData, setupTokenPersistence, checkDailyResetAfterRestore } from './src/store/persistConfig/tokenPersist';
 
 const { width } = Dimensions.get('window');
 
@@ -88,6 +90,27 @@ const App: React.FC = () => {
       console.log('React Native Version:', require('react-native/package.json').version);
       console.log('✨ Using Reanimated 3 for animations');
     }
+
+    // 토큰 데이터 즉시 복원 (서비스 초기화 전에 실행)
+    const initializeApp = async () => {
+      try {
+        // 1. 토큰 데이터 복원 (가장 먼저)
+        await restoreTokenData();
+        
+        // 2. 일일 리셋 체크
+        await checkDailyResetAfterRestore();
+        
+        // 3. 토큰 지속성 설정
+        setupTokenPersistence();
+        
+        console.log('✅ Token data restored successfully');
+      } catch (error) {
+        console.error('❌ Failed to restore token data:', error);
+      }
+    };
+    
+    // 토큰 복원을 먼저 실행
+    initializeApp();
 
     // 초기 렌더링 후 서비스 초기화
     InteractionManager.runAfterInteractions(() => {
@@ -210,7 +233,7 @@ const App: React.FC = () => {
     
     setIsAnimating(true);
     
-    const tabs = ['home', 'ai-write', 'my-style', 'settings'];
+    const tabs = ['home', 'ai-write', 'trend', 'my-style', 'settings'];
     const currentIndex = tabs.indexOf(activeTab);
     const nextIndex = tabs.indexOf(tab);
     const direction = nextIndex > currentIndex ? 1 : -1;
@@ -289,6 +312,8 @@ const App: React.FC = () => {
             tips={navigationData?.tips}
           />
         );
+      case 'trend':
+        return <TrendScreen key="trend" onNavigate={handleTabPress} />;
       case 'my-style':
         return <MyStyleScreen key="my-style" onNavigate={handleTabPress} />;
       case 'settings':
@@ -322,21 +347,30 @@ const App: React.FC = () => {
 
   return (
     <Provider store={store}>
-      <View style={styles.container}>
-        <StatusBar 
-          backgroundColor={colors.surface} 
-          barStyle={isDark ? "light-content" : "dark-content"} 
-        />
-        <Animated.View style={[styles.content, animatedStyle]}>
-          {renderScreen}
-        </Animated.View>
-        {activeTab !== 'login' && (
-          <TabNavigator 
-            activeTab={activeTab} 
-            onTabPress={handleTabPress} 
+      <PersistGate 
+        loading={
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        } 
+        persistor={persistor}
+      >
+        <View style={styles.container}>
+          <StatusBar 
+            backgroundColor={colors.surface} 
+            barStyle={isDark ? "light-content" : "dark-content"} 
           />
-        )}
-      </View>
+          <Animated.View style={[styles.content, animatedStyle]}>
+            {renderScreen}
+          </Animated.View>
+          {activeTab !== 'login' && (
+            <TabNavigator 
+              activeTab={activeTab} 
+              onTabPress={handleTabPress} 
+            />
+          )}
+        </View>
+      </PersistGate>
     </Provider>
   );
 };

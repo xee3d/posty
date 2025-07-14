@@ -1,6 +1,8 @@
 import { configureStore } from '@reduxjs/toolkit';
+import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import userReducer from './slices/userSlice';
 import { firestoreSyncMiddleware } from './middleware/firestoreSyncMiddleware';
+import { persistConfig } from './persist/persistConfig';
 
 // 개발 모드에서 성능 모니터링
 const performanceMiddleware = (store: any) => (next: any) => (action: any) => {
@@ -20,16 +22,41 @@ const performanceMiddleware = (store: any) => (next: any) => (action: any) => {
   return next(action);
 };
 
+// 영속화된 reducer 생성
+const persistedUserReducer = persistReducer(
+  {
+    key: 'user',
+    storage: persistConfig.storage,
+    whitelist: [
+      'tokens',
+      'currentTokens',
+      'freeTokens',
+      'purchasedTokens',
+      'subscriptionPlan',
+      'subscription',
+      'lastTokenResetDate',
+      'uid',
+      'email',
+      'displayName',
+      'photoURL',
+    ],
+  },
+  userReducer
+);
+
 export const store = configureStore({
   reducer: {
-    user: userReducer,
+    user: persistedUserReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
-        // Firestore Timestamp 등 직렬화 불가능한 값 무시
-        ignoredActions: ['user/setUserData', 'user/updateSettings'],
-        ignoredPaths: ['user.settings.lastUpdated', 'user.tokens.lastUpdated'],
+        // Redux persist 및 Firestore Timestamp 등 직렬화 불가능한 값 무시
+        ignoredActions: [
+          FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER,
+          'user/setUserData', 'user/updateSettings'
+        ],
+        ignoredPaths: ['user.settings.lastUpdated', 'user.tokens.lastUpdated', 'user._persist'],
       },
       immutableCheck: __DEV__ ? { warnAfter: 128 } : false,
     })
@@ -44,3 +71,8 @@ export const store = configureStore({
 
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
+
+// persistor 생성
+export const persistor = persistStore(store, null, () => {
+  console.log('Redux persist: rehydration complete');
+});

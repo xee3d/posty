@@ -153,49 +153,83 @@ export const transformContentForPlatform = (
   const platformStyle = PLATFORM_STYLES[platform as keyof typeof PLATFORM_STYLES];
   if (!platformStyle) return content;
   
-  // 기본 content 처리
+  // 기본 content 처리 - 원본 내용 보존
   let transformed = content;
   
-  // 플랫폼별 구조 변환
+  // 플랫폼별 구조 변환 - 문맥 유지하면서 형식만 변경
   switch (platform) {
     case 'twitter':
-      // 줄바꿈 제거, 간결하게
-      transformed = content.replace(/\n+/g, ' ').trim();
-      // 280자 제한
+      // 줄바꿈을 공백으로 변환하되, 문단 구조는 유지
+      transformed = content
+        .split('\n\n')
+        .map(paragraph => paragraph.replace(/\n/g, ' '))
+        .join(' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      // 280자 제한 - 문장 단위로 자르기
       if (transformed.length > 280) {
-        transformed = transformed.substring(0, 277) + '...';
+        const sentences = transformed.match(/[^.!?]+[.!?]+/g) || [transformed];
+        let result = '';
+        for (const sentence of sentences) {
+          if ((result + sentence).length <= 277) {
+            result += sentence;
+          } else {
+            break;
+          }
+        }
+        transformed = result.trim() + '...';
       }
       break;
       
     case 'instagram':
-      // 적절한 줄바꿈 추가 (3-4문장마다)
-      const sentences = content.match(/[^.!?]+[.!?]+/g) || [content];
-      transformed = sentences.reduce((acc, sentence, index) => {
-        if (index > 0 && index % 3 === 0) {
-          return acc + '\n\n' + sentence.trim();
-        }
-        return acc + ' ' + sentence.trim();
-      }, '').trim();
+      // 문단을 유지하면서 가독성 향상
+      const paragraphs = content.split('\n\n').filter(p => p.trim());
+      
+      if (paragraphs.length === 1) {
+        // 한 문단일 경우 3-4문장마다 줄바꿈
+        const sentences = content.match(/[^.!?]+[.!?]+/g) || [content];
+        transformed = sentences.reduce((acc, sentence, index) => {
+          if (index > 0 && index % 3 === 0) {
+            return acc + '\n\n' + sentence.trim();
+          }
+          return acc + (index > 0 ? ' ' : '') + sentence.trim();
+        }, '');
+      } else {
+        // 여러 문단일 경우 그대로 유지
+        transformed = paragraphs.join('\n\n');
+      }
       break;
       
     case 'facebook':
-      // 단락 구분 추가
-      const paragraphs = content.split(/\n\n+/);
-      transformed = paragraphs.map(p => p.trim()).filter(p => p).join('\n\n');
+      // 긴 스토리텔링을 위한 구조 유지
+      // 이미 잘 구성된 경우 그대로 사용
+      transformed = content;
       break;
       
     case 'threads':
-      // 대화체로 변환
-      transformed = content.replace(/\.\s+/g, '.\n');
+      // 대화체 스타일 - 짧은 문장으로 분리
+      const threadSentences = content.match(/[^.!?]+[.!?]+/g) || [content];
+      if (threadSentences.length > 2) {
+        // 긴 문장은 짧게 나누기
+        transformed = threadSentences
+          .map(s => s.trim())
+          .join('\n\n')
+          .replace(/\n\n+/g, '\n\n');
+      }
       break;
       
     case 'linkedin':
-      // 전문적인 구조로
-      const points = content.split(/\.\s+/).filter(p => p);
-      if (points.length > 3) {
-        transformed = points[0] + '.\n\n' + 
-                     points.slice(1, -1).join('. ') + '.\n\n' + 
-                     points[points.length - 1] + '.';
+      // 전문적인 구조 - 명확한 문단 분리
+      const linkedinParagraphs = content.split('\n\n').filter(p => p.trim());
+      if (linkedinParagraphs.length === 1) {
+        // 한 문단일 경우 주요 포인트 분리
+        const points = content.split(/(?<=[.!?])\s+/).filter(p => p);
+        if (points.length >= 3) {
+          transformed = points[0] + '\n\n' + 
+                       points.slice(1, -1).join(' ') + '\n\n' + 
+                       points[points.length - 1];
+        }
       }
       break;
   }
