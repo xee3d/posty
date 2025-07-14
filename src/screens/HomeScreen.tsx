@@ -19,7 +19,8 @@ import { TokenBadge, SectionHeader } from '../components/common';
 import { getSavedContents, SavedContent } from '../utils/storage';
 import PostListScreen from './PostListScreen';
 import { APP_TEXT, getText } from '../utils/textConstants';
-import dailyTipsService from '../services/dailyTipsService';
+import { enhancedTipsService, trendingHashtagService } from '../services/enhancedTipsService';
+import { personalizedRecommendationService, RecommendationCard } from '../services/personalizedRecommendationService';
 import simplePostService from '../services/simplePostService';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { resetDailyTokens } from '../store/slices/userSlice';
@@ -71,10 +72,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [coachingTip, setCoachingTip] = useState<any>(null);
-  const [tipIndex, setTipIndex] = useState(0);
+  const [trendingHashtags, setTrendingHashtags] = useState<string[]>(['일상', '주말', '카페', '맛집', '여행', '운동', '책스타그램']);
   const [showPostList, setShowPostList] = useState(false);
   const [recentPosts, setRecentPosts] = useState<SavedContent[]>([]);
   const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
+  const [stats, setStats] = useState<any>(null); // 사용자 통계 추가
+  const [tipIndex, setTipIndex] = useState(0); // 팁 인덱스 추가
+  const [recommendations, setRecommendations] = useState<RecommendationCard[]>([]);
 
   // 앱 시작 시 매일 토큰 리셋 체크
   useEffect(() => {
@@ -96,58 +100,85 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     },
   ];
 
-  // 사전 정의된 팁 목록
-  const predefinedTips = [
-    {
-      emoji: '💡',
-      label: '오늘의 꿀팁',
-      value: '자연광 활용',
-      subtext: '카페 사진은 자연광이 들어오는 창가에서 찍으면 더 예쁘게 나와요. 오전 10-11시가 가장 좋은 시간대예요!'
-    },
-    {
-      emoji: '📸',
-      label: '사진 구도 팁',
-      value: '3분할 법칙',
-      subtext: '화면을 가로세로 3등분하여 피사체를 교차점에 배치하면 안정적인 구도가 완성돼요!'
-    },
-    {
-      emoji: '✍️',
-      label: '글쓰기 팁',
-      value: '첫 문장이 중요해요',
-      subtext: '질문이나 공감대를 형성하는 문장으로 시작하면 독자의 관심을 끌 수 있어요!'
-    },
-    {
-      emoji: '🎨',
-      label: '색감 조정 팁',
-      value: '통일감 있는 피드',
-      subtext: '비슷한 톤과 필터를 사용하면 전체적으로 조화로운 피드를 만들 수 있어요!'
-    },
-    {
-      emoji: '⏰',
-      label: '포스팅 시간 팁',
-      value: '점심시간 활용',
-      subtext: '12시-1시 사이는 많은 사람들이 휴식하며 SNS를 보는 시간이에요!'
-    },
-    {
-      emoji: '💬',
-      label: '소통 팁',
-      value: '댓글에 답글 달기',
-      subtext: '팔로워의 댓글에 진심 어린 답글을 달면 친밀감이 높아져요!'
-    },
-    {
-      emoji: '🏷️',
-      label: '해시태그 팁',
-      value: '적절한 개수 사용',
-      subtext: '인스타그램은 5-10개, 트위터는 2-3개가 적당해요. 너무 많으면 스팸으로 보일 수 있어요!'
+  // 사용자 통계 가져오기
+  const loadUserStats = async () => {
+    try {
+      const userStats = await simplePostService.getStats();
+      setStats(userStats);
+    } catch (error) {
+      console.error('Failed to load user stats:', error);
     }
-  ];
+  };
 
   // 오늘의 꿀팁 가져오기
-  const loadCoachingTip = () => {
-    // 현재 인덱스의 팁을 설정
-    setCoachingTip(predefinedTips[tipIndex]);
-    // 다음 인덱스 준비 (순환)
-    setTipIndex((prevIndex) => (prevIndex + 1) % predefinedTips.length);
+  const loadCoachingTip = async () => {
+    try {
+      // 사용자 컨텍스트 준비
+      const userContext = {
+        totalPosts: stats?.totalPosts || 0,
+        favoriteCategories: stats?.favoriteCategories || [],
+        mostActiveTime: stats?.postingPatterns?.mostActiveTime || '',
+        lastPostDate: recentPosts[0]?.createdAt || '',
+        preferredPlatform: stats?.preferredPlatform || 'instagram',
+        currentHour: new Date().getHours(),
+        currentDay: new Date().getDay(),
+        currentMonth: new Date().getMonth() + 1
+      };
+      
+      const tip = await enhancedTipsService.getPersonalizedTip(userContext);
+      setCoachingTip(tip);
+    } catch (error) {
+      console.error('Failed to load tip:', error);
+      // 기본 팁 설정
+      setCoachingTip({
+        emoji: '👍',
+        label: '오늘의 꿀팁',
+        value: '꾸준한 포스팅이 핵심',
+        subtext: '매일 작은 이야기라도 공유하면 팔로워들과의 유대감이 깊어져요!'
+      });
+    }
+  };
+
+  // 트렌딩 해시태그 가져오기
+  const loadTrendingHashtags = async () => {
+    try {
+      // 사용자 컨텍스트 준비
+      const userContext = {
+        recentCategories: stats?.favoriteCategories || [],
+        currentLocation: null,
+        recentHashtags: recentPosts.flatMap(p => p.hashtags || [])
+      };
+      
+      const tags = await trendingHashtagService.getRecommendedHashtags(userContext);
+      setTrendingHashtags(tags);
+    } catch (error) {
+      console.error('Failed to load trending hashtags:', error);
+      // 기본 해시태그 설정
+      setTrendingHashtags(['일상', '주말', '카페', '맛집', '여행', '운동', '책스타그램']);
+    }
+  };
+
+  // 맞춤 추천 가져오기
+  const loadRecommendations = async () => {
+    try {
+      const userContext = {
+        currentHour: new Date().getHours(),
+        currentDay: new Date().getDay(),
+        currentMonth: new Date().getMonth() + 1,
+        totalPosts: stats?.totalPosts || recentPosts.length,
+        recentPosts: recentPosts,
+        lastPostDate: recentPosts[0]?.createdAt,
+        weather: undefined, // 날씨 API 연동 시 추가
+        location: undefined,
+        favoriteCategories: stats?.favoriteCategories || [],
+        devicePhotos: undefined // 디바이스 사진 수 체크 시 추가
+      };
+      
+      const cards = await personalizedRecommendationService.getPersonalizedRecommendations(userContext);
+      setRecommendations(cards);
+    } catch (error) {
+      console.error('Failed to load recommendations:', error);
+    }
   };
 
   // 날짜 포맷팅 함수
@@ -173,8 +204,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
   useEffect(() => {
     setPosts(samplePosts);
-    loadCoachingTip();
+    loadUserStats();
   }, []);
+
+  // 사용자 통계가 로드되면 팁과 해시태그 로드
+  useEffect(() => {
+    if (stats || recentPosts.length > 0) {
+      loadCoachingTip();
+      loadTrendingHashtags();
+      loadRecommendations();
+    }
+  }, [stats, recentPosts]);
 
   // 최근 게시물 불러오기
   const loadRecentPosts = async () => {
@@ -219,7 +259,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     setRefreshing(true);
     try {
       setPosts(samplePosts);
-      loadCoachingTip();
+      await loadUserStats();
+      await loadCoachingTip();
+      await loadTrendingHashtags();
+      await loadRecommendations();
       // 로그인 상태에 따라 적절히 새로고침
       if (!auth().currentUser) {
         await loadRecentPosts();
@@ -455,14 +498,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </View>
         </SlideInView>
 
-        {/* 오늘의 트렌드 - 간단한 해시태그 추천 */}
+        {/* 오늘의 트렌드 - 개인화된 해시태그 추천 */}
         <SlideInView direction="left" delay={600}>
           <View style={styles.trendSection}>
             <Text style={styles.sectionTitle}>오늘의 추천 해시태그</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hashtagScroll}>
-              {['일상', '주말', '카페', '맛집', '여행', '운동', '책스타그램'].map((tag, index) => (
+              {trendingHashtags.map((tag, index) => (
                 <TouchableOpacity
-                  key={tag}
+                  key={`${tag}-${index}`}
                   style={styles.hashtagChip}
                   onPress={() => onNavigate('ai-write', { content: `#${tag} `, hashtags: [tag] })}
                   activeOpacity={0.7}
@@ -471,6 +514,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 </TouchableOpacity>
               ))}
             </ScrollView>
+            {trendingHashtags.length === 0 && (
+              <View style={styles.loadingHashtags}>
+                <Text style={styles.loadingText}>맞춤 해시태그를 준비 중...</Text>
+              </View>
+            )}
           </View>
         </SlideInView>
 
@@ -482,95 +530,92 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
             </View>
             
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recommendScroll}>
-              {/* 일정 기반 추천 */}
-              <AnimatedCard delay={700} style={styles.recommendCard}>
-                <View style={styles.recommendIconContainer}>
-                  <MaterialIcon name="event" size={24} color={colors.white} />
-                </View>
-                <View style={styles.recommendBadge}>
-                  <Text style={styles.recommendBadgeText}>📅 오늘의 일정</Text>
-                </View>
-                <Text style={styles.recommendTitle}>"팀 미팅" 후기 작성하기</Text>
-                <Text style={styles.recommendContent}>
-                  오늘 오후 2시에 있었던 팀 미팅,{"\n"}어떤 인사이트를 얻으셨나요?
-                </Text>
-                <View style={styles.recommendFooter}>
-                  <View style={styles.recommendMeta}>
-                    <Icon name="time-outline" size={14} color={colors.text.secondary} />
-                    <Text style={styles.recommendMetaText}>2시간 전 일정</Text>
-                  </View>
-                  <ScaleButton 
-                    style={styles.writeButton}
-                    onPress={() => {
-                      onNavigate('ai-write', {
-                        prompt: '오늘 팀 미팅에서 얻은 인사이트',
-                        category: 'professional'
-                      });
-                    }}
+              {recommendations.length > 0 ? (
+                recommendations.map((card, index) => (
+                  <AnimatedCard 
+                    key={card.id} 
+                    delay={700 + index * 50} 
+                    style={[styles.recommendCard, index > 0 && { marginLeft: SPACING.sm }]}
                   >
-                    <Text style={styles.writeButtonText}>글쓰기</Text>
-                  </ScaleButton>
-                </View>
-              </AnimatedCard>
-
-              {/* 사진 기반 추천 */}
-              <AnimatedCard delay={750} style={[styles.recommendCard, { marginLeft: SPACING.sm }]}>
-                <View style={[styles.recommendIconContainer, { backgroundColor: '#E91E63' }]}>
-                  <MaterialIcon name="photo-library" size={24} color={colors.white} />
-                </View>
-                <View style={styles.recommendBadge}>
-                  <Text style={styles.recommendBadgeText}>📸 최근 사진</Text>
-                </View>
-                <Text style={styles.recommendTitle}>어제 찍은 카페 사진</Text>
-                <Text style={styles.recommendContent}>
-                  갤러리에 있는 카페 사진으로{"\n"}감성 가득한 포스팅을 만들어보세요!
-                </Text>
-                <View style={styles.recommendFooter}>
-                  <View style={styles.recommendMeta}>
-                    <Icon name="image" size={14} color={colors.text.secondary} />
-                    <Text style={styles.recommendMetaText}>3장의 사진</Text>
-                  </View>
-                  <ScaleButton 
-                    style={styles.writeButton}
-                    onPress={() => {
-                      onNavigate('ai-write', {
-                        mode: 'photo',
-                        prompt: '카페 분위기와 메뉴 소개'
-                      });
-                    }}
-                  >
-                    <Text style={styles.writeButtonText}>글쓰기</Text>
-                  </ScaleButton>
-                </View>
-              </AnimatedCard>
-
-              {/* 시간대 기반 추천 */}
-              <AnimatedCard delay={800} style={[styles.recommendCard, { marginLeft: SPACING.sm }]}>
-                <View style={[styles.recommendIconContainer, { backgroundColor: '#2196F3' }]}>
-                  <MaterialIcon name="access-time" size={24} color={colors.white} />
-                </View>
-                <View style={styles.recommendBadge}>
-                  <Text style={styles.recommendBadgeText}>⏰ 활동 시간</Text>
-                </View>
-                <Text style={styles.recommendTitle}>저녁 7시 황금 시간대!</Text>
-                <Text style={styles.recommendContent}>
-                  지금이 가장 많은 사람들이{"\n"}활동하는 시간이에요. 포스팅 해볼까요?
-                </Text>
-                <View style={styles.recommendFooter}>
-                  <View style={styles.recommendMeta}>
-                    <Icon name="trending-up" size={14} color={colors.text.secondary} />
-                    <Text style={styles.recommendMetaText}>참여율 높음</Text>
-                  </View>
-                  <ScaleButton 
-                    style={styles.writeButton}
-                    onPress={() => {
-                      onNavigate('ai-write');
-                    }}
-                  >
-                    <Text style={styles.writeButtonText}>글쓰기</Text>
-                  </ScaleButton>
-                </View>
-              </AnimatedCard>
+                    <View style={[styles.recommendIconContainer, { backgroundColor: card.iconColor }]}>
+                      <MaterialIcon name={card.icon} size={24} color={colors.white} />
+                    </View>
+                    <View style={styles.recommendBadge}>
+                      <Text style={styles.recommendBadgeText}>{card.badge}</Text>
+                    </View>
+                    <Text style={styles.recommendTitle}>{card.title}</Text>
+                    <Text style={styles.recommendContent}>{card.content}</Text>
+                    <View style={styles.recommendFooter}>
+                      <View style={styles.recommendMeta}>
+                        <Icon name={card.meta.icon} size={14} color={colors.text.secondary} />
+                        <Text style={styles.recommendMetaText}>{card.meta.text}</Text>
+                      </View>
+                      <ScaleButton 
+                        style={styles.writeButton}
+                        onPress={() => {
+                          personalizedRecommendationService.saveRecommendationShown(card.id);
+                          onNavigate('ai-write', card.actionPayload);
+                        }}
+                      >
+                        <Text style={styles.writeButtonText}>{card.actionText}</Text>
+                      </ScaleButton>
+                    </View>
+                  </AnimatedCard>
+                ))
+              ) : (
+                // 기본 추천 카드 (로드 중이거나 데이터가 없을 때)
+                <>
+                  <AnimatedCard delay={700} style={styles.recommendCard}>
+                    <View style={styles.recommendIconContainer}>
+                      <MaterialIcon name="edit" size={24} color={colors.white} />
+                    </View>
+                    <View style={styles.recommendBadge}>
+                      <Text style={styles.recommendBadgeText}>🔥 시작하기</Text>
+                    </View>
+                    <Text style={styles.recommendTitle}>첨 포스팅 도전!</Text>
+                    <Text style={styles.recommendContent}>
+                      포스티와 함께 오늘의 이야기를{"\n"}만들어보세요!
+                    </Text>
+                    <View style={styles.recommendFooter}>
+                      <View style={styles.recommendMeta}>
+                        <Icon name="star" size={14} color={colors.text.secondary} />
+                        <Text style={styles.recommendMetaText}>추천</Text>
+                      </View>
+                      <ScaleButton 
+                        style={styles.writeButton}
+                        onPress={() => onNavigate('ai-write')}
+                      >
+                        <Text style={styles.writeButtonText}>글쓰기</Text>
+                      </ScaleButton>
+                    </View>
+                  </AnimatedCard>
+                  
+                  <AnimatedCard delay={750} style={[styles.recommendCard, { marginLeft: SPACING.sm }]}>
+                    <View style={[styles.recommendIconContainer, { backgroundColor: '#E91E63' }]}>
+                      <MaterialIcon name="photo-camera" size={24} color={colors.white} />
+                    </View>
+                    <View style={styles.recommendBadge}>
+                      <Text style={styles.recommendBadgeText}>📸 사진 활용</Text>
+                    </View>
+                    <Text style={styles.recommendTitle}>사진으로 시작하기</Text>
+                    <Text style={styles.recommendContent}>
+                      갤러리의 사진에{"\n"}이야기를 더해보세요!
+                    </Text>
+                    <View style={styles.recommendFooter}>
+                      <View style={styles.recommendMeta}>
+                        <Icon name="images" size={14} color={colors.text.secondary} />
+                        <Text style={styles.recommendMetaText}>간편하게</Text>
+                      </View>
+                      <ScaleButton 
+                        style={styles.writeButton}
+                        onPress={() => onNavigate('ai-write', { mode: 'photo' })}
+                      >
+                        <Text style={styles.writeButtonText}>사진 선택</Text>
+                      </ScaleButton>
+                    </View>
+                  </AnimatedCard>
+                </>
+              )}
             </ScrollView>
           </View>
         </SlideInView>
@@ -1150,6 +1195,15 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     top: -10,
     right: SPACING.lg,
     zIndex: 10,
+  },
+  loadingHashtags: {
+    paddingVertical: SPACING.md,
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    fontStyle: 'italic',
   },
   });
 };
