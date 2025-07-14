@@ -1,5 +1,3 @@
-import axios from 'axios';
-
 // CORS 헤더 설정
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -90,11 +88,16 @@ export default async function handler(req, res) {
     - Keep content concise and impactful
     - Match the requested tone perfectly`;
     
-    // OpenAI API 호출
+    // OpenAI API 호출 (fetch 사용)
     console.log('Calling OpenAI API...');
-    const response = await axios.post(
-      'https://api.openai.com/v1/chat/completions',
-      {
+    
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
         model: model,
         messages: [
           {
@@ -110,23 +113,39 @@ export default async function handler(req, res) {
         temperature: 0.8,
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
-      },
-      {
-        headers: {
-          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-          'Content-Type': 'application/json',
-        },
-        timeout: 30000, // 30초 타임아웃
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('OpenAI API Error:', errorData);
+      
+      if (response.status === 429) {
+        return res.status(429).json({
+          success: false,
+          error: 'OpenAI API rate limit exceeded. Please try again later.',
+        });
       }
-    );
+      
+      if (response.status === 401) {
+        return res.status(500).json({
+          success: false,
+          error: 'Server configuration error. Please contact support.',
+        });
+      }
+      
+      throw new Error(`OpenAI API error: ${response.status}`);
+    }
+    
+    const data = await response.json();
     
     // 성공 응답
     return res.status(200).json({
       success: true,
       data: {
-        content: response.data.choices[0].message.content,
-        usage: response.data.usage,
-        model: response.data.model,
+        content: data.choices[0].message.content,
+        usage: data.usage,
+        model: data.model,
       },
       metadata: {
         tone,
@@ -136,22 +155,7 @@ export default async function handler(req, res) {
     });
     
   } catch (error) {
-    console.error('API Error:', error.response?.data || error.message);
-    
-    // OpenAI API 에러 처리
-    if (error.response?.status === 429) {
-      return res.status(429).json({
-        success: false,
-        error: 'OpenAI API rate limit exceeded. Please try again later.',
-      });
-    }
-    
-    if (error.response?.status === 401) {
-      return res.status(500).json({
-        success: false,
-        error: 'Server configuration error. Please contact support.',
-      });
-    }
+    console.error('API Error:', error.message);
     
     // 일반 에러
     return res.status(500).json({

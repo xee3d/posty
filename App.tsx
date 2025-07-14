@@ -48,6 +48,8 @@ import inAppPurchaseService from './src/services/subscription/inAppPurchaseServi
 import tokenService from './src/services/subscription/tokenService';
 import autoMigrationService from './src/services/firebase/autoMigrationService';
 import offlineSyncService from './src/services/offline/offlineSyncService';
+import analyticsService from './src/services/analytics/analyticsService';
+import notificationService from './src/services/notification/notificationService';
 
 const { width } = Dimensions.get('window');
 
@@ -96,6 +98,8 @@ const App: React.FC = () => {
             subscriptionService.initialize(),
             tokenService.initialize(),
             offlineSyncService.initialize(),
+            analyticsService.initialize(),
+            notificationService.initialize(),
           ]);
           
           console.log('✅ Services initialized successfully');
@@ -121,10 +125,11 @@ const App: React.FC = () => {
     }
   }, [isAuthenticated, isCheckingAuth]);
   
-  // 앱 종료 시 오프라인 동기화 서비스 정리
+  // 앱 종료 시 서비스 정리
   useEffect(() => {
     return () => {
       offlineSyncService.destroy();
+      notificationService.cleanup();
     };
   }, []);
 
@@ -133,6 +138,13 @@ const App: React.FC = () => {
     const unsubscribe = socialAuthService.onAuthStateChanged((user) => {
       setIsAuthenticated(!!user);
       setIsCheckingAuth(false);
+      
+      // Analytics 사용자 ID 설정
+      if (user) {
+        analyticsService.setUserId(user.uid);
+      } else {
+        analyticsService.setUserId(null);
+      }
       
       // 개발 모드에서는 로그인 건너뛰기 옵션
       const SKIP_LOGIN = __DEV__ && true; // true로 설정하면 로그인 건너뛰기

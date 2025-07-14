@@ -1,8 +1,0 @@
-node_modules\
-.git\
-.svn\pristine\
-.svn\tmp\
-*.log
-*.tmp
-.DS_Store
-Thumbs.db

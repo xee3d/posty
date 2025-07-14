@@ -1,5 +1,5 @@
 // 서버 API 서비스 - Posty 백엔드 서버와 통신
-import { API_BASE_URL, APP_SECRET } from '@env';
+import API_CONFIG, { getApiUrl, getAuthHeader } from '../config/api';
 
 interface ServerGenerateParams {
   prompt: string;
@@ -25,26 +25,19 @@ interface ServerResponse {
 }
 
 class ServerAIService {
-  private baseUrl: string;
-  private appSecret: string;
-  private timeout: number = 30000; // 30초
+  private timeout: number = API_CONFIG.TIMEOUT;
 
   constructor() {
-    // 환경 변수에서 서버 URL과 시크릿 키 가져오기
-    // 개발 중에는 로컬 서버, 프로덕션에서는 Vercel URL 사용
-    this.baseUrl = API_BASE_URL || 'http://localhost:3000';
-    this.appSecret = APP_SECRET || 'development-secret';
-    
     console.log('ServerAIService initialized with:', {
-      baseUrl: this.baseUrl,
-      hasSecret: !!this.appSecret,
+      baseUrl: API_CONFIG.BASE_URL,
+      hasSecret: !!API_CONFIG.APP_SECRET,
     });
   }
 
   // 서버 상태 체크
   async checkHealth(): Promise<boolean> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/health`, {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.HEALTH), {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -62,22 +55,21 @@ class ServerAIService {
   // 콘텐츠 생성 (서버 API 호출)
   async generateContent(params: ServerGenerateParams): Promise<string> {
     try {
-      console.log('Calling server API:', `${this.baseUrl}/api/generate`);
+      console.log('Calling server API:', getApiUrl(API_CONFIG.ENDPOINTS.GENERATE));
       
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), this.timeout);
       
-      const response = await fetch(`${this.baseUrl}/api/generate`, {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.GENERATE), {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.appSecret}`,
+          ...getAuthHeader(),
           'X-App-Version': '1.0.0',
         },
         body: JSON.stringify({
           prompt: params.prompt,
           tone: params.tone,
-          platform: params.platform,
+          platform: params.platform || 'instagram',
           // 이미지가 있으면 base64 전송
           ...(params.imageBase64 && { image: params.imageBase64 }),
         }),
@@ -131,12 +123,9 @@ class ServerAIService {
   // 이미지 분석 (서버 API 호출)
   async analyzeImage(imageBase64: string): Promise<string> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/analyze-image`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/analyze-image`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${this.appSecret}`,
-        },
+        headers: getAuthHeader(),
         body: JSON.stringify({
           image: imageBase64,
         }),
@@ -159,11 +148,9 @@ class ServerAIService {
   // 사용량 확인
   async checkUsage(): Promise<any> {
     try {
-      const response = await fetch(`${this.baseUrl}/api/usage`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/usage`, {
         method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${this.appSecret}`,
-        },
+        headers: getAuthHeader(),
       });
       
       const data = await response.json();
@@ -172,6 +159,25 @@ class ServerAIService {
     } catch (error) {
       console.error('Usage check error:', error);
       return null;
+    }
+  }
+
+  // 테스트 생성 (개발용)
+  async testGenerate(): Promise<any> {
+    try {
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.GENERATE_TEST), {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      const data = await response.json();
+      return data;
+      
+    } catch (error) {
+      console.error('Test generate error:', error);
+      throw error;
     }
   }
 }

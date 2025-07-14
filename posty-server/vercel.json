@@ -13,9 +13,5 @@
         { "key": "Access-Control-Allow-Headers", "value": "Content-Type,Authorization" }
       ]
     }
-  ],
-  "env": {
-    "OPENAI_API_KEY": "@openai_api_key",
-    "APP_SECRET": "@app_secret"
-  }
+  ]
 }

@@ -1,152 +1,114 @@
-# 🚀 Posty - AI 기반 SNS 콘텐츠 생성 앱
+# 📱 Posty - AI 기반 SNS 콘텐츠 생성 앱
 
-<p align="center">
-  <img src="docs/app-icon.png" alt="Posty Logo" width="120" height="120">
-</p>
+<div align="center">
+  <img src="assets/app-icon.png" alt="Posty Logo" width="120" height="120">
+  
+  **당신의 일상을 특별하게 만드는 AI 글쓰기 도우미**
+  
+  [![React Native](https://img.shields.io/badge/React%20Native-0.74.5-blue.svg)](https://reactnative.dev/)
+  [![TypeScript](https://img.shields.io/badge/TypeScript-5.0.4-blue.svg)](https://www.typescriptlang.org/)
+  [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+</div>
 
-<p align="center">
-  <strong>당신의 SNS를 더 특별하게, AI가 만드는 맞춤형 콘텐츠</strong>
-</p>
+## 🌟 주요 기능
 
-## 📱 소개
+### AI 콘텐츠 생성
+- **텍스트 생성**: 프롬프트 기반 SNS 콘텐츠 자동 생성
+- **이미지 분석**: 사진을 분석하여 적절한 캡션 생성
+- **문장 다듬기**: 작성한 글을 더 매력적으로 개선
 
-Posty는 AI를 활용하여 Instagram, Facebook, Twitter, LinkedIn 등 다양한 SNS 플랫폼에 최적화된 콘텐츠를 생성하는 React Native 앱입니다.
+### 플랫폼 최적화
+- Instagram, Facebook, Twitter 등 각 플랫폼에 최적화된 콘텐츠
+- 플랫폼별 해시태그 자동 생성
+- 글자 수 제한 자동 조정
 
-### 주요 기능
-- 🤖 **AI 콘텐츠 생성**: OpenAI GPT-4o-mini를 활용한 고품질 텍스트 생성
-- 📸 **이미지 기반 작성**: 사진을 분석하여 어울리는 텍스트 자동 생성
-- 🎨 **다양한 톤 선택**: 캐주얼, 전문적, 유머러스, GenZ 등 7가지 톤
-- 📊 **플랫폼 최적화**: 각 SNS 특성에 맞는 글자수, 해시태그, 형식
-- 🌙 **다크 모드**: 눈이 편안한 다크 테마 지원
-- 🔊 **사운드 효과**: 재미있는 인터랙션 사운드
-
-## 🛠 기술 스택
-
-- **Framework**: React Native 0.72.6
-- **Language**: TypeScript 4.8.4
-- **AI Service**: OpenAI API (GPT-4o-mini)
-- **Storage**: AsyncStorage
-- **광고**: Google AdMob
-- **결제**: React Native IAP
-- **아이콘**: React Native Vector Icons
-
-## 📋 프로젝트 구조
-
-```
-Posty/
-├── src/
-│   ├── components/      # UI 컴포넌트
-│   ├── screens/         # 화면 컴포넌트
-│   ├── services/        # API 및 서비스
-│   ├── utils/          # 유틸리티 함수
-│   ├── hooks/          # 커스텀 훅
-│   └── types/          # TypeScript 타입
-├── android/            # Android 네이티브 코드
-├── ios/               # iOS 네이티브 코드
-├── docs/              # 문서
-└── posty-server/      # 백엔드 서버 (개발 중)
-```
+### 스타일 가이드
+- 10가지 이상의 미리 정의된 글쓰기 스타일
+- 개인 맞춤형 스타일 생성
+- 톤과 분위기 조절 기능
 
 ## 🚀 시작하기
 
 ### 사전 요구사항
-- Node.js 16.x 이상
-- React Native 개발 환경
+- Node.js 18.0 이상
+- React Native 개발 환경 설정
 - Android Studio / Xcode
 
 ### 설치
-
 ```bash
 # 저장소 클론
 git clone https://github.com/yourusername/posty.git
 cd posty
 
 # 의존성 설치
-npm install
+npm install --legacy-peer-deps
 
-# iOS 의존성 설치 (Mac만 해당)
+# iOS 의존성 설치 (macOS)
 cd ios && pod install && cd ..
 
 # 환경 변수 설정
 cp .env.example .env
-# .env 파일에 OpenAI API 키 입력
+# .env 파일에 필요한 API 키 입력
 ```
 
 ### 실행
-
 ```bash
 # Metro 서버 시작
-npm start
+npx react-native start
 
 # Android 실행
-npm run android
+npx react-native run-android
 
-# iOS 실행 (Mac만 해당)
-npm run ios
+# iOS 실행 (macOS)
+npx react-native run-ios
 ```
 
-## 📱 주요 화면
+## 📁 프로젝트 구조
+```
+Posty/
+├── src/
+│   ├── components/     # 재사용 가능한 컴포넌트
+│   ├── screens/        # 화면 컴포넌트
+│   ├── services/       # 비즈니스 로직 서비스
+│   ├── store/          # Redux 스토어
+│   ├── hooks/          # 커스텀 훅
+│   ├── utils/          # 유틸리티 함수
+│   └── types/          # TypeScript 타입 정의
+├── android/            # Android 네이티브 코드
+├── ios/               # iOS 네이티브 코드
+├── docs/              # 문서
+│   ├── guides/        # 사용 가이드
+│   ├── setup/         # 설정 가이드
+│   └── legal/         # 법적 문서
+└── scripts/           # 유틸리티 스크립트
+```
 
-### 1. 홈 화면
-- 오늘의 추천 콘텐츠
-- 빠른 시작 버튼
-- 사용 팁 제공
+## 🛠 기술 스택
 
-### 2. AI 작성 화면
-- 텍스트/이미지 입력
-- 플랫폼 선택
-- 톤 선택
-- 생성 및 편집
+### Frontend
+- **React Native 0.74.5**: 크로스 플랫폼 모바일 앱 개발
+- **TypeScript 5.0.4**: 타입 안전성 보장
+- **Redux Toolkit**: 상태 관리
+- **React Navigation**: 화면 네비게이션
 
-### 3. 트렌드 화면
-- 실시간 트렌드 (개발 중)
-- 인기 해시태그
-- 최적 게시 시간
+### Backend & Services
+- **Firebase**: 인증, 데이터베이스, 분석
+- **OpenAI API**: AI 콘텐츠 생성
+- **Google AdMob**: 광고 수익화
+- **React Native IAP**: 인앱 구매
 
-### 4. 내 스타일 화면
-- 작성 히스토리 (개발 중)
-- 스타일 분석
-- 성과 리포트
+## 📱 스크린샷
 
-### 5. 설정 화면
-- 프로필 관리
-- 테마 설정
-- 알림 설정
-- 구독 관리
-
-## 🔧 개발 현황
-
-### 완료된 기능 (75%)
-- ✅ AI 콘텐츠 생성
-- ✅ 플랫폼별 최적화
-- ✅ 이미지 분석
-- ✅ 다크 모드
-- ✅ 기본 UI/UX
-- ✅ 설정 저장
-
-### 개발 중
-- 🚧 API 서버 구축
-- 🚧 히스토리 저장
-- 🚧 실시간 트렌드
-- 🚧 구독 시스템
-
-### 예정
-- 📅 SNS 자동 게시
-- 📅 푸시 알림
-- 📅 A/B 테스트
-- 📅 팀 협업
-
-## 📚 문서
-
-- [프로젝트 현황](PROJECT_STATUS.md)
-- [개발 상태](DEVELOPMENT_STATUS.md)
-- [미구현 기능](UNIMPLEMENTED_FEATURES.md)
-- [구현 계획](IMPLEMENTATION_PLAN.md)
-- [패키지 현황](PACKAGE_STATUS.md)
+<div align="center">
+  <img src="docs/screenshots/home.png" alt="홈 화면" width="200">
+  <img src="docs/screenshots/write.png" alt="글쓰기 화면" width="200">
+  <img src="docs/screenshots/style.png" alt="스타일 화면" width="200">
+  <img src="docs/screenshots/settings.png" alt="설정 화면" width="200">
+</div>
 
 ## 🤝 기여하기
 
-프로젝트에 기여하고 싶으시다면:
+기여를 환영합니다! 다음 단계를 따라주세요:
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
@@ -156,16 +118,22 @@ npm run ios
 
 ## 📄 라이선스
 
-이 프로젝트는 MIT 라이선스 하에 있습니다.
+이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
 
 ## 📞 연락처
 
-- Email: support@posty.app
-- Website: https://posty.app
+- 이메일: contact@posty.app
+- 웹사이트: https://posty.app
+- 지원: support@posty.app
+
+## 🙏 감사의 말
+
+- OpenAI - AI 기술 제공
+- Firebase - 백엔드 인프라
+- React Native 커뮤니티
 
 ---
 
-<p align="center">
+<div align="center">
   Made with ❤️ by Posty Team
-</p>
-"# Posty" 
+</div>

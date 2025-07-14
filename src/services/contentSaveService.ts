@@ -4,6 +4,7 @@ import { saveContent } from '../utils/storage';
 import simplePostService from './simplePostService';
 import { getCategoryFromTone, extractHashtags } from '../utils/promptUtils';
 import { generateHashtags } from '../utils/platformStyles';
+import analyticsService from './analytics/analyticsService';
 
 interface SaveContentParams {
   content: string;
@@ -47,6 +48,13 @@ class ContentSaveService {
         platform: platform as 'instagram' | 'facebook' | 'twitter' | 'general',
         category: getCategoryFromTone(tone),
         tone,
+      });
+      
+      // Analytics 이벤트 기록
+      analyticsService.logContentSaved({
+        platform,
+        content_length: content.length,
+        hashtag_count: adjustedHashtags.length,
       });
       
       // 성공 알림

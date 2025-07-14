@@ -4,13 +4,11 @@
   "description": "Posty App Backend Server",
   "main": "index.js",
   "scripts": {
-    "dev": "vercel dev",
+    "dev": "node api/health.js",
     "deploy": "vercel --prod"
   },
-  "dependencies": {
-    "axios": "^1.6.0",
-    "cors": "^2.8.5"
-  },
+  "type": "module",
+  "dependencies": {},
   "devDependencies": {
     "vercel": "^32.0.0"
   }

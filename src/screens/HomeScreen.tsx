@@ -30,6 +30,7 @@ import auth from '@react-native-firebase/auth';
 import firestoreService from '../services/firebase/firestoreService';
 import { Post as FirestorePost } from '../types/firestore';
 import { SyncIndicator } from '../components/SyncIndicator';
+import { useScreenTracking } from '../hooks/analytics/useScreenTracking';
 
 interface HomeScreenProps {
   onNavigate: (tab: string, content?: any) => void;
@@ -38,6 +39,9 @@ interface HomeScreenProps {
 const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
   const dispatch = useAppDispatch();
+  
+  // 화면 추적
+  useScreenTracking('HomeScreen');
   
   // 토큰 관리 훅 사용
   const {

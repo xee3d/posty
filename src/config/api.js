@@ -1,0 +1,41 @@
+// API 설정
+const API_CONFIG = {
+  // 새로운 Vercel 서버 URL
+  BASE_URL: 'https://posty-server-new.vercel.app/api',
+  
+  // API 엔드포인트
+  ENDPOINTS: {
+    HEALTH: '/health',
+    GENERATE: '/generate',
+    GENERATE_TEST: '/generate-test', // 테스트용
+    TEST: '/test', // 간단한 테스트
+  },
+  
+  // 요청 타임아웃 (밀리초)
+  TIMEOUT: 30000,
+  
+  // 앱 시크릿 (환경변수로 관리하는 것이 좋음)
+  APP_SECRET: 'posty-secret-key-change-this-in-production', // Vercel 환경변수와 일치해야 함
+};
+
+// 개발 모드에서 로컬 서버 사용 (현재는 주석 처리)
+// if (__DEV__) {
+//   // Android 에뮬레이터에서는 10.0.2.2 사용
+//   // iOS 시뮬레이터나 실제 기기에서는 컴퓨터의 IP 주소 사용
+//   API_CONFIG.BASE_URL = 'http://10.0.2.2:3000/api'; // Android 에뮬레이터
+//   // API_CONFIG.BASE_URL = 'http://192.168.x.x:3000/api'; // 실제 기기 (IP 주소 변경 필요)
+// }
+
+// API 헬퍼 함수
+export const getApiUrl = (endpoint) => {
+  return `${API_CONFIG.BASE_URL}${endpoint}`;
+};
+
+export const getAuthHeader = () => {
+  return {
+    'Authorization': `Bearer ${API_CONFIG.APP_SECRET}`,
+    'Content-Type': 'application/json',
+  };
+};
+
+export default API_CONFIG;
