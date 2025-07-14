@@ -20,7 +20,7 @@ import { ScaleButton } from '../components/AnimationComponents';
 import { LoadingScreen, EmptyState } from '../components/common';
 import simplePostService from '../services/simplePostService';
 import improvedStyleService, { STYLE_TEMPLATES, STYLE_CHALLENGES } from '../services/improvedStyleService';
-import { UNIFIED_STYLES, getStyleById, STYLE_CATEGORIES } from '../utils/unifiedStyleConstants';
+import { UNIFIED_STYLES, getStyleById, STYLE_CATEGORIES, recommendStyles } from '../utils/unifiedStyleConstants';
 import { soundManager } from '../utils/soundManager';
 import { saveContent } from '../utils/storage';
 
@@ -44,6 +44,13 @@ interface WritingPattern {
   label: string;
 }
 
+interface TemplateUsage {
+  [templateId: string]: {
+    count: number;
+    lastUsed: number;
+  };
+}
+
 const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
   const styles = createStyles(colors, cardTheme, isDark);
@@ -56,9 +63,57 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const [activeChallenge, setActiveChallenge] = useState<any>(null);
   const [selectedTab, setSelectedTab] = useState<'overview' | 'analytics' | 'templates'>('overview');
   const [templates, setTemplates] = useState<any[]>([]);
+  const [templateUsage, setTemplateUsage] = useState<TemplateUsage>({});
+  const [recommendedTemplates, setRecommendedTemplates] = useState<string[]>([]);
   
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
+
+  // 템플릿 사용 통계 저장
+  const saveTemplateUsage = async (templateId: string) => {
+    try {
+      const usage = { ...templateUsage };
+      if (!usage[templateId]) {
+        usage[templateId] = { count: 0, lastUsed: 0 };
+      }
+      usage[templateId].count += 1;
+      usage[templateId].lastUsed = Date.now();
+      
+      setTemplateUsage(usage);
+      await AsyncStorage.setItem('TEMPLATE_USAGE', JSON.stringify(usage));
+    } catch (error) {
+      console.error('Failed to save template usage:', error);
+    }
+  };
+
+  // 템플릿 사용 통계 로드
+  const loadTemplateUsage = async () => {
+    try {
+      const saved = await AsyncStorage.getItem('TEMPLATE_USAGE');
+      if (saved) {
+        setTemplateUsage(JSON.parse(saved));
+      }
+    } catch (error) {
+      console.error('Failed to load template usage:', error);
+    }
+  };
+
+  // 추천 템플릿 생성
+  const generateRecommendations = (analysis: any, statsData: any) => {
+    const preferences = {
+      length: statsData.avgContentLength < 100 ? 'short' : statsData.avgContentLength > 200 ? 'long' : 'medium',
+      mood: analysis.emotionalTone > 0.7 ? 'emotional' : analysis.humorScore > 0.7 ? 'fun' : 'serious',
+      age: 'young' // 기본값, 실제로는 사용자 프로필에서 가져와야 함
+    };
+    
+    const recommended = recommendStyles(preferences);
+    setRecommendedTemplates(recommended);
+    
+    // styleAnalysis에도 추천 스타일 추가
+    if (analysis) {
+      analysis.recommendedStyles = recommended;
+    }
+  };
 
   // 데이터 로드 및 분석
   const loadDataAndAnalyze = async () => {
@@ -77,8 +132,14 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       setStyleAnalysis(analysis);
       setAchievements(userAchievements);
       
+      // 템플릿 사용 통계 로드
+      await loadTemplateUsage();
+      
       // 인사이트 생성
       generateInsights(analysis, posts);
+      
+      // 추천 템플릿 생성
+      generateRecommendations(analysis, statsData);
       
       // 통합된 템플릿 설정
       setTemplates(UNIFIED_STYLES);
@@ -322,8 +383,11 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     }
   };
 
-  const handleTemplateUse = (template: any) => {
+  const handleTemplateUse = async (template: any) => {
     soundManager.playSuccess();
+    
+    // 템플릿 사용 통계 저장
+    await saveTemplateUsage(template.id);
     
     if (onNavigate) {
       let content = '';
@@ -593,37 +657,64 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     <View>
       <Text style={styles.sectionTitle}>📝 스타일 템플릿</Text>
       <Text style={styles.sectionSubtitle}>
-        다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요
+      다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요
       </Text>
       
-      {templates.map((template) => (
-        <TouchableOpacity
+      {templates.map((template) => {
+      const templateUsageData = templateUsage[template.id];
+      const isRecommended = styleAnalysis?.recommendedStyles?.includes(template.id);
+      
+      return (
+      <TouchableOpacity
           key={template.id}
-          style={[styles.templateCard, cardTheme.card]}
-          onPress={() => handleTemplateUse(template)}
-          activeOpacity={0.8}
-        >
-          <View style={[styles.templateIcon, { backgroundColor: template.color + '20' }]}>
-            <Icon name={template.icon} size={28} color={template.color} />
-          </View>
+        style={[
+        styles.templateCard, 
+          cardTheme.card,
+          isRecommended && styles.recommendedTemplate
+      ]}
+      onPress={() => handleTemplateUse(template)}
+      activeOpacity={0.8}
+      >
+      {isRecommended && (
+      <View style={styles.recommendedBadge}>
+        <Icon name="star" size={12} color="#fff" />
+      <Text style={styles.recommendedText}>추천</Text>
+      </View>
+      )}
+      
+      <View style={[styles.templateIcon, { backgroundColor: template.color + '20' }]}>
+        <Icon name={template.icon} size={28} color={template.color} />
+        </View>
+        
           <View style={styles.templateContent}>
-            <Text style={styles.templateName}>{template.name}</Text>
-            <Text style={styles.templateDescription}>{template.description}</Text>
-            <View style={styles.templateStructure}>
-              <Text style={styles.templateStructureItem}>
-                • 평균 길이: {template.characteristics.avgLength}
-              </Text>
-              <Text style={styles.templateStructureItem}>
-                • 키워드: {template.characteristics.keywords.slice(0, 3).join(', ')}
-              </Text>
-              <Text style={styles.templateStructureItem}>
-                • 이모지: {template.characteristics.emojis.slice(0, 3).join(' ')}
-              </Text>
-            </View>
-          </View>
-          <Icon name="arrow-forward" size={20} color={colors.textSecondary} />
-        </TouchableOpacity>
-      ))}
+              <Text style={styles.templateName}>{template.name}</Text>
+                <Text style={styles.templateDescription}>{template.description}</Text>
+                
+                <View style={styles.templateDetails}>
+                  <View style={styles.templateStructure}>
+                    <Text style={styles.templateStructureItem}>
+                      • 평균 길이: {template.characteristics.avgLength}
+                    </Text>
+                    <Text style={styles.templateStructureItem}>
+                      • 키워드: {template.characteristics.keywords.slice(0, 3).join(', ')}
+                    </Text>
+                    <Text style={styles.templateStructureItem}>
+                      • 이모지: {template.characteristics.emojis.slice(0, 3).join(' ')}
+                    </Text>
+                  </View>
+                  
+                  {templateUsageData && templateUsageData.count > 0 && (
+                    <Text style={styles.templateUsageCount}>
+                      사용 {templateUsageData.count}회
+                    </Text>
+                  )}
+                </View>
+              </View>
+              
+              <Icon name="arrow-forward" size={20} color={colors.textSecondary} />
+            </TouchableOpacity>
+          );
+        })}
       
 
       
@@ -1109,19 +1200,35 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       color: colors.textSecondary,
       marginBottom: 2,
     },
-    createTemplateButton: {
+    recommendedTemplate: {
+      borderWidth: 2,
+      borderColor: colors.primary + '30',
+    },
+    recommendedBadge: {
+      position: 'absolute',
+      top: 8,
+      right: 8,
       flexDirection: 'row',
       alignItems: 'center',
-      justifyContent: 'center',
-      padding: SPACING.lg,
-      borderRadius: 16,
-      borderWidth: 2,
-      borderStyle: 'dashed',
-      marginTop: SPACING.sm,
-      gap: SPACING.sm,
+      backgroundColor: colors.primary,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      borderRadius: 12,
+      gap: 4,
     },
-    createTemplateText: {
-      fontSize: 16,
+    recommendedText: {
+      fontSize: 10,
+      color: '#fff',
+      fontWeight: '600',
+    },
+    templateDetails: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'flex-end',
+    },
+    templateUsageCount: {
+      fontSize: 11,
+      color: colors.primary,
       fontWeight: '600',
     },
     styleIconContainer: {
