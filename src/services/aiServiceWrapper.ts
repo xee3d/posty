@@ -20,7 +20,10 @@ class AIServiceWrapper {
         prompt: params.prompt || '',
         tone: params.tone || 'casual',
         platform: params.platform,
+        length: params.length,
       });
+      
+      console.log('AIServiceWrapper received content:', content);
       
       // 해시태그 추출 (서버에서 안 하면 클라이언트에서)
       const hashtags = params.hashtags || extractHashtags(content);

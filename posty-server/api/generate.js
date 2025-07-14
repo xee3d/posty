@@ -46,7 +46,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, tone, platform, model = 'gpt-3.5-turbo' } = req.body;
+    const { prompt, tone, platform, model = 'gpt-3.5-turbo', language = 'ko', length = 'medium' } = req.body;
     
     // 입력 검증
     if (!prompt || prompt.trim().length === 0) {
@@ -74,22 +74,56 @@ export default async function handler(req, res) {
       return res.status(429).json({ error: 'Too many requests. Please try again later.' });
     }
     
-    // 시스템 프롬프트 생성
-    const systemPrompt = `You are Posty, a creative AI assistant specialized in creating engaging social media content.
+    // 시스템 프롬프트 생성 (언어별)
+    const lengthGuides = {
+      short: { ko: '50자 이내', en: 'under 50 characters' },
+      medium: { ko: '100-150자', en: '100-150 characters' },
+      long: { ko: '250-300자', en: '250-300 characters' }
+    };
+    
+    const systemPrompts = {
+      ko: `당신은 창의적인 소셜 미디어 콘텐츠를 만드는 AI 어시스턴트 '포스티'입니다.
+    
+    현재 설정:
+    - 톤: ${tone || 'friendly'}
+    - 플랫폼: ${platform || 'general'}
+    - 길이: ${lengthGuides[length]?.ko || lengthGuides.medium.ko}
+    
+    가이드라인:
+    - 창의적이고 매력적인 콘텐츠를 작성하세요
+    - 특정 플랫폼에 맞게 콘텐츠를 조정하세요
+    - 적절한 해시태그를 사용하세요
+    - 요청된 길이(${lengthGuides[length]?.ko || lengthGuides.medium.ko})에 맞춰 작성하세요
+    - 요청된 톤에 완벽하게 맞춰 작성하세요
+    - 반드시 한국어로 응답하세요`,
+      
+      en: `You are Posty, a creative AI assistant specialized in creating engaging social media content.
     
     Current settings:
     - Tone: ${tone || 'friendly'}
     - Platform: ${platform || 'general'}
+    - Length: ${lengthGuides[length]?.en || lengthGuides.medium.en}
     
     Guidelines:
     - Be creative and engaging
     - Adapt content for the specific platform
     - Use appropriate hashtags when relevant
-    - Keep content concise and impactful
-    - Match the requested tone perfectly`;
+    - Keep content to the requested length (${lengthGuides[length]?.en || lengthGuides.medium.en})
+    - Match the requested tone perfectly
+    - Always respond in English`
+    };
+    
+    const systemPrompt = systemPrompts[language] || systemPrompts.ko;
+    
+    // 길이에 따른 max_tokens 설정
+    const maxTokensMap = {
+      short: 150,
+      medium: 300,
+      long: 600
+    };
     
     // OpenAI API 호출 (fetch 사용)
-    console.log('Calling OpenAI API...');
+    console.log('Calling OpenAI API with length:', length);
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -109,7 +143,7 @@ export default async function handler(req, res) {
             content: prompt,
           },
         ],
-        max_tokens: 500,
+        max_tokens: maxTokensMap[length] || 300,
         temperature: 0.8,
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
@@ -138,6 +172,8 @@ export default async function handler(req, res) {
     }
     
     const data = await response.json();
+    
+    console.log('OpenAI response:', JSON.stringify(data, null, 2));
     
     // 성공 응답
     return res.status(200).json({

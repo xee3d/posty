@@ -1,3 +1,5 @@
+// import { getCurrentLanguage } from '../locales/i18n';
+
 // 서버 API 서비스 - Posty 백엔드 서버와 통신
 import API_CONFIG, { getApiUrl, getAuthHeader } from '../config/api';
 
@@ -6,6 +8,7 @@ interface ServerGenerateParams {
   tone: string;
   platform?: string;
   imageBase64?: string;
+  length?: string;
 }
 
 interface ServerResponse {
@@ -70,6 +73,8 @@ class ServerAIService {
           prompt: params.prompt,
           tone: params.tone,
           platform: params.platform || 'instagram',
+          language: 'ko', // getCurrentLanguage(), // 현재 언어 추가
+          length: params.length || 'medium', // 길이 추가
           // 이미지가 있으면 base64 전송
           ...(params.imageBase64 && { image: params.imageBase64 }),
         }),
@@ -92,6 +97,7 @@ class ServerAIService {
         success: data.success,
         contentLength: data.data.content.length,
         usage: data.data.usage,
+        content: data.data.content, // 실제 콘텐츠도 출력
       });
       
       return data.data.content;
