@@ -1,6 +1,18 @@
+// Firebase Modular API로 마이그레이션 완료
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
+import { 
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  query,
+  where,
+  getDocs,
+  serverTimestamp,
+  Timestamp
+} from '@react-native-firebase/firestore';
+import { getAuth } from '@react-native-firebase/auth';
+import { getApp } from '@react-native-firebase/app';
 import firestoreService from './firestoreService';
 
 export interface MigrationResult {
@@ -12,6 +24,10 @@ export interface MigrationResult {
 }
 
 class DataMigrationService {
+  private app = getApp();
+  private auth = getAuth(this.app);
+  private firestore = getFirestore(this.app);
+
   /**
    * AsyncStorage에서 Firestore로 데이터 마이그레이션
    */
@@ -25,7 +41,7 @@ class DataMigrationService {
     };
 
     try {
-      const userId = auth().currentUser?.uid;
+      const userId = this.auth.currentUser?.uid;
       if (!userId) {
         result.errors.push('사용자가 로그인되어 있지 않습니다');
         return result;
@@ -62,7 +78,7 @@ class DataMigrationService {
       }
 
       const contents = JSON.parse(savedContents);
-      const userId = auth().currentUser?.uid;
+      const userId = this.auth.currentUser?.uid;
       
       console.log(`Found ${contents.length} contents to migrate`);
 
@@ -92,22 +108,21 @@ class DataMigrationService {
             category: this.inferCategory(content),
             userId: userId!,
             createdAt: content.timestamp 
-              ? firestore.Timestamp.fromDate(new Date(content.timestamp))
-              : firestore.FieldValue.serverTimestamp(),
+              ? Timestamp.fromDate(new Date(content.timestamp))
+              : serverTimestamp(),
             status: 'draft' as const,
             // 마이그레이션 메타데이터
             migrationData: {
-              migratedAt: firestore.FieldValue.serverTimestamp(),
+              migratedAt: serverTimestamp(),
               originalId: contentId,
               source: 'asyncstorage',
             },
           };
 
-          // Firestore에 저장
-          await firestore()
-            .collection('posts')
-            .doc(contentId)
-            .set(postData);
+          // Firestore에 저장 - 모듈러 API 사용
+          const postsCollection = collection(this.firestore, 'posts');
+          const postRef = doc(postsCollection, contentId);
+          await setDoc(postRef, postData);
 
           result.migratedCount++;
           console.log(`Migrated content: ${contentId}`);
@@ -142,11 +157,11 @@ class DataMigrationService {
         return;
       }
 
-      const userId = auth().currentUser?.uid;
+      const userId = this.auth.currentUser?.uid;
       const analyticsData: any = {
         userId: userId!,
         migrationData: {
-          migratedAt: firestore.FieldValue.serverTimestamp(),
+          migratedAt: serverTimestamp(),
           source: 'asyncstorage',
         },
         dailyStats: {},
@@ -161,14 +176,13 @@ class DataMigrationService {
         }
       }
 
-      // Firestore에 저장 (문서 ID를 userId_legacy로 설정)
+      // Firestore에 저장 (문서 ID를 userId_legacy로 설정) - 모듈러 API 사용
       const analyticsDocId = `${userId}_legacy`;
       
       try {
-        await firestore()
-          .collection('analytics')
-          .doc(analyticsDocId)
-          .set(analyticsData);
+        const analyticsCollection = collection(this.firestore, 'analytics');
+        const analyticsRef = doc(analyticsCollection, analyticsDocId);
+        await setDoc(analyticsRef, analyticsData);
           
         result.migratedCount++;
         console.log(`Analytics data migrated successfully to: ${analyticsDocId}`);
@@ -244,15 +258,18 @@ class DataMigrationService {
    * 이미 마이그레이션된 콘텐츠 ID 가져오기
    */
   private async getMigratedContentIds(): Promise<Set<string>> {
-    const userId = auth().currentUser?.uid;
+    const userId = this.auth.currentUser?.uid;
     if (!userId) return new Set();
 
     try {
-      const snapshot = await firestore()
-        .collection('posts')
-        .where('userId', '==', userId)
-        .where('migrationData.source', '==', 'asyncstorage')
-        .get();
+      const postsCollection = collection(this.firestore, 'posts');
+      const q = query(
+        postsCollection,
+        where('userId', '==', userId),
+        where('migrationData.source', '==', 'asyncstorage')
+      );
+      
+      const snapshot = await getDocs(q);
 
       const ids = new Set<string>();
       snapshot.docs.forEach(doc => {

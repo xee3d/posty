@@ -1,10 +1,14 @@
+// Firebase Modular API로 마이그레이션 완료
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import auth from '@react-native-firebase/auth';
+import { getAuth } from '@react-native-firebase/auth';
+import { getApp } from '@react-native-firebase/app';
 import dataMigrationService from './dataMigrationService';
 
 class AutoMigrationService {
   private static instance: AutoMigrationService;
   private isMigrationInProgress = false;
+  private app = getApp();
+  private auth = getAuth(this.app);
 
   static getInstance(): AutoMigrationService {
     if (!AutoMigrationService.instance) {
@@ -25,8 +29,8 @@ class AutoMigrationService {
         return;
       }
 
-      // 로그인 상태 확인
-      const user = auth().currentUser;
+      // 로그인 상태 확인 - 모듈러 API 사용
+      const user = this.auth.currentUser;
       if (!user) {
         console.log('No authenticated user, skipping migration check');
         return;

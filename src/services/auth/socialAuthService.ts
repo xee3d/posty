@@ -1,4 +1,14 @@
-import auth, { FirebaseAuthTypes } from '@react-native-firebase/auth';
+// Firebase Modular API로 마이그레이션 완료
+import { 
+  getAuth, 
+  signInWithCredential,
+  signInWithCustomToken,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  User as FirebaseUser
+} from '@react-native-firebase/auth';
+import { getApp } from '@react-native-firebase/app';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import NaverLogin from '@react-native-seoul/naver-login';
 import { login as kakaoLogin, getProfile as getKakaoProfile } from '@react-native-seoul/kakao-login';
@@ -16,6 +26,9 @@ export interface UserProfile {
 const DEV_MODE = __DEV__ && !process.env.GOOGLE_WEB_CLIENT_ID;
 
 class SocialAuthService {
+  private app = getApp();
+  private auth = getAuth(this.app);
+
   constructor() {
     if (!DEV_MODE) {
       this.initializeGoogleSignIn();
@@ -76,9 +89,9 @@ class SocialAuthService {
       // Google 로그인
       const { idToken } = await GoogleSignin.signIn();
       
-      // Firebase 인증
-      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-      const userCredential = await auth().signInWithCredential(googleCredential);
+      // Firebase 인증 - 모듈러 API 사용
+      const googleCredential = GoogleAuthProvider.credential(idToken);
+      const userCredential = await signInWithCredential(this.auth, googleCredential);
       
       return this.formatUserProfile(userCredential.user, 'google');
     } catch (error) {
@@ -119,7 +132,7 @@ class SocialAuthService {
       
       // Firebase Custom Token으로 로그인 (서버에서 생성 필요)
       const customToken = await this.getFirebaseCustomToken('naver', profileResult.response);
-      const userCredential = await auth().signInWithCustomToken(customToken);
+      const userCredential = await signInWithCustomToken(this.auth, customToken);
       
       return this.formatUserProfile(userCredential.user, 'naver');
     } catch (error) {
@@ -144,7 +157,7 @@ class SocialAuthService {
       
       // Firebase Custom Token으로 로그인 (서버에서 생성 필요)
       const customToken = await this.getFirebaseCustomToken('kakao', profile);
-      const userCredential = await auth().signInWithCustomToken(customToken);
+      const userCredential = await signInWithCustomToken(this.auth, customToken);
       
       return this.formatUserProfile(userCredential.user, 'kakao');
     } catch (error) {
@@ -158,7 +171,7 @@ class SocialAuthService {
     try {
       if (!DEV_MODE) {
         // 현재 로그인된 사용자 확인
-        const currentUser = auth().currentUser;
+        const currentUser = this.auth.currentUser;
         
         if (currentUser) {
           // 각 소셜 로그인 SDK 로그아웃
@@ -174,8 +187,8 @@ class SocialAuthService {
             console.warn('소셜 로그아웃 오류 (무시됨):', socialError);
           }
           
-          // Firebase 로그아웃
-          await auth().signOut();
+          // Firebase 로그아웃 - 모듈러 API 사용
+          await firebaseSignOut(this.auth);
         } else {
           console.log('로그인된 사용자가 없음 - 로컬 데이터만 정리');
         }
@@ -209,21 +222,21 @@ class SocialAuthService {
   }
 
   // 현재 로그인된 사용자 가져오기
-  getCurrentUser(): FirebaseAuthTypes.User | null {
+  getCurrentUser(): FirebaseUser | null {
     if (DEV_MODE) {
       return null; // 개발 모드에서는 항상 로그아웃 상태
     }
-    return auth().currentUser;
+    return this.auth.currentUser;
   }
 
-  // 로그인 상태 리스너
-  onAuthStateChanged(callback: (user: FirebaseAuthTypes.User | null) => void) {
+  // 로그인 상태 리스너 - 모듈러 API 사용
+  onAuthStateChanged(callback: (user: FirebaseUser | null) => void) {
     if (DEV_MODE) {
       // 개발 모드에서는 즉시 null 콜백
       callback(null);
       return () => {}; // unsubscribe 함수
     }
-    return auth().onAuthStateChanged(callback);
+    return onAuthStateChanged(this.auth, callback);
   }
 
   // Firebase Custom Token 가져오기 (서버 API 호출)
@@ -249,7 +262,7 @@ class SocialAuthService {
   }
 
   // 사용자 프로필 포맷팅
-  private formatUserProfile(user: FirebaseAuthTypes.User, provider: 'google' | 'naver' | 'kakao' | 'email'): UserProfile {
+  private formatUserProfile(user: FirebaseUser, provider: 'google' | 'naver' | 'kakao' | 'email'): UserProfile {
     return {
       uid: user.uid,
       email: user.email,
