@@ -1,139 +1,144 @@
-# 📱 Posty - AI 기반 SNS 콘텐츠 생성 앱
+# Posty - AI-Powered Social Media Content Creator
 
 <div align="center">
-  <img src="assets/app-icon.png" alt="Posty Logo" width="120" height="120">
-  
-  **당신의 일상을 특별하게 만드는 AI 글쓰기 도우미**
+  <img src="./assets/logo.png" alt="Posty Logo" width="200"/>
   
   [![React Native](https://img.shields.io/badge/React%20Native-0.74.5-blue.svg)](https://reactnative.dev/)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.0.4-blue.svg)](https://www.typescriptlang.org/)
-  [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+  [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 </div>
 
-## 🌟 주요 기능
+## 📱 Overview
 
-### AI 콘텐츠 생성
-- **텍스트 생성**: 프롬프트 기반 SNS 콘텐츠 자동 생성
-- **이미지 분석**: 사진을 분석하여 적절한 캡션 생성
-- **문장 다듬기**: 작성한 글을 더 매력적으로 개선
+Posty는 AI를 활용하여 창의적인 소셜 미디어 콘텐츠를 생성하는 모바일 앱입니다. 사용자의 아이디어를 매력적인 포스팅으로 변환하여 소셜 미디어 활동을 더욱 효과적으로 만들어줍니다.
 
-### 플랫폼 최적화
-- Instagram, Facebook, Twitter 등 각 플랫폼에 최적화된 콘텐츠
-- 플랫폼별 해시태그 자동 생성
-- 글자 수 제한 자동 조정
+## ✨ Features
 
-### 스타일 가이드
-- 10가지 이상의 미리 정의된 글쓰기 스타일
-- 개인 맞춤형 스타일 생성
-- 톤과 분위기 조절 기능
+- **AI 콘텐츠 생성**: OpenAI를 활용한 창의적인 콘텐츠 작성
+- **다양한 톤 선택**: 캐주얼, 전문적, 유머러스 등 9가지 톤
+- **사진 기반 글쓰기**: 이미지를 분석하여 관련 콘텐츠 생성
+- **문장 다듬기**: 기존 텍스트를 개선하고 교정
+- **스타일 템플릿**: 미니멀리스트, 스토리텔러 등 다양한 스타일
+- **토큰 시스템**: 사용량 관리 및 구독 모델
+- **오프라인 지원**: 네트워크 없이도 기본 기능 사용 가능
 
-## 🚀 시작하기
+## 🚀 Getting Started
 
-### 사전 요구사항
-- Node.js 18.0 이상
-- React Native 개발 환경 설정
+### Prerequisites
+
+- Node.js >= 18
+- React Native development environment
 - Android Studio / Xcode
+- Java 17 (for Android)
 
-### 설치
+### Installation
+
+1. Clone the repository
 ```bash
-# 저장소 클론
-git clone https://github.com/yourusername/posty.git
-cd posty
-
-# 의존성 설치
-npm install --legacy-peer-deps
-
-# iOS 의존성 설치 (macOS)
-cd ios && pod install && cd ..
-
-# 환경 변수 설정
-cp .env.example .env
-# .env 파일에 필요한 API 키 입력
+git clone https://github.com/xee3d/Posty.git
+cd Posty
 ```
 
-### 실행
+2. Install dependencies
 ```bash
-# Metro 서버 시작
-npx react-native start
+npm install
+# or
+yarn install
+```
 
-# Android 실행
+3. Install iOS pods (iOS only)
+```bash
+cd ios && pod install
+```
+
+4. Set up environment variables
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+### Running the App
+
+#### Android
+```bash
 npx react-native run-android
+```
 
-# iOS 실행 (macOS)
+#### iOS
+```bash
 npx react-native run-ios
 ```
 
-## 📁 프로젝트 구조
+## 🔧 Configuration
+
+### API Server Setup
+
+Posty uses a separate API server for AI content generation. See [posty-server](https://github.com/xee3d/posty-server) for server setup.
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+# API Configuration
+API_BASE_URL=https://your-posty-server.vercel.app/api
+API_SECRET=your-app-secret
+
+# Firebase Configuration (Optional)
+FIREBASE_API_KEY=your-firebase-api-key
+FIREBASE_AUTH_DOMAIN=your-auth-domain
+FIREBASE_PROJECT_ID=your-project-id
+```
+
+## 📁 Project Structure
+
 ```
 Posty/
 ├── src/
-│   ├── components/     # 재사용 가능한 컴포넌트
-│   ├── screens/        # 화면 컴포넌트
-│   ├── services/       # 비즈니스 로직 서비스
-│   ├── store/          # Redux 스토어
-│   ├── hooks/          # 커스텀 훅
-│   ├── utils/          # 유틸리티 함수
-│   └── types/          # TypeScript 타입 정의
-├── android/            # Android 네이티브 코드
-├── ios/               # iOS 네이티브 코드
-├── docs/              # 문서
-│   ├── guides/        # 사용 가이드
-│   ├── setup/         # 설정 가이드
-│   └── legal/         # 법적 문서
-└── scripts/           # 유틸리티 스크립트
+│   ├── screens/          # App screens
+│   ├── components/       # Reusable components
+│   ├── services/         # API and business logic
+│   ├── utils/           # Utility functions
+│   ├── hooks/           # Custom React hooks
+│   ├── store/           # Redux store
+│   └── config/          # App configuration
+├── android/             # Android native code
+├── ios/                 # iOS native code
+└── assets/             # Images, fonts, etc.
 ```
 
-## 🛠 기술 스택
+## 🛠️ Tech Stack
 
-### Frontend
-- **React Native 0.74.5**: 크로스 플랫폼 모바일 앱 개발
-- **TypeScript 5.0.4**: 타입 안전성 보장
-- **Redux Toolkit**: 상태 관리
-- **React Navigation**: 화면 네비게이션
+- **Frontend**: React Native 0.74.5, TypeScript
+- **State Management**: Redux Toolkit
+- **Navigation**: React Navigation 6
+- **UI Components**: React Native Reanimated 3
+- **Backend**: Node.js, Vercel Functions
+- **AI**: OpenAI GPT-4
+- **Database**: Firebase Firestore
+- **Authentication**: Firebase Auth
 
-### Backend & Services
-- **Firebase**: 인증, 데이터베이스, 분석
-- **OpenAI API**: AI 콘텐츠 생성
-- **Google AdMob**: 광고 수익화
-- **React Native IAP**: 인앱 구매
+## 📱 Supported Platforms
 
-## 📱 스크린샷
+- Android 6.0+ (API 23+)
+- iOS 13.0+
 
-<div align="center">
-  <img src="docs/screenshots/home.png" alt="홈 화면" width="200">
-  <img src="docs/screenshots/write.png" alt="글쓰기 화면" width="200">
-  <img src="docs/screenshots/style.png" alt="스타일 화면" width="200">
-  <img src="docs/screenshots/settings.png" alt="설정 화면" width="200">
-</div>
+## 🤝 Contributing
 
-## 🤝 기여하기
+Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md) for details.
 
-기여를 환영합니다! 다음 단계를 따라주세요:
+## 📄 License
 
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 📄 라이선스
+## 🙏 Acknowledgments
 
-이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
-
-## 📞 연락처
-
-- 이메일: contact@posty.app
-- 웹사이트: https://posty.app
-- 지원: support@posty.app
-
-## 🙏 감사의 말
-
-- OpenAI - AI 기술 제공
-- Firebase - 백엔드 인프라
-- React Native 커뮤니티
+- OpenAI for GPT API
+- React Native Community
+- All contributors and users
 
 ---
 
 <div align="center">
-  Made with ❤️ by Posty Team
+  Made with ❤️ by the Posty Team
 </div>
