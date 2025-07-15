@@ -13,10 +13,10 @@ import { APP_TEXT } from '../../utils/textConstants';
 import { useAppTheme } from '../../hooks/useAppTheme';
 
 interface TermsOfServiceScreenProps {
-  onBack?: () => void;
+  onNavigate: (screen: string) => void;
 }
 
-const TermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({ onBack }) => {
+const TermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({ onNavigate }) => {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
@@ -25,7 +25,7 @@ const TermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({ onBack }) =
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+        <TouchableOpacity onPress={() => onNavigate('settings')} style={styles.backButton}>
           <Icon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>이용약관</Text>

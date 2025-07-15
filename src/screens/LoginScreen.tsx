@@ -23,6 +23,7 @@ import Animated, {
 } from 'react-native-reanimated';
 
 import { useAppTheme } from '../hooks/useAppTheme';
+import { AppIcon } from '../components/AppIcon';
 import socialAuthService from '../services/auth/socialAuthService';
 import { useAppDispatch } from '../hooks/redux';
 import { setUser } from '../store/slices/userSlice';
@@ -125,6 +126,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
           style={[
             styles.socialButton,
             { backgroundColor },
+            provider === 'google' && styles.googleButton,
             isLoading && !isThisLoading && styles.disabledButton,
           ]}
           onPress={() => handleSocialLogin(provider)}
@@ -170,9 +172,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         >
           {/* 로고 영역 */}
           <Animated.View style={[styles.logoContainer, logoAnimatedStyle]}>
-            <View style={styles.logoWrapper}>
-              <Icon name="edit-note" size={60} color={colors.primary} />
-            </View>
+            <AppIcon size={100} />
             <Text style={styles.appName}>Posty</Text>
             <Text style={styles.appDescription}>
               AI가 만드는 나만의 SNS 콘텐츠
@@ -193,7 +193,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
               'Google로 시작하기',
               'google',
               '#FFFFFF',
-              '#333333',
+              '#1F1F1F',
               400
             )}
 
@@ -277,54 +277,49 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     marginTop: 60,
     marginBottom: 60,
   },
-  logoWrapper: {
-    width: 100,
-    height: 100,
-    backgroundColor: colors.primary + '20',
-    borderRadius: 25,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
   appName: {
-    fontSize: 36,
-    fontWeight: 'bold',
-    color: colors.text,
+    fontSize: 40,
+    fontWeight: '800',
+    color: colors.primary,
     marginBottom: 8,
+    letterSpacing: -1,
   },
   appDescription: {
-    fontSize: 16,
-    color: colors.textSecondary,
+    fontSize: 17,
+    color: colors.text.primary,
     textAlign: 'center',
+    opacity: 0.8,
+    lineHeight: 24,
   },
   buttonContainer: {
     marginBottom: 40,
   },
   loginTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text,
-    marginBottom: 20,
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.text.primary,
+    marginBottom: 24,
     textAlign: 'center',
+    letterSpacing: -0.3,
   },
   socialButtonContainer: {
-    marginBottom: 12,
+    marginBottom: 16,
   },
   socialButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    elevation: 2,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 14,
+    elevation: 3,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
   },
   disabledButton: {
-    opacity: 0.6,
+    opacity: 0.5,
   },
   socialIconContainer: {
     marginRight: 12,
@@ -338,18 +333,19 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     fontWeight: 'bold',
   },
   socialButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
+    fontSize: 17,
+    fontWeight: '700',
+    letterSpacing: -0.2,
   },
   termsContainer: {
     alignItems: 'center',
     marginBottom: 30,
   },
   termsText: {
-    fontSize: 12,
-    color: colors.textSecondary,
+    fontSize: 13,
+    color: colors.text.secondary,
     textAlign: 'center',
-    lineHeight: 18,
+    lineHeight: 20,
   },
   termsLink: {
     color: colors.primary,
@@ -363,9 +359,13 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     paddingHorizontal: 32,
   },
   guestButtonText: {
-    fontSize: 16,
+    fontSize: 17,
     color: colors.primary,
-    fontWeight: '600',
+    fontWeight: '700',
+  },
+  googleButton: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
 });
 

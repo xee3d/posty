@@ -13,10 +13,10 @@ import { APP_TEXT } from '../../utils/textConstants';
 import { useAppTheme } from '../../hooks/useAppTheme';
 
 interface PrivacyPolicyScreenProps {
-  onBack?: () => void;
+  onNavigate: (screen: string) => void;
 }
 
-const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({ onBack }) => {
+const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({ onNavigate }) => {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
 
@@ -25,7 +25,7 @@ const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({ onBack }) => 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
+        <TouchableOpacity onPress={() => onNavigate('settings')} style={styles.backButton}>
           <Icon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>개인정보 처리방침</Text>
