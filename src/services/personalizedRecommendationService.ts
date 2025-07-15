@@ -206,7 +206,7 @@ class PersonalizedRecommendationService {
       title: '감성 비 오는 날',
       content: '빗소리와 함께하는 감성적인\n순간을 기록해보세요',
       meta: {
-        icon: 'opacity',
+        icon: 'water',
         text: '비 예보'
       },
       actionText: '글쓰기',
@@ -229,7 +229,7 @@ class PersonalizedRecommendationService {
       title: '화창한 날씨',
       content: '맑은 날씨를 만끽할 수 있는\n야외 활동 어떠세요?',
       meta: {
-        icon: 'light-mode',
+        icon: 'sunny',
         text: '맑음'
       },
       actionText: '글쓰기',
@@ -351,7 +351,7 @@ class PersonalizedRecommendationService {
       title: '작성 중인 글이 있어요',
       content: '조금만 더 다듬어서\n멋진 포스팅을 완성해보세요!',
       meta: {
-        icon: 'hourglass-empty',
+        icon: 'hourglass',
         text: '70% 완성'
       },
       actionText: '이어쓰기',

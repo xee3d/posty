@@ -18,6 +18,11 @@ LogBox.ignoreLogs([
   /.*getAuth.*/,
   /.*getFirestore.*/,
   
+  // 터치 이벤트 관련 경고
+  'Cannot record touch move without a touch start',
+  /.*Touch Move:.*/,
+  /.*Touch Bank:.*/,
+  
   // 기타 일반적인 경고
   'Non-serializable values were found',
   'Require cycle:',
@@ -43,6 +48,9 @@ if (__DEV__) {
         'getFirestore',
         'method is deprecated',
         'namespaced API',
+        'Cannot record touch move without a touch start',
+        'Touch Move:',
+        'Touch Bank:',
       ];
       
       const shouldSuppress = firebasePatterns.some(pattern => 
