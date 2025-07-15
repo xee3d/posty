@@ -52,8 +52,8 @@ interface TemplateUsage {
 }
 
 const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
-  const { colors, cardTheme, isDark } = useAppTheme();
-  const styles = createStyles(colors, cardTheme, isDark);
+  const { colors, cardTheme } = useAppTheme();
+  const styles = createStyles(colors, cardTheme);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
   const [recentPosts, setRecentPosts] = useState<any[]>([]);
@@ -682,8 +682,8 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       </View>
       )}
       
-      <View style={[styles.templateIcon, { backgroundColor: template.color + '20' }]}>
-        <Icon name={template.icon} size={28} color={template.color} />
+      <View style={[styles.templateIcon, { backgroundColor: template.color + '30' }]}>
+        <Icon name={template.icon} size={32} color={template.color} />
         </View>
         
           <View style={styles.templateContent}>
@@ -711,7 +711,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 </View>
               </View>
               
-              <Icon name="arrow-forward" size={20} color={colors.textSecondary} />
+              <Icon name="arrow-forward" size={20} color={colors.text.secondary} />
             </TouchableOpacity>
           );
         })}
@@ -734,8 +734,8 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             onPress={() => !activeChallenge && handleStartChallenge(challenge.id)}
             activeOpacity={activeChallenge ? 1 : 0.8}
           >
-            <View style={[styles.challengeIcon, { backgroundColor: colors.warning + '20' }]}>
-              <Icon name="trophy" size={24} color={colors.warning} />
+            <View style={[styles.challengeIcon, { backgroundColor: colors.warning + '30' }]}>
+              <Icon name="trophy" size={28} color={colors.warning} />
             </View>
             <View style={styles.challengeContent}>
               <Text style={styles.challengeName}>{challenge.name}</Text>
@@ -764,7 +764,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 <Text style={styles.challengeStatusText}>진행 중</Text>
               </View>
             ) : (
-              <Icon name="arrow-forward" size={20} color={colors.textSecondary} />
+              <Icon name="arrow-forward" size={20} color={colors.primary} />
             )}
           </TouchableOpacity>
         ))}
@@ -863,7 +863,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   );
 };
 
-const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDark: boolean) =>
+const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -893,11 +893,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     headerTitle: {
       fontSize: 28,
       fontWeight: '700',
-      color: colors.text,
+      color: colors.text.primary,
     },
     headerSubtitle: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: colors.text.secondary,
       marginTop: 4,
     },
     refreshButton: {
@@ -922,7 +922,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     tabText: {
       fontSize: 14,
       fontWeight: '600',
-      color: colors.textSecondary,
+      color: colors.text.secondary,
     },
     tabTextActive: {
       color: '#fff',
@@ -936,7 +936,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       borderRadius: 16,
       padding: SPACING.lg,
       marginBottom: SPACING.lg,
-      ...cardTheme.shadow,
+      ...cardTheme.default.shadow,
     },
     brandHeader: {
       flexDirection: 'row',
@@ -950,11 +950,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     brandName: {
       fontSize: 20,
       fontWeight: '700',
-      color: colors.text,
+      color: colors.text.primary,
     },
     brandTagline: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: colors.text.secondary,
       marginTop: 4,
     },
     keywordsContainer: {
@@ -963,7 +963,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     sectionLabel: {
       fontSize: 12,
       fontWeight: '600',
-      color: colors.textSecondary,
+      color: colors.text.tertiary,
       textTransform: 'uppercase',
       marginBottom: SPACING.sm,
     },
@@ -979,7 +979,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     },
     keywordText: {
       fontSize: 14,
-      fontWeight: '500',
+      fontWeight: '600',
     },
     insightsSection: {
       marginBottom: SPACING.lg,
@@ -987,14 +987,17 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     sectionTitle: {
       fontSize: 20,
       fontWeight: '700',
-      color: colors.text,
+      color: colors.text.primary,
       marginBottom: SPACING.md,
+      letterSpacing: -0.3,
     },
     insightCard: {
       flexDirection: 'row',
       padding: SPACING.md,
       borderRadius: 12,
       marginBottom: SPACING.sm,
+      backgroundColor: colors.surface,
+      ...cardTheme.default.shadow,
     },
     insightIcon: {
       width: 48,
@@ -1010,12 +1013,12 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     insightTitle: {
       fontSize: 16,
       fontWeight: '600',
-      color: colors.text,
+      color: colors.text.primary,
       marginBottom: 4,
     },
     insightDescription: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: colors.text.secondary,
       lineHeight: 20,
     },
     insightAction: {
@@ -1027,7 +1030,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       backgroundColor: colors.surface,
       borderRadius: 16,
       padding: SPACING.lg,
-      ...cardTheme.shadow,
+      ...cardTheme.default.shadow,
     },
     patternsContainer: {
       marginTop: SPACING.md,
@@ -1038,7 +1041,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     patternTime: {
       fontSize: 14,
       fontWeight: '600',
-      color: colors.text,
+      color: colors.text.primary,
       marginBottom: 4,
     },
     patternBar: {
@@ -1062,7 +1065,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     },
     patternLabel: {
       fontSize: 11,
-      color: colors.textSecondary,
+      color: colors.text.tertiary,
     },
     growthSection: {
       padding: SPACING.lg,
@@ -1081,12 +1084,12 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     metricValue: {
       fontSize: 24,
       fontWeight: '700',
-      color: colors.text,
+      color: colors.text.primary,
       marginVertical: SPACING.xs,
     },
     metricLabel: {
       fontSize: 12,
-      color: colors.textSecondary,
+      color: colors.text.tertiary,
     },
     categoryDistribution: {
       marginTop: SPACING.lg,
@@ -1094,7 +1097,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     subsectionTitle: {
       fontSize: 16,
       fontWeight: '600',
-      color: colors.text,
+      color: colors.text.primary,
       marginBottom: SPACING.md,
     },
     categoryBar: {
@@ -1104,7 +1107,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     },
     categoryName: {
       fontSize: 14,
-      color: colors.text,
+      color: colors.text.primary,
       width: 80,
     },
     categoryProgress: {
@@ -1121,7 +1124,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     },
     categoryCount: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: colors.text.secondary,
       width: 30,
       textAlign: 'right',
     },
@@ -1151,17 +1154,19 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     toneCount: {
       fontSize: 18,
       fontWeight: '700',
-      color: colors.text,
+      color: colors.text.primary,
     },
     toneName: {
       fontSize: 12,
-      color: colors.textSecondary,
+      color: colors.text.secondary,
       textAlign: 'center',
     },
     sectionSubtitle: {
-      fontSize: 14,
-      color: colors.textSecondary,
+      fontSize: 15,
+      color: colors.text.primary,
       marginBottom: SPACING.lg,
+      opacity: 0.8,
+      lineHeight: 22,
     },
     templateCard: {
       flexDirection: 'row',
@@ -1169,6 +1174,10 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       padding: SPACING.lg,
       borderRadius: 16,
       marginBottom: SPACING.md,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...cardTheme.default.shadow,
     },
     templateIcon: {
       width: 56,
@@ -1177,28 +1186,33 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       justifyContent: 'center',
       alignItems: 'center',
       marginRight: SPACING.md,
+      opacity: 1,
     },
     templateContent: {
       flex: 1,
     },
     templateName: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: colors.text,
-      marginBottom: 4,
+      fontSize: 17,
+      fontWeight: '700',
+      color: colors.text.primary,
+      marginBottom: 6,
+      letterSpacing: -0.3,
     },
     templateDescription: {
-      fontSize: 14,
-      color: colors.textSecondary,
+      fontSize: 15,
+      color: colors.text.primary,
       marginBottom: SPACING.sm,
+      lineHeight: 22,
+      opacity: 0.85,
     },
     templateStructure: {
       marginTop: SPACING.xs,
     },
     templateStructureItem: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      marginBottom: 2,
+      fontSize: 13,
+      color: colors.text.secondary,
+      marginBottom: 4,
+      lineHeight: 18,
     },
     recommendedTemplate: {
       borderWidth: 2,
@@ -1252,12 +1266,12 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     },
     styleScoreName: {
       fontSize: 12,
-      color: colors.textSecondary,
+      color: colors.text.secondary,
     },
     styleScoreValue: {
       fontSize: 16,
       fontWeight: '600',
-      color: colors.text,
+      color: colors.text.primary,
     },
     metricsContainer: {
       flexDirection: 'row',
@@ -1266,7 +1280,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     },
     metricCard: {
       flex: 1,
-      backgroundColor: colors.background,
+      backgroundColor: colors.lightGray,
       padding: SPACING.md,
       borderRadius: 12,
     },
@@ -1304,11 +1318,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     challengeTitle: {
       fontSize: 16,
       fontWeight: '600',
-      color: colors.text,
+      color: colors.text.primary,
     },
     challengeProgress: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: colors.text.secondary,
     },
     challengeSection: {
       marginTop: SPACING.xl,
@@ -1319,10 +1333,15 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       padding: SPACING.lg,
       borderRadius: 16,
       marginBottom: SPACING.md,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...cardTheme.default.shadow,
     },
     activeChallengeCardBorder: {
       borderWidth: 2,
       borderColor: colors.warning,
+      backgroundColor: colors.warning + '08',
     },
     challengeIcon: {
       width: 48,
@@ -1331,28 +1350,33 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       justifyContent: 'center',
       alignItems: 'center',
       marginRight: SPACING.md,
+      opacity: 1,
     },
     challengeContent: {
       flex: 1,
     },
     challengeName: {
       fontSize: 16,
-      fontWeight: '600',
-      color: colors.text,
+      fontWeight: '700',
+      color: colors.text.primary,
       marginBottom: 4,
+      letterSpacing: -0.2,
     },
     challengeDescription: {
       fontSize: 14,
-      color: colors.textSecondary,
+      color: colors.text.primary,
       marginBottom: SPACING.sm,
+      lineHeight: 20,
+      opacity: 0.85,
     },
     challengeRules: {
       marginTop: SPACING.xs,
     },
     challengeRule: {
-      fontSize: 12,
-      color: colors.textSecondary,
-      marginBottom: 2,
+      fontSize: 13,
+      color: colors.text.secondary,
+      marginBottom: 4,
+      lineHeight: 18,
     },
     challengeProgressBar: {
       height: 4,
@@ -1366,15 +1390,15 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       borderRadius: 2,
     },
     challengeStatus: {
-      backgroundColor: colors.warning + '20',
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 4,
-      borderRadius: 12,
+      backgroundColor: colors.warning + '30',
+      paddingHorizontal: SPACING.md,
+      paddingVertical: 6,
+      borderRadius: 14,
     },
     challengeStatusText: {
-      fontSize: 12,
+      fontSize: 13,
       color: colors.warning,
-      fontWeight: '600',
+      fontWeight: '700',
     },
   });
 

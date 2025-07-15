@@ -84,3 +84,5 @@ yarn-error.log
 
 # SVN
 .svn/
+commit_message.txt 
+*_backup.tsx 

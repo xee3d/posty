@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { LIGHT_COLORS, DARK_COLORS } from '../utils/constants';
+import { getUnifiedColors, getUnifiedShadows, getUnifiedCardTheme } from '../styles/themeStyles';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -37,10 +38,15 @@ export const useAppTheme = () => {
     ? systemColorScheme === 'dark'
     : globalThemeMode === 'dark';
 
-  // 현재 색상 가져오기
+  // 기존 색상 (하위 호환성을 위해 유지)
   const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
   
-  // 카드 테마 생성
+  // 통합된 색상과 테마 가져오기
+  const unifiedColors = getUnifiedColors(isDark);
+  const unifiedShadows = getUnifiedShadows(isDark);
+  const unifiedCardTheme = getUnifiedCardTheme(isDark);
+  
+  // 기존 cardTheme (하위 호환성을 위해 유지)
   const cardTheme = {
     molly: {
       background: colors.accentLight,
@@ -50,7 +56,7 @@ export const useAppTheme = () => {
       textColor: colors.text.secondary,
       button: {
         background: colors.primary,
-        text: isDark ? '#1A202C' : colors.white, // 다크모드에서 버튼 텍스트 가독성
+        text: isDark ? '#1A202C' : colors.white,
       },
     },
     default: {
@@ -58,16 +64,7 @@ export const useAppTheme = () => {
       titleColor: colors.text.primary,
       textColor: colors.text.secondary,
       borderColor: colors.border,
-      // 다크모드 그림자 효과
-      shadow: isDark ? {
-        shadowColor: '#000000',
-        shadowOpacity: 0.3,
-        elevation: 8,
-      } : {
-        shadowColor: colors.black,
-        shadowOpacity: 0.05,
-        elevation: 2,
-      },
+      shadow: unifiedShadows.small,
     },
   };
 
@@ -77,5 +74,11 @@ export const useAppTheme = () => {
     colors,
     cardTheme,
     changeTheme,
+    // 통합된 테마 추가
+    theme: {
+      colors: unifiedColors,
+      shadows: unifiedShadows,
+      cards: unifiedCardTheme,
+    },
   };
 };
