@@ -684,30 +684,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       status: connectedAccounts.facebook ? '연결됨' : '연결하기',
     },
     {
-      id: 'naver',
-      name: '네이버',
-      username: connectedAccounts.naver ? '계정 연결됨' : '연결되지 않음',
-      color: '#03C75A',
-      connected: connectedAccounts.naver,
-      status: connectedAccounts.naver ? '연결됨' : '연결하기',
-    },
-    {
-      id: 'kakao',
-      name: '카카오',
-      username: connectedAccounts.kakao ? '계정 연결됨' : '연결되지 않음',
-      color: '#FEE500',
-      connected: connectedAccounts.kakao,
-      status: connectedAccounts.kakao ? '연결됨' : '연결하기',
-    },
-    {
-      id: 'linkedin',
-      name: 'LinkedIn',
-      username: '연결되지 않음',
-      color: '#0077B5',
-      connected: false,
-      status: '연결하기',
-    },
-    {
       id: 'twitter',
       name: 'X (Twitter)',
       username: '연결되지 않음',
@@ -799,7 +775,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
         </View>
 
         {/* 프로필 카드 (통합) */}
-        <View style={styles.section}>
+        <View style={styles.profileSection}>
           <View style={styles.profileCard}>
             <View style={styles.profileHeader}>
               <View style={styles.profileInfo}>
@@ -823,26 +799,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
                   </View>
                 </View>
               </View>
-              <TouchableOpacity style={styles.editButton} onPress={handleEditProfile}>
-                <Icon name="create-outline" size={20} color={colors.text.secondary} />
-              </TouchableOpacity>
             </View>
 
+            {/* 간단한 통계 제거 */}
 
-
-            {/* 간단한 통계 */}
-            <View style={styles.miniStats}>
-              <View style={styles.miniStatItem}>
-                <Text style={styles.miniStatValue}>{stats.totalSaved}</Text>
-                <Text style={styles.miniStatLabel}>저장된 콘텐츠</Text>
-              </View>
-              <View style={styles.miniStatDivider} />
-              <View style={styles.miniStatItem}>
-                <Text style={styles.miniStatValue}>{stats.joinDays}일</Text>
-                <Text style={styles.miniStatLabel}>함께한 날</Text>
-              </View>
-            </View>
-
+            {/* 프로필 편집 버튼 */}
+            <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfile}>
+              <Icon name="person-circle-outline" size={20} color={colors.primary} />
+              <Text style={styles.editProfileButtonText}>프로필 편집</Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -862,17 +827,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
             <View key={platform.id} style={styles.platformItem}>
               <View style={styles.platformLeft}>
                 <View style={[styles.platformIcon, { backgroundColor: platform.color }]}>
-                  {platform.id === 'naver' ? (
-                    <Text style={styles.platformIconText}>N</Text>
-                  ) : platform.id === 'kakao' ? (
-                    <Text style={[styles.platformIconText, { color: '#3C1E1E' }]}>K</Text>
-                  ) : (
-                    <Icon 
-                      name={`logo-${platform.id}`} 
-                      size={20} 
-                      color="#FFFFFF" 
-                    />
-                  )}
+                  <Icon 
+                  name={`logo-${platform.id}`} 
+                    size={20} 
+                  color="#FFFFFF" 
+                  />
                 </View>
                 <View style={styles.platformInfo}>
                   <Text style={styles.platformName}>{platform.name}</Text>
@@ -958,75 +917,22 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
             />
           </View>
           
-          {/* 사운드 테스트 버튼 */}
-          <TouchableOpacity
-            style={[styles.testButton, { backgroundColor: colors.primary + '20' }]}
-            onPress={() => {
-              soundManager.playSuccess();
-              Alert.alert(
-                'Posty',
-                '테스트 사운드가 재생되었습니다! 🔊',
-                [{ text: '확인' }]
-              );
-            }}
-          >
-            <Icon name="play-circle-outline" size={20} color={colors.primary} />
-            <Text style={[styles.testButtonText, { color: colors.primary }]}>
-              사운드 테스트
-            </Text>
-          </TouchableOpacity>
-          
-          {/* Firebase 테스트 버튼 (개발용) */}
-          <TouchableOpacity
-            style={[styles.testButton, { backgroundColor: '#F59E0B' + '20', marginTop: SPACING.xs }]}
-            onPress={() => setShowFirebaseTest(true)}
-          >
-            <Icon name="flame-outline" size={20} color="#F59E0B" />
-            <Text style={[styles.testButtonText, { color: '#F59E0B' }]}>
-              Firebase 통합 테스트
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[styles.testButton, { backgroundColor: '#14B8A6' + '20', marginTop: SPACING.xs }]}
-            onPress={async () => {
-              await resetAllMissionData();
-              await resetAdData();
-              Alert.alert('초기화 완료', '미션 및 광고 데이터가 초기화되었습니다.');
-            }}
-          >
-            <Icon name="refresh-outline" size={20} color="#14B8A6" />
-            <Text style={[styles.testButtonText, { color: '#14B8A6' }]}>
-              미션 데이터 초기화 (개발용)
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[styles.testButton, { backgroundColor: '#EC4899' + '20', marginTop: SPACING.xs }]}
-            onPress={async () => {
-              await debugMissionData();
-              Alert.alert('디버그', '콘솔에서 미션 데이터를 확인하세요.');
-            }}
-          >
-            <Icon name="bug-outline" size={20} color="#EC4899" />
-            <Text style={[styles.testButtonText, { color: '#EC4899' }]}>
-              미션 데이터 확인 (개발용)
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[styles.testButton, { backgroundColor: '#8B5CF6' + '20', marginTop: SPACING.xs }]}
-            onPress={() => {
-              if (onNavigate) {
-                onNavigate('token-debug');
-              }
-            }}
-          >
-            <Icon name="code-outline" size={20} color="#8B5CF6" />
-            <Text style={[styles.testButtonText, { color: '#8B5CF6' }]}>
-              토큰 디버그 정보 (개발용)
-            </Text>
-          </TouchableOpacity>
+          {/* 개발용 버튼들 - 토큰 디버그만 남김 */}
+          {__DEV__ && (
+            <TouchableOpacity
+              style={[styles.testButton, { backgroundColor: '#8B5CF6' + '20', marginTop: SPACING.xs }]}
+              onPress={() => {
+                if (onNavigate) {
+                  onNavigate('token-debug');
+                }
+              }}
+            >
+              <Icon name="code-outline" size={20} color="#8B5CF6" />
+              <Text style={[styles.testButtonText, { color: '#8B5CF6' }]}>
+                토큰 디버그 정보 (개발용)
+              </Text>
+            </TouchableOpacity>
+          )}
           
           <View style={styles.themeSection}>
             <View style={styles.settingHeader}>
@@ -1077,49 +983,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
           </View>
         </View>
 
-        {/* 데이터 관리 섹션 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>데이터 관리</Text>
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={handleClearHistory}
-          >
-            <View style={styles.menuItemLeft}>
-              <Icon name="time-outline" size={20} color={colors.text.secondary} />
-              <Text style={styles.menuItemLabel}>히스토리 삭제</Text>
-            </View>
-            <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
-          </TouchableOpacity>
-          
-          <TouchableOpacity
-            style={[styles.menuItem, styles.dangerMenuItem]}
-            onPress={handleDeleteAllData}
-          >
-            <View style={styles.menuItemLeft}>
-              <Icon name="trash-outline" size={20} color="#EF4444" />
-              <Text style={[styles.menuItemLabel, { color: '#EF4444' }]}>
-                모든 데이터 삭제
-              </Text>
-            </View>
-            <Icon name="chevron-forward" size={20} color="#EF4444" />
-          </TouchableOpacity>
-        </View>
+        {/* 데이터 관리 섹션 제거 */}
 
         {/* 기타 메뉴 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>지원</Text>
-          
-          {/* 구독 복원 버튼 */}
-          <TouchableOpacity
-            style={styles.menuItem}
-            onPress={handleRestorePurchases}
-          >
-            <View style={styles.menuItemLeft}>
-              <Icon name="refresh-circle-outline" size={20} color={colors.text.secondary} />
-              <Text style={styles.menuItemLabel}>구독 복원</Text>
-            </View>
-            <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
-          </TouchableOpacity>
           
           {menuItems.map((item, index) => (
             <TouchableOpacity
@@ -1213,6 +1081,12 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     backgroundColor: colors.surface,
     marginBottom: SPACING.md,
     paddingVertical: SPACING.md,
+    borderRadius: 16,
+    marginHorizontal: SPACING.md,
+  },
+  profileSection: {
+    marginHorizontal: SPACING.md,
+    marginBottom: SPACING.md,
   },
   sectionTitle: {
     fontSize: 14,
@@ -1222,7 +1096,10 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     marginBottom: SPACING.md,
   },
   profileCard: {
-    paddingHorizontal: SPACING.lg,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: SPACING.lg,
+    ...cardTheme.default.shadow,
   },
   profileHeader: {
     flexDirection: 'row',
@@ -1236,9 +1113,9 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     flex: 1,
   },
   profileAvatar: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
@@ -1282,13 +1159,20 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     fontSize: 11,
     fontWeight: '600',
   },
-  editButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: colors.lightGray,
-    justifyContent: 'center',
+  editProfileButton: {
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: SPACING.xs,
+    marginTop: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: 12,
+    backgroundColor: colors.primary + '10',
+  },
+  editProfileButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.primary,
   },
   tokenStatusContainer: {
     backgroundColor: colors.lightGray,
@@ -1331,7 +1215,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   miniStats: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: SPACING.sm,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.md,
+    backgroundColor: colors.lightGray,
+    borderRadius: 12,
+    marginTop: SPACING.md,
   },
   miniStatItem: {
     flex: 1,
@@ -1495,7 +1383,10 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     alignItems: 'center',
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
+
   dangerMenuItem: {
     backgroundColor: '#EF4444' + '10',
   },
@@ -1510,7 +1401,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   },
   versionSection: {
     alignItems: 'center',
-    paddingVertical: SPACING.md,
+    paddingVertical: SPACING.lg,
+    marginHorizontal: SPACING.md,
   },
   versionText: {
     fontSize: FONT_SIZES.small,
@@ -1526,10 +1418,12 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     alignItems: 'center',
     justifyContent: 'center',
     gap: SPACING.sm,
-    marginHorizontal: SPACING.lg,
+    marginHorizontal: SPACING.md,
+    marginBottom: SPACING.lg,
     paddingVertical: SPACING.md,
     borderRadius: 12,
     backgroundColor: isDark ? colors.error + '20' : '#FEF2F2',
+    ...cardTheme.default.shadow,
   },
   logoutText: {
     fontSize: 15,
@@ -1537,7 +1431,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     color: '#EF4444',
   },
   bottomSpace: {
-    height: SPACING.xxl,
+    height: SPACING.xxl * 2,
   },
   testButton: {
     flexDirection: 'row',

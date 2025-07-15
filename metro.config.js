@@ -47,9 +47,10 @@ const config = {
     },
   },
   watchFolders: [],
-  // 빌드 폴더 무시 - 더 명확하게
-  watchOptions: {
-    ignored: [
+  // File watcher 설정
+  watchman: {
+    // 빌드 폴더 무시
+    ignore: [
       path.resolve(__dirname, 'android', 'build'),
       path.resolve(__dirname, 'android', 'app', 'build'),
       path.resolve(__dirname, 'android', '.gradle'),

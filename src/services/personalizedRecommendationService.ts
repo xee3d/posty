@@ -59,7 +59,7 @@ class PersonalizedRecommendationService {
       title: '모닝 커피 타임',
       content: '아침 커피와 함께 하루 시작을\n기록해보는 건 어떨까요?',
       meta: {
-        icon: 'schedule',
+        icon: 'access-time',
         text: '아침 7-9시 추천'
       },
       actionText: '글쓰기',
@@ -83,7 +83,7 @@ class PersonalizedRecommendationService {
       title: '오늘의 점심 메뉴',
       content: '맛있는 점심 식사하셨나요?\n음식 사진과 함께 공유해보세요!',
       meta: {
-        icon: 'schedule',
+        icon: 'access-time',
         text: '점심시간 추천'
       },
       actionText: '사진 올리기',
@@ -206,7 +206,7 @@ class PersonalizedRecommendationService {
       title: '감성 비 오는 날',
       content: '빗소리와 함께하는 감성적인\n순간을 기록해보세요',
       meta: {
-        icon: 'water-drop',
+        icon: 'opacity',
         text: '비 예보'
       },
       actionText: '글쓰기',
@@ -351,7 +351,7 @@ class PersonalizedRecommendationService {
       title: '작성 중인 글이 있어요',
       content: '조금만 더 다듬어서\n멋진 포스팅을 완성해보세요!',
       meta: {
-        icon: 'pending',
+        icon: 'hourglass-empty',
         text: '70% 완성'
       },
       actionText: '이어쓰기',
