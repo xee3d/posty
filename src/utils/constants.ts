@@ -43,38 +43,38 @@ const LIGHT_COLORS = {
   transparent: 'transparent',
 };
 
-// 다크 테마 색상 - MyStyleScreen 기준으로 통일
+// 다크 테마 색상 - 블랙 배경 기준
 const DARK_COLORS = {
-  primary: '#C4B5FD', // 더 밝은 보라색 (Violet-300)
-  secondary: '#E9D5FF', // Violet-200
+  primary: '#A78BFA', // 밝은 보라색 (Violet-400)
+  secondary: '#C4B5FD', // Violet-300
   success: '#86EFAC',
   warning: '#FDE047',
   error: '#FCA5A5',
   info: '#93C5FD',
   
-  accent: '#A78BFA', // Violet-400
-  accentLight: '#5B4C8C', // 다크모드 특별 카드 배경 (몰리 메시지 등)
-  accentDark: '#C4B5FD',
+  accent: '#8B5CF6', // Violet-500
+  accentLight: '#1F1F1F', // 거의 블랙에 가까운 카드 배경
+  accentDark: '#DDD6FE', // Violet-200
   
   text: {
     primary: '#FFFFFF', // 순백색
-    secondary: '#E2E8F0', // 밝은 회색
-    tertiary: '#CBD5E0', // 중간 회색
+    secondary: '#A0A0A0', // 중간 밝기 회색
+    tertiary: '#6B6B6B', // 어두운 회색
   },
   
-  highlight: '#5B4C8C', // 다크모드 특별 카드 배경
-  highlightDark: '#6B5B93',
-  lightText: '#E2E8F0',
+  highlight: '#1A1A1A', // 매우 어두운 회색 (특별 카드 배경)
+  highlightDark: '#252525',
+  lightText: '#E5E5E5',
   white: '#FFFFFF',
   black: '#000000',
-  gray: '#A0AEC0',
-  lightGray: '#2D3748', // 다크모드에서의 연한 배경
-  darkGray: '#E2E8F0',
+  gray: '#808080',
+  lightGray: '#0F0F0F', // 블랙에 가까운 배경
+  darkGray: '#CCCCCC',
   
-  background: '#1A202C', // 전체 배경색
-  lightBackground: '#2D3748', // 카드/섹션 배경
-  surface: '#2D3748', // 표면 색상 (일반 카드)
-  border: '#4A5568', // 경계선 색상
+  background: '#000000', // 순수 블랙 배경
+  lightBackground: '#0A0A0A', // 약간 밝은 블랙
+  surface: '#141414', // 카드 배경 (약간 밝은 검정)
+  border: '#2A2A2A', // 어두운 경계선
   
   transparent: 'transparent',
 };

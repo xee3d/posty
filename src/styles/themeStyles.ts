@@ -9,27 +9,27 @@ export const getUnifiedColors = (isDark: boolean) => {
     // 텍스트 색상 통합
     text: {
       primary: isDark ? '#FFFFFF' : '#1F2937',
-      secondary: isDark ? '#A0A0A0' : '#6B7280',
-      tertiary: isDark ? '#B0B0B0' : '#8E8E93',
+      secondary: isDark ? '#A0A0A0' : '#6B7280', 
+      tertiary: isDark ? '#6B6B6B' : '#8E8E93',
       // 추가 텍스트 색상
       primaryBright: isDark ? '#FFFFFF' : '#1F2937',
-      secondaryBright: isDark ? '#E0E0E0' : '#4B5563',
-      disabled: isDark ? '#666666' : '#C7C7CC',
+      secondaryBright: isDark ? '#B0B0B0' : '#4B5563',
+      disabled: isDark ? '#4A4A4A' : '#C7C7CC',
     },
     // 배경색 통합
     backgrounds: {
       primary: baseColors.background,
       secondary: baseColors.surface,
-      tertiary: isDark ? '#3A3A3C' : baseColors.lightGray,
-      card: isDark ? '#2C2C2E' : baseColors.surface,
-      cardElevated: isDark ? '#3A3A3C' : baseColors.white,
-      input: isDark ? '#1C1C1E' : '#F5F5F5',
+      tertiary: isDark ? '#0F0F0F' : baseColors.lightGray,
+      card: isDark ? '#141414' : baseColors.surface,
+      cardElevated: isDark ? '#1F1F1F' : baseColors.white,
+      input: isDark ? '#0A0A0A' : '#F5F5F5',
     },
     // 보더 색상
     borders: {
       default: baseColors.border,
-      light: isDark ? '#3A3A3C' : '#E5E7EB',
-      dark: isDark ? '#48484A' : '#D1D5DB',
+      light: isDark ? '#2A2A2A' : '#E5E7EB',
+      dark: isDark ? '#3A3A3A' : '#D1D5DB',
     },
     // 상태 색상
     states: {
@@ -116,7 +116,7 @@ export const getUnifiedCardTheme = (isDark: boolean) => {
       ...shadows.medium,
     },
     molly: {
-      backgroundColor: isDark ? '#5B4C8C' : colors.states.primaryLight,
+      backgroundColor: isDark ? '#1A1A1A' : colors.states.primaryLight,
       borderRadius: 16,
       padding: 16,
       ...shadows.medium,

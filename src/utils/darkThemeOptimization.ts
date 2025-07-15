@@ -46,13 +46,13 @@ export const OPTIMIZED_DARK_COLORS = {
 // 다크모드 그라데이션
 export const DARK_GRADIENTS = {
   // 메인 그라데이션 (은은하게)
-  primary: ['#805AD5', '#9F7AEA', '#B794F4'],
+  primary: ['#8B5CF6', '#A78BFA', '#C4B5FD'],
   
   // 카드 배경 그라데이션
-  card: ['#2D3748', '#1A202C'],
+  card: ['#1F1F1F', '#141414'],
   
   // 버튼 그라데이션
-  button: ['#9F7AEA', '#805AD5'],
+  button: ['#A78BFA', '#8B5CF6'],
   
   // 성공/에러 등 상태 그라데이션
   success: ['#48BB78', '#68D391'],

@@ -16,8 +16,9 @@ export const AppIcon: React.FC<AppIconProps> = ({ size = 100, style }) => {
     <View style={[styles.logoWrapper, { 
       width: size * 1.2, 
       height: size * 1.2,
-      backgroundColor: colors.primary + '15',
+      backgroundColor: colors.background === '#000000' ? colors.primary + '20' : colors.primary + '15',
       shadowColor: colors.primary,
+      shadowOpacity: colors.background === '#000000' ? 0.4 : 0.2,
     }, style]}>
       <View style={[styles.logoInner, { 
         width: size * 0.9, 
@@ -26,7 +27,7 @@ export const AppIcon: React.FC<AppIconProps> = ({ size = 100, style }) => {
       }]}>
         <Text style={[styles.logoText, { 
           fontSize: 48 * scale,
-          color: colors.white 
+          color: colors.background === '#000000' ? '#000000' : colors.white 
         }]}>P</Text>
       </View>
     </View>

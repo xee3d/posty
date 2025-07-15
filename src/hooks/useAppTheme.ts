@@ -49,14 +49,14 @@ export const useAppTheme = () => {
   // 기존 cardTheme (하위 호환성을 위해 유지)
   const cardTheme = {
     molly: {
-      background: colors.accentLight,
+      background: isDark ? '#1A1A1A' : colors.accentLight,
       iconBackground: colors.primary,
       iconColor: colors.white,
       titleColor: colors.text.primary,
       textColor: colors.text.secondary,
       button: {
         background: colors.primary,
-        text: isDark ? '#1A202C' : colors.white,
+        text: isDark ? '#000000' : colors.white,
       },
     },
     default: {
