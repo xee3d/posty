@@ -38,7 +38,7 @@ interface HomeScreenProps {
 }
 
 const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
-  const { colors, cardTheme, isDark } = useAppTheme();
+  const { colors, cardTheme, isDark, theme } = useAppTheme();
   const dispatch = useAppDispatch();
   
   // 화면 추적
@@ -307,7 +307,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     }
   };
 
-  const styles = createStyles(colors, cardTheme);
+  const styles = createStyles(colors, cardTheme, theme);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -725,8 +725,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   );
 };
 
-const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
-  const isDark = colors.background === '#1A202C'; // 다크모드 체크
+const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme?: any) => {
+  const isDark = colors.background === '#1A202C'; // 하위 호환성을 위해 유지
   
   return StyleSheet.create({
   container: {
@@ -872,7 +872,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   },
   mollyBannerSubtitle: {
     fontSize: 14,
-    color: colors.text.primary,
+    color: theme?.colors.text.primary || colors.text.primary,
     marginTop: 4,
     fontWeight: '500',
   },
@@ -913,14 +913,14 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   mainActionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text.primary,
+    color: theme?.colors.text.primary || colors.text.primary,
     marginBottom: 3,
     includeFontPadding: false,
     lineHeight: 20,
   },
   mainActionDesc: {
     fontSize: 14,
-    color: colors.text.secondary,
+    color: theme?.colors.text.secondary || colors.text.secondary,
     includeFontPadding: false,
     lineHeight: 18,
   },
@@ -969,7 +969,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: colors.text.primary,
+    color: theme?.colors.text.primary || colors.text.primary,
     marginBottom: SPACING.md,
     letterSpacing: -0.3,
   },

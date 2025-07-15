@@ -585,8 +585,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                 >
                   <MaterialIcon 
                     name="edit" 
-                    size={18} 
-                    color={writeMode === 'text' ? colors.white : colors.text.secondary} 
+                    size={20} 
+                    color={writeMode === 'text' ? colors.white : colors.text.primary} 
+                    style={{ opacity: writeMode === 'text' ? 1 : 0.8 }}
                   />
                   <Text style={[
                     styles.modeButtonText,
@@ -601,8 +602,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                 >
                   <MaterialIcon 
                     name="auto-fix-high" 
-                    size={18} 
-                    color={writeMode === 'polish' ? colors.white : colors.text.secondary} 
+                    size={20} 
+                    color={writeMode === 'polish' ? colors.white : colors.text.primary} 
+                    style={{ opacity: writeMode === 'polish' ? 1 : 0.8 }}
                   />
                   <Text style={[
                     styles.modeButtonText,
@@ -617,8 +619,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                 >
                   <MaterialIcon 
                     name="image" 
-                    size={18} 
-                    color={writeMode === 'photo' ? colors.white : colors.text.secondary} 
+                    size={20} 
+                    color={writeMode === 'photo' ? colors.white : colors.text.primary} 
+                    style={{ opacity: writeMode === 'photo' ? 1 : 0.8 }}
                   />
                   <Text style={[
                     styles.modeButtonText,
@@ -707,8 +710,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                       >
                         <Icon 
                           name="checkmark-circle" 
-                          size={16} 
+                          size={18} 
                           color={selectedPolishOption === 'spelling' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -724,8 +728,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                       >
                         <Icon 
                           name="color-wand" 
-                          size={16} 
+                          size={18} 
                           color={selectedPolishOption === 'refine' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -741,8 +746,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                       >
                         <Icon 
                           name="sparkles" 
-                          size={16} 
+                          size={18} 
                           color={selectedPolishOption === 'improve' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -762,8 +768,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                       >
                         <MaterialIcon 
                           name="business" 
-                          size={16} 
+                          size={18} 
                           color={selectedPolishOption === 'formal' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -780,8 +787,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                       >
                         <MaterialIcon 
                           name="child-care" 
-                          size={16} 
+                          size={18} 
                           color={selectedPolishOption === 'simple' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -798,8 +806,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                       >
                         <MaterialIcon 
                           name="favorite" 
-                          size={16} 
+                          size={18} 
                           color={selectedPolishOption === 'engaging' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -838,7 +847,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                     ) : (
                       <View style={styles.uploadPlaceholder}>
                         <View style={styles.uploadIconContainer}>
-                          <Icon name="image-outline" size={48} color="#8E8E93" />
+                          <Icon name="image-outline" size={56} color={colors.primary} style={{ opacity: 0.4 }} />
                         </View>
                         <Text style={styles.uploadTitle}>사진을 선택해주세요</Text>
                         <Text style={styles.uploadSubtitle}>갤러리에서 선택하거나 직접 촬영하세요</Text>
@@ -1151,10 +1160,12 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
   modeButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.text.secondary,
+    color: colors.text.primary,
+    opacity: 0.8,
   },
   modeButtonTextActive: {
     color: colors.white,
+    opacity: 1,
   },
   inputSection: {
     paddingHorizontal: SPACING.lg,
@@ -1244,7 +1255,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#F8F9FA',
+    backgroundColor: colors.primary + '10',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: SPACING.md,
