@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-  ScrollView,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, ActivityIndicator,  } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { SPACING } from '../utils/constants';
@@ -16,6 +7,7 @@ import missionService, { Mission } from '../services/missionService';
 import tokenService from '../services/subscription/tokenService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { Alert } from '../utils/customAlert';
 interface MissionModalProps {
   visible: boolean;
   onClose: () => void;

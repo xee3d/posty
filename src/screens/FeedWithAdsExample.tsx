@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  FlatList,
-  StyleSheet,
-  TouchableOpacity,
-  RefreshControl,
-  Alert,
-  Modal,
-  Switch,
-} from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, RefreshControl, Modal, Switch,  } from 'react-native';
 import { COLORS, SPACING } from '../utils/constants';
 import NativeAdView from '../components/ads/NativeAdView';
 import FeedNativeAd from '../components/ads/FeedNativeAd';
@@ -23,6 +13,7 @@ import { Platform } from 'react-native';
 import { useAppTheme } from '../hooks/useAppTheme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { Alert } from '../utils/customAlert';
 interface FeedItem {
   id: string;
   type: 'post' | 'ad';

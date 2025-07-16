@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ScrollView,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, ActivityIndicator,  } from 'react-native';
 import postyAPI from '../services/postyAPI';
 
+import { Alert } from '../utils/customAlert';
 const APITestScreen = () => {
   const [loading, setLoading] = useState(false);
   const [healthStatus, setHealthStatus] = useState(null);

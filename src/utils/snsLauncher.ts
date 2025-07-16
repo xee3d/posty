@@ -1,6 +1,7 @@
-import { Linking, Platform, Alert } from 'react-native';
+import { Linking, Platform } from 'react-native';
 import Clipboard from '@react-native-clipboard/clipboard';
 
+import { Alert } from './customAlert';
 interface SNSLaunchResult {
   success: boolean;
   message?: string;

@@ -1,22 +1,12 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  Modal,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  ScrollView,
-  Alert,
-} from 'react-native';
+import { View, Text, Modal, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView,  } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '../utils/constants';
 import { APP_TEXT } from '../utils/textConstants';
 import { storage } from '../utils/storage';
 import { useAppTheme } from '../hooks/useAppTheme';
 
+import { Alert } from '../utils/customAlert';
 interface ProfileEditModalProps {
   visible: boolean;
   onClose: () => void;

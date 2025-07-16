@@ -1,4 +1,4 @@
-import { Alert } from 'react-native';
+;
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { saveContent } from '../utils/storage';
 import simplePostService from './simplePostService';
@@ -6,6 +6,7 @@ import { getCategoryFromTone, extractHashtags } from '../utils/promptUtils';
 import { generateHashtags } from '../utils/platformStyles';
 import analyticsService from './analytics/analyticsService';
 
+import { Alert } from '../utils/customAlert';
 interface SaveContentParams {
   content: string;
   platform?: string;

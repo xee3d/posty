@@ -3,10 +3,11 @@
  * 실제 스토어 연결 전 테스트용
  */
 
-import { Alert } from 'react-native';
+;
 import tokenService from './tokenService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { Alert } from '../../utils/customAlert';
 class MockPurchaseService {
   private isInitialized = false;
 

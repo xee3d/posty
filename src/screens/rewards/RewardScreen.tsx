@@ -1,18 +1,10 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-  Animated,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Animated,  } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, SPACING } from '../../utils/constants';
 import { useAppTheme } from '../../hooks/useAppTheme';
 
+import { Alert } from '../../utils/customAlert';
 interface RewardScreenProps {
   navigation: any;
 }

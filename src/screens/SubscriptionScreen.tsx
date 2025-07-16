@@ -1,17 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-  Dimensions,
-  Linking,
-  Share,
-  Platform,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Linking, Share, Platform,  } from 'react-native';
 import { COLORS, SPACING, BRAND } from '../utils/constants';
 import { SUBSCRIPTION_PLANS, TOKEN_USAGE } from '../utils/adConfig';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -27,6 +15,7 @@ import missionService from '../services/missionService';
 import TokenPurchaseView from '../components/TokenPurchaseView';
 import ModernSubscriptionView from '../components/ModernSubscriptionView';
 
+import { Alert } from '../utils/customAlert';
 const { width: screenWidth } = Dimensions.get('window');
 
 interface SubscriptionScreenProps {
@@ -287,7 +276,6 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       ]
     );
   };
-
 
   const handleSubscribe = async () => {
     if (selectedPlan === 'free') {

@@ -18,12 +18,13 @@ import {
   validateReceiptIos,
   getReceiptIOS,
 } from 'react-native-iap';
-import { Platform, EmitterSubscription, Alert } from 'react-native';
+import { Platform, EmitterSubscription } from 'react-native';
 import serverSubscriptionService from './serverSubscriptionService';
 import tokenService from './tokenService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import mockPurchaseService from './mockPurchaseService';
 
+import { Alert } from '../../utils/customAlert';
 // 개발 모드에서는 Mock 서비스 사용
 const USE_MOCK = __DEV__ && true; // 프로덕션에서는 false로 변경
 

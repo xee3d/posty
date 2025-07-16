@@ -1,17 +1,6 @@
 // src/screens/PostListScreen.tsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  FlatList,
-  Alert,
-  SafeAreaView,
-  ActivityIndicator,
-  RefreshControl,
-  ListRenderItem,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, ActivityIndicator, RefreshControl, ListRenderItem,  } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, CARD_THEME } from '../utils/constants';
@@ -23,6 +12,7 @@ import auth from '@react-native-firebase/auth';
 import firestoreService from '../services/firebase/firestoreService';
 import { Post as FirestorePost } from '../types/firestore';
 
+import { Alert } from '../utils/customAlert';
 interface PostListScreenProps {
   onClose: () => void;
 }

@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ScrollView,
-  TextInput,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, TextInput, ActivityIndicator,  } from 'react-native';
 // 모듈러 API 임포트
 import { 
   getAuth, 
@@ -31,6 +22,7 @@ import { getApp } from '@react-native-firebase/app';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, SPACING } from '../utils/constants';
 
+import { Alert } from '../utils/customAlert';
 interface FirebaseAuthTestProps {
   onBack?: () => void;
 }

@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  RefreshControl,
-  Dimensions,
-  FlatList,
-  Modal,
-  Alert,
-} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Dimensions, FlatList, Modal,  } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Achievement, ACHIEVEMENT_CATEGORIES, ACHIEVEMENTS } from '../types/achievement';
 import AchievementCard from '../components/AchievementCard';
 import ProgressBar from '../components/ProgressBar';
 
+import { Alert } from '../utils/customAlert';
 const { width } = Dimensions.get('window');
 
 interface CategorySummary {

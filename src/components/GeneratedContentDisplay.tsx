@@ -1,14 +1,7 @@
 // 생성된 콘텐츠 표시 컴포넌트 개선
 
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator,  } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -20,6 +13,7 @@ import { launchSNSApp } from '../utils/snsLauncher';
 import { soundManager } from '../utils/soundManager';
 import missionService from '../services/missionService';
 
+import { Alert } from '../utils/customAlert';
 interface GeneratedContentProps {
   originalContent: string | any; // 일단 any로 처리하여 에러 방지
   tone: string;

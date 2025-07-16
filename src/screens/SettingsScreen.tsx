@@ -1,18 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Switch,
-  Alert,
-  Linking,
-  Platform as RNPlatform,
-  ActivityIndicator,
-  Image,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Switch, Linking, Platform as RNPlatform, ActivityIndicator, Image,  } from 'react-native';
 import { User, Platform } from '../types';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, PLATFORMS, BRAND, CARD_THEME, TYPOGRAPHY, FONT_SIZES } from '../utils/constants';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -36,6 +23,7 @@ import { resetAllMissionData, resetAdData, debugMissionData } from '../utils/mis
 import achievementService from '../services/achievementService';
 import { UserProfile } from '../types/achievement';
 
+import { Alert } from '../utils/customAlert';
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
   onFirebaseTest?: () => void;

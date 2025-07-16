@@ -1,17 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  Alert,
-  Dimensions,
-  Linking,
-  Share,
-  Platform,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Linking, Share, Platform,  } from 'react-native';
 import { COLORS, SPACING } from '../../utils/constants';
 import { SUBSCRIPTION_PLANS } from '../../utils/adConfig';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -26,6 +14,7 @@ import missionService from '../../services/missionService';
 import TokenPurchaseView from '../../components/TokenPurchaseView';
 import EarnTokenModal from '../../components/EarnTokenModal';
 
+import { Alert } from '../../utils/customAlert';
 const { width: screenWidth } = Dimensions.get('window');
 
 interface SubscriptionScreenProps {

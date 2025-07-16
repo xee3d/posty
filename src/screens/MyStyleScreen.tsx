@@ -1,17 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
-  StyleSheet,
-  SafeAreaView,
-  ActivityIndicator,
-  Animated,
-  Alert,
-  Dimensions,
-  Platform,
-} from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, ActivityIndicator, Animated, Dimensions, Platform,  } from 'react-native';
 import { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withTiming } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, BRAND, TYPOGRAPHY, FONT_SIZES } from '../utils/constants';
@@ -26,6 +14,7 @@ import { UNIFIED_STYLES, getStyleById, STYLE_CATEGORIES, recommendStyles } from 
 import { soundManager } from '../utils/soundManager';
 import { saveContent } from '../utils/storage';
 
+import { Alert } from '../utils/customAlert';
 const { width } = Dimensions.get('window');
 
 interface MyStyleScreenProps {
@@ -845,8 +834,6 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       </SafeAreaView>
     );
   }
-
-
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>

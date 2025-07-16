@@ -1,21 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  SafeAreaView,
-  Alert,
-  ActivityIndicator,
-  Platform,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, ActivityIndicator, Platform,  } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { SPACING } from '../utils/constants';
 import dataMigrationService from '../services/firebase/dataMigrationService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+import { Alert } from '../utils/customAlert';
 interface MigrationScreenProps {
   onNavigate?: (tab: string) => void;
   onComplete?: () => void;

@@ -1,15 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  SafeAreaView,
-  Linking,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Linking, ActivityIndicator,  } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '../utils/constants';
@@ -18,6 +8,7 @@ import { ScaleButton, FadeInView, AnimatedCard } from '../components/AnimationCo
 import socialMediaService from '../services/socialMediaService';
 import localAnalyticsService from '../services/analytics/localAnalyticsService';
 
+import { Alert } from '../utils/customAlert';
 interface SNSConnectionScreenProps {
   onClose: () => void;
 }

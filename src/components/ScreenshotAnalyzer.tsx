@@ -1,18 +1,11 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  Image,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator,  } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, SPACING } from '../utils/constants';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { launchImageLibrary, ImagePickerResponse } from 'react-native-image-picker';
+import { Alert } from '../utils/customAlert';
 // import TextRecognition from '@react-native-ml-kit/text-recognition'; // 설치 필요
 
 interface ScreenshotAnalyzerProps {

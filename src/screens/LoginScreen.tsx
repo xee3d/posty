@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  ScrollView,
-  Image,
-  ActivityIndicator,
-  Alert,
-  Platform,
-  KeyboardAvoidingView,
-} from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator, Platform, KeyboardAvoidingView,  } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Animated, {
@@ -29,6 +18,7 @@ import { useAppDispatch } from '../hooks/redux';
 import { setUser } from '../store/slices/userSlice';
 import { BRAND } from '../utils/constants';
 
+import { Alert } from '../utils/customAlert';
 interface LoginScreenProps {
   onNavigate: (screen: string, data?: any) => void;
 }

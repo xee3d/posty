@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Alert,
-  ScrollView,
-  SafeAreaView,
-  ActivityIndicator,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView, ActivityIndicator,  } from 'react-native';
 import auth from '@react-native-firebase/auth';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, SPACING } from '../utils/constants';
@@ -18,6 +9,7 @@ import { User, Post } from '../types/firestore';
 import MigrationScreen from './MigrationScreen';
 import TestDataScreen from './TestDataScreen';
 
+import { Alert } from '../utils/customAlert';
 interface FirebaseTestScreenProps {
   onNavigate?: (tab: string) => void;
 }

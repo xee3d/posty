@@ -1,23 +1,11 @@
 import React, { useState } from 'react';
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-  TextInput,
-  KeyboardAvoidingView,
-  Platform,
-  Alert,
-  Linking,
-  Pressable,
-} from 'react-native';
+import { View, Text, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Linking, Pressable,  } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES } from '../../utils/constants';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import Clipboard from '@react-native-clipboard/clipboard';
 
+import { Alert } from '../../utils/customAlert';
 interface ContactScreenProps {
   onBack?: () => void;
 }
