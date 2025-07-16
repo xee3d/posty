@@ -691,27 +691,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
 
   const menuItems = [
     {
-      icon: 'trophy',
-      label: '내 업적',
-      onPress: async () => {
-        if (onNavigate) {
-          onNavigate('profile');
-          setTimeout(async () => {
-            const profile = await achievementService.getUserProfile();
-            setUserProfile(profile);
-          }, 1000);
-        }
-      },
-    },
-    {
       icon: 'help-circle-outline',
       label: '사용 가이드',
       onPress: handleOpenHelp,
-    },
-    {
-      icon: 'star-outline',
-      label: 'Posty 평가하기',
-      onPress: handleRateApp,
     },
     {
       icon: 'mail-outline',
@@ -742,15 +724,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   }
   
   if (showTerms) {
-    return <TermsOfServiceScreen onBack={() => setShowTerms(false)} />;
+    return <TermsOfServiceScreen onBack={() => setShowTerms(false)} onNavigate={onNavigate} />;
   }
   
   if (showPrivacy) {
-    return <PrivacyPolicyScreen onBack={() => setShowPrivacy(false)} />;
+    return <PrivacyPolicyScreen onBack={() => setShowPrivacy(false)} onNavigate={onNavigate} />;
   }
   
   if (showContact) {
-    return <ContactScreen onBack={() => setShowContact(false)} />;
+    return <ContactScreen onBack={() => setShowContact(false)} onNavigate={onNavigate} />;
   }
   
   if (showFirebaseTest) {
@@ -956,22 +938,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
             />
           </View>
           
-          {/* 개발용 버튼들 - 토큰 디버그만 남김 */}
-          {__DEV__ && (
-            <TouchableOpacity
-              style={[styles.testButton, { backgroundColor: '#8B5CF6' + '20', marginTop: SPACING.xs }]}
-              onPress={() => {
-                if (onNavigate) {
-                  onNavigate('token-debug');
-                }
-              }}
-            >
-              <Icon name="code-outline" size={20} color="#8B5CF6" />
-              <Text style={[styles.testButtonText, { color: '#8B5CF6' }]}>
-                토큰 디버그 정보 (개발용)
-              </Text>
-            </TouchableOpacity>
-          )}
+
           
           <View style={styles.themeSection}>
             <View style={styles.settingHeader}>

@@ -7,10 +7,11 @@ import Clipboard from '@react-native-clipboard/clipboard';
 
 import { Alert } from '../../utils/customAlert';
 interface ContactScreenProps {
-  onBack?: () => void;
+  onBack: () => void;
+  onNavigate?: (screen: string) => void;
 }
 
-const ContactScreen: React.FC<ContactScreenProps> = ({ onBack }) => {
+const ContactScreen: React.FC<ContactScreenProps> = ({ onBack, onNavigate }) => {
   const { colors } = useAppTheme();
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [subject, setSubject] = useState('');
