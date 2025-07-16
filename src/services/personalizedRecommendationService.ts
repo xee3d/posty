@@ -29,6 +29,7 @@ export interface RecommendationCard {
     weather?: string[];
     minPosts?: number;
     maxPosts?: number;
+    devicePhotos?: number;
   };
 }
 
@@ -52,7 +53,7 @@ class PersonalizedRecommendationService {
     {
       id: 'morning-routine',
       type: 'timing',
-      icon: 'wb-sunny',
+      icon: 'light-mode',
       iconColor: '#FF9800',
       badge: '🌅 아침 루틴',
       badgeEmoji: '🌅',
@@ -108,7 +109,7 @@ class PersonalizedRecommendationService {
       title: '황금빛 사진 타임',
       content: '해질녘 황금빛이 가장 예쁜 시간!\n감성 사진 찍기 좋은 때예요',
       meta: {
-        icon: 'wb-twilight',
+        icon: 'light-mode',
         text: '일몰 1시간 전'
       },
       actionText: '사진 팁 보기',
@@ -174,7 +175,7 @@ class PersonalizedRecommendationService {
     {
       id: 'weekend-vibes',
       type: 'calendar',
-      icon: 'weekend',
+      icon: 'calendar-today',
       iconColor: '#00BCD4',
       badge: '🌈 주말',
       badgeEmoji: '🌈',
@@ -222,14 +223,14 @@ class PersonalizedRecommendationService {
     {
       id: 'sunny-day',
       type: 'weather',
-      icon: 'wb-sunny',
+      icon: 'light-mode',
       iconColor: '#FFC107',
       badge: '☀️ 맑은 날',
       badgeEmoji: '☀️',
       title: '화창한 날씨',
       content: '맑은 날씨를 만끽할 수 있는\n야외 활동 어떠세요?',
       meta: {
-        icon: 'sunny',
+        icon: 'light-mode',
         text: '맑음'
       },
       actionText: '글쓰기',
@@ -351,7 +352,7 @@ class PersonalizedRecommendationService {
       title: '작성 중인 글이 있어요',
       content: '조금만 더 다듬어서\n멋진 포스팅을 완성해보세요!',
       meta: {
-        icon: 'hourglass',
+        icon: 'hourglass-empty',
         text: '70% 완성'
       },
       actionText: '이어쓰기',

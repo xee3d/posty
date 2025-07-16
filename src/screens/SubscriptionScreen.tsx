@@ -12,7 +12,7 @@ import {
   Share,
   Platform,
 } from 'react-native';
-import { COLORS, SPACING } from '../utils/constants';
+import { COLORS, SPACING, BRAND } from '../utils/constants';
 import { SUBSCRIPTION_PLANS, TOKEN_USAGE } from '../utils/adConfig';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../hooks/useAppTheme';
@@ -427,7 +427,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               <Text style={styles.subscribeButtonText}>
                 {selectedPlan === 'free' 
                   ? '무료로 계속하기' 
-                  : `${SUBSCRIPTION_PLANS[selectedPlan].priceDisplay}로 시작하기`}
+                  : BRAND.cta.download}  {/* CTA 적용 */}
               </Text>
             </TouchableOpacity>
             
@@ -458,7 +458,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               무료 토큰 받기
             </Text>
             <Text style={styles.heroSubtitle}>
-              다양한 활동으로 무료 토큰을 획득하세요
+              {BRAND.slogans.busy}
             </Text>
           </View>
 

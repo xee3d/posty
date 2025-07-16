@@ -1,4 +1,81 @@
-import React, { useState, useEffect } from 'react';
+  styleSelectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.md,
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  styleSelectLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  styleSelectIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  styleSelectLabel: {
+    fontSize: 12,
+    color: colors.text.tertiary,
+    marginBottom: 2,
+  },
+  styleSelectName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text.primary,
+  },      {/* 스타일 선택 모달 */}
+      <StyleSelectorModal
+        visible={showStyleSelector}
+        onClose={() => setShowStyleSelector(false)}
+        onSelectStyle={(style) => {
+          setStyleInfo(style);
+          setSelectedTone(style.aiTone);
+          setShowStyleGuide(true);
+        }}
+        currentStyle={styleInfo?.id}
+      />          {/* 스타일 선택 버튼 - 텍스트 모드에서만 표시 */}
+          {writeMode === 'text' && (
+            <SlideInView direction="up" delay={150}>
+              <TouchableOpacity
+                style={styles.styleSelectButton}
+                onPress={() => setShowStyleSelector(true)}
+              >
+                <View style={styles.styleSelectLeft}>
+                  {styleInfo ? (
+                    <>
+                      <View style={[styles.styleSelectIcon, { backgroundColor: styleInfo.color + '20' }]}>
+                        <Icon name={styleInfo.icon} size={20} color={styleInfo.color} />
+                      </View>
+                      <View>
+                        <Text style={styles.styleSelectLabel}>선택된 스타일</Text>
+                        <Text style={styles.styleSelectName}>{styleInfo.name}</Text>
+                      </View>
+                    </>
+                  ) : (
+                    <>
+                      <View style={[styles.styleSelectIcon, { backgroundColor: colors.primary + '20' }]}>
+                        <Icon name="color-palette-outline" size={20} color={colors.primary} />
+                      </View>
+                      <View>
+                        <Text style={styles.styleSelectLabel}>스타일을 선택하면</Text>
+                        <Text style={styles.styleSelectName}>더 나은 글을 쓸 수 있어요</Text>
+                      </View>
+                    </>
+                  )
+                  }
+                </View>
+                <Icon name="chevron-forward" size={20} color={colors.text.secondary} />
+              </TouchableOpacity>
+            </SlideInView>
+          )}  const [showStyleSelector, setShowStyleSelector] = useState(false);import StyleSelectorModal from '../components/StyleSelectorModal';import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,6 +86,7 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
+  Alert,
   Image,
   ActivityIndicator,
 } from 'react-native';
@@ -30,7 +108,6 @@ import contentSaveService from '../services/contentSaveService';
 import { APP_TEXT, getText } from '../utils/textConstants';
 import { soundManager } from '../utils/soundManager';
 import trendService from '../services/trendService';
-import { Alert } from '../utils/customAlert';
 import { getPlaceholderText, getTimeBasedPrompts, getCategoryFromTone, extractHashtags } from '../utils/promptUtils';
 import {
   launchImageLibrary,
@@ -45,6 +122,7 @@ import { PLATFORM_STYLES, getRandomEndingStyle, transformContentForPlatform, gen
 import missionService from '../services/missionService';
 import improvedStyleService, { STYLE_TEMPLATES } from '../services/improvedStyleService';
 import { UNIFIED_STYLES, getStyleById, getStyleByAiTone } from '../utils/unifiedStyleConstants';
+import StyleSelectorModal from '../components/StyleSelectorModal';
 
 type WriteMode = 'text' | 'photo' | 'polish';
 
@@ -124,6 +202,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   const [trendingHashtags, setTrendingHashtags] = useState<string[]>([]);
   const [selectedHashtags, setSelectedHashtags] = useState<string[]>([]);
   const [trendingPrompts, setTrendingPrompts] = useState<string[]>([]);
+  const [showStyleSelector, setShowStyleSelector] = useState(false);
 
   // initialText가 있을 때 자동으로 콘텐츠 생성 - 제거됨
   // 사용자가 직접 생성 버튼을 눌러야 함
@@ -180,21 +259,21 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
 
   // 기본 톤 정의 (11가지 스타일에 매핑되는 9가지 톤)
   const tones = [
-    { id: 'casual', label: '캐주얼', icon: 'happy-outline', iconType: 'ionicon', color: '#FF6B6B' },
-    { id: 'professional', label: '전문적', icon: 'briefcase-outline', iconType: 'ionicon', color: '#4ECDC4' },
-    { id: 'humorous', label: '유머러스', icon: 'happy', iconType: 'ionicon', color: '#FFD93D' },
-    { id: 'emotional', label: '감성적', icon: 'heart-outline', iconType: 'ionicon', color: '#FF6B9D' },
-    { id: 'genz', label: 'Gen Z', icon: 'flame-outline', iconType: 'ionicon', color: '#FE5F55' },
-    { id: 'millennial', label: '밀레니얼', icon: 'cafe-outline', iconType: 'ionicon', color: '#A8896C' },
-    { id: 'minimalist', label: '미니멀', icon: 'ellipse-outline', iconType: 'ionicon', color: '#95A3B3' },
-    { id: 'storytelling', label: '스토리텔링', icon: 'book-outline', iconType: 'ionicon', color: '#6C5B7B' },
-    { id: 'motivational', label: '동기부여', icon: 'fitness-outline', iconType: 'ionicon', color: '#4ECDC4' },
+    { id: 'casual', label: '캐주얼', icon: '😊' },
+    { id: 'professional', label: '전문적', icon: '💼' },
+    { id: 'humorous', label: '유머러스', icon: '😄' },
+    { id: 'emotional', label: '감성적', icon: '💕' },
+    { id: 'genz', label: 'Gen Z', icon: '🔥' },
+    { id: 'millennial', label: '밀레니얼', icon: '☕' },
+    { id: 'minimalist', label: '미니멀', icon: '⚪' },
+    { id: 'storytelling', label: '스토리텔링', icon: '📖' },
+    { id: 'motivational', label: '동기부여', icon: '💪' },
   ];
 
   const lengths = [
-    { id: 'short', label: 'text-outline', count: '짧게', desc: '~50자', iconSize: 24 },
-    { id: 'medium', label: 'document-text-outline', count: '보통', desc: '~150자', iconSize: 28 },
-    { id: 'long', label: 'newspaper-outline', count: '길게', desc: '~300자', iconSize: 32 },
+    { id: 'short', label: '🩳', count: '짧게', desc: '~50자' },
+    { id: 'medium', label: '👕', count: '보통', desc: '~150자' },
+    { id: 'long', label: '🥼', count: '길게', desc: '~300자' },
   ];
 
   // 기본 키워드 목록
@@ -484,7 +563,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   
   // promptUtils로 이동됨
 
-  const styles = createStyles(colors, cardTheme, isDark);
+  const styles = createStyles(colors, cardTheme);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -513,10 +592,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
               </View>
               <Text style={styles.headerSubtitle}>
                 {writeMode === 'text' 
-                  ? '어떤 이야기를 써볼까요? 제가 도와드릴게요!'
+                  ? BRAND.subTagline
                   : writeMode === 'polish'
                   ? '작성하신 글을 더 멋지게 다듬어드릴게요!'
-                  : '사진을 보여주시면 어울리는 글을 만들어드려요!'}
+                  : BRAND.cta.experience}
               </Text>
             </View>
           </FadeInView>
@@ -573,16 +652,21 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
 
           {/* 모드 선택 */}
           <SlideInView direction="up" delay={100}>
-            <View style={styles.modeSelectorWrapper}>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              style={styles.modeSelectorScroll}
+            >
               <View style={styles.modeSelector}>
                 <ScaleButton
                   style={[styles.modeButton, writeMode === 'text' && styles.modeButtonActive]}
                   onPress={() => setWriteMode('text')}
                 >
-                  <Icon 
-                    name="create-outline" 
+                  <MaterialIcon 
+                    name="edit" 
                     size={20} 
-                    color={writeMode === 'text' ? colors.primary : colors.text.secondary} 
+                    color={writeMode === 'text' ? colors.white : colors.text.primary} 
+                    style={{ opacity: writeMode === 'text' ? 1 : 0.8 }}
                   />
                   <Text style={[
                     styles.modeButtonText,
@@ -595,10 +679,11 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                   style={[styles.modeButton, writeMode === 'polish' && styles.modeButtonActive]}
                   onPress={() => setWriteMode('polish')}
                 >
-                  <Icon 
-                    name="color-wand-outline" 
+                  <MaterialIcon 
+                    name="auto-fix-high" 
                     size={20} 
-                    color={writeMode === 'polish' ? colors.primary : colors.text.secondary} 
+                    color={writeMode === 'polish' ? colors.white : colors.text.primary} 
+                    style={{ opacity: writeMode === 'polish' ? 1 : 0.8 }}
                   />
                   <Text style={[
                     styles.modeButtonText,
@@ -611,10 +696,11 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                   style={[styles.modeButton, writeMode === 'photo' && styles.modeButtonActive]}
                   onPress={() => setWriteMode('photo')}
                 >
-                  <Icon 
-                    name="image-outline" 
+                  <MaterialIcon 
+                    name="image" 
                     size={20} 
-                    color={writeMode === 'photo' ? colors.primary : colors.text.secondary} 
+                    color={writeMode === 'photo' ? colors.white : colors.text.primary} 
+                    style={{ opacity: writeMode === 'photo' ? 1 : 0.8 }}
                   />
                   <Text style={[
                     styles.modeButtonText,
@@ -624,8 +710,44 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                   </Text>
                 </ScaleButton>
               </View>
-            </View>
+            </ScrollView>
           </SlideInView>
+
+          {/* 스타일 선택 버튼 - 텍스트 모드에서만 표시 */}
+          {writeMode === 'text' && (
+            <SlideInView direction="up" delay={150}>
+              <TouchableOpacity
+                style={styles.styleSelectButton}
+                onPress={() => setShowStyleSelector(true)}
+              >
+                <View style={styles.styleSelectLeft}>
+                  {styleInfo ? (
+                    <>
+                      <View style={[styles.styleSelectIcon, { backgroundColor: styleInfo.color + '20' }]}>
+                        <Icon name={styleInfo.icon} size={20} color={styleInfo.color} />
+                      </View>
+                      <View>
+                        <Text style={styles.styleSelectLabel}>선택된 스타일</Text>
+                        <Text style={styles.styleSelectName}>{styleInfo.name}</Text>
+                      </View>
+                    </>
+                  ) : (
+                    <>
+                      <View style={[styles.styleSelectIcon, { backgroundColor: colors.primary + '20' }]}>
+                        <Icon name="color-palette-outline" size={20} color={colors.primary} />
+                      </View>
+                      <View>
+                        <Text style={styles.styleSelectLabel}>스타일을 선택하면</Text>
+                        <Text style={styles.styleSelectName}>더 나은 글을 쓸 수 있어요</Text>
+                      </View>
+                    </>
+                  )
+                  }
+                </View>
+                <Icon name="chevron-forward" size={20} color={colors.text.secondary} />
+              </TouchableOpacity>
+            </SlideInView>
+          )}
 
           {writeMode === 'text' ? (
             <>
@@ -702,9 +824,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                         onPress={() => setSelectedPolishOption('spelling')}
                       >
                         <Icon 
-                          name="checkmark-circle-outline" 
+                          name="checkmark-circle" 
                           size={18} 
-                          color={selectedPolishOption === 'spelling' ? colors.primary : colors.text.secondary} 
+                          color={selectedPolishOption === 'spelling' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -719,9 +842,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                         onPress={() => setSelectedPolishOption('refine')}
                       >
                         <Icon 
-                          name="color-wand-outline" 
+                          name="color-wand" 
                           size={18} 
-                          color={selectedPolishOption === 'refine' ? colors.primary : colors.text.secondary} 
+                          color={selectedPolishOption === 'refine' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -736,9 +860,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                         onPress={() => setSelectedPolishOption('improve')}
                       >
                         <Icon 
-                          name="sparkles-outline" 
+                          name="sparkles" 
                           size={18} 
-                          color={selectedPolishOption === 'improve' ? colors.primary : colors.text.secondary} 
+                          color={selectedPolishOption === 'improve' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -756,10 +881,11 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                         ]}
                         onPress={() => setSelectedPolishOption('formal')}
                       >
-                        <Icon 
-                          name="business-outline" 
+                        <MaterialIcon 
+                          name="business" 
                           size={18} 
-                          color={selectedPolishOption === 'formal' ? colors.primary : colors.text.secondary} 
+                          color={selectedPolishOption === 'formal' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -774,10 +900,11 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                         ]}
                         onPress={() => setSelectedPolishOption('simple')}
                       >
-                        <Icon 
-                          name="happy-outline" 
+                        <MaterialIcon 
+                          name="child-care" 
                           size={18} 
-                          color={selectedPolishOption === 'simple' ? colors.primary : colors.text.secondary} 
+                          color={selectedPolishOption === 'simple' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -792,10 +919,11 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                         ]}
                         onPress={() => setSelectedPolishOption('engaging')}
                       >
-                        <Icon 
-                          name="heart-outline" 
+                        <MaterialIcon 
+                          name="favorite" 
                           size={18} 
-                          color={selectedPolishOption === 'engaging' ? colors.primary : colors.text.secondary} 
+                          color={selectedPolishOption === 'engaging' ? colors.white : colors.primary} 
+                          style={{ opacity: 1 }}
                         />
                         <Text style={[
                           styles.polishOptionText,
@@ -839,7 +967,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                         <Text style={styles.uploadTitle}>사진을 선택해주세요</Text>
                         <Text style={styles.uploadSubtitle}>갤러리에서 선택하거나 직접 촬영하세요</Text>
                         <View style={styles.uploadButton}>
-                          <Icon name="add" size={20} color="#FFFFFF" />
+                          <Icon name="add" size={20} color={COLORS.primary} />
                           <Text style={styles.uploadButtonText}>사진 선택</Text>
                         </View>
                       </View>
@@ -851,7 +979,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                     <FadeInView delay={300}>
                       <View style={styles.analysisCard}>
                         <View style={styles.analysisHeader}>
-                          <Icon name="sparkles" size={20} color="#7C3AED" />
+                          <MaterialIcon name="auto-awesome" size={20} color="#7C3AED" />
                           <Text style={styles.analysisTitle}>포스티가 본 사진</Text>
                         </View>
                         <Text style={styles.analysisText}>{imageAnalysis}</Text>
@@ -870,35 +998,23 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                 <Text style={styles.sectionTitle}>어떤 느낌으로 쓸까요?</Text>
                 <View style={styles.toneGrid}>
                   {tones.map((tone, index) => (
-                    <TouchableOpacity
+                    <AnimatedCard
                       key={tone.id}
+                      delay={700 + index * 50}
                       style={[
                         styles.toneCard,
-                        selectedTone === tone.id && styles.toneCardActive,
-                        selectedTone === tone.id && { 
-                          borderColor: tone.color, 
-                          backgroundColor: isDark ? tone.color + '20' : tone.color + '25',
-                          shadowColor: tone.color,
-                          shadowOpacity: 0.2,
-                          elevation: 3
-                        }
+                        selectedTone === tone.id && styles.toneCardActive
                       ]}
                       onPress={() => setSelectedTone(tone.id)}
-                      activeOpacity={0.7}
                     >
-                      <Icon 
-                        name={tone.icon} 
-                        size={32} 
-                        color={selectedTone === tone.id ? tone.color : colors.text.secondary}
-                      />
+                      <Text style={styles.toneIcon}>{tone.icon}</Text>
                       <Text style={[
                         styles.toneLabel,
-                        selectedTone === tone.id && styles.toneLabelActive,
-                        selectedTone === tone.id && { color: tone.color }
+                        selectedTone === tone.id && styles.toneLabelActive
                       ]}>
                         {tone.label}
                       </Text>
-                    </TouchableOpacity>
+                    </AnimatedCard>
                   ))}
                 </View>
               </View>
@@ -911,36 +1027,34 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
               <Text style={styles.sectionTitle}>얼마나 길게 쓸까요?</Text>
               <View style={styles.lengthOptions}>
                 {lengths.map((length, index) => (
-                <TouchableOpacity
-                key={length.id}
-                style={[
-                  styles.lengthCard,
-                selectedLength === length.id && styles.lengthCardActive
-                ]}
-                onPress={() => setSelectedLength(length.id)}
-                activeOpacity={0.7}
-                >
-                <Icon 
-                name={length.label} 
-                size={length.iconSize} 
-                color={selectedLength === length.id ? colors.primary : colors.text.secondary}
-                style={[
-                selectedLength === length.id && styles.lengthEmojiActive
-                ]}
-                />
-                <Text style={[
-                styles.lengthCount,
-                selectedLength === length.id && styles.lengthCountActive
-                ]}>
-                {length.count}
-                </Text>
-                <Text style={[
-                styles.lengthDesc,
-                selectedLength === length.id && styles.lengthDescActive
-                ]}>
-                {length.desc}
-                </Text>
-                </TouchableOpacity>
+                  <AnimatedCard
+                    key={length.id}
+                    delay={1000 + index * 50}
+                    style={[
+                      styles.lengthCard,
+                      selectedLength === length.id && styles.lengthCardActive
+                    ]}
+                    onPress={() => setSelectedLength(length.id)}
+                  >
+                    <Text style={[
+                      styles.lengthEmoji,
+                      selectedLength === length.id && styles.lengthEmojiActive
+                    ]}>
+                      {length.label}
+                    </Text>
+                    <Text style={[
+                      styles.lengthCount,
+                      selectedLength === length.id && styles.lengthCountActive
+                    ]}>
+                      {length.count}
+                    </Text>
+                    <Text style={[
+                      styles.lengthDesc,
+                      selectedLength === length.id && styles.lengthDescActive
+                    ]}>
+                      {length.desc}
+                    </Text>
+                  </AnimatedCard>
                 ))}
               </View>
             </View>
@@ -986,8 +1100,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                     {isGenerating ? (
                       <ActivityIndicator size="small" color={colors.white} />
                     ) : (
-                      <Icon 
-                        name="sparkles" 
+                      <MaterialIcon 
+                        name="auto-awesome" 
                         size={20} 
                         color={(currentTokens === 0 || (writeMode === 'photo' && currentTokens === 1)) ? colors.text.tertiary : "#FFFFFF"} 
                       />
@@ -1063,6 +1177,18 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         </ScrollView>
       </KeyboardAvoidingView>
       
+      {/* 스타일 선택 모달 */}
+      <StyleSelectorModal
+        visible={showStyleSelector}
+        onClose={() => setShowStyleSelector(false)}
+        onSelectStyle={(style) => {
+          setStyleInfo(style);
+          setSelectedTone(style.aiTone);
+          setShowStyleGuide(true);
+        }}
+        currentStyle={styleInfo?.id}
+      />
+      
       {/* 무료 토큰 받기 모달 */}
       <EarnTokenModal
         visible={showEarnTokenModal}
@@ -1084,7 +1210,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   );
 };
 
-const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDark: boolean) => 
+const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => 
   StyleSheet.create({
   container: {
     flex: 1,
@@ -1097,12 +1223,12 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 120,
+    paddingBottom: 100,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 20,
+    paddingHorizontal: SPACING.lg,
+    paddingTop: SPACING.xl,
+    paddingBottom: SPACING.lg,
   },
   headerTop: {
     flexDirection: 'row',
@@ -1110,103 +1236,84 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     marginBottom: SPACING.sm,
   },
   mollyBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
+    marginRight: SPACING.sm,
   },
   mollyBadgeText: {
-    fontSize: 20,
-    fontWeight: '800',
+    fontSize: 18,
+    fontWeight: '700',
     color: colors.white,
   },
   headerTitle: {
-    fontSize: 24,
-    fontWeight: '800',
+    fontSize: 28,
+    fontWeight: '700',
     color: colors.text.primary,
     letterSpacing: -0.5,
-    flex: 1,
   },
   headerSubtitle: {
     fontSize: 15,
     color: colors.text.secondary,
     lineHeight: 22,
   },
-  modeSelectorWrapper: {
-    paddingHorizontal: SPACING.lg,
+  modeSelectorScroll: {
+    marginHorizontal: SPACING.lg,
     marginBottom: SPACING.xl,
   },
   modeSelector: {
     flexDirection: 'row',
-    backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-    borderRadius: 16,
-    padding: 6,
-    gap: 6,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
+    backgroundColor: colors.lightGray,
+    borderRadius: 12,
+    padding: 4,
+    gap: 4,
   },
   modeButton: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-    backgroundColor: isDark ? '#2C2C2E' : '#F5F5F5',
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.md,
+    borderRadius: 8,
+    minWidth: 100,
   },
   modeButtonActive: {
-    backgroundColor: isDark ? colors.primary + '20' : '#F3E8FF',
-    borderWidth: 1,
-    borderColor: colors.primary,
+    backgroundColor: colors.primary,
   },
   modeButtonText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
-    color: colors.text.secondary,
+    color: colors.text.primary,
+    opacity: 0.8,
   },
   modeButtonTextActive: {
-    color: colors.primary,
-    fontWeight: '700',
+    color: colors.white,
+    opacity: 1,
   },
   inputSection: {
     paddingHorizontal: SPACING.lg,
     marginBottom: SPACING.xl,
   },
   sectionTitle: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '600',
     color: colors.text.primary,
-    marginBottom: 12,
-    letterSpacing: -0.3,
+    marginBottom: SPACING.md,
   },
   inputContainer: {
-    backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-    borderRadius: 20,
-    padding: 16,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: SPACING.md,
     borderWidth: 1,
-    borderColor: isDark ? '#3A3A3C' : '#F3F4F6',
-    elevation: isDark ? 0 : 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: isDark ? 0 : 0.05,
-    shadowRadius: 4,
+    borderColor: '#F3F4F6',
   },
   input: {
     fontSize: 15,
-    color: colors.text.primary,
+    color: '#1A1A1A',
     minHeight: 80,
     textAlignVertical: 'top',
   },
@@ -1232,96 +1339,78 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-    borderRadius: 12,
+    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.sm,
+    backgroundColor: colors.surface,
+    borderRadius: 8,
     borderWidth: 1,
-    borderColor: isDark ? '#3A3A3C' : '#F3F4F6',
-    elevation: isDark ? 0 : 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: isDark ? 0 : 0.03,
-    shadowRadius: 2,
+    borderColor: colors.border,
   },
   polishOptionButtonActive: {
-    backgroundColor: isDark ? colors.primary + '20' : '#F3E8FF',
+    backgroundColor: colors.primary,
     borderColor: colors.primary,
-    borderWidth: 1.5,
   },
   polishOptionText: {
     fontSize: 12,
     color: colors.text.secondary,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   polishOptionTextActive: {
-    color: colors.primary,
-    fontWeight: '700',
+    color: colors.white,
   },
   quickPromptsScroll: {
-    marginTop: 12,
+    flexDirection: 'row',
+    marginTop: SPACING.sm,
   },
   photoSection: {
     paddingHorizontal: SPACING.lg,
     marginBottom: SPACING.xl,
   },
   photoUploadArea: {
-    backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-    borderRadius: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     borderWidth: 2,
-    borderColor: isDark ? '#3A3A3C' : '#E5E7EB',
+    borderColor: '#F3F4F6',
     borderStyle: 'dashed',
     overflow: 'hidden',
-    elevation: isDark ? 0 : 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: isDark ? 0 : 0.03,
-    shadowRadius: 4,
   },
   uploadPlaceholder: {
     padding: SPACING.xl,
     alignItems: 'center',
   },
   uploadIconContainer: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: isDark ? colors.primary + '20' : '#F3E8FF',
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.primary + '10',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: colors.primary + '20',
+    marginBottom: SPACING.md,
   },
   uploadTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text.primary,
+    color: '#1A1A1A',
     marginBottom: SPACING.xs,
   },
   uploadSubtitle: {
     fontSize: 14,
-    color: colors.text.secondary,
+    color: '#8E8E93',
     marginBottom: SPACING.md,
   },
   uploadButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: colors.primary,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    gap: SPACING.xs,
+    backgroundColor: '#FFF7F5',
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
     borderRadius: 20,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
   },
   uploadButtonText: {
     fontSize: 14,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontWeight: '600',
+    color: COLORS.primary,
   },
   selectedImageContainer: {
     position: 'relative',
@@ -1349,12 +1438,10 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     fontWeight: '500',
   },
   analysisCard: {
-    backgroundColor: isDark ? colors.primary + '20' : '#F3E8FF',
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 16,
-    borderWidth: 1,
-    borderColor: colors.primary + '20',
+    backgroundColor: cardTheme.molly.background,
+    borderRadius: 12,
+    padding: SPACING.md,
+    marginTop: SPACING.md,
   },
   analysisHeader: {
     flexDirection: 'row',
@@ -1379,65 +1466,49 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
   toneGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginHorizontal: -4,
+    gap: SPACING.sm,
   },
   toneCard: {
-    width: '31%',
-    aspectRatio: 1,
-    backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
+    minWidth: '30%',
+    backgroundColor: colors.surface,
     borderRadius: 12,
-    padding: 10,
+    padding: SPACING.md,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
     borderWidth: 1,
-    borderColor: isDark ? '#3A3A3C' : '#F3F4F6',
-    elevation: isDark ? 0 : 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: isDark ? 0 : 0.03,
-    shadowRadius: 2,
-    overflow: 'hidden',
+    borderColor: colors.border,
   },
   toneCardActive: {
-    borderWidth: 2,
+    borderColor: colors.primary,
+    backgroundColor: cardTheme.molly.background,
+  },
+  toneIcon: {
+    fontSize: 24,
+    marginBottom: SPACING.xs,
   },
   toneLabel: {
-    fontSize: 11,
+    fontSize: 13,
     color: colors.text.secondary,
-    fontWeight: '600',
-    textAlign: 'center',
-    marginTop: 6,
+    fontWeight: '500',
   },
   toneLabelActive: {
     color: colors.primary,
   },
   lengthOptions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: SPACING.sm,
   },
   lengthCard: {
     flex: 1,
-    backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-    borderRadius: 16,
-    paddingVertical: 14,
-    paddingHorizontal: 12,
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    padding: SPACING.md,
     alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 100,
     borderWidth: 1,
-    borderColor: isDark ? '#3A3A3C' : '#F3F4F6',
-    elevation: isDark ? 0 : 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: isDark ? 0 : 0.03,
-    shadowRadius: 2,
+    borderColor: colors.border,
   },
   lengthCardActive: {
     borderColor: colors.primary,
-    backgroundColor: isDark ? colors.primary + '20' : '#F3E8FF',
-    borderWidth: 1.5,
+    backgroundColor: cardTheme.molly.background,
   },
   lengthLabel: {
     fontSize: 14,
@@ -1448,19 +1519,19 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     color: colors.primary,
   },
   lengthCount: {
-    fontSize: 13,
-    color: colors.text.secondary,
-    marginTop: 2,
-    fontWeight: '600',
+    fontSize: 12,
+    color: colors.text.tertiary,
+    marginTop: 4,
   },
   lengthCountActive: {
     color: colors.primary,
   },
   lengthEmoji: {
-    marginBottom: 4,
+    fontSize: 28,
+    marginBottom: SPACING.xs,
   },
   lengthEmojiActive: {
-    transform: [{ scale: 1.15 }],
+    transform: [{ scale: 1.1 }],
   },
   lengthDesc: {
     fontSize: 11,
@@ -1473,26 +1544,25 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
   generateButton: {
     backgroundColor: colors.primary,
     marginHorizontal: SPACING.lg,
-    paddingVertical: 18,
-    borderRadius: 24,
+    paddingVertical: 14,
+    borderRadius: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.25,
-    shadowRadius: 12,
-    elevation: 6,
+    shadowColor: colors.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   generateButtonDisabled: {
     opacity: 0.6,
   },
   generateButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '600',
     color: colors.white,
-    marginLeft: 10,
-    letterSpacing: -0.3,
+    marginLeft: 8,
   },
   resultSection: {
     marginTop: SPACING.xl,
@@ -1512,7 +1582,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
   mollyComment: {
     marginHorizontal: SPACING.lg,
     marginBottom: SPACING.md,
-    backgroundColor: isDark ? colors.primary + '20' : cardTheme.molly.background,
+    backgroundColor: cardTheme.molly.background,
     borderRadius: 12,
     padding: SPACING.md,
   },
@@ -1530,7 +1600,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
   styleGuideBanner: {
     marginHorizontal: SPACING.lg,
     marginBottom: SPACING.md,
-    backgroundColor: isDark ? colors.primary + '20' : cardTheme.molly.background,
+    backgroundColor: cardTheme.molly.background,
     borderRadius: 12,
     padding: SPACING.md,
     flexDirection: 'row',
@@ -1599,29 +1669,23 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     flexDirection: 'row',
   },
   hashtagChip: {
-    backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
-    paddingHorizontal: 14,
+    backgroundColor: colors.surface,
+    paddingHorizontal: SPACING.md,
     paddingVertical: 8,
-    borderRadius: 16,
-    marginRight: 8,
+    borderRadius: 20,
+    marginRight: SPACING.sm,
     borderWidth: 1,
-    borderColor: isDark ? '#3A3A3C' : '#F3F4F6',
-    maxWidth: 200,
-    elevation: isDark ? 0 : 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: isDark ? 0 : 0.03,
-    shadowRadius: 2,
+    borderColor: colors.border,
+    maxWidth: 200, // 최대 너비 제한
   },
   hashtagChipActive: {
-    backgroundColor: isDark ? colors.primary + '20' : '#F3E8FF',
+    backgroundColor: cardTheme.molly.background,
     borderColor: colors.primary,
-    borderWidth: 1.5,
   },
   hashtagText: {
     fontSize: 13,
     color: colors.text.secondary,
-    fontWeight: '600',
+    fontWeight: '500',
   },
   hashtagTextActive: {
     color: colors.primary,
@@ -1658,24 +1722,22 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
   tokenCostBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.25)',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 14,
-    marginLeft: 10,
-    gap: 3,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginLeft: 8,
+    gap: 2,
   },
   tokenCostText: {
-    fontSize: 13,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
     color: colors.white,
   },
   generateButtonNoToken: {
-    backgroundColor: isDark ? '#2C2C2E' : '#F5F5F5',
+    backgroundColor: colors.lightGray,
     borderWidth: 1,
-    borderColor: isDark ? '#3A3A3C' : '#E5E7EB',
-    shadowOpacity: 0,
-    elevation: 0,
+    borderColor: colors.border,
   },
   generateButtonTextDisabled: {
     color: colors.text.tertiary,
@@ -1695,6 +1757,40 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
   generateButtonMain: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  styleSelectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.md,
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    padding: SPACING.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  styleSelectLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  styleSelectIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  styleSelectLabel: {
+    fontSize: 12,
+    color: colors.text.tertiary,
+    marginBottom: 2,
+  },
+  styleSelectName: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text.primary,
   },
 });
 

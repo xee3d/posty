@@ -127,7 +127,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
               </View>
               <Text style={styles.headerTitle}>실시간 트렌드</Text>
             </View>
-            <Text style={styles.headerSubtitle}>지금 사람들이 이야기하는 주제들이에요</Text>
+            <Text style={styles.headerSubtitle}>{BRAND.slogans.creative}</Text>
           </View>
         </FadeInView>
 

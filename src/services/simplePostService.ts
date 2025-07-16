@@ -1,31 +1,37 @@
 // 단순화된 포스트 기록 서비스
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SimplePost, PostStats } from './types/postTypes';
 
-interface SimplePost {
-  id: string;
-  content: string;
-  hashtags: string[];
-  platform: 'instagram' | 'facebook' | 'twitter' | 'general';
-  category: string;
-  tone: string;
-  createdAt: string;
-  // 성과 지표 제거 - 각 플랫폼에서 확인
-}
-
-interface PostStats {
-  totalPosts: number;
-  byCategory: Record<string, number>;
-  byPlatform: Record<string, number>;
-  byTone: Record<string, number>;
-  favoriteHashtags: string[];
-  postingPatterns: {
-    mostActiveDay: string;
-    mostActiveTime: string;
-  };
-}
+// achievementService를 직접 import하지 않고 이벤트 방식으로 변경
+type PostEventListener = () => Promise<void>;
+type SpecialEventListener = (date: Date) => Promise<void>;
 
 class SimplePostService {
   private STORAGE_KEY = 'SIMPLE_POSTS';
+  private postEventListeners: PostEventListener[] = [];
+  private specialEventListeners: SpecialEventListener[] = [];
+  
+  // 이벤트 리스너 등록
+  onPostSaved(listener: PostEventListener): () => void {
+    this.postEventListeners.push(listener);
+    // unsubscribe 함수 반환
+    return () => {
+      const index = this.postEventListeners.indexOf(listener);
+      if (index > -1) {
+        this.postEventListeners.splice(index, 1);
+      }
+    };
+  }
+  
+  onSpecialEvent(listener: SpecialEventListener): () => void {
+    this.specialEventListeners.push(listener);
+    return () => {
+      const index = this.specialEventListeners.indexOf(listener);
+      if (index > -1) {
+        this.specialEventListeners.splice(index, 1);
+      }
+    };
+  }
 
   // 포스트 저장 (AI 생성 시 자동 호출)
   async savePost(post: Omit<SimplePost, 'id' | 'createdAt'>): Promise<void> {
@@ -38,6 +44,14 @@ class SimplePostService {
     const posts = await this.getPosts();
     posts.push(newPost);
     await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(posts));
+    
+    // 이벤트 리스너들 호출
+    await Promise.all(this.postEventListeners.map(listener => listener()));
+    
+    // 특별 이벤트 체크
+    await Promise.all(this.specialEventListeners.map(listener => 
+      listener(new Date(newPost.createdAt))
+    ));
   }
 
   // 모든 포스트 가져오기

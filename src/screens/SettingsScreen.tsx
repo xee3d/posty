@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -33,10 +33,13 @@ import tokenService from '../services/subscription/tokenService';
 import inAppPurchaseService from '../services/subscription/inAppPurchaseService';
 import TokenManagementSection from '../components/token/TokenManagementSection';
 import { resetAllMissionData, resetAdData, debugMissionData } from '../utils/missionUtils';
+import achievementService from '../services/achievementService';
+import { UserProfile } from '../types/achievement';
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
   onFirebaseTest?: () => void;
+  refreshKey?: number;
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseTest }) => {
@@ -45,8 +48,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const reduxUser = useAppSelector(state => state.user);
   const [user, setUser] = useState<User>({
     id: '1',
-    name: '김포스티',
-    email: 'posty@example.com',
+    name: 'Google Test User',
+    email: 'test.google@example.com',
     connectedPlatforms: [],
     preferences: {
       defaultPlatform: 'instagram',
@@ -70,6 +73,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const [loading, setLoading] = useState(true);
   const [showFirebaseTest, setShowFirebaseTest] = useState(false);
   const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   
   // AI 토큰 및 통계
   const [stats, setStats] = useState({
@@ -131,6 +135,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       // 구독 정보 로드
       const plan = await AsyncStorage.getItem('subscription_plan');
       setSubscriptionPlan(plan || 'free');
+      
+      // 프로필 정보 로드
+      const profile = await achievementService.getUserProfile();
+      setUserProfile(profile);
     } catch (error) {
       console.error('Failed to load user data:', error);
     }
@@ -695,6 +703,19 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
 
   const menuItems = [
     {
+      icon: 'trophy',
+      label: '내 업적',
+      onPress: async () => {
+        if (onNavigate) {
+          onNavigate('profile');
+          setTimeout(async () => {
+            const profile = await achievementService.getUserProfile();
+            setUserProfile(profile);
+          }, 1000);
+        }
+      },
+    },
+    {
       icon: 'help-circle-outline',
       label: '사용 가이드',
       onPress: handleOpenHelp,
@@ -779,8 +800,17 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
           <View style={styles.profileCard}>
             <View style={styles.profileHeader}>
               <View style={styles.profileInfo}>
-                <View style={styles.profileAvatar}>
-                  {reduxUser.photoURL ? (
+                <View style={[
+                  styles.profileAvatar,
+                  userProfile?.selectedBadge && { backgroundColor: colors.white }
+                ]}>
+                  {userProfile?.selectedBadge ? (
+                    <Icon 
+                      name={userProfile.achievements.find(a => a.id === userProfile.selectedBadge)?.icon || 'person'}
+                      size={32}
+                      color={userProfile.achievements.find(a => a.id === userProfile.selectedBadge)?.iconColor || colors.primary}
+                    />
+                  ) : reduxUser.photoURL ? (
                     <Image source={{ uri: reduxUser.photoURL }} style={styles.profileAvatarImage} />
                   ) : (
                     <Text style={styles.profileAvatarText}>
@@ -790,6 +820,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
                 </View>
                 <View style={styles.profileDetails}>
                   <Text style={styles.profileName}>{reduxUser.displayName || user.name}</Text>
+                  {userProfile?.selectedTitle && (
+                    <Text style={styles.profileTitle}>{userProfile.selectedTitle}</Text>
+                  )}
                   <Text style={styles.profileEmail}>{reduxUser.email || user.email}</Text>
                   <View style={styles.planBadgeContainer}>
                     <MaterialIcon name={planBadge.icon} size={14} color={planBadge.color} />
@@ -807,6 +840,24 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
             <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfile}>
               <Icon name="person-circle-outline" size={20} color={colors.primary} />
               <Text style={styles.editProfileButtonText}>프로필 편집</Text>
+            </TouchableOpacity>
+            
+            {/* 업적 보기 버튼 - 새로 추가 */}
+            <TouchableOpacity 
+              style={[styles.editProfileButton, { marginTop: SPACING.xs, backgroundColor: '#8B5CF6' + '10' }]}
+              onPress={async () => {
+                if (onNavigate) {
+                  onNavigate('profile');
+                  // 프로필에서 돌아온 후 데이터 새로고침을 위해 타이머 설정
+                  setTimeout(async () => {
+                    const profile = await achievementService.getUserProfile();
+                    setUserProfile(profile);
+                  }, 1000);
+                }
+              }}
+            >
+              <Icon name="trophy" size={20} color="#8B5CF6" />
+              <Text style={[styles.editProfileButtonText, { color: '#8B5CF6' }]}>내 업적 보기</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1140,10 +1191,40 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     color: colors.text.primary,
     marginBottom: 2,
   },
+  profileTitle: {
+    fontSize: 13,
+    fontWeight: '500',
+    color: '#8B5CF6',
+    marginBottom: 2,
+  },
   profileEmail: {
     fontSize: 14,
     color: colors.text.tertiary,
     marginBottom: 6,
+  },
+  profileStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 'auto',
+  },
+  profileStatItem: {
+    alignItems: 'center',
+    paddingHorizontal: SPACING.md,
+  },
+  profileStatValue: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: colors.text.primary,
+  },
+  profileStatLabel: {
+    fontSize: 11,
+    color: colors.text.tertiary,
+    marginTop: 2,
+  },
+  profileStatDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: colors.border,
   },
   planBadgeContainer: {
     flexDirection: 'row',

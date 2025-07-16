@@ -1,6 +1,7 @@
 // 스타일 템플릿 및 향상된 분석 서비스
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import simplePostService from './simplePostService';
+import achievementService from './achievementService';
 
 import { UNIFIED_STYLES } from '../utils/unifiedStyleConstants';
 
@@ -506,6 +507,15 @@ class ImprovedStyleService {
       });
       
       await AsyncStorage.setItem(this.STORAGE_KEYS.STYLE_ACHIEVEMENTS, JSON.stringify(achievements));
+      
+      // 업적 서비스에 챌린지 완료 알리기
+      if (rewards.badge === 'minimal-master') {
+        await achievementService.unlockSpecialAchievement('minimal_master');
+      } else if (rewards.badge === 'story-teller') {
+        await achievementService.unlockSpecialAchievement('story_teller');
+      } else if (rewards.badge === 'trend-hunter') {
+        await achievementService.unlockSpecialAchievement('trend_hunter');
+      }
     } catch (error) {
       console.error('Failed to award achievement:', error);
     }

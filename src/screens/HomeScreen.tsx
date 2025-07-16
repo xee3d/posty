@@ -322,15 +322,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
         <FadeInView delay={0} duration={250}>
           <View style={styles.headerSection}>
             <View style={styles.headerContent}>
-              <View style={styles.logoContainer}>
+              <TouchableOpacity 
+                style={styles.logoContainer}
+                onPress={() => onNavigate('profile')}
+                activeOpacity={0.7}
+              >
               <View style={styles.logoCircle}>
-              <Text style={styles.mollyIcon}>{APP_TEXT.brand.characterName.charAt(0)}</Text>
+                <Text style={styles.mollyIcon}>{APP_TEXT.brand.characterName.charAt(0)}</Text>
               </View>
               <View>
               <Text style={styles.appTitle}>{BRAND.name}</Text>
               <Text style={styles.appSubtitle}>{BRAND.tagline}</Text>
               </View>
-              </View>
+              </TouchableOpacity>
               
               {/* 토큰 잔액 표시 - TokenBadge 컴포넌트 사용 */}
               <View style={styles.tokenContainer}>
@@ -373,7 +377,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
             </View>
             <View style={styles.mollyBannerContent}>
               <Text style={styles.mollyBannerTitle}>{APP_TEXT.home.header.greeting}</Text>
-              <Text style={styles.mollyBannerSubtitle}>{APP_TEXT.home.header.subtitle}</Text>
+              <Text style={styles.mollyBannerSubtitle}>{BRAND.subTagline}</Text>
             </View>
           </View>
         </FadeInView>
@@ -547,7 +551,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     <Text style={styles.recommendContent}>{card.content}</Text>
                     <View style={styles.recommendFooter}>
                       <View style={styles.recommendMeta}>
-                        <Icon name={card.meta.icon} size={14} color={colors.text.secondary} />
+                        <MaterialIcon name={card.meta.icon} size={14} color={colors.text.secondary} />
                         <Text style={styles.recommendMetaText}>{card.meta.text}</Text>
                       </View>
                       <ScaleButton 

@@ -27,6 +27,7 @@ import { AppIcon } from '../components/AppIcon';
 import socialAuthService from '../services/auth/socialAuthService';
 import { useAppDispatch } from '../hooks/redux';
 import { setUser } from '../store/slices/userSlice';
+import { BRAND } from '../utils/constants';
 
 interface LoginScreenProps {
   onNavigate: (screen: string, data?: any) => void;
@@ -175,7 +176,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
             <AppIcon size={100} />
             <Text style={styles.appName}>Posty</Text>
             <Text style={styles.appDescription}>
-              AI가 만드는 나만의 SNS 콘텐츠
+              {BRAND.tagline}
             </Text>
           </Animated.View>
 

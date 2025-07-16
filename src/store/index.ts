@@ -15,14 +15,15 @@ import { firestoreSyncMiddleware } from './middleware/firestoreSyncMiddleware';
 
 // 개발 모드에서 성능 모니터링 - 임계값 상향 조정
 const performanceMiddleware = (store: any) => (next: any) => (action: any) => {
-  if (__DEV__) {
+  if (__DEV__ && process.env.REACT_NATIVE_PERF_MONITOR !== 'false') {
     const start = performance.now();
     const result = next(action);
     const end = performance.now();
     const duration = end - start;
     
-    // 100ms 이상 걸리는 액션만 경고 (persist/REHYDRATE는 제외)
-    if (duration > 100 || (duration > 50 && action.type !== 'persist/REHYDRATE')) {
+    // 150ms 이상 걸리는 액션만 경고 (persist/REHYDRATE, user/setUserData는 제외)
+    const ignoredActions = ['persist/REHYDRATE', 'user/setUserData', 'persist/PERSIST'];
+    if (duration > 150 && !ignoredActions.includes(action.type)) {
       console.warn(`Slow Redux action: ${action.type} took ${duration.toFixed(2)}ms`);
     }
     
@@ -89,7 +90,9 @@ export const store = configureStore({
         ],
       },
       // 개발 모드에서만 불변성 체크, 임계값 상향
-      immutableCheck: __DEV__ ? { warnAfter: 256 } : false,
+      immutableCheck: __DEV__ ? { warnAfter: 512 } : false,
+      // 직렬화 체크 비활성화로 성능 개선
+      serializableCheck: false,
     })
       .concat(firestoreSyncMiddleware)
       .concat(__DEV__ ? [performanceMiddleware] : []),

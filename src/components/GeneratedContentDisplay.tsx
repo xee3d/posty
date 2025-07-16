@@ -221,7 +221,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
             <Icon
               name={platform.icon}
               size={18}
-              color={activePlatform === platform.id ? platform.color : colors.textSecondary}
+              color={activePlatform === platform.id ? platform.color : colors.text.secondary}
             />
             <Text style={[
               styles.platformTabText,
@@ -347,7 +347,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       fontSize: 12,
       fontFamily: 'System',
       fontWeight: '500' as const,
-      color: colors.textSecondary,
+      color: colors.text.secondary,
       marginLeft: SPACING.xs / 2,
     },
     loader: {

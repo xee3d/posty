@@ -1,9 +1,23 @@
 // 브랜드 정보
 export const BRAND = {
   name: 'Posty',
-  tagline: 'AI SNS 글쓰기 도우미',
+  tagline: 'AI가 쓰고, 나는 빛나고',
+  subTagline: '1분 만에 완성되는 완벽한 포스팅',
+  description: '사진 한 장으로 멋진 포스팅을 완성하세요',
   characterName: 'Posty',
   characterNameKo: '포스티',
+  slogans: {
+    main: 'AI가 쓰고, 나는 빛나고',
+    emotional: '당신의 일상을 특별하게, 포스티 AI',
+    practical: 'SNS 고민 끝! AI가 다 써드려요',
+    busy: '바쁜 당신을 위한 AI 비서',
+    creative: '당신의 창의력에 AI를 더하다'
+  },
+  cta: {
+    download: '지금 다운로드하고 첫 포스팅 무료로!',
+    experience: '사진 한 장으로 AI의 마법을 경험하세요!',
+    promotion: '지금 가입하면 첫 달 무료 토큰 10개 증정!'
+  }
 };
 
 // 라이트 테마 색상
@@ -58,8 +72,8 @@ const DARK_COLORS = {
   
   text: {
     primary: '#FFFFFF', // 순백색
-    secondary: '#A0A0A0', // 중간 밝기 회색
-    tertiary: '#6B6B6B', // 어두운 회색
+    secondary: '#CBD5E0', // 밝은 회색 (기존보다 밝게)
+    tertiary: '#A0AEC0', // 중간 회색 (기존보다 밝게)
   },
   
   highlight: '#1A1A1A', // 매우 어두운 회색 (특별 카드 배경)
@@ -67,14 +81,14 @@ const DARK_COLORS = {
   lightText: '#E5E5E5',
   white: '#FFFFFF',
   black: '#000000',
-  gray: '#808080',
+  gray: '#9CA3AF',
   lightGray: '#0F0F0F', // 블랙에 가까운 배경
   darkGray: '#CCCCCC',
   
   background: '#000000', // 순수 블랙 배경
   lightBackground: '#0A0A0A', // 약간 밝은 블랙
   surface: '#141414', // 카드 배경 (약간 밝은 검정)
-  border: '#2A2A2A', // 어두운 경계선
+  border: '#3A3A3A', // 어두운 경계선 (좀 더 밝게)
   
   transparent: 'transparent',
 };
@@ -120,21 +134,9 @@ export const SPACING = {
   xxlarge: 48,
 };
 
-// 글꼴 스타일 - fontFamily 제거하여 시스템 기본 폰트 사용
-export const FONTS = {
-  regular: {
-    fontWeight: '400' as const,
-  },
-  medium: {
-    fontWeight: '500' as const,
-  },
-  semibold: {
-    fontWeight: '600' as const,
-  },
-  bold: {
-    fontWeight: '700' as const,
-  },
-};
+// 폰트 스타일은 fonts 모듈에서 관리
+// 이 파일에서는 하위 호환을 위해 필요한 부분만 남김
+export { FONTS } from './fonts';
 
 // 글꼴 크기 - 가독성 개선
 export const FONT_SIZES = {
@@ -148,27 +150,29 @@ export const FONT_SIZES = {
 };
 
 // 타이포그래피 스타일
+import { getFontStyle } from './fonts';
+
 export const TYPOGRAPHY = {
   cardTitle: {
-    fontSize: FONT_SIZES.xlarge,
-    fontWeight: '700' as const,
+    ...getFontStyle('lg', 'bold'),
+    fontSize: FONT_SIZES.xlarge, // 커스텀 크기 유지
     color: COLORS.text.primary,
     letterSpacing: -0.3,
   },
   cardText: {
-    fontSize: FONT_SIZES.medium,
-    fontWeight: '400' as const,
+    ...getFontStyle('md', 'regular'),
+    fontSize: FONT_SIZES.medium, // 커스텀 크기 유지
     color: COLORS.text.secondary,
     lineHeight: 22,
   },
   button: {
-    fontSize: FONT_SIZES.medium,
-    fontWeight: '600' as const,
+    ...getFontStyle('md', 'medium'),
+    fontSize: FONT_SIZES.medium, // 커스텀 크기 유지
     letterSpacing: -0.1,
   },
   label: {
-    fontSize: FONT_SIZES.small,
-    fontWeight: '500' as const,
+    ...getFontStyle('sm', 'medium'),
+    fontSize: FONT_SIZES.small, // 커스텀 크기 유지
     color: COLORS.text.tertiary,
   },
 };

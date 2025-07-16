@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
   View,
   StyleSheet,
@@ -36,6 +36,8 @@ import LoginScreen from './src/screens/LoginScreen';
 import { TermsOfServiceScreen, PrivacyPolicyScreen } from './src/screens/documents';
 import TabNavigator from './src/components/TabNavigator';
 import TokenDebugScreen from './src/screens/debug/TokenDebugScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import AchievementNotification from './src/components/AchievementNotification';
 
 // Import constants and hooks
 import { COLORS } from './src/utils/constants';
@@ -54,6 +56,8 @@ import analyticsService from './src/services/analytics/analyticsService';
 import notificationService from './src/services/notification/notificationService';
 import { restoreTokenData, setupTokenPersistence, checkDailyResetAfterRestore } from './src/store/persistConfig/tokenPersist';
 import { fixTokenInconsistency } from './src/utils/tokenFix';
+import { AlertProvider } from './src/components/AlertProvider';
+import { AlertManager } from './src/components/CustomAlert';
 
 const { width } = Dimensions.get('window');
 
@@ -79,12 +83,28 @@ const App: React.FC = () => {
   const [navigationData, setNavigationData] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const alertRef = useRef<any>(null);
   
   // Reanimated shared values
   const opacity = useSharedValue(1);
   const translateX = useSharedValue(0);
   const scale = useSharedValue(1);
 
+  // AlertManager ref 설정 - 별도 useEffect로 분리
+  useEffect(() => {
+    // 약간의 지연을 주어 ref가 확실히 설정되도록 함
+    const timer = setTimeout(() => {
+      if (alertRef.current) {
+        console.log('Setting AlertManager ref:', alertRef.current);
+        AlertManager.setAlertRef(alertRef.current);
+      } else {
+        console.error('AlertRef is still null after timeout');
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
   // 광고 및 구독 서비스 초기화 (InteractionManager 사용)
   useEffect(() => {
     if (__DEV__) {
@@ -240,7 +260,7 @@ const App: React.FC = () => {
     
     setIsAnimating(true);
     
-    const tabs = ['home', 'ai-write', 'trend', 'my-style', 'settings'];
+    const tabs = ['home', 'ai-write', 'trend', 'my-style', 'settings', 'profile'];
     const currentIndex = tabs.indexOf(activeTab);
     const nextIndex = tabs.indexOf(tab);
     const direction = nextIndex > currentIndex ? 1 : -1;
@@ -348,6 +368,8 @@ const App: React.FC = () => {
         return <PrivacyPolicyScreen key="privacy" onNavigate={handleTabPress} />;
       case 'token-debug':
         return <TokenDebugScreen key="token-debug" />;
+      case 'profile':
+        return <ProfileScreen key="profile" navigation={{ goBack: () => handleTabPress('settings') }} />;
       default:
         return <HomeScreen key="home" onNavigate={handleTabPress} />;
     }
@@ -364,21 +386,26 @@ const App: React.FC = () => {
         } 
         persistor={persistor}
       >
-        <View style={styles.container}>
-          <StatusBar 
-            backgroundColor={colors.surface} 
-            barStyle={isDark ? "light-content" : "dark-content"} 
-          />
-          <Animated.View style={[styles.content, animatedStyle]}>
-            {renderScreen}
-          </Animated.View>
-          {activeTab !== 'login' && (
-            <TabNavigator 
-              activeTab={activeTab} 
-              onTabPress={handleTabPress} 
+        <AlertProvider ref={alertRef}>
+          <View style={styles.container}>
+            <StatusBar 
+              backgroundColor={colors.surface} 
+              barStyle={isDark ? "light-content" : "dark-content"} 
             />
-          )}
-        </View>
+            <Animated.View style={[styles.content, animatedStyle]}>
+              {renderScreen}
+            </Animated.View>
+            {activeTab !== 'login' && (
+              <TabNavigator 
+                activeTab={activeTab} 
+                onTabPress={handleTabPress} 
+              />
+            )}
+            <AchievementNotification 
+              onNavigateToProfile={() => handleTabPress('profile')} 
+            />
+          </View>
+        </AlertProvider>
       </PersistGate>
     </Provider>
   );

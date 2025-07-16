@@ -23,6 +23,10 @@ LogBox.ignoreLogs([
   /.*Touch Move:.*/,
   /.*Touch Bank:.*/,
   
+  // Redux 성능 경고
+  'Slow Redux action',
+  /.*took.*ms$/,
+  
   // 기타 일반적인 경고
   'Non-serializable values were found',
   'Require cycle:',
@@ -57,8 +61,12 @@ if (__DEV__) {
         warningMessage.toLowerCase().includes(pattern.toLowerCase())
       );
       
-      // Firebase 경고가 아닌 경우에만 출력
-      if (!shouldSuppress) {
+      // Redux 성능 경고 체크
+      const isReduxWarning = warningMessage.includes('Slow Redux action') || 
+                           warningMessage.includes('took') && warningMessage.includes('ms');
+      
+      // Firebase 경고나 Redux 성능 경고가 아닌 경우에만 출력
+      if (!shouldSuppress && !isReduxWarning) {
         originalWarn.apply(console, args);
       }
     } catch (e) {

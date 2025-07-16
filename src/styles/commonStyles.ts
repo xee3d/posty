@@ -1,5 +1,6 @@
 import { StyleSheet, TextStyle, ViewStyle } from 'react-native';
-import { COLORS, SPACING, BORDER_RADIUS, FONTS, CARD_THEME } from '../utils/constants';
+import { COLORS, SPACING, BORDER_RADIUS, CARD_THEME } from '../utils/constants';
+import { getFontStyle, TEXT_STYLES } from '../utils/fonts';
 
 // 공통 헤더 스타일
 export const createHeaderStyles = (colors: typeof COLORS) => StyleSheet.create({
@@ -14,13 +15,14 @@ export const createHeaderStyles = (colors: typeof COLORS) => StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   headerTitle: {
-    fontSize: 28,
-    fontWeight: '700',
+    ...getFontStyle('xxl', 'bold'),
+    fontSize: 28, // 커스텀 크기
     color: colors.text.primary,
     letterSpacing: -0.5,
   },
   headerSubtitle: {
-    fontSize: 15,
+    ...getFontStyle('sm', 'regular'),
+    fontSize: 15, // 커스텀 크기
     color: colors.text.secondary,
     lineHeight: 22,
   },
@@ -33,17 +35,15 @@ export const createSectionStyles = (colors: typeof COLORS) => StyleSheet.create(
     marginBottom: SPACING.xl,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700',
+    ...getFontStyle('lg', 'bold'),
     color: colors.text.primary,
     marginBottom: SPACING.md,
     letterSpacing: -0.3,
   },
   sectionSubtitle: {
-    fontSize: 14,
+    ...getFontStyle('sm', 'regular'),
     color: colors.text.secondary,
     marginBottom: SPACING.md,
-    lineHeight: 20,
   },
 });
 
@@ -59,8 +59,7 @@ export const createTokenStyles = (colors: typeof COLORS) => StyleSheet.create({
     gap: 4,
   },
   tokenText: {
-    fontSize: 14,
-    fontWeight: '600',
+    ...getFontStyle('sm', 'medium'),
     color: colors.primary,
   },
   tokenTextEmpty: {
@@ -76,9 +75,8 @@ export const createTokenStyles = (colors: typeof COLORS) => StyleSheet.create({
     gap: 4,
   },
   tokenBalanceText: {
+    ...getFontStyle('md', 'bold'),
     color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700',
   },
 });
 
@@ -93,9 +91,8 @@ export const createButtonStyles = (colors: typeof COLORS) => StyleSheet.create({
     justifyContent: 'center',
   },
   primaryButtonText: {
+    ...TEXT_STYLES.button,
     color: colors.white,
-    fontSize: 16,
-    fontWeight: '600',
   },
   iconButton: {
     width: 44,

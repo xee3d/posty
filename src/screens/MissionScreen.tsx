@@ -12,6 +12,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import missionService, { Mission } from '../services/missionService';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import ProgressBar from '../components/ProgressBar';
+import AchievementsView from '../components/AchievementsView';
 
 interface MissionItemProps {
   mission: Mission;
@@ -233,15 +234,19 @@ const MissionScreen: React.FC = () => {
         {renderTabButton('achievements', '업적')}
       </View>
 
-      <ScrollView
-        style={styles.missionList}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
-        }
-        showsVerticalScrollIndicator={false}
-      >
-        {renderMissions()}
-      </ScrollView>
+      {selectedTab === 'achievements' ? (
+        <AchievementsView refreshing={refreshing} onRefresh={handleRefresh} />
+      ) : (
+        <ScrollView
+          style={styles.missionList}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />
+          }
+          showsVerticalScrollIndicator={false}
+        >
+          {renderMissions()}
+        </ScrollView>
+      )}
     </View>
   );
 };

@@ -10,7 +10,9 @@ import {
   Animated,
   Alert,
   Dimensions,
+  Platform,
 } from 'react-native';
+import { useSharedValue, useAnimatedStyle, withSpring, withRepeat, withTiming } from 'react-native-reanimated';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, BRAND, TYPOGRAPHY, FONT_SIZES } from '../utils/constants';
 import { useAppTheme } from '../hooks/useAppTheme';
@@ -52,8 +54,8 @@ interface TemplateUsage {
 }
 
 const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
-  const { colors, cardTheme } = useAppTheme();
-  const styles = createStyles(colors, cardTheme);
+  const { colors, cardTheme, isDark } = useAppTheme();
+  const styles = createStyles(colors, cardTheme, isDark);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
   const [recentPosts, setRecentPosts] = useState<any[]>([]);
@@ -68,6 +70,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
+  const [pressedTemplateId, setPressedTemplateId] = useState<string | null>(null);
 
   // 템플릿 사용 통계 저장
   const saveTemplateUsage = async (templateId: string) => {
@@ -423,9 +426,19 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       {/* 나의 브랜드 정체성 */}
       <View style={styles.brandIdentity}>
         <View style={styles.brandHeader}>
-          <View style={[styles.styleIconContainer, { backgroundColor: getStyleColor(styleAnalysis?.dominantStyle || 'minimalist') + '20' }]}>
+          <Animated.View style={[styles.styleIconContainer, { 
+            backgroundColor: getStyleColor(styleAnalysis?.dominantStyle || 'minimalist') + (isDark ? '40' : '15'),
+            borderWidth: 0,
+            borderColor: 'transparent',
+            transform: [{ 
+              rotate: fadeAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: ['0deg', '360deg']
+              })
+            }]
+          }]}>
             <Icon name={getStyleIcon(styleAnalysis?.dominantStyle || 'minimalist')} size={40} color={getStyleColor(styleAnalysis?.dominantStyle || 'minimalist')} />
-          </View>
+          </Animated.View>
           <View style={styles.brandInfo}>
             <Text style={styles.brandName}>
               {styleAnalysis ? STYLE_TEMPLATES.find(t => t.id === styleAnalysis.dominantStyle)?.name : ''} 브랜드
@@ -462,9 +475,13 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <View style={styles.keywordsList}>
             {stats?.favoriteHashtags?.slice(0, 5).map((tag: string, index: number) => (
               <TouchableOpacity
-                key={index}
-                style={[styles.keywordBadge, { backgroundColor: colors.primary + '20' }]}
-                onPress={() => {
+              key={index}
+              style={[styles.keywordBadge, { 
+                backgroundColor: colors.primary + (isDark ? '30' : '20'),
+                    borderWidth: isDark ? 1 : 0,
+                    borderColor: colors.primary + '40'
+                  }]}
+                  onPress={() => {
                   soundManager.playTap();
                   if (onNavigate) {
                     onNavigate('ai-write', { hashtags: [tag] });
@@ -490,10 +507,11 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             onPress={() => insight.action && handleInsightAction(insight)}
             activeOpacity={0.8}
           >
-            <View style={[styles.insightIcon, {
+            <Animated.View style={[styles.insightIcon, {
               backgroundColor: insight.type === 'strength' ? colors.success + '20' :
                              insight.type === 'improvement' ? colors.warning + '20' :
-                             colors.primary + '20'
+                             colors.primary + '20',
+              transform: [{ scale: fadeAnim }]
             }]}>
               <Icon 
                 name={insight.icon} 
@@ -502,7 +520,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                        insight.type === 'improvement' ? colors.warning :
                        colors.primary} 
               />
-            </View>
+            </Animated.View>
             <View style={styles.insightContent}>
               <Text style={styles.insightTitle}>{insight.title}</Text>
               <Text style={styles.insightDescription}>{insight.description}</Text>
@@ -520,7 +538,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       <View style={styles.patternsSection}>
         <Text style={styles.sectionTitle}>📊 나의 스타일 지표</Text>
         <View style={styles.metricsContainer}>
-          <View style={styles.metricCard}>
+          <View style={[styles.metricCard, {
+            backgroundColor: isDark ? colors.surface : colors.lightGray
+          }]}>
             <View style={styles.metricHeader}>
               <Icon name="sync" size={24} color={colors.primary} />
               <Text style={styles.metricLabel}>일관성</Text>
@@ -539,7 +559,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             </View>
           </View>
           
-          <View style={styles.metricCard}>
+          <View style={[styles.metricCard, {
+            backgroundColor: isDark ? colors.surface : colors.lightGray
+          }]}>
             <View style={styles.metricHeader}>
               <Icon name="color-palette" size={24} color={colors.accent} />
               <Text style={styles.metricLabel}>다양성</Text>
@@ -655,14 +677,21 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
   const renderTemplatesTab = () => (
     <View>
-      <Text style={styles.sectionTitle}>📝 스타일 템플릿</Text>
-      <Text style={styles.sectionSubtitle}>
-      다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요
-      </Text>
+      <Animated.View style={{
+        opacity: fadeAnim,
+        transform: [{ translateY: Animated.multiply(slideAnim, 0.5) }]
+      }}>
+        <Text style={styles.sectionTitle}>📝 스타일 템플릿</Text>
+        <Text style={styles.sectionSubtitle}>
+        다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요
+        </Text>
+      </Animated.View>
       
       {templates.map((template) => {
       const templateUsageData = templateUsage[template.id];
       const isRecommended = styleAnalysis?.recommendedStyles?.includes(template.id);
+      const iconBgOpacity = isDark ? '40' : '30';
+      const iconSize = width < 380 ? 28 : 32;
       
       return (
       <TouchableOpacity
@@ -670,21 +699,32 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         style={[
         styles.templateCard, 
           cardTheme.card,
-          isRecommended && styles.recommendedTemplate
+          isRecommended && styles.recommendedTemplate,
+          pressedTemplateId === template.id && styles.templateCardPressed
       ]}
+      onPressIn={() => setPressedTemplateId(template.id)}
+      onPressOut={() => setPressedTemplateId(null)}
       onPress={() => handleTemplateUse(template)}
-      activeOpacity={0.8}
+      activeOpacity={0.7}
       >
       {isRecommended && (
-      <View style={styles.recommendedBadge}>
+      <Animated.View 
+        style={[styles.recommendedBadge, {
+          opacity: fadeAnim
+        }]}
+      >
         <Icon name="star" size={12} color="#fff" />
       <Text style={styles.recommendedText}>추천</Text>
-      </View>
+      </Animated.View>
       )}
       
-      <View style={[styles.templateIcon, { backgroundColor: template.color + '30' }]}>
-        <Icon name={template.icon} size={32} color={template.color} />
+      <View style={styles.templateIconWrapper}>
+        <View style={[styles.templateIcon, { 
+          backgroundColor: isDark ? template.color + '40' : template.color + '15',
+        }]}>
+          <Icon name={template.icon} size={iconSize} color={template.color} />
         </View>
+      </View>
         
           <View style={styles.templateContent}>
               <Text style={styles.templateName}>{template.name}</Text>
@@ -732,10 +772,14 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               activeChallenge?.id === challenge.id && styles.activeChallengeCardBorder
             ]}
             onPress={() => !activeChallenge && handleStartChallenge(challenge.id)}
-            activeOpacity={activeChallenge ? 1 : 0.8}
+            activeOpacity={activeChallenge ? 1 : 0.7}
           >
-            <View style={[styles.challengeIcon, { backgroundColor: colors.warning + '30' }]}>
-              <Icon name="trophy" size={28} color={colors.warning} />
+            <View style={styles.challengeIconWrapper}>
+              <View style={[styles.challengeIcon, { 
+                backgroundColor: isDark ? colors.warning + '40' : colors.warning + '15',
+              }]}>
+                <Icon name="trophy" size={28} color={colors.warning} />
+              </View>
             </View>
             <View style={styles.challengeContent}>
               <Text style={styles.challengeName}>{challenge.name}</Text>
@@ -863,7 +907,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   );
 };
 
-const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
+const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -914,7 +958,9 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       paddingVertical: SPACING.sm,
       alignItems: 'center',
       borderRadius: 20,
-      backgroundColor: colors.surface,
+      backgroundColor: isDark ? colors.surface : '#F3F4F6',
+      borderWidth: isDark ? 0 : 1,
+      borderColor: isDark ? 'transparent' : '#E5E7EB',
     },
     tabActive: {
       backgroundColor: colors.primary,
@@ -932,16 +978,33 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       paddingBottom: SPACING.xl,
     },
     brandIdentity: {
-      backgroundColor: colors.surface,
+      backgroundColor: isDark ? colors.surface : '#FFFFFF',
       borderRadius: 16,
       padding: SPACING.lg,
       marginBottom: SPACING.lg,
+      borderWidth: isDark ? 0 : 1,
+      borderColor: isDark ? 'transparent' : colors.border,
       ...cardTheme.default.shadow,
     },
     brandHeader: {
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: SPACING.lg,
+    },
+    styleIconContainer: {
+      width: 60,
+      height: 60,
+      borderRadius: 30,
+      justifyContent: 'center',
+      alignItems: 'center',
+      overflow: 'hidden',
+      // Android elevation 제거하고 iOS 스타일만 사용
+      ...(Platform.OS === 'ios' ? {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: isDark ? 0.15 : 0.06,
+        shadowRadius: 6,
+      } : {}),
     },
     brandInfo: {
       marginLeft: SPACING.md,
@@ -996,7 +1059,9 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       padding: SPACING.md,
       borderRadius: 12,
       marginBottom: SPACING.sm,
-      backgroundColor: colors.surface,
+      backgroundColor: isDark ? colors.surface : '#FFFFFF',
+      borderWidth: isDark ? 0 : 1,
+      borderColor: isDark ? 'transparent' : colors.border,
       ...cardTheme.default.shadow,
     },
     insightIcon: {
@@ -1027,9 +1092,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       marginTop: 8,
     },
     patternsSection: {
-      backgroundColor: colors.surface,
+      backgroundColor: isDark ? colors.surface : '#FFFFFF',
       borderRadius: 16,
       padding: SPACING.lg,
+      borderWidth: isDark ? 0 : 1,
+      borderColor: isDark ? 'transparent' : colors.border,
       ...cardTheme.default.shadow,
     },
     patternsContainer: {
@@ -1174,19 +1241,34 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       padding: SPACING.lg,
       borderRadius: 16,
       marginBottom: SPACING.md,
-      backgroundColor: colors.surface,
+      backgroundColor: isDark ? colors.surface : '#FFFFFF',
       borderWidth: 1,
-      borderColor: colors.border,
-      ...cardTheme.default.shadow,
+      borderColor: isDark ? colors.border + '50' : '#E5E7EB',
+      minHeight: 100, // 최소 높이 설정
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: isDark ? 0.15 : 0.05,
+      shadowRadius: 8,
+      elevation: isDark ? 4 : 2,
+      // 트랜지션 추가
+      transform: [{ scale: 1 }],
+    },
+    templateCardPressed: {
+      transform: [{ scale: 0.98 }],
+      opacity: 0.9,
+    },
+    templateIconWrapper: {
+      width: 64,
+      height: 64,
+      marginRight: SPACING.md,
     },
     templateIcon: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
+      width: 64,
+      height: 64,
+      borderRadius: 32,
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: SPACING.md,
-      opacity: 1,
+      overflow: 'hidden',
     },
     templateContent: {
       flex: 1,
@@ -1216,7 +1298,9 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     recommendedTemplate: {
       borderWidth: 2,
-      borderColor: colors.primary + '30',
+      borderColor: colors.primary,
+      backgroundColor: isDark ? colors.primary + '10' : '#F3E8FF',
+      transform: [{ scale: 1.02 }],
     },
     recommendedBadge: {
       position: 'absolute',
@@ -1225,10 +1309,16 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       flexDirection: 'row',
       alignItems: 'center',
       backgroundColor: colors.primary,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 12,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 14,
       gap: 4,
+      // 그림자 추가
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 4,
     },
     recommendedText: {
       fontSize: 10,
@@ -1245,13 +1335,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       color: colors.primary,
       fontWeight: '600',
     },
-    styleIconContainer: {
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      justifyContent: 'center',
-      alignItems: 'center',
-    },
+
     styleScoresContainer: {
       marginTop: SPACING.lg,
     },
@@ -1280,9 +1364,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     metricCard: {
       flex: 1,
-      backgroundColor: colors.lightGray,
+      backgroundColor: isDark ? colors.surface : '#F9FAFB',
       padding: SPACING.md,
       borderRadius: 12,
+      borderWidth: isDark ? 0 : 1,
+      borderColor: isDark ? 'transparent' : '#E5E7EB',
     },
     metricHeader: {
       flexDirection: 'row',
@@ -1333,24 +1419,32 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       padding: SPACING.lg,
       borderRadius: 16,
       marginBottom: SPACING.md,
-      backgroundColor: colors.surface,
+      backgroundColor: isDark ? colors.surface : '#FFFFFF',
       borderWidth: 1,
-      borderColor: colors.border,
-      ...cardTheme.default.shadow,
+      borderColor: isDark ? colors.border : '#E5E7EB',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: isDark ? 0.15 : 0.05,
+      shadowRadius: 8,
+      elevation: isDark ? 4 : 2,
     },
     activeChallengeCardBorder: {
       borderWidth: 2,
       borderColor: colors.warning,
       backgroundColor: colors.warning + '08',
     },
+    challengeIconWrapper: {
+      width: 56,
+      height: 56,
+      marginRight: SPACING.md,
+    },
     challengeIcon: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
       justifyContent: 'center',
       alignItems: 'center',
-      marginRight: SPACING.md,
-      opacity: 1,
+      overflow: 'hidden',
     },
     challengeContent: {
       flex: 1,

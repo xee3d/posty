@@ -97,20 +97,10 @@ export const useTheme = () => {
 // 기존 상수들과 호환을 위한 export
 export const COLORS = lightTheme;
 
-export const FONTS = {
-  regular: 'System',
-  medium: 'System',
-  bold: 'System',
-  sizes: {
-    xs: 12,
-    sm: 14,
-    md: 16,
-    lg: 18,
-    xl: 20,
-    xxl: 24,
-    xxxl: 32,
-  },
-};
+// 폰트 설정은 ./fonts 모듈에서 관리
+import { FONTS as FONT_CONFIG, getFontStyle, TEXT_STYLES } from './fonts';
+export const FONTS = FONT_CONFIG;
+export { getFontStyle, TEXT_STYLES };
 
 export const SPACING = {
   xs: 4,

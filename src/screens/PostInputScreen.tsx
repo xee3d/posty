@@ -6,7 +6,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-  Alert,
   SafeAreaView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -16,6 +15,7 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { ScaleButton, FadeInView } from '../components/AnimationComponents';
 import localAnalyticsService from '../services/analytics/localAnalyticsService';
 import { soundManager } from '../utils/soundManager';
+import { Alert } from '../utils/customAlert';
 
 interface PostInputScreenProps {
   onClose: () => void;

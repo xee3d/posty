@@ -233,42 +233,55 @@ const userSlice = createSlice({
     setUserData: (state, action: PayloadAction<Partial<UserState>>) => {
       const data = action.payload;
       
-      // 얕은 병합으로 성능 개선
-      Object.assign(state, {
-        uid: data.uid ?? state.uid,
-        email: data.email ?? state.email,
-        displayName: data.displayName ?? state.displayName,
-        photoURL: data.photoURL ?? state.photoURL,
-        provider: data.provider ?? state.provider,
-      });
+      // 변경된 필드만 업데이트하도록 최적화
+      if (data.uid !== undefined && data.uid !== state.uid) {
+        state.uid = data.uid;
+      }
+      if (data.email !== undefined && data.email !== state.email) {
+        state.email = data.email;
+      }
+      if (data.displayName !== undefined && data.displayName !== state.displayName) {
+        state.displayName = data.displayName;
+      }
+      if (data.photoURL !== undefined && data.photoURL !== state.photoURL) {
+        state.photoURL = data.photoURL;
+      }
+      if (data.provider !== undefined && data.provider !== state.provider) {
+        state.provider = data.provider;
+      }
       
-      if (data.tokens) {
+      // 토큰 정보 업데이트
+      if (data.tokens && (data.tokens.current !== state.tokens.current || data.tokens.total !== state.tokens.total)) {
         state.tokens = data.tokens;
         state.currentTokens = data.tokens.current;
       }
       
       // 개별 토큰 필드 업데이트
-      if (data.currentTokens !== undefined) {
+      if (data.currentTokens !== undefined && data.currentTokens !== state.currentTokens) {
         state.currentTokens = data.currentTokens;
       }
-      if (data.purchasedTokens !== undefined) {
+      if (data.purchasedTokens !== undefined && data.purchasedTokens !== state.purchasedTokens) {
         state.purchasedTokens = data.purchasedTokens;
       }
-      if (data.freeTokens !== undefined) {
+      if (data.freeTokens !== undefined && data.freeTokens !== state.freeTokens) {
         state.freeTokens = data.freeTokens;
       }
-      if (data.lastTokenResetDate !== undefined) {
+      if (data.lastTokenResetDate !== undefined && data.lastTokenResetDate !== state.lastTokenResetDate) {
         state.lastTokenResetDate = data.lastTokenResetDate;
       }
       
-      if (data.subscription) {
+      // 구독 정보 업데이트
+      if (data.subscription && JSON.stringify(data.subscription) !== JSON.stringify(state.subscription)) {
         state.subscription = data.subscription;
         state.subscriptionPlan = data.subscription.plan === 'basic' ? 'premium' : data.subscription.plan;
       }
       
-      if (data.settings) {
+      // 설정 업데이트
+      if (data.settings && JSON.stringify(data.settings) !== JSON.stringify(state.settings)) {
         state.settings = { ...state.settings, ...data.settings };
       }
+      
+      // 토큰 히스토리는 메모리에만 유지하므로 제외
     },
     
     // 토큰 정보만 업데이트 - 최적화
