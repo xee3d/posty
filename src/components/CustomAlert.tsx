@@ -122,7 +122,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                   }
                 ]}
               >
-                <Icon name={icon} size={48} color={iconColor || colors.primary} />
+                <Icon name={icon} size={40} color={iconColor || colors.primary} />
               </Animated.View>
             </View>
           )}
@@ -138,7 +138,8 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
           {/* 버튼들 */}
           <View style={[
             styles.buttonContainer,
-            buttons.length > 1 && styles.multipleButtons
+            buttons.length === 2 && styles.twoButtons,
+            buttons.length >= 3 && styles.threeButtons
           ]}>
             {buttons.map((button, index) => (
               <TouchableOpacity
@@ -147,7 +148,9 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                   styles.button,
                   button.style === 'cancel' && styles.cancelButton,
                   button.style === 'destructive' && styles.destructiveButton,
-                  buttons.length > 1 && index === 0 && styles.firstButton,
+                  buttons.length === 2 && index === 0 && styles.firstButtonTwo,
+                  buttons.length >= 3 && styles.buttonThree,
+                  buttons.length >= 3 && index === 0 && { marginTop: 0 },
                 ]}
                 onPress={button.onPress}
                 activeOpacity={0.8}
@@ -192,43 +195,46 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     borderColor: isDark ? colors.border : 'transparent',
   },
   iconContainer: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     backgroundColor: colors.primary + '20',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 16,
     overflow: 'hidden',
   },
   title: {
-    fontSize: 22,
-    fontWeight: '800',
+    fontSize: 20,
+    fontWeight: '700',
     color: colors.text.primary,
-    marginBottom: 12,
+    marginBottom: 10,
     textAlign: 'center',
-    letterSpacing: -0.5,
+    letterSpacing: -0.3,
   },
   message: {
-    fontSize: 16,
+    fontSize: 15,
     color: colors.text.secondary,
     textAlign: 'center',
-    lineHeight: 24,
-    marginBottom: 28,
-    paddingHorizontal: 10,
+    lineHeight: 22,
+    marginBottom: 24,
+    paddingHorizontal: 8,
   },
   buttonContainer: {
     width: '100%',
   },
-  multipleButtons: {
+  twoButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  threeButtons: {
+    flexDirection: 'column',
+  },
   button: {
     backgroundColor: colors.primary,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    borderRadius: 16,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 14,
     minWidth: 100,
     alignItems: 'center',
     shadowColor: colors.primary,
@@ -237,15 +243,20 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     shadowRadius: 8,
     elevation: 5,
   },
-  firstButton: {
+  firstButtonTwo: {
     marginRight: 12,
     flex: 1,
+  },
+  buttonThree: {
+    width: '100%',
+    marginTop: 10,
+    shadowOpacity: 0.15,
+    elevation: 2,
   },
   cancelButton: {
     backgroundColor: isDark ? colors.surface : colors.lightGray,
     borderWidth: 1.5,
     borderColor: colors.border,
-    flex: 1,
     shadowOpacity: 0,
     elevation: 0,
   },
@@ -266,9 +277,9 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     color: colors.white,
   },
   iconWrapper: {
-    width: 88,
-    height: 88,
-    marginBottom: 20,
+    width: 80,
+    height: 80,
+    marginBottom: 16,
     justifyContent: 'center',
     alignItems: 'center',
   },

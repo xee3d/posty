@@ -8,7 +8,6 @@ import {
   SafeAreaView,
   Image,
   Modal,
-  Alert,
   Animated,
   Dimensions,
 } from 'react-native';
@@ -20,6 +19,7 @@ import achievementService from '../services/achievementService';
 import { Achievement, ACHIEVEMENT_CATEGORIES, UserProfile } from '../types/achievement';
 import { ScaleButton, FadeInView } from '../components/AnimationComponents';
 import { soundManager } from '../utils/soundManager';
+import { Alert } from '../utils/customAlert';
 
 const { width } = Dimensions.get('window');
 

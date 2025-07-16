@@ -4,72 +4,95 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  ScrollView,
   SafeAreaView,
+  ScrollView,
 } from 'react-native';
 import { Alert } from '../utils/customAlert';
+import { showImagePicker } from '../utils/imagePicker';
 import { useAppTheme } from '../hooks/useAppTheme';
+import { SPACING } from '../utils/constants';
 
 const AlertTestScreen: React.FC = () => {
   const { colors } = useAppTheme();
 
-  const testAlerts = [
-    {
-      title: '포스티 알림',
-      message: '무엇에 대해 쓸지 알려주세요! 🤔',
-      buttons: [{ text: 'OK' }],
-    },
-    {
-      title: '성공',
-      message: '게시물이 저장되었습니다!',
-      buttons: [{ text: '확인' }],
-    },
-    {
-      title: '오류',
-      message: '게시물 저장 중 문제가 발생했습니다.',
-      buttons: [{ text: '확인' }],
-    },
-    {
-      title: '삭제 확인',
-      message: '정말로 이 게시물을 삭제하시겠습니까?',
-      buttons: [
-        { text: '취소', style: 'cancel' },
-        { text: '삭제', style: 'destructive' },
-      ],
-    },
-    {
-      title: '사진 선택',
-      message: '어떤 방법으로 사진을 선택하시겠어요?',
-      buttons: [
-        { text: '취소', style: 'cancel' },
-        { text: '카메라로 촬영' },
-        { text: '갤러리에서 선택' },
-      ],
-    },
-  ];
+  const handleImagePicker = async () => {
+    try {
+      const result = await showImagePicker({
+        title: '사진 선택',
+        quality: 0.8,
+      });
+      
+      if (!result.didCancel && result.assets && result.assets[0]) {
+        Alert.alert('성공', '사진이 선택되었습니다!', [
+          { text: '확인', style: 'default' }
+        ]);
+      }
+    } catch (error) {
+      Alert.alert('오류', '사진 선택 중 문제가 발생했습니다.', [
+        { text: '확인', style: 'default' }
+      ]);
+    }
+  };
 
-  const showTestAlert = (index: number) => {
-    const alert = testAlerts[index];
-    Alert.alert(alert.title, alert.message, alert.buttons as any);
+  const showSuccessAlert = () => {
+    Alert.alert('성공', '작업이 성공적으로 완료되었습니다!', [
+      { text: '확인', style: 'default' }
+    ]);
+  };
+
+  const showErrorAlert = () => {
+    Alert.alert('오류', '작업 중 문제가 발생했습니다.', [
+      { text: '확인', style: 'default' }
+    ]);
+  };
+
+  const showWarningAlert = () => {
+    Alert.alert('주의', '이 작업은 되돌릴 수 없습니다.', [
+      { text: '취소', style: 'cancel' },
+      { text: '계속', style: 'destructive' }
+    ]);
+  };
+
+  const showQuestionAlert = () => {
+    Alert.alert('질문', '정말로 삭제하시겠습니까?', [
+      { text: '취소', style: 'cancel' },
+      { text: '삭제', style: 'destructive' }
+    ]);
   };
 
   const styles = createStyles(colors);
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.content}>
+      <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>Alert 테스트</Text>
         
-        {testAlerts.map((alert, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.button}
-            onPress={() => showTestAlert(index)}
-          >
-            <Text style={styles.buttonTitle}>{alert.title}</Text>
-            <Text style={styles.buttonSubtitle}>{alert.message}</Text>
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>이미지 선택</Text>
+          <TouchableOpacity style={styles.button} onPress={handleImagePicker}>
+            <Text style={styles.buttonText}>사진 선택 팝업</Text>
           </TouchableOpacity>
-        ))}
+        </View>
+
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Alert 타입</Text>
+          
+          <TouchableOpacity style={[styles.button, styles.successButton]} onPress={showSuccessAlert}>
+            <Text style={styles.buttonText}>성공 Alert</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={[styles.button, styles.errorButton]} onPress={showErrorAlert}>
+            <Text style={styles.buttonText}>오류 Alert</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={[styles.button, styles.warningButton]} onPress={showWarningAlert}>
+            <Text style={styles.buttonText}>경고 Alert (2개 버튼)</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={[styles.button, styles.questionButton]} onPress={showQuestionAlert}>
+            <Text style={styles.buttonText}>질문 Alert (2개 버튼)</Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -81,31 +104,47 @@ const createStyles = (colors: any) => StyleSheet.create({
     backgroundColor: colors.background,
   },
   content: {
-    padding: 20,
+    padding: SPACING.lg,
   },
   title: {
     fontSize: 24,
     fontWeight: '700',
     color: colors.text.primary,
-    marginBottom: 20,
+    marginBottom: SPACING.xl,
   },
-  button: {
-    backgroundColor: colors.surface,
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: colors.border,
+  section: {
+    marginBottom: SPACING.xl,
   },
-  buttonTitle: {
-    fontSize: 16,
+  sectionTitle: {
+    fontSize: 18,
     fontWeight: '600',
     color: colors.text.primary,
-    marginBottom: 4,
+    marginBottom: SPACING.md,
   },
-  buttonSubtitle: {
-    fontSize: 14,
-    color: colors.text.secondary,
+  button: {
+    backgroundColor: colors.primary,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.lg,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  buttonText: {
+    color: colors.white,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  successButton: {
+    backgroundColor: '#10B981',
+  },
+  errorButton: {
+    backgroundColor: '#EF4444',
+  },
+  warningButton: {
+    backgroundColor: '#F59E0B',
+  },
+  questionButton: {
+    backgroundColor: '#3B82F6',
   },
 });
 

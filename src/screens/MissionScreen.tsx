@@ -6,13 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   RefreshControl,
-  Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import missionService, { Mission } from '../services/missionService';
 import { useSubscription } from '../contexts/SubscriptionContext';
 import ProgressBar from '../components/ProgressBar';
 import AchievementsView from '../components/AchievementsView';
+import { Alert } from '../utils/customAlert';
 
 interface MissionItemProps {
   mission: Mission;

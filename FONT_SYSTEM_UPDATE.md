@@ -1,79 +1,175 @@
-# Posty React Native 0.74.5 - 폰트 시스템 업데이트
+# Font System 업데이트 가이드
 
-## 🎯 해결된 문제
+## 개요
+React Native에서 `fontFamily: 'System'`은 지원되지 않습니다. 이 문서는 올바른 시스템 폰트 사용 방법을 설명합니다.
 
-React Native에서 `fontFamily: 'System'`이 지원되지 않는 문제를 해결했습니다.
+## ✅ 현재 구현 상태
+프로젝트에서 이미 플랫폼별 시스템 폰트 처리가 구현되어 있습니다.
 
-## 📁 변경된 파일
+### 구현 위치
+- `src/utils/fonts/index.ts`
 
-### 새로 생성된 파일
-- `src/utils/fonts/index.ts` - 플랫폼별 폰트 시스템
-- `src/utils/fonts/FONT_GUIDE.md` - 폰트 사용 가이드
+## 시스템 폰트 사용 방법
 
-### 수정된 파일
-- `src/utils/theme.tsx` - 폰트 설정을 fonts 모듈로 분리
-- `src/utils/constants.ts` - FONTS export를 fonts 모듈로 연결
-- `src/styles/commonStyles.ts` - getFontStyle() 함수 사용으로 변경
-
-## 🔧 주요 변경사항
-
-### 1. 플랫폼별 폰트 자동 선택
+### 1. iOS 시스템 폰트
 ```typescript
-// iOS: 시스템 폰트 (San Francisco) 자동 사용
-// Android: Roboto 폰트 패밀리 명시
-const fontFamily = Platform.OS === 'ios' ? undefined : 'Roboto';
+// iOS는 fontFamily를 undefined로 설정하면 시스템 폰트 사용
+const styles = {
+  text: {
+    fontFamily: undefined,  // San Francisco 폰트 자동 사용
+    fontWeight: '400',     // fontWeight로 굵기 조절
+  }
+}
 ```
 
-### 2. 새로운 폰트 스타일 함수
+### 2. Android 시스템 폰트
 ```typescript
-import { getFontStyle } from '@/utils/fonts';
-
-// 사용 예시
-const styles = StyleSheet.create({
+// Android는 Roboto 폰트 패밀리 명시
+const styles = {
   text: {
-    ...getFontStyle('md', 'regular'), // 크기와 굵기 지정
-    color: colors.text.primary,
+    fontFamily: 'Roboto',  // 기본 Roboto
+    // 또는
+    fontFamily: 'Roboto-Medium',  // 중간 굵기
+    fontFamily: 'Roboto-Bold',    // 굵은 글씨
+  }
+}
+```
+
+### 3. 크로스 플랫폼 헬퍼 함수 사용 (권장)
+```typescript
+import { getFontStyle, TEXT_STYLES } from '../utils/fonts';
+
+// 방법 1: getFontStyle 헬퍼 사용
+const styles = StyleSheet.create({
+  title: {
+    ...getFontStyle('xl', 'bold'),  // 크기와 굵기 지정
+    color: '#000',
   },
+  body: {
+    ...getFontStyle('md', 'regular'),
+    color: '#333',
+  }
+});
+
+// 방법 2: 미리 정의된 스타일 사용
+const styles = StyleSheet.create({
+  title: {
+    ...TEXT_STYLES.h1,  // 제목 1 스타일
+    color: '#000',
+  },
+  subtitle: {
+    ...TEXT_STYLES.h3,  // 제목 3 스타일
+    color: '#666',
+  },
+  body: {
+    ...TEXT_STYLES.body,  // 본문 스타일
+    color: '#333',
+  }
 });
 ```
 
-### 3. 사전 정의된 텍스트 스타일
+## 사용 가능한 폰트 굵기
+
+### iOS (fontWeight 사용)
+- `'100'` - Thin
+- `'300'` - Light
+- `'400'` - Regular
+- `'500'` - Medium
+- `'700'` - Bold
+
+### Android (fontFamily 사용)
+- `'Roboto-Thin'`
+- `'Roboto-Light'`
+- `'Roboto'` (Regular)
+- `'Roboto-Medium'`
+- `'Roboto-Bold'`
+
+## 미리 정의된 텍스트 스타일
+
 ```typescript
-import { TEXT_STYLES } from '@/utils/fonts';
+// 제목
+TEXT_STYLES.h1  // 32px, bold
+TEXT_STYLES.h2  // 24px, bold
+TEXT_STYLES.h3  // 20px, bold
+TEXT_STYLES.h4  // 18px, medium
+TEXT_STYLES.h5  // 16px, medium
+TEXT_STYLES.h6  // 14px, medium
 
-// 사용 예시
-<Text style={TEXT_STYLES.h1}>제목</Text>
-<Text style={TEXT_STYLES.body}>본문</Text>
-<Text style={TEXT_STYLES.caption}>캡션</Text>
+// 본문
+TEXT_STYLES.body        // 16px, regular
+TEXT_STYLES.bodyLarge   // 18px, regular
+TEXT_STYLES.bodySmall   // 14px, regular
+
+// 캡션
+TEXT_STYLES.caption      // 12px, regular
+TEXT_STYLES.captionBold  // 12px, medium
+
+// 버튼
+TEXT_STYLES.button       // 16px, medium
+TEXT_STYLES.buttonSmall  // 14px, medium
+TEXT_STYLES.buttonLarge  // 18px, medium
+
+// 링크
+TEXT_STYLES.link        // 16px, regular, underline
 ```
 
-## ✅ 다음 단계
+## 주의사항
 
-1. **전체 프로젝트 검토**: 모든 컴포넌트에서 폰트 사용을 새로운 시스템으로 마이그레이션
-2. **테스트**: iOS와 Android 모두에서 폰트가 올바르게 표시되는지 확인
-3. **성능 최적화**: 폰트 로딩 및 렌더링 성능 모니터링
+1. **절대 사용하지 말아야 할 것**:
+   ```typescript
+   // ❌ 잘못된 방법
+   fontFamily: 'System'
+   fontFamily: 'San Francisco'
+   fontFamily: 'SF Pro Display'
+   ```
 
-## 📱 테스트 방법
+2. **커스텀 폰트 사용 시**:
+   - 폰트 파일을 프로젝트에 추가
+   - `react-native.config.js`에 폰트 경로 설정
+   - `npx react-native-asset` 실행
 
-```bash
-# Android 실행
-cd C:\Users\xee3d\Documents\Posty_V74
-npx react-native run-android
+3. **성능 최적화**:
+   - 폰트 스타일을 재사용하여 스타일 객체 생성 최소화
+   - `getFontStyle` 함수 사용으로 일관성 유지
 
-# iOS 실행 (Mac에서만 가능)
-cd C:\Users\xee3d\Documents\Posty_V74
-cd ios && pod install && cd ..
-npx react-native run-ios
+## 마이그레이션 가이드
+
+기존 코드에서 `fontFamily: 'System'`을 사용하는 경우:
+
+```typescript
+// Before
+const styles = StyleSheet.create({
+  text: {
+    fontFamily: 'System',
+    fontSize: 16,
+    fontWeight: '500',
+  }
+});
+
+// After
+import { getFontStyle } from '../utils/fonts';
+
+const styles = StyleSheet.create({
+  text: {
+    ...getFontStyle('md', 'medium'),
+    // 또는 직접 지정
+    fontSize: 16,
+    fontWeight: '500',  // iOS
+    fontFamily: Platform.OS === 'android' ? 'Roboto-Medium' : undefined,
+  }
+});
 ```
 
-## 🚨 주의사항
+## 문제 해결
 
-1. **fontFamily: 'System'을 직접 사용하지 마세요** - 대신 getFontStyle() 사용
-2. **폰트 크기는 정의된 크기 사용** - xs, sm, md, lg, xl, xxl, xxxl
-3. **커스텀 폰트 추가시** - fonts/index.ts 파일 수정
+1. **Android에서 폰트가 적용되지 않는 경우**:
+   - Roboto 폰트가 기기에 설치되어 있는지 확인
+   - fontFamily 철자 확인 (대소문자 구분)
 
-## 📚 참고 문서
+2. **iOS에서 폰트가 이상하게 보이는 경우**:
+   - fontFamily를 undefined로 설정했는지 확인
+   - fontWeight 값이 문자열인지 확인 ('400', not 400)
 
-- [React Native Typography](https://reactnative.dev/docs/text-style-props)
-- [Platform Specific Code](https://reactnative.dev/docs/platform-specific-code)
-- 프로젝트 내부 문서: `src/utils/fonts/FONT_GUIDE.md`
+3. **텍스트가 잘리는 경우**:
+   - Android: `includeFontPadding: false` 설정
+   - lineHeight 값 조정

@@ -7,7 +7,6 @@ import {
   StyleSheet,
   SafeAreaView,
   RefreshControl,
-  Alert,
 } from 'react-native';
 import { Post, Platform } from '../types';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, PLATFORMS, MOLLY_MESSAGES, BRAND, CARD_THEME, DARK_COLORS } from '../utils/constants';
@@ -32,6 +31,7 @@ import firestoreService from '../services/firebase/firestoreService';
 import { Post as FirestorePost } from '../types/firestore';
 import { SyncIndicator } from '../components/SyncIndicator';
 import { useScreenTracking } from '../hooks/analytics/useScreenTracking';
+import { Alert } from '../utils/customAlert';
 
 interface HomeScreenProps {
   onNavigate: (tab: string, content?: any) => void;

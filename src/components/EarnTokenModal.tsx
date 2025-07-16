@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Modal,
-  Alert,
   ActivityIndicator,
   Platform,
 } from 'react-native';
@@ -18,6 +17,7 @@ import { ScaleButton, FadeInView } from './AnimationComponents';
 import { soundManager } from '../utils/soundManager';
 // import DeviceInfo from 'react-native-device-info'; // 설치 필요
 import { Linking, Share } from 'react-native';
+import { Alert } from '../utils/customAlert';
 // import crypto from 'crypto-js'; // 설치 필요
 
 interface EarnTokenModalProps {

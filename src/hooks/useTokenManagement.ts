@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Alert } from '../utils/customAlert';
 import { useAppSelector, useAppDispatch } from './redux';
 import { selectCurrentTokens, selectSubscriptionPlan, useTokens, earnTokens } from '../store/slices/userSlice';
 import tokenService from '../services/subscription/tokenService';
