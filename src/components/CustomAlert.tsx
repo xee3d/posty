@@ -290,7 +290,9 @@ class AlertManager {
   private static alertRef: any = null;
 
   static setAlertRef(ref: any) {
-    console.log('AlertManager.setAlertRef called with:', ref);
+    if (__DEV__) {
+      console.log('AlertManager.setAlertRef called');
+    }
     this.alertRef = ref;
   }
 
@@ -307,8 +309,13 @@ class AlertManager {
       iconColor?: string;
     }
   ) {
-    console.log('AlertManager.show called with:', { title, message, buttons, options });
-    console.log('Current alertRef:', this.alertRef);
+    if (__DEV__) {
+      console.log('AlertManager.show called with:', { 
+        title, 
+        message: message?.substring(0, 30) + (message?.length > 30 ? '...' : ''), 
+        buttonsCount: buttons?.length || 0 
+      });
+    }
     
     if (this.alertRef && this.alertRef.show) {
       this.alertRef.show({ title, message, buttons, ...options });

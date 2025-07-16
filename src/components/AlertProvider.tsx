@@ -18,10 +18,18 @@ export const AlertProvider = forwardRef((props: { children: React.ReactNode }, r
   const [visible, setVisible] = useState(false);
 
   useImperativeHandle(ref, () => {
-    console.log('AlertProvider useImperativeHandle called');
+    if (__DEV__) {
+      console.log('AlertProvider useImperativeHandle called');
+    }
     return {
       show: (config: AlertConfig) => {
-        console.log('AlertProvider.show called with:', config);
+        if (__DEV__) {
+          console.log('AlertProvider.show called with:', {
+            title: config.title,
+            message: config.message?.substring(0, 30) + (config.message?.length > 30 ? '...' : ''),
+            buttonsCount: config.buttons?.length || 0
+          });
+        }
         setAlertConfig(config);
         setVisible(true);
       },

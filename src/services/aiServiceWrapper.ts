@@ -1,5 +1,7 @@
 // AI 서비스 래퍼 - 서버 API 사용
 import serverAIService from './serverAIService';
+import localAIService from './localAIService';
+import API_CONFIG from '../config/api';
 import { 
   GenerateContentParams, 
   PolishContentParams, 
@@ -14,6 +16,12 @@ class AIServiceWrapper {
   // 콘텐츠 생성
   async generateContent(params: GenerateContentParams): Promise<GeneratedContent> {
     console.log('AIServiceWrapper: Generating content with params:', params);
+    
+    // 로컬 모드 사용 여부 확인
+    if (!API_CONFIG.USE_SERVER) {
+      console.log('Using local AI service');
+      return localAIService.generateContent(params);
+    }
     
     try {
       // 플랫폼별로 프롬프트 강화
@@ -105,37 +113,173 @@ class AIServiceWrapper {
   
   // 이미지 분석
   async analyzeImage(params: AnalyzeImageParams): Promise<ImageAnalysis> {
-    console.log('AIServiceWrapper: Analyzing image');
+    console.log('AIServiceWrapper: Analyzing image', {
+      hasImageUri: !!params.imageUri,
+      hasBase64: !!params.base64Image,
+      imageSize: params.imageUri ? (params.imageUri.length / 1024).toFixed(2) + ' KB' : 'N/A'
+    });
     
     try {
-      // 서버에 이미지 분석 API가 있다면 사용
-      if (params.base64Image) {
-        const description = await serverAIService.analyzeImage(params.base64Image);
-        return {
-          description,
-          objects: [],
-          mood: 'neutral',
-          suggestedContent: ['이미지와 함께하는 포스팅'],
-        };
+      // imageUri 또는 base64Image 파라미터 확인
+      const imageData = params.base64Image || params.imageUri;
+      
+      if (!imageData) {
+        console.error('No image data provided');
+        return this.getDefaultAnalysis();
       }
       
-      // 기본 응답
-      return {
-        description: '아름다운 사진이네요!',
-        objects: [],
-        mood: 'positive',
-        suggestedContent: ['오늘의 순간', '일상의 기록'],
-      };
+      // base64 형식인지 확인 (data:image로 시작하는지)
+      const isBase64 = imageData.startsWith('data:image');
+      
+      if (isBase64) {
+        console.log('Analyzing base64 image...');
+        console.log('Image data length:', imageData.length);
+        
+        // 이미지 크기 체크 (대략적인 계산)
+        const sizeInMB = (imageData.length * 0.75) / (1024 * 1024);
+        console.log('Estimated image size:', sizeInMB.toFixed(2), 'MB');
+        
+        if (sizeInMB > 4) {
+          console.warn('Image too large for analysis');
+          return this.getSmartDefaultAnalysis('이미지가 너무 큽니다. 더 작은 이미지를 선택해주세요.');
+        }
+        
+        try {
+          // base64 prefix 제거
+          const base64Data = imageData.split(',')[1] || imageData;
+          const description = await serverAIService.analyzeImage(base64Data);
+          
+          console.log('Server analysis result:', description);
+          
+          // 유효한 분석인지 확인
+          if (description && description.length > 30 && 
+              !description.includes('목업') && 
+              !description.includes('파스텔톤') &&
+              !description.includes('이 사진 속')) {
+            return {
+              description,
+              objects: this.extractObjects(description),
+              mood: this.detectMood(description),
+              suggestedContent: this.generateSuggestedContent(description),
+            };
+          } else {
+            console.log('Invalid or generic analysis, using smart default');
+            return this.getSmartDefaultAnalysis();
+          }
+        } catch (error) {
+          console.error('Server analysis failed:', error);
+          return this.getSmartDefaultAnalysis();
+        }
+      } else {
+        // URI 형식인 경우 (file:// 등) - 기본 메시지 제공
+        console.log('Image URI provided, but base64 conversion needed');
+        return this.getSmartDefaultAnalysis();
+      }
     } catch (error) {
       console.error('AIServiceWrapper analyze error:', error);
-      // 폴백
-      return {
-        description: '사진을 분석하고 있습니다...',
-        objects: [],
-        mood: 'neutral',
-        suggestedContent: ['사진과 함께하는 이야기'],
-      };
+      return this.getDefaultAnalysis();
     }
+  }
+  
+  // 스마트한 기본 분석 생성
+  private getSmartDefaultAnalysis(customMessage?: string): ImageAnalysis {
+    const hour = new Date().getHours();
+    const timeOfDay = hour < 12 ? '아침' : hour < 18 ? '오후' : '저녁';
+    const day = new Date().getDay();
+    const isWeekend = day === 0 || day === 6;
+    
+    const descriptions = [
+      `${timeOfDay}의 특별한 순간이 담긴 사진이네요! 어떤 이야기가 숨어있나요?`,
+      '일상 속에서 발견한 아름다운 장면이 인상적이에요.',
+      '사진 속 분위기가 참 좋네요. 이 순간의 느낌을 글로 표현해보세요.',
+      '멋진 구도와 색감이 돋보이는 사진이에요!',
+      '이 사진이 전하고 싶은 메시지가 무엇인가요?',
+      isWeekend ? '주말의 여유가 느껴지는 사진이네요!' : '일상의 소중한 순간을 포착하셨네요!',
+    ];
+    
+    const randomDesc = customMessage || descriptions[Math.floor(Math.random() * descriptions.length)];
+    
+    return {
+      description: randomDesc,
+      objects: [],
+      mood: 'positive',
+      suggestedContent: [
+        `${timeOfDay}의 일상`,
+        isWeekend ? '주말 스냅' : '데일리 로그',
+        '오늘의 특별한 순간',
+        '일상 속 소확행',
+        '나만의 이야기',
+      ].slice(0, 3),
+    };
+  }
+  
+  // 분석 결과로부터 제안 콘텐츠 생성
+  private generateSuggestedContent(description: string): string[] {
+    const suggestions = [];
+    const lowerDesc = description.toLowerCase();
+    
+    // 키워드 기반 제안
+    if (lowerDesc.includes('카페') || lowerDesc.includes('커피') || lowerDesc.includes('coffee')) {
+      suggestions.push('카페 일상', '오늘의 커피', '힐링 타임');
+    }
+    if (lowerDesc.includes('음식') || lowerDesc.includes('맛') || lowerDesc.includes('food')) {
+      suggestions.push('맛있는 한 끼', '오늘의 메뉴', '푸드 다이어리');
+    }
+    if (lowerDesc.includes('풍경') || lowerDesc.includes('자연') || lowerDesc.includes('nature')) {
+      suggestions.push('자연과 함께', '힐링 풍경', '여행의 순간');
+    }
+    if (lowerDesc.includes('사람') || lowerDesc.includes('친구') || lowerDesc.includes('people')) {
+      suggestions.push('함께한 시간', '소중한 사람들', '우정 기록');
+    }
+    if (lowerDesc.includes('밤') || lowerDesc.includes('야경') || lowerDesc.includes('night')) {
+      suggestions.push('도시의 밤', '야경 스냅', '밤의 정취');
+    }
+    
+    // 기본 제안 추가
+    if (suggestions.length === 0) {
+      suggestions.push('일상 기록', '오늘의 이야기', '특별한 순간');
+    }
+    
+    return suggestions.slice(0, 3);
+  }
+  
+  // 객체 추출
+  private extractObjects(description: string): string[] {
+    const objects = [];
+    const keywords = ['사람', '카페', '음식', '풍경', '건물', '하늘', '바다', '꽃', '나무', '동물'];
+    
+    keywords.forEach(keyword => {
+      if (description.includes(keyword)) {
+        objects.push(keyword);
+      }
+    });
+    
+    return objects;
+  }
+  
+  // 분위기 감지
+  private detectMood(description: string): 'positive' | 'neutral' | 'negative' {
+    const positiveWords = ['아름답', '멋진', '좋은', '행복', '따뜻', '밝은', '화사', '평화'];
+    const negativeWords = ['어두운', '쓸쓸', '외로운', '슬픈', '우울'];
+    
+    const lowerDesc = description.toLowerCase();
+    
+    const positiveCount = positiveWords.filter(word => lowerDesc.includes(word)).length;
+    const negativeCount = negativeWords.filter(word => lowerDesc.includes(word)).length;
+    
+    if (positiveCount > negativeCount) return 'positive';
+    if (negativeCount > positiveCount) return 'negative';
+    return 'neutral';
+  }
+  
+  // 기본 분석 결과
+  private getDefaultAnalysis(): ImageAnalysis {
+    return {
+      description: '사진을 분석할 수 없습니다. 다시 시도해주세요.',
+      objects: [],
+      mood: 'neutral',
+      suggestedContent: ['다시 시도하기'],
+    };
   }
   
   // Polish 프롬프트 생성

@@ -95,7 +95,9 @@ const App: React.FC = () => {
     // 약간의 지연을 주어 ref가 확실히 설정되도록 함
     const timer = setTimeout(() => {
       if (alertRef.current) {
-        console.log('Setting AlertManager ref:', alertRef.current);
+        if (__DEV__) {
+          console.log('Setting AlertManager ref');
+        }
         AlertManager.setAlertRef(alertRef.current);
       } else {
         console.error('AlertRef is still null after timeout');

@@ -19,7 +19,9 @@ class CustomAlertHelper {
     buttons?: AlertButton[],
     options?: AlertOptions
   ) {
-    console.log('CustomAlert.alert called:', { title, message, buttons });
+    if (__DEV__) {
+      console.log('CustomAlert.alert called:', { title, message, buttons: buttons?.length || 0 });
+    }
     
     // 메시지가 없으면 title을 message로 사용
     const finalMessage = message || title || '';
@@ -48,7 +50,13 @@ class CustomAlertHelper {
       iconColor = '#6366F1';
     }
     
-    console.log('Calling AlertManager.show with:', { finalTitle, finalMessage, buttons, icon, iconColor });
+    if (__DEV__) {
+      console.log('Calling AlertManager.show with:', { 
+        title: finalTitle, 
+        message: finalMessage?.substring(0, 50) + (finalMessage?.length > 50 ? '...' : ''), 
+        buttonsCount: buttons?.length || 0 
+      });
+    }
     
     try {
       AlertManager.show(

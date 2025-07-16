@@ -129,24 +129,73 @@ class ServerAIService {
   // 이미지 분석 (서버 API 호출)
   async analyzeImage(imageBase64: string): Promise<string> {
     try {
-      const response = await fetch(getApiUrl('/analyze-image'), {
+      // 서버에 이미지 분석 엔드포인트가 없으므로,
+      // 이미지 분석을 포함한 콘텐츠 생성 요청으로 대체
+      console.log('Analyzing image through content generation...');
+      console.log('Image data length:', imageBase64.length);
+      console.log('Estimated image size:', (imageBase64.length * 0.75 / 1024 / 1024).toFixed(2), 'MB');
+      
+      const requestBody = {
+        prompt: '사진을 보고 사진에 대한 설명을 한국어로 자연스럽게 작성해주세요. 사진 속 분위기, 배경, 주요 요소들을 포함해서 설명해주세요.',
+        image: imageBase64, // imageBase64 대신 image로 변경
+        platform: 'instagram',
+        tone: 'casual',
+        length: 'short'
+      };
+      
+      // 개발 모드에서만 상세 로그 출력
+      if (__DEV__) {
+        console.log('Request body size:', JSON.stringify(requestBody).length);
+        console.log('API URL:', getApiUrl(API_CONFIG.ENDPOINTS.GENERATE));
+      }
+      
+      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.GENERATE), {
         method: 'POST',
         headers: getAuthHeader(),
-        body: JSON.stringify({
-          imageBase64: imageBase64,
-          platform: 'instagram',
-          tone: 'casual'
-        }),
+        body: JSON.stringify(requestBody),
       });
       
-      const data = await response.json();
+      console.log('Response status:', response.status);
       
-      if (!response.ok || !data.success) {
-        console.log('Image analysis failed, using fallback');
+      // 응답 텍스트 확인
+      const responseText = await response.text();
+      if (__DEV__) {
+        console.log('Response text (first 200 chars):', responseText.substring(0, 200));
+      }
+      
+      // JSON 파싱 시도
+      let data;
+      try {
+        data = JSON.parse(responseText);
+        if (__DEV__) {
+          console.log('Parsed response data:', {
+            success: data.success,
+            hasContent: !!data.data?.content,
+            contentLength: data.data?.content?.length || 0
+          });
+        }
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.log('Response was not JSON.');
         return '멋진 사진이네요! 이 순간을 포착하신 센스가 돋보입니다.';
       }
       
-      return data.data.description;
+      if (!response.ok || !data.success) {
+        console.log('Image analysis failed:', data.error || data.message);
+        if (data.details) {
+          console.log('Error details:', data.details);
+        }
+        return '멋진 사진이네요! 이 순간을 포착하신 센스가 돋보입니다.';
+      }
+      
+      // content에서 분석 결과만 추출
+      const content = data.data?.content || '';
+      // 해시태그 제거
+      const description = content.replace(/#\S+/g, '').trim();
+      
+      console.log('Image analysis result:', description);
+      
+      return description || '멋진 사진이네요! 어떤 이야기가 담겨있나요?';
       
     } catch (error) {
       console.error('Image analysis error:', error);
