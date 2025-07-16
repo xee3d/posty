@@ -35,6 +35,18 @@ function checkRateLimit(clientId) {
 }
 
 export default async function handler(req, res) {
+  // 환경 변수 체크 (디버깅용)
+  console.log('Environment check:', {
+    hasOpenAI: !!process.env.OPENAI_API_KEY,
+    hasAppSecret: !!process.env.APP_SECRET,
+    nodeEnv: process.env.NODE_ENV
+  });
+  
+  // CORS 헤더 설정
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  
   // CORS preflight 요청 처리
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -46,7 +58,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, tone, platform, model = 'gpt-3.5-turbo', language = 'ko', length = 'medium' } = req.body;
+    const { prompt, tone, platform, model, language = 'ko', length = 'medium', image } = req.body;
     
     // 입력 검증
     if (!prompt || prompt.trim().length === 0) {
@@ -122,8 +134,108 @@ export default async function handler(req, res) {
       long: 600
     };
     
-    // OpenAI API 호출 (fetch 사용)
-    console.log('Calling OpenAI API with length:', length);
+    // 이미지가 있는 경우 Vision API 사용
+    let messages;
+    let apiModel = model || 'gpt-3.5-turbo';
+    
+    if (image) {
+      console.log('Image detected, using Vision-capable model');
+      console.log('Image data length:', image.length);
+      console.log('Image data prefix:', image.substring(0, 100));
+      
+      // base64 유효성 검사
+      const isValidBase64 = /^data:image\/(png|jpeg|jpg|gif);base64,/.test(image);
+      if (!isValidBase64 && !image.startsWith('data:')) {
+        console.log('Invalid image format, attempting to fix...');
+      }
+      
+      // 이미지 크기 체크 (4MB 제한)
+      const imageSizeInBytes = (image.length * 3) / 4;
+      const imageSizeInMB = imageSizeInBytes / (1024 * 1024);
+      console.log('Estimated image size:', imageSizeInMB.toFixed(2), 'MB');
+      
+      if (imageSizeInMB > 4) {
+        return res.status(400).json({
+          success: false,
+          error: 'Image too large. Please use an image under 4MB.',
+          details: {
+            sizeInMB: imageSizeInMB.toFixed(2),
+            maxSizeMB: 4
+          }
+        });
+      }
+      
+      // Vision 모델 사용 - 비용 효율적인 순서로
+      const visionModels = ['gpt-4o-mini', 'gpt-4o', 'gpt-4-turbo'];
+      apiModel = visionModels[0]; // 'gpt-4o-mini' 먼저 사용 (비용 절감)
+      console.log('Switching to Vision model:', apiModel);
+      
+      // 이미지 분석용 메시지 구성
+      messages = [
+        {
+          role: 'system',
+          content: language === 'ko' 
+            ? `당신은 사진을 분석하고 SNS 콘텐츠를 만드는 AI 어시스턴트 '포스티'입니다. 
+사진을 자세히 분석하고 다음 정보를 포함하여 설명해주세요:
+1. 사진 속 인물 (나이, 표정, 의상 등)
+2. 배경과 장소
+3. 분위기와 느낌
+4. 특별한 요소나 상황
+
+그 후 이 사진에 어울리는 매력적인 SNS 글을 작성해주세요.
+톤: ${tone || 'casual'}
+길이: ${lengthGuides[length]?.ko || lengthGuides.medium.ko}`
+            : `You are 'Posty', an AI assistant that analyzes photos and creates social media content. 
+Analyze the photo in detail and include:
+1. People in the photo (age, expressions, clothing)
+2. Background and location
+3. Mood and atmosphere
+4. Special elements or situations
+
+Then create an engaging social media post for this photo.
+Tone: ${tone || 'casual'}
+Length: ${lengthGuides[length]?.en || lengthGuides.medium.en}`,
+        },
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: prompt || (language === 'ko' 
+                ? '이 사진을 분석하고 SNS에 올릴 매력적인 글을 작성해주세요. 사진의 분위기, 배경, 주요 요소들을 포함해서 설명해주세요.'
+                : 'Analyze this photo and write an engaging social media post. Include the mood, background, and key elements in the photo.'),
+            },
+            {
+              type: 'image_url',
+              image_url: {
+                url: image.startsWith('data:') ? image : `data:image/jpeg;base64,${image}`,
+                detail: 'low', // 'low'로 변경하여 비용 절감 및 성능 향상
+              },
+            },
+          ],
+        },
+      ];
+      
+      // Vision API는 max_tokens가 더 필요함
+      maxTokensMap.short = 300;
+      maxTokensMap.medium = 500;
+      maxTokensMap.long = 800;
+    } else {
+      // 텍스트만 있는 경우 기존 방식
+      messages = [
+        {
+          role: 'system',
+          content: systemPrompt,
+        },
+        {
+          role: 'user',
+          content: prompt,
+        },
+      ];
+    }
+    
+    // OpenAI API 호출
+    console.log('Calling OpenAI API with model:', apiModel);
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -132,17 +244,8 @@ export default async function handler(req, res) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: model,
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt,
-          },
-          {
-            role: 'user',
-            content: prompt,
-          },
-        ],
+        model: apiModel,
+        messages: messages,
         max_tokens: maxTokensMap[length] || 300,
         temperature: 0.8,
         presence_penalty: 0.1,
@@ -153,6 +256,102 @@ export default async function handler(req, res) {
     if (!response.ok) {
       const errorData = await response.json();
       console.error('OpenAI API Error:', errorData);
+      
+      // Vision 모델이 실패하면 다른 모델 시도
+      if (image && errorData.error) {
+        console.log('Vision model error:', errorData.error.code, errorData.error.message);
+        
+        // 다른 Vision 모델 시도
+        if (errorData.error.code === 'model_not_found' || errorData.error.code === 'invalid_request_error') {
+          console.log('Trying alternative vision model: gpt-4o');
+          
+          // gpt-4o로 재시도 (더 강력한 모델)
+          const retryResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              model: 'gpt-4o',
+              messages: messages,
+              max_tokens: maxTokensMap[length] || 300,
+              temperature: 0.8,
+            }),
+          });
+          
+          if (retryResponse.ok) {
+            const retryData = await retryResponse.json();
+            return res.status(200).json({
+              success: true,
+              data: {
+                content: retryData.choices[0].message.content,
+                usage: retryData.usage,
+                model: retryData.model,
+              },
+              metadata: {
+                tone,
+                platform,
+                timestamp: new Date().toISOString(),
+              },
+            });
+          }
+        }
+        
+        // 그래도 안 되면 텍스트 모델로 폴백
+        console.log('All vision models failed, falling back to text model');
+        
+        // 텍스트 기반 이미지 설명으로 대체
+        const imageContext = language === 'ko' 
+          ? '사진에 담긴 특별한 순간을 SNS에 공유하려고 합니다.' 
+          : 'Sharing a special moment captured in this photo.';
+        
+        messages = [
+          {
+            role: 'system',
+            content: systemPrompt,
+          },
+          {
+            role: 'user',
+            content: prompt || `${imageContext} 사진 분위기에 어울리는 매력적인 SNS 글을 작성해주세요.`,
+          },
+        ];
+        
+        // 텍스트 모델로 재시도
+        const fallbackResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-3.5-turbo',
+            messages: messages,
+            max_tokens: maxTokensMap[length] || 300,
+            temperature: 0.8,
+            presence_penalty: 0.1,
+            frequency_penalty: 0.1,
+          }),
+        });
+        
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          return res.status(200).json({
+            success: true,
+            data: {
+              content: fallbackData.choices[0].message.content,
+              usage: fallbackData.usage,
+              model: fallbackData.model,
+            },
+            metadata: {
+              tone,
+              platform,
+              timestamp: new Date().toISOString(),
+              fallback: true,
+            },
+          });
+        }
+      }
       
       if (response.status === 429) {
         return res.status(429).json({

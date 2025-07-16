@@ -51,7 +51,8 @@ export interface PolishContentParams {
 }
 
 export interface AnalyzeImageParams {
-  imageUri: string;
+  imageUri?: string;
+  base64Image?: string;
 }
 
 export interface GeneratedContent {

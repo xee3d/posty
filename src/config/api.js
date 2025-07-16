@@ -1,14 +1,17 @@
 // API 설정
 const API_CONFIG = {
+  // 서버 API 사용 여부 (문제 발생 시 false로 설정)
+  USE_SERVER: true,  // 서버 사용
+  
   // 새로운 Vercel 서버 URL
-  BASE_URL: 'https://posty-server-new.vercel.app/api',
+  BASE_URL: 'https://posty-api-v2.vercel.app/api',
   
   // API 엔드포인트
   ENDPOINTS: {
     HEALTH: '/health',
-    GENERATE: '/generate',
-    GENERATE_TEST: '/generate-test', // 테스트용
-    TEST: '/test', // 간단한 테스트
+    GENERATE: '/generate',  // 정상 엔드포인트로 복구
+    GENERATE_TEST: '/generate-test',
+    TEST: '/test',
   },
   
   // 요청 타임아웃 (밀리초)
@@ -38,6 +41,7 @@ export const getAuthHeader = () => {
   return {
     'Authorization': `Bearer ${API_CONFIG.APP_SECRET}`,
     'Content-Type': 'application/json',
+    'User-Agent': 'Posty-App/1.0.0',
   };
 };
 

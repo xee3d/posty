@@ -259,19 +259,57 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     try {
       setImageAnalysis('이미지를 분석하는 중...');
       
+      // 이미지 크기 체크
+      if (imageUrl.startsWith('data:image')) {
+        const sizeInMB = (imageUrl.length * 0.75) / (1024 * 1024);
+        console.log('Image size:', sizeInMB.toFixed(2), 'MB');
+        
+        if (sizeInMB > 4) {
+          Alert.alert('알림', '이미지가 너무 큽니다. 더 작은 이미지를 선택해주세요.');
+          setImageAnalysis('이미지가 너무 큽니다.');
+          return null;
+        }
+      }
+      
       const analysis = await aiService.analyzeImage({
         imageUri: imageUrl,
       });
       
       console.log('Image analysis completed:', analysis);
-      setImageAnalysis(analysis.description);
-      setImageAnalysisResult(analysis);
+      
+      // 분석 결과 검증
+      if (analysis && analysis.description && analysis.description.length > 20) {
+        setImageAnalysis(analysis.description);
+        setImageAnalysisResult(analysis);
+        
+        // 추천 해시태그 설정
+        if (analysis.suggestedContent && analysis.suggestedContent.length > 0) {
+          const hashtags = analysis.suggestedContent.map(content => 
+            content.replace(/\s+/g, '')
+          ).slice(0, 3);
+          setSelectedHashtags(hashtags);
+        }
+      } else {
+        setImageAnalysis('사진 분석에 실패했습니다. 다시 시도해주세요.');
+      }
       
       return analysis;
     } catch (error) {
       console.error('Image analysis failed:', error);
-      setImageAnalysis('이미지 분석에 실패했습니다.');
-      return null;
+      setImageAnalysis('사진 분석 중 오류가 발생했습니다.');
+      
+      // 오류 시 기본 메시지 제공
+      const fallbackAnalysis = {
+        description: '멋진 사진이네요! 어떤 이야기를 담아볼까요?',
+        objects: [],
+        mood: 'positive',
+        suggestedContent: ['오늘의사진', '일상기록', '특별한순간'],
+      };
+      
+      setImageAnalysis(fallbackAnalysis.description);
+      setImageAnalysisResult(fallbackAnalysis);
+      
+      return fallbackAnalysis;
     }
   };
 
@@ -279,9 +317,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     const options: ImageLibraryOptions = {
       mediaType: 'photo',
       includeBase64: true,
-      maxHeight: 2000,
-      maxWidth: 2000,
-      quality: 0.8,
+      maxHeight: 1024,  // 크기 줄임
+      maxWidth: 1024,   // 크기 줄임
+      quality: 0.7,     // 품질 낮춤
     };
 
     launchImageLibrary(options, (response: ImagePickerResponse) => {
@@ -312,9 +350,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     const options: CameraOptions = {
       mediaType: 'photo',
       includeBase64: true,
-      maxHeight: 2000,
-      maxWidth: 2000,
-      quality: 0.8,
+      maxHeight: 1024,  // 크기 줄임
+      maxWidth: 1024,   // 크기 줄임
+      quality: 0.7,     // 품질 낮춤
       saveToPhotos: true,
     };
 
@@ -402,14 +440,42 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         // 객체에서 content 문자열만 추출
         result = response.content;
       } else if (writeMode === 'photo') {
-        // generateFromImage 메서드가 없으므로 generateContent 사용
-        const photoPrompt = imageAnalysis || '사진을 보고 작성하는 글';
-        console.log('Generating photo content with analysis:', photoPrompt);
+        // 사진 분석 결과를 기반으로 콘텐츠 생성
+        let photoPrompt = '';
+        
+        if (imageAnalysisResult && imageAnalysisResult.description) {
+          // 분석 결과가 있으면 사용
+          photoPrompt = `사진: ${imageAnalysisResult.description}\n\n`;
+          
+          // 분위기 추가
+          if (imageAnalysisResult.mood) {
+            const moodText = imageAnalysisResult.mood === 'positive' ? '긍정적이고 밝은' :
+                           imageAnalysisResult.mood === 'negative' ? '차분하고 여운적인' : '평온한';
+            photoPrompt += `분위기: ${moodText}\n`;
+          }
+          
+          // 사용자 입력이 있으면 추가
+          if (prompt.trim()) {
+            photoPrompt += `\n추가 요청: ${prompt.trim()}\n`;
+          }
+          
+          photoPrompt += '\n위 사진에 어울리는 매력적인 SNS 글을 작성해주세요.';
+        } else {
+          // 분석 결과가 없으면 기본 프롬프트
+          photoPrompt = imageAnalysis || '사진을 보고 SNS에 올릴 매력적인 글을 작성해주세요.';
+          if (prompt.trim()) {
+            photoPrompt += `\n\n특히 다음 내용을 포함해주세요: ${prompt.trim()}`;
+          }
+        }
+        
+        console.log('Generating photo content with prompt:', photoPrompt);
+        
         const response = await aiService.generateContent({
-          prompt: photoPrompt.trim(),
+          prompt: photoPrompt,
           tone: selectedTone as any,
           length: selectedLength,
-          hashtags: selectedHashtags.length > 0 ? selectedHashtags : (initialHashtagsList.length > 0 ? initialHashtagsList : undefined),
+          hashtags: selectedHashtags.length > 0 ? selectedHashtags : 
+                   (imageAnalysisResult?.suggestedContent || initialHashtagsList || undefined),
         });
         result = response.content;
       }
