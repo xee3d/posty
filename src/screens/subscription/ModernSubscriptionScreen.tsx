@@ -5,7 +5,8 @@ import { SUBSCRIPTION_PLANS } from '../../config/adConfig';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useAppSelector } from '../../hooks/redux';
-import { selectCurrentTokens, selectSubscriptionPlan } from '../../store/slices/userSlice';
+import { selectCurrentTokens, selectSubscriptionPlan, selectSubscriptionAutoRenew, cancelSubscription } from '../../store/slices/userSlice';
+import { useAppDispatch } from '../../hooks/redux';
 import tokenService from '../../services/subscription/tokenService';
 import inAppPurchaseService from '../../services/subscription/inAppPurchaseService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,8 +28,10 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   currentPlan = 'free' 
 }) => {
   const { colors, isDark } = useAppTheme();
+  const dispatch = useAppDispatch();
   const currentTokens = useAppSelector(selectCurrentTokens);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
+  const subscriptionAutoRenew = useAppSelector(selectSubscriptionAutoRenew);
   const [selectedPlan, setSelectedPlan] = useState<'free' | 'starter' | 'premium' | 'pro'>('premium');
   const [activeTab, setActiveTab] = useState<'subscription' | 'tokens' | 'manage'>('subscription');
   const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
@@ -310,6 +313,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           style: 'destructive',
           onPress: async () => {
             try {
+              // Redux에서 구독 취소 상태 업데이트
+              dispatch(cancelSubscription());
+              
               // TODO: 실제 구독 취소 API 호출
               // await inAppPurchaseService.cancelSubscription();
               
@@ -734,24 +740,28 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   </View>
                   
                   <View style={styles.autoRenewInfo}>
-                    <Icon name="autorenew" size={16} color={colors.text.secondary} />
-                    <Text style={styles.autoRenewText}>
-                      자동 갱신 활성화됨
+                    <Icon name="autorenew" size={16} color={subscriptionAutoRenew ? colors.text.secondary : colors.error || '#FF3B30'} />
+                    <Text style={[styles.autoRenewText, !subscriptionAutoRenew && { color: colors.error || '#FF3B30' }]}>
+                      {subscriptionAutoRenew ? '자동 갱신 활성화됨' : '자동 갱신 취소됨'}
                     </Text>
                   </View>
                 </View>
                 
-                <TouchableOpacity
-                  style={styles.cancelButton}
-                  onPress={() => handleCancelSubscription()}
-                >
-                  <Icon name="cancel" size={20} color={colors.error || '#FF3B30'} />
-                  <Text style={styles.cancelButtonText}>구독 취소</Text>
-                </TouchableOpacity>
+                {subscriptionAutoRenew && (
+                  <TouchableOpacity
+                    style={styles.cancelButton}
+                    onPress={() => handleCancelSubscription()}
+                  >
+                    <Icon name="cancel" size={20} color={colors.error || '#FF3B30'} />
+                    <Text style={styles.cancelButtonText}>구독 취소</Text>
+                  </TouchableOpacity>
+                )}
                 
                 <Text style={styles.cancelInfo}>
-                  구독을 취소해도 {formatExpiryDate(getSubscriptionExpiryDate())}까지 
-                  현재 플랜을 계속 이용할 수 있습니다.
+                  {subscriptionAutoRenew 
+                    ? `구독을 취소해도 ${formatExpiryDate(getSubscriptionExpiryDate())}까지 현재 플랜을 계속 이용할 수 있습니다.`
+                    : `구독이 취소되었으며, ${formatExpiryDate(getSubscriptionExpiryDate())}에 만료됩니다.`
+                  }
                 </Text>
               </View>
             )}

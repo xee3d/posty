@@ -47,10 +47,14 @@ export const firestoreSyncMiddleware: Middleware<{}, RootState> = store => next 
     syncTimers.token = setTimeout(async () => {
       try {
         const currentState = store.getState();
-        const tokensToSync = {
-          current: currentState.user.currentTokens,
-          total: currentState.user.tokens.total || currentState.user.currentTokens,
-        };
+        
+        // PRO 플랜은 항상 9999로 저장
+        const tokensToSync = currentState.user.subscriptionPlan === 'pro' 
+          ? { current: 9999, total: 9999 }
+          : {
+              current: currentState.user.currentTokens,
+              total: currentState.user.tokens.total || currentState.user.currentTokens,
+            };
         
         if (__DEV__) {
           console.log('[Firestore Sync] Syncing tokens:', tokensToSync);
@@ -67,7 +71,7 @@ export const firestoreSyncMiddleware: Middleware<{}, RootState> = store => next 
   }
   
   // 구독 변경 시 - 즉시 동기화 필요한 경우만
-  if (action.type === 'user/updateSubscription' && action.meta?.source !== 'firestore') {
+  if ((action.type === 'user/updateSubscription' || action.type === 'user/cancelSubscription') && action.meta?.source !== 'firestore') {
     // 기존 타이머 취소
     if (syncTimers.subscription) {
       clearTimeout(syncTimers.subscription);
@@ -94,7 +98,9 @@ export const firestoreSyncMiddleware: Middleware<{}, RootState> = store => next 
             startedAt: new Date().toISOString(),
             autoRenew: false,
           },
-          subscriptionPlan: action.payload.plan, // 실제 플랜은 action.payload.plan 사용
+          subscriptionPlan: action.type === 'user/updateSubscription' ? action.payload.plan : currentState.user.subscriptionPlan,
+          subscriptionAutoRenew: action.type === 'user/cancelSubscription' ? false : currentState.user.subscriptionAutoRenew,
+          subscriptionExpiresAt: currentState.user.subscriptionExpiresAt,
           tokens: {
             current: currentState.user.currentTokens,
             total: currentState.user.currentTokens,
@@ -129,6 +135,8 @@ export const loadUserFromFirestore = async (dispatch: any) => {
         tokens: userData.tokens,
         subscription: userData.subscription,
         subscriptionPlan: userData.subscriptionPlan, // 추가: subscriptionPlan 필드
+        subscriptionAutoRenew: userData.subscriptionAutoRenew !== undefined ? userData.subscriptionAutoRenew : true,
+        subscriptionExpiresAt: userData.subscriptionExpiresAt,
         settings: userData.settings,
       };
       
@@ -181,22 +189,28 @@ export const subscribeToFirestoreUser = (dispatch: any) => {
           const updates: any[] = [];
           
           if (userData.tokens) {
-            updates.push({
-              type: 'user/updateTokens',
-              payload: {
-                current: userData.tokens.current,
-                total: userData.tokens.total,
-              },
-              meta: { source: 'firestore' }
-            });
+            // PRO 플랜이면 토큰 업데이트 무시
+            const currentPlan = userData.subscriptionPlan || userData.subscription?.plan || 'free';
+            if (currentPlan !== 'pro') {
+              updates.push({
+                type: 'user/updateTokens',
+                payload: {
+                  current: userData.tokens.current,
+                  total: userData.tokens.total,
+                },
+                meta: { source: 'firestore' }
+              });
+            }
           }
           
           // subscriptionPlan을 우선 확인하고, 변경된 경우에만 업데이트
-          if (userData.subscriptionPlan) {
+          if (userData.subscriptionPlan || userData.subscriptionAutoRenew !== undefined || userData.subscriptionExpiresAt) {
             updates.push({
               type: 'user/updateSubscription',
               payload: {
                 plan: userData.subscriptionPlan,
+                autoRenew: userData.subscriptionAutoRenew,
+                expiresAt: userData.subscriptionExpiresAt,
               },
               meta: { source: 'firestore' }
             });

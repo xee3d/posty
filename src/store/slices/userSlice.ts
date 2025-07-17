@@ -30,6 +30,7 @@ interface UserState {
   };
   subscriptionPlan: 'free' | 'starter' | 'premium' | 'pro'; // 호환성을 위해 임시 유지
   subscriptionExpiresAt: string | null;
+  subscriptionAutoRenew: boolean; // 자동 갱신 여부 (false면 구독 취소 상태)
   
   // 토큰 정보
   tokens: {
@@ -69,6 +70,7 @@ const initialState: UserState = {
   },
   subscriptionPlan: 'free',
   subscriptionExpiresAt: null,
+  subscriptionAutoRenew: true,
   tokens: {
     current: 10,
     total: 0,
@@ -161,10 +163,14 @@ const userSlice = createSlice({
     updateSubscription: (state, action: PayloadAction<{
       plan: 'free' | 'starter' | 'premium' | 'pro';
       expiresAt?: string;
+      autoRenew?: boolean;
     }>) => {
       const previousPlan = state.subscriptionPlan;
       state.subscriptionPlan = action.payload.plan;
       state.subscriptionExpiresAt = action.payload.expiresAt || null;
+      if (action.payload.autoRenew !== undefined) {
+        state.subscriptionAutoRenew = action.payload.autoRenew;
+      }
       
       console.log('[UserSlice] Updating subscription from', previousPlan, 'to', action.payload.plan);
       
@@ -237,11 +243,12 @@ const userSlice = createSlice({
         }
         
         console.log('[UserSlice] PREMIUM plan activated: tokens =', state.currentTokens);
-      } else if (action.payload.plan === 'pro' && previousPlan !== 'pro') {
-        // MAX (Pro): 무제한
+      } else if (action.payload.plan === 'pro') {
+        // PRO: 무제한 (항상 9999로 유지)
         state.currentTokens = 9999;
         state.freeTokens = 9999;
-        state.tokens.current = state.currentTokens;
+        state.tokens.current = 9999;
+        state.purchasedTokens = 0; // PRO는 구매 토큰 필요 없음
         console.log('[UserSlice] PRO plan activated: unlimited tokens');
       } else if (action.payload.plan === 'free' && previousPlan !== 'free') {
         // 다운그레이드 시: 구매한 토큰은 유지, 무료 토큰만 10개로 조정
@@ -263,7 +270,20 @@ const userSlice = createSlice({
     
     // 토큰 사용 - 최적화: 토큰 히스토리 관리 개선
     useTokens: (state, action: PayloadAction<number>) => {
-      if (state.subscriptionPlan === 'pro') return;
+      // PRO 플랜은 무제한이므로 토큰 차감 안함
+      if (state.subscriptionPlan === 'pro') {
+        // 히스토리만 추가
+        const newHistory: TokenHistory = {
+          id: Date.now().toString(),
+          date: new Date().toISOString(),
+          type: 'use',
+          amount: -action.payload,
+          description: 'AI 콘텐츠 생성',
+          balance: 9999, // 항상 무제한
+        };
+        state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
+        return;
+      }
       
       const amount = action.payload;
       if (state.currentTokens >= amount) {
@@ -368,13 +388,29 @@ const userSlice = createSlice({
           state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
           
         } else if (state.subscriptionPlan === 'pro') {
-          // MAX: 무제한 (리셋 불필요)
+          // PRO: 무제한 유지 (리셋 불필요)
           state.currentTokens = 9999;
           state.freeTokens = 9999;
+          state.tokens.current = 9999;
         }
         
         state.lastTokenResetDate = today;
       }
+    },
+    
+    // 구독 취소
+    cancelSubscription: (state) => {
+      state.subscriptionAutoRenew = false;
+      // 구독 취소 히스토리 추가
+      const newHistory: TokenHistory = {
+        id: Date.now().toString(),
+        date: new Date().toISOString(),
+        type: 'earn',
+        amount: 0,
+        description: `${state.subscriptionPlan.toUpperCase()} 플랜 구독 취소`,
+        balance: state.currentTokens,
+      };
+      state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
     },
     
     // 리워드로 토큰 획득
@@ -421,15 +457,24 @@ const userSlice = createSlice({
         state.provider = data.provider;
       }
       
-      // 토큰 정보 업데이트
+      // 토큰 정보 업데이트 (PRO 플랜은 항상 9999)
       if (data.tokens && (data.tokens.current !== state.tokens.current || data.tokens.total !== state.tokens.total)) {
-        state.tokens = data.tokens;
-        state.currentTokens = data.tokens.current;
+        if (state.subscriptionPlan === 'pro') {
+          state.tokens = { current: 9999, total: 9999 };
+          state.currentTokens = 9999;
+        } else {
+          state.tokens = data.tokens;
+          state.currentTokens = data.tokens.current;
+        }
       }
       
-      // 개별 토큰 필드 업데이트
+      // 개별 토큰 필드 업데이트 (PRO 플랜은 항상 9999)
       if (data.currentTokens !== undefined && data.currentTokens !== state.currentTokens) {
-        state.currentTokens = data.currentTokens;
+        if (state.subscriptionPlan === 'pro') {
+          state.currentTokens = 9999;
+        } else {
+          state.currentTokens = data.currentTokens;
+        }
       }
       if (data.purchasedTokens !== undefined && data.purchasedTokens !== state.purchasedTokens) {
         state.purchasedTokens = data.purchasedTokens;
@@ -465,9 +510,16 @@ const userSlice = createSlice({
     
     // 토큰 정보만 업데이트 - 최적화
     updateTokens: (state, action: PayloadAction<{ current: number; total: number }>) => {
-      state.tokens.current = action.payload.current;
-      state.tokens.total = action.payload.total;
-      state.currentTokens = action.payload.current;
+      // PRO 플랜은 항상 9999 유지
+      if (state.subscriptionPlan === 'pro') {
+        state.tokens.current = 9999;
+        state.tokens.total = 9999;
+        state.currentTokens = 9999;
+      } else {
+        state.tokens.current = action.payload.current;
+        state.tokens.total = action.payload.total;
+        state.currentTokens = action.payload.current;
+      }
     },
     
     // 설정 업데이트 - 최적화
@@ -480,6 +532,7 @@ const userSlice = createSlice({
 export const {
   setUser,
   updateSubscription,
+  cancelSubscription,
   useTokens,
   purchaseTokens,
   resetDailyTokens,
@@ -495,6 +548,18 @@ export const {
 export const setTokens = (tokens: number) => (dispatch: any, getState: any) => {
   const currentState = getState().user;
   const currentTokens = currentState.currentTokens || 0;
+  const subscriptionPlan = currentState.subscriptionPlan;
+  
+  // PRO 플랜은 항상 9999
+  if (subscriptionPlan === 'pro') {
+    if (currentTokens !== 9999) {
+      dispatch(updateTokens({ 
+        current: 9999,
+        total: 9999 
+      }));
+    }
+    return;
+  }
   
   // 새로운 토큰 수가 현재와 다를 때만 업데이트
   if (tokens !== currentTokens && !isNaN(tokens)) {
@@ -518,6 +583,7 @@ export default userSlice.reducer;
 // 선택자 (Selectors) - 메모이제이션 활용
 export const selectCurrentTokens = (state: { user: UserState }) => state.user.currentTokens;
 export const selectSubscriptionPlan = (state: { user: UserState }) => state.user.subscriptionPlan;
+export const selectSubscriptionAutoRenew = (state: { user: UserState }) => state.user.subscriptionAutoRenew;
 export const selectTokenHistory = (state: { user: UserState }) => state.user.tokenHistory;
 export const selectUserInfo = (state: { user: UserState }) => ({
   userId: state.user.userId,
