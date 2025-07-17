@@ -46,14 +46,36 @@ export const SUBSCRIPTION_PLANS = {
     features: {
       monthlyTokens: 300, // 매일 10개 x 30일
       dailyLimit: 10,
-      aiModel: 'basic',
+      aiModel: 'gpt-4o-mini', // 기본 모델 업그레이드
       hasAds: true,
       platforms: ['instagram', 'facebook', 'twitter'],
       extraFeatures: [
         '매일 10개 토큰 무료 충전',
-        '기본 AI 모델 (GPT-3.5)',
+        'GPT-4o mini AI 모델',
         '3가지 SNS 플랫폼 지원',
         '기본 템플릿 제공',
+      ],
+    },
+  },
+  
+  starter: {
+    id: 'starter',
+    name: 'STARTER',
+    price: 2900,
+    priceDisplay: '₩2,900',
+    features: {
+      monthlyTokens: 300, // 무료와 동일하지만 일일 제한 없음
+      dailyLimit: -1, // 일일 제한 없음
+      aiModel: 'gpt-4o-mini', // 무료와 동일한 모델
+      hasAds: false,
+      platforms: ['instagram', 'facebook', 'twitter'],
+      rolloverTokens: 50, // 50개까지 이월
+      extraFeatures: [
+        '매월 300개 토큰 제공',
+        '일일 제한 없음',
+        '최대 50개 이월 가능',
+        '광고 완전 제거',
+        'GPT-4o mini AI 모델',
       ],
     },
   },
@@ -64,17 +86,20 @@ export const SUBSCRIPTION_PLANS = {
     price: 4900,
     priceDisplay: '₩4,900',
     features: {
-      monthlyTokens: 100, // 한 달에 100개 제공
+      monthlyTokens: 500, // 100개 -> 500개로 증량
       dailyLimit: -1, // 일일 제한 없음
-      aiModel: 'advanced',
+      aiModel: 'gpt-4o', // 고급 모델
       hasAds: false,
       platforms: ['instagram', 'facebook', 'twitter', 'linkedin', 'blog'],
+      rolloverTokens: 100, // 이월 가능 토큰 추가
       extraFeatures: [
-        '매월 100개 토큰 제공',
+        '매월 500개 토큰 제공',
+        '최대 100개까지 다음 달 이월',
         '광고 완전 제거',
         '5가지 플랫폼 지원',
         '프리미엄 템플릿',
         '톤 & 스타일 커스터마이징',
+        'GPT-4o 최신 AI 모델',
       ],
     },
   },
@@ -87,16 +112,17 @@ export const SUBSCRIPTION_PLANS = {
     features: {
       monthlyTokens: -1, // 무제한
       dailyLimit: -1, // 무제한
-      aiModel: 'premium',
+      aiModel: 'gpt-4-turbo', // 최고급 모델
       hasAds: false,
       platforms: ['instagram', 'facebook', 'twitter', 'linkedin', 'blog', 'youtube', 'tiktok'],
       extraFeatures: [
         '무제한 토큰',
-        '최신 AI 모델 우선 사용',
+        'GPT-4 Turbo 최고급 AI',
         '모든 플랫폼 지원',
         'AI 이미지 생성 (월 50장)',
         '팀 협업 기능',
         '분석 대시보드',
+        '우선 처리 속도',
       ],
     },
   },

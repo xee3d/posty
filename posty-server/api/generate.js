@@ -165,7 +165,7 @@ export default async function handler(req, res) {
     
     // 이미지가 있는 경우 Vision API 사용
     let messages;
-    let apiModel = model || 'gpt-3.5-turbo';
+    let apiModel = model || 'gpt-4o-mini'; // 기본 모델을 gpt-4o-mini로 변경
     
     if (image) {
       console.log('Image detected, using Vision-capable model');
@@ -358,7 +358,7 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            model: 'gpt-3.5-turbo',
+            model: model || 'gpt-4o-mini', // 기본 모델 사용
             messages: messages,
             max_tokens: maxTokensMap[length] || 300,
             temperature: 0.8,

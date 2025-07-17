@@ -29,13 +29,13 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   const { colors, isDark } = useAppTheme();
   const currentTokens = useAppSelector(selectCurrentTokens);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
-  const [selectedPlan, setSelectedPlan] = useState<'free' | 'premium' | 'pro'>('premium');
+  const [selectedPlan, setSelectedPlan] = useState<'free' | 'starter' | 'premium' | 'pro'>('premium');
   const [activeTab, setActiveTab] = useState<'subscription' | 'tokens' | 'manage'>('subscription');
   const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
   const [stats, setStats] = useState({
     totalTokens: 0,
   });
-  const [realSubscriptionPlan, setRealSubscriptionPlan] = useState<'free' | 'premium' | 'pro'>('free');
+  const [realSubscriptionPlan, setRealSubscriptionPlan] = useState<'free' | 'starter' | 'premium' | 'pro'>('free');
   const [adStats, setAdStats] = useState({
     dailyCount: 0,
     remainingToday: 10,
@@ -267,7 +267,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     navigation.navigate('Mission');
   };
 
-  const handleSubscribe = async (planKey?: 'free' | 'premium' | 'pro') => {
+  const handleSubscribe = async (planKey?: 'free' | 'starter' | 'premium' | 'pro') => {
     const targetPlan = planKey || selectedPlan;
     
     if (targetPlan === 'free') {
@@ -301,17 +301,19 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   const planColors = {
     free: '#6B7280',
+    starter: '#10B981',  // STARTER - 그린 색상
     premium: '#F59E0B',  // PRO - 골드 색상
     pro: '#8B5CF6',      // MAX - 보라 색상
   };
 
   const planIcons = {
     free: 'account-circle',
+    starter: 'flight-takeoff',
     premium: 'star',
     pro: 'workspace-premium',
   };
 
-  const renderPlanCard = (planKey: 'free' | 'premium' | 'pro') => {
+  const renderPlanCard = (planKey: 'free' | 'starter' | 'premium' | 'pro') => {
     const plan = SUBSCRIPTION_PLANS[planKey];
     const isSelected = selectedPlan === planKey;
     const isCurrent = currentPlan === planKey;
@@ -514,6 +516,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
             <View style={styles.plansContainer}>
               {renderPlanCard('free')}
+              {renderPlanCard('starter')}
               {renderPlanCard('premium')}
               {renderPlanCard('pro')}
             </View>
@@ -558,7 +561,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 <View style={styles.benefitContent}>
                   <Text style={styles.benefitTitle}>더 많은 토큰</Text>
                   <Text style={styles.benefitDesc}>
-                  PRO는 매월 100개, MAX는 무제한 토큰을 제공합니다
+                  STARTER는 300개, PRO는 500개, MAX는 무제한 토큰을 제공합니다
                   </Text>
                 </View>
               </View>
@@ -570,7 +573,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 <View style={styles.benefitContent}>
                   <Text style={styles.benefitTitle}>고급 AI 모델</Text>
                   <Text style={styles.benefitDesc}>
-                    GPT-4 기반의 더 창의적이고 정확한 콘텐츠 생성
+                    플랜별 차별화된 AI 모델 제공 (GPT-4o, GPT-4 Turbo)
                   </Text>
                 </View>
               </View>
@@ -716,8 +719,10 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 <View style={styles.premiumNotice}>
                   <Icon name="workspace-premium" size={20} color={colors.primary} />
                   <Text style={styles.premiumNoticeText}>
-                    {realSubscriptionPlan === 'premium' 
-                      ? 'PRO 회원은 매월 100개의 토큰을 사용할 수 있습니다'
+                    {realSubscriptionPlan === 'starter' 
+                      ? 'STARTER 회원은 매월 300개의 토큰을 사용할 수 있습니다'
+                      : realSubscriptionPlan === 'premium' 
+                      ? 'PRO 회원은 매월 500개의 토큰을 사용할 수 있습니다'
                       : 'MAX 회원은 무제한 토큰을 사용할 수 있습니다'}
                   </Text>
                 </View>

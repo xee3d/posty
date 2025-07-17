@@ -11,8 +11,29 @@ import {
 } from './ai/types/ai.types';
 import { extractHashtags } from '../utils/promptUtils';
 import { enhancePromptForPlatform, validateContentForPlatform } from '../utils/platformUtils';
+import { store } from '../store';
+import { selectSubscriptionPlan } from '../store/slices/userSlice';
+import { SUBSCRIPTION_PLANS } from '../utils/adConfig';
 
 class AIServiceWrapper {
+  // 사용자 구독 플랜 가져오기
+  private async getUserPlan(): Promise<'free' | 'starter' | 'premium' | 'pro'> {
+    try {
+      const state = store.getState();
+      const plan = selectSubscriptionPlan(state);
+      return plan || 'free';
+    } catch (error) {
+      console.error('Failed to get user plan:', error);
+      return 'free';
+    }
+  }
+  
+  // 플랜별 AI 모델 결정
+  private getModelByPlan(plan: 'free' | 'starter' | 'premium' | 'pro'): string {
+    const planConfig = SUBSCRIPTION_PLANS[plan];
+    return planConfig?.features?.aiModel || 'gpt-4o-mini';
+  }
+  
   // 콘텐츠 생성
   async generateContent(params: GenerateContentParams): Promise<GeneratedContent> {
     console.log('AIServiceWrapper: Generating content with params:', params);
@@ -50,12 +71,18 @@ class AIServiceWrapper {
       
       console.log('Enhanced prompt for platform:', platform, finalPrompt);
       
+      // 사용자의 구독 플랜에 따른 AI 모델 결정
+      const userPlan = await this.getUserPlan();
+      const aiModel = this.getModelByPlan(userPlan);
+      console.log('Using AI model:', aiModel, 'for plan:', userPlan);
+      
       // 서버 API 호출
       const content = await serverAIService.generateContent({
         prompt: finalPrompt,
         tone: params.tone || 'casual',
         platform: params.platform,
         length: params.length,
+        model: aiModel, // 플랜별 모델 전달
       });
       
       console.log('AIServiceWrapper received content:', content);
@@ -101,11 +128,16 @@ class AIServiceWrapper {
       // 사용자가 선택한 길이를 사용 (기본값: medium)
       const selectedLength = params.length || 'medium';
       
+      // 사용자의 구독 플랜에 따른 AI 모델 결정
+      const userPlan = await this.getUserPlan();
+      const aiModel = this.getModelByPlan(userPlan);
+      
       const content = await serverAIService.generateContent({
         prompt: polishPrompt,
         tone: params.tone || 'casual',
         platform: params.platform,
         length: selectedLength,
+        model: aiModel, // 플랜별 모델 전달
       });
       
       return {

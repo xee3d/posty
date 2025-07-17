@@ -9,6 +9,7 @@ interface ServerGenerateParams {
   platform?: string;
   imageBase64?: string;
   length?: string;
+  model?: string;
 }
 
 interface ServerResponse {
@@ -75,6 +76,7 @@ class ServerAIService {
           platform: params.platform || 'instagram',
           language: 'ko', // getCurrentLanguage(), // 현재 언어 추가
           length: params.length || 'medium', // 길이 추가
+          model: params.model, // AI 모델 추가
           // 이미지가 있으면 base64 전송
           ...(params.imageBase64 && { image: params.imageBase64 }),
         }),
