@@ -31,7 +31,7 @@ import TrendScreen from './src/screens/TrendScreen';
 import MyStyleScreen from './src/screens/MyStyleScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import FeedWithAdsExample from './src/screens/FeedWithAdsExample';
-import SubscriptionScreen from './src/screens/SubscriptionScreen';
+import ModernSubscriptionScreen from './src/screens/subscription/ModernSubscriptionScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import { TermsOfServiceScreen, PrivacyPolicyScreen } from './src/screens/documents';
 import TabNavigator from './src/components/TabNavigator';
@@ -369,7 +369,7 @@ const App: React.FC = () => {
         );
       case 'subscription':
         return (
-          <SubscriptionScreen 
+          <ModernSubscriptionScreen 
             key="subscription" 
             navigation={{ 
               goBack: () => handleTabPress('home'), 

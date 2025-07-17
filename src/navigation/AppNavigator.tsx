@@ -6,7 +6,7 @@ import MyStyleScreen from '../screens/MyStyleScreen';
 import AIWriteScreen from '../screens/AIWriteScreen';
 import TrendScreen from '../screens/TrendScreen';
 import FeedWithAdsExample from '../screens/FeedWithAdsExample';
-import SubscriptionScreen from '../screens/SubscriptionScreen';
+import ModernSubscriptionScreen from '../screens/subscription/ModernSubscriptionScreen';
 import CostMonitorScreen from '../screens/CostMonitorScreen';
 import MissionScreen from '../screens/MissionScreen';
 import AnimationExamplesScreen from '../screens/AnimationExamplesScreen';
@@ -81,7 +81,7 @@ const AppNavigator: React.FC = () => {
       case 'feed-ads':
         return <FeedWithAdsExample key="feed-ads" />;
       case 'subscription':
-        return <SubscriptionScreen key="subscription" navigation={{ navigate: handleTabChange }} />;
+        return <ModernSubscriptionScreen key="subscription" navigation={{ navigate: handleTabChange, goBack: () => handleTabChange('home') }} />;
       case 'mission':
         return <MissionScreen key="mission" />;
       case 'animation-examples':
