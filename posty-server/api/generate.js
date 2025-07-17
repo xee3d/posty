@@ -58,7 +58,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, tone, platform, model, language = 'ko', length = 'medium', image } = req.body;
+    const { prompt, tone, platform, model, language = 'ko', length = 'medium', image, max_tokens } = req.body;
     
     // 입력 검증
     if (!prompt || prompt.trim().length === 0) {
@@ -90,7 +90,8 @@ export default async function handler(req, res) {
     const lengthGuides = {
       short: { ko: '50자 이내', en: 'under 50 characters' },
       medium: { ko: '100-150자', en: '100-150 characters' },
-      long: { ko: '250-300자', en: '250-300 characters' }
+      long: { ko: '250-300자', en: '250-300 characters' },
+      extra: { ko: '500-700자', en: '500-700 characters' }
     };
     
     const systemPrompts = {
@@ -131,8 +132,12 @@ export default async function handler(req, res) {
     const maxTokensMap = {
       short: 150,
       medium: 300,
-      long: 600
+      long: 600,
+      extra: 1200
     };
+    
+    // 클라이언트에서 보낸 max_tokens를 우선 사용, 없으면 기본값 사용
+    const finalMaxTokens = max_tokens || maxTokensMap[length] || 300;
     
     // 문장 정리/교정 모드 감지 (프롬프트에 특정 키워드가 포함된 경우)
     const isPolishMode = prompt.includes('맞춤법') || prompt.includes('문장') || prompt.includes('다듬') || 
@@ -279,7 +284,7 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
       body: JSON.stringify({
         model: apiModel,
         messages: messages,
-        max_tokens: maxTokensMap[length] || 300,
+        max_tokens: finalMaxTokens,
         temperature: 0.8,
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
@@ -308,7 +313,7 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
             body: JSON.stringify({
               model: 'gpt-4o',
               messages: messages,
-              max_tokens: maxTokensMap[length] || 300,
+              max_tokens: finalMaxTokens,
               temperature: 0.8,
             }),
           });
@@ -360,7 +365,7 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
           body: JSON.stringify({
             model: model || 'gpt-4o-mini', // 기본 모델 사용
             messages: messages,
-            max_tokens: maxTokensMap[length] || 300,
+            max_tokens: finalMaxTokens,
             temperature: 0.8,
             presence_penalty: 0.1,
             frequency_penalty: 0.1,
