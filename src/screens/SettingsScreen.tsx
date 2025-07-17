@@ -34,6 +34,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const { themeMode, changeTheme, colors, cardTheme } = useAppTheme();
   const dispatch = useAppDispatch();
   const reduxUser = useAppSelector(state => state.user);
+  const reduxSubscriptionPlan = useAppSelector(state => state.user.subscriptionPlan);
   const [user, setUser] = useState<User>({
     id: '1',
     name: 'Google Test User',
@@ -76,6 +77,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   useEffect(() => {
     loadAllData();
   }, []);
+
+  // Redux 구독 플랜 변경 시 업데이트
+  useEffect(() => {
+    setSubscriptionPlan(reduxSubscriptionPlan || 'free');
+  }, [reduxSubscriptionPlan]);
 
   // Redux 상태 변경 시 토큰 정보 업데이트
   useEffect(() => {
@@ -180,18 +186,25 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       // Redux 상태에서 토큰 정보 확인 (우선)
       const reduxTokens = reduxUser.tokens?.current;
       
+      // Redux 상태에서 현재 구독 플랜 확인
+      const currentPlan = reduxSubscriptionPlan || subscription.subscriptionPlan;
+      
       // 실제 남은 토큰 수 계산
       let remainingTokens = 0;
       let tokensTotal = 10;
       
-      if (subscription.subscriptionPlan === 'pro') {
+      if (currentPlan === 'pro') {
         // 프로 플랜은 무제한
         tokensTotal = 999;
         remainingTokens = 999;
-      } else if (subscription.subscriptionPlan === 'premium') {
+      } else if (currentPlan === 'premium') {
         // 프리미엄 플랜
-        tokensTotal = 100;
+        tokensTotal = 500;
         remainingTokens = reduxTokens !== undefined ? reduxTokens : (subscription.monthlyTokensRemaining || 0);
+      } else if (currentPlan === 'starter') {
+        // 스타터 플랜
+        tokensTotal = 200;
+        remainingTokens = reduxTokens !== undefined ? reduxTokens : 200;
       } else {
         // Free 플랜
         tokensTotal = 10;
@@ -213,8 +226,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
         joinDays,
       });
       
-      // 구독 플랜도 업데이트
-      setSubscriptionPlan(subscription.subscriptionPlan);
+      // 구독 플랜도 Redux에서 가져온 것으로 설정
+      setSubscriptionPlan(currentPlan);
     } catch (error) {
       console.error('Failed to load stats:', error);
       // 오류 시 기본값 설정
@@ -655,9 +668,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const getSubscriptionBadge = () => {
     switch (subscriptionPlan) {
       case 'pro':
-        return { text: 'PRO', color: '#8B5CF6', icon: 'workspace-premium' }; // crown -> workspace-premium
+        return { text: 'MAX', color: '#8B5CF6', icon: 'workspace-premium' };
       case 'premium':
-        return { text: 'PREMIUM', color: '#F59E0B', icon: 'star' };
+        return { text: 'PRO', color: '#F59E0B', icon: 'star' };
+      case 'starter':
+        return { text: 'STARTER', color: '#10B981', icon: 'bolt' }; // flash-on -> bolt
       default:
         return { text: 'FREE', color: colors.text.secondary, icon: 'person' };
     }
@@ -795,12 +810,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
                     <Text style={styles.profileTitle}>{userProfile.selectedTitle}</Text>
                   )}
                   <Text style={styles.profileEmail}>{reduxUser.email || user.email}</Text>
-                  <View style={styles.planBadgeContainer}>
-                    <MaterialIcon name={planBadge.icon} size={14} color={planBadge.color} />
-                    <Text style={[styles.planBadgeText, { color: planBadge.color }]}>
-                      {planBadge.text}
-                    </Text>
-                  </View>
                 </View>
               </View>
             </View>
@@ -1144,7 +1153,6 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   profileEmail: {
     fontSize: 14,
     color: colors.text.tertiary,
-    marginBottom: 6,
   },
   profileStats: {
     flexDirection: 'row',
@@ -1169,20 +1177,6 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     width: 1,
     height: 24,
     backgroundColor: colors.border,
-  },
-  planBadgeContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    backgroundColor: colors.lightGray,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    alignSelf: 'flex-start',
-  },
-  planBadgeText: {
-    fontSize: 11,
-    fontWeight: '600',
   },
   editProfileButton: {
     flexDirection: 'row',

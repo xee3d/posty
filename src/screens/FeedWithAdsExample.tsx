@@ -33,7 +33,7 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
   const [showAds, setShowAds] = useState(true);
   const [remainingTokens, setRemainingTokens] = useState<number>(0);
   const [showPlanModal, setShowPlanModal] = useState(false);
-  const [currentPlan, setCurrentPlan] = useState<'free' | 'premium' | 'pro'>('free');
+  const [currentPlan, setCurrentPlan] = useState<'free' | 'starter' | 'premium' | 'pro'>('free');
 
   useEffect(() => {
     initializeFeed();
@@ -123,7 +123,7 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
   };
 
   // 테스트용 구독 플랜 변경 함수
-  const handleChangePlan = async (plan: 'free' | 'premium' | 'pro') => {
+  const handleChangePlan = async (plan: 'free' | 'starter' | 'premium' | 'pro') => {
     try {
       await tokenService.upgradeSubscription(plan);
       
@@ -133,10 +133,14 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
         subscription.dailyTokens = 10;
         subscription.purchasedTokens = 0;
         subscription.monthlyTokensRemaining = 0;
+      } else if (plan === 'starter') {
+        subscription.dailyTokens = 0;
+        subscription.purchasedTokens = 0;
+        subscription.monthlyTokensRemaining = 300;
       } else if (plan === 'premium') {
         subscription.dailyTokens = 0;
         subscription.purchasedTokens = 0;
-        subscription.monthlyTokensRemaining = 100;
+        subscription.monthlyTokensRemaining = 500;
       } else if (plan === 'pro') {
         subscription.dailyTokens = 0;
         subscription.purchasedTokens = 0;
@@ -148,7 +152,7 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
       await loadTokenInfo();
       
       setShowPlanModal(false);
-      Alert.alert('성공', `${plan.toUpperCase()} 플랜으로 변경되었습니다!`);
+      Alert.alert('성공', `${plan === 'free' ? '무료' : plan === 'starter' ? '스타터' : plan === 'premium' ? '프로' : '맥스'} 플랜으로 변경되었습니다!`);
     } catch (error) {
       console.error('Failed to change plan:', error);
       Alert.alert('오류', '플랜 변경에 실패했습니다.');
@@ -327,7 +331,7 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
             onPress={() => setShowPlanModal(true)}
           >
             <Icon name="settings" size={20} color={COLORS.text} />
-            <Text style={styles.planButtonText}>{currentPlan.toUpperCase()}</Text>
+            <Text style={styles.planButtonText}>{currentPlan === 'free' ? '무료' : currentPlan === 'starter' ? '스타터' : currentPlan === 'premium' ? '프로' : '맥스'}</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.resetButton}
@@ -433,7 +437,7 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
                 onPress={() => handleChangePlan('free')}
               >
                 <View style={styles.planOptionHeader}>
-                  <Text style={[styles.planOptionTitle, { color: colors.text.primary }]}>FREE</Text>
+                  <Text style={[styles.planOptionTitle, { color: colors.text.primary }]}>무료</Text>
                   {currentPlan === 'free' && (
                     <View style={styles.currentBadge}>
                       <Text style={styles.currentBadgeText}>현재</Text>
@@ -451,24 +455,48 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
               <TouchableOpacity
                 style={[
                   styles.planOption,
-                  currentPlan === 'premium' && styles.planOptionActive,
-                  { borderColor: currentPlan === 'premium' ? '#8B5CF6' : colors.border }
+                  currentPlan === 'starter' && styles.planOptionActive,
+                  { borderColor: currentPlan === 'starter' ? '#10B981' : colors.border }
                 ]}
-                onPress={() => handleChangePlan('premium')}
+                onPress={() => handleChangePlan('starter')}
               >
                 <View style={styles.planOptionHeader}>
-                  <Text style={[styles.planOptionTitle, { color: colors.text.primary }]}>PREMIUM</Text>
-                  {currentPlan === 'premium' && (
-                    <View style={[styles.currentBadge, { backgroundColor: '#8B5CF6' }]}>
+                  <Text style={[styles.planOptionTitle, { color: colors.text.primary }]}>스타터</Text>
+                  {currentPlan === 'starter' && (
+                    <View style={[styles.currentBadge, { backgroundColor: '#10B981' }]}>
                       <Text style={styles.currentBadgeText}>현재</Text>
                     </View>
                   )}
                 </View>
                 <Text style={[styles.planOptionDesc, { color: colors.text.secondary }]}>
-                  매월 100개 토큰
+                  매월 300개 토큰
                 </Text>
                 <Text style={[styles.planOptionDesc, { color: colors.text.secondary }]}>
-                  광고 표시
+                  광고 제거
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.planOption,
+                  currentPlan === 'premium' && styles.planOptionActive,
+                  { borderColor: currentPlan === 'premium' ? '#F59E0B' : colors.border }
+                ]}
+                onPress={() => handleChangePlan('premium')}
+              >
+                <View style={styles.planOptionHeader}>
+                  <Text style={[styles.planOptionTitle, { color: colors.text.primary }]}>프로</Text>
+                  {currentPlan === 'premium' && (
+                    <View style={[styles.currentBadge, { backgroundColor: '#F59E0B' }]}>
+                      <Text style={styles.currentBadgeText}>현재</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={[styles.planOptionDesc, { color: colors.text.secondary }]}>
+                  매월 500개 토큰
+                </Text>
+                <Text style={[styles.planOptionDesc, { color: colors.text.secondary }]}>
+                  광고 제거
                 </Text>
               </TouchableOpacity>
 
@@ -476,14 +504,14 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
                 style={[
                   styles.planOption,
                   currentPlan === 'pro' && styles.planOptionActive,
-                  { borderColor: currentPlan === 'pro' ? '#F59E0B' : colors.border }
+                  { borderColor: currentPlan === 'pro' ? '#8B5CF6' : colors.border }
                 ]}
                 onPress={() => handleChangePlan('pro')}
               >
                 <View style={styles.planOptionHeader}>
-                  <Text style={[styles.planOptionTitle, { color: colors.text.primary }]}>PRO</Text>
+                  <Text style={[styles.planOptionTitle, { color: colors.text.primary }]}>맥스</Text>
                   {currentPlan === 'pro' && (
-                    <View style={[styles.currentBadge, { backgroundColor: '#F59E0B' }]}>
+                    <View style={[styles.currentBadge, { backgroundColor: '#8B5CF6' }]}>
                       <Text style={styles.currentBadgeText}>현재</Text>
                     </View>
                   )}

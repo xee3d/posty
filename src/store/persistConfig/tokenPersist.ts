@@ -156,6 +156,7 @@ export const checkDailyResetAfterRestore = async () => {
   const state = store.getState().user;
   const today = new Date().toISOString().split('T')[0];
   
+  // 모든 플랜에서 일일 리셋 체크 (무료는 충전, 유료는 보너스)
   if (state.lastTokenResetDate !== today) {
     // resetDailyTokens 액션은 이미 userSlice에 정의되어 있음
     const { resetDailyTokens } = require('../slices/userSlice');

@@ -31,6 +31,7 @@ const USE_MOCK = __DEV__ && true; // 프로덕션에서는 false로 변경
 // 상품 ID 정의
 const productIds = Platform.select({
   ios: [
+    'com.posty.starter.monthly',
     'com.posty.premium.monthly',
     'com.posty.premium.yearly',
     'com.posty.pro.monthly',
@@ -40,6 +41,7 @@ const productIds = Platform.select({
     'com.posty.tokens.200',
   ],
   android: [
+    'starter_monthly',
     'premium_monthly',
     'premium_yearly', 
     'pro_monthly',
@@ -53,12 +55,14 @@ const productIds = Platform.select({
 
 const subscriptionIds = Platform.select({
   ios: [
+    'com.posty.starter.monthly',
     'com.posty.premium.monthly',
     'com.posty.premium.yearly',
     'com.posty.pro.monthly',
     'com.posty.pro.yearly',
   ],
   android: [
+    'starter_monthly',
     'premium_monthly',
     'premium_yearly',
     'pro_monthly',
@@ -304,7 +308,7 @@ class InAppPurchaseService {
       
       Alert.alert(
         '구독 완료! 🎉',
-        '프리미엄 기능을 이용할 수 있습니다.',
+        `${planId.toUpperCase()} 플랜이 활성화되었습니다.\n${planId === 'starter' ? '가입 즉시 300개 + 매일 10개 토큰' : planId === 'premium' ? '가입 즉시 500개 + 매일 20개 토큰' : '무제한 토큰'}`,
         [{ text: '확인' }]
       );
     } else {
@@ -428,7 +432,8 @@ class InAppPurchaseService {
     return `${prefix}tokens.${packageId}`;
   }
 
-  private getPlanIdFromSku(sku: string): 'premium' | 'pro' {
+  private getPlanIdFromSku(sku: string): 'starter' | 'premium' | 'pro' {
+    if (sku.includes('starter')) return 'starter';
     if (sku.includes('premium')) return 'premium';
     if (sku.includes('pro')) return 'pro';
     throw new Error('Invalid SKU');

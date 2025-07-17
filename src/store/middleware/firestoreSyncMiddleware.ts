@@ -67,7 +67,7 @@ export const firestoreSyncMiddleware: Middleware<{}, RootState> = store => next 
   }
   
   // 구독 변경 시 - 즉시 동기화 필요한 경우만
-  if (action.type === 'user/updateSubscription') {
+  if (action.type === 'user/updateSubscription' && action.meta?.source !== 'firestore') {
     // 기존 타이머 취소
     if (syncTimers.subscription) {
       clearTimeout(syncTimers.subscription);
@@ -89,12 +89,12 @@ export const firestoreSyncMiddleware: Middleware<{}, RootState> = store => next 
         // 구독 정보와 토큰 모두 업데이트
         await firestoreService.updateUserSettings({
           subscription: {
-            plan: currentState.user.subscriptionPlan === 'premium' ? 'premium' : 
-                  currentState.user.subscriptionPlan === 'pro' ? 'pro' : 'free',
+            plan: 'free', // subscription 객체는 레거시이므로 항상 free로 저장
             status: 'active',
             startedAt: new Date().toISOString(),
             autoRenew: false,
           },
+          subscriptionPlan: action.payload.plan, // 실제 플랜은 action.payload.plan 사용
           tokens: {
             current: currentState.user.currentTokens,
             total: currentState.user.currentTokens,
@@ -128,6 +128,7 @@ export const loadUserFromFirestore = async (dispatch: any) => {
         provider: userData.provider,
         tokens: userData.tokens,
         subscription: userData.subscription,
+        subscriptionPlan: userData.subscriptionPlan, // 추가: subscriptionPlan 필드
         settings: userData.settings,
       };
       
@@ -137,7 +138,10 @@ export const loadUserFromFirestore = async (dispatch: any) => {
       });
       
       if (__DEV__) {
-        console.log('[Firestore Sync] User data loaded');
+        console.log('[Firestore Sync] User data loaded:', {
+          plan: userData.subscriptionPlan,
+          tokens: userData.tokens?.current
+        });
       }
     }
   } catch (error) {
@@ -187,10 +191,13 @@ export const subscribeToFirestoreUser = (dispatch: any) => {
             });
           }
           
-          if (userData.subscription) {
+          // subscriptionPlan을 우선 확인하고, 변경된 경우에만 업데이트
+          if (userData.subscriptionPlan) {
             updates.push({
               type: 'user/updateSubscription',
-              payload: userData.subscription,
+              payload: {
+                plan: userData.subscriptionPlan,
+              },
               meta: { source: 'firestore' }
             });
           }

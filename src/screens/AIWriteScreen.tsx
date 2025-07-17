@@ -45,6 +45,17 @@ import { PLATFORM_STYLES, getRandomEndingStyle, transformContentForPlatform, gen
 import missionService from '../services/missionService';
 import improvedStyleService, { STYLE_TEMPLATES } from '../services/improvedStyleService';
 import { UNIFIED_STYLES, getStyleById, getStyleByAiTone } from '../utils/unifiedStyleConstants';
+import { 
+  getUserPlan, 
+  getAvailableTones, 
+  getAvailableLengths, 
+  canAccessTone, 
+  canAccessLength,
+  getImageAnalysisTokens,
+  MY_STYLE_ACCESS,
+  TREND_ACCESS,
+  PlanType 
+} from '../config/adConfig';
 
 type WriteMode = 'text' | 'photo' | 'polish';
 
@@ -105,14 +116,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     }
   }, [style]);
   
-  const [selectedTone, setSelectedTone] = useState(initialTone || 'casual');
-  const [selectedLength, setSelectedLength] = useState(() => {
-    // 스타일에 따른 기본 길이 설정
-    const styleInfo = style ? getStyleById(style) : null;
-    if (styleInfo?.characteristics.avgLength.includes('50')) return 'short';
-    if (styleInfo?.characteristics.avgLength.includes('200')) return 'long';
-    return 'medium';
-  });
+  const [selectedTone, setSelectedTone] = useState('casual');
+  const [selectedLength, setSelectedLength] = useState('medium');
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -124,9 +129,41 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   const [trendingHashtags, setTrendingHashtags] = useState<string[]>([]);
   const [selectedHashtags, setSelectedHashtags] = useState<string[]>([]);
   const [trendingPrompts, setTrendingPrompts] = useState<string[]>([]);
+  
+  // 구독 플랜 정보 가져오기
+  const subscriptionPlan = useAppSelector(state => state.user.subscriptionPlan);
+  const userPlan = (subscriptionPlan || 'free') as PlanType;
 
   // initialText가 있을 때 자동으로 콘텐츠 생성 - 제거됨
   // 사용자가 직접 생성 버튼을 눌러야 함
+
+  // 톤과 길이 초기값 설정
+  useEffect(() => {
+    // 초기 톤 설정
+    if (initialTone && canAccessTone(userPlan, initialTone)) {
+      setSelectedTone(initialTone);
+    } else if (styleInfo?.aiTone && canAccessTone(userPlan, styleInfo.aiTone)) {
+      setSelectedTone(styleInfo.aiTone);
+    } else {
+      // 사용 가능한 첫 번째 톤 선택
+      const firstAvailableTone = allTones.find(tone => canAccessTone(userPlan, tone.id));
+      setSelectedTone(firstAvailableTone?.id || 'casual');
+    }
+    
+    // 초기 길이 설정
+    const styleInfo = style ? getStyleById(style) : null;
+    let desiredLength = 'medium';
+    if (styleInfo?.characteristics.avgLength.includes('50')) desiredLength = 'short';
+    if (styleInfo?.characteristics.avgLength.includes('200')) desiredLength = 'long';
+    
+    if (canAccessLength(userPlan, desiredLength)) {
+      setSelectedLength(desiredLength);
+    } else {
+      // 사용 가능한 첫 번째 길이 선택
+      const firstAvailableLength = allLengths.find(length => canAccessLength(userPlan, length.id));
+      setSelectedLength(firstAvailableLength?.id || 'short');
+    }
+  }, [initialTone, style, userPlan]);
 
   // 트렌드 해시태그 및 주제 로드
   useEffect(() => {
@@ -178,8 +215,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     }
   };
 
-  // 기본 톤 정의 (11가지 스타일에 매핑되는 9가지 톤)
-  const tones = [
+  // 모든 톤 정의
+  const allTones = [
     { id: 'casual', label: '캐주얼', icon: 'happy-outline', iconType: 'ionicon', color: '#FF6B6B' },
     { id: 'professional', label: '전문적', icon: 'briefcase-outline', iconType: 'ionicon', color: '#4ECDC4' },
     { id: 'humorous', label: '유머러스', icon: 'happy', iconType: 'ionicon', color: '#FFD93D' },
@@ -190,12 +227,18 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     { id: 'storytelling', label: '스토리텔링', icon: 'book-outline', iconType: 'ionicon', color: '#6C5B7B' },
     { id: 'motivational', label: '동기부여', icon: 'fitness-outline', iconType: 'ionicon', color: '#4ECDC4' },
   ];
-
-  const lengths = [
+  
+  // 모든 길이 정의
+  const allLengths = [
     { id: 'short', label: 'text-outline', count: '짧게', desc: '~50자', iconSize: 24 },
     { id: 'medium', label: 'document-text-outline', count: '보통', desc: '~150자', iconSize: 28 },
     { id: 'long', label: 'newspaper-outline', count: '길게', desc: '~300자', iconSize: 32 },
+    { id: 'extra', label: 'reader-outline', count: '초장문', desc: '~500자', iconSize: 36 },
   ];
+  
+  // 플랜별 사용 가능한 톤과 길이 필터링 - 모든 옵션 표시로 변경
+  const tones = allTones; // 모든 톤 표시
+  const lengths = allLengths; // 모든 길이 표시
 
   // 기본 키워드 목록
   const getDefaultKeywords = () => {
@@ -407,8 +450,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       return;
     }
 
-    // 토큰 체크
-    const requiredTokens = writeMode === 'photo' ? 2 : 1;
+    // 토큰 체크 - 플랜별 이미지 분석 토큰 적용
+    const requiredTokens = writeMode === 'photo' ? getImageAnalysisTokens(userPlan) : 1;
     if (!checkTokenAvailability(requiredTokens)) {
       return;
     }
@@ -979,23 +1022,39 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                           shadowColor: tone.color,
                           shadowOpacity: 0.2,
                           elevation: 3
-                        }
+                        },
+                        !canAccessTone(userPlan, tone.id) && styles.lockedItem
                       ]}
-                      onPress={() => setSelectedTone(tone.id)}
+                      onPress={() => {
+                        if (!canAccessTone(userPlan, tone.id)) {
+                          Alert.alert(
+                            '프리미엄 스타일 🌟',
+                            `${tone.label} 스타일은 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.\n\n업그레이드하면 더 다양한 스타일로 글을 작성할 수 있어요!`,
+                            [
+                              { text: '나중에', style: 'cancel' },
+                              { text: '플랜 보기', onPress: () => onNavigate?.('subscription') }
+                            ]
+                          );
+                          return;
+                        }
+                        setSelectedTone(tone.id);
+                      }}
                       activeOpacity={0.7}
                     >
                       <Icon 
                         name={tone.icon} 
                         size={32} 
-                        color={selectedTone === tone.id ? tone.color : colors.text.secondary}
+                        color={selectedTone === tone.id ? tone.color : (!canAccessTone(userPlan, tone.id) ? colors.text.tertiary : colors.text.secondary)}
                       />
                       <Text style={[
                         styles.toneLabel,
                         selectedTone === tone.id && styles.toneLabelActive,
-                        selectedTone === tone.id && { color: tone.color }
+                        selectedTone === tone.id && { color: tone.color },
+                        !canAccessTone(userPlan, tone.id) && styles.lockedItemText
                       ]}>
                         {tone.label}
                       </Text>
+
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -1013,31 +1072,48 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                 key={length.id}
                 style={[
                   styles.lengthCard,
-                selectedLength === length.id && styles.lengthCardActive
+                selectedLength === length.id && styles.lengthCardActive,
+                  !canAccessLength(userPlan, length.id) && styles.lockedItem
                 ]}
-                onPress={() => setSelectedLength(length.id)}
+                onPress={() => {
+                  if (!canAccessLength(userPlan, length.id)) {
+                    Alert.alert(
+                      '프리미엄 길이 📏',
+                      `${length.count} 길이는 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.\n\n더 긴 글을 작성하면 더 풍부한 콘텐츠를 만들 수 있어요!`,
+                      [
+                        { text: '나중에', style: 'cancel' },
+                        { text: '플랜 보기', onPress: () => onNavigate?.('subscription') }
+                      ]
+                    );
+                    return;
+                  }
+                  setSelectedLength(length.id);
+                }}
                 activeOpacity={0.7}
                 >
                 <Icon 
                 name={length.label} 
                 size={length.iconSize} 
-                color={selectedLength === length.id ? colors.primary : colors.text.secondary}
+                color={selectedLength === length.id ? colors.primary : (!canAccessLength(userPlan, length.id) ? colors.text.tertiary : colors.text.secondary)}
                 style={[
                 selectedLength === length.id && styles.lengthEmojiActive
                 ]}
                 />
                 <Text style={[
                 styles.lengthCount,
-                selectedLength === length.id && styles.lengthCountActive
+                selectedLength === length.id && styles.lengthCountActive,
+                !canAccessLength(userPlan, length.id) && styles.lockedItemText
                 ]}>
                 {length.count}
                 </Text>
                 <Text style={[
                 styles.lengthDesc,
-                selectedLength === length.id && styles.lengthDescActive
+                selectedLength === length.id && styles.lengthDescActive,
+                !canAccessLength(userPlan, length.id) && styles.lockedItemText
                 ]}>
                 {length.desc}
                 </Text>
+
                 </TouchableOpacity>
                 ))}
               </View>
@@ -1102,6 +1178,14 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                       <Icon name="flash" size={14} color="#FFFFFF" />
                       <Text style={styles.tokenCostText}>
                         {writeMode === 'photo' ? '2' : '1'}
+                      </Text>
+                    </View>
+                  )}
+                  {writeMode === 'photo' && userPlan !== 'pro' && (
+                    <View style={styles.tokenRequiredBadge}>
+                      <Icon name="flash" size={12} color={colors.primary} />
+                      <Text style={styles.tokenRequiredText}>
+                        {getImageAnalysisTokens(userPlan)} 토큰
                       </Text>
                     </View>
                   )}
@@ -1496,7 +1580,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: isDark ? 0 : 0.03,
     shadowRadius: 2,
-    overflow: 'hidden',
+    overflow: 'visible',
   },
   toneCardActive: {
     borderWidth: 2,
@@ -1793,6 +1877,47 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
   generateButtonMain: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  lockedItem: {
+    opacity: 0.5,
+    position: 'relative',
+  },
+  lockedItemText: {
+    color: colors.text.tertiary,
+  },
+  premiumBadge: {
+    position: 'absolute',
+    top: -6,
+    right: -6,
+    backgroundColor: isDark ? colors.primary + '20' : '#F3E8FF',
+    borderRadius: 16,
+    padding: 6,
+    borderWidth: 2,
+    borderColor: colors.primary,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tokenRequiredBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    position: 'absolute',
+    bottom: 8,
+    right: 8,
+    backgroundColor: isDark ? colors.primary + '20' : '#F3E8FF',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.primary + '30',
+  },
+  tokenRequiredText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.primary,
   },
 });
 

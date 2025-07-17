@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, SafeAreaView, ActivityIndicator,  } from 'react-native';
-import auth from '@react-native-firebase/auth';
+import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
+import { getApp } from '@react-native-firebase/app';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, SPACING } from '../utils/constants';
 import { useAppTheme } from '../hooks/useAppTheme';
@@ -16,8 +17,9 @@ interface FirebaseTestScreenProps {
 
 const FirebaseTestScreen: React.FC<FirebaseTestScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme } = useAppTheme();
+  const auth = getAuth(getApp());
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(auth().currentUser);
+  const [user, setUser] = useState(auth.currentUser);
   const [userData, setUserData] = useState<User | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [testResults, setTestResults] = useState<{[key: string]: string}>({});
@@ -25,8 +27,8 @@ const FirebaseTestScreen: React.FC<FirebaseTestScreenProps> = ({ onNavigate }) =
   const [showTestData, setShowTestData] = useState(false);
 
   useEffect(() => {
-    // Auth state listener
-    const unsubscribe = auth().onAuthStateChanged((currentUser) => {
+    // Auth state listener - Modular API 사용
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       if (currentUser) {
         loadUserData();

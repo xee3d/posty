@@ -22,15 +22,45 @@ class MockPurchaseService {
     // 실제 구매 시뮬레이션 (2초 대기)
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    // 성공 시뮬레이션
-    await tokenService.upgradeSubscription(planId as 'premium' | 'pro');
+    // 성공 시뮬레이션 - 만료일 포함
+    const expiryDate = new Date();
+    expiryDate.setMonth(expiryDate.getMonth() + (isYearly ? 12 : 1));
+    
+    await tokenService.upgradeSubscription(planId as 'starter' | 'premium' | 'pro');
+    
+    // Redux에 만료일 업데이트
+    const { updateSubscription } = require('../../store/slices/userSlice');
+    const { store } = require('../../store');
+    store.dispatch(updateSubscription({
+      plan: planId as 'starter' | 'premium' | 'pro',
+      expiresAt: expiryDate.toISOString(),
+    }));
     
     // Mock 구독 정보 저장 (복원용)
     await AsyncStorage.setItem('mock_subscription_plan', planId);
     
+    // 플랜별 메시지
+    let planName = '';
+    let features = '';
+    
+    switch (planId) {
+      case 'starter':
+        planName = 'STARTER';
+        features = '가입 즉시 300개 + 매일 10개 토큰';
+        break;
+      case 'premium':
+        planName = 'PREMIUM';
+        features = '가입 즉시 500개 + 매일 20개 토큰';
+        break;
+      case 'pro':
+        planName = 'PRO';
+        features = '무제한 토큰';
+        break;
+    }
+    
     Alert.alert(
       '구독 완료! 🎉',
-      `${planId.toUpperCase()} 플랜이 활성화되었습니다.\n(개발 모드 - 실제 결제 없음)`,
+      `${planName} 플랜이 활성화되었습니다.\n${features}\n(개발 모드 - 실제 결제 없음)`,
       [{ text: '확인' }]
     );
   }
@@ -41,14 +71,24 @@ class MockPurchaseService {
     // 토큰 수량 결정
     let tokens = 0;
     switch (packageId) {
+      case '30':
+        tokens = 30;
+        break;
+      case '100':
+        tokens = 100;
+        break;
+      case '300':
+        tokens = 300;
+        break;
+      case '1000':
+        tokens = 1000;
+        break;
+      // 레거시 호환성
       case '50':
         tokens = 50;
         break;
-      case '100':
-        tokens = 120; // 20 보너스 포함
-        break;
       case '200':
-        tokens = 250; // 50 보너스 포함
+        tokens = 200;
         break;
     }
     
@@ -75,7 +115,7 @@ class MockPurchaseService {
     const savedPlan = await AsyncStorage.getItem('mock_subscription_plan');
     
     if (savedPlan && savedPlan !== 'free') {
-      await tokenService.upgradeSubscription(savedPlan as 'premium' | 'pro');
+      await tokenService.upgradeSubscription(savedPlan as 'starter' | 'premium' | 'pro');
       
       Alert.alert(
         '복원 완료! 🎉',
@@ -99,19 +139,27 @@ class MockPurchaseService {
   getProducts(): any[] {
     return [
       {
-        productId: 'com.posty.premium.monthly',
-        price: '₩9,900',
+        productId: 'com.posty.starter.monthly',
+        price: '₩1,900',
         currency: 'KRW',
-        localizedPrice: '₩9,900',
-        title: 'Premium 월간',
-        description: '매월 100개 토큰',
+        localizedPrice: '₩1,900',
+        title: 'STARTER 월간',
+        description: '가입 즉시 300개 + 매일 10개 토큰',
+      },
+      {
+        productId: 'com.posty.premium.monthly',
+        price: '₩4,900',
+        currency: 'KRW',
+        localizedPrice: '₩4,900',
+        title: 'PREMIUM 월간',
+        description: '가입 즉시 500개 + 매일 20개 토큰',
       },
       {
         productId: 'com.posty.pro.monthly',
-        price: '₩19,900',
+        price: '₩14,900',
         currency: 'KRW',
-        localizedPrice: '₩19,900',
-        title: 'Pro 월간',
+        localizedPrice: '₩14,900',
+        title: 'PRO 월간',
         description: '무제한 토큰',
       },
     ];

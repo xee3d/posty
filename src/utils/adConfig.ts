@@ -61,19 +61,19 @@ export const SUBSCRIPTION_PLANS = {
   starter: {
     id: 'starter',
     name: 'STARTER',
-    price: 2900,
-    priceDisplay: '₩2,900',
+    price: 1900,
+    priceDisplay: '₩1,900',
     features: {
-      monthlyTokens: 300, // 무료와 동일하지만 일일 제한 없음
+      monthlyTokens: 200, // 월 200개로 조정
       dailyLimit: -1, // 일일 제한 없음
       aiModel: 'gpt-4o-mini', // 무료와 동일한 모델
       hasAds: false,
       platforms: ['instagram', 'facebook', 'twitter'],
-      rolloverTokens: 50, // 50개까지 이월
+      rolloverTokens: 30, // 30개까지 이월
       extraFeatures: [
-        '매월 300개 토큰 제공',
+        '매월 200개 토큰 제공',
         '일일 제한 없음',
-        '최대 50개 이월 가능',
+        '최대 30개 이월 가능',
         '광고 완전 제거',
         'GPT-4o mini AI 모델',
       ],

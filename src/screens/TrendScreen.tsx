@@ -17,6 +17,9 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { soundManager } from '../utils/soundManager';
 import trendService from '../services/trendService';
 import { AnimatedCard, SlideInView, FadeInView } from '../components/AnimationComponents';
+import { useAppSelector } from '../hooks/redux';
+import { getUserPlan, TREND_ACCESS, PlanType } from '../config/adConfig';
+import { Alert } from '../utils/customAlert';
 
 type TrendCategory = 'all' | 'news' | 'social' | 'keywords';
 
@@ -26,6 +29,18 @@ interface TrendScreenProps {
 
 const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   const { colors, isDark } = useAppTheme();
+  
+  // 구독 플랜 정보
+  const subscription = useAppSelector(state => state.user.subscription);
+  const subscriptionPlan = useAppSelector(state => state.user.subscriptionPlan);
+  const userPlan = getUserPlan(subscriptionPlan || subscription?.plan || 'free');
+  const trendAccess = TREND_ACCESS[userPlan] || TREND_ACCESS.free;
+  
+  console.log('[TrendScreen] subscription:', subscription);
+  console.log('[TrendScreen] subscriptionPlan:', subscriptionPlan);
+  console.log('[TrendScreen] userPlan:', userPlan);
+  console.log('[TrendScreen] trendAccess:', trendAccess);
+  console.log('[TrendScreen] TREND_ACCESS:', TREND_ACCESS);
   const [selectedCategory, setSelectedCategory] = useState<TrendCategory>('all');
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -57,6 +72,22 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   };
 
   useEffect(() => {
+    console.log('[TrendScreen] useEffect - checking access');
+    console.log('[TrendScreen] trendAccess:', trendAccess);
+    console.log('[TrendScreen] Current userPlan:', userPlan);
+    
+    // trendAccess가 존재하지 않으면 기본값 사용
+    const hasAccess = trendAccess?.hasAccess ?? true;
+    
+    // 플랜에 따라 접근 권한 확인
+    if (!hasAccess) {
+      console.log('[TrendScreen] Access denied - showing premium screen');
+      // 접근 불가 로직은 렌더링 후에 처리
+      setIsLoading(false);
+      return;
+    }
+    
+    console.log('[TrendScreen] Access granted - loading trends');
     loadTrends();
   }, []);
 
@@ -99,6 +130,48 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
           <Text style={styles.loadingText}>실시간 트렌드를 가져오는 중...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+  
+  // 접근 권한이 없을 때
+  const hasAccess = trendAccess?.hasAccess ?? true;
+  if (!hasAccess) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <View style={styles.headerTop}>
+            <View style={styles.mollyBadge}>
+              <Text style={styles.mollyBadgeText}>T</Text>
+            </View>
+            <Text style={styles.headerTitle}>실시간 트렌드</Text>
+          </View>
+          <Text style={styles.headerSubtitle}>{BRAND.slogans.creative}</Text>
+        </View>
+        
+        <View style={styles.accessDeniedContainer}>
+          <View style={styles.accessDeniedIcon}>
+            <Icon name="lock-closed" size={48} color={colors.text.tertiary} />
+          </View>
+          <Text style={styles.accessDeniedTitle}>프리미엄 기능입니다</Text>
+          <Text style={styles.accessDeniedSubtitle}>
+            PRO 플랜부터 실시간 트렌드를 확인할 수 있습니다.
+          </Text>
+          <TouchableOpacity
+            style={styles.upgradeButton}
+            onPress={() => onNavigate?.('subscription')}
+          >
+            <Text style={styles.upgradeButtonText}>구독 플랜 보기</Text>
+          </TouchableOpacity>
+          
+          <View style={styles.trendPreview}>
+            <Text style={styles.trendPreviewTitle}>트렌드 미리보기</Text>
+            <Text style={styles.trendPreviewSubtitle}>
+              트렌드를 분석하여 트래픽을 높이고,{"\n"}
+              실시간 이슈에 맞춰 콘텐츠를 작성해보세요.
+            </Text>
+          </View>
         </View>
       </SafeAreaView>
     );
@@ -173,7 +246,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         </SlideInView>
 
         {/* 내 트렌드 요약 (있는 경우) */}
-        {userTrends && userTrends.hashtags?.length > 0 && (
+        {userPlan === 'pro' && userTrends && userTrends.hashtags?.length > 0 && (
           <SlideInView direction="right" delay={200}>
             <View style={styles.myTrendsSection}>
               <Text style={styles.sectionTitle}>내가 자주 쓴 태그</Text>
@@ -286,6 +359,25 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
             </View>
           </View>
         </FadeInView>
+        
+        {/* 업데이트 빈도 표시 */}
+        {trendAccess?.updateFrequency === 'daily' && userPlan !== 'pro' && (
+          <View style={styles.updateFrequencyBadge}>
+            <Icon name="time-outline" size={16} color={colors.text.secondary} />
+            <Text style={styles.updateFrequencyText}>
+              트렌드가 매일 업데이트됩니다
+            </Text>
+          </View>
+        )}
+        
+        {trendAccess?.updateFrequency === 'realtime' && (
+          <View style={styles.updateFrequencyBadge}>
+            <Icon name="flash" size={16} color={colors.primary} />
+            <Text style={[styles.updateFrequencyText, { color: colors.primary }]}>
+              실시간 트렌드 업데이트
+            </Text>
+          </View>
+        )}
 
         <View style={styles.bottomSpace} />
       </ScrollView>
@@ -547,6 +639,89 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
     },
     bottomSpace: {
       height: SPACING.xxl,
+    },
+    accessDeniedContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: SPACING.xl,
+    },
+    accessDeniedIcon: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: isDark ? colors.surface : '#F3F4F6',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: SPACING.lg,
+    },
+    accessDeniedTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.text.primary,
+      marginBottom: SPACING.sm,
+    },
+    accessDeniedSubtitle: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 24,
+      marginBottom: SPACING.xl,
+    },
+    upgradeButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: SPACING.xl,
+      paddingVertical: SPACING.md,
+      borderRadius: 24,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    upgradeButtonText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: '#FFFFFF',
+    },
+    trendPreview: {
+      marginTop: SPACING.xxl,
+      padding: SPACING.lg,
+      backgroundColor: colors.primary + '10',
+      borderRadius: 16,
+      width: '100%',
+    },
+    trendPreviewTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.primary,
+      marginBottom: SPACING.sm,
+      textAlign: 'center',
+    },
+    trendPreviewSubtitle: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 22,
+    },
+    updateFrequencyBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: SPACING.xs,
+      marginHorizontal: SPACING.lg,
+      marginBottom: SPACING.lg,
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.sm,
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: colors.border,
+      alignSelf: 'flex-start',
+    },
+    updateFrequencyText: {
+      fontSize: 13,
+      color: colors.text.secondary,
+      fontWeight: '500',
     },
   });
 

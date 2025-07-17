@@ -90,6 +90,11 @@ class FirestoreService {
           updateData.subscription = cleanSettings.subscription;
         }
         
+        // subscriptionPlan이 있는 경우 (starter, premium, pro)
+        if (cleanSettings.subscriptionPlan) {
+          updateData.subscriptionPlan = cleanSettings.subscriptionPlan;
+        }
+        
         updateData.lastUpdated = serverTimestamp();
         
         await updateDoc(userRef, updateData);

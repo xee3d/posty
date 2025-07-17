@@ -15,6 +15,8 @@ import { soundManager } from '../utils/soundManager';
 import { saveContent } from '../utils/storage';
 
 import { Alert } from '../utils/customAlert';
+import { useAppSelector } from '../hooks/redux';
+import { getUserPlan, MY_STYLE_ACCESS, PlanType } from '../config/adConfig';
 const { width } = Dimensions.get('window');
 
 interface MyStyleScreenProps {
@@ -45,6 +47,17 @@ interface TemplateUsage {
 const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
   const styles = createStyles(colors, cardTheme, isDark);
+  
+  // 구독 플랜 정보
+  const subscription = useAppSelector(state => state.user.subscription);
+  const subscriptionPlan = useAppSelector(state => state.user.subscriptionPlan);
+  const userPlan = getUserPlan(subscriptionPlan || subscription?.plan || 'free');
+  const styleAccess = MY_STYLE_ACCESS[userPlan] || MY_STYLE_ACCESS.free;
+  
+  console.log('[MyStyleScreen] subscription:', subscription);
+  console.log('[MyStyleScreen] subscriptionPlan:', subscriptionPlan);
+  console.log('[MyStyleScreen] userPlan:', userPlan);
+  console.log('[MyStyleScreen] styleAccess:', styleAccess);
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>(null);
   const [recentPosts, setRecentPosts] = useState<any[]>([]);
@@ -90,20 +103,81 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     }
   };
 
-  // 추천 템플릿 생성
+  // 추천 템플릿 생성 - 사용 가능한 템플릿만 추천
   const generateRecommendations = (analysis: any, statsData: any) => {
-    const preferences = {
-      length: statsData.avgContentLength < 100 ? 'short' : statsData.avgContentLength > 200 ? 'long' : 'medium',
-      mood: analysis.emotionalTone > 0.7 ? 'emotional' : analysis.humorScore > 0.7 ? 'fun' : 'serious',
-      age: 'young' // 기본값, 실제로는 사용자 프로필에서 가져와야 함
-    };
+    // 실제 사용 데이터 기반 추천
+    const usedTemplates = Object.entries(templateUsage)
+      .filter(([_, usage]: [string, any]) => usage.count > 0)
+      .sort(([_, a]: [string, any], [__, b]: [string, any]) => b.count - a.count)
+      .map(([templateId]) => templateId);
     
-    const recommended = recommendStyles(preferences);
-    setRecommendedTemplates(recommended);
+    // 자주 사용한 템플릿과 비슷한 스타일 추천
+    const recommendations: string[] = [];
+    
+    // 1. 가장 많이 사용한 템플릿의 유사 스타일 찾기
+    if (usedTemplates.length > 0) {
+      const mostUsedTemplate = UNIFIED_STYLES.find(t => t.id === usedTemplates[0]);
+      if (mostUsedTemplate) {
+        // 같은 카테고리의 다른 템플릿 추천
+        const similarTemplates = UNIFIED_STYLES.filter(t => 
+          t.id !== mostUsedTemplate.id && 
+          t.characteristics.keywords.some(k => 
+            mostUsedTemplate.characteristics.keywords.includes(k)
+          )
+        );
+        
+        similarTemplates.forEach(t => {
+          if (recommendations.length < 3) {
+            // Starter 플랜은 처음 3개 템플릿만 사용 가능
+            const templateIndex = UNIFIED_STYLES.findIndex(style => style.id === t.id);
+            const isAccessible = userPlan !== 'starter' || 
+                                (styleAccess?.templateLimit === 0) || 
+                                (templateIndex < (styleAccess?.templateLimit || 0));
+            
+            if (isAccessible) {
+              recommendations.push(t.id);
+            }
+          }
+        });
+      }
+    }
+    
+    // 2. 분석 결과 기반 추천 (사용 가능한 템플릿만)
+    if (analysis?.dominantStyle && recommendations.length < 3) {
+      const dominantTemplate = UNIFIED_STYLES.find(t => t.id === analysis.dominantStyle);
+      if (dominantTemplate) {
+        const templateIndex = UNIFIED_STYLES.findIndex(style => style.id === dominantTemplate.id);
+        const isAccessible = userPlan !== 'starter' || 
+                            (styleAccess?.templateLimit === 0) || 
+                            (templateIndex < (styleAccess?.templateLimit || 0));
+        
+        if (isAccessible && !recommendations.includes(dominantTemplate.id)) {
+          recommendations.push(dominantTemplate.id);
+        }
+      }
+    }
+    
+    // 3. 사용하지 않은 템플릿 중 추천 (다양성 확보)
+    const unusedTemplates = UNIFIED_STYLES.filter((t, index) => {
+      const isAccessible = userPlan !== 'starter' || 
+                          (styleAccess?.templateLimit === 0) || 
+                          (index < (styleAccess?.templateLimit || 0));
+      return isAccessible && 
+             !usedTemplates.includes(t.id) && 
+             !recommendations.includes(t.id);
+    });
+    
+    unusedTemplates.forEach(t => {
+      if (recommendations.length < 3) {
+        recommendations.push(t.id);
+      }
+    });
+    
+    setRecommendedTemplates(recommendations);
     
     // styleAnalysis에도 추천 스타일 추가
     if (analysis) {
-      analysis.recommendedStyles = recommended;
+      analysis.recommendedStyles = recommendations;
     }
   };
 
@@ -322,6 +396,13 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   };
 
   useEffect(() => {
+    // 플랜에 따라 접근 권한 확인
+    const hasAccess = styleAccess?.hasAccess ?? false;
+    if (!hasAccess) {
+      setLoading(false);
+      return;
+    }
+    
     loadDataAndAnalyze();
   }, []);
 
@@ -674,13 +755,27 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         <Text style={styles.sectionSubtitle}>
         다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요
         </Text>
+        {userPlan === 'starter' && styleAccess?.templateLimit && styleAccess.templateLimit > 0 && (
+          <View style={styles.templateLimitBadge}>
+            <Icon name="information-circle" size={16} color={colors.primary} />
+            <Text style={styles.templateLimitText}>
+              STARTER 플랜: {styleAccess.templateLimit}개 템플릿만 사용 가능
+            </Text>
+          </View>
+        )}
       </Animated.View>
       
-      {templates.map((template) => {
+      {templates.map((template, index) => {
       const templateUsageData = templateUsage[template.id];
       const isRecommended = styleAnalysis?.recommendedStyles?.includes(template.id);
       const iconBgOpacity = isDark ? '40' : '30';
       const iconSize = width < 380 ? 28 : 32;
+      
+      // 템플릿 제한 확인
+      const isLocked = userPlan === 'starter' && 
+                       styleAccess?.templateLimit && 
+                       styleAccess.templateLimit > 0 && 
+                       index >= styleAccess.templateLimit;
       
       return (
       <TouchableOpacity
@@ -689,12 +784,26 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         styles.templateCard, 
           cardTheme.card,
           isRecommended && styles.recommendedTemplate,
-          pressedTemplateId === template.id && styles.templateCardPressed
+          pressedTemplateId === template.id && styles.templateCardPressed,
+          isLocked && styles.lockedTemplate
       ]}
-      onPressIn={() => setPressedTemplateId(template.id)}
+      onPressIn={() => !isLocked && setPressedTemplateId(template.id)}
       onPressOut={() => setPressedTemplateId(null)}
-      onPress={() => handleTemplateUse(template)}
-      activeOpacity={0.7}
+      onPress={() => {
+        if (isLocked) {
+          Alert.alert(
+            '프리미엄 템플릿',
+            'PRO 플랜에서 모든 템플릿을 사용할 수 있습니다.',
+            [
+              { text: '취소', style: 'cancel' },
+              { text: '업그레이드', onPress: () => onNavigate?.('subscription') }
+            ]
+          );
+          return;
+        }
+        handleTemplateUse(template);
+      }}
+      activeOpacity={isLocked ? 1 : 0.7}
       >
       {isRecommended && (
       <Animated.View 
@@ -740,7 +849,13 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 </View>
               </View>
               
-              <Icon name="arrow-forward" size={20} color={colors.text.secondary} />
+              {isLocked ? (
+                <View style={styles.lockIconContainer}>
+                  <Icon name="lock-closed" size={20} color={colors.primary} />
+                </View>
+              ) : (
+                <Icon name="arrow-forward" size={20} color={colors.text.secondary} />
+              )}
             </TouchableOpacity>
           );
         })}
@@ -816,6 +931,36 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     );
   }
 
+  // 접근 권한이 없을 때
+  const hasAccess = styleAccess?.hasAccess ?? false;
+  if (!hasAccess) {
+    return (
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+        <View style={styles.header}>
+          <View>
+            <Text style={styles.headerTitle}>내 스타일</Text>
+            <Text style={styles.headerSubtitle}>나만의 콘텐츠 브랜드를 만들어가세요</Text>
+          </View>
+        </View>
+        <View style={styles.accessDeniedContainer}>
+          <View style={styles.accessDeniedIcon}>
+            <Icon name="lock-closed" size={48} color={colors.text.tertiary} />
+          </View>
+          <Text style={styles.accessDeniedTitle}>프리미엄 기능입니다</Text>
+          <Text style={styles.accessDeniedSubtitle}>
+            {styleAccess?.message || 'STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.'}
+          </Text>
+          <TouchableOpacity
+            style={styles.upgradeButton}
+            onPress={() => onNavigate?.('subscription')}
+          >
+            <Text style={styles.upgradeButtonText}>구독 플랜 보기</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+  
   // 데이터가 없을 때
   if (!stats || stats.totalPosts === 0) {
     return (
@@ -1480,6 +1625,78 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       fontSize: 13,
       color: colors.warning,
       fontWeight: '700',
+    },
+    accessDeniedContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: SPACING.xl,
+    },
+    accessDeniedIcon: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: isDark ? colors.surface : '#F3F4F6',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: SPACING.lg,
+    },
+    accessDeniedTitle: {
+      fontSize: 20,
+      fontWeight: '700',
+      color: colors.text.primary,
+      marginBottom: SPACING.sm,
+    },
+    accessDeniedSubtitle: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: 24,
+      marginBottom: SPACING.xl,
+    },
+    upgradeButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: SPACING.xl,
+      paddingVertical: SPACING.md,
+      borderRadius: 24,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 8,
+      elevation: 4,
+    },
+    upgradeButtonText: {
+      fontSize: 16,
+      fontWeight: '700',
+      color: '#FFFFFF',
+    },
+    templateLimitBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: SPACING.xs,
+      backgroundColor: colors.primary + '10',
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.sm,
+      borderRadius: 12,
+      marginBottom: SPACING.md,
+    },
+    templateLimitText: {
+      fontSize: 13,
+      color: colors.primary,
+      fontWeight: '600',
+    },
+    lockedTemplate: {
+      opacity: 0.6,
+    },
+    lockIconContainer: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: isDark ? colors.primary + '20' : '#F3E8FF',
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: colors.primary,
     },
   });
 

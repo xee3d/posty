@@ -34,9 +34,13 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
   // Redux에서 직접 토큰 정보 계산
   const tokenInfo = {
     current: subscriptionPlan === 'pro' ? '무제한' : currentTokens.toString(),
-    total: subscriptionPlan === 'pro' ? '무제한' : (subscriptionPlan === 'premium' ? '100' : '10'),
+    total: subscriptionPlan === 'pro' ? '무제한' : 
+           subscriptionPlan === 'premium' ? '500' : 
+           subscriptionPlan === 'starter' ? '200' : '10',
     currentNumber: currentTokens, // 숫자값 (프로그레스 바용)
-    totalNumber: subscriptionPlan === 'pro' ? 999 : (subscriptionPlan === 'premium' ? 100 : 10), // 숫자값
+    totalNumber: subscriptionPlan === 'pro' ? 999 : 
+                 subscriptionPlan === 'premium' ? 500 : 
+                 subscriptionPlan === 'starter' ? 200 : 10, // 숫자값
     plan: subscriptionPlan,
     todayUsed,
   };
@@ -72,14 +76,16 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
     switch (tokenInfo.plan) {
       case 'pro': return '#8B5CF6';
       case 'premium': return '#F59E0B';
+      case 'starter': return '#10B981';
       default: return colors.primary;
     }
   };
 
   const getPlanName = () => {
     switch (tokenInfo.plan) {
-      case 'pro': return 'PRO';
-      case 'premium': return 'PREMIUM';
+      case 'pro': return 'MAX';
+      case 'premium': return 'PRO';
+      case 'starter': return 'STARTER';
       default: return 'FREE';
     }
   };
@@ -163,10 +169,10 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
             style={[styles.actionButton, styles.chargeButton]}
             onPress={() => {
               if (tokenInfo.plan === 'pro') {
-                // PRO 플랜 사용자에게 안내 메시지 표시
+                // MAX 플랜 사용자에게 안내 메시지 표시
                 Alert.alert(
-                  'PRO 플랜 사용 중',
-                  '현재 PRO 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. 🚀',
+                  'MAX 플랜 사용 중',
+                  '현재 MAX 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. 🚀',
                   [{ text: '확인' }]
                 );
               } else {
@@ -188,9 +194,11 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
         <Text style={styles.quickInfoText}>
           {tokenInfo.plan === 'free' 
             ? '매일 자정에 10개의 무료 토큰이 충전됩니다'
+            : tokenInfo.plan === 'starter'
+            ? 'STARTER 플랜으로 매월 200개의 토큰을 사용할 수 있습니다'
             : tokenInfo.plan === 'premium'
-            ? '프리미엄 플랜으로 매월 100개의 토큰을 사용할 수 있습니다'
-            : '프로 플랜으로 무제한 토큰을 사용 중입니다'}
+            ? 'PRO 플랜으로 매월 500개의 토큰을 사용할 수 있습니다'
+            : 'MAX 플랜으로 무제한 토큰을 사용 중입니다'}
         </Text>
       </View>
     </View>

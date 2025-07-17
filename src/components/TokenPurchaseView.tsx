@@ -16,6 +16,7 @@ const { width: screenWidth } = Dimensions.get('window');
 import { useAppSelector } from '../hooks/redux';
 import { selectSubscriptionPlan } from '../store/slices/userSlice';
 import { Alert } from '../utils/customAlert';
+import { getUserPlan, TOKEN_PURCHASE_CONFIG, PlanType } from '../config/adConfig';
 
 interface TokenPurchaseViewProps {
   onPurchase: (tokenAmount: string) => void;
@@ -28,30 +29,75 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
   colors,
   isDark,
 }) => {
+  const subscription = useAppSelector(state => state.user.subscription);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
-  const packages = [
+  const userPlan = getUserPlan(subscription);
+  const planBonus = TOKEN_PURCHASE_CONFIG.planBonuses[userPlan];
+  
+  // 첫 구매 여부 확인 (실제로는 서버에서 가져와야 함)
+  const isFirstPurchase = false; // TODO: 실제 첫 구매 여부 체크
+  // 플랜별 보너스 및 할인 적용
+  const applyPlanBenefits = (pkg: any) => {
+    if (userPlan === 'pro') {
+      return { 
+        amount: pkg.baseAmount, 
+        price: pkg.basePrice, 
+        originalPrice: pkg.originalPrice,
+        bonus: 0, 
+        discount: pkg.baseDiscount 
+      };
+    }
+    
+    // 기본 할인 + 플랜 할인
+    const planDiscount = planBonus?.priceDiscount || 0;
+    const totalDiscount = pkg.baseDiscount + planDiscount;
+    
+    // 가격 계산 (원가에서 총 할인율 적용)
+    const discountedPrice = Math.floor(pkg.originalPrice * (1 - totalDiscount / 100));
+    
+    // 보너스 토큰
+    const bonusAmount = Math.floor(pkg.baseAmount * (planBonus?.bonusRate || 0));
+    
+    // 첫 구매 프로모션 적용
+    let finalPrice = discountedPrice;
+    let finalDiscount = totalDiscount;
+    
+    if (isFirstPurchase && pkg.baseAmount >= TOKEN_PURCHASE_CONFIG.promotions.firstPurchase.minAmount) {
+      const firstPurchaseDiscount = TOKEN_PURCHASE_CONFIG.promotions.firstPurchase.discount;
+      finalPrice = Math.floor(pkg.originalPrice * (1 - (totalDiscount + firstPurchaseDiscount) / 100));
+      finalDiscount = totalDiscount + firstPurchaseDiscount;
+    }
+    
+    return {
+      amount: pkg.baseAmount,
+      bonus: bonusAmount,
+      price: finalPrice,
+      originalPrice: pkg.originalPrice,
+      discount: finalDiscount,
+    };
+  };
+  
+  const basePackages = [
     {
-      id: '50',
-      name: '스타터 팩',
-      amount: 50,
-      price: 2900,
-      originalPrice: null,
-      discount: null,
+      id: '30',
+      name: '라이트 팩',
+      baseAmount: 30,
+      basePrice: 1900,  // ₩63/개 - STARTER 한달치와 동일 가격
+      originalPrice: 2400,
+      baseDiscount: 20,  // 기본 20% 할인
       gradient: ['#E0C3FC', '#8EC5FC'],
       accentColor: '#8B5CF6',
       popular: false,
       icon: '✨',
-      tagline: '가볍게 시작하기',
-      bonus: null,
+      tagline: '부담없이 시작하기',
     },
     {
       id: '100',
       name: '베스트 밸류',
-      amount: 100,
-      bonus: 20,
-      price: 4900,
-      originalPrice: 5800,
-      discount: 15,
+      baseAmount: 100,
+      basePrice: 4900,  // ₩49/개 - PREMIUM 한달치와 동일 가격
+      originalPrice: 6500,
+      baseDiscount: 25,  // 기본 25% 할인
       gradient: ['#FA709A', '#FEE140'],
       accentColor: '#EC4899',
       popular: true,
@@ -59,28 +105,53 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       tagline: '가장 인기 있는 선택',
     },
     {
-      id: '200',
-      name: '프리미엄 팩',
-      amount: 200,
-      bonus: 50,
-      price: 8900,
-      originalPrice: 11600,
-      discount: 23,
+      id: '300',
+      name: '메가 팩',
+      baseAmount: 300,
+      basePrice: 9900,  // ₩33/개 - 대량 구매 혜택
+      originalPrice: 15000,
+      baseDiscount: 35,  // 기본 35% 할인
       gradient: ['#667EEA', '#764BA2'],
       accentColor: '#6366F1',
       popular: false,
       icon: '💎',
-      tagline: '프로를 위한 선택',
+      tagline: '헤비 유저를 위한 선택',
+    },
+    {
+      id: '1000',
+      name: '울트라 팩',
+      baseAmount: 1000,
+      basePrice: 19900,  // ₩20/개 - 최고 할인율
+      originalPrice: 40000,
+      baseDiscount: 50,  // 기본 50% 할인
+      gradient: ['#F687B3', '#D53F8C'],
+      accentColor: '#EC4899',
+      popular: false,
+      icon: '🚀',
+      tagline: '프로페셔널을 위한 최강 패키지',
     },
   ];
+  
+  // 플랜별 혜택 적용한 최종 패키지
+  const packages = basePackages.map(pkg => {
+    const benefits = applyPlanBenefits(pkg);
+    return {
+      ...pkg,
+      amount: benefits.amount,
+      price: benefits.price,
+      originalPrice: benefits.originalPrice,
+      discount: benefits.discount,
+      bonus: benefits.bonus > 0 ? benefits.bonus : null,
+    };
+  });
 
   const styles = createStyles(colors, isDark);
   
   const handlePackagePurchase = (packageId: string) => {
     if (subscriptionPlan === 'pro') {
       Alert.alert(
-        'PRO 플랜 사용 중',
-        '현재 PRO 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. \n\n추가 토큰 구매가 필요하지 않습니다. 🚀',
+        'MAX 플랜 사용 중',
+        '현재 MAX 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. \n\n추가 토큰 구매가 필요하지 않습니다. 🚀',
         [{ text: '확인' }]
       );
     } else {
@@ -94,6 +165,46 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
     >
+      {/* 플랜별 혜택 안내 */}
+      {userPlan !== 'free' && userPlan !== 'pro' && planBonus && (
+        <LinearGradient
+          colors={['#6366F1', '#818CF8']}
+          style={styles.planBenefitNotice}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Icon name="card-giftcard" size={20} color="#FFFFFF" />
+          <View style={styles.planBenefitContent}>
+            <Text style={styles.planBenefitTitle}>
+              {userPlan === 'starter' ? 'STARTER' : userPlan === 'premium' ? 'PRO' : userPlan === 'pro' ? 'MAX' : userPlan.toUpperCase()} 플랜 혜택
+            </Text>
+            <Text style={styles.planBenefitDesc}>
+              {planBonus.bonusRate > 0 && `${planBonus.bonusRate * 100}% 보너스 토큰`}
+              {planBonus.bonusRate > 0 && planBonus.priceDiscount > 0 && ' + '}
+              {planBonus.priceDiscount > 0 && `${planBonus.priceDiscount}% 할인`}
+            </Text>
+          </View>
+        </LinearGradient>
+      )}
+      
+      {/* 첫 구매 프로모션 안내 */}
+      {isFirstPurchase && (
+        <LinearGradient
+          colors={['#EC4899', '#F472B6']}
+          style={styles.firstPurchaseNotice}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Icon name="celebration" size={20} color="#FFFFFF" />
+          <View style={styles.firstPurchaseContent}>
+            <Text style={styles.firstPurchaseTitle}>첫 구매 특별 혜택</Text>
+            <Text style={styles.firstPurchaseDesc}>
+              30개 이상 구매 시 추가 30% 할인!
+            </Text>
+          </View>
+        </LinearGradient>
+      )}
+      
       {/* PRO 플랜 안내 메시지 */}
       {subscriptionPlan === 'pro' && (
         <LinearGradient
@@ -104,7 +215,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
         >
           <Icon name="stars" size={24} color="#FFFFFF" />
           <View style={styles.proNoticeContent}>
-            <Text style={styles.proNoticeTitle}>PRO 플랜 사용 중</Text>
+            <Text style={styles.proNoticeTitle}>MAX 플랜 사용 중</Text>
             <Text style={styles.proNoticeDesc}>
               무제한 토큰을 사용하실 수 있어 추가 구매가 필요하지 않습니다
             </Text>
@@ -233,9 +344,10 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
             >
               <Icon name="trending-up" size={24} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.featureTitle}>대량 구매 할인</Text>
+            <Text style={styles.featureTitle}>대량 구매 혜택</Text>
             <Text style={styles.featureDesc}>
-              더 많이 구매할수록 최대 23% 할인
+              최대 50% 기본 할인
+              + 플랜별 추가 할인
             </Text>
           </LinearGradient>
 
@@ -253,9 +365,10 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
             >
               <Icon name="lock-open" size={24} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.featureTitle}>구독 부담 없음</Text>
+            <Text style={styles.featureTitle}>유연한 사용</Text>
             <Text style={styles.featureDesc}>
-              일회성 구매로 추가 결제 걱정 없음
+              필요할 때만 구매
+              구독 부담 없음
             </Text>
           </LinearGradient>
 
@@ -273,9 +386,10 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
             >
               <Icon name="rocket-launch" size={24} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.featureTitle}>즉시 사용 가능</Text>
+            <Text style={styles.featureTitle}>영구 소유</Text>
             <Text style={styles.featureDesc}>
-              구매 후 바로 콘텐츠 생성 시작
+              구매한 토큰은 만료 없이
+              영원히 사용 가능
             </Text>
           </LinearGradient>
 
@@ -293,11 +407,41 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
             >
               <Icon name="favorite" size={24} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.featureTitle}>보너스 토큰</Text>
+            <Text style={styles.featureTitle}>플랜 혜택</Text>
             <Text style={styles.featureDesc}>
-              대량 구매 시 추가 보너스 토큰
+              구독 플랜별
+              보너스 토큰 제공
             </Text>
           </LinearGradient>
+        </View>
+      </View>
+
+      {/* 구독 vs 토큰 구매 비교 */}
+      <View style={styles.comparisonSection}>
+        <Text style={styles.sectionTitle}>토큰 구매 vs 구독 플랜</Text>
+        
+        <View style={styles.comparisonCard}>
+          <Icon name="help-outline" size={20} color={colors.primary} />
+          <View style={styles.comparisonContent}>
+            <Text style={styles.comparisonTitle}>어떤 경우 토큰 구매가 좋나요?</Text>
+            <Text style={styles.comparisonDesc}>
+              • 불규칙하게 사용하시는 분
+              • 특정 프로젝트를 위해 집중적으로 사용하시는 분
+              • 구독 부담 없이 필요할 때만 사용하고 싶으신 분
+            </Text>
+          </View>
+        </View>
+        
+        <View style={styles.comparisonCard}>
+          <Icon name="workspace-premium" size={20} color={colors.primary} />
+          <View style={styles.comparisonContent}>
+            <Text style={styles.comparisonTitle}>구독 플랜의 장점</Text>
+            <Text style={styles.comparisonDesc}>
+              • STARTER: ₩1,900으로 총 600개 (가입 300 + 매일 10)
+              • PREMIUM: ₩4,900으로 총 1,100개 (가입 500 + 매일 20)
+              • 광고 제거 + 고급 기능 사용 가능
+            </Text>
+          </View>
         </View>
       </View>
 
@@ -578,6 +722,35 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   bottomSpace: {
     height: 40,
   },
+  comparisonSection: {
+    marginTop: 48,
+    paddingHorizontal: 24,
+  },
+  comparisonCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: isDark ? colors.surface : '#F9FAFB',
+    padding: 16,
+    borderRadius: 16,
+    marginBottom: 12,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  comparisonContent: {
+    flex: 1,
+  },
+  comparisonTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.text.primary,
+    marginBottom: 8,
+  },
+  comparisonDesc: {
+    fontSize: 13,
+    color: colors.text.secondary,
+    lineHeight: 20,
+  },
   proNotice: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -597,6 +770,52 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     marginBottom: 4,
   },
   proNoticeDesc: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
+    lineHeight: 20,
+  },
+  planBenefitNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginHorizontal: 24,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 16,
+  },
+  planBenefitContent: {
+    flex: 1,
+  },
+  planBenefitTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  planBenefitDesc: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
+    lineHeight: 20,
+  },
+  firstPurchaseNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginHorizontal: 24,
+    marginBottom: 16,
+    padding: 16,
+    borderRadius: 16,
+  },
+  firstPurchaseContent: {
+    flex: 1,
+  },
+  firstPurchaseTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  firstPurchaseDesc: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.9)',
     lineHeight: 20,

@@ -9,7 +9,8 @@ import {
   purchaseTokens,
   earnTokens,
   updateSubscription,
-  resetDailyTokens
+  resetDailyTokens,
+  resetMonthlyTokens
 } from '../../store/slices/userSlice';
 import auth from '@react-native-firebase/auth';
 import firestoreService from '../firebase/firestoreService';
@@ -66,7 +67,9 @@ class TokenService {
           
           // Redux와 로컬 스토리지에 저장
           store.dispatch(setTokens(firestoreTokens));
-          store.dispatch(setSubscriptionPlan(userData.subscription?.plan || 'free'));
+          // subscriptionPlan 필드를 우선 사용, 없으면 subscription.plan 사용
+          const plan = userData.subscriptionPlan || userData.subscription?.plan || 'free';
+          store.dispatch(setSubscriptionPlan(plan));
           
           // 로컬 스토리지에도 저장 (백업)
           await AsyncStorage.setItem(this.TOKEN_KEY, JSON.stringify({
@@ -77,7 +80,7 @@ class TokenService {
           
           await AsyncStorage.setItem(this.SUBSCRIPTION_KEY, JSON.stringify({
             ...this.getDefaultSubscription(),
-            subscriptionPlan: userData.subscription?.plan || 'free',
+            subscriptionPlan: plan,
             dailyTokens: firestoreTokens,
           }));
           
@@ -115,6 +118,12 @@ class TokenService {
       // 일일 리셋 체크
       const subscription = await this.getSubscription();
       await this.checkDailyReset(subscription);
+      
+      // 월간 리셋 체크 (STARTER, PREMIUM 플랜)
+      const subscriptionPlan = store.getState().user.subscriptionPlan;
+      if (subscriptionPlan === 'starter' || subscriptionPlan === 'premium') {
+        store.dispatch(resetMonthlyTokens());
+      }
       
     } catch (error) {
       console.error('TokenService: Initialization error:', error);
@@ -245,10 +254,15 @@ class TokenService {
   /**
    * 구독 업그레이드
    */
-  async upgradeSubscription(plan: 'premium' | 'pro'): Promise<void> {
+  async upgradeSubscription(plan: 'starter' | 'premium' | 'pro'): Promise<void> {
     try {
       // Redux 상태 업데이트
       store.dispatch(updateSubscription({ plan }));
+      
+      // 월간 토큰 리셋 (새로운 플랜으로 변경 시)
+      if (plan === 'starter' || plan === 'premium') {
+        store.dispatch(resetMonthlyTokens());
+      }
     } catch (error) {
       console.error('Failed to upgrade subscription:', error);
     }
@@ -280,14 +294,17 @@ class TokenService {
 
   /**
    * 일일 리셋 체크
+   * - 무료 플랜: 매일 10개로 리셋
+   * - 유료 플랜: 일일 보너스 토큰 추가
    */
   private async checkDailyReset(subscription: UserTokenData): Promise<void> {
     const now = new Date();
     const lastReset = new Date(subscription.lastResetDate);
     
-    // 날짜가 다르면 리셋
+    // 날짜가 다르면 리셋 (모든 플랜에서 적용)
     if (now.toDateString() !== lastReset.toDateString()) {
       // Redux에서 일일 토큰 리셋
+      console.log('[TokenService] Daily reset triggered for', subscription.subscriptionPlan);
       store.dispatch(resetDailyTokens());
     }
   }
@@ -296,19 +313,8 @@ class TokenService {
    * 월간 리셋 체크 (Premium 플랜)
    */
   async checkMonthlyReset(): Promise<void> {
-    const subscription = await this.getSubscription();
-    
-    if (subscription.subscriptionPlan === 'premium') {
-      // TODO: 구독 시작일 기준으로 월간 리셋
-      // 현재는 매월 1일 리셋으로 간단히 구현
-      const now = new Date();
-      const lastReset = new Date(subscription.lastResetDate);
-      
-      if (now.getMonth() !== lastReset.getMonth()) {
-        subscription.monthlyTokensRemaining = 100;
-        await this.saveSubscription(subscription);
-      }
-    }
+    // Redux에서 처리하므로 액션만 호출
+    store.dispatch(resetMonthlyTokens());
   }
 
   /**
