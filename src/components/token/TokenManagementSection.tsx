@@ -14,6 +14,7 @@ import tokenService from '../../services/subscription/tokenService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAppSelector } from '../../hooks/redux';
 import { selectCurrentTokens, selectSubscriptionPlan } from '../../store/slices/userSlice';
+import { Alert } from '../../utils/customAlert';
 
 interface TokenManagementSectionProps {
   onNavigateToSubscription: () => void;
@@ -32,8 +33,10 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
 
   // Redux에서 직접 토큰 정보 계산
   const tokenInfo = {
-    current: subscriptionPlan === 'pro' ? 999 : currentTokens,
-    total: subscriptionPlan === 'pro' ? 999 : (subscriptionPlan === 'premium' ? 100 : 10),
+    current: subscriptionPlan === 'pro' ? '무제한' : currentTokens.toString(),
+    total: subscriptionPlan === 'pro' ? '무제한' : (subscriptionPlan === 'premium' ? '100' : '10'),
+    currentNumber: currentTokens, // 숫자값 (프로그레스 바용)
+    totalNumber: subscriptionPlan === 'pro' ? 999 : (subscriptionPlan === 'premium' ? 100 : 10), // 숫자값
     plan: subscriptionPlan,
     todayUsed,
   };
@@ -104,7 +107,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
                 <Text style={[styles.tokenNumber, { color: getPlanColor() }]}>
                   {tokenInfo.current}
                 </Text>
-                <Text style={styles.tokenTotal}>/ {tokenInfo.total}</Text>
+                <Text style={styles.tokenTotal}> / {tokenInfo.total}</Text>
               </View>
             </View>
           </View>
@@ -124,7 +127,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
                 style={[
                   styles.progressFill, 
                   { 
-                    width: `${(tokenInfo.current / tokenInfo.total) * 100}%`,
+                    width: `${(tokenInfo.currentNumber / tokenInfo.totalNumber) * 100}%`,
                     backgroundColor: getPlanColor(),
                   }
                 ]} 
@@ -158,7 +161,18 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
           
           <TouchableOpacity 
             style={[styles.actionButton, styles.chargeButton]}
-            onPress={onNavigateToSubscription}
+            onPress={() => {
+              if (tokenInfo.plan === 'pro') {
+                // PRO 플랜 사용자에게 안내 메시지 표시
+                Alert.alert(
+                  'PRO 플랜 사용 중',
+                  '현재 PRO 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. 🚀',
+                  [{ text: '확인' }]
+                );
+              } else {
+                onNavigateToSubscription();
+              }
+            }}
           >
             <Icon name="add-circle" size={18} color={colors.primary} />
             <Text style={[styles.actionButtonText, { color: colors.primary }]}>

@@ -120,6 +120,8 @@ export const restoreTokenData = async (): Promise<boolean> => {
 /**
  * Redux 상태 변경 시 자동으로 저장하는 미들웨어 설정
  */
+let persistTimeout: NodeJS.Timeout | null = null;
+
 export const setupTokenPersistence = () => {
   // Redux 상태 변경 감지
   let previousTokens = store.getState().user.currentTokens;
@@ -134,8 +136,15 @@ export const setupTokenPersistence = () => {
       previousTokens = currentState.currentTokens;
       previousPlan = currentState.subscriptionPlan;
       
-      // 비동기로 저장 (성능 최적화)
-      persistTokenData();
+      // 기존 타이머 취소
+      if (persistTimeout) {
+        clearTimeout(persistTimeout);
+      }
+      
+      // 디바운스: 500ms 후에 저장 (중복 방지)
+      persistTimeout = setTimeout(() => {
+        persistTokenData();
+      }, 500);
     }
   });
 };

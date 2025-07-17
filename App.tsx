@@ -187,6 +187,8 @@ const App: React.FC = () => {
 
   // 로그인 상태 확인
   useEffect(() => {
+    let unsubscribeFirestore: (() => void) | null = null;
+    
     const unsubscribe = socialAuthService.onAuthStateChanged((user) => {
       setIsAuthenticated(!!user);
       setIsCheckingAuth(false);
@@ -198,8 +200,8 @@ const App: React.FC = () => {
         analyticsService.setUserId(null);
       }
       
-      // 개발 모드에서는 로그인 건너뛰기 옵션
-      const SKIP_LOGIN = __DEV__ && true; // true로 설정하면 로그인 건너뛰기
+      // 개발 모드에서도 로그인 화면을 보여주기 위해 false로 설정
+      const SKIP_LOGIN = false; // 로그인 화면을 표시
       
       // 로그인된 경우 홈으로, 아니면 로그인 화면으로
       if (!SKIP_LOGIN && !user && activeTab !== 'login') {
@@ -209,24 +211,35 @@ const App: React.FC = () => {
       // 로그인된 경우 처리
       if (user) {
         InteractionManager.runAfterInteractions(async () => {
-          // Firestore에서 사용자 데이터 로드
-          await loadUserFromFirestore(store.dispatch);
-          
-          // 실시간 구독 시작
-          const unsubscribeFirestore = subscribeToFirestoreUser(store.dispatch);
-          
-          // 자동 마이그레이션 체크
-          autoMigrationService.silentMigration();
-          
-          // 컴포넌트 언마운트 시 cleanup
-          return () => {
-            unsubscribeFirestore();
-          };
+          try {
+            // Firestore에서 사용자 데이터 로드
+            await loadUserFromFirestore(store.dispatch);
+            
+            // 실시간 구독 시작
+            unsubscribeFirestore = subscribeToFirestoreUser(store.dispatch);
+            
+            // 자동 마이그레이션 체크
+            autoMigrationService.silentMigration();
+          } catch (error) {
+            console.error('Failed to setup user data:', error);
+          }
         });
+      } else {
+        // 로그아웃 시 Firestore 구독 정리
+        if (unsubscribeFirestore) {
+          unsubscribeFirestore();
+          unsubscribeFirestore = null;
+        }
       }
     });
 
-    return unsubscribe;
+    // 컴포넌트 언마운트 시 cleanup
+    return () => {
+      unsubscribe();
+      if (unsubscribeFirestore) {
+        unsubscribeFirestore();
+      }
+    };
   }, [activeTab]);
 
   // Reanimated animated style

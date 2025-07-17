@@ -5,7 +5,7 @@ import { SUBSCRIPTION_PLANS } from '../../utils/adConfig';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useAppSelector } from '../../hooks/redux';
-import { selectCurrentTokens } from '../../store/slices/userSlice';
+import { selectCurrentTokens, selectSubscriptionPlan } from '../../store/slices/userSlice';
 import tokenService from '../../services/subscription/tokenService';
 import inAppPurchaseService from '../../services/subscription/inAppPurchaseService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -28,6 +28,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 }) => {
   const { colors, isDark } = useAppTheme();
   const currentTokens = useAppSelector(selectCurrentTokens);
+  const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
   const [selectedPlan, setSelectedPlan] = useState<'free' | 'premium' | 'pro'>('premium');
   const [activeTab, setActiveTab] = useState<'subscription' | 'tokens' | 'manage'>('subscription');
   const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
@@ -266,22 +267,24 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     navigation.navigate('Mission');
   };
 
-  const handleSubscribe = async () => {
-    if (selectedPlan === 'free') {
+  const handleSubscribe = async (planKey?: 'free' | 'premium' | 'pro') => {
+    const targetPlan = planKey || selectedPlan;
+    
+    if (targetPlan === 'free') {
       navigation.goBack();
       return;
     }
 
     Alert.alert(
       '구독 확인',
-      `${SUBSCRIPTION_PLANS[selectedPlan].name} 플랜을 구독하시겠습니까?`,
+      `${SUBSCRIPTION_PLANS[targetPlan].name} 플랜을 구독하시겠습니까?`,
       [
         { text: '취소', style: 'cancel' },
         { 
           text: '구독하기', 
           onPress: async () => {
             try {
-              await inAppPurchaseService.purchaseSubscription(selectedPlan, false);
+              await inAppPurchaseService.purchaseSubscription(targetPlan, false);
             } catch (error) {
               console.error('Subscription error:', error);
               Alert.alert(
@@ -298,8 +301,14 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   const planColors = {
     free: '#6B7280',
-    premium: '#8B5CF6',
-    pro: '#F59E0B',
+    premium: '#F59E0B',  // PRO - 골드 색상
+    pro: '#8B5CF6',      // MAX - 보라 색상
+  };
+
+  const planIcons = {
+    free: 'account-circle',
+    premium: 'star',
+    pro: 'workspace-premium',
   };
 
   const renderPlanCard = (planKey: 'free' | 'premium' | 'pro') => {
@@ -328,6 +337,12 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
         <View style={styles.planHeader}>
           <View style={styles.planTitleRow}>
+            <Icon 
+              name={planIcons[planKey]} 
+              size={24} 
+              color={isSelected ? planColor : colors.text.secondary} 
+              style={{ marginRight: 8 }}
+            />
             <Text style={[styles.planName, { color: isSelected ? planColor : colors.text.primary }]}>
               {plan.name}
             </Text>
@@ -370,6 +385,21 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             </View>
           ))}
         </View>
+
+        {/* 각 카드 내 구매 버튼 */}
+        {planKey !== 'free' && (
+          <TouchableOpacity
+            style={[
+              styles.cardPurchaseButton,
+              { backgroundColor: planColor }
+            ]}
+            onPress={() => handleSubscribe(planKey)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.cardPurchaseButtonText}>구독하기</Text>
+            <Icon name="arrow-forward" size={18} color="#FFFFFF" />
+          </TouchableOpacity>
+        )}
       </TouchableOpacity>
     );
   };
@@ -401,7 +431,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           onPress={() => setShowEarnTokenModal(true)}
         >
           <Icon name="flash-on" size={20} color={colors.primary} />
-          <Text style={styles.currentTokens}>{currentTokens}</Text>
+          <Text style={styles.currentTokens}>{subscriptionPlan === 'pro' ? '무제한' : currentTokens}</Text>
         </TouchableOpacity>
       </View>
 
@@ -528,7 +558,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 <View style={styles.benefitContent}>
                   <Text style={styles.benefitTitle}>더 많은 토큰</Text>
                   <Text style={styles.benefitDesc}>
-                  프리미엄은 매월 100개, 프로는 무제한 토큰을 제공합니다
+                  PRO는 매월 100개, MAX는 무제한 토큰을 제공합니다
                   </Text>
                 </View>
               </View>
@@ -687,8 +717,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   <Icon name="workspace-premium" size={20} color={colors.primary} />
                   <Text style={styles.premiumNoticeText}>
                     {realSubscriptionPlan === 'premium' 
-                      ? '프리미엄 회원은 매월 100개의 토큰을 사용할 수 있습니다'
-                      : '프로 회원은 무제한 토큰을 사용할 수 있습니다'}
+                      ? 'PRO 회원은 매월 100개의 토큰을 사용할 수 있습니다'
+                      : 'MAX 회원은 무제한 토큰을 사용할 수 있습니다'}
                   </Text>
                 </View>
               )}
@@ -699,28 +729,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         <View style={styles.bottomSpace} />
       </ScrollView>
 
-      {activeTab === 'subscription' && (
-        <View style={styles.bottomCTA}>
-          <TouchableOpacity 
-            style={[
-              styles.subscribeButton,
-              { backgroundColor: selectedPlan === 'free' ? colors.text.tertiary : planColors[selectedPlan] }
-            ]} 
-            onPress={handleSubscribe}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.subscribeButtonText}>
-              {selectedPlan === 'free' 
-                ? '무료로 계속하기' 
-                : `${SUBSCRIPTION_PLANS[selectedPlan].priceDisplay}로 시작하기`}
-            </Text>
-          </TouchableOpacity>
-          
-          <Text style={styles.legalText}>
-            구독은 언제든지 취소할 수 있습니다
-          </Text>
-        </View>
-      )}
+      {/* 하단 버튼 제거 - 각 카드에 버튼 추가됨 */}
       
       <EarnTokenModal
         visible={showEarnTokenModal}
@@ -1102,7 +1111,21 @@ const createStyles = (colors: any, isDark: boolean) => {
       lineHeight: 18,
     },
     bottomSpace: {
-      height: 100,
+      height: 40,
+    },
+    cardPurchaseButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: 14,
+      borderRadius: 10,
+      marginTop: SPACING.medium,
+      gap: 8,
+    },
+    cardPurchaseButtonText: {
+      color: '#FFFFFF',
+      fontSize: 15,
+      fontWeight: '600',
     },
     bottomCTA: {
       position: 'absolute',
@@ -1122,10 +1145,19 @@ const createStyles = (colors: any, isDark: boolean) => {
       alignItems: 'center',
       marginBottom: SPACING.small,
     },
+    subscribeButtonContent: {
+      alignItems: 'center',
+    },
     subscribeButtonText: {
       color: '#FFFFFF',
       fontSize: 16,
       fontWeight: '600',
+      marginBottom: 2,
+    },
+    subscribeButtonPrice: {
+      color: 'rgba(255, 255, 255, 0.9)',
+      fontSize: 14,
+      fontWeight: '500',
     },
     legalText: {
       fontSize: 12,

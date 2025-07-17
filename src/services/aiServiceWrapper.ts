@@ -88,15 +88,24 @@ class AIServiceWrapper {
   // 콘텐츠 다듬기
   async polishContent(params: PolishContentParams): Promise<GeneratedContent> {
     console.log('AIServiceWrapper: Polishing content');
+    console.log('Polish params:', { 
+      length: params.length, 
+      textLength: params.text.length,
+      polishType: params.polishType 
+    });
     
     try {
       // 서버에 polish 엔드포인트가 없으므로 일반 생성 사용
-      const polishPrompt = this.createPolishPrompt(params.text, params.polishType);
+      const polishPrompt = this.createPolishPrompt(params.text, params.polishType, params.length);
+      
+      // 사용자가 선택한 길이를 사용 (기본값: medium)
+      const selectedLength = params.length || 'medium';
       
       const content = await serverAIService.generateContent({
         prompt: polishPrompt,
         tone: params.tone || 'casual',
         platform: params.platform,
+        length: selectedLength,
       });
       
       return {
@@ -283,22 +292,34 @@ class AIServiceWrapper {
   }
   
   // Polish 프롬프트 생성
-  private createPolishPrompt(text: string, polishType?: string): string {
+  private createPolishPrompt(text: string, polishType?: string, length?: 'short' | 'medium' | 'long'): string {
+    // 길이에 따른 추가 지시사항
+    const lengthInstructions = {
+      short: '50자 이내로 간결하게',
+      medium: '100-150자 사이로',
+      long: '200-300자로 상세하게'
+    };
+    
+    const lengthGuide = length ? `\n길이: ${lengthInstructions[length]} 작성해주세요.` : '';
+    
+    // 추가 지시사항: 전체 내용을 모두 포함하여 완성된 글로 작성
+    const completionInstruction = '\n\n중요: 반드시 전체 내용을 빠짐없이 포함하여 완성된 글로 작성해주세요. 중간에 끊기지 않도록 주의해주세요.';
+    
     switch (polishType) {
       case 'spelling':
-        return `다음 텍스트의 맞춤법과 띄어쓰기를 교정해주세요: "${text}"`;
+        return `다음 텍스트의 맞춤법과 띄어쓰기를 교정해주세요. 원문의 의미와 내용은 그대로 유지하면서 맞춤법만 수정해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'refine':
-        return `다음 텍스트를 더 매끄럽고 읽기 좋게 다듬어주세요: "${text}"`;
+        return `다음 텍스트를 더 매끄럽고 읽기 좋게 다듬어주세요. 원문의 핵심 내용은 모두 유지해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'improve':
-        return `다음 텍스트의 표현을 더 풍부하고 매력적으로 개선해주세요: "${text}"`;
+        return `다음 텍스트의 표현을 더 풍부하고 매력적으로 개선해주세요. 모든 내용을 포함해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'formal':
-        return `다음 텍스트를 격식있는 문체로 변환해주세요: "${text}"`;
+        return `다음 텍스트를 격식있는 문체로 변환해주세요. 전체 내용을 빠짐없이 변환해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'simple':
-        return `다음 텍스트를 쉽고 친근하게 풀어서 다시 써주세요: "${text}"`;
+        return `다음 텍스트를 쉽고 친근하게 풀어서 다시 써주세요. 모든 내용을 빠짐없이 포함해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'engaging':
-        return `다음 텍스트를 더 재미있고 매력적으로 만들어주세요: "${text}"`;
+        return `다음 텍스트를 더 재미있고 매력적으로 만들어주세요. 전체 내용을 빠짐없이 포함해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       default:
-        return `다음 텍스트를 개선해주세요: "${text}"`;
+        return `다음 텍스트를 개선해주세요: "${text}"${lengthGuide}${completionInstruction}`;
     }
   }
 }

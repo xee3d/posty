@@ -20,6 +20,8 @@ export interface Achievement {
 
 export interface UserProfile {
   displayName: string;
+  email?: string;
+  photoURL?: string | null;
   selectedBadge?: string; // 선택한 대표 배지
   selectedTitle?: string; // 선택한 칭호
   totalPosts: number;

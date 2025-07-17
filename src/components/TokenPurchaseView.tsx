@@ -13,6 +13,10 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const { width: screenWidth } = Dimensions.get('window');
 
+import { useAppSelector } from '../hooks/redux';
+import { selectSubscriptionPlan } from '../store/slices/userSlice';
+import { Alert } from '../utils/customAlert';
+
 interface TokenPurchaseViewProps {
   onPurchase: (tokenAmount: string) => void;
   colors: any;
@@ -24,6 +28,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
   colors,
   isDark,
 }) => {
+  const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
   const packages = [
     {
       id: '50',
@@ -70,6 +75,18 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
   ];
 
   const styles = createStyles(colors, isDark);
+  
+  const handlePackagePurchase = (packageId: string) => {
+    if (subscriptionPlan === 'pro') {
+      Alert.alert(
+        'PRO 플랜 사용 중',
+        '현재 PRO 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. \n\n추가 토큰 구매가 필요하지 않습니다. 🚀',
+        [{ text: '확인' }]
+      );
+    } else {
+      onPurchase(packageId);
+    }
+  };
 
   return (
     <ScrollView 
@@ -77,7 +94,23 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
     >
-
+      {/* PRO 플랜 안내 메시지 */}
+      {subscriptionPlan === 'pro' && (
+        <LinearGradient
+          colors={['#8B5CF6', '#9333EA']}
+          style={styles.proNotice}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <Icon name="stars" size={24} color="#FFFFFF" />
+          <View style={styles.proNoticeContent}>
+            <Text style={styles.proNoticeTitle}>PRO 플랜 사용 중</Text>
+            <Text style={styles.proNoticeDesc}>
+              무제한 토큰을 사용하실 수 있어 추가 구매가 필요하지 않습니다
+            </Text>
+          </View>
+        </LinearGradient>
+      )}
 
       {/* Token Packages */}
       <View style={styles.packagesContainer}>
@@ -85,7 +118,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
           <TouchableOpacity
             key={pkg.id}
             style={styles.packageWrapper}
-            onPress={() => onPurchase(pkg.id)}
+            onPress={() => handlePackagePurchase(pkg.id)}
             activeOpacity={0.9}
           >
             {pkg.popular && (
@@ -544,6 +577,29 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   },
   bottomSpace: {
     height: 40,
+  },
+  proNotice: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+    marginHorizontal: 24,
+    marginBottom: 24,
+    padding: 16,
+    borderRadius: 16,
+  },
+  proNoticeContent: {
+    flex: 1,
+  },
+  proNoticeTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 4,
+  },
+  proNoticeDesc: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.9)',
+    lineHeight: 20,
   },
 });
 

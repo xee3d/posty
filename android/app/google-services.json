@@ -12,7 +12,20 @@
           "package_name": "com.posty"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "457030848293-ro74dm085o515vp3l66lpm692vvvvn0v.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.posty",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "457030848293-ln3opq1i78fqglmq1tt8h0ajt4oo2n83.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBBTuHfNCYpUZde-vNi1KZpJN8cpidxO2E"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "457030848293-ln3opq1i78fqglmq1tt8h0ajt4oo2n83.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

@@ -222,16 +222,37 @@ class FirestoreService {
     }
 
     const userRef = doc(this.collections.users, userId);
-    return onSnapshot(
-      userRef,
-      (doc) => {
-        callback(doc.exists() ? (doc.data() as User) : null);
-      },
-      (error) => {
-        console.error('Error subscribing to user:', error);
+    
+    // 권한 오류 발생 시 일반 데이터 가져오기로 대체
+    const handleError = async (error: any) => {
+      console.error('Error subscribing to user:', error);
+      
+      // 권한 오류인 경우 일반 조회 시도
+      if (error?.code === 'permission-denied') {
+        try {
+          const userData = await this.getUser();
+          callback(userData);
+        } catch (getError) {
+          console.error('Error getting user data:', getError);
+          callback(null);
+        }
+      } else {
         callback(null);
       }
-    );
+    };
+    
+    try {
+      return onSnapshot(
+        userRef,
+        (doc) => {
+          callback(doc.exists() ? (doc.data() as User) : null);
+        },
+        handleError
+      );
+    } catch (error) {
+      handleError(error);
+      return () => {};
+    }
   }
 
   // ===== 게시물 관련 =====

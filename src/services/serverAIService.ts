@@ -100,7 +100,34 @@ class ServerAIService {
         content: data.data.content, // 실제 콘텐츠도 출력
       });
       
-      return data.data.content;
+      // 사진과 관련 없는 내용 필터링 (임시 조치)
+      let content = data.data.content;
+      
+      // 이미지가 있는 경우에만 필터링 적용
+      if (params.imageBase64) {
+        // 사진과 관련 없는 내용 제거
+        const unwantedPatterns = [
+          /보양식[^.!?\n]*[.!?]/g,
+          /미각으로[^.!?\n]*[.!?]/g,
+          /레시피[^.!?\n]*[.!?]/g,
+          /요리[^.!?\n]*[.!?]/g,
+          /맛집[^.!?\n]*[.!?]/g,
+          /음식[^.!?\n]*추천[^.!?\n]*[.!?]/g,
+        ];
+        
+        unwantedPatterns.forEach(pattern => {
+          const matches = content.match(pattern);
+          if (matches) {
+            console.log('Filtering out unwanted content:', matches);
+            content = content.replace(pattern, '');
+          }
+        });
+        
+        // 빈 줄이 여러 개 생긴 경우 정리
+        content = content.replace(/\n{3,}/g, '\n\n').trim();
+      }
+      
+      return content;
       
     } catch (error: any) {
       console.error('Server API error:', error);

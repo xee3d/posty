@@ -10,7 +10,7 @@ import {
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useAppSelector } from '../hooks/redux';
-import { selectCurrentTokens } from '../store/slices/userSlice';
+import { selectCurrentTokens, selectSubscriptionPlan } from '../store/slices/userSlice';
 import { SPACING } from '../utils/constants';
 
 interface TokenDisplayProps {
@@ -30,6 +30,7 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
 }) => {
   const { colors } = useAppTheme();
   const currentTokens = useAppSelector(selectCurrentTokens);
+  const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
   
   const getSizeStyles = () => {
     switch (size) {
@@ -81,7 +82,7 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
         { fontSize: sizeStyles.text.fontSize },
         textStyle,
       ]}>
-        {currentTokens === -1 ? '∞' : currentTokens}
+        {subscriptionPlan === 'pro' ? '무제한' : currentTokens}
       </Text>
       {showAddButton && onPress && (
         <MaterialIcon 

@@ -13,6 +13,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import NaverLogin from '@react-native-seoul/naver-login';
 import { login as kakaoLogin, getProfile as getKakaoProfile } from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GOOGLE_WEB_CLIENT_ID, NAVER_CONSUMER_KEY, NAVER_CONSUMER_SECRET, API_URL } from '@env';
 
 export interface UserProfile {
   uid: string;
@@ -22,24 +23,38 @@ export interface UserProfile {
   provider: 'google' | 'naver' | 'kakao' | 'email';
 }
 
-// 개발 모드 플래그
-const DEV_MODE = __DEV__ && !process.env.GOOGLE_WEB_CLIENT_ID;
+// 개발 모드 플래그 - Google 로그인 실제 테스트
+const DEV_MODE = false; // 실제 Google 로그인 사용
 
 class SocialAuthService {
   private app = getApp();
   private auth = getAuth(this.app);
+  private isGoogleSignInConfigured = false;
 
   constructor() {
     if (!DEV_MODE) {
-      this.initializeGoogleSignIn();
+      // 생성자에서는 초기화하지 않음
+      console.log('SocialAuthService created, Google Sign-In will be configured on first use');
     }
   }
 
-  private initializeGoogleSignIn() {
-    GoogleSignin.configure({
-      webClientId: process.env.GOOGLE_WEB_CLIENT_ID || '',
-      offlineAccess: true,
-    });
+  private async ensureGoogleSignInConfigured() {
+    if (!this.isGoogleSignInConfigured && !DEV_MODE) {
+      console.log('Configuring Google Sign-In...');
+      console.log('Web Client ID:', GOOGLE_WEB_CLIENT_ID);
+      
+      try {
+        await GoogleSignin.configure({
+          webClientId: GOOGLE_WEB_CLIENT_ID,
+          offlineAccess: false,
+        });
+        this.isGoogleSignInConfigured = true;
+        console.log('Google Sign-In configured successfully');
+      } catch (error) {
+        console.error('Error configuring Google Sign-In:', error);
+        throw error;
+      }
+    }
   }
 
   // 개발 모드용 테스트 로그인
@@ -83,19 +98,43 @@ class SocialAuthService {
         return await this.mockLogin('google');
       }
 
+      // Google Sign-In 설정 확인
+      await this.ensureGoogleSignInConfigured();
+
       // Google Play Services 확인
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       
+      // 기존 로그인 정보 초기화
+      await GoogleSignin.signOut();
+      
       // Google 로그인
-      const { idToken } = await GoogleSignin.signIn();
+      console.log('Starting Google Sign In...');
+      const userInfo = await GoogleSignin.signIn();
+      console.log('Google Sign In successful, user info:', userInfo);
+      
+      // idToken 확인 - react-native-google-signin의 버전에 따라 위치가 다름
+      const idToken = userInfo.idToken || userInfo.data?.idToken;
+      
+      if (!idToken) {
+        console.error('No idToken received from Google Sign In');
+        console.error('userInfo structure:', JSON.stringify(userInfo, null, 2));
+        throw new Error('Google Sign In failed: No idToken');
+      }
+      
+      console.log('Got idToken, length:', idToken.length);
       
       // Firebase 인증 - 모듈러 API 사용
       const googleCredential = GoogleAuthProvider.credential(idToken);
+      console.log('Created Google credential');
+      
       const userCredential = await signInWithCredential(this.auth, googleCredential);
+      console.log('Firebase sign in successful');
       
       return this.formatUserProfile(userCredential.user, 'google');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Google 로그인 실패:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
       throw error;
     }
   }
@@ -108,8 +147,8 @@ class SocialAuthService {
         return await this.mockLogin('naver');
       }
 
-      const consumerKey = process.env.NAVER_CONSUMER_KEY || '';
-      const consumerSecret = process.env.NAVER_CONSUMER_SECRET || '';
+      const consumerKey = NAVER_CONSUMER_KEY || '';
+      const consumerSecret = NAVER_CONSUMER_SECRET || '';
       const appName = 'Posty';
       
       // 네이버 로그인 초기화
@@ -242,7 +281,7 @@ class SocialAuthService {
   // Firebase Custom Token 가져오기 (서버 API 호출)
   private async getFirebaseCustomToken(provider: string, profile: any): Promise<string> {
     try {
-      const response = await fetch(`${process.env.API_URL}/auth/custom-token`, {
+      const response = await fetch(`${API_URL}/auth/custom-token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

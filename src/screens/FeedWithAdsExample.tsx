@@ -155,7 +155,44 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
     }
   };
 
-  // 테스트용 토큰 추가 함수
+  // 테스트용 토큰 초기화 함수 (토큰을 10개로 설정)
+  const handleResetTokens = async () => {
+    try {
+      // Redux 상태 직접 업데이트를 위해 import 추가 필요
+      const { store } = require('../store');
+      const { setTokens, setSubscriptionPlan } = require('../store/slices/userSlice');
+      
+      // Redux 상태 업데이트
+      store.dispatch(setTokens(10));
+      store.dispatch(setSubscriptionPlan('free'));
+      
+      // 로컬 스토리지도 업데이트
+      const subscription = {
+        subscriptionPlan: 'free',
+        dailyTokens: 10,
+        purchasedTokens: 0,
+        monthlyTokensRemaining: 0,
+        lastResetDate: new Date().toISOString(),
+        tokensUsedToday: 0,
+        tokenHistory: [],
+      };
+      
+      await AsyncStorage.setItem('USER_SUBSCRIPTION', JSON.stringify(subscription));
+      await AsyncStorage.setItem('USER_TOKENS', JSON.stringify({
+        current: 10,
+        total: 10,
+        lastUpdated: new Date().toISOString(),
+      }));
+      
+      await checkSubscription();
+      await loadTokenInfo();
+      
+      Alert.alert('성공', '토큰이 10개로 초기화되었습니다!');
+    } catch (error) {
+      console.error('Failed to reset tokens:', error);
+      Alert.alert('오류', '토큰 초기화에 실패했습니다.');
+    }
+  };
   const handleAddTestTokens = async () => {
     Alert.alert(
       '테스트 토큰 추가',
@@ -291,6 +328,13 @@ export const FeedWithAdsExample: React.FC<FeedWithAdsExampleProps> = ({ navigati
           >
             <Icon name="settings" size={20} color={COLORS.text} />
             <Text style={styles.planButtonText}>{currentPlan.toUpperCase()}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.resetButton}
+            onPress={handleResetTokens}
+          >
+            <Icon name="refresh" size={20} color={COLORS.error} />
+            <Text style={styles.resetButtonText}>10개로</Text>
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.tokenButton}
@@ -499,6 +543,20 @@ const styles = StyleSheet.create({
   planButtonText: {
     marginLeft: 4,
     color: COLORS.text,
+    fontWeight: '600',
+    fontSize: 13,
+  },
+  resetButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.error + '20',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  resetButtonText: {
+    marginLeft: 4,
+    color: COLORS.error,
     fontWeight: '600',
     fontSize: 13,
   },

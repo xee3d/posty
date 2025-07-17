@@ -41,6 +41,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     : (originalContent?.content || JSON.stringify(originalContent));
 
   const platforms = [
+    { id: 'original', name: '원본', icon: 'document-text-outline', color: colors.primary },
     { id: 'instagram', name: 'Instagram', icon: 'logo-instagram', color: '#E4405F' },
     { id: 'facebook', name: 'Facebook', icon: 'logo-facebook', color: '#1877F2' },
     { id: 'twitter', name: 'X', icon: 'logo-twitter', color: '#000000' },
@@ -52,7 +53,8 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
       setIsOptimizing(true);
       const contents: Record<string, { content: string; hashtags: string[] }> = {};
       
-      for (const platform of platforms) {
+      // 원본을 제외한 플랫폼들만 처리
+      for (const platform of platforms.filter(p => p.id !== 'original')) {
         const optimized = optimizeForPlatform(
           safeOriginalContent,
           platform.id as 'instagram' | 'facebook' | 'twitter',
@@ -214,7 +216,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
           >
             <Icon
               name={platform.icon}
-              size={18}
+              size={16}
               color={activePlatform === platform.id ? platform.color : colors.text.secondary}
             />
             <Text style={[
@@ -244,7 +246,22 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
         </View>
       )}
       
-      {/* 토큰 사용 안내 */}
+      {/* 변환 비교 안내 */}
+      {activePlatform !== 'original' && (
+        <View style={styles.conversionInfo}>
+          <View style={styles.conversionInfoItem}>
+            <Text style={styles.conversionLabel}>원본 길이:</Text>
+            <Text style={styles.conversionValue}>{safeOriginalContent.split('#')[0].trim().length}자</Text>
+          </View>
+          <Icon name="arrow-forward" size={16} color={colors.text.tertiary} />
+          <View style={styles.conversionInfoItem}>
+            <Text style={styles.conversionLabel}>변환 후:</Text>
+            <Text style={styles.conversionValue}>{getContentLength()}자</Text>
+          </View>
+        </View>
+      )}
+      
+      {/* 토큰 사용 안내 및 플랫폼별 설명 */}
       {activePlatform !== 'original' && (
         <View style={[styles.tokenNotice]}>
           <Icon name="information-circle-outline" size={14} color={colors.text.tertiary} />
@@ -253,10 +270,26 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
           </Text>
         </View>
       )}
+      
+      {/* 원본 탭에서는 안내 메시지 표시 */}
+      {activePlatform === 'original' && (
+        <View style={[styles.tokenNotice]}>
+          <Icon name="sparkles-outline" size={14} color={colors.text.tertiary} />
+          <Text style={styles.tokenNoticeText}>
+            아래 플랫폼 탭을 눌러 각 SNS에 맞게 변환해보세요
+          </Text>
+        </View>
+      )}
 
       {/* 콘텐츠 표시 영역 */}
       <View style={styles.contentContainer}>
         <View style={styles.contentHeader}>
+          {activePlatform === 'original' && (
+            <View style={styles.originalBadge}>
+              <Icon name="create-outline" size={12} color={colors.primary} />
+              <Text style={styles.originalBadgeText}>생성된 원본</Text>
+            </View>
+          )}
           <Text style={styles.contentLengthText}>
             본문 {getContentLength()}자
           </Text>
@@ -315,19 +348,20 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       justifyContent: 'space-between',
       paddingHorizontal: SPACING.md,
       marginBottom: SPACING.sm,
+      gap: SPACING.xs,
     },
     platformTab: {
       flex: 1,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingHorizontal: SPACING.sm,
+      paddingHorizontal: SPACING.xs,
       paddingVertical: SPACING.sm,
       borderRadius: 20,
       backgroundColor: colors.surface,
       borderWidth: 2,
       borderColor: 'transparent',
-      marginHorizontal: SPACING.xs / 2,
+      minHeight: 40,
     },
     platformTabActive: {
       backgroundColor: isDark ? colors.surface : '#fff',
@@ -338,11 +372,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       elevation: 3,
     },
     platformTabText: {
-      fontSize: 12,
+      fontSize: 11,
       fontFamily: 'System',
-      fontWeight: '500' as const,
+      fontWeight: '600' as const,
       color: colors.text.secondary,
-      marginLeft: SPACING.xs / 2,
+      marginLeft: 4,
     },
     loader: {
       marginLeft: SPACING.xs,
@@ -376,7 +410,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     },
     contentHeader: {
       flexDirection: 'row',
-      justifyContent: 'flex-end',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       marginBottom: SPACING.sm,
     },
     contentLengthText: {
@@ -457,6 +492,50 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       height: 16,
       justifyContent: 'center',
       alignItems: 'center',
+    },
+    originalBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      backgroundColor: colors.primary + '20',
+      paddingHorizontal: SPACING.sm,
+      paddingVertical: 2,
+      borderRadius: 10,
+    },
+    originalBadgeText: {
+      fontSize: 11,
+      fontFamily: 'System',
+      fontWeight: '600' as const,
+      color: colors.primary,
+    },
+    conversionInfo: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: SPACING.sm,
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.xs,
+      marginHorizontal: SPACING.md,
+      marginBottom: SPACING.xs,
+      backgroundColor: colors.surface,
+      borderRadius: 8,
+    },
+    conversionInfoItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+    },
+    conversionLabel: {
+      fontSize: 12,
+      fontFamily: 'System',
+      fontWeight: '400' as const,
+      color: colors.text.tertiary,
+    },
+    conversionValue: {
+      fontSize: 12,
+      fontFamily: 'System',
+      fontWeight: '600' as const,
+      color: colors.text.primary,
     },
   });
 

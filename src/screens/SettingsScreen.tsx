@@ -8,7 +8,7 @@ import { APP_TEXT } from '../utils/textConstants';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { storage } from '../utils/storage';
 import socialMediaService from '../services/socialMediaService';
-import ProfileEditModal from '../components/ProfileEditModal';
+// ProfileEditModal 제거
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import socialAuthService from '../services/auth/socialAuthService';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
@@ -22,7 +22,7 @@ import TokenManagementSection from '../components/token/TokenManagementSection';
 import { resetAllMissionData, resetAdData, debugMissionData } from '../utils/missionUtils';
 import achievementService from '../services/achievementService';
 import { UserProfile } from '../types/achievement';
-
+import { cleanupFirestoreSubscription } from '../store/middleware/firestoreSyncMiddleware';
 import { Alert } from '../utils/customAlert';
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
@@ -51,7 +51,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const [pushEnabled, setPushEnabled] = useState(true);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [vibrationEnabled, setVibrationEnabled] = useState(true);
-  const [profileEditVisible, setProfileEditVisible] = useState(false);
+  // 프로필 편집 모달 상태 제거
   const [connectedAccounts, setConnectedAccounts] = useState<Record<string, boolean>>({});
   const [subscriptionPlan, setSubscriptionPlan] = useState('free');
   const [showUserGuide, setShowUserGuide] = useState(false);
@@ -349,13 +349,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
     );
   };
 
-  const handleEditProfile = () => {
-    setProfileEditVisible(true);
-  };
-
-  const handleSaveProfile = (profile: { name: string; email: string }) => {
-    setUser(prev => ({ ...prev, ...profile }));
-  };
+  // 프로필 편집 관련 함수 제거
 
   const handleUpgradePlan = () => {
     if (onNavigate) {
@@ -461,6 +455,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
           style: 'destructive',
           onPress: async () => {
             try {
+              // Firestore 구독 먼저 정리
+              cleanupFirestoreSubscription();
+              
+              // 약간의 지연 후 로그아웃 진행
+              await new Promise(resolve => setTimeout(resolve, 100));
+              
               // 소셜 로그인 로그아웃 (에러 무시)
               await socialAuthService.signOut().catch(err => {
                 console.log('로그아웃 에러 (continued):', err);
@@ -494,6 +494,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
             } catch (error) {
               console.error('로그아웃 중 예상치 못한 에러:', error);
               // 그래도 로그아웃 처리
+              cleanupFirestoreSubscription();
               dispatch(resetUser());
               if (onNavigate) {
                 setTimeout(() => {
@@ -654,7 +655,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const getSubscriptionBadge = () => {
     switch (subscriptionPlan) {
       case 'pro':
-        return { text: 'PRO', color: '#8B5CF6', icon: 'crown' };
+        return { text: 'PRO', color: '#8B5CF6', icon: 'workspace-premium' }; // crown -> workspace-premium
       case 'premium':
         return { text: 'PREMIUM', color: '#F59E0B', icon: 'star' };
       default:
@@ -805,16 +806,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
             </View>
 
             {/* 간단한 통계 제거 */}
-
-            {/* 프로필 편집 버튼 */}
-            <TouchableOpacity style={styles.editProfileButton} onPress={handleEditProfile}>
-              <Icon name="person-circle-outline" size={20} color={colors.primary} />
-              <Text style={styles.editProfileButtonText}>프로필 편집</Text>
-            </TouchableOpacity>
             
-            {/* 업적 보기 버튼 - 새로 추가 */}
+            {/* 업적 보기 버튼 */}
             <TouchableOpacity 
-              style={[styles.editProfileButton, { marginTop: SPACING.xs, backgroundColor: '#8B5CF6' + '10' }]}
+              style={[styles.editProfileButton, { backgroundColor: '#8B5CF6' + '10' }]}
               onPress={async () => {
                 if (onNavigate) {
                   onNavigate('profile');
@@ -1025,13 +1020,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
         <View style={styles.bottomSpace} />
       </ScrollView>
 
-      {/* 프로필 편집 모달 */}
-      <ProfileEditModal
-        visible={profileEditVisible}
-        onClose={() => setProfileEditVisible(false)}
-        currentProfile={{ name: user.name, email: user.email, connectedPlatforms: user.connectedPlatforms }}
-        onSave={handleSaveProfile}
-      />
+      {/* 프로필 편집 모달 제거 */}
       
 
     </SafeAreaView>

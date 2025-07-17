@@ -134,6 +134,35 @@ export default async function handler(req, res) {
       long: 600
     };
     
+    // 문장 정리/교정 모드 감지 (프롬프트에 특정 키워드가 포함된 경우)
+    const isPolishMode = prompt.includes('맞춤법') || prompt.includes('문장') || prompt.includes('다듬') || 
+                        prompt.includes('교정') || prompt.includes('개선') || prompt.includes('격식체') ||
+                        prompt.includes('쉽게') || prompt.includes('매력적');
+    
+    // 문장 정리 모드인 경우 원본 길이를 고려하여 max_tokens 증가
+    if (isPolishMode) {
+      // 원본 텍스트를 추출 (따옴표 사이의 텍스트)
+      const textMatch = prompt.match(/"으로|해주세요:\s*"([^"]+)"|'로|해주세요:\s*'([^']+)'/);
+      const originalTextLength = textMatch ? (textMatch[1] || textMatch[2] || '').length : prompt.length;
+      
+      // 원본 길이에 따라 max_tokens 조정 (여유롭게 설정)
+      if (originalTextLength > 300) {
+        maxTokensMap.short = 500;
+        maxTokensMap.medium = 700;
+        maxTokensMap.long = 1000;
+      } else if (originalTextLength > 150) {
+        maxTokensMap.short = 300;
+        maxTokensMap.medium = 500;
+        maxTokensMap.long = 800;
+      } else {
+        maxTokensMap.short = 200;
+        maxTokensMap.medium = 400;
+        maxTokensMap.long = 600;
+      }
+      
+      console.log('Polish mode detected. Original text length:', originalTextLength, 'Max tokens:', maxTokensMap[length]);
+    }
+    
     // 이미지가 있는 경우 Vision API 사용
     let messages;
     let apiModel = model || 'gpt-3.5-turbo';
@@ -184,7 +213,9 @@ export default async function handler(req, res) {
 
 그 후 이 사진에 어울리는 매력적인 SNS 글을 작성해주세요.
 톤: ${tone || 'casual'}
-길이: ${lengthGuides[length]?.ko || lengthGuides.medium.ko}`
+길이: ${lengthGuides[length]?.ko || lengthGuides.medium.ko}
+
+중요: 사진과 직접적으로 관련 없는 내용(음식, 보양식, 레시피 등)은 절대 포함하지 마세요. 오직 사진에서 볼 수 있는 것만 설명하세요.`
             : `You are 'Posty', an AI assistant that analyzes photos and creates social media content. 
 Analyze the photo in detail and include:
 1. People in the photo (age, expressions, clothing)
@@ -194,7 +225,9 @@ Analyze the photo in detail and include:
 
 Then create an engaging social media post for this photo.
 Tone: ${tone || 'casual'}
-Length: ${lengthGuides[length]?.en || lengthGuides.medium.en}`,
+Length: ${lengthGuides[length]?.en || lengthGuides.medium.en}
+
+IMPORTANT: Do NOT include any content not directly related to the photo (such as food, recipes, or other unrelated topics). Only describe what can be seen in the photo.`,
         },
         {
           role: 'user',

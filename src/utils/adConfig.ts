@@ -60,7 +60,7 @@ export const SUBSCRIPTION_PLANS = {
   
   premium: {
     id: 'premium',
-    name: '프리미엄',
+    name: 'PRO',
     price: 4900,
     priceDisplay: '₩4,900',
     features: {
@@ -72,7 +72,6 @@ export const SUBSCRIPTION_PLANS = {
       extraFeatures: [
         '매월 100개 토큰 제공',
         '광고 완전 제거',
-        '고급 AI 모델 (GPT-4)',
         '5가지 플랫폼 지원',
         '프리미엄 템플릿',
         '톤 & 스타일 커스터마이징',
@@ -82,7 +81,7 @@ export const SUBSCRIPTION_PLANS = {
   
   pro: {
     id: 'pro',
-    name: '프로',
+    name: 'MAX',
     price: 14900,
     priceDisplay: '₩14,900',
     features: {
@@ -98,7 +97,6 @@ export const SUBSCRIPTION_PLANS = {
         'AI 이미지 생성 (월 50장)',
         '팀 협업 기능',
         '분석 대시보드',
-        '우선 고객 지원',
       ],
     },
   },

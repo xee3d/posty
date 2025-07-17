@@ -236,6 +236,22 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   
   const quickPrompts = getStyleBasedPrompts();
 
+  // 모드 전환 시 상태 초기화 함수
+  const resetAllStates = () => {
+    setGeneratedContent(''); // 생성된 콘텐츠 초기화
+    setPrompt(''); // 입력 내용 초기화
+    setSelectedHashtags([]); // 선택된 해시태그 초기화
+    setSelectedImage(null); // 사진 초기화
+    setSelectedImageUri(null);
+    setImageAnalysis('');
+    setImageAnalysisResult(null);
+    setSelectedPolishOption('refine'); // 문장 정리 옵션 초기화
+    // 톤과 길이는 유지 (사용자 편의)
+    // 스타일 가이드는 초기화
+    setStyleInfo(null);
+    setShowStyleGuide(false);
+  };
+
   const handleSelectImage = () => {
     Alert.alert(
       '사진 선택',
@@ -431,11 +447,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         result = response.content;
       } else if (writeMode === 'polish') {
         console.log('Polishing content with text:', prompt);
+        console.log('Selected length:', selectedLength); // 길이 로그 추가
         const response = await aiService.polishContent({
           text: prompt.trim(),
           polishType: selectedPolishOption,
           tone: selectedTone as any,
-          length: selectedLength,
+          length: selectedLength, // 길이 추가
         });
         // 객체에서 content 문자열만 추출
         result = response.content;
@@ -643,7 +660,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
               <View style={styles.modeSelector}>
                 <ScaleButton
                   style={[styles.modeButton, writeMode === 'text' && styles.modeButtonActive]}
-                  onPress={() => setWriteMode('text')}
+                  onPress={() => {
+                    if (writeMode !== 'text') {
+                      resetAllStates();
+                    }
+                    setWriteMode('text');
+                  }}
                 >
                   <Icon 
                     name="create-outline" 
@@ -659,7 +681,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                 </ScaleButton>
                 <ScaleButton
                   style={[styles.modeButton, writeMode === 'polish' && styles.modeButtonActive]}
-                  onPress={() => setWriteMode('polish')}
+                  onPress={() => {
+                    if (writeMode !== 'polish') {
+                      resetAllStates();
+                    }
+                    setWriteMode('polish');
+                  }}
                 >
                   <Icon 
                     name="color-wand-outline" 
@@ -675,7 +702,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                 </ScaleButton>
                 <ScaleButton
                   style={[styles.modeButton, writeMode === 'photo' && styles.modeButtonActive]}
-                  onPress={() => setWriteMode('photo')}
+                  onPress={() => {
+                    if (writeMode !== 'photo') {
+                      resetAllStates();
+                    }
+                    setWriteMode('photo');
+                  }}
                 >
                   <Icon 
                     name="image-outline" 

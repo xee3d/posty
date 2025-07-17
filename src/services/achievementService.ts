@@ -2,6 +2,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Achievement, ACHIEVEMENTS, UserProfile } from '../types/achievement';
 import { PostStats } from './types/postTypes';
 import { soundManager } from '../utils/soundManager';
+import socialAuthService from './auth/socialAuthService';
+import { store } from '../store';
 
 // 순환 참조 해결을 위해 lazy import 사용
 let simplePostService: any = null;
@@ -41,20 +43,51 @@ class AchievementService {
   // 사용자 프로필 가져오기
   async getUserProfile(): Promise<UserProfile> {
     try {
-      const saved = await AsyncStorage.getItem(this.PROFILE_KEY);
-      if (saved) {
-        return JSON.parse(saved);
-      }
+      // Redux에서 현재 로그인한 사용자 정보 가져오기
+      const state = store.getState();
+      const currentUser = state.user;
       
-      // 기본 프로필
-      return {
-        displayName: 'Google Test User',
-        totalPosts: 0,
-        joinedDate: new Date().toISOString(),
-        achievements: [],
-        level: 1,
-        experience: 0
+      // Firebase Auth에서 현재 사용자 확인
+      const firebaseUser = socialAuthService.getCurrentUser();
+      
+      // 저장된 프로필 가져오기
+      const saved = await AsyncStorage.getItem(this.PROFILE_KEY);
+      const savedProfile = saved ? JSON.parse(saved) : null;
+      
+      // 로그인한 사용자 정보가 있으면 사용
+      const displayName = currentUser?.displayName || 
+                         firebaseUser?.displayName || 
+                         savedProfile?.displayName || 
+                         'Posty User';
+      
+      const email = currentUser?.email || 
+                   firebaseUser?.email || 
+                   savedProfile?.email || 
+                   '';
+      
+      const photoURL = currentUser?.photoURL || 
+                      firebaseUser?.photoURL || 
+                      savedProfile?.photoURL || 
+                      null;
+      
+      // 프로필 병합
+      const profile: UserProfile = {
+        displayName,
+        email,
+        photoURL,
+        totalPosts: savedProfile?.totalPosts || 0,
+        joinedDate: savedProfile?.joinedDate || new Date().toISOString(),
+        achievements: savedProfile?.achievements || [],
+        level: savedProfile?.level || 1,
+        experience: savedProfile?.experience || 0,
+        selectedBadge: savedProfile?.selectedBadge,
+        selectedTitle: savedProfile?.selectedTitle,
       };
+      
+      // 프로필 저장
+      await AsyncStorage.setItem(this.PROFILE_KEY, JSON.stringify(profile));
+      
+      return profile;
     } catch (error) {
       console.error('Failed to get user profile:', error);
       return this.getDefaultProfile();
@@ -292,8 +325,14 @@ class AchievementService {
   }
   
   private getDefaultProfile(): UserProfile {
+    // Redux에서 현재 사용자 정보 확인
+    const state = store.getState();
+    const currentUser = state.user;
+    
     return {
-      displayName: 'Google Test User',
+      displayName: currentUser?.displayName || 'Posty User',
+      email: currentUser?.email || '',
+      photoURL: currentUser?.photoURL || null,
       totalPosts: 0,
       joinedDate: new Date().toISOString(),
       achievements: [],

@@ -67,12 +67,44 @@ export const firestoreSyncMiddleware: Middleware<{}, RootState> = store => next 
   }
   
   // 구독 변경 시 - 즉시 동기화 필요한 경우만
-  if (action.type === 'user/updateSubscription' && action.meta?.immediate) {
-    firestoreService.updateUserSettings({
-      subscription: store.getState().user.subscription,
-    }).catch(error => {
-      console.error('[Firestore Sync] Subscription sync error:', error);
-    });
+  if (action.type === 'user/updateSubscription') {
+    // 기존 타이머 취소
+    if (syncTimers.subscription) {
+      clearTimeout(syncTimers.subscription);
+    }
+    
+    // 즉시 동기화
+    syncTimers.subscription = setTimeout(async () => {
+      try {
+        const currentState = store.getState();
+        const { subscription, tokens } = currentState.user;
+        
+        if (__DEV__) {
+          console.log('[Firestore Sync] Syncing subscription update:', {
+            plan: subscription.plan,
+            tokens: tokens.current
+          });
+        }
+        
+        // 구독 정보와 토큰 모두 업데이트
+        await firestoreService.updateUserSettings({
+          subscription: {
+            plan: currentState.user.subscriptionPlan === 'premium' ? 'premium' : 
+                  currentState.user.subscriptionPlan === 'pro' ? 'pro' : 'free',
+            status: 'active',
+            startedAt: new Date().toISOString(),
+            autoRenew: false,
+          },
+          tokens: {
+            current: currentState.user.currentTokens,
+            total: currentState.user.currentTokens,
+          }
+        });
+        
+      } catch (error) {
+        console.error('[Firestore Sync] Subscription sync error:', error);
+      }
+    }, 500); // 0.5초 후 동기화
   }
   
   return result;
@@ -114,7 +146,15 @@ export const loadUserFromFirestore = async (dispatch: any) => {
 };
 
 // Firestore 실시간 구독으로 Redux store 업데이트 - 최적화
+let activeFirestoreSubscription: (() => void) | null = null;
+
 export const subscribeToFirestoreUser = (dispatch: any) => {
+  // 기존 구독 정리
+  if (activeFirestoreSubscription) {
+    activeFirestoreSubscription();
+    activeFirestoreSubscription = null;
+  }
+  
   const auth = getAuth(getApp());
   const currentUser = auth.currentUser;
   if (!currentUser) return () => {};
@@ -122,7 +162,7 @@ export const subscribeToFirestoreUser = (dispatch: any) => {
   // 업데이트 빈도 제한을 위한 디바운스
   let updateTimer: NodeJS.Timeout;
   
-  return firestoreService.subscribeToUser((userData) => {
+  const unsubscribe = firestoreService.subscribeToUser((userData) => {
     if (userData) {
       // 디바운스로 연속적인 업데이트 방지
       if (updateTimer) {
@@ -172,6 +212,17 @@ export const subscribeToFirestoreUser = (dispatch: any) => {
       }, 500); // 0.5초 디바운스
     }
   });
+  
+  activeFirestoreSubscription = unsubscribe;
+  return unsubscribe;
+};
+
+// Firestore 구독 정리 함수
+export const cleanupFirestoreSubscription = () => {
+  if (activeFirestoreSubscription) {
+    activeFirestoreSubscription();
+    activeFirestoreSubscription = null;
+  }
 };
 
 // 타이머 정리 함수

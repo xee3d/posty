@@ -113,17 +113,29 @@ const userSlice = createSlice({
       plan: 'free' | 'premium' | 'pro';
       expiresAt?: string;
     }>) => {
+      const previousPlan = state.subscriptionPlan;
       state.subscriptionPlan = action.payload.plan;
       state.subscriptionExpiresAt = action.payload.expiresAt || null;
       
-      // 구독 플랜별 토큰 처리
-      if (action.payload.plan === 'premium') {
-        state.currentTokens += 100;
-        state.freeTokens = 100;
-      } else if (action.payload.plan === 'pro') {
+      // 구독 플랜별 토큰 처리 - 중복 방지
+      if (action.payload.plan === 'premium' && previousPlan !== 'premium') {
+        // 기본 10개 + 프리미엄 100개 = 110개
+        if (previousPlan === 'free') {
+          state.currentTokens = state.purchasedTokens + 110; // 10 + 100
+          state.freeTokens = 110;
+        }
+      } else if (action.payload.plan === 'pro' && previousPlan !== 'pro') {
         state.currentTokens = 9999;
         state.freeTokens = 9999;
+      } else if (action.payload.plan === 'free' && previousPlan !== 'free') {
+        // 다운그레이드 시
+        state.currentTokens = state.purchasedTokens + 10;
+        state.freeTokens = 10;
       }
+      
+      // 구독 객체도 업데이트
+      state.subscription.plan = action.payload.plan === 'premium' ? 'premium' : 
+                                action.payload.plan === 'pro' ? 'pro' : 'free';
     },
     
     // 토큰 사용 - 최적화: 토큰 히스토리 관리 개선
@@ -273,7 +285,9 @@ const userSlice = createSlice({
       // 구독 정보 업데이트
       if (data.subscription && JSON.stringify(data.subscription) !== JSON.stringify(state.subscription)) {
         state.subscription = data.subscription;
-        state.subscriptionPlan = data.subscription.plan === 'basic' ? 'premium' : data.subscription.plan;
+        state.subscriptionPlan = data.subscription.plan === 'basic' ? 'premium' : 
+                                 data.subscription.plan === 'premium' ? 'premium' :
+                                 data.subscription.plan === 'pro' ? 'pro' : 'free';
       }
       
       // 설정 업데이트
