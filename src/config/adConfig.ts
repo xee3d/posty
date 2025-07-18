@@ -40,7 +40,7 @@ export const PLAN_FEATURES = {
     initialTokens: 9999, // 무제한
     dailyBonus: 0, // 추가 충전 불필요
     tones: ['casual', 'professional', 'humorous', 'emotional', 'genz', 'millennial', 'minimalist', 'storytelling', 'motivational'],
-    lengths: ['short', 'medium', 'long', 'extra'],
+    lengths: ['short', 'medium', 'long'],
     hasAds: false,
     imageAnalysisTokens: 1,
   },
@@ -232,7 +232,7 @@ export const SUBSCRIPTION_PLANS = {
     features: [
       '무제한 토큰',
       '모든 톤 스타일',
-      '초장문 작성',
+      '모든 글 길이',
       '광고 제거',
       'MyStyle 분석',
       '즉시 이미지 분석',

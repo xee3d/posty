@@ -15,7 +15,7 @@ const API_CONFIG = {
   },
   
   // 요청 타임아웃 (밀리초)
-  TIMEOUT: 30000,
+  TIMEOUT: 60000,  // 30초에서 60초로 증가
   
   // 앱 시크릿 (환경변수로 관리하는 것이 좋음)
   APP_SECRET: 'posty-secret-key-change-this-in-production', // Vercel 환경변수와 일치해야 함

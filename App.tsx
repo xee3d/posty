@@ -54,6 +54,7 @@ import autoMigrationService from './src/services/firebase/autoMigrationService';
 import offlineSyncService from './src/services/offline/offlineSyncService';
 import analyticsService from './src/services/analytics/analyticsService';
 import notificationService from './src/services/notification/notificationService';
+import trendService from './src/services/trendService';
 import { restoreTokenData, setupTokenPersistence, checkDailyResetAfterRestore } from './src/store/persistConfig/tokenPersist';
 import { fixTokenInconsistency } from './src/utils/tokenFix';
 import { AlertProvider } from './src/components/AlertProvider';
@@ -152,6 +153,7 @@ const App: React.FC = () => {
             offlineSyncService.initialize(),
             analyticsService.initialize(),
             notificationService.initialize(),
+            trendService.initialize(), // 트렌드 서비스 초기화
           ]);
           
           console.log('✅ Services initialized successfully');

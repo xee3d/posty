@@ -274,8 +274,13 @@ const transformToInstagram = (content: string, tone: string): string => {
       transformed += ending;
     }
   }
-  
-  return transformed;
+    console.log('[transformToTwitter] Final length:', transformed.length);
+    return transformed;
+  } catch (error) {
+    console.error('[transformToTwitter] Error:', error);
+    // 에러 발생 시 원본의 일부만 반환
+    return content.substring(0, 240) + '...';
+  }
 };
 
 const transformToFacebook = (content: string, tone: string): string => {
@@ -487,159 +492,153 @@ const transformToTwitter = (content: string, tone: string): string => {
           transformed = summary + '\n\n🧵 (스레드에서 이어집니다)';
         }
       } else {
-        // 핵심 문장만 추출
-        const sentences = transformed.split(/[.!?]/);
-        
-        // 문장 단위로 길이 조절
-        let compressed = '';
-        for (const sentence of sentences) {
-          const trimmed = sentence.trim();
-          if (!trimmed) continue;
-          
-          if (compressed.length + trimmed.length + 2 <= maxContentLength) {
-            compressed += (compressed ? '. ' : '') + trimmed;
-          } else {
-            break;
-          }
-        }
-        
-        // 여전히 길다면 마지막 수단으로 자르기
-        if (compressed.length > maxContentLength) {
-          compressed = compressed.substring(0, maxContentLength - 3) + '...';
-        }
-        
-        transformed = compressed;
-      }
-    }
+    // 핵심 문장만 추출
+    const sentences = transformed.split(/[.!?]/);
     
-    // 트위터 스타일 변환
-    const twitterStyles: Record<string, (text: string) => string> = {
-      casual: (text) => {
-        const casualEndings = [
-          text.toLowerCase().replace(/\./g, ''),
-          text + ' 그냥 그런 날',
-          text + ' 그게 다야',
-          '오늘 깨달은 것: ' + text
-        ];
-        return casualEndings[Math.floor(Math.random() * casualEndings.length)];
-      },
-      humorous: (text) => {
-        const jokes = [
-          '(스포일러: ',
-          '플롯 트위스트: ',
-          '아무도 예상 못한 결말: ',
-          '충격 실화: ',
-          '누가 이길 줄 알았겠어: ',
-          '편의점 알바가 알려준 인생의 진리: '
-        ];
-        return jokes[Math.floor(Math.random() * jokes.length)] + text + ')';
-      },
-      genz: (text) => {
-        const genzVersions = [
-          text.replace(/그리고/g, 'ㄱㄷ').replace(/진짜/g, 'ㄹㅇ'),
-          text + ' (이게 맞나)',
-          'no cap ' + text,
-          text + ' periodt',
-          '아니 ' + text + ' 이거 실화냐'
-        ];
-        return genzVersions[Math.floor(Math.random() * genzVersions.length)];
-      },
-      professional: (text) => {
-        const profVersions = [
-          `📊 ${text}`,
-          `[통찰] ${text}`,
-          `핵심 요약: ${text}`,
-          text + ' - 이것이 핵심입니다.'
-        ];
-        return profVersions[Math.floor(Math.random() * profVersions.length)];
-      },
-      emotional: (text) => {
-        const emoVersions = [
-          `${text} 🥺`,
-          `${text}\n\n그냥... 그렇다고`,
-          `오늘따라 ${text}`,
-          text + '\n\n(눈물한방울)'
-        ];
-        return emoVersions[Math.floor(Math.random() * emoVersions.length)];
-      },
-      millennial: (text) => {
-        const millVersions = [
-          `${text} (카공 중)`,
-          `${text} #YOLO`,
-          `성인이 되니까 알게 되는 것: ${text}`,
-          text + ' (커피 한 모금)'
-        ];
-        return millVersions[Math.floor(Math.random() * millVersions.length)];
-      },
-      minimalist: (text) => {
-        const minVersions = [
-          text.replace(/[!?]/g, '.'),
-          text.split('.')[0] + '.',
-          text.replace(/들/g, '').replace(/을/g, '').replace(/를/g, ''),
-          text.split(' ').slice(0, -2).join(' ') + '.'
-        ];
-        return minVersions[Math.floor(Math.random() * minVersions.length)];
-      }
-    };
-    
-    if (twitterStyles[tone]) {
-      transformed = twitterStyles[tone](transformed);
-    }
-    
-    // 트위터 특유의 마무리 (30% 확률로만 추가)
-    const shouldAddEnding = Math.random() < 0.3;
-    
-    if (shouldAddEnding) {
-      // 원본이 실제로 긴 글인지 확인
-      const originalLength = content.length;
-      const isActuallyLong = originalLength > 280;
+    // 문장 단위로 길이 조절
+    let compressed = '';
+    for (const sentence of sentences) {
+      const trimmed = sentence.trim();
+      if (!trimmed) continue;
       
-      // 이미 특정 방식으로 끝났다면 추가하지 않음
-      if (transformed.trim().endsWith(')') || transformed.trim().endsWith('.')) {
-        return transformed;
-      }
-      
-      let endingOptions = [];
-      
-      if (isActuallyLong && Math.random() > 0.5) {
-        // 실제로 긴 글일 때만 스레드 표시 (50% 확률)
-        const threadCount = Math.ceil(originalLength / 260);
-        endingOptions = [`\n\n🧵 (1/${Math.min(threadCount, 5)})`];
-      } else if (tone === 'genz') {
-        endingOptions = [
-          '\n\n이상 TMI',
-          '\n\nㅂㅂ',
-          '' // 종결 없이
-        ];
-      } else if (tone === 'humorous') {
-        endingOptions = [
-          '\n\n(웃프다)',
-          '\n\n이게 팩트',
-          '' // 종결 없이
-        ];
+      if (compressed.length + trimmed.length + 2 <= maxContentLength) {
+        compressed += (compressed ? '. ' : '') + trimmed;
       } else {
-        // 일반적인 경우 - 더 자제된 종결
-        endingOptions = [
-          '', // 종결 없이 (50%)
-          '', // 종결 없이 (확률 높이기)
-          '\n\n그게 다야',
-          '\n\n끝.'
-        ];
-      }
-      
-      const ending = endingOptions[Math.floor(Math.random() * endingOptions.length)];
-      if (ending) {
-        transformed += ending;
+        break;
       }
     }
     
-    console.log('[transformToTwitter] Final length:', transformed.length);
-    return transformed;
-  } catch (error) {
-    console.error('[transformToTwitter] Error:', error);
-    // 에러 발생 시 원본의 일부만 반환
-    return content.substring(0, 240) + '...';
+    // 여전히 길다면 마지막 수단으로 자르기
+    if (compressed.length > maxContentLength) {
+      compressed = compressed.substring(0, maxContentLength - 3) + '...';
+    }
+    
+      transformed = compressed;
+    }
   }
+  
+  // 트위터 스타일 변환
+  const twitterStyles: Record<string, (text: string) => string> = {
+    casual: (text) => {
+      const casualEndings = [
+        text.toLowerCase().replace(/\./g, ''),
+        text + ' 그냥 그런 날',
+        text + ' 그게 다야',
+        '오늘 깨달은 것: ' + text
+      ];
+      return casualEndings[Math.floor(Math.random() * casualEndings.length)];
+    },
+    humorous: (text) => {
+      const jokes = [
+        '(스포일러: ',
+        '플롯 트위스트: ',
+        '아무도 예상 못한 결말: ',
+        '충격 실화: ',
+        '누가 이길 줄 알았겠어: ',
+        '편의점 알바가 알려준 인생의 진리: '
+      ];
+      return jokes[Math.floor(Math.random() * jokes.length)] + text + ')';
+    },
+    genz: (text) => {
+      const genzVersions = [
+        text.replace(/그리고/g, 'ㄱㄷ').replace(/진짜/g, 'ㄹㅇ'),
+        text + ' (이게 맞나)',
+        'no cap ' + text,
+        text + ' periodt',
+        '아니 ' + text + ' 이거 실화냐'
+      ];
+      return genzVersions[Math.floor(Math.random() * genzVersions.length)];
+    },
+    professional: (text) => {
+      const profVersions = [
+        `📊 ${text}`,
+        `[통찰] ${text}`,
+        `핵심 요약: ${text}`,
+        text + ' - 이것이 핵심입니다.'
+      ];
+      return profVersions[Math.floor(Math.random() * profVersions.length)];
+    },
+    emotional: (text) => {
+      const emoVersions = [
+        `${text} 🥺`,
+        `${text}\n\n그냥... 그렇다고`,
+        `오늘따라 ${text}`,
+        text + '\n\n(눈물한방울)'
+      ];
+      return emoVersions[Math.floor(Math.random() * emoVersions.length)];
+    },
+    millennial: (text) => {
+      const millVersions = [
+        `${text} (카공 중)`,
+        `${text} #YOLO`,
+        `성인이 되니까 알게 되는 것: ${text}`,
+        text + ' (커피 한 모금)'
+      ];
+      return millVersions[Math.floor(Math.random() * millVersions.length)];
+    },
+    minimalist: (text) => {
+      const minVersions = [
+        text.replace(/[!?]/g, '.'),
+        text.split('.')[0] + '.',
+        text.replace(/들/g, '').replace(/을/g, '').replace(/를/g, ''),
+        text.split(' ').slice(0, -2).join(' ') + '.'
+      ];
+      return minVersions[Math.floor(Math.random() * minVersions.length)];
+    }
+  };
+  
+  if (twitterStyles[tone]) {
+    transformed = twitterStyles[tone](transformed);
+  }
+  
+  // 트위터 특유의 마무리 (30% 확률로만 추가)
+  const shouldAddEnding = Math.random() < 0.3;
+  
+  if (shouldAddEnding) {
+    // 원본이 실제로 긴 글인지 확인
+    const originalLength = content.length;
+    const isActuallyLong = originalLength > 280;
+    
+    // 이미 특정 방식으로 끝났다면 추가하지 않음
+    if (transformed.trim().endsWith(')') || transformed.trim().endsWith('.')) {
+      return transformed;
+    }
+    
+    let endingOptions = [];
+    
+    if (isActuallyLong && Math.random() > 0.5) {
+      // 실제로 긴 글일 때만 스레드 표시 (50% 확률)
+      const threadCount = Math.ceil(originalLength / 260);
+      endingOptions = [`\n\n🧵 (1/${Math.min(threadCount, 5)})`];
+    } else if (tone === 'genz') {
+      endingOptions = [
+        '\n\n이상 TMI',
+        '\n\nㅂㅂ',
+        '' // 종결 없이
+      ];
+    } else if (tone === 'humorous') {
+      endingOptions = [
+        '\n\n(웃프다)',
+        '\n\n이게 팩트',
+        '' // 종결 없이
+      ];
+    } else {
+      // 일반적인 경우 - 더 자제된 종결
+      endingOptions = [
+        '', // 종결 없이 (50%)
+        '', // 종결 없이 (확률 높이기)
+        '\n\n그게 다야',
+        '\n\n끝.'
+      ];
+    }
+    
+    const ending = endingOptions[Math.floor(Math.random() * endingOptions.length)];
+    if (ending) {
+      transformed += ending;
+    }
+  }
+  
+  return transformed;
 };
 
 const adjustHashtagsForInstagram = (hashtags: string[] = []): string[] => {

@@ -61,8 +61,15 @@ class ServerAIService {
     try {
       console.log('Calling server API:', getApiUrl(API_CONFIG.ENDPOINTS.GENERATE));
       
+      // 길이에 따른 타임아웃 설정
+      const timeoutDuration = params.length === 'extra' ? 90000 : // 초장문: 90초
+                             params.length === 'long' ? 60000 :   // 긴 글: 60초  
+                             this.timeout;                         // 기본: 60초
+      
+      console.log(`Using timeout: ${timeoutDuration / 1000}s for length: ${params.length}`);
+      
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+      const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
       
       const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.GENERATE), {
         method: 'POST',
@@ -138,16 +145,23 @@ class ServerAIService {
       
       // 에러 타입에 따른 처리
       if (error.name === 'AbortError') {
+        console.error('Request timeout after', this.getMaxTokensByLength(params.length), 'ms');
         throw new Error('요청 시간이 초과되었습니다. 다시 시도해주세요.');
       }
       
       if (error.message.includes('Failed to fetch')) {
+        console.error('Network error - server may be down');
         throw new Error('서버에 연결할 수 없습니다. 네트워크를 확인해주세요.');
       }
       
       if (error.message.includes('429')) {
+        console.error('Rate limit exceeded');
         throw new Error('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
       }
+      
+      // 기타 서버 에러
+      console.error('Unexpected server error:', error.message);
+      throw new Error(`서버 오류: ${error.message}`);
       
       if (error.message.includes('401')) {
         throw new Error('인증에 실패했습니다. 앱을 다시 시작해주세요.');

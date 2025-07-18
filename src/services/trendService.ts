@@ -26,10 +26,14 @@ interface NewsItem {
 
 class TrendService {
   private readonly CACHE_KEY = 'TREND_CACHE';
-  private readonly CACHE_DURATION = 1000 * 60 * 60 * 24; // 24시간 (하루 1회 업데이트)
+  private readonly CACHE_DURATION = 1000 * 60 * 60 * 4; // 4시간마다 업데이트
   
   // NewsAPI 키 (무료 플랜)
   private readonly NEWS_API_KEY = NEWS_API_KEY || '';
+  
+  // 실시간 API 설정
+  private USE_REAL_API = false; // 기본값: false (샘플 데이터 사용) - API 문제 해결 후 true로 변경
+  private API_BASE_URL = 'https://posty-api-v2.vercel.app/api'; // Vercel Production URL
   
   /**
    * 모든 소스에서 트렌드 가져오기
@@ -45,32 +49,41 @@ class TrendService {
       // 캐시 확인
       const cached = await this.getCachedTrends();
       if (cached) {
-        console.log('Using cached trends (24h cache)');
+        const cacheInfo = await this.getCacheAge();
+        console.log(`[TrendService] Using cached trends (age: ${cacheInfo.ageInMinutes} minutes)`);
         return cached;
       }
+      console.log('[TrendService] Cache expired or not found, fetching new trends...');
       
-      // 병렬로 여러 소스에서 트렌드 가져오기
-      const [newsTraends, redditTrends, naverTrends] = await Promise.allSettled([
-        this.getNewsTrends(),
-        this.getRedditTrends(),
-        this.getNaverTrends(),
-      ]);
+      let allTrends: TrendItem[] = [];
       
-      const allTrends: TrendItem[] = [];
-      
-      // 네이버 트렌드 우선 (한국 콘텐츠)
-      if (naverTrends.status === 'fulfilled') {
-        allTrends.push(...naverTrends.value);
-      }
-      
-      // 뉴스 트렌드 추가
-      if (newsTraends.status === 'fulfilled') {
-        allTrends.push(...newsTraends.value);
-      }
-      
-      // Reddit 트렌드 마지막에 추가
-      if (redditTrends.status === 'fulfilled') {
-        allTrends.push(...redditTrends.value.slice(0, 5)); // 최대 5개만
+      if (this.USE_REAL_API) {
+        // 실시간 API 사용
+        console.log('[TrendService] Using real-time API...');
+        allTrends = await this.fetchRealTimeTrends();
+      } else {
+        // 기존 로직 사용
+        // 병렬로 여러 소스에서 트렌드 가져오기
+        const [newsTraends, redditTrends, naverTrends] = await Promise.allSettled([
+          this.getNewsTrends(),
+          this.getRedditTrends(),
+          this.getNaverTrends(),
+        ]);
+        
+        // 네이버 트렌드 우선 (한국 콘텐츠)
+        if (naverTrends.status === 'fulfilled') {
+          allTrends.push(...naverTrends.value);
+        }
+        
+        // 뉴스 트렌드 추가
+        if (newsTraends.status === 'fulfilled') {
+          allTrends.push(...newsTraends.value);
+        }
+        
+        // Reddit 트렌드 마지막에 추가
+        if (redditTrends.status === 'fulfilled') {
+          allTrends.push(...redditTrends.value.slice(0, 5)); // 최대 5개만
+        }
       }
       
       // 캐시 저장
@@ -132,36 +145,78 @@ class TrendService {
    * 샘플 뉴스 트렌드 (언어별)
    */
   private getSampleNewsTrends(isKorean: boolean): TrendItem[] {
-    const month = new Date().getMonth() + 1;
+    const now = new Date();
+    const month = now.getMonth() + 1;
+    const randomSeed = Math.floor(now.getTime() / (1000 * 60 * 60)); // 시간마다 변경
     
     if (isKorean) {
-      // 한국어 샘플 뉴스 - 계절별
-      let sampleNews = [];
+      // 한국어 샘플 뉴스 풀
+      const newsPool = [
+        // 경제
+        { title: '삼성전자, 신규 반도체 공장 건설', hashtags: ['삼성전자', '반도체', '투자'] },
+        { title: 'SK하이닉스, 미국 공장 확대 발표', hashtags: ['SK', '반도체', '미국'] },
+        { title: 'LG에너지솔루션, 유럽 시장 진출', hashtags: ['LG', '배터리', '유럽'] },
+        { title: '현대차, 전기차 판매 호조', hashtags: ['현대차', '전기차', '자동차'] },
+        { title: '코스피 역대 최고치 경신', hashtags: ['코스피', '주식', '경제'] },
+        { title: '원/달러 환율 변동성 확대', hashtags: ['환율', '달러', '경제'] },
+        // 기술/IT
+        { title: '카카오, AI 서비스 대규모 투자', hashtags: ['카카오', 'AI', '투자'] },
+        { title: '네이버, 클라우드 사업 확대', hashtags: ['네이버', '클라우드', 'IT'] },
+        { title: '쿠팡, 로켓배송 서비스 확대', hashtags: ['쿠팡', '로켓배송', '이커머스'] },
+        { title: 'AI 반도체 개발 경쟁 본격화', hashtags: ['AI', '반도체', '기술'] },
+        // 사회
+        { title: '직장인 워라밸 중요성 증가', hashtags: ['워라밸', '직장', '트렌드'] },
+        { title: 'MZ세대 투자 트렌드 변화', hashtags: ['MZ', '투자', '트렌드'] },
+        { title: '친환경 소비 트렌드 확산', hashtags: ['친환경', '소비', '환경'] },
+        // 문화
+        { title: 'K-콘텐츠 글로벌 인기 지속', hashtags: ['K콘텐츠', '한류', '문화'] },
+        { title: '한국 영화 국제 영화제 수상', hashtags: ['영화', '한국영화', '수상'] },
+        { title: 'K-팝 세계 투어 성황리', hashtags: ['K팝', '투어', '음악'] },
+      ];
       
-      if (month >= 7 && month <= 8) { // 여름
-        sampleNews = [
-          { title: '전국 폭염주의보, 온열질환 주의', hashtags: ['폭염', '건강', '날씨'] },
-          { title: '휴가철 국내 여행객 증가세', hashtags: ['여행', '휴가', '국내'] },
-          { title: '여름 휴가 항공료 할인 이벤트', hashtags: ['항공', '할인', '여행'] },
-          { title: '수력발전소 전력 생산 감소', hashtags: ['전력', '에너지', '환경'] },
-          { title: '여름철 식중독 예방법', hashtags: ['건강', '식품', '안전'] },
-        ];
-      } else if (month >= 11 || month <= 2) { // 겨울
-        sampleNews = [
-          { title: '삼성전자, 내년 대규모 투자 계획 발표', hashtags: ['삼성전자', '투자', '경제'] },
-          { title: '서울 최초 눈 예보, 주말 한파 예상', hashtags: ['날씨', '겨울', '서울'] },
-          { title: '연말 특별 할인 이벤트 시작', hashtags: ['쇼핑', '할인', '연말'] },
-        ];
-      } else { // 봄/가을
-        sampleNews = [
-          { title: 'K-팝, 빌보드 차트 1위 달성', hashtags: ['K팝', '음악', '한류'] },
-          { title: '카카오, AI 기반 새 서비스 출시', hashtags: ['카카오', 'AI', 'IT'] },
-          { title: '미세먼지 농도 "나쁨" 주의', hashtags: ['미세먼지', '환경', '건강'] },
-        ];
+      // 계절별 추가 뉴스
+      const seasonalNewsPool = {
+        summer: [
+          { title: '전국 폭염특보 발효', hashtags: ['폭염', '날씨', '건강'] },
+          { title: '여름 휴가 특집 - 국내 명소', hashtags: ['휴가', '여행', '여름'] },
+          { title: '에어컨 판매량 급증', hashtags: ['에어컨', '폭염', '가전'] },
+        ],
+        winter: [
+          { title: '전국 한파경보 발효', hashtags: ['한파', '날씨', '겨울'] },
+          { title: '겨울 에너지 절약 방법', hashtags: ['에너지', '절약', '겨울'] },
+          { title: '연말 쇼핑 시즌 시작', hashtags: ['연말', '쇼핑', '할인'] },
+        ],
+        spring: [
+          { title: '봄철 미세먼지 주의보', hashtags: ['미세먼지', '봄', '건강'] },
+          { title: '벚꽃 개화 시기 예측', hashtags: ['벚꽃', '봄', '날씨'] },
+          { title: '새학기 준비 특집', hashtags: ['새학기', '학교', '준비'] },
+        ],
+        fall: [
+          { title: '단풍 절정 시기 예측', hashtags: ['단풍', '가을', '여행'] },
+          { title: '가을 축제 정보', hashtags: ['축제', '가을', '문화'] },
+          { title: '독감 예방접종 시작', hashtags: ['독감', '건강', '예방'] },
+        ],
+      };
+      
+      // 뉴스 선택 (랜덤)
+      const selectedNews = [];
+      const shuffledMain = this.shuffleArray([...newsPool], randomSeed);
+      selectedNews.push(...shuffledMain.slice(0, 3));
+      
+      // 계절별 뉴스 추가
+      let seasonNews = [];
+      if (month >= 6 && month <= 8) seasonNews = seasonalNewsPool.summer;
+      else if (month >= 9 && month <= 11) seasonNews = seasonalNewsPool.fall;
+      else if (month >= 12 || month <= 2) seasonNews = seasonalNewsPool.winter;
+      else seasonNews = seasonalNewsPool.spring;
+      
+      if (seasonNews.length > 0) {
+        const shuffledSeason = this.shuffleArray([...seasonNews], randomSeed + 100);
+        selectedNews.push(...shuffledSeason.slice(0, 2));
       }
       
-      return sampleNews.map((news, index) => ({
-        id: `news-${index}`,
+      return selectedNews.map((news, index) => ({
+        id: `news-${index}-${randomSeed}`,
         title: news.title,
         category: 'news',
         source: 'news' as const,
@@ -338,98 +393,155 @@ class TrendService {
     
     try {
       // 시간대별로 다른 트렌드를 보여주기 위한 로직
-      const hour = new Date().getHours();
-      const month = new Date().getMonth() + 1; // 0-11 -> 1-12
-      const isMorning = hour >= 6 && hour < 12;
-      const isAfternoon = hour >= 12 && hour < 18;
-      const isEvening = hour >= 18 && hour < 24;
+      const now = new Date();
+      const hour = now.getHours();
+      const month = now.getMonth() + 1;
+      const dayOfWeek = now.getDay(); // 0: 일요일, 6: 토요일
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      const randomSeed = Math.floor(now.getTime() / (1000 * 60 * 30)); // 30분마다 변경
       
-      // 시간대별 트렌드 데이터
-      const morningTrends = [
+      // 랜덤 함수 (시드 기반)
+      const seededRandom = (seed: number, max: number) => {
+        const x = Math.sin(seed) * 10000;
+        return Math.floor((x - Math.floor(x)) * max);
+      };
+      
+      // 시간대별 기본 트렌드 풀
+      const morningTrendsPool = [
         { title: '오늘 날씨', category: 'life', hashtags: ['날씨', '미세먼지', '외출'] },
         { title: '출근길 카페', category: 'food', hashtags: ['카페', '커피', '모닝커피'] },
         { title: '아침 운동', category: 'health', hashtags: ['운동', '헬스', '아침루틴'] },
+        { title: '지하철 상황', category: 'life', hashtags: ['지하철', '출근', '교통'] },
+        { title: '아침 뉴스', category: 'news', hashtags: ['뉴스', '속보', '아침'] },
+        { title: '브런치 맛집', category: 'food', hashtags: ['브런치', '주말', '맛집'] },
       ];
       
-      const afternoonTrends = [
+      const afternoonTrendsPool = [
         { title: '점심 메뉴 추천', category: 'food', hashtags: ['점심', '맛집', '직장인점심'] },
         { title: '주말 계획', category: 'life', hashtags: ['주말', '나들이', '데이트'] },
         { title: '온라인 쇼핑', category: 'shopping', hashtags: ['쇼핑', '할인', '택배'] },
+        { title: '카페 추천', category: 'food', hashtags: ['카페', '디저트', '커피'] },
+        { title: '오후 산책', category: 'life', hashtags: ['산책', '공원', '힐링'] },
+        { title: '주식 시황', category: 'finance', hashtags: ['주식', '코스피', '투자'] },
       ];
       
-      const eveningTrends = [
+      const eveningTrendsPool = [
         { title: '저녁 메뉴', category: 'food', hashtags: ['저녁', '요리', '배달'] },
         { title: '넷플릭스 추천', category: 'entertainment', hashtags: ['넷플릭스', '드라마', '영화'] },
         { title: '야식 추천', category: 'food', hashtags: ['야식', '배달음식', '치킨'] },
+        { title: '운동 루틴', category: 'health', hashtags: ['운동', '홈트', '다이어트'] },
+        { title: '와인 추천', category: 'food', hashtags: ['와인', '술', '홈술'] },
+        { title: '책 추천', category: 'life', hashtags: ['독서', '책', '베스트셀러'] },
       ];
       
-      // 계절별 기본 트렌드
-      let seasonalTrends = [];
-      
-      // 7-8월: 여름
-      if (month >= 7 && month <= 8) {
-        seasonalTrends = [
+      // 계절별 트렌드 풀 (더 다양하게)
+      const seasonalTrendsPool = {
+        summer: [
           { title: '여름 휴가지 추천', category: 'travel', hashtags: ['여름휴가', '국내여행', '해외여행'] },
           { title: '해수욕장 명소', category: 'travel', hashtags: ['해수욕장', '바다', '여름'] },
           { title: '보양식 추천', category: 'food', hashtags: ['보양식', '여름', '건강'] },
           { title: '에어컨 구매 가이드', category: 'shopping', hashtags: ['에어컨', '여름', '가전'] },
           { title: '수박 화채', category: 'food', hashtags: ['수박', '화채', '여름음식'] },
           { title: '폭염 대비', category: 'life', hashtags: ['폭염', '더위', '건강'] },
-          { title: '캘핑 장소', category: 'travel', hashtags: ['캘핑', '여름', '휴가'] },
+          { title: '캠핑 장소', category: 'travel', hashtags: ['캠핑', '여름', '휴가'] },
           { title: '여름 패션', category: 'fashion', hashtags: ['여름코디', '패션', '옷'] },
-        ];
-      }
-      // 9-10월: 가을
-      else if (month >= 9 && month <= 10) {
-        seasonalTrends = [
+          { title: '빙수 맛집', category: 'food', hashtags: ['빙수', '디저트', '여름'] },
+          { title: '워터파크', category: 'travel', hashtags: ['워터파크', '물놀이', '여름'] },
+        ],
+        fall: [
           { title: '가을 여행지 추천', category: 'travel', hashtags: ['가을여행', '단풍', '여행'] },
           { title: '단풍 명소', category: 'travel', hashtags: ['단풍', '가을', '산'] },
           { title: '가을 패션', category: 'fashion', hashtags: ['가을코디', '패션', '외투'] },
           { title: '독서의 계절', category: 'life', hashtags: ['독서', '책', '가을'] },
-        ];
-      }
-      // 11-2월: 겨울
-      else if (month >= 11 || month <= 2) {
-        seasonalTrends = [
+          { title: '가을 카페', category: 'food', hashtags: ['카페', '가을', '따뜻한'] },
+          { title: '맛있는 베이커리', category: 'food', hashtags: ['베이커리', '빵', '디저트'] },
+          { title: '할로윈 행사', category: 'life', hashtags: ['할로윈', '이벤트', '파티'] },
+          { title: '캠핑 명소', category: 'travel', hashtags: ['캠핑', '가을', '야외'] },
+        ],
+        winter: [
           { title: '크리스마스 선물', category: 'shopping', hashtags: ['크리스마스', '선물', '연말'] },
           { title: '겨울 여행지 추천', category: 'travel', hashtags: ['겨울여행', '국내여행', '해외여행'] },
           { title: '연말정산', category: 'life', hashtags: ['연말정산', '세금', '환급'] },
           { title: '겨울 패션', category: 'fashion', hashtags: ['겨울코디', '패딩', '니트'] },
-        ];
-      }
-      // 3-6월: 봄/초여름
-      else {
-        seasonalTrends = [
+          { title: '스키장 추천', category: 'travel', hashtags: ['스키', '겨울스포츠', '여행'] },
+          { title: '따뜻한 음료', category: 'food', hashtags: ['차', '커피', '따뜻한'] },
+          { title: '크리스마스 마켓', category: 'life', hashtags: ['크리스마스', '마켓', '이벤트'] },
+          { title: '연말 모임', category: 'life', hashtags: ['연말', '모임', '파티'] },
+        ],
+        spring: [
           { title: '봄 나들이 명소', category: 'travel', hashtags: ['봄나들이', '꽃구경', '여행'] },
           { title: '미세먼지 대비', category: 'life', hashtags: ['미세먼지', '건강', '봄'] },
           { title: '새학기 준비', category: 'shopping', hashtags: ['새학기', '학용품', '준비'] },
           { title: '봄 패션', category: 'fashion', hashtags: ['봄코디', '패션', '옷'] },
-        ];
-      }
+          { title: '벚꽃 명소', category: 'travel', hashtags: ['벚꽃', '봄', '꽃구경'] },
+          { title: '봄 소풍', category: 'travel', hashtags: ['소풍', '피크닉', '나들이'] },
+          { title: '새로운 시작', category: 'life', hashtags: ['새학기', '새출발', '목표'] },
+          { title: '봄 특별 메뉴', category: 'food', hashtags: ['봄', '제철음식', '맛집'] },
+        ],
+      };
       
-      // 시간대별 트렌드 선택
-      let selectedTrends = seasonalTrends;
+      // 시간대별 트렌드 선택 (랜덤하게)
+      let timeBasedTrends = [];
+      const isMorning = hour >= 6 && hour < 12;
+      const isAfternoon = hour >= 12 && hour < 18;
+      const isEvening = hour >= 18 && hour < 24;
+      
       if (isMorning) {
-        selectedTrends = [...morningTrends, ...seasonalTrends];
+        // 아침 트렌드에서 3-4개 랜덤 선택
+        const count = 3 + seededRandom(randomSeed, 2);
+        const shuffled = this.shuffleArray([...morningTrendsPool], randomSeed);
+        timeBasedTrends = shuffled.slice(0, count);
       } else if (isAfternoon) {
-        selectedTrends = [...afternoonTrends, ...seasonalTrends];
+        const count = 3 + seededRandom(randomSeed + 1, 2);
+        const shuffled = this.shuffleArray([...afternoonTrendsPool], randomSeed + 1);
+        timeBasedTrends = shuffled.slice(0, count);
       } else if (isEvening) {
-        selectedTrends = [...eveningTrends, ...seasonalTrends];
+        const count = 3 + seededRandom(randomSeed + 2, 2);
+        const shuffled = this.shuffleArray([...eveningTrendsPool], randomSeed + 2);
+        timeBasedTrends = shuffled.slice(0, count);
       }
       
-      // 중복 제거
-      const uniqueTrends = selectedTrends.filter((trend, index, self) =>
+      // 계절별 트렌드 선택
+      let seasonalTrends = [];
+      let currentSeasonPool = [];
+      
+      if (month >= 6 && month <= 8) {
+        currentSeasonPool = seasonalTrendsPool.summer;
+      } else if (month >= 9 && month <= 11) {
+        currentSeasonPool = seasonalTrendsPool.fall || [];
+      } else if (month >= 12 || month <= 2) {
+        currentSeasonPool = seasonalTrendsPool.winter || [];
+      } else {
+        currentSeasonPool = seasonalTrendsPool.spring || [];
+      }
+      
+      if (currentSeasonPool.length > 0) {
+        const count = 3 + seededRandom(randomSeed + 3, 3);
+        const shuffled = this.shuffleArray([...currentSeasonPool], randomSeed + 3);
+        seasonalTrends = shuffled.slice(0, count);
+      }
+      
+      // 실시간 이슈 트렌드 (매번 변경)
+      const realtimeTrends = this.generateRealtimeTrends(randomSeed);
+      
+      // 모든 트렌드 합치고 중복 제거
+      const allTrends = [...timeBasedTrends, ...seasonalTrends, ...realtimeTrends];
+      const uniqueTrends = allTrends.filter((trend, index, self) =>
         index === self.findIndex((t) => t.title === trend.title)
       );
       
-      return uniqueTrends.slice(0, 10).map((trend, index) => ({
-        id: `naver-${index}`,
+      // 순서 섞기
+      const finalTrends = this.shuffleArray(uniqueTrends, randomSeed + 10);
+      
+      return finalTrends.slice(0, 10).map((trend, index) => ({
+        id: `naver-${index}-${randomSeed}`,
         title: trend.title,
         category: trend.category,
         source: 'naver' as const,
         timestamp: new Date().toISOString(),
         hashtags: trend.hashtags,
-        volume: Math.floor(Math.random() * 10000) + 1000, // 임시 볼륨
+        volume: 1000 + seededRandom(randomSeed + index, 9000),
+        change: seededRandom(randomSeed + index + 100, 200) - 100, // -100 ~ +100
       }));
     } catch (error) {
       console.error('Naver trends error:', error);
@@ -562,6 +674,62 @@ class TrendService {
       return prompts[Math.floor(Math.random() * prompts.length)];
     }
   }
+  
+  /**
+   * 배열 섞기 (시드 기반)
+   */
+  private shuffleArray<T>(array: T[], seed: number): T[] {
+    const arr = [...array];
+    let currentIndex = arr.length;
+    
+    while (currentIndex !== 0) {
+      const randomIndex = Math.floor((Math.sin(seed++) * 10000 - Math.floor(Math.sin(seed) * 10000)) * currentIndex);
+      currentIndex--;
+      [arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
+    }
+    
+    return arr;
+  }
+  
+  /**
+   * 실시간 이슈 트렌드 생성
+   */
+  private generateRealtimeTrends(seed: number): any[] {
+    const topics = [
+      { title: '신상 카페 오픈', category: 'food', hashtags: ['카페', '신상', '오픈'] },
+      { title: '연예인 패션', category: 'fashion', hashtags: ['연예인', '패션', '스타일'] },
+      { title: '화제의 드라마', category: 'entertainment', hashtags: ['드라마', 'TV', '화제'] },
+      { title: '신규 카페 메뉴', category: 'food', hashtags: ['카페', '메뉴', '신상'] },
+      { title: '핫플레이스', category: 'travel', hashtags: ['여행', '핫플', '명소'] },
+      { title: '새로운 맛집', category: 'food', hashtags: ['맛집', '신상', '맛스타그램'] },
+      { title: '팝업스토어', category: 'shopping', hashtags: ['팝업', '쇼핑', '이벤트'] },
+      { title: '신규 브랜드', category: 'fashion', hashtags: ['브랜드', '패션', '신상'] },
+      { title: 'SNS 화제', category: 'social', hashtags: ['SNS', '화제', '바이럴'] },
+      { title: '경제 뉴스', category: 'finance', hashtags: ['경제', '뉴스', '투자'] },
+    ];
+    
+    // 시드를 사용해 2-3개 랜덤 선택
+    const count = 2 + (seed % 2);
+    const shuffled = this.shuffleArray(topics, seed);
+    return shuffled.slice(0, count);
+  }
+  
+  /**
+   * 캐시 나이 확인
+   */
+  private async getCacheAge(): Promise<{ ageInMinutes: number }> {
+    try {
+      const cached = await AsyncStorage.getItem(this.CACHE_KEY);
+      if (!cached) return { ageInMinutes: 0 };
+      
+      const { timestamp } = JSON.parse(cached);
+      const ageInMinutes = Math.floor((Date.now() - timestamp) / (1000 * 60));
+      return { ageInMinutes };
+    } catch (error) {
+      return { ageInMinutes: 0 };
+    }
+  }
+  
   /**
    * 캐시 삭제 (디버깅용)
    */
@@ -571,6 +739,219 @@ class TrendService {
       console.log('Trend cache cleared');
     } catch (error) {
       console.error('Failed to clear cache:', error);
+    }
+  }
+  
+  /**
+   * 실시간 트렌드 API 호출
+   */
+  private async fetchRealTimeTrends(): Promise<TrendItem[]> {
+    try {
+      console.log('[TrendService] Fetching real-time trends from API...');
+      
+      const response = await axios.get(`${this.API_BASE_URL}/trends`, {
+        timeout: 10000, // 10초 타임아웃
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.data && response.data.trends) {
+        return this.parseApiTrends(response.data.trends);
+      }
+      
+      console.log('[TrendService] No trends data from API, using sample data');
+      return this.getSampleTrends();
+    } catch (error) {
+      console.error('[TrendService] API error:', error);
+      // API 오류 시 샘플 데이터 사용
+      return this.getSampleTrends();
+    }
+  }
+  
+  /**
+   * API 응답 파싱
+   */
+  private parseApiTrends(apiData: any): TrendItem[] {
+    const trends: TrendItem[] = [];
+    let idCounter = 0;
+    
+    // 네이버 트렌드
+    if (apiData.naver && Array.isArray(apiData.naver)) {
+      apiData.naver.forEach((item: any) => {
+        trends.push({
+          id: `naver-api-${idCounter++}`,
+          title: item.keyword || item.title,
+          category: this.categorizeKeyword(item.keyword || item.title),
+          source: 'naver',
+          timestamp: new Date().toISOString(),
+          hashtags: this.extractHashtags(item.keyword || item.title),
+          volume: item.volume || Math.floor(Math.random() * 10000),
+          change: item.change || 0,
+        });
+      });
+    }
+    
+    // Google 트렌드
+    if (apiData.google && Array.isArray(apiData.google)) {
+      apiData.google.forEach((item: any) => {
+        trends.push({
+          id: `google-api-${idCounter++}`,
+          title: item.title || item.query,
+          category: this.categorizeKeyword(item.title || item.query),
+          source: 'google',
+          timestamp: new Date().toISOString(),
+          hashtags: this.extractHashtags(item.title || item.query),
+          volume: item.traffic || Math.floor(Math.random() * 10000),
+        });
+      });
+    }
+    
+    // 뉴스 트렌드
+    if (apiData.news && Array.isArray(apiData.news)) {
+      apiData.news.forEach((item: any) => {
+        trends.push({
+          id: `news-api-${idCounter++}`,
+          title: item.title,
+          category: 'news',
+          source: 'news',
+          timestamp: new Date().toISOString(),
+          hashtags: this.extractHashtags(item.title),
+        });
+      });
+    }
+    
+    return trends;
+  }
+  
+  /**
+   * 키워드 카테고리 분류
+   */
+  private categorizeKeyword(keyword: string): string {
+    const lowerKeyword = keyword.toLowerCase();
+    
+    // 한국어 키워드
+    if (keyword.includes('음식') || keyword.includes('맛집') || 
+        keyword.includes('카페') || keyword.includes('요리')) {
+      return 'food';
+    }
+    if (keyword.includes('여행') || keyword.includes('관광') || 
+        keyword.includes('호텔') || keyword.includes('항공')) {
+      return 'travel';
+    }
+    if (keyword.includes('쇼핑') || keyword.includes('구매') || 
+        keyword.includes('할인') || keyword.includes('세일')) {
+      return 'shopping';
+    }
+    if (keyword.includes('건강') || keyword.includes('운동') || 
+        keyword.includes('다이어트') || keyword.includes('헬스')) {
+      return 'health';
+    }
+    if (keyword.includes('패션') || keyword.includes('옷') || 
+        keyword.includes('스타일') || keyword.includes('코디')) {
+      return 'fashion';
+    }
+    if (keyword.includes('IT') || keyword.includes('기술') || 
+        keyword.includes('AI') || keyword.includes('앱')) {
+      return 'tech';
+    }
+    if (keyword.includes('연예') || keyword.includes('드라마') || 
+        keyword.includes('영화') || keyword.includes('음악')) {
+      return 'entertainment';
+    }
+    
+    // 영어 키워드
+    if (lowerKeyword.includes('food') || lowerKeyword.includes('restaurant') || 
+        lowerKeyword.includes('cafe') || lowerKeyword.includes('recipe')) {
+      return 'food';
+    }
+    if (lowerKeyword.includes('travel') || lowerKeyword.includes('trip') || 
+        lowerKeyword.includes('hotel') || lowerKeyword.includes('flight')) {
+      return 'travel';
+    }
+    if (lowerKeyword.includes('shopping') || lowerKeyword.includes('buy') || 
+        lowerKeyword.includes('sale') || lowerKeyword.includes('discount')) {
+      return 'shopping';
+    }
+    if (lowerKeyword.includes('health') || lowerKeyword.includes('fitness') || 
+        lowerKeyword.includes('diet') || lowerKeyword.includes('exercise')) {
+      return 'health';
+    }
+    if (lowerKeyword.includes('fashion') || lowerKeyword.includes('style') || 
+        lowerKeyword.includes('clothing') || lowerKeyword.includes('outfit')) {
+      return 'fashion';
+    }
+    if (lowerKeyword.includes('tech') || lowerKeyword.includes('technology') || 
+        lowerKeyword.includes('ai') || lowerKeyword.includes('app')) {
+      return 'tech';
+    }
+    if (lowerKeyword.includes('entertainment') || lowerKeyword.includes('movie') || 
+        lowerKeyword.includes('music') || lowerKeyword.includes('drama')) {
+      return 'entertainment';
+    }
+    
+    return 'life';
+  }
+  
+  /**
+   * 실시간 API 모드 전환
+   */
+  async toggleRealApiMode(enabled: boolean): Promise<void> {
+    this.USE_REAL_API = enabled;
+    await AsyncStorage.setItem('@use_real_api', enabled.toString());
+    // 캐시 삭제하여 새로운 데이터 로드
+    await this.clearCache();
+    console.log(`[TrendService] Real API mode: ${enabled ? 'ON' : 'OFF'}`);
+  }
+  
+  /**
+   * 실시간 API 모드 상태 확인
+   */
+  async isRealApiEnabled(): Promise<boolean> {
+    try {
+      const value = await AsyncStorage.getItem('@use_real_api');
+      return value === 'true';
+    } catch (error) {
+      return false;
+    }
+  }
+  
+  /**
+   * 샘플 트렌드 데이터 반환
+   */
+  private async getSampleTrends(): Promise<TrendItem[]> {
+    const isKoreanDevice = isKorean();
+    
+    const allTrends: TrendItem[] = [];
+    
+    // 네이버 트렌드
+    const naverTrends = await this.getNaverTrends();
+    allTrends.push(...naverTrends);
+    
+    // Google 트렌드
+    const googleTrends = this.getGoogleTrends();
+    allTrends.push(...googleTrends);
+    
+    // 뉴스 트렌드
+    const newsTrends = this.getSampleNewsTrends(isKoreanDevice);
+    allTrends.push(...newsTrends);
+    
+    return allTrends;
+  }
+  
+  /**
+   * 초기화 시 API 모드 설정 로드
+   */
+  async initialize(): Promise<void> {
+    try {
+      const useRealApi = await AsyncStorage.getItem('@use_real_api');
+      if (useRealApi !== null) {
+        this.USE_REAL_API = useRealApi === 'true';
+      }
+      console.log(`[TrendService] Initialized with Real API mode: ${this.USE_REAL_API ? 'ON' : 'OFF'}`);
+    } catch (error) {
+      console.error('[TrendService] Initialize error:', error);
     }
   }
 }

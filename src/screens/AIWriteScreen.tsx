@@ -56,6 +56,7 @@ import {
   TREND_ACCESS,
   PlanType 
 } from '../config/adConfig';
+import { trendCacheUtils } from '../utils/trendCacheUtils';
 
 type WriteMode = 'text' | 'photo' | 'polish';
 
@@ -133,6 +134,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   // 구독 플랜 정보 가져오기
   const subscriptionPlan = useAppSelector(state => state.user.subscriptionPlan);
   const userPlan = (subscriptionPlan || 'free') as PlanType;
+  
+  // generatedContent 상태 모니터링
+  useEffect(() => {
+    console.log('[AIWriteScreen] generatedContent changed:', generatedContent ? 'Has content' : 'Empty');
+    console.log('[AIWriteScreen] isGenerating:', isGenerating);
+  }, [generatedContent, isGenerating]);
 
   // initialText가 있을 때 자동으로 콘텐츠 생성 - 제거됨
   // 사용자가 직접 생성 버튼을 눌러야 함
@@ -167,19 +174,29 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
 
   // 트렌드 해시태그 및 주제 로드
   useEffect(() => {
+    // 즉시 로드
     loadTrendingData();
     
-    // 30분마다 업데이트 (트렌드가 업데이트되면 반영)
+    // 5분마다 업데이트 (트렌드 서비스는 4시간 캐시 사용)
     const interval = setInterval(() => {
+      console.log('[AIWriteScreen] Refreshing trending data...');
       loadTrendingData();
-    }, 30 * 60 * 1000); // 30분
+    }, 5 * 60 * 1000); // 5분
     
     return () => clearInterval(interval);
   }, []);
 
-  const loadTrendingData = async () => {
+  const loadTrendingData = async (forceRefresh = false) => {
     try {
+      console.log('[AIWriteScreen] Loading trending data...', forceRefresh ? '(force refresh)' : '');
+      
+      // 강제 새로고침 시 캐시 삭제
+      if (forceRefresh) {
+        await trendCacheUtils.clearCache();
+      }
+      
       const trends = await trendService.getAllTrends();
+      console.log('[AIWriteScreen] Received trends:', trends.length, 'items');
       
       // 트렌드에서 해시태그 추출 (최대 10개)
       const hashtags = new Set<string>();
@@ -192,7 +209,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
           });
         }
       });
-      setTrendingHashtags(Array.from(hashtags));
+      const hashtagArray = Array.from(hashtags);
+      console.log('[AIWriteScreen] Extracted hashtags:', hashtagArray);
+      setTrendingHashtags(hashtagArray);
       
       // 트렌드 제목을 그대로 주제로 사용 (최대 8개)
       const prompts = trends
@@ -200,6 +219,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         .map(trend => trend.title)
         .filter(title => title && title.length > 0);
       
+      console.log('[AIWriteScreen] Extracted prompts:', prompts);
       setTrendingPrompts(prompts);
       
       // 부족하면 기본 키워드 추가
@@ -209,7 +229,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         setTrendingPrompts(prompts);
       }
     } catch (error) {
-      console.error('Failed to load trending data:', error);
+      console.error('[AIWriteScreen] Failed to load trending data:', error);
       // 오류 시 기본 키워드 사용
       setTrendingPrompts(getDefaultKeywords());
     }
@@ -233,7 +253,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     { id: 'short', label: 'text-outline', count: '짧게', desc: '~50자', iconSize: 24 },
     { id: 'medium', label: 'document-text-outline', count: '보통', desc: '~150자', iconSize: 28 },
     { id: 'long', label: 'newspaper-outline', count: '길게', desc: '~300자', iconSize: 32 },
-    { id: 'extra', label: 'reader-outline', count: '초장문', desc: '~500자', iconSize: 36 },
   ];
   
   // 플랜별 사용 가능한 톤과 길이 필터링 - 모든 옵션 표시로 변경
@@ -540,7 +559,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         result = response.content;
       }
       
+      console.log('[AIWriteScreen] About to set generatedContent with:', result.substring(0, 50) + '...');
       setGeneratedContent(result);
+      console.log('[AIWriteScreen] generatedContent set, now releasing loading state');
+      
+      // 로딩 상태를 먼저 해제
+      setIsGenerating(false);
       
       // 데이터 자동 저장
       if (result) {
@@ -582,7 +606,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     } catch (error) {
       console.error('Generation error:', error);
       Alert.alert('포스티 알림', '앗! 뭔가 문제가 생겼어요. 다시 시도해주세요 🥺');
-    } finally {
+      // 에러 발생 시에만 로딩 해제
       setIsGenerating(false);
     }
   };
@@ -621,7 +645,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         <ScrollView 
           style={styles.content}
           showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: generatedContent ? 120 : 20 }]}
         >
           {/* 헤더 */}
           <FadeInView delay={0}>
@@ -773,7 +797,20 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
               {/* 텍스트 모드 */}
               <SlideInView direction="left" delay={200}>
                 <View style={styles.inputSection}>
-                  <Text style={styles.sectionTitle}>무엇에 대해 쓸까요?</Text>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>무엇에 대해 쓸까요?</Text>
+                    <TouchableOpacity
+                      style={styles.refreshButton}
+                      onPress={async () => {
+                        console.log('[AIWriteScreen] Manual refresh triggered');
+                        await loadTrendingData(true);
+                        Alert.alert('트렌드 업데이트', '최신 트렌드를 불러왔어요!');
+                      }}
+                    >
+                      <Icon name="refresh" size={16} color={colors.primary} />
+                      <Text style={styles.refreshButtonText}>새로고침</Text>
+                    </TouchableOpacity>
+                  </View>
                   <View style={styles.inputContainer}>
                     <TextInput
                       style={styles.input}
@@ -802,6 +839,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                         ]}
                         onPress={() => handleQuickPrompt(quickPrompt)}
                       >
+                        {trendingPrompts.includes(quickPrompt) && (
+                          <Icon name="trending-up" size={12} color={colors.primary} style={{ marginRight: 4 }} />
+                        )}
                         <Text style={[
                           styles.hashtagText,
                           trendingPrompts.includes(quickPrompt) && styles.hashtagTextActive
@@ -1367,12 +1407,33 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     paddingHorizontal: SPACING.lg,
     marginBottom: SPACING.xl,
   },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   sectionTitle: {
     fontSize: 17,
     fontWeight: '700',
     color: colors.text.primary,
-    marginBottom: 12,
     letterSpacing: -0.3,
+  },
+  refreshButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    backgroundColor: isDark ? colors.primary + '20' : '#F3E8FF',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: colors.primary + '30',
+  },
+  refreshButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: colors.primary,
   },
   inputContainer: {
     backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
@@ -1781,6 +1842,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     flexDirection: 'row',
   },
   hashtagChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
     backgroundColor: isDark ? '#1C1C1E' : '#FFFFFF',
     paddingHorizontal: 14,
     paddingVertical: 8,

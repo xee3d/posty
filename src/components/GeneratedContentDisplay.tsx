@@ -1,7 +1,7 @@
 // 생성된 콘텐츠 표시 컴포넌트 개선
 
-import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator,  } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView, Animated } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Clipboard from '@react-native-clipboard/clipboard';
@@ -12,20 +12,18 @@ import { ScaleButton } from './AnimationComponents';
 import { launchSNSApp } from '../utils/snsLauncher';
 import { soundManager } from '../utils/soundManager';
 import missionService from '../services/missionService';
-
 import { Alert } from '../utils/customAlert';
+
 interface GeneratedContentProps {
-  originalContent: string | any; // 일단 any로 처리하여 에러 방지
+  originalContent: string | any;
   tone: string;
   onEdit?: (content: string) => void;
-
 }
 
 export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   originalContent,
   tone,
   onEdit,
-
 }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
   const [activePlatform, setActivePlatform] = useState<'original' | 'instagram' | 'facebook' | 'twitter'>('original');
@@ -34,11 +32,49 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [optimizationTip, setOptimizationTip] = useState('');
   const [regenerateCount, setRegenerateCount] = useState<Record<string, number>>({});
+  const [showPlatformHint, setShowPlatformHint] = useState(false);
+  const hintOpacity = useRef(new Animated.Value(0)).current;
+  const [contentHeight, setContentHeight] = useState<number>(300); // 동적 높이 상태
 
   // originalContent가 객체인 경우 처리
   const safeOriginalContent = typeof originalContent === 'string' 
     ? originalContent 
-    : (originalContent?.content || JSON.stringify(originalContent));
+    : (originalContent?.content || '');
+    
+  // 디버깅을 위한 로그
+  useEffect(() => {
+    console.log('[GeneratedContentDisplay] Content type:', typeof originalContent);
+    console.log('[GeneratedContentDisplay] Content length:', safeOriginalContent.length);
+    if (safeOriginalContent.length > 500) {
+      console.log('[GeneratedContentDisplay] Long content detected, first 100 chars:', safeOriginalContent.substring(0, 100));
+    }
+  }, [originalContent, safeOriginalContent]);
+  
+  // 새로운 콘텐츠가 생성되면 원본 탭으로 이동
+  useEffect(() => {
+    if (originalContent && safeOriginalContent) {
+      setActivePlatform('original');
+      console.log('[GeneratedContentDisplay] New content detected, switching to original tab');
+      
+      // 플랫폼 변경 힌트 애니메이션
+      setShowPlatformHint(true);
+      Animated.sequence([
+        Animated.timing(hintOpacity, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.delay(3000),
+        Animated.timing(hintOpacity, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start(() => {
+        setShowPlatformHint(false);
+      });
+    }
+  }, [originalContent]); // originalContent가 변경될 때마다 실행
 
   const platforms = [
     { id: 'original', name: '원본', icon: 'document-text-outline', color: colors.primary },
@@ -50,30 +86,37 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   // 플랫폼별 콘텐츠 생성
   useEffect(() => {
     const generatePlatformContents = async () => {
+      console.log('[GeneratedContentDisplay] Generating platform contents...');
       setIsOptimizing(true);
       const contents: Record<string, { content: string; hashtags: string[] }> = {};
       
-      // 원본을 제외한 플랫폼들만 처리
-      for (const platform of platforms.filter(p => p.id !== 'original')) {
-        const optimized = optimizeForPlatform(
-          safeOriginalContent,
-          platform.id as 'instagram' | 'facebook' | 'twitter',
-          tone
-        );
-        contents[platform.id] = optimized;
+      try {
+        // 원본을 제외한 플랫폼들만 처리
+        for (const platform of platforms.filter(p => p.id !== 'original')) {
+          console.log(`[GeneratedContentDisplay] Optimizing for ${platform.id}`);
+          const optimized = optimizeForPlatform(
+            safeOriginalContent,
+            platform.id as 'instagram' | 'facebook' | 'twitter',
+            tone
+          );
+          contents[platform.id] = optimized;
+        }
+        
+        setPlatformContents(contents);
+      } catch (error) {
+        console.error('[GeneratedContentDisplay] Error generating platform contents:', error);
+      } finally {
+        setIsOptimizing(false);
       }
-      
-      setPlatformContents(contents);
-      setIsOptimizing(false);
     };
 
-    if (safeOriginalContent) {
+    if (safeOriginalContent && safeOriginalContent.length > 0) {
       generatePlatformContents();
     }
   }, [safeOriginalContent, tone]);
 
   const handlePlatformChange = async (platformId: string) => {
-    soundManager.playTap(); // 탭 사운드
+    soundManager.playTap();
     
     // 이미 선택된 플랫폼을 다시 클릭하면 재생성
     if (activePlatform === platformId && platformId !== 'original') {
@@ -121,17 +164,25 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   };
 
   const getCurrentContent = () => {
-    if (activePlatform === 'original') {
-      return safeOriginalContent;
+    try {
+      if (activePlatform === 'original') {
+        return safeOriginalContent || '';
+      }
+      
+      const platformData = platformContents[activePlatform];
+      if (!platformData || !platformData.content) {
+        console.log(`[GeneratedContentDisplay] No content for platform: ${activePlatform}`);
+        return '';
+      }
+      
+      const hashtagString = platformData.hashtags && platformData.hashtags.length > 0 
+        ? platformData.hashtags.map(tag => `#${tag}`).join(' ')
+        : '';
+      return hashtagString ? `${platformData.content}\n\n${hashtagString}` : platformData.content;
+    } catch (error) {
+      console.error('[GeneratedContentDisplay] Error getting content:', error);
+      return safeOriginalContent || '';
     }
-    
-    const platformData = platformContents[activePlatform];
-    if (!platformData) return '';
-    
-    const hashtagString = platformData.hashtags && platformData.hashtags.length > 0 
-      ? platformData.hashtags.map(tag => `#${tag}`).join(' ')
-      : '';
-    return hashtagString ? `${platformData.content}\n\n${hashtagString}` : platformData.content;
   };
 
   // 본문 길이 계산 (해시태그 제외)
@@ -148,7 +199,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
       await Clipboard.setString(content);
       setCopiedPlatform(activePlatform);
       
-      soundManager.playCopy(); // 복사 사운드
+      soundManager.playCopy();
       
       Alert.alert(
         '복사 완료! 📋',
@@ -166,7 +217,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     const content = getCurrentContent();
     if (!content) return;
 
-    soundManager.playTap(); // 공유 버튼 사운드
+    soundManager.playTap();
 
     // original 탭에서는 플랫폼 선택 모달 표시
     if (activePlatform === 'original') {
@@ -203,7 +254,6 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     <View style={styles.container}>
       {/* 플랫폼 탭 */}
       <View style={styles.platformTabs}>
-        {/* 플랫폼 탭들 */}
         {platforms.map((platform) => (
           <TouchableOpacity
             key={platform.id}
@@ -256,7 +306,12 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
           <Icon name="arrow-forward" size={16} color={colors.text.tertiary} />
           <View style={styles.conversionInfoItem}>
             <Text style={styles.conversionLabel}>변환 후:</Text>
-            <Text style={styles.conversionValue}>{getContentLength()}자</Text>
+            <Text style={[styles.conversionValue, 
+              getContentLength() < safeOriginalContent.split('#')[0].trim().length * 0.5 && { color: colors.primary }
+            ]}>
+              {getContentLength()}자
+              {getContentLength() < safeOriginalContent.split('#')[0].trim().length * 0.5 && ' (-' + Math.round((1 - getContentLength() / safeOriginalContent.split('#')[0].trim().length) * 100) + '%)'}
+            </Text>
           </View>
         </View>
       )}
@@ -273,12 +328,12 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
       
       {/* 원본 탭에서는 안내 메시지 표시 */}
       {activePlatform === 'original' && (
-        <View style={[styles.tokenNotice]}>
-          <Icon name="sparkles-outline" size={14} color={colors.text.tertiary} />
-          <Text style={styles.tokenNoticeText}>
-            아래 플랫폼 탭을 눌러 각 SNS에 맞게 변환해보세요
+        <Animated.View style={[styles.tokenNotice, { opacity: showPlatformHint ? hintOpacity : 1 }]}>
+          <Icon name="sparkles-outline" size={14} color={showPlatformHint ? colors.primary : colors.text.tertiary} />
+          <Text style={[styles.tokenNoticeText, showPlatformHint && { color: colors.primary, fontWeight: '600' }]}>
+            {showPlatformHint ? '🎉 생성 완료! 아래 플랫폼 탭을 눌러 SNS에 맞게 변환해보세요' : '아래 플랫폼 탭을 눌러 각 SNS에 맞게 변환해보세요'}
           </Text>
-        </View>
+        </Animated.View>
       )}
 
       {/* 콘텐츠 표시 영역 */}
@@ -294,7 +349,17 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
             본문 {getContentLength()}자
           </Text>
         </View>
-        <Text style={styles.contentText}>{getCurrentContent()}</Text>
+        <ScrollView 
+          style={[styles.contentScrollView, { maxHeight: contentHeight }]} 
+          showsVerticalScrollIndicator={false}
+          onContentSizeChange={(width, height) => {
+            // 콘텐츠 높이에 따라 동적으로 조절 (최소 200, 최대 600)
+            const newHeight = Math.min(Math.max(height + 20, 200), 600);
+            setContentHeight(newHeight);
+          }}
+        >
+          <Text style={styles.contentText}>{getCurrentContent()}</Text>
+        </ScrollView>
       </View>
 
       {/* 액션 버튼들 */}
@@ -338,7 +403,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   );
 };
 
-const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDark: boolean) =>
+const createStyles = (colors: typeof COLORS, cardTheme: any, isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -391,7 +456,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       marginHorizontal: SPACING.md,
       marginBottom: SPACING.sm,
       borderWidth: 1,
-      borderColor: colors.primary + '20', // 약간 투명한 테두리
+      borderColor: colors.primary + '20',
     },
     tipText: {
       flex: 1,
@@ -424,7 +489,9 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       paddingVertical: 2,
       borderRadius: 10,
     },
-
+    contentScrollView: {
+      // maxHeight는 동적으로 설정됨
+    },
     contentText: {
       fontSize: 16,
       fontFamily: 'System',
@@ -437,7 +504,6 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       justifyContent: 'space-between',
       marginTop: SPACING.md,
       marginHorizontal: SPACING.md,
-  
     },
     actionButton: {
       flex: 1,
@@ -461,7 +527,6 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
       borderWidth: 1,
       borderColor: colors.primary,
     },
-
     actionButtonText: {
       fontSize: 14,
       fontFamily: 'System',

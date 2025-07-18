@@ -29,9 +29,18 @@ class AIServiceWrapper {
   }
   
   // 플랜별 AI 모델 결정
-  private getModelByPlan(plan: 'free' | 'starter' | 'premium' | 'pro'): string {
-    const planConfig = SUBSCRIPTION_PLANS[plan];
-    return planConfig?.features?.aiModel || 'gpt-4o-mini';
+  private getModelByPlan(plan: 'free' | 'starter' | 'premium' | 'pro', length?: string): string {
+    // 모든 플랜에서 속도를 위해 gpt-4o-mini 사용
+    console.log('Using gpt-4o-mini for all plans (optimized for speed)');
+    return 'gpt-4o-mini';
+    
+    // 기존 코드 (필요시 복원 가능)
+    // if (length === 'extra') {
+    //   console.log('Using gpt-4o-mini for extra long content (faster generation)');
+    //   return 'gpt-4o-mini';
+    // }
+    // const planConfig = SUBSCRIPTION_PLANS[plan];
+    // return planConfig?.features?.aiModel || 'gpt-4o-mini';
   }
   
   // 콘텐츠 생성
@@ -65,9 +74,6 @@ class AIServiceWrapper {
         case 'long':
           lengthInstruction = '\n[길이: 200-300자로 자세하고 풍부하게 작성해주세요]';
           break;
-        case 'extra':
-          lengthInstruction = '\n[길이: 500자 이상의 초장문으로 매우 자세히 작성해주세요. 여러 문단으로 나누어 풍부한 내용을 담아주세요]';
-          break;
       }
       
       const finalPrompt = enhancedPrompt + lengthInstruction;
@@ -76,7 +82,7 @@ class AIServiceWrapper {
       
       // 사용자의 구독 플랜에 따른 AI 모델 결정
       const userPlan = await this.getUserPlan();
-      const aiModel = this.getModelByPlan(userPlan);
+      const aiModel = this.getModelByPlan(userPlan, params.length);
       console.log('Using AI model:', aiModel, 'for plan:', userPlan);
       
       // 서버 API 호출
@@ -332,8 +338,7 @@ class AIServiceWrapper {
     const lengthInstructions = {
       short: '50자 이내로 간결하게',
       medium: '100-150자 사이로',
-      long: '200-300자로 상세하게',
-      extra: '500-700자로 매우 자세히'
+      long: '200-300자로 상세하게'
     };
     
     const lengthGuide = length ? `\n길이: ${lengthInstructions[length]} 작성해주세요.` : '';
