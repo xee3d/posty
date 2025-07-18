@@ -65,6 +65,9 @@ class AIServiceWrapper {
         case 'long':
           lengthInstruction = '\n[길이: 200-300자로 자세하고 풍부하게 작성해주세요]';
           break;
+        case 'extra':
+          lengthInstruction = '\n[길이: 500자 이상의 초장문으로 매우 자세히 작성해주세요. 여러 문단으로 나누어 풍부한 내용을 담아주세요]';
+          break;
       }
       
       const finalPrompt = enhancedPrompt + lengthInstruction;
@@ -329,7 +332,8 @@ class AIServiceWrapper {
     const lengthInstructions = {
       short: '50자 이내로 간결하게',
       medium: '100-150자 사이로',
-      long: '200-300자로 상세하게'
+      long: '200-300자로 상세하게',
+      extra: '500-700자로 매우 자세히'
     };
     
     const lengthGuide = length ? `\n길이: ${lengthInstructions[length]} 작성해주세요.` : '';

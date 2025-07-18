@@ -77,6 +77,8 @@ class ServerAIService {
           language: 'ko', // getCurrentLanguage(), // 현재 언어 추가
           length: params.length || 'medium', // 길이 추가
           model: params.model, // AI 모델 추가
+          // 길이에 따른 max_tokens 설정
+          max_tokens: this.getMaxTokensByLength(params.length),
           // 이미지가 있으면 base64 전송
           ...(params.imageBase64 && { image: params.imageBase64 }),
         }),
@@ -271,7 +273,9 @@ class ServerAIService {
 
   // 길이에 따라 프롬프트 보강
   private enhancePromptWithLength(prompt: string, length?: string): string {
-    if (length === 'long') {
+    if (length === 'extra') {
+      return `${prompt} (자세히 500-600자로 작성해주세요. 구체적인 예시와 풍부한 설명을 포함해주세요. 너무 길게 쓰지 말고 핵심 내용에 집중해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
+    } else if (length === 'long') {
       return `${prompt} (자세히 300-400자로 설명해주세요. 구체적인 예시와 상세한 설명을 포함해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
     } else if (length === 'short') {
       return `${prompt} (간결하게 30-50자로 작성해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
@@ -279,6 +283,23 @@ class ServerAIService {
       return `${prompt} (적당히 100-200자로 작성해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
     }
     return prompt;
+  }
+
+  // 길이에 따른 최대 토큰 수 설정
+  private getMaxTokensByLength(length?: string): number {
+    switch (length) {
+      case 'short':
+        return 150;
+      case 'medium':
+        return 300;
+      case 'long':
+        return 600;
+      case 'extra':
+        // 초장문의 경우 약간 줄여서 속도 개선
+        return 1000; // 1200에서 1000으로 감소
+      default:
+        return 300;
+    }
   }
 }
 
