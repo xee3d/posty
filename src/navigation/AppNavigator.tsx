@@ -77,7 +77,7 @@ const AppNavigator: React.FC = () => {
       case 'settings':
         return <SettingsScreen key="settings" />;
       case 'trend':
-        return <TrendScreen key="trend" />;
+        return <TrendScreen key="trend" onNavigate={handleNavigate} />;
       case 'feed-ads':
         return <FeedWithAdsExample key="feed-ads" />;
       case 'subscription':

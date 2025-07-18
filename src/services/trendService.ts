@@ -32,7 +32,7 @@ class TrendService {
   private readonly NEWS_API_KEY = NEWS_API_KEY || '';
   
   // 실시간 API 설정
-  private USE_REAL_API = false; // 기본값: false (샘플 데이터 사용) - API 문제 해결 후 true로 변경
+  private USE_REAL_API = true; // 기본값: true (실시간 API 사용)
   private API_BASE_URL = 'https://posty-api-v2.vercel.app/api'; // Vercel Production URL
   
   /**
@@ -43,8 +43,6 @@ class TrendService {
       // 디버깅을 위한 언어 확인
       const deviceLang = getDeviceLanguage();
       const isKoreanLang = isKorean();
-      console.log('Trend Service - Device Language:', deviceLang);
-      console.log('Trend Service - Is Korean:', isKoreanLang);
       
       // 캐시 확인
       const cached = await this.getCachedTrends();
@@ -53,13 +51,11 @@ class TrendService {
         console.log(`[TrendService] Using cached trends (age: ${cacheInfo.ageInMinutes} minutes)`);
         return cached;
       }
-      console.log('[TrendService] Cache expired or not found, fetching new trends...');
       
       let allTrends: TrendItem[] = [];
       
       if (this.USE_REAL_API) {
         // 실시간 API 사용
-        console.log('[TrendService] Using real-time API...');
         allTrends = await this.fetchRealTimeTrends();
       } else {
         // 기존 로직 사용
@@ -71,17 +67,17 @@ class TrendService {
         ]);
         
         // 네이버 트렌드 우선 (한국 콘텐츠)
-        if (naverTrends.status === 'fulfilled') {
+        if (naverTrends.status === 'fulfilled' && naverTrends.value) {
           allTrends.push(...naverTrends.value);
         }
         
         // 뉴스 트렌드 추가
-        if (newsTraends.status === 'fulfilled') {
+        if (newsTraends.status === 'fulfilled' && newsTraends.value) {
           allTrends.push(...newsTraends.value);
         }
         
         // Reddit 트렌드 마지막에 추가
-        if (redditTrends.status === 'fulfilled') {
+        if (redditTrends.status === 'fulfilled' && redditTrends.value) {
           allTrends.push(...redditTrends.value.slice(0, 5)); // 최대 5개만
         }
       }
@@ -248,13 +244,16 @@ class TrendService {
    * Reddit에서 인기 포스트 가져오기 (소셜 트렌드)
    */
   private async getRedditTrends(): Promise<TrendItem[]> {
+    console.log('[TrendService] getRedditTrends() called');
     const isKoreanDevice = isKorean();
-    console.log('Reddit Trends - Is Korean Device:', isKoreanDevice);
+    console.log('[TrendService] Reddit Trends - Is Korean Device:', isKoreanDevice);
     
     // 한국어 설정이면 샘플 데이터만 사용 (Reddit API가 영어 콘텐츠 반환)
     if (isKoreanDevice) {
-      console.log('Using Korean sample social trends');
-      return this.getSampleSocialTrends(true);
+      console.log('[TrendService] Using Korean sample social trends');
+      const sampleTrends = this.getSampleSocialTrends(true);
+      console.log('[TrendService] Sample social trends count:', sampleTrends.length);
+      return sampleTrends;
     }
     
     try {
@@ -294,6 +293,7 @@ class TrendService {
    * 샘플 소셜 트렌드 (언어별)
    */
   private getSampleSocialTrends(isKorean: boolean): TrendItem[] {
+    console.log('[TrendService] getSampleSocialTrends called with isKorean:', isKorean);
     const month = new Date().getMonth() + 1;
     
     if (isKorean) {
@@ -322,7 +322,7 @@ class TrendService {
         ];
       }
       
-      return sampleSocialTrends.map((trend, index) => ({
+      const result = sampleSocialTrends.map((trend, index) => ({
         id: `social-${index}`,
         title: trend.title,
         category: 'social',
@@ -331,6 +331,10 @@ class TrendService {
         timestamp: new Date().toISOString(),
         hashtags: trend.hashtags,
       }));
+      
+      console.log('[TrendService] Returning Korean social trends:', result.length);
+      console.log('[TrendService] Sample trend:', result[0]);
+      return result;
     } else {
       const sampleSocialTrends = [
         { title: 'Amazing coffee shop discovery today', hashtags: ['coffee', 'cafe', 'daily'], volume: 3456 },
@@ -533,16 +537,24 @@ class TrendService {
       // 순서 섞기
       const finalTrends = this.shuffleArray(uniqueTrends, randomSeed + 10);
       
-      return finalTrends.slice(0, 10).map((trend, index) => ({
-        id: `naver-${index}-${randomSeed}`,
-        title: trend.title,
-        category: trend.category,
-        source: 'naver' as const,
-        timestamp: new Date().toISOString(),
-        hashtags: trend.hashtags,
-        volume: 1000 + seededRandom(randomSeed + index, 9000),
-        change: seededRandom(randomSeed + index + 100, 200) - 100, // -100 ~ +100
-      }));
+      return finalTrends.slice(0, 10).map((trend, index) => {
+        // null/undefined 검사
+        if (!trend || !trend.title) {
+          console.error('[TrendService] Invalid trend item:', trend);
+          return null;
+        }
+        
+        return {
+          id: `naver-${index}-${randomSeed}`,
+          title: trend.title,
+          category: trend.category || 'life',
+          source: 'naver' as const,
+          timestamp: new Date().toISOString(),
+          hashtags: trend.hashtags || [],
+          volume: 1000 + seededRandom(randomSeed + index, 9000),
+          change: seededRandom(randomSeed + index + 100, 200) - 100, // -100 ~ +100
+        };
+      }).filter(item => item !== null); // null 제거
     } catch (error) {
       console.error('Naver trends error:', error);
       return [];
@@ -568,7 +580,7 @@ class TrendService {
       id: `google-${index}`,
       title: trend.title,
       category: trend.category,
-      source: 'naver' as const, // 'naver' 을 검색어 카테고리로 사용
+      source: 'google' as const, // Google 트렌드
       timestamp: new Date().toISOString(),
       hashtags: trend.hashtags,
       volume: Math.floor(Math.random() * 10000) + 1000,
@@ -695,6 +707,7 @@ class TrendService {
    * 실시간 이슈 트렌드 생성
    */
   private generateRealtimeTrends(seed: number): any[] {
+    console.log('[TrendService] generateRealtimeTrends called with seed:', seed);
     const topics = [
       { title: '신상 카페 오픈', category: 'food', hashtags: ['카페', '신상', '오픈'] },
       { title: '연예인 패션', category: 'fashion', hashtags: ['연예인', '패션', '스타일'] },
@@ -748,6 +761,7 @@ class TrendService {
   private async fetchRealTimeTrends(): Promise<TrendItem[]> {
     try {
       console.log('[TrendService] Fetching real-time trends from API...');
+      console.log('[TrendService] API URL:', `${this.API_BASE_URL}/trends`);
       
       const response = await axios.get(`${this.API_BASE_URL}/trends`, {
         timeout: 10000, // 10초 타임아웃
@@ -757,14 +771,30 @@ class TrendService {
         },
       });
       
+      console.log('[TrendService] API Response status:', response.status);
+      console.log('[TrendService] API Response data:', JSON.stringify(response.data, null, 2));
+      
       if (response.data && response.data.trends) {
-        return this.parseApiTrends(response.data.trends);
+        const parsed = this.parseApiTrends(response.data.trends);
+        console.log('[TrendService] Parsed trends count:', parsed.length);
+        console.log('[TrendService] Parsed trends by source:', {
+          news: parsed.filter(t => t.source === 'news').length,
+          social: parsed.filter(t => t.source === 'social').length,
+          naver: parsed.filter(t => t.source === 'naver').length,
+          google: parsed.filter(t => t.source === 'google').length,
+        });
+        return parsed;
       }
       
       console.log('[TrendService] No trends data from API, using sample data');
       return this.getSampleTrends();
     } catch (error) {
       console.error('[TrendService] API error:', error);
+      console.error('[TrendService] Error details:', {
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
+      });
       // API 오류 시 샘플 데이터 사용
       return this.getSampleTrends();
     }
@@ -774,11 +804,13 @@ class TrendService {
    * API 응답 파싱
    */
   private parseApiTrends(apiData: any): TrendItem[] {
+    console.log('[TrendService] parseApiTrends called with:', JSON.stringify(apiData, null, 2));
     const trends: TrendItem[] = [];
     let idCounter = 0;
     
     // 네이버 트렌드
     if (apiData.naver && Array.isArray(apiData.naver)) {
+      console.log('[TrendService] Parsing naver trends:', apiData.naver.length);
       apiData.naver.forEach((item: any) => {
         trends.push({
           id: `naver-api-${idCounter++}`,
@@ -795,6 +827,7 @@ class TrendService {
     
     // Google 트렌드
     if (apiData.google && Array.isArray(apiData.google)) {
+      console.log('[TrendService] Parsing google trends:', apiData.google.length);
       apiData.google.forEach((item: any) => {
         trends.push({
           id: `google-api-${idCounter++}`,
@@ -810,6 +843,7 @@ class TrendService {
     
     // 뉴스 트렌드
     if (apiData.news && Array.isArray(apiData.news)) {
+      console.log('[TrendService] Parsing news trends:', apiData.news.length);
       apiData.news.forEach((item: any) => {
         trends.push({
           id: `news-api-${idCounter++}`,
@@ -822,6 +856,23 @@ class TrendService {
       });
     }
     
+    // 소셜 트렌드 (중요!)
+    if (apiData.social && Array.isArray(apiData.social)) {
+      console.log('[TrendService] Parsing social trends:', apiData.social.length);
+      apiData.social.forEach((item: any) => {
+        trends.push({
+          id: `social-api-${idCounter++}`,
+          title: item.keyword || item.title,
+          category: 'social',
+          source: 'social',
+          timestamp: new Date().toISOString(),
+          hashtags: this.extractHashtags(item.keyword || item.title),
+          volume: item.score || item.views || Math.floor(Math.random() * 5000),
+        });
+      });
+    }
+    
+    console.log('[TrendService] Total parsed trends:', trends.length);
     return trends;
   }
   

@@ -15,7 +15,7 @@ import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { resetUser } from '../store/slices/userSlice';
 import { UserGuideScreen, TermsOfServiceScreen, PrivacyPolicyScreen, ContactScreen } from './documents';
 import FirebaseTestScreen from './FirebaseTestScreen';
-import TrendApiSettings from './settings/TrendApiSettings';
+// import TrendApiSettings from './settings/TrendApiSettings'; // 제거
 import { soundManager } from '../utils/soundManager';
 import tokenService from '../services/subscription/tokenService';
 import inAppPurchaseService from '../services/subscription/inAppPurchaseService';
@@ -63,7 +63,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const [loading, setLoading] = useState(true);
   const [showFirebaseTest, setShowFirebaseTest] = useState(false);
   const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
-  const [showTrendSettings, setShowTrendSettings] = useState(false);
+  // const [showTrendSettings, setShowTrendSettings] = useState(false); // 제거
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   
   // AI 토큰 및 통계
@@ -708,11 +708,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   ];
 
   const menuItems = [
-    {
-      icon: 'trending-up',
-      label: '트렌드 API 설정',
-      onPress: () => setShowTrendSettings(true),
-    },
+    // {
+    //   icon: 'trending-up',
+    //   label: '트렌드 API 설정',
+    //   onPress: () => setShowTrendSettings(true),
+    // },
     {
       icon: 'help-circle-outline',
       label: '사용 가이드',
