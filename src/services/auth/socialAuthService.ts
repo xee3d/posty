@@ -13,7 +13,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import NaverLogin from '@react-native-seoul/naver-login';
 import { login as kakaoLogin, getProfile as getKakaoProfile } from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GOOGLE_WEB_CLIENT_ID, NAVER_CONSUMER_KEY, NAVER_CONSUMER_SECRET, API_URL } from '@env';
+import { GOOGLE_WEB_CLIENT_ID, NAVER_CONSUMER_KEY, NAVER_CONSUMER_SECRET, API_URL, SERVER_URL } from '@env';
 
 export interface UserProfile {
   uid: string;
@@ -46,7 +46,9 @@ class SocialAuthService {
       try {
         await GoogleSignin.configure({
           webClientId: GOOGLE_WEB_CLIENT_ID,
-          offlineAccess: false,
+          offlineAccess: true, // serverAuthCode를 받기 위해 true로 변경
+          forceCodeForRefreshToken: true,
+          scopes: ['profile', 'email'],
         });
         this.isGoogleSignInConfigured = true;
         console.log('Google Sign-In configured successfully');
@@ -109,16 +111,45 @@ class SocialAuthService {
       
       // Google 로그인
       console.log('Starting Google Sign In...');
-      const userInfo = await GoogleSignin.signIn();
-      console.log('Google Sign In successful, user info:', userInfo);
+      const signInResult = await GoogleSignin.signIn();
+      console.log('Google Sign In successful, user info structure:');
+      console.log('signInResult keys:', Object.keys(signInResult));
+      console.log('Full signInResult:', JSON.stringify(signInResult, null, 2));
       
-      // idToken 확인 - react-native-google-signin의 버전에 따라 위치가 다름
-      const idToken = userInfo.idToken || userInfo.data?.idToken;
+      // 사용자 정보 추출
+      const user = signInResult.data?.user || signInResult.user;
+      if (!user) {
+        throw new Error('No user data received from Google Sign In');
+      }
       
+      // idToken 확인 - 최신 버전에서는 idToken이 제공되지 않을 수 있음
+      let idToken = signInResult.data?.idToken || signInResult.idToken;
+      
+      // idToken이 없으면 accessToken을 사용하여 서버에서 처리
       if (!idToken) {
-        console.error('No idToken received from Google Sign In');
-        console.error('userInfo structure:', JSON.stringify(userInfo, null, 2));
-        throw new Error('Google Sign In failed: No idToken');
+        console.log('No idToken, trying alternative method...');
+        
+        // 방법 1: getTokens 시도
+        try {
+          const tokens = await GoogleSignin.getTokens();
+          console.log('Tokens from getTokens:', tokens);
+          idToken = tokens.idToken;
+        } catch (e) {
+          console.log('getTokens failed:', e);
+        }
+        
+        // 방법 2: 여전히 idToken이 없으면 serverAuthCode 사용
+        if (!idToken && signInResult.data?.serverAuthCode) {
+          console.log('Using serverAuthCode method...');
+          return await this.signInWithServerAuthCode(signInResult.data.serverAuthCode, user);
+        }
+        
+        // 방법 3: accessToken으로 직접 Firebase 사용자 생성
+        if (!idToken) {
+          console.log('Using custom authentication method...');
+          const tokens = await GoogleSignin.getTokens();
+          return await this.signInWithGoogleAccessToken(tokens.accessToken, user);
+        }
       }
       
       console.log('Got idToken, length:', idToken.length);
@@ -281,7 +312,8 @@ class SocialAuthService {
   // Firebase Custom Token 가져오기 (서버 API 호출)
   private async getFirebaseCustomToken(provider: string, profile: any): Promise<string> {
     try {
-      const response = await fetch(`${API_URL}/auth/custom-token`, {
+      const serverUrl = SERVER_URL || API_URL || 'https://posty-server-new.vercel.app';
+      const response = await fetch(`${serverUrl}/api/auth/custom-token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -328,6 +360,64 @@ class SocialAuthService {
     } catch (error) {
       console.error('프로필 불러오기 실패:', error);
       return null;
+    }
+  }
+  
+  // Google accessToken으로 로그인 (대체 방법)
+  private async signInWithGoogleAccessToken(accessToken: string, googleUser: any): Promise<UserProfile> {
+    try {
+      console.log('Signing in with Google access token...');
+      
+      // 서버에서 Custom Token 받기
+      const customToken = await this.getFirebaseCustomToken('google', {
+        id: googleUser.id,
+        email: googleUser.email,
+        name: googleUser.name,
+        photo: googleUser.photo,
+        accessToken: accessToken,
+      });
+      
+      const userCredential = await signInWithCustomToken(this.auth, customToken);
+      return this.formatUserProfile(userCredential.user, 'google');
+    } catch (error) {
+      console.error('Google access token login failed:', error);
+      throw error;
+    }
+  }
+  
+  // serverAuthCode로 로그인 (대체 방법)
+  private async signInWithServerAuthCode(serverAuthCode: string, googleUser: any): Promise<UserProfile> {
+    try {
+      console.log('Signing in with server auth code...');
+      
+      // 서버에서 idToken 받기
+      const serverUrl = SERVER_URL || API_URL || 'https://posty-server-new.vercel.app';
+      const response = await fetch(`${serverUrl}/api/auth/google-server-auth`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          serverAuthCode,
+          user: googleUser,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (data.idToken) {
+        const googleCredential = GoogleAuthProvider.credential(data.idToken);
+        const userCredential = await signInWithCredential(this.auth, googleCredential);
+        return this.formatUserProfile(userCredential.user, 'google');
+      } else if (data.customToken) {
+        const userCredential = await signInWithCustomToken(this.auth, data.customToken);
+        return this.formatUserProfile(userCredential.user, 'google');
+      } else {
+        throw new Error('Server did not return valid authentication token');
+      }
+    } catch (error) {
+      console.error('Server auth code login failed:', error);
+      throw error;
     }
   }
 }
