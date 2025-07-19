@@ -4,7 +4,7 @@ const API_CONFIG = {
   USE_SERVER: true,  // 서버 사용
   
   // 새로운 Vercel 서버 URL
-  BASE_URL: 'https://posty-api-v2.vercel.app/api',
+  BASE_URL: 'https://posty-server-new.vercel.app/api',
   
   // API 엔드포인트
   ENDPOINTS: {
