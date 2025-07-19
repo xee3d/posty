@@ -788,12 +788,12 @@ class TrendService {
       
       console.log('[TrendService] No trends data from API, using sample data');
       return this.getSampleTrends();
-    } catch (error) {
+    } catch (error: any) {
       console.error('[TrendService] API error:', error);
       console.error('[TrendService] Error details:', {
-        message: error.message,
-        code: error.code,
-        response: error.response?.data
+        message: error?.message || 'Unknown error',
+        code: error?.code,
+        response: error?.response?.data
       });
       // API 오류 시 샘플 데이터 사용
       return this.getSampleTrends();
@@ -868,6 +868,28 @@ class TrendService {
           timestamp: new Date().toISOString(),
           hashtags: this.extractHashtags(item.keyword || item.title),
           volume: item.score || item.views || Math.floor(Math.random() * 5000),
+        });
+      });
+    } else {
+      // 소셜 데이터가 없으면 샘플 데이터 추가
+      console.log('[TrendService] No social data from API, adding sample social trends');
+      const sampleSocial = [
+        { keyword: '#OOTD 오늘의 코디', score: 4500 },
+        { keyword: '인스타 맛집', score: 4000 },
+        { keyword: '주말 나들이', score: 3500 },
+        { keyword: '신상 카페', score: 3000 },
+        { keyword: '#일상스타그램', score: 2500 },
+      ];
+      
+      sampleSocial.forEach((item: any) => {
+        trends.push({
+          id: `social-sample-${idCounter++}`,
+          title: item.keyword,
+          category: 'social',
+          source: 'social',
+          timestamp: new Date().toISOString(),
+          hashtags: this.extractHashtags(item.keyword),
+          volume: item.score,
         });
       });
     }
