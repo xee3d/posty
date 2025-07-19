@@ -48,8 +48,16 @@ class ServerAIService {
         },
       });
       
-      const data = await response.json();
-      return data.status === 'ok';
+      const responseText = await response.text();
+      
+      try {
+        const data = JSON.parse(responseText);
+        return data.status === 'ok';
+      } catch (parseError) {
+        console.error('Health check JSON parse error:', parseError);
+        console.error('Response text:', responseText);
+        return false;
+      }
     } catch (error) {
       console.error('Health check failed:', error);
       return false;
@@ -59,7 +67,13 @@ class ServerAIService {
   // 콘텐츠 생성 (서버 API 호출)
   async generateContent(params: ServerGenerateParams): Promise<string> {
     try {
-      console.log('Calling server API:', getApiUrl(API_CONFIG.ENDPOINTS.GENERATE));
+      const apiUrl = getApiUrl(API_CONFIG.ENDPOINTS.GENERATE);
+      console.log('Calling server API:', apiUrl);
+      console.log('Full URL components:', {
+        BASE_URL: API_CONFIG.BASE_URL,
+        ENDPOINT: API_CONFIG.ENDPOINTS.GENERATE,
+        FULL_URL: apiUrl
+      });
       
       // 길이에 따른 타임아웃 설정
       const timeoutDuration = params.length === 'extra' ? 90000 : // 초장문: 90초
@@ -71,7 +85,7 @@ class ServerAIService {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), timeoutDuration);
       
-      const response = await fetch(getApiUrl(API_CONFIG.ENDPOINTS.GENERATE), {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           ...getAuthHeader(),
@@ -94,7 +108,33 @@ class ServerAIService {
       
       clearTimeout(timeoutId);
       
-      const data: ServerResponse = await response.json();
+      // 응답을 먼저 텍스트로 읽기
+      const responseText = await response.text();
+      
+      // JSON 파싱 시도
+      let data: ServerResponse;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.error('Response text:', responseText.substring(0, 200));
+        
+        // JSON이 아닌 경우 에러 처리
+        if (response.ok) {
+          throw new Error('서버가 올바른 형식의 응답을 반환하지 않았습니다.');
+        } else {
+          // HTML 응답인 경우 체크
+          if (responseText.includes('<!DOCTYPE') || responseText.includes('<html')) {
+            console.error('Server returned HTML instead of JSON');
+            console.error('This usually means the endpoint is not found (404)');
+            console.error('Check API URL:', apiUrl);
+            console.error('Response status:', response.status);
+            console.error('First 200 chars of response:', responseText.substring(0, 200));
+            throw new Error('JSON Parse error: Unexpected character: T');
+          }
+          throw new Error(`JSON Parse error: ${parseError.message}`);
+        }
+      }
       
       if (!response.ok) {
         throw new Error(data.error || `Server error: ${response.status}`);

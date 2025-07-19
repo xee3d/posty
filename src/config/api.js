@@ -3,8 +3,11 @@ const API_CONFIG = {
   // 서버 API 사용 여부 (문제 발생 시 false로 설정)
   USE_SERVER: true,  // 서버 사용
   
-  // 새로운 Vercel 서버 URL
+  // AI 콘텐츠 생성 서버 (posty-server-new)
   BASE_URL: 'https://posty-server-new.vercel.app/api',
+  
+  // 트렌드 데이터 서버 (posty-api-v2)
+  TRENDS_URL: 'https://posty-api-v2.vercel.app/api',
   
   // API 엔드포인트
   ENDPOINTS: {
@@ -12,6 +15,7 @@ const API_CONFIG = {
     GENERATE: '/generate',  // 정상 엔드포인트로 복구
     GENERATE_TEST: '/generate-test',
     TEST: '/test',
+    TRENDS: '/trends', // 트렌드 엔드포인트
   },
   
   // 요청 타임아웃 (밀리초)
@@ -35,6 +39,11 @@ const API_CONFIG = {
 // API 헬퍼 함수
 export const getApiUrl = (endpoint) => {
   return `${API_CONFIG.BASE_URL}${endpoint}`;
+};
+
+// 트렌드 API URL 헬퍼 함수
+export const getTrendsApiUrl = (endpoint) => {
+  return `${API_CONFIG.TRENDS_URL}${endpoint}`;
 };
 
 export const getAuthHeader = () => {

@@ -25,6 +25,7 @@ import achievementService from '../services/achievementService';
 import { UserProfile } from '../types/achievement';
 import { cleanupFirestoreSubscription } from '../store/middleware/firestoreSyncMiddleware';
 import { Alert } from '../utils/customAlert';
+
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
   onFirebaseTest?: () => void;
@@ -400,6 +401,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       console.error('Restore purchases error:', error);
     }
   };
+
+
 
   const handleClearHistory = () => {
     Alert.alert(
@@ -854,6 +857,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
             onNavigateToSubscription={handleUpgradePlan}
             onTokensUpdated={loadStats}
           />
+
         </View>
 
         {/* 계정 연결 섹션 */}

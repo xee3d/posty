@@ -83,8 +83,8 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
 
   const getPlanName = () => {
     switch (tokenInfo.plan) {
-      case 'pro': return 'MAX';
-      case 'premium': return 'PRO';
+      case 'pro': return 'PRO';
+      case 'premium': return 'PREMIUM';
       case 'starter': return 'STARTER';
       default: return 'FREE';
     }
@@ -171,8 +171,8 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
               if (tokenInfo.plan === 'pro') {
                 // MAX 플랜 사용자에게 안내 메시지 표시
                 Alert.alert(
-                  'MAX 플랜 사용 중',
-                  '현재 MAX 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. 🚀',
+                  'PRO 플랜 사용 중',
+                  '현재 PRO 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. 🚀',
                   [{ text: '확인' }]
                 );
               } else {
@@ -197,8 +197,8 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
             : tokenInfo.plan === 'starter'
             ? 'STARTER 플랜으로 매월 200개의 토큰을 사용할 수 있습니다'
             : tokenInfo.plan === 'premium'
-            ? 'PRO 플랜으로 매월 500개의 토큰을 사용할 수 있습니다'
-            : 'MAX 플랜으로 무제한 토큰을 사용 중입니다'}
+            ? 'PREMIUM 플랜으로 매월 500개의 토큰을 사용할 수 있습니다'
+            : 'PRO 플랜으로 무제한 토큰을 사용 중입니다'}
         </Text>
       </View>
     </View>

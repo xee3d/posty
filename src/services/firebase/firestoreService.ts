@@ -95,6 +95,16 @@ class FirestoreService {
           updateData.subscriptionPlan = cleanSettings.subscriptionPlan;
         }
         
+        // subscriptionAutoRenew가 있는 경우
+        if (cleanSettings.subscriptionAutoRenew !== undefined) {
+          updateData.subscriptionAutoRenew = cleanSettings.subscriptionAutoRenew;
+        }
+        
+        // subscriptionExpiresAt이 있는 경우
+        if (cleanSettings.subscriptionExpiresAt !== undefined) {
+          updateData.subscriptionExpiresAt = cleanSettings.subscriptionExpiresAt;
+        }
+        
         updateData.lastUpdated = serverTimestamp();
         
         await updateDoc(userRef, updateData);
@@ -155,13 +165,23 @@ class FirestoreService {
               status: 'active',
               autoRenew: false,
             },
+            subscriptionPlan: existingData.subscriptionPlan || userData.subscriptionPlan || 'free',
+            subscriptionAutoRenew: existingData.subscriptionAutoRenew ?? userData.subscriptionAutoRenew ?? true,
+            subscriptionExpiresAt: existingData.subscriptionExpiresAt || userData.subscriptionExpiresAt || null,
             lastLoginAt: serverTimestamp(),
           });
         } else {
-          await updateDoc(userRef, {
+          // subscriptionPlan이 없으면 추가
+          const updateData: any = {
             ...userData,
             lastLoginAt: serverTimestamp(),
-          });
+          };
+          
+          if (existingData.subscriptionPlan === undefined) {
+            updateData.subscriptionPlan = userData.subscriptionPlan || 'free';
+          }
+          
+          await updateDoc(userRef, updateData);
         }
       } else {
         // 새 사용자 생성
@@ -179,6 +199,9 @@ class FirestoreService {
             status: 'active',
             autoRenew: false,
           },
+          subscriptionPlan: userData.subscriptionPlan || 'free', // subscriptionPlan 필드 추가
+          subscriptionAutoRenew: userData.subscriptionAutoRenew ?? true,
+          subscriptionExpiresAt: userData.subscriptionExpiresAt || null,
           tokens: {
             current: 10, // 신규 가입 보너스
             total: 0,
