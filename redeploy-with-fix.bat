@@ -1,33 +1,27 @@
 @echo off
-echo ====================================
-echo   Redeploying with Domain Fix
-echo ====================================
+echo === Redeploy AI Server with Fix ===
+echo.
 
-cd C:\Users\xee3d\Documents\Posty\posty-server
+cd /d C:\Users\xee3d\Documents\Posty\posty-server
+
+echo 1. Checking current Vercel configuration...
+vercel ls
 
 echo.
-echo [1] Checking current project info...
-vercel
-
-echo.
-echo [2] Removing and re-linking project...
-echo Press Ctrl+C to cancel if needed
-pause
-
-echo.
-echo Removing project link...
-rm -rf .vercel
-
-echo.
-echo [3] Re-linking and deploying...
-vercel --yes
-
-echo.
-echo [4] Deploying to production...
+echo 2. Redeploying to production...
 vercel --prod --yes
 
 echo.
-echo [5] After deployment, manually set domain alias:
-echo Run: vercel domains add posty-server-new.vercel.app
+echo 3. Setting up alias...
+vercel alias posty-server-new.vercel.app
+
 echo.
+echo === Deployment Complete ===
+echo.
+echo Test the server:
+echo - Health: https://posty-server-new.vercel.app/api/health
+echo - Generate: POST https://posty-server-new.vercel.app/api/generate
+echo.
+
+cd ..
 pause

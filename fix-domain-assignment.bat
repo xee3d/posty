@@ -1,31 +1,30 @@
 @echo off
-echo ====================================
-echo   Fixing Domain Assignment
-echo ====================================
+echo === Fix 404 Error - Domain Assignment ===
+echo.
+
+cd /d C:\Users\xee3d\Documents\Posty\posty-server
+
+echo 1. Remove old aliases...
+vercel alias rm posty-server-new.vercel.app --yes 2>nul
 
 echo.
-echo [1] Removing wrong domain from posty-api-v2...
-cd C:\Users\xee3d\Documents\Posty\posty-api-v2
-vercel domains remove posty-server-new.vercel.app
+echo 2. Deploy fresh...
+vercel --prod --yes
 
 echo.
-echo [2] Adding domain to correct project (posty-server)...
-cd ..\posty-server
-vercel domains add posty-server-new.vercel.app
+echo 3. Assign domain alias...
+vercel alias set posty-server-new.vercel.app
 
 echo.
-echo [3] Verifying domains...
+echo 4. List current deployments...
+vercel ls
+
 echo.
-echo posty-server domains:
-vercel domains ls
+echo === Complete ===
 echo.
-echo posty-api-v2 domains:
-cd ..\posty-api-v2
-vercel domains ls
+echo Please test:
+echo curl https://posty-server-new.vercel.app/api/health
+echo.
 
 cd ..
-echo.
-echo ====================================
-echo Domain fix complete!
-echo ====================================
 pause
