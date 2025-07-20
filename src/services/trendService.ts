@@ -772,7 +772,21 @@ class TrendService {
       });
       
       console.log('[TrendService] API Response status:', response.status);
+      console.log('[TrendService] API Response headers:', response.headers);
+      console.log('[TrendService] API Response data type:', typeof response.data);
+      console.log('[TrendService] API Response data keys:', response.data ? Object.keys(response.data) : 'null');
       console.log('[TrendService] API Response data:', JSON.stringify(response.data, null, 2));
+      
+      // 입력 데이터 검증
+      if (!response.data) {
+        console.error('[TrendService] No data in response');
+        return this.getSampleTrends();
+      }
+      
+      if (response.data.error) {
+        console.error('[TrendService] API returned error:', response.data.error);
+        return this.getSampleTrends();
+      }
       
       if (response.data && response.data.trends) {
         const parsed = this.parseApiTrends(response.data.trends);
@@ -991,6 +1005,17 @@ class TrendService {
     return allTrends;
   }
   
+  /**
+   * 강제로 실시간 트렌드 새로고침 (캐시 무시)
+   */
+  async forceRefreshTrends(): Promise<TrendItem[]> {
+    console.log('[TrendService] Force refreshing trends...');
+    // 캐시 삭제
+    await this.clearCache();
+    // 새로운 트렌드 가져오기
+    return this.getAllTrends();
+  }
+
   /**
    * 초기화 시 API 모드 설정 로드
    */

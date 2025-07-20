@@ -15,7 +15,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { soundManager } from '../utils/soundManager';
-import trendService from '../services/trendServiceForced';
+import trendService from '../services/trendService';
 import { AnimatedCard, SlideInView, FadeInView } from '../components/AnimationComponents';
 import { useAppSelector } from '../hooks/redux';
 import { getUserPlan, TREND_ACCESS, PlanType } from '../config/adConfig';
@@ -94,7 +94,17 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   const onRefresh = async () => {
     soundManager.playRefresh();
     setRefreshing(true);
-    await loadTrends();
+    
+    try {
+      // 캐시를 무시하고 강제로 새로간 데이터 가져오기
+      await trendService.clearCache();
+      console.log('[TrendScreen] Cache cleared, fetching fresh data...');
+      await loadTrends();
+    } catch (error) {
+      console.error('[TrendScreen] Refresh error:', error);
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   const handleCategoryChange = (category: TrendCategory) => {
