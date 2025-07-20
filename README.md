@@ -11,12 +11,13 @@ Posty는 AI를 활용하여 창의적인 SNS 콘텐츠를 생성하는 React Nat
 - **구독 시스템**: FREE, STARTER, PREMIUM, PRO 플랜
 
 ## 🛠 기술 스택
-- **Frontend**: React Native 0.74
+- **Frontend**: React Native 0.74.5
 - **Backend**: Node.js (Vercel Functions)
 - **Database**: Firebase Firestore
-- **Authentication**: Firebase Auth (Google, Email)
+- **Authentication**: Firebase Auth (Google, Kakao, Naver, Email)
 - **AI**: OpenAI API (GPT-4o-mini)
 - **State Management**: Redux Toolkit
+- **Animation**: React Native Reanimated 3
 
 ## 📂 프로젝트 구조
 ```
@@ -31,6 +32,14 @@ Posty/
 └── posty-api-v2/       # 트렌드 데이터 서버
 ```
 
+## 🌐 서버 아키텍처
+- **AI 서버**: https://posty-server-new.vercel.app
+  - 자동 배포 설정 완료 ✅
+  - Git 연동 완료 ✅
+- **트렌드 서버**: https://posty-api-v2.vercel.app
+  - 자동 배포 설정 완료 ✅
+  - Git 연동 완료 ✅
+
 ## 🔧 설치 및 실행
 
 ### 필수 요구사항
@@ -44,13 +53,13 @@ Posty/
 # 의존성 설치
 npm install
 
-# iOS 의존성 설치
+# iOS 의존성 설치 (Mac only)
 cd ios && pod install
 
 # Android 실행
 npm run android
 
-# iOS 실행
+# iOS 실행 (Mac only)
 npm run ios
 ```
 
@@ -61,13 +70,34 @@ OPENAI_API_KEY=your_openai_api_key
 APP_SECRET=your_app_secret
 ```
 
-## 🌐 서버 아키텍처
-- **AI 서버**: https://posty-server-new.vercel.app
-- **트렌드 서버**: https://posty-api-v2.vercel.app
+## 🚀 배포
 
-자세한 내용은 [SERVER_ARCHITECTURE.md](./SERVER_ARCHITECTURE.md) 참조
+### 자동 배포 (권장)
+Git push 시 자동으로 Vercel에 배포됩니다:
+```bash
+git add .
+git commit -m "feat: 새로운 기능"
+git push
+```
+
+### 수동 배포 (필요시)
+```bash
+# 모든 서버 한번에 배포
+deploy-all.bat
+
+# 서버 상태 확인
+verify-deployment.bat
+```
+
+## 📱 주요 유틸리티 스크립트
+- `deploy-all.bat`: 모든 서버 배포
+- `verify-deployment.bat`: 서버 상태 확인
+- `fresh-deploy.bat`: Metro 캐시 클리어 + 앱 시작
+- `install-phone.bat`: 연결된 폰에 앱 설치
+- `device-manager.bat`: ADB 디바이스 관리
 
 ## 📝 최근 업데이트
+- 2025.01.20: Git 자동 배포 설정 완료
 - 2025.01.20: 서버 404 에러 해결 및 구독 시스템 개선
 - 2025.01.19: 실시간 트렌드 기능 추가
 
@@ -78,3 +108,6 @@ APP_SECRET=your_app_secret
 
 ## 📄 라이선스
 Private Repository
+
+---
+*최종 업데이트: 2025년 1월 20일*

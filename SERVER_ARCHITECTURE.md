@@ -9,14 +9,15 @@ Posty 프로젝트는 마이크로서비스 아키텍처를 채택하여 두 개
 - **URL**: https://posty-server-new.vercel.app
 - **역할**: AI 기반 콘텐츠 생성 및 이미지 분석
 - **주요 엔드포인트**:
-  - `/api/generate` - AI 콘텐츠 생성
-  - `/api/stream/generate` - 스트리밍 방식 콘텐츠 생성
   - `/api/health` - 서버 상태 확인
+  - `/api/generate` - AI 콘텐츠 생성
+  - `/api/generate-test` - 테스트용 엔드포인트
 - **특징**:
   - maxDuration: 30초 (AI 처리 시간 고려)
   - OpenAI API 연동
   - 이미지 분석 기능
   - JSON 형식 응답
+- **배포 상태**: ✅ Git 자동 배포 설정 완료
 
 ### 2. posty-api-v2 (트렌드 데이터 서버)
 - **URL**: https://posty-api-v2.vercel.app
@@ -27,92 +28,114 @@ Posty 프로젝트는 마이크로서비스 아키텍처를 채택하여 두 개
 - **특징**:
   - maxDuration: 10초 (빠른 응답)
   - 외부 트렌드 API 연동
-  - 캐싱 처리
+  - 4시간 캐싱 처리
+- **배포 상태**: ✅ Git 자동 배포 설정 완료
 
-## 앱 설정
+## 배포 관리
 
-### API 설정 파일 위치
-`C:\Users\xee3d\Documents\Posty\src\config\api.js`
+### 자동 배포 (현재 설정)
+1. **Git 연동**: 두 서버 모두 GitHub 저장소와 연동됨
+2. **자동 배포**: `git push` 시 자동으로 배포 시작
+3. **Root Directory 설정**:
+   - posty-server-new: `posty-server`
+   - posty-api-v2: `posty-api-v2`
 
-```javascript
-const API_CONFIG = {
-  // AI 생성 서버 (posty-server-new)
-  BASE_URL: 'https://posty-server-new.vercel.app/api',
-  
-  // 트렌드 서버는 별도 관리 (필요시 추가)
-  TRENDS_URL: 'https://posty-api-v2.vercel.app/api',
-  
-  ENDPOINTS: {
-    HEALTH: '/health',
-    GENERATE: '/generate',
-    GENERATE_TEST: '/generate-test',
-    TRENDS: '/trends'
-  }
-};
-```
-
-## 서버 관리
-
-### Vercel 프로젝트
-1. **posty-server-new**: AI 서버 (현재 사용 중)
-2. **posty-api-v2**: 트렌드 서버
-3. **posty-server**: 구 버전 (삭제 예정)
-
-### 배포 방법
+### 배포 프로세스
 ```bash
-# AI 서버 배포
-cd C:\Users\xee3d\Documents\Posty\posty-server
-npx vercel --prod
+# 1. 코드 수정
+# 2. 커밋 및 푸시
+git add .
+git commit -m "feat: 새로운 기능"
+git push
 
-# 트렌드 서버 배포
-cd C:\Users\xee3d\Documents\Posty\posty-api-v2
-npx vercel --prod
+# 3. 1-2분 후 자동 배포 완료
+# 4. 상태 확인
+verify-deployment.bat
 ```
 
-### Git 브랜치 관리
-- 현재 브랜치: `recovery-8eb39c1`
-- 커밋: `8eb39c1` (긴문장제거, 실시간트랜드API연동)
+### 수동 배포 (백업)
+```bash
+# 모든 서버 배포
+deploy-all.bat
 
-## 주의사항
+# 개별 서버 배포
+cd posty-server && vercel --prod
+cd posty-api-v2 && vercel --prod
+```
 
-### 1. API URL 혼동 방지
-- AI 생성 요청은 반드시 `posty-server-new`로
-- 트렌드 요청은 `posty-api-v2`로
+## 환경 변수
 
-### 2. JSON 파싱 에러
-- 서버가 텍스트 대신 JSON 응답을 반환하는지 확인
-- 에러 발생 시 서버 로그 확인
+### Vercel 대시보드에서 관리
+각 프로젝트의 Settings > Environment Variables에서 설정:
 
-### 3. 환경변수
-- 각 서버의 환경변수는 Vercel 대시보드에서 관리
-- API 키, 시크릿 등 민감한 정보 포함
+#### posty-server-new
+- `OPENAI_API_KEY`: OpenAI API 키
+- `APP_SECRET`: 앱 인증 시크릿
+
+#### posty-api-v2
+- `NEWS_API_KEY`: NewsAPI 키 (선택사항)
+
+## 모니터링
+
+### 서버 상태 확인
+```bash
+# 빠른 상태 확인
+verify-deployment.bat
+
+# 실시간 모니터링
+monitor-servers-live.bat
+```
+
+### 로그 확인
+- Vercel 대시보드 > Functions > Logs
+- 실시간 로그 스트리밍 가능
 
 ## 문제 해결
 
-### JSON Parse Error 발생 시
-1. API URL이 올바른지 확인
-2. 서버 응답 형식 확인
-3. `src/config/api.js` 파일의 BASE_URL 확인
+### 일반적인 문제
+1. **404 에러**: 보통 배포 문제. `deploy-all.bat` 실행
+2. **타임아웃**: AI 처리가 30초 초과 시 발생
+3. **CORS 에러**: vercel.json의 headers 설정 확인
 
-### 404 Not Found 에러
-1. 엔드포인트 경로 확인
-2. 서버가 정상 배포되었는지 확인
-3. Vercel 대시보드에서 로그 확인
+### 해결 완료된 이슈
+- ✅ 서버 404 에러 (2025.01.20)
+- ✅ Git 자동 배포 설정 (2025.01.20)
+- ✅ Root Directory 설정 (2025.01.20)
 
-## 향후 개선사항
-1. API Gateway 도입 검토
-2. 통합 모니터링 시스템 구축
-3. 서버 간 통신 최적화
+## API 사용 예시
 
-## 최근 해결된 이슈
+### AI 콘텐츠 생성
+```javascript
+const response = await fetch('https://posty-server-new.vercel.app/api/generate', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_APP_SECRET'
+  },
+  body: JSON.stringify({
+    prompt: '오늘 날씨가 좋네요',
+    tone: 'casual',
+    platform: 'instagram'
+  })
+});
+```
 
-### 2025.01.20 - 404 에러 해결
-- **문제**: API 호출 시 404 NOT_FOUND 에러 발생
-- **원인**: Vercel 배포 시 도메인 alias 설정 누락
-- **해결**: 
-  - `vercel alias` 명령으로 posty-server-new.vercel.app 도메인 설정
-  - 환경 변수 확인 및 재배포
-  - API 엔드포인트 정상 작동 확인
+### 트렌드 데이터 조회
+```javascript
+const response = await fetch('https://posty-api-v2.vercel.app/api/trends');
+const data = await response.json();
+// data.trends 에 트렌드 정보 포함
+```
+
+## 보안
+- API 키는 환경 변수로 관리
+- APP_SECRET을 통한 인증
+- CORS 설정으로 허용된 도메인만 접근
+
+## 성능 최적화
+- 트렌드 데이터 4시간 캐싱
+- Vercel Edge Network 활용
+- 병렬 API 호출 처리
 
 ---
 *최종 업데이트: 2025년 1월 20일*
