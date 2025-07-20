@@ -766,9 +766,22 @@ class TrendService {
       const response = await axios.get(`${this.API_BASE_URL}/trends`, {
         timeout: 10000, // 10초 타임아웃
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
+          'Accept': 'application/json; charset=utf-8',
+          'Content-Type': 'application/json; charset=utf-8',
         },
+        responseType: 'json',
+        transformResponse: [(data) => {
+          try {
+            // 문자열인 경우만 파싱
+            if (typeof data === 'string') {
+              return JSON.parse(data);
+            }
+            return data;
+          } catch (error) {
+            console.error('[TrendService] JSON parse error:', error);
+            return data;
+          }
+        }],
       });
       
       console.log('[TrendService] API Response status:', response.status);

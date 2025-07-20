@@ -76,8 +76,7 @@ class ServerAIService {
       });
       
       // 길이에 따른 타임아웃 설정
-      const timeoutDuration = params.length === 'extra' ? 90000 : // 초장문: 90초
-                             params.length === 'long' ? 60000 :   // 긴 글: 60초  
+      const timeoutDuration = params.length === 'long' ? 60000 :   // 긴 글: 60초  
                              this.timeout;                         // 기본: 60초
       
       console.log(`Using timeout: ${timeoutDuration / 1000}s for length: ${params.length}`);
@@ -199,15 +198,13 @@ class ServerAIService {
         throw new Error('요청이 너무 많습니다. 잠시 후 다시 시도해주세요.');
       }
       
-      // 기타 서버 에러
-      console.error('Unexpected server error:', error.message);
-      throw new Error(`서버 오류: ${error.message}`);
-      
       if (error.message.includes('401')) {
         throw new Error('인증에 실패했습니다. 앱을 다시 시작해주세요.');
       }
       
-      throw error;
+      // 기타 서버 에러
+      console.error('Unexpected server error:', error.message);
+      throw new Error(`서버 오류: ${error.message}`);
     }
   }
 
@@ -327,9 +324,7 @@ class ServerAIService {
 
   // 길이에 따라 프롬프트 보강
   private enhancePromptWithLength(prompt: string, length?: string): string {
-    if (length === 'extra') {
-      return `${prompt} (자세히 500-600자로 작성해주세요. 구체적인 예시와 풍부한 설명을 포함해주세요. 너무 길게 쓰지 말고 핵심 내용에 집중해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
-    } else if (length === 'long') {
+    if (length === 'long') {
       return `${prompt} (자세히 300-400자로 설명해주세요. 구체적인 예시와 상세한 설명을 포함해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
     } else if (length === 'short') {
       return `${prompt} (간결하게 30-50자로 작성해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
@@ -348,9 +343,6 @@ class ServerAIService {
         return 300;
       case 'long':
         return 600;
-      case 'extra':
-        // 초장문의 경우 약간 줄여서 속도 개선
-        return 1000; // 1200에서 1000으로 감소
       default:
         return 300;
     }
