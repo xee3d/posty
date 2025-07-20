@@ -2,6 +2,7 @@
 
 // 서버 API 서비스 - Posty 백엔드 서버와 통신
 import API_CONFIG, { getApiUrl, getAuthHeader } from '../config/api';
+import apiService from './api/apiService';
 
 interface ServerGenerateParams {
   prompt: string;

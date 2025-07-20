@@ -32,7 +32,7 @@ class TrendService {
   private readonly NEWS_API_KEY = NEWS_API_KEY || '';
   
   // 실시간 API 설정
-  private USE_REAL_API = true; // 기본값: true (실시간 API 사용)
+  private USE_REAL_API = true; // API 정상 작동 확인!
   private API_BASE_URL = 'https://posty-api-v2.vercel.app/api'; // Vercel Production URL
   
   /**
@@ -766,22 +766,9 @@ class TrendService {
       const response = await axios.get(`${this.API_BASE_URL}/trends`, {
         timeout: 10000, // 10초 타임아웃
         headers: {
-          'Accept': 'application/json; charset=utf-8',
-          'Content-Type': 'application/json; charset=utf-8',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
         },
-        responseType: 'json',
-        transformResponse: [(data) => {
-          try {
-            // 문자열인 경우만 파싱
-            if (typeof data === 'string') {
-              return JSON.parse(data);
-            }
-            return data;
-          } catch (error) {
-            console.error('[TrendService] JSON parse error:', error);
-            return data;
-          }
-        }],
       });
       
       console.log('[TrendService] API Response status:', response.status);
@@ -801,12 +788,12 @@ class TrendService {
       
       console.log('[TrendService] No trends data from API, using sample data');
       return this.getSampleTrends();
-    } catch (error: any) {
+    } catch (error) {
       console.error('[TrendService] API error:', error);
       console.error('[TrendService] Error details:', {
-        message: error?.message || 'Unknown error',
-        code: error?.code,
-        response: error?.response?.data
+        message: error.message,
+        code: error.code,
+        response: error.response?.data
       });
       // API 오류 시 샘플 데이터 사용
       return this.getSampleTrends();
@@ -881,28 +868,6 @@ class TrendService {
           timestamp: new Date().toISOString(),
           hashtags: this.extractHashtags(item.keyword || item.title),
           volume: item.score || item.views || Math.floor(Math.random() * 5000),
-        });
-      });
-    } else {
-      // 소셜 데이터가 없으면 샘플 데이터 추가
-      console.log('[TrendService] No social data from API, adding sample social trends');
-      const sampleSocial = [
-        { keyword: '#OOTD 오늘의 코디', score: 4500 },
-        { keyword: '인스타 맛집', score: 4000 },
-        { keyword: '주말 나들이', score: 3500 },
-        { keyword: '신상 카페', score: 3000 },
-        { keyword: '#일상스타그램', score: 2500 },
-      ];
-      
-      sampleSocial.forEach((item: any) => {
-        trends.push({
-          id: `social-sample-${idCounter++}`,
-          title: item.keyword,
-          category: 'social',
-          source: 'social',
-          timestamp: new Date().toISOString(),
-          hashtags: this.extractHashtags(item.keyword),
-          volume: item.score,
         });
       });
     }

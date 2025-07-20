@@ -15,7 +15,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { soundManager } from '../utils/soundManager';
-import trendService from '../services/trendService';
+import trendService from '../services/trendServiceForced';
 import { AnimatedCard, SlideInView, FadeInView } from '../components/AnimationComponents';
 import { useAppSelector } from '../hooks/redux';
 import { getUserPlan, TREND_ACCESS, PlanType } from '../config/adConfig';
@@ -47,27 +47,12 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   const [trends, setTrends] = useState<any[]>([]);
   const [userTrends, setUserTrends] = useState<any>(null);
 
-  const loadTrends = async (forceRefresh: boolean = false) => {
+  const loadTrends = async () => {
     try {
       setIsLoading(true);
       
-      // forceRefresh가 true면 캐시 초기화
-      if (forceRefresh) {
-        console.log('[TrendScreen] Clearing cache...');
-        await trendService.clearCache();
-      }
-      
       // 외부 트렌드 데이터 가져오기
-      console.log('[TrendScreen] Loading trends...');
       const trendData = await trendService.getAllTrends();
-      console.log('[TrendScreen] Trends loaded:', trendData.length);
-      console.log('[TrendScreen] Trends by source:', {
-        all: trendData.length,
-        news: trendData.filter((t: any) => t.source === 'news').length,
-        social: trendData.filter((t: any) => t.source === 'social').length,
-        naver: trendData.filter((t: any) => t.source === 'naver').length,
-        google: trendData.filter((t: any) => t.source === 'google').length,
-      });
       setTrends(trendData);
       
       // 사용자 트렌드 분석 (기존 서비스 사용)
@@ -136,13 +121,6 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         if (selectedCategory === 'keywords') return trend.source === 'naver' || trend.source === 'google';
         return true;
       });
-  
-  // 디버깅을 위한 로그 추가
-  console.log('[TrendScreen] Selected category:', selectedCategory);
-  console.log('[TrendScreen] Filtered trends count:', filteredTrends.length);
-  if (selectedCategory === 'social') {
-    console.log('[TrendScreen] Social trends:', filteredTrends);
-  }
 
   const styles = createStyles(colors, isDark);
 
@@ -221,17 +199,6 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
                 <Text style={styles.mollyBadgeText}>T</Text>
               </View>
               <Text style={styles.headerTitle}>실시간 트렌드</Text>
-              <TouchableOpacity
-                style={styles.clearCacheButton}
-                onPress={async () => {
-                  console.log('[TrendScreen] Clear cache button pressed');
-                  soundManager.playTap();
-                  await loadTrends(true);
-                }}
-              >
-                <Icon name="refresh" size={20} color={colors.primary} />
-                <Text style={styles.clearCacheText}>새로고침</Text>
-              </TouchableOpacity>
             </View>
             <Text style={styles.headerSubtitle}>{BRAND.slogans.creative}</Text>
           </View>
@@ -446,21 +413,6 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: SPACING.sm,
-    },
-    clearCacheButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: 4,
-      backgroundColor: colors.primary + '10',
-      paddingVertical: 6,
-      paddingHorizontal: 12,
-      borderRadius: 16,
-      marginLeft: 'auto',
-    },
-    clearCacheText: {
-      fontSize: 12,
-      color: colors.primary,
-      fontWeight: '500',
     },
     mollyBadge: {
       width: 36,
