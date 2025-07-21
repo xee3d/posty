@@ -1,0 +1,46 @@
+// trendService.ts에 추가할 fetchRealTimeTrends 메서드
+
+  /**
+   * 실시간 서버 트렌드 가져오기
+   */
+  private async fetchRealTimeTrends(): Promise<TrendItem[]> {
+    try {
+      console.log('[TrendService] Fetching from server:', `${this.API_BASE_URL}/trends`);
+      
+      const response = await axios.get(`${this.API_BASE_URL}/trends`, {
+        timeout: 10000,
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      console.log('[TrendService] Server response status:', response.status);
+      
+      if (response.data) {
+        // 서버 응답이 있으면 파싱
+        if (response.data.trends && Array.isArray(response.data.trends)) {
+          console.log('[TrendService] Server trends received:', response.data.trends.length);
+          return response.data.trends;
+        }
+        
+        // 다른 형식의 응답 처리
+        if (response.data.data) {
+          return this.parseApiData(response.data.data);
+        }
+        
+        // 직접 배열인 경우
+        if (Array.isArray(response.data)) {
+          return response.data;
+        }
+      }
+      
+      console.log('[TrendService] No valid trends from server, using fallback');
+      return this.getSampleTrends();
+    } catch (error: any) {
+      console.error('[TrendService] Server error:', error.message);
+      console.error('[TrendService] Error details:', error.response?.data);
+      // 서버 오류 시 샘플 데이터 사용
+      return this.getSampleTrends();
+    }
+  }

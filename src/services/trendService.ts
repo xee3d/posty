@@ -32,7 +32,7 @@ class TrendService {
   private readonly NEWS_API_KEY = NEWS_API_KEY || '';
   
   // 실시간 API 설정
-  private USE_REAL_API = true; // API 정상 작동 확인!
+  private USE_REAL_API = true; // 서버 API 활성화
   private API_BASE_URL = 'https://posty-api.vercel.app/api'; // 새 API URL
   
   /**

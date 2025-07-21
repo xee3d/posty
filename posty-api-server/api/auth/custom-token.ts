@@ -4,6 +4,17 @@ import * as admin from 'firebase-admin';
 // Firebase Admin SDK 초기화
 if (!admin.apps.length) {
   try {
+    console.log('Initializing Firebase Admin...');
+    console.log('Environment variables check:', {
+      hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
+      hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
+      hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
+      privateKeyLength: process.env.FIREBASE_PRIVATE_KEY?.length || 0
+    });
+    
+    if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PRIVATE_KEY) {
+      throw new Error('Missing required environment variables');
+    }
     const serviceAccount = {
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
@@ -31,6 +42,12 @@ interface CustomTokenRequest {
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  console.log('Environment check:', {
+    PROJECT_ID: !!process.env.FIREBASE_PROJECT_ID,
+    CLIENT_EMAIL: !!process.env.FIREBASE_CLIENT_EMAIL,
+    PRIVATE_KEY: !!process.env.FIREBASE_PRIVATE_KEY,
+    PRIVATE_KEY_LENGTH: process.env.FIREBASE_PRIVATE_KEY?.length || 0
+  });
   // CORS 설정
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
