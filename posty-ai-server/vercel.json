@@ -1,20 +1,14 @@
 {
-  "name": "posty-ai-server",
   "version": 2,
   "builds": [
     {
       "src": "api/**/*.js",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "maxDuration": 30
+      }
     }
   ],
-  "buildCommand": "echo 'No build needed'",
-  "outputDirectory": ".",
-  "installCommand": "echo 'No install needed'",
-  "functions": {
-    "api/*.js": {
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
     {
       "source": "/",
