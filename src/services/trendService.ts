@@ -26,7 +26,9 @@ interface NewsItem {
 
 class TrendService {
   private readonly CACHE_KEY = 'TREND_CACHE';
-  private readonly CACHE_DURATION = 1000 * 60 * 60 * 4; // 4시간마다 업데이트
+  private readonly CACHE_VERSION_KEY = 'TREND_CACHE_VERSION';
+  private readonly CACHE_VERSION = '2.0'; // 버전 변경 시 캐시 초기화
+  private readonly CACHE_DURATION = 1000 * 60 * 10; // 10분마다 업데이트 (실시간성 향상)
   
   // NewsAPI 키 (무료 플랜)
   private readonly NEWS_API_KEY = NEWS_API_KEY || '';
@@ -44,12 +46,20 @@ class TrendService {
       const deviceLang = getDeviceLanguage();
       const isKoreanLang = isKorean();
       
-      // 캐시 확인
+      // 캐시 확인 (실시간 API 사용 시 캐시 시간 단축)
       const cached = await this.getCachedTrends();
-      if (cached) {
+      if (cached && !this.USE_REAL_API) {
         const cacheInfo = await this.getCacheAge();
         console.log(`[TrendService] Using cached trends (age: ${cacheInfo.ageInMinutes} minutes)`);
         return cached;
+      } else if (cached && this.USE_REAL_API) {
+        const cacheInfo = await this.getCacheAge();
+        // 실시간 API 사용 시 10분 이상 된 캐시는 무시
+        if (cacheInfo.ageInMinutes < 10) {
+          console.log(`[TrendService] Using cached trends (age: ${cacheInfo.ageInMinutes} minutes)`);
+          return cached;
+        }
+        console.log(`[TrendService] Cache too old (${cacheInfo.ageInMinutes} minutes), fetching new data`);
       }
       
       let allTrends: TrendItem[] = [];
@@ -635,6 +645,15 @@ class TrendService {
    */
   private async getCachedTrends(): Promise<TrendItem[] | null> {
     try {
+      // 캐시 버전 확인
+      const cacheVersion = await AsyncStorage.getItem(this.CACHE_VERSION_KEY);
+      if (cacheVersion !== this.CACHE_VERSION) {
+        console.log('[TrendService] Cache version mismatch, clearing cache');
+        await this.clearCache();
+        await AsyncStorage.setItem(this.CACHE_VERSION_KEY, this.CACHE_VERSION);
+        return null;
+      }
+      
       const cached = await AsyncStorage.getItem(this.CACHE_KEY);
       if (!cached) return null;
       
@@ -998,21 +1017,24 @@ class TrendService {
       });
       
       console.log('[TrendService] Server response status:', response.status);
+      console.log('[TrendService] Server response data:', JSON.stringify(response.data, null, 2));
       
       if (response.data) {
         // 서버 응답이 있으면 파싱
-        if (response.data.trends && Array.isArray(response.data.trends)) {
-          console.log('[TrendService] Server trends received:', response.data.trends.length);
-          return response.data.trends;
+        if (response.data.trends) {
+          console.log('[TrendService] Found trends in response.data.trends');
+          return this.parseApiTrends(response.data.trends);
         }
         
         // 다른 형식의 응답 처리
         if (response.data.data) {
-          return this.parseApiData(response.data.data);
+          console.log('[TrendService] Found data in response.data.data');
+          return this.parseApiTrends(response.data.data);
         }
         
         // 직접 배열인 경우
         if (Array.isArray(response.data)) {
+          console.log('[TrendService] Response is direct array');
           return response.data;
         }
       }
@@ -1021,7 +1043,12 @@ class TrendService {
       return this.getSampleTrends();
     } catch (error: any) {
       console.error('[TrendService] Server error:', error.message);
-      console.error('[TrendService] Error details:', error.response?.data);
+      console.error('[TrendService] Error details:', {
+        response: error.response?.data,
+        status: error.response?.status,
+        headers: error.response?.headers,
+        url: error.config?.url
+      });
       // 서버 오류 시 샘플 데이터 사용
       return this.getSampleTrends();
     }
