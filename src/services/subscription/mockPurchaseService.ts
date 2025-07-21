@@ -3,11 +3,13 @@
  * 실제 스토어 연결 전 테스트용
  */
 
-;
 import tokenService from './tokenService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
 import { Alert } from '../../utils/customAlert';
+
+// EventEmitter를 사용하여 구매 성공 이벤트 전달
+import { DeviceEventEmitter } from 'react-native';
+
 class MockPurchaseService {
   private isInitialized = false;
 
@@ -58,11 +60,21 @@ class MockPurchaseService {
         break;
     }
     
-    Alert.alert(
-      '구독 완료! 🎉',
-      `${planName} 플랜이 활성화되었습니다.\n${features}\n(개발 모드 - 실제 결제 없음)`,
-      [{ text: '확인' }]
-    );
+    // 구매 성공 이벤트 발생 (폭죽 애니메이션용)
+    console.log('[MockPurchaseService] Emitting purchaseSuccess event:', {
+      type: 'subscription',
+      planId,
+      planName,
+      features
+    });
+    DeviceEventEmitter.emit('purchaseSuccess', {
+      type: 'subscription',
+      planId,
+      planName,
+      features
+    });
+    
+    // Alert 제거 - 폭죽 모달로 대체됨
   }
 
   async purchaseTokens(packageId: string): Promise<void> {
@@ -98,11 +110,13 @@ class MockPurchaseService {
     // 토큰 추가
     await tokenService.addPurchasedTokens(tokens);
     
-    Alert.alert(
-      '토큰 구매 완료! 🎉',
-      `${tokens}개의 토큰이 추가되었습니다.\n(개발 모드 - 실제 결제 없음)`,
-      [{ text: '확인' }]
-    );
+    // 구매 성공 이벤트 발생 (폭죽 애니메이션용)
+    DeviceEventEmitter.emit('purchaseSuccess', {
+      type: 'tokens',
+      amount: tokens
+    });
+    
+    // Alert 제거 - 폭죽 모달로 대체됨
   }
 
   async restorePurchases(): Promise<void> {

@@ -3,11 +3,11 @@ const API_CONFIG = {
   // 서버 API 사용 여부 (문제 발생 시 false로 설정)
   USE_SERVER: true,  // 서버 사용
   
-  // AI 콘텐츠 생성 서버 (posty-server-new)
-  BASE_URL: 'https://posty-server-new.vercel.app',  // 정식 도메인 사용
+  // AI 콘텐츠 생성 서버
+  BASE_URL: 'https://posty-ai-server.vercel.app',
   
-  // 트렌드 데이터 서버 (posty-api-v2)
-  TRENDS_URL: 'https://posty-api-v2.vercel.app/api',
+  // 통합 API 서버 (트렌드, 인증, 기타)
+  TRENDS_URL: 'https://posty-api-server.vercel.app/api',
   
   // API 엔드포인트
   ENDPOINTS: {

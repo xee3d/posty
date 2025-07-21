@@ -19,6 +19,7 @@ import {
   getReceiptIOS,
 } from 'react-native-iap';
 import { Platform, EmitterSubscription } from 'react-native';
+import { DeviceEventEmitter } from 'react-native';
 import serverSubscriptionService from './serverSubscriptionService';
 import tokenService from './tokenService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -306,21 +307,25 @@ class InAppPurchaseService {
       const planId = this.getPlanIdFromSku(productId);
       await tokenService.upgradeSubscription(planId);
       
-      Alert.alert(
-        '구독 완료! 🎉',
-        `${planId.toUpperCase()} 플랜이 활성화되었습니다.\n${planId === 'starter' ? '가입 즉시 300개 + 매일 10개 토큰' : planId === 'premium' ? '가입 즉시 500개 + 매일 20개 토큰' : '무제한 토큰'}`,
-        [{ text: '확인' }]
-      );
+      // 구독 성공 이벤트 발생
+      DeviceEventEmitter.emit('purchaseSuccess', {
+        type: 'subscription',
+        planId,
+        planName: planId.toUpperCase(),
+        features: planId === 'starter' ? '가입 즉시 300개 + 매일 10개 토큰' : 
+                  planId === 'premium' ? '가입 즉시 500개 + 매일 20개 토큰' : 
+                  '무제한 토큰'
+      });
     } else {
       // 토큰 구매 처리
       const tokens = this.getTokensFromSku(productId);
       await tokenService.addPurchasedTokens(tokens);
       
-      Alert.alert(
-        '토큰 구매 완료! 🎉',
-        `${tokens}개의 토큰이 추가되었습니다.`,
-        [{ text: '확인' }]
-      );
+      // 토큰 구매 성공 이벤트 발생
+      DeviceEventEmitter.emit('purchaseSuccess', {
+        type: 'tokens',
+        amount: tokens
+      });
     }
 
     // Android acknowledge

@@ -14,8 +14,10 @@ import rewardAdService from '../../services/rewardAdService';
 import missionService from '../../services/missionService';
 import TokenPurchaseView from '../../components/TokenPurchaseView';
 import EarnTokenModal from '../../components/EarnTokenModal';
+import PaymentSuccessModal from '../../components/PaymentSuccessModal';
 
 import { Alert } from '../../utils/customAlert';
+import { DeviceEventEmitter } from 'react-native';
 const { width: screenWidth } = Dimensions.get('window');
 
 interface SubscriptionScreenProps {
@@ -44,6 +46,16 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     remainingToday: 10,
     dailyLimit: 10,
   });
+  
+  // 폭죽 애니메이션용 state
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [purchaseType, setPurchaseType] = useState<'subscription' | 'tokens'>('subscription');
+  const [purchaseDetails, setPurchaseDetails] = useState<any>({});
+  
+  // 디버깅용
+  useEffect(() => {
+    console.log('[ModernSubscriptionScreen] showSuccessModal changed:', showSuccessModal);
+  }, [showSuccessModal]);
 
   useEffect(() => {
     loadTokenStats();
@@ -59,6 +71,23 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     checkInitialTab();
 
     rewardAdService.preloadAd();
+    
+    // 구매 성공 이벤트 리스너
+    const purchaseListener = DeviceEventEmitter.addListener('purchaseSuccess', (data) => {
+      console.log('[ModernSubscriptionScreen] Purchase success event received:', data);
+      console.log('[ModernSubscriptionScreen] Setting showSuccessModal to true');
+      setPurchaseType(data.type);
+      if (data.type === 'subscription') {
+        setPurchaseDetails({ planName: data.planName });
+      } else {
+        setPurchaseDetails({ tokenAmount: data.amount });
+      }
+      setShowSuccessModal(true);
+    });
+    
+    return () => {
+      purchaseListener.remove();
+    };
   }, []);
 
   // 구독 플랜이 변경되면 화면 새로고침
@@ -915,6 +944,15 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           loadTokenStats();
         }}
         onTokensEarned={handleEarnTokens}
+      />
+      
+      {/* 결제 성공 모달 */}
+      <PaymentSuccessModal
+        visible={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        type={purchaseType}
+        planName={purchaseDetails.planName}
+        tokenAmount={purchaseDetails.tokenAmount}
       />
     </SafeAreaView>
   );

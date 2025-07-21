@@ -13,7 +13,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import NaverLogin from '@react-native-seoul/naver-login';
 import { login as kakaoLogin, getProfile as getKakaoProfile } from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GOOGLE_WEB_CLIENT_ID, NAVER_CONSUMER_KEY, NAVER_CONSUMER_SECRET, API_URL, SERVER_URL } from '@env';
+import { GOOGLE_WEB_CLIENT_ID, NAVER_CONSUMER_KEY, NAVER_CONSUMER_SECRET, KAKAO_APP_KEY, API_URL, SERVER_URL } from '@env';
 
 export interface UserProfile {
   uid: string;
@@ -182,6 +182,10 @@ class SocialAuthService {
       const consumerSecret = NAVER_CONSUMER_SECRET || '';
       const appName = 'Posty';
       
+      console.log('네이버 로그인 시작...');
+      console.log('Consumer Key:', consumerKey);
+      console.log('Consumer Secret:', consumerSecret ? '***' : 'undefined');
+      
       // 네이버 로그인 초기화
       await NaverLogin.initialize({
         appName,
@@ -190,8 +194,14 @@ class SocialAuthService {
         disableNaverAppAuth: true,
       });
       
+      console.log('네이버 로그인 초기화 완료');
+      
       // 네이버 로그인
-      const { successResponse } = await NaverLogin.login();
+      console.log('네이버 로그인 시도 중...');
+      const loginResult = await NaverLogin.login();
+      console.log('네이버 로그인 결과:', loginResult);
+      
+      const { successResponse } = loginResult;
       
       if (!successResponse) {
         throw new Error('네이버 로그인 실패');
@@ -205,8 +215,11 @@ class SocialAuthService {
       const userCredential = await signInWithCustomToken(this.auth, customToken);
       
       return this.formatUserProfile(userCredential.user, 'naver');
-    } catch (error) {
-      console.error('Naver 로그인 실패:', error);
+    } catch (error: any) {
+      console.error('Naver 로그인 상세 오류:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+      console.error('Error userInfo:', error.userInfo);
       throw error;
     }
   }
@@ -219,8 +232,12 @@ class SocialAuthService {
         return await this.mockLogin('kakao');
       }
 
+      console.log('카카오 로그인 시작...');
+      console.log('Kakao App Key:', KAKAO_APP_KEY);
+      
       // 카카오 로그인
       const token = await kakaoLogin();
+      console.log('카카오 토큰 받음:', token);
       
       // 카카오 사용자 정보 가져오기
       const profile = await getKakaoProfile();
@@ -312,8 +329,13 @@ class SocialAuthService {
   // Firebase Custom Token 가져오기 (서버 API 호출)
   private async getFirebaseCustomToken(provider: string, profile: any): Promise<string> {
     try {
-      const serverUrl = SERVER_URL || API_URL || 'https://posty-server-new.vercel.app';
-      const response = await fetch(`${serverUrl}/api/auth/custom-token`, {
+      const serverUrl = SERVER_URL || API_URL || 'https://posty-api-server.vercel.app';
+      const url = `${serverUrl}/api/auth/custom-token`;
+      
+      console.log('Custom token 요청 URL:', url);
+      console.log('Custom token 요청 데이터:', { provider, profile });
+      
+      const response = await fetch(url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -324,7 +346,24 @@ class SocialAuthService {
         }),
       });
       
-      const data = await response.json();
+      console.log('Custom token 응답 상태:', response.status);
+      
+      const responseText = await response.text();
+      console.log('Custom token 응답 텍스트:', responseText.substring(0, 200));
+      
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON 파싱 오류:', parseError);
+        console.error('응답 내용:', responseText);
+        throw new Error('서버 응답이 JSON 형식이 아닙니다');
+      }
+      
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+      }
+      
       return data.customToken;
     } catch (error) {
       console.error('Custom token 생성 실패:', error);
@@ -391,7 +430,7 @@ class SocialAuthService {
       console.log('Signing in with server auth code...');
       
       // 서버에서 idToken 받기
-      const serverUrl = SERVER_URL || API_URL || 'https://posty-server-new.vercel.app';
+      const serverUrl = SERVER_URL || API_URL || 'https://posty-api-server.vercel.app';
       const response = await fetch(`${serverUrl}/api/auth/google-server-auth`, {
         method: 'POST',
         headers: {

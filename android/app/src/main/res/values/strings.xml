@@ -1,3 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Posty</string>
+    
+    <!-- 네이버 로그인 설정 -->
+    <string name="naver_client_id">jXC0jUWPhSCotIWBrKrB</string>
+    <string name="naver_client_secret">RND5w7pcJt</string>
+    <string name="naver_client_name">Posty</string>
+    
+    <!-- 카카오 로그인 설정 -->
+    <string name="kakao_app_key">566cba5c08009852b6b5f1a31c3b28d8</string>
+    <string name="kakao_scheme">kakao566cba5c08009852b6b5f1a31c3b28d8</string>
 </resources>
