@@ -7,7 +7,7 @@ const API_CONFIG = {
   BASE_URL: 'https://posty-ai-server.vercel.app',
   
   // 통합 API 서버 (트렌드, 인증, 기타)
-  TRENDS_URL: 'https://posty-api-server.vercel.app/api',
+  TRENDS_URL: 'https://posty-api.vercel.app/api',
   
   // API 엔드포인트
   ENDPOINTS: {

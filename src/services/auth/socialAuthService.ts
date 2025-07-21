@@ -329,7 +329,7 @@ class SocialAuthService {
   // Firebase Custom Token 가져오기 (서버 API 호출)
   private async getFirebaseCustomToken(provider: string, profile: any): Promise<string> {
     try {
-      const serverUrl = SERVER_URL || API_URL || 'https://posty-api-server.vercel.app';
+      const serverUrl = SERVER_URL || API_URL || 'https://posty-api.vercel.app';
       const url = `${serverUrl}/api/auth/custom-token`;
       
       console.log('Custom token 요청 URL:', url);

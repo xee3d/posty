@@ -33,7 +33,7 @@ class TrendService {
   
   // 실시간 API 설정
   private USE_REAL_API = true; // API 정상 작동 확인!
-  private API_BASE_URL = 'https://posty-api-v2.vercel.app/api'; // Vercel Production URL
+  private API_BASE_URL = 'https://posty-api.vercel.app/api'; // 새 API URL
   
   /**
    * 모든 소스에서 트렌드 가져오기
