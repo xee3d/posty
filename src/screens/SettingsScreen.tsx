@@ -25,6 +25,7 @@ import achievementService from '../services/achievementService';
 import { UserProfile } from '../types/achievement';
 import { cleanupFirestoreSubscription } from '../store/middleware/firestoreSyncMiddleware';
 import { Alert } from '../utils/customAlert';
+import AccountChangeSection from '../components/settings/AccountChangeSection';
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;

@@ -93,7 +93,7 @@ class SocialAuthService {
   }
 
   // Google 로그인
-  async signInWithGoogle(): Promise<UserProfile> {
+  async signInWithGoogle(forceNewAccount: boolean = false): Promise<UserProfile> {
     try {
       if (DEV_MODE) {
         console.log('🔧 개발 모드: Google 로그인 시뮬레이션');
@@ -106,11 +106,33 @@ class SocialAuthService {
       // Google Play Services 확인
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       
-      // 기존 로그인 정보 초기화
-      await GoogleSignin.signOut();
+      // 자동 로그인 시도 (계정 변경이 아닌 경우)
+      if (!forceNewAccount) {
+        try {
+          console.log('Attempting silent sign in...');
+          const userInfo = await GoogleSignin.signInSilently();
+          console.log('Silent sign in successful');
+          
+          // 토큰 가져오기
+          const tokens = await GoogleSignin.getTokens();
+          const idToken = tokens.idToken || (await this.getIdTokenFromUser(userInfo));
+          
+          if (idToken) {
+            const googleCredential = GoogleAuthProvider.credential(idToken);
+            const userCredential = await signInWithCredential(this.auth, googleCredential);
+            return this.formatUserProfile(userCredential.user, 'google');
+          }
+        } catch (silentError: any) {
+          console.log('Silent sign in failed, proceeding with interactive sign in');
+        }
+      } else {
+        // 계정 변경 시에만 기존 정보 초기화
+        console.log('Force new account: signing out first');
+        await GoogleSignin.signOut();
+      }
       
-      // Google 로그인
-      console.log('Starting Google Sign In...');
+      // Google 로그인 (Interactive)
+      console.log('Starting interactive Google Sign In...');
       const signInResult = await GoogleSignin.signIn();
       console.log('Google Sign In successful, user info structure:');
       console.log('signInResult keys:', Object.keys(signInResult));
@@ -421,6 +443,46 @@ class SocialAuthService {
     } catch (error) {
       console.error('Google access token login failed:', error);
       throw error;
+    }
+  }
+  
+  // 계정 변경 메서드 추가
+  async changeAccount(provider: 'google' | 'naver' | 'kakao'): Promise<UserProfile> {
+    console.log(`Changing ${provider} account...`);
+    
+    switch (provider) {
+      case 'google':
+        return this.signInWithGoogle(true); // forceNewAccount = true
+      case 'naver':
+        // 네이버 로그아웃 후 재로그인
+        try {
+          await NaverLogin.logout();
+        } catch (e) {
+          console.log('Naver logout error (ignored):', e);
+        }
+        return this.signInWithNaver();
+      case 'kakao':
+        // 카카오 로그아웃 후 재로그인
+        try {
+          const { logout: kakaoLogout } = await import('@react-native-seoul/kakao-login');
+          await kakaoLogout();
+        } catch (e) {
+          console.log('Kakao logout error (ignored):', e);
+        }
+        return this.signInWithKakao();
+      default:
+        throw new Error('Invalid provider');
+    }
+  }
+  
+  // getIdToken helper 메서드
+  private async getIdTokenFromUser(userInfo: any): Promise<string | null> {
+    try {
+      const tokens = await GoogleSignin.getTokens();
+      return tokens.idToken;
+    } catch (error) {
+      console.log('Failed to get ID token:', error);
+      return null;
     }
   }
   
