@@ -36,18 +36,16 @@ interface CustomTokenRequest {
     id: string;
     email?: string;
     name?: string;
+    nickname?: string;
     photo?: string;
+    profile_image?: string;
     accessToken?: string;
   };
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
-  console.log('Environment check:', {
-    PROJECT_ID: !!process.env.FIREBASE_PROJECT_ID,
-    CLIENT_EMAIL: !!process.env.FIREBASE_CLIENT_EMAIL,
-    PRIVATE_KEY: !!process.env.FIREBASE_PRIVATE_KEY,
-    PRIVATE_KEY_LENGTH: process.env.FIREBASE_PRIVATE_KEY?.length || 0
-  });
+  console.log('Custom token request received');
+  
   // CORS 설정
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -83,12 +81,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 사용자 고유 ID 생성
     const uid = `${provider}_${profile.id}`;
 
+    // 프로필 이미지 URL 처리 (null이면 undefined로)
+    const photoURL = profile.photo || profile.profile_image || undefined;
+    
+    // 이름 처리 (nickname 우선)
+    const displayName = profile.name || profile.nickname || `${provider} User`;
+
     // Custom claims 설정
     const customClaims = {
       provider,
       email: profile.email || `${profile.id}@${provider}.local`,
-      name: profile.name || `${provider} User`,
-      picture: profile.photo || null,
+      name: displayName,
+      picture: photoURL || null,
     };
 
     try {
@@ -97,20 +101,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       try {
         user = await admin.auth().getUser(uid);
         // 기존 사용자 업데이트
-        await admin.auth().updateUser(uid, {
+        const updateData: any = {
           email: customClaims.email,
-          displayName: customClaims.name,
-          photoURL: customClaims.picture,
-        });
+          displayName: displayName,
+          emailVerified: true,
+        };
+        
+        // photoURL이 있을 때만 추가
+        if (photoURL) {
+          updateData.photoURL = photoURL;
+        }
+        
+        await admin.auth().updateUser(uid, updateData);
       } catch (error) {
         // 새 사용자 생성
-        user = await admin.auth().createUser({
+        const createData: any = {
           uid,
           email: customClaims.email,
-          displayName: customClaims.name,
-          photoURL: customClaims.picture,
+          displayName: displayName,
           emailVerified: true,
-        });
+        };
+        
+        // photoURL이 있을 때만 추가
+        if (photoURL) {
+          createData.photoURL = photoURL;
+        }
+        
+        user = await admin.auth().createUser(createData);
       }
 
       // Custom claims 설정
