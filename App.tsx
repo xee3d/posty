@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import SplashScreen from 'react-native-splash-screen';
 import {
   View,
   StyleSheet,
@@ -194,6 +195,9 @@ const App: React.FC = () => {
     const unsubscribe = socialAuthService.onAuthStateChanged((user) => {
       setIsAuthenticated(!!user);
       setIsCheckingAuth(false);
+      
+      // 인증 체크 완료 후 스플래시 스크린 숨기기
+      SplashScreen.hide();
       
       // Analytics 사용자 ID 설정
       if (user) {
@@ -418,9 +422,11 @@ const App: React.FC = () => {
                 onTabPress={handleTabPress} 
               />
             )}
-            <AchievementNotification 
-              onNavigateToProfile={() => handleTabPress('profile')} 
-            />
+            {activeTab !== 'login' && (
+              <AchievementNotification 
+                onNavigateToProfile={() => handleTabPress('profile')} 
+              />
+            )}
           </View>
         </AlertProvider>
       </PersistGate>

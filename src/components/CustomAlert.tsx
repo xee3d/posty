@@ -148,7 +148,6 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
                   styles.button,
                   button.style === 'cancel' && styles.cancelButton,
                   button.style === 'destructive' && styles.destructiveButton,
-                  buttons.length === 2 && index === 0 && styles.firstButtonTwo,
                   buttons.length >= 3 && styles.buttonThree,
                   buttons.length >= 3 && index === 0 && { marginTop: 0 },
                 ]}
@@ -177,14 +176,16 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     backgroundColor: isDark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 40,
+    paddingHorizontal: 30, // 40에서 30으로 줄임
   },
   alertContainer: {
     backgroundColor: isDark ? colors.surface : colors.white,
-    borderRadius: 28,
-    padding: 28,
+    borderRadius: 24, // 28에서 24로 조정
+    paddingTop: 24,
+    paddingHorizontal: 24,
+    paddingBottom: 20, // 하단 패딩 조정
     width: '100%',
-    maxWidth: 340,
+    maxWidth: 320, // 340에서 320으로 조정
     alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 20 },
@@ -222,10 +223,12 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
+    gap: 12, // 버튼 사이 간격 추가
   },
   twoButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    gap: 12, // 버튼 사이 간격
   },
   threeButtons: {
     flexDirection: 'column',
@@ -235,8 +238,10 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 14,
-    minWidth: 100,
+    flex: 1, // 버튼이 균등하게 늘어나도록
+    minHeight: 48, // 최소 높이 보장
     alignItems: 'center',
+    justifyContent: 'center', // 세로 중앙 정렬 추가
     shadowColor: colors.primary,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -244,14 +249,14 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     elevation: 5,
   },
   firstButtonTwo: {
-    marginRight: 12,
-    flex: 1,
+    // marginRight 제거 (gap으로 대체)
   },
   buttonThree: {
     width: '100%',
     marginTop: 10,
     shadowOpacity: 0.15,
     elevation: 2,
+    flex: 0, // 3개 이상일 때는 flex 제거
   },
   cancelButton: {
     backgroundColor: isDark ? colors.surface : colors.lightGray,

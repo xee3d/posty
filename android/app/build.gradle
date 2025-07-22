@@ -112,6 +112,7 @@ dependencies {
     implementation("com.facebook.react:react-android")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
     implementation platform('com.google.firebase:firebase-bom:33.6.0')  // Firebase 활성화
+    implementation 'com.facebook.android:facebook-android-sdk:[17.0.2]'  // Facebook SDK
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")

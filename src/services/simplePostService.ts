@@ -2,14 +2,28 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SimplePost, PostStats } from './types/postTypes';
 
+import socialAuthService from './auth/socialAuthService';
+
 // achievementService를 직접 import하지 않고 이벤트 방식으로 변경
 type PostEventListener = () => Promise<void>;
 type SpecialEventListener = (date: Date) => Promise<void>;
 
 class SimplePostService {
-  private STORAGE_KEY = 'SIMPLE_POSTS';
+  private STORAGE_KEY_PREFIX = 'SIMPLE_POSTS_';
   private postEventListeners: PostEventListener[] = [];
   private specialEventListeners: SpecialEventListener[] = [];
+  
+  // 현재 사용자 UID 가져오기
+  private getCurrentUserId(): string {
+    const firebaseUser = socialAuthService.getCurrentUser();
+    return firebaseUser?.uid || 'default';
+  }
+  
+  // 사용자별 스토리지 키 생성
+  private get STORAGE_KEY(): string {
+    const userId = this.getCurrentUserId();
+    return `${this.STORAGE_KEY_PREFIX}${userId}`;
+  }
   
   // 이벤트 리스너 등록
   onPostSaved(listener: PostEventListener): () => void {
@@ -146,9 +160,19 @@ class SimplePostService {
     return posts.find(post => post.id === id) || null;
   }
 
-  // 모든 데이터 초기화 (테스트용)
-  async clearAllPosts(): Promise<void> {
-    await AsyncStorage.removeItem(this.STORAGE_KEY);
+  // 모든 사용자의 포스트 데이터 삭제 (디버깅용)
+  async clearAllUsersPosts(): Promise<void> {
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      const postKeys = keys.filter(key => key.startsWith(this.STORAGE_KEY_PREFIX));
+      
+      if (postKeys.length > 0) {
+        await AsyncStorage.multiRemove(postKeys);
+        console.log(`Cleared ${postKeys.length} post-related keys`);
+      }
+    } catch (error) {
+      console.error('Failed to clear all posts:', error);
+    }
   }
 }
 

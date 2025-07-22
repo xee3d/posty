@@ -48,20 +48,6 @@ const config = {
   },
   watchFolders: [],
   // File watcher 설정
-  watchman: {
-    // 빌드 폴더 무시
-    ignore: [
-      path.resolve(__dirname, 'android', 'build'),
-      path.resolve(__dirname, 'android', 'app', 'build'),
-      path.resolve(__dirname, 'android', '.gradle'),
-      path.resolve(__dirname, 'node_modules', '**', 'android', 'build'),
-      '**/android/build/**',
-      '**/android/app/build/**',
-      '**/android/.gradle/**',
-      '**/node_modules/**/android/build/**',
-    ],
-  },
-  // File watcher 설정
   watcher: {
     // Watchman 대신 Node watcher 사용 (더 안정적)
     useWatchman: false,

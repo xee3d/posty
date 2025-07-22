@@ -78,6 +78,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
     joinDays: 0,
   });
 
+  // Redux 상태 확인을 위한 로그 추가
+  useEffect(() => {
+    console.log('[SettingsScreen] Redux user state:', {
+      displayName: reduxUser.displayName,
+      email: reduxUser.email,
+      provider: reduxUser.provider,
+      photoURL: reduxUser.photoURL
+    });
+  }, [reduxUser]);
+
   useEffect(() => {
     loadAllData();
   }, []);
@@ -508,8 +518,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
                   onNavigate('login');
                 }, 100);
               }
-              
-              Alert.alert('알림', '로그아웃되었습니다.');
             } catch (error) {
               console.error('로그아웃 중 예상치 못한 에러:', error);
               // 그래도 로그아웃 처리
@@ -671,6 +679,44 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
     });
   };
 
+  // 플랫폼 정보 헬퍼 함수들
+  const getProviderName = (provider: string | null | undefined) => {
+    console.log('[SettingsScreen] getProviderName - provider:', provider);
+    if (!provider) return 'Email';
+    switch (provider) {
+      case 'google': return 'Google';
+      case 'naver': return 'Naver';
+      case 'kakao': return 'Kakao';
+      case 'facebook': return 'Facebook';
+      case 'apple': return 'Apple';
+      default: return 'Email';
+    }
+  };
+
+  const getProviderIcon = (provider: string | null | undefined) => {
+    if (!provider) return 'mail';
+    switch (provider) {
+      case 'google': return 'logo-google';
+      case 'naver': return 'chatbubble'; // Naver 아이콘 대체
+      case 'kakao': return 'chatbubble-ellipses';
+      case 'facebook': return 'logo-facebook';
+      case 'apple': return 'logo-apple';
+      default: return 'mail';
+    }
+  };
+
+  const getProviderColor = (provider: string | null | undefined) => {
+    if (!provider) return colors.primary;
+    switch (provider) {
+      case 'google': return '#4285F4';
+      case 'naver': return '#03C75A';
+      case 'kakao': return '#FEE500';
+      case 'facebook': return '#1877F2';
+      case 'apple': return colors.text.primary;
+      default: return colors.primary;
+    }
+  };
+
   const getSubscriptionBadge = () => {
     switch (subscriptionPlan) {
       case 'pro':
@@ -824,7 +870,21 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
                   {userProfile?.selectedTitle && (
                     <Text style={styles.profileTitle}>{userProfile.selectedTitle}</Text>
                   )}
-                  <Text style={styles.profileEmail}>{reduxUser.email || user.email}</Text>
+                  {/* 플랫폼 정보 표시 */}
+                  {reduxUser.provider ? (
+                    <View style={styles.profilePlatformInfo}>
+                      <Icon 
+                        name={getProviderIcon(reduxUser.provider)} 
+                        size={14} 
+                        color={getProviderColor(reduxUser.provider)} 
+                      />
+                      <Text style={styles.profilePlatform}>
+                        {getProviderName(reduxUser.provider)}
+                      </Text>
+                    </View>
+                  ) : (
+                    <Text style={styles.profileEmail}>{reduxUser.email || user.email}</Text>
+                  )}
                 </View>
               </View>
             </View>
@@ -1170,6 +1230,16 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     fontSize: 14,
     color: colors.text.tertiary,
   },
+  profilePlatformInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  profilePlatform: {
+    fontSize: 14,
+    color: colors.text.secondary,
+    fontWeight: '500',
+  },
   profileStats: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1452,18 +1522,22 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: SPACING.sm,
-    marginHorizontal: SPACING.md,
+    gap: 8,
+    marginHorizontal: SPACING.md * 2,
     marginBottom: SPACING.lg,
-    paddingVertical: SPACING.md,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
     borderRadius: 12,
     backgroundColor: isDark ? colors.error + '20' : '#FEF2F2',
-    ...cardTheme.default.shadow,
+    minWidth: 150,
+    alignSelf: 'center',
   },
   logoutText: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#EF4444',
+    letterSpacing: -0.3,
+    flexShrink: 0,
   },
   bottomSpace: {
     height: SPACING.xxl * 2,

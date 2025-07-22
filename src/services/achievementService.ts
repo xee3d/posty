@@ -16,13 +16,80 @@ const getSimplePostService = () => {
 };
 
 class AchievementService {
-  private STORAGE_KEY = 'USER_ACHIEVEMENTS';
-  private PROFILE_KEY = 'USER_PROFILE';
-  private STREAK_KEY = 'USER_STREAK';
+  private STORAGE_KEY_PREFIX = 'USER_ACHIEVEMENTS_';
+  private PROFILE_KEY_PREFIX = 'USER_PROFILE_';
+  private STREAK_KEY_PREFIX = 'USER_STREAK_';
   private initialized = false;
   
+  // 현재 사용자 UID 가져오기
+  private getCurrentUserId(): string {
+    const firebaseUser = socialAuthService.getCurrentUser();
+    return firebaseUser?.uid || 'default';
+  }
+  
+  // 사용자별 스토리지 키 생성
+  private getUserStorageKey(baseKey: string): string {
+    const userId = this.getCurrentUserId();
+    return `${baseKey}${userId}`;
+  }
+  
+  // 기존 키들을 사용자별로 변환
+  private get STORAGE_KEY(): string {
+    return this.getUserStorageKey(this.STORAGE_KEY_PREFIX);
+  }
+  
+  private get PROFILE_KEY(): string {
+    return this.getUserStorageKey(this.PROFILE_KEY_PREFIX);
+  }
+  
+  private get STREAK_KEY(): string {
+    return this.getUserStorageKey(this.STREAK_KEY_PREFIX);
+  }
+  
+  // 사용자 변경 시 업적 초기화
+  async resetForNewUser(): Promise<void> {
+    try {
+      console.log('Resetting achievements for new user...');
+      const userId = this.getCurrentUserId();
+      console.log('New user ID:', userId);
+      
+      // 현재 사용자의 저장된 데이터 확인
+      const existingData = await AsyncStorage.getItem(this.STORAGE_KEY);
+      if (!existingData) {
+        console.log('No existing achievements for this user, creating new profile');
+        // 새 사용자이므로 기본 프로필 생성
+        const defaultProfile = this.getDefaultProfile();
+        await AsyncStorage.setItem(this.PROFILE_KEY, JSON.stringify(defaultProfile));
+        await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify([]));
+      } else {
+        console.log('Found existing achievements for this user');
+      }
+    } catch (error) {
+      console.error('Failed to reset achievements:', error);
+    }
+  }
+  
+  // 모든 사용자의 업적 데이터 삭제 (디버깅용)
+  async clearAllUsersAchievements(): Promise<void> {
+    try {
+      const keys = await AsyncStorage.getAllKeys();
+      const achievementKeys = keys.filter(key => 
+        key.startsWith(this.STORAGE_KEY_PREFIX) ||
+        key.startsWith(this.PROFILE_KEY_PREFIX) ||
+        key.startsWith(this.STREAK_KEY_PREFIX)
+      );
+      
+      if (achievementKeys.length > 0) {
+        await AsyncStorage.multiRemove(achievementKeys);
+        console.log(`Cleared ${achievementKeys.length} achievement-related keys`);
+      }
+    } catch (error) {
+      console.error('Failed to clear all achievements:', error);
+    }
+  }
+  
   // 초기화 메서드 - 이벤트 리스너 등록
-  initialize() {
+  async initialize() {
     if (this.initialized) return;
     
     const postService = getSimplePostService();
@@ -582,6 +649,23 @@ class AchievementService {
       required: nextLevelExp,
       percentage: Math.min(percentage, 100)
     };
+  }
+  
+  // 사용자 업적 가져오기 (getUnlockedAchievements의 alias)
+  async getUserAchievements(): Promise<Achievement[]> {
+    return this.getUnlockedAchievements();
+  }
+  
+  // 비어 있는 업적 초기화
+  async clearAchievements(): Promise<void> {
+    try {
+      await AsyncStorage.removeItem(this.STORAGE_KEY);
+      await AsyncStorage.removeItem(this.PROFILE_KEY);
+      await AsyncStorage.removeItem(this.STREAK_KEY);
+      console.log('Achievements cleared for current user');
+    } catch (error) {
+      console.error('Failed to clear achievements:', error);
+    }
   }
 }
 

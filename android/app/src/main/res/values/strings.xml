@@ -10,4 +10,9 @@
     <!-- 카카오 로그인 설정 -->
     <string name="kakao_app_key">566cba5c08009852b6b5f1a31c3b28d8</string>
     <string name="kakao_scheme">kakao566cba5c08009852b6b5f1a31c3b28d8</string>
+    
+    <!-- Facebook 로그인 설정 -->
+    <string name="facebook_app_id">757255383655974</string>
+    <string name="facebook_client_token">EAAKwuEIlpiYBPCoFywTwSZC1ZBSpSEB8iyoyFBCkyjNRQmkC8pUMP8tot3zgUZBocHtEA0zmYr4xGz5C6TcZB5JqRi06cpHDTOZBs9UMb0E0XMAIuh4XkVlZBxUkk3GrNRXavINy2HE4AgBjTNOaGGEy5dSYXP8ZCpdQmnTeZCPpO7k2oBP7hDvk5aXeLwtvptD1RHmM5S1PIQByWBgRWjaZCOI0mJ0hMkdMvAwVsXmocIvk38y54naiwDUrjQBYez4ZC6d2tludVQrAOrWAZDZD</string>
+    <string name="fb_login_protocol_scheme">fb757255383655974</string>
 </resources>

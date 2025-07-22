@@ -20,6 +20,7 @@ import { Achievement, ACHIEVEMENT_CATEGORIES, UserProfile } from '../types/achie
 import { ScaleButton, FadeInView } from '../components/AnimationComponents';
 import { soundManager } from '../utils/soundManager';
 import { Alert } from '../utils/customAlert';
+import { useAppSelector } from '../hooks/redux';
 
 const { width } = Dimensions.get('window');
 
@@ -30,6 +31,7 @@ interface ProfileScreenProps {
 
 const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) => {
   const { colors, isDark } = useAppTheme();
+  const userInfo = useAppSelector(state => state.user);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -39,6 +41,33 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
   const [expProgress, setExpProgress] = useState({ current: 0, required: 100, percentage: 0 });
   
   const progressAnim = new Animated.Value(0);
+  
+  // 디버깅을 위해 userInfo 확인
+  useEffect(() => {
+    console.log('ProfileScreen - userInfo:', {
+      displayName: userInfo.displayName,
+      photoURL: userInfo.photoURL,
+      provider: userInfo.provider,
+      email: userInfo.email
+    });
+  }, [userInfo]);
+  
+  // 소셜 로그인 정보
+  const getProviderInfo = () => {
+    console.log('getProviderInfo - provider:', userInfo.provider);
+    switch (userInfo.provider) {
+      case 'google':
+        return { name: 'Google', icon: 'logo-google', color: '#4285F4' };
+      case 'naver':
+        return { name: 'Naver', icon: 'logo-apple', color: '#03C75A', text: 'N' }; // Naver 아이콘이 없으므로 대체
+      case 'kakao':
+        return { name: 'Kakao', icon: 'chatbubble', color: '#FEE500' };
+      case 'facebook':
+        return { name: 'Facebook', icon: 'logo-facebook', color: '#1877F2' };
+      default:
+        return { name: 'Email', icon: 'mail', color: colors.primary };
+    }
+  };
 
   useEffect(() => {
     loadData();
@@ -128,7 +157,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
         <FadeInView delay={100}>
           <View style={styles.profileSection}>
             <View style={styles.profileImageContainer}>
-              {profile?.selectedBadge ? (
+              {userInfo.photoURL ? (
+                <Image 
+                  source={{ uri: userInfo.photoURL }} 
+                  style={styles.profileImage}
+                />
+              ) : profile?.selectedBadge ? (
                 <View style={[
                   styles.profileBadge,
                   { backgroundColor: achievements.find(a => a.id === profile.selectedBadge)?.badgeColor }
@@ -141,7 +175,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
                 </View>
               ) : (
                 <View style={styles.profilePlaceholder}>
-                  <Icon name="person" size={48} color={colors.text.tertiary} />
+                  <Text style={styles.profileInitial}>
+                    {userInfo.displayName?.charAt(0).toUpperCase() || 'U'}
+                  </Text>
                 </View>
               )}
               <TouchableOpacity 
@@ -153,6 +189,27 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
             </View>
             
             <Text style={styles.profileName}>{profile?.displayName}</Text>
+            
+            {/* 소셜 로그인 정보 - 더 크고 눈에 띄게 표시 */}
+            {userInfo.provider && (
+              <View style={styles.providerInfoEnhanced}>
+                {userInfo.provider === 'naver' ? (
+                  <View style={[styles.naverIconBoxLarge, { backgroundColor: getProviderInfo().color }]}>
+                    <Text style={styles.naverIconTextLarge}>N</Text>
+                  </View>
+                ) : (
+                  <Icon 
+                    name={getProviderInfo().icon} 
+                    size={20} 
+                    color={getProviderInfo().color} 
+                  />
+                )}
+                <Text style={styles.providerTextEnhanced}>
+                  {getProviderInfo().name}
+                </Text>
+              </View>
+            )}
+            
             {profile?.selectedTitle && (
               <View style={styles.titleBadge}>
                 <Text style={styles.titleText}>{profile.selectedTitle}</Text>
@@ -455,6 +512,13 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     position: 'relative',
     marginBottom: SPACING.md,
   },
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 3,
+    borderColor: colors.primary,
+  },
   profileBadge: {
     width: 100,
     height: 100,
@@ -466,9 +530,16 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: colors.lightGray,
+    backgroundColor: colors.primary + '20',
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 3,
+    borderColor: colors.primary,
+  },
+  profileInitial: {
+    fontSize: 48,
+    fontWeight: '700',
+    color: colors.primary,
   },
   editBadgeButton: {
     position: 'absolute',
@@ -488,6 +559,58 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     fontWeight: '700',
     color: colors.text.primary,
     marginBottom: SPACING.xs,
+  },
+  providerInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
+  },
+  providerText: {
+    fontSize: FONT_SIZES.small,
+    color: colors.text.secondary,
+    marginLeft: SPACING.xs,
+  },
+  naverIconBox: {
+    width: 16,
+    height: 16,
+    borderRadius: 3,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  naverIconText: {
+    fontSize: 11,
+    fontWeight: 'bold',
+    color: 'white',
+  },
+  // 향상된 플랫폼 정보 스타일
+  providerInfoEnhanced: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+    backgroundColor: colors.surface,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  providerTextEnhanced: {
+    fontSize: FONT_SIZES.medium,
+    color: colors.text.primary,
+    marginLeft: SPACING.sm,
+    fontWeight: '600',
+  },
+  naverIconBoxLarge: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  naverIconTextLarge: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: 'white',
   },
   titleBadge: {
     backgroundColor: colors.primary + '20',

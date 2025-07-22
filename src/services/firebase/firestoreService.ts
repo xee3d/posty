@@ -143,6 +143,8 @@ class FirestoreService {
     const userId = this.auth.currentUser?.uid;
     if (!userId) throw new Error('User not authenticated');
 
+    console.log('[FirestoreService] createOrUpdateUser called with:', userData);
+
     try {
       const userRef = doc(this.collections.users, userId);
       const userDoc = await getDoc(userRef);
@@ -185,12 +187,12 @@ class FirestoreService {
         }
       } else {
         // 새 사용자 생성
-        await setDoc(userRef, {
+        const newUserData = {
           uid: userId,
-          email: this.auth.currentUser?.email || '',
-          displayName: this.auth.currentUser?.displayName || '',
-          photoURL: this.auth.currentUser?.photoURL || '',
-          provider: this.auth.currentUser?.providerData[0]?.providerId || 'unknown',
+          email: userData.email || this.auth.currentUser?.email || '',
+          displayName: userData.displayName || this.auth.currentUser?.displayName || '',
+          photoURL: userData.photoURL || this.auth.currentUser?.photoURL || '',
+          provider: userData.provider || this.auth.currentUser?.providerData[0]?.providerId || 'unknown',
           createdAt: serverTimestamp(),
           lastLoginAt: serverTimestamp(),
           isActive: true,
@@ -214,7 +216,10 @@ class FirestoreService {
             soundEnabled: true,
           },
           ...userData,
-        });
+        };
+        
+        console.log('[FirestoreService] Creating new user with data:', newUserData);
+        await setDoc(userRef, newUserData);
       }
     } catch (error) {
       console.error('Error creating/updating user:', error);

@@ -286,15 +286,41 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
   };
 
   const watchRewardedAd = async (): Promise<boolean> => {
-    // TODO: 실제 AdMob SDK 연동
-    // 예시: 
-    // const rewarded = await RewardedAd.createForAdRequest(adUnitId);
-    // await rewarded.load();
-    // await rewarded.show();
-    
-    // 테스트용 시뮬레이션
-    await new Promise(resolve => setTimeout(resolve, 3000));
-    return true;
+    try {
+      // rewardAdService 사용
+      const rewardAdService = (await import('../services/rewardAdService')).default;
+      
+      // 광고 준비 상태 확인
+      const stats = await rewardAdService.getAdStats();
+      if (stats.remainingToday === 0) {
+        Alert.alert('일일 한도', '오늘의 광고 시청 횟수를 모두 사용했어요.');
+        return false;
+      }
+      
+      // 광고 표시
+      const result = await rewardAdService.showRewardedAd();
+      
+      if (result.success) {
+        console.log('Ad watched successfully, reward:', result.reward);
+        return true;
+      } else {
+        if (result.error) {
+          Alert.alert('광고 오류', result.error);
+        }
+        return false;
+      }
+    } catch (error) {
+      console.error('Failed to watch ad:', error);
+      
+      // 개발 모드에서는 무시하고 성공으로 처리
+      if (__DEV__) {
+        console.log('Development mode: Simulating successful ad watch');
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        return true;
+      }
+      
+      return false;
+    }
   };
 
   const shareInviteLink = async (): Promise<boolean> => {

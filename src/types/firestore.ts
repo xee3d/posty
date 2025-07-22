@@ -23,6 +23,11 @@ export interface User {
     autoRenew: boolean;
   };
   
+  // 새로운 구독 필드들
+  subscriptionPlan?: 'free' | 'starter' | 'premium' | 'pro';
+  subscriptionAutoRenew?: boolean;
+  subscriptionExpiresAt?: string | null;
+  
   tokens: {
     current: number;
     total: number;

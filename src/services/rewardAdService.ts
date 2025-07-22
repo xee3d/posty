@@ -4,6 +4,7 @@ import {
   RewardedAdEventType,
   TestIds,
   AdEventType,
+  MobileAds,
 } from 'react-native-google-mobile-ads';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -13,10 +14,16 @@ const STORAGE_KEYS = {
   TOTAL_REWARDS: 'total_rewards_earned',
 };
 
-// 광고 ID (실제 배포 시 실제 ID로 변경)
+// 광고 ID (환경 변수에서 가져오기)
+import { ADMOB_APP_ID_ANDROID, ADMOB_APP_ID_IOS, ADMOB_REWARDED_ANDROID, ADMOB_REWARDED_IOS } from '@env';
+
 const AD_UNIT_IDS = {
-  android: __DEV__ ? TestIds.REWARDED : 'ca-app-pub-xxxxx/xxxxx',
-  ios: __DEV__ ? TestIds.REWARDED : 'ca-app-pub-xxxxx/xxxxx',
+  android: __DEV__ 
+    ? TestIds.REWARDED 
+    : ADMOB_REWARDED_ANDROID || 'ca-app-pub-xxxxx/xxxxx',
+  ios: __DEV__ 
+    ? TestIds.REWARDED 
+    : ADMOB_REWARDED_IOS || 'ca-app-pub-xxxxx/xxxxx',
 };
 
 class RewardAdService {
@@ -25,9 +32,13 @@ class RewardAdService {
   private isAdLoaded: boolean = false;
   private isAdShowing: boolean = false;
   private dailyAdLimit: number = 10; // 일일 광고 시청 제한
+  private isInitialized: boolean = false;
+  private loadRetryCount: number = 0;
+  private maxRetries: number = 3;
 
   private constructor() {
-    this.initializeRewardedAd();
+    // 초기화를 비동기로 처리
+    this.initializeService();
   }
 
   static getInstance(): RewardAdService {
@@ -37,19 +48,55 @@ class RewardAdService {
     return RewardAdService.instance;
   }
 
+  private async initializeService() {
+    try {
+      // MobileAds 초기화 확인
+      if (!this.isInitialized) {
+        console.log('Initializing MobileAds...');
+        await MobileAds().initialize();
+        this.isInitialized = true;
+        console.log('MobileAds initialized successfully');
+      }
+      
+      // 광고 초기화
+      this.initializeRewardedAd();
+    } catch (error) {
+      console.error('Failed to initialize MobileAds:', error);
+      // 초기화 실패 시에도 계속 진행 (테스트 모드에서는 문제없음)
+      if (__DEV__) {
+        console.log('Running in development mode, continuing without ads');
+      }
+    }
+  }
+
   private initializeRewardedAd() {
-    const adUnitId = Platform.select({
-      ios: AD_UNIT_IDS.ios,
-      android: AD_UNIT_IDS.android,
-    }) as string;
+    try {
+      if (!this.isInitialized && !__DEV__) {
+        console.log('MobileAds not initialized yet, skipping ad creation');
+        return;
+      }
 
-    this.rewardedAd = RewardedAd.createForAdRequest(adUnitId, {
-      requestNonPersonalizedAdsOnly: true,
-      keywords: ['social', 'media', 'instagram', 'content'],
-    });
+      const adUnitId = Platform.select({
+        ios: AD_UNIT_IDS.ios,
+        android: AD_UNIT_IDS.android,
+      }) as string;
 
-    this.setupAdEventListeners();
-    this.loadAd();
+      console.log('Creating rewarded ad with unit ID:', adUnitId);
+
+      this.rewardedAd = RewardedAd.createForAdRequest(adUnitId, {
+        requestNonPersonalizedAdsOnly: true,
+        keywords: ['social', 'media', 'instagram', 'content'],
+      });
+
+      this.setupAdEventListeners();
+      this.loadAd();
+    } catch (error) {
+      console.error('Error initializing rewarded ad:', error);
+      // 개발 모드에서는 광고 없이 계속 진행
+      if (__DEV__) {
+        console.log('Development mode: Continuing without ads');
+      }
+    }
   }
 
   private setupAdEventListeners() {
@@ -65,8 +112,20 @@ class RewardAdService {
     this.rewardedAd.addAdEventListener(AdEventType.ERROR, (error) => {
       console.error('Rewarded ad failed to load:', error);
       this.isAdLoaded = false;
-      // 3초 후 재시도
-      setTimeout(() => this.loadAd(), 3000);
+      this.loadRetryCount++;
+      
+      // 재시도 로직
+      if (this.loadRetryCount < this.maxRetries) {
+        const retryDelay = Math.min(3000 * this.loadRetryCount, 10000); // 최대 10초
+        console.log(`Retrying ad load in ${retryDelay}ms (attempt ${this.loadRetryCount}/${this.maxRetries})`);
+        setTimeout(() => this.loadAd(), retryDelay);
+      } else {
+        console.log('Max retry attempts reached. Giving up on ad loading.');
+        // 개발 모드에서는 무시
+        if (__DEV__) {
+          console.log('Development mode: Ad loading failed but continuing');
+        }
+      }
     });
 
     // 광고 열림
@@ -97,9 +156,23 @@ class RewardAdService {
     if (!this.rewardedAd || this.isAdLoaded || this.isAdShowing) return;
 
     try {
+      console.log('Loading rewarded ad...');
       await this.rewardedAd.load();
-    } catch (error) {
+      this.loadRetryCount = 0; // 성공 시 재시도 카운트 리셋
+    } catch (error: any) {
       console.error('Error loading rewarded ad:', error);
+      
+      // 특정 오류에 대한 처리
+      if (error.code === 'internal-error' || error.message?.includes('Internal error')) {
+        console.log('Internal error detected. This might be due to test mode or network issues.');
+        
+        // 개발 모드에서는 무시하고 계속
+        if (__DEV__) {
+          console.log('Development mode: Ignoring ad loading error');
+          // 테스트 모드에서는 광고가 로드된 것처럼 동작
+          this.isAdLoaded = false; // 강제로 false로 설정하여 실제 광고 표시 방지
+        }
+      }
     }
   }
 
@@ -170,6 +243,31 @@ class RewardAdService {
   // 광고 표시 및 리워드 처리
   async showRewardedAd(): Promise<{ success: boolean; reward?: number; error?: string }> {
     try {
+      // 개발 모드에서는 시뮬레이션
+      if (__DEV__) {
+        console.log('Development mode: Simulating ad display');
+        
+        // 일일 카운트 확인
+        const dailyCount = await this.getDailyAdCount();
+        if (dailyCount >= this.dailyAdLimit) {
+          return {
+            success: false,
+            error: `일일 광고 시청 제한 (${this.dailyAdLimit}회)에 도달했습니다.`,
+          };
+        }
+        
+        // 2초 대기 후 리워드 지급 (시뮬레이션)
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // 일일 카운트 증가
+        await this.incrementDailyAdCount();
+        
+        // 총 리워드 업데이트
+        await this.updateTotalRewards(2);
+        
+        return { success: true, reward: 2 };
+      }
+
       const { canWatch, reason } = await this.canWatchAd();
       
       if (!canWatch) {
@@ -270,6 +368,10 @@ class RewardAdService {
 
   // 광고 준비 상태 확인
   isReady(): boolean {
+    // 개발 모드에서는 항상 준비 상태로 간주
+    if (__DEV__) {
+      return true;
+    }
     return this.isAdLoaded && !this.isAdShowing;
   }
 

@@ -52,6 +52,12 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
       icon: 'chatbubble',
       color: '#FEE500',
     },
+    {
+      id: 'facebook',
+      name: '페이스북',
+      icon: 'logo-facebook',
+      color: '#1877F2',
+    },
   ];
   
   // 현재 로그인된 계정 정보
@@ -59,7 +65,7 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
   const currentEmail = userProfile?.email || 'unknown@example.com';
   const currentName = userProfile?.displayName || '사용자';
   
-  const handleChangeAccount = async (providerId: 'google' | 'naver' | 'kakao') => {
+  const handleChangeAccount = async (providerId: 'google' | 'naver' | 'kakao' | 'facebook') => {
     try {
       setChanging(providerId);
       
@@ -94,6 +100,10 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
       
       // 프로필 저장
       await socialAuthService.saveUserProfile(newProfile);
+      
+      // 업적 초기화 (사용자별로 분리)
+      const achievementService = require('../../services/achievementService').default;
+      await achievementService.resetForNewUser();
       
       Alert.alert(
         '성공',

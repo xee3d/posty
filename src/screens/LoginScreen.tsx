@@ -14,6 +14,7 @@ import Animated, {
 import { useAppTheme } from '../hooks/useAppTheme';
 import { AppIcon } from '../components/AppIcon';
 import socialAuthService from '../services/auth/socialAuthService';
+import achievementService from '../services/achievementService';
 import { useAppDispatch } from '../hooks/redux';
 import { setUser } from '../store/slices/userSlice';
 import { BRAND } from '../utils/constants';
@@ -45,7 +46,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
     };
   });
 
-  const handleSocialLogin = async (provider: 'google' | 'naver' | 'kakao') => {
+  const handleSocialLogin = async (provider: 'google' | 'naver' | 'kakao' | 'facebook' | 'apple') => {
     setIsLoading(true);
     setLoadingProvider(provider);
 
@@ -62,6 +63,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         case 'kakao':
           userProfile = await socialAuthService.signInWithKakao();
           break;
+        case 'facebook':
+          userProfile = await socialAuthService.signInWithFacebook();
+          break;
+        case 'apple':
+          userProfile = await socialAuthService.signInWithApple();
+          break;
       }
 
       if (userProfile) {
@@ -76,6 +83,23 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
 
         // 사용자 프로필 로컬 저장
         await socialAuthService.saveUserProfile(userProfile);
+        
+        // Firestore에 provider 정보 포함하여 저장
+        const firestoreService = (await import('../services/firebase/firestoreService')).default;
+        await firestoreService.createOrUpdateUser({
+          uid: userProfile.uid,
+          email: userProfile.email,
+          displayName: userProfile.displayName,
+          photoURL: userProfile.photoURL,
+          provider: userProfile.provider,
+        });
+        
+        // 새 사용자로 업적 초기화
+        await achievementService.resetForNewUser();
+        
+        // 이미 달성한 업적이 있는지 확인 (기존 사용자)
+        const achievements = await achievementService.getUserAchievements();
+        console.log(`User ${userProfile.displayName} has ${achievements.filter(a => a.isUnlocked).length} achievements`);
 
         // 홈 화면으로 이동
         onNavigate('home');
@@ -99,7 +123,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
   };
 
   const renderSocialButton = (
-    provider: 'google' | 'naver' | 'kakao',
+    provider: 'google' | 'naver' | 'kakao' | 'facebook' | 'apple',
     text: string,
     iconName: string,
     backgroundColor: string,
@@ -118,6 +142,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
             styles.socialButton,
             { backgroundColor },
             provider === 'google' && styles.googleButton,
+            provider === 'apple' && styles.appleButton,
             isLoading && !isThisLoading && styles.disabledButton,
           ]}
           onPress={() => handleSocialLogin(provider)}
@@ -137,6 +162,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                 )}
                 {provider === 'kakao' && (
                   <Icon name="chat-bubble" size={20} color={textColor} />
+                )}
+                {provider === 'facebook' && (
+                  <Icon name="facebook" size={20} color={textColor} />
+                )}
+                {provider === 'apple' && (
+                  <Icon name="apple" size={20} color={textColor} />
                 )}
               </View>
               <Text style={[styles.socialButtonText, { color: textColor }]}>
@@ -163,7 +194,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         >
           {/* 로고 영역 */}
           <Animated.View style={[styles.logoContainer, logoAnimatedStyle]}>
-            <AppIcon size={100} />
+            <View style={styles.logoBox}>
+              <Text style={styles.logoText}>P</Text>
+            </View>
             <Text style={styles.appName}>Posty</Text>
             <Text style={styles.appDescription}>
               {BRAND.tagline}
@@ -204,6 +237,24 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
               '#FEE500',
               '#191919',
               600
+            )}
+
+            {renderSocialButton(
+              'facebook',
+              'Facebook으로 시작하기',
+              'facebook',
+              '#1877F2',
+              '#FFFFFF',
+              700
+            )}
+
+            {Platform.OS === 'ios' && renderSocialButton(
+              'apple',
+              'Apple로 시작하기',
+              'apple',
+              '#000000',
+              '#FFFFFF',
+              800
             )}
           </View>
 
@@ -268,6 +319,26 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     marginTop: 60,
     marginBottom: 60,
   },
+  logoBox: {
+    width: 100,
+    height: 100,
+    borderRadius: 24,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  logoText: {
+    fontSize: 48,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: -2,
+  },
   appName: {
     fontSize: 40,
     fontWeight: '800',
@@ -294,20 +365,20 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     letterSpacing: -0.3,
   },
   socialButtonContainer: {
-    marginBottom: 16,
+    marginBottom: 12,
   },
   socialButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 14,
-    elevation: 3,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   disabledButton: {
     opacity: 0.5,
@@ -324,8 +395,8 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     fontWeight: 'bold',
   },
   socialButtonText: {
-    fontSize: 17,
-    fontWeight: '700',
+    fontSize: 16,
+    fontWeight: '600',
     letterSpacing: -0.2,
   },
   termsContainer: {
@@ -357,6 +428,10 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   googleButton: {
     borderWidth: 1,
     borderColor: '#E0E0E0',
+  },
+  appleButton: {
+    borderWidth: isDark ? 1 : 0,
+    borderColor: isDark ? '#FFFFFF' : undefined,
   },
 });
 

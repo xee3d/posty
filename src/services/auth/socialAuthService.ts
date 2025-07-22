@@ -1,34 +1,24 @@
-// Firebase Modular API로 마이그레이션 완료
-import { 
-  getAuth, 
-  signInWithCredential,
-  signInWithCustomToken,
-  signOut as firebaseSignOut,
-  onAuthStateChanged,
-  GoogleAuthProvider,
-  User as FirebaseUser
-} from '@react-native-firebase/auth';
-import { getApp } from '@react-native-firebase/app';
+// Firebase auth import 수정
+import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import NaverLogin from '@react-native-seoul/naver-login';
 import { login as kakaoLogin, getProfile as getKakaoProfile } from '@react-native-seoul/kakao-login';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GOOGLE_WEB_CLIENT_ID, NAVER_CONSUMER_KEY, NAVER_CONSUMER_SECRET, KAKAO_APP_KEY, API_URL, SERVER_URL } from '@env';
+import { GOOGLE_WEB_CLIENT_ID, NAVER_CONSUMER_KEY, NAVER_CONSUMER_SECRET, KAKAO_APP_KEY, API_URL, SERVER_URL, FACEBOOK_APP_ID } from '@env';
+import { Platform } from 'react-native';
 
 export interface UserProfile {
   uid: string;
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
-  provider: 'google' | 'naver' | 'kakao' | 'email';
+  provider: 'google' | 'naver' | 'kakao' | 'facebook' | 'apple' | 'email';
 }
 
 // 개발 모드 플래그 - Google 로그인 실제 테스트
 const DEV_MODE = false; // 실제 Google 로그인 사용
 
 class SocialAuthService {
-  private app = getApp();
-  private auth = getAuth(this.app);
   private isGoogleSignInConfigured = false;
 
   constructor() {
@@ -42,6 +32,17 @@ class SocialAuthService {
     if (!this.isGoogleSignInConfigured && !DEV_MODE) {
       console.log('Configuring Google Sign-In...');
       console.log('Web Client ID:', GOOGLE_WEB_CLIENT_ID);
+      
+      try {
+        // 이미 초기화되었는지 확인
+        const isSignedIn = await GoogleSignin.isSignedIn();
+        console.log('Already signed in:', isSignedIn);
+        this.isGoogleSignInConfigured = true;
+        return;
+      } catch (checkError) {
+        // 초기화되지 않은 경우 계속 진행
+        console.log('Google Sign-In not yet configured, proceeding...');
+      }
       
       try {
         await GoogleSignin.configure({
@@ -60,7 +61,7 @@ class SocialAuthService {
   }
 
   // 개발 모드용 테스트 로그인
-  private async mockLogin(provider: 'google' | 'naver' | 'kakao'): Promise<UserProfile> {
+  private async mockLogin(provider: 'google' | 'naver' | 'kakao' | 'facebook' | 'apple'): Promise<UserProfile> {
     // 테스트용 사용자 정보
     const mockProfiles = {
       google: {
@@ -83,6 +84,20 @@ class SocialAuthService {
         displayName: '카카오 테스트 사용자',
         photoURL: 'https://via.placeholder.com/150',
         provider: 'kakao' as const,
+      },
+      facebook: {
+        uid: 'facebook_test_user_123',
+        email: 'test.facebook@example.com',
+        displayName: 'Facebook Test User',
+        photoURL: 'https://via.placeholder.com/150',
+        provider: 'facebook' as const,
+      },
+      apple: {
+        uid: 'apple_test_user_123',
+        email: 'test.apple@example.com',
+        displayName: 'Apple Test User',
+        photoURL: 'https://via.placeholder.com/150',
+        provider: 'apple' as const,
       },
     };
 
@@ -118,8 +133,8 @@ class SocialAuthService {
           const idToken = tokens.idToken || (await this.getIdTokenFromUser(userInfo));
           
           if (idToken) {
-            const googleCredential = GoogleAuthProvider.credential(idToken);
-            const userCredential = await signInWithCredential(this.auth, googleCredential);
+            const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+            const userCredential = await auth().signInWithCredential(googleCredential);
             return this.formatUserProfile(userCredential.user, 'google');
           }
         } catch (silentError: any) {
@@ -176,11 +191,11 @@ class SocialAuthService {
       
       console.log('Got idToken, length:', idToken.length);
       
-      // Firebase 인증 - 모듈러 API 사용
-      const googleCredential = GoogleAuthProvider.credential(idToken);
+      // Firebase 인증
+      const googleCredential = auth.GoogleAuthProvider.credential(idToken);
       console.log('Created Google credential');
       
-      const userCredential = await signInWithCredential(this.auth, googleCredential);
+      const userCredential = await auth().signInWithCredential(googleCredential);
       console.log('Firebase sign in successful');
       
       return this.formatUserProfile(userCredential.user, 'google');
@@ -231,12 +246,26 @@ class SocialAuthService {
       
       // 네이버 사용자 정보 가져오기
       const profileResult = await NaverLogin.getProfile(successResponse.accessToken);
+      console.log('네이버 프로필 정보:', profileResult.response);
       
       // Firebase Custom Token으로 로그인 (서버에서 생성 필요)
       const customToken = await this.getFirebaseCustomToken('naver', profileResult.response);
-      const userCredential = await signInWithCustomToken(this.auth, customToken);
+      const userCredential = await auth().signInWithCustomToken(customToken);
       
-      return this.formatUserProfile(userCredential.user, 'naver');
+      // 네이버 프로필 정보를 포함한 UserProfile 반환
+      const userProfile = this.formatUserProfile(userCredential.user, 'naver');
+      
+      // 네이버 프로필 이미지 추가
+      if (profileResult.response.profile_image) {
+        userProfile.photoURL = profileResult.response.profile_image;
+      }
+      
+      // 네이버 닉네임 사용
+      if (profileResult.response.nickname) {
+        userProfile.displayName = profileResult.response.nickname;
+      }
+      
+      return userProfile;
     } catch (error: any) {
       console.error('Naver 로그인 상세 오류:', error);
       console.error('Error code:', error.code);
@@ -263,12 +292,45 @@ class SocialAuthService {
       
       // 카카오 사용자 정보 가져오기
       const profile = await getKakaoProfile();
+      console.log('카카오 프로필 정보:', profile);
       
       // Firebase Custom Token으로 로그인 (서버에서 생성 필요)
+      console.log('Firebase custom token 요청 시작...');
       const customToken = await this.getFirebaseCustomToken('kakao', profile);
-      const userCredential = await signInWithCustomToken(this.auth, customToken);
+      console.log('Custom token 받음, 길이:', customToken.length);
       
-      return this.formatUserProfile(userCredential.user, 'kakao');
+      // Firebase 인증 시도 - 타임아웃 추가
+      console.log('Firebase 인증 시작...');
+      const timeoutPromise = new Promise<never>((_, reject) => {
+        setTimeout(() => reject(new Error('Firebase authentication timeout')), 30000); // 30초 타임아웃
+      });
+      
+      try {
+        const userCredential = await Promise.race([
+          auth().signInWithCustomToken(customToken),
+          timeoutPromise
+        ]);
+        console.log('Firebase 인증 성공, UID:', userCredential.user.uid);
+        
+        // 카카오 프로필 정보를 포함한 UserProfile 반환
+        const userProfile = this.formatUserProfile(userCredential.user, 'kakao');
+        
+        // 카카오 프로필 이미지 추가
+        if (profile.profileImageUrl) {
+          userProfile.photoURL = profile.profileImageUrl;
+        }
+        
+        // 카카오 닉네임 사용
+        if (profile.nickname) {
+          userProfile.displayName = profile.nickname;
+        }
+        
+        console.log('카카오 로그인 완료:', userProfile);
+        return userProfile;
+      } catch (authError) {
+        console.error('Firebase 인증 오류:', authError);
+        throw authError;
+      }
     } catch (error) {
       console.error('Kakao 로그인 실패:', error);
       throw error;
@@ -280,7 +342,7 @@ class SocialAuthService {
     try {
       if (!DEV_MODE) {
         // 현재 로그인된 사용자 확인
-        const currentUser = this.auth.currentUser;
+        const currentUser = auth().currentUser;
         
         if (currentUser) {
           // 각 소셜 로그인 SDK 로그아웃
@@ -288,16 +350,39 @@ class SocialAuthService {
           
           try {
             if (providerId?.includes('google')) {
-              await GoogleSignin.signOut();
+              // Google Sign-In이 초기화되었는지 확인
+              if (this.isGoogleSignInConfigured) {
+                await GoogleSignin.signOut();
+              } else {
+                console.log('Google Sign-In not configured, skipping signOut');
+              }
             } else if (providerId?.includes('naver')) {
-              await NaverLogin.logout();
+              // 네이버 로그아웃 시도
+              try {
+                await NaverLogin.logout();
+              } catch (naverError: any) {
+                // 네이버가 초기화되지 않은 경우 무시
+                if (naverError.message?.includes('not initialized')) {
+                  console.log('Naver not initialized, skipping logout');
+                } else {
+                  console.warn('네이버 로그아웃 오류:', naverError.message);
+                }
+              }
+            } else if (providerId?.includes('kakao')) {
+              // 카카오 로그아웃 시도
+              try {
+                const { logout: kakaoLogout } = await import('@react-native-seoul/kakao-login');
+                await kakaoLogout();
+              } catch (kakaoError: any) {
+                console.log('카카오 로그아웃 오류 (무시됨):', kakaoError.message);
+              }
             }
           } catch (socialError) {
             console.warn('소셜 로그아웃 오류 (무시됨):', socialError);
           }
           
-          // Firebase 로그아웃 - 모듈러 API 사용
-          await firebaseSignOut(this.auth);
+          // Firebase 로그아웃
+          await auth().signOut();
         } else {
           console.log('로그인된 사용자가 없음 - 로컬 데이터만 정리');
         }
@@ -331,21 +416,21 @@ class SocialAuthService {
   }
 
   // 현재 로그인된 사용자 가져오기
-  getCurrentUser(): FirebaseUser | null {
+  getCurrentUser(): any {
     if (DEV_MODE) {
       return null; // 개발 모드에서는 항상 로그아웃 상태
     }
-    return this.auth.currentUser;
+    return auth().currentUser;
   }
 
-  // 로그인 상태 리스너 - 모듈러 API 사용
-  onAuthStateChanged(callback: (user: FirebaseUser | null) => void) {
+  // 로그인 상태 리스너
+  onAuthStateChanged(callback: (user: any) => void) {
     if (DEV_MODE) {
       // 개발 모드에서는 즉시 null 콜백
       callback(null);
       return () => {}; // unsubscribe 함수
     }
-    return onAuthStateChanged(this.auth, callback);
+    return auth().onAuthStateChanged(callback);
   }
 
   // Firebase Custom Token 가져오기 (서버 API 호출)
@@ -394,7 +479,7 @@ class SocialAuthService {
   }
 
   // 사용자 프로필 포맷팅
-  private formatUserProfile(user: FirebaseUser, provider: 'google' | 'naver' | 'kakao' | 'email'): UserProfile {
+  private formatUserProfile(user: any, provider: 'google' | 'naver' | 'kakao' | 'facebook' | 'apple' | 'email'): UserProfile {
     return {
       uid: user.uid,
       email: user.email,
@@ -438,7 +523,7 @@ class SocialAuthService {
         accessToken: accessToken,
       });
       
-      const userCredential = await signInWithCustomToken(this.auth, customToken);
+      const userCredential = await auth().signInWithCustomToken(customToken);
       return this.formatUserProfile(userCredential.user, 'google');
     } catch (error) {
       console.error('Google access token login failed:', error);
@@ -446,8 +531,124 @@ class SocialAuthService {
     }
   }
   
+  // Facebook 로그인
+  async signInWithFacebook(): Promise<UserProfile> {
+    try {
+      if (DEV_MODE) {
+        console.log('🔧 개발 모드: Facebook 로그인 시뮬레이션');
+        return await this.mockLogin('facebook');
+      }
+
+      // Facebook SDK import (lazy loading)
+      const { LoginManager, AccessToken } = await import('react-native-fbsdk-next');
+      
+      console.log('Facebook 로그인 시작...');
+      
+      // 기존 로그인 정보 초기화
+      await LoginManager.logOut();
+      
+      // Facebook 로그인 다이얼로그 표시 - 이메일 권한 명시
+      const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+      
+      if (result.isCancelled) {
+        throw new Error('Facebook 로그인이 취소되었습니다.');
+      }
+      
+      // Access Token 가져오기
+      const data = await AccessToken.getCurrentAccessToken();
+      if (!data) {
+        throw new Error('Facebook access token을 가져올 수 없습니다.');
+      }
+      
+      console.log('Facebook access token 획득');
+      
+      // Facebook 사용자 정보 가져오기
+      const response = await fetch(
+        `https://graph.facebook.com/me?access_token=${data.accessToken}&fields=id,name,email,picture.type(large)`
+      );
+      const userInfo = await response.json();
+      
+      console.log('Facebook 사용자 정보:', userInfo);
+      
+      // 이메일이 없는 경우 처리
+      if (!userInfo.email) {
+        console.warn('Facebook 계정에 이메일이 없거나 권한이 거부되었습니다.');
+        // Facebook ID를 기반으로 임시 이메일 생성
+        userInfo.email = `${userInfo.id}@facebook.local`;
+      }
+      
+      // Firebase Custom Token으로 로그인
+      const customToken = await this.getFirebaseCustomToken('facebook', {
+        id: userInfo.id,
+        name: userInfo.name,
+        email: userInfo.email,
+        picture: userInfo.picture?.data?.url,
+        accessToken: data.accessToken,
+      });
+      
+      const userCredential = await auth().signInWithCustomToken(customToken);
+      return this.formatUserProfile(userCredential.user, 'facebook');
+      
+    } catch (error: any) {
+      console.error('Facebook 로그인 실패:', error);
+      throw error;
+    }
+  }
+
+  // Apple 로그인 (iOS 전용)
+  async signInWithApple(): Promise<UserProfile> {
+    try {
+      if (DEV_MODE) {
+        console.log('🔧 개발 모드: Apple 로그인 시뮬레이션');
+        return await this.mockLogin('apple');
+      }
+
+      // Android에서는 지원하지 않음
+      if (Platform.OS === 'android') {
+        throw new Error('Apple 로그인은 iOS에서만 사용 가능합니다.');
+      }
+
+      // Apple Sign In import (iOS only)
+      const { appleAuth } = await import('@invertase/react-native-apple-authentication');
+      
+      console.log('Apple 로그인 시작...');
+      
+      // Apple Sign In 요청
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+      });
+      
+      // 자격 증명 상태 확인
+      const credentialState = await appleAuth.getCredentialStateForUser(
+        appleAuthRequestResponse.user
+      );
+      
+      if (credentialState === appleAuth.State.AUTHORIZED) {
+        console.log('Apple 인증 성공');
+        
+        // Firebase Custom Token으로 로그인
+        const customToken = await this.getFirebaseCustomToken('apple', {
+          user: appleAuthRequestResponse.user,
+          email: appleAuthRequestResponse.email,
+          fullName: appleAuthRequestResponse.fullName,
+          identityToken: appleAuthRequestResponse.identityToken,
+        });
+        
+        const userCredential = await auth().signInWithCustomToken(customToken);
+        return this.formatUserProfile(userCredential.user, 'apple');
+      }
+      
+      throw new Error('Apple Sign In not authorized');
+      
+    } catch (error: any) {
+      console.error('Apple 로그인 실패:', error);
+      throw error;
+    }
+  }
+
   // 계정 변경 메서드 추가
-  async changeAccount(provider: 'google' | 'naver' | 'kakao'): Promise<UserProfile> {
+  async changeAccount(provider: 'google' | 'naver' | 'kakao' | 'facebook'): Promise<UserProfile> {
     console.log(`Changing ${provider} account...`);
     
     switch (provider) {
@@ -470,6 +671,15 @@ class SocialAuthService {
           console.log('Kakao logout error (ignored):', e);
         }
         return this.signInWithKakao();
+      case 'facebook':
+        // Facebook 로그아웃 후 재로그인
+        try {
+          const { LoginManager } = await import('react-native-fbsdk-next');
+          await LoginManager.logOut();
+        } catch (e) {
+          console.log('Facebook logout error (ignored):', e);
+        }
+        return this.signInWithFacebook();
       default:
         throw new Error('Invalid provider');
     }
@@ -507,11 +717,11 @@ class SocialAuthService {
       const data = await response.json();
       
       if (data.idToken) {
-        const googleCredential = GoogleAuthProvider.credential(data.idToken);
-        const userCredential = await signInWithCredential(this.auth, googleCredential);
+        const googleCredential = auth.GoogleAuthProvider.credential(data.idToken);
+        const userCredential = await auth().signInWithCredential(googleCredential);
         return this.formatUserProfile(userCredential.user, 'google');
       } else if (data.customToken) {
-        const userCredential = await signInWithCustomToken(this.auth, data.customToken);
+        const userCredential = await auth().signInWithCustomToken(data.customToken);
         return this.formatUserProfile(userCredential.user, 'google');
       } else {
         throw new Error('Server did not return valid authentication token');
