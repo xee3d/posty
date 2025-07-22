@@ -302,7 +302,7 @@ class SocialAuthService {
       // Firebase 인증 시도 - 타임아웃 추가
       console.log('Firebase 인증 시작...');
       const timeoutPromise = new Promise<never>((_, reject) => {
-        setTimeout(() => reject(new Error('Firebase authentication timeout')), 30000); // 30초 타임아웃
+        setTimeout(() => reject(new Error('Firebase authentication timeout')), 10000); // 10초 타임아웃
       });
       
       try {
@@ -436,7 +436,16 @@ class SocialAuthService {
   // Firebase Custom Token 가져오기 (서버 API 호출)
   private async getFirebaseCustomToken(provider: string, profile: any): Promise<string> {
     try {
-      const serverUrl = SERVER_URL || API_URL || 'https://posty-api.vercel.app';
+      // 환경 변수 디버깅
+      console.log('Environment variables:', {
+        API_URL,
+        SERVER_URL,
+        hasApiUrl: !!API_URL,
+        hasServerUrl: !!SERVER_URL
+      });
+      
+      // posty-api.vercel.app 사용 (현재 실제 사용 중인 서버)
+      const serverUrl = API_URL || 'https://posty-api.vercel.app';
       const url = `${serverUrl}/api/auth/custom-token`;
       
       console.log('Custom token 요청 URL:', url);

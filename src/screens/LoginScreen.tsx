@@ -10,6 +10,7 @@ import Animated, {
   FadeIn,
   FadeInDown,
 } from 'react-native-reanimated';
+import AppLogo from '../components/AppLogo';
 
 import { useAppTheme } from '../hooks/useAppTheme';
 import { AppIcon } from '../components/AppIcon';
@@ -194,13 +195,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         >
           {/* 로고 영역 */}
           <Animated.View style={[styles.logoContainer, logoAnimatedStyle]}>
-            <View style={styles.logoBox}>
-              <Text style={styles.logoText}>P</Text>
-            </View>
-            <Text style={styles.appName}>Posty</Text>
-            <Text style={styles.appDescription}>
-              {BRAND.tagline}
-            </Text>
+            <AppLogo size={100} showText={true} />
           </Animated.View>
 
           {/* 소셜 로그인 버튼들 */}
@@ -318,40 +313,6 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     alignItems: 'center',
     marginTop: 60,
     marginBottom: 60,
-  },
-  logoBox: {
-    width: 100,
-    height: 100,
-    borderRadius: 24,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  logoText: {
-    fontSize: 48,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    letterSpacing: -2,
-  },
-  appName: {
-    fontSize: 40,
-    fontWeight: '800',
-    color: colors.primary,
-    marginBottom: 8,
-    letterSpacing: -1,
-  },
-  appDescription: {
-    fontSize: 17,
-    color: colors.text.primary,
-    textAlign: 'center',
-    opacity: 0.8,
-    lineHeight: 24,
   },
   buttonContainer: {
     marginBottom: 40,

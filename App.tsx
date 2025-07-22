@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import SplashScreen from 'react-native-splash-screen';
+import AnimatedSplashScreen from './src/components/AnimatedSplashScreen';
 import {
   View,
   StyleSheet,
@@ -85,6 +86,7 @@ const App: React.FC = () => {
   const [navigationData, setNavigationData] = useState<any>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
+  const [showSplash, setShowSplash] = useState(true);
   const alertRef = useRef<any>(null);
   
   // Reanimated shared values
@@ -92,30 +94,38 @@ const App: React.FC = () => {
   const translateX = useSharedValue(0);
   const scale = useSharedValue(1);
 
-  // AlertManager ref 설정 - 별도 useEffect로 분리
+  // 앱 초기화 시 네이티브 스플래시 스크린 숨기기
   useEffect(() => {
-    // 약간의 지연을 주어 ref가 확실히 설정되도록 함
-    const timer = setTimeout(() => {
-      if (alertRef.current) {
-        if (__DEV__) {
-          console.log('Setting AlertManager ref');
-        }
-        AlertManager.setAlertRef(alertRef.current);
-      } else {
-        console.error('AlertRef is still null after timeout');
-      }
-    }, 100);
-    
-    return () => clearTimeout(timer);
+    SplashScreen.hide();
   }, []);
+
+  // AlertManager ref 설정 - 스플래시 스크린이 숨겨진 후에만 실행
+  useEffect(() => {
+    if (!showSplash) {
+      // 약간의 지연을 주어 ref가 확실히 설정되도록 함
+      const timer = setTimeout(() => {
+        if (alertRef.current) {
+          if (__DEV__) {
+            console.log('Setting AlertManager ref');
+          }
+          AlertManager.setAlertRef(alertRef.current);
+        } else {
+          console.error('AlertRef is still null after timeout');
+        }
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [showSplash]);
   
   // 광고 및 구독 서비스 초기화 (InteractionManager 사용)
   useEffect(() => {
-    if (__DEV__) {
-      console.log('🚀 Posty App Started in Development Mode');
-      console.log('React Native Version:', require('react-native/package.json').version);
-      console.log('✨ Using Reanimated 3 for animations');
-    }
+    if (!showSplash) {
+      if (__DEV__) {
+        console.log('🚀 Posty App Started in Development Mode');
+        console.log('React Native Version:', require('react-native/package.json').version);
+        console.log('✨ Using Reanimated 3 for animations');
+      }
 
     // 토큰 데이터 즉시 복원 (서비스 초기화 전에 실행)
     const initializeApp = async () => {
@@ -165,7 +175,8 @@ const App: React.FC = () => {
       
       initializeServices();
     });
-  }, []);
+    }
+  }, [showSplash]);
 
   // 인앱 결제 초기화 최적화
   useEffect(() => {
@@ -196,9 +207,6 @@ const App: React.FC = () => {
       setIsAuthenticated(!!user);
       setIsCheckingAuth(false);
       
-      // 인증 체크 완료 후 스플래시 스크린 숨기기
-      SplashScreen.hide();
-      
       // Analytics 사용자 ID 설정
       if (user) {
         analyticsService.setUserId(user.uid);
@@ -218,14 +226,19 @@ const App: React.FC = () => {
       if (user) {
         InteractionManager.runAfterInteractions(async () => {
           try {
-            // Firestore에서 사용자 데이터 로드
-            await loadUserFromFirestore(store.dispatch);
+            // 병렬 처리로 성능 개선
+            const [, migrationResult] = await Promise.all([
+              // Firestore에서 사용자 데이터 로드
+              loadUserFromFirestore(store.dispatch),
+              // 자동 마이그레이션 체크 (비동기)
+              autoMigrationService.silentMigration().catch(err => {
+                console.log('Migration check failed:', err);
+                return null;
+              })
+            ]);
             
-            // 실시간 구독 시작
+            // 실시간 구독은 데이터 로드 후 시작
             unsubscribeFirestore = subscribeToFirestoreUser(store.dispatch);
-            
-            // 자동 마이그레이션 체크
-            autoMigrationService.silentMigration();
           } catch (error) {
             console.error('Failed to setup user data:', error);
           }
@@ -396,6 +409,15 @@ const App: React.FC = () => {
     }
   }, [activeTab, isCheckingAuth, colors.background, colors.primary, handleTabPress, 
       navigationData, photoMode, styles]);
+
+  // 애니메이션 스플래시 스크린을 표시
+  if (showSplash) {
+    return (
+      <AnimatedSplashScreen 
+        onAnimationComplete={() => setShowSplash(false)} 
+      />
+    );
+  }
 
   return (
     <Provider store={store}>

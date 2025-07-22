@@ -34,8 +34,6 @@ public class MainActivity extends ReactActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    setTheme(R.style.AppTheme);  // 앱 테마로 변경
-    SplashScreen.show(this);  // 스플래시 스크린 표시
     super.onCreate(null);
   }
 }

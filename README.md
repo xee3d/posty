@@ -28,17 +28,19 @@ Posty/
 │   ├── services/       # API 및 서비스 로직
 │   ├── store/          # Redux 상태 관리
 │   └── utils/          # 유틸리티 함수
-├── posty-server/       # AI 콘텐츠 생성 서버
-└── posty-api-v2/       # 트렌드 데이터 서버
+├── posty-ai-server/    # AI 콘텐츠 생성 서버
+└── posty-api-server/   # 통합 API 서버 (인증, 트렌드)
 ```
 
 ## 🌐 서버 아키텍처
-- **AI 서버**: https://posty-server-new.vercel.app
-  - 자동 배포 설정 완료 ✅
-  - Git 연동 완료 ✅
-- **트렌드 서버**: https://posty-api-v2.vercel.app
-  - 자동 배포 설정 완료 ✅
-  - Git 연동 완료 ✅
+- **AI 서버**: https://posty-ai.vercel.app
+  - AI 콘텐츠 생성
+  - 이미지 분석
+  - OpenAI GPT-4 연동
+- **API 서버**: https://posty-api.vercel.app
+  - 소셜 로그인 인증 (Custom Token)
+  - 실시간 트렌드 데이터
+  - Firebase Admin SDK 연동
 
 ## 🔧 설치 및 실행
 
@@ -97,6 +99,7 @@ verify-deployment.bat
 - `device-manager.bat`: ADB 디바이스 관리
 
 ## 📝 최근 업데이트
+- 2025.01.23: 서버 구조 문서 업데이트
 - 2025.01.20: Git 자동 배포 설정 완료
 - 2025.01.20: 서버 404 에러 해결 및 구독 시스템 개선
 - 2025.01.19: 실시간 트렌드 기능 추가
@@ -110,4 +113,4 @@ verify-deployment.bat
 Private Repository
 
 ---
-*최종 업데이트: 2025년 1월 20일*
+*최종 업데이트: 2025년 1월 23일*
