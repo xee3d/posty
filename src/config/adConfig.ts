@@ -84,6 +84,20 @@ export const getImageAnalysisTokens = (plan: PlanType): number => {
   return PLAN_FEATURES[plan]?.imageAnalysisTokens || 2;
 };
 
+// 플랜별 문장 다듬기 옵션
+export const POLISH_OPTIONS = {
+  free: ['summarize', 'simple', 'engaging'], // 3개
+  starter: ['summarize', 'simple', 'formal', 'engaging', 'hashtag'], // 5개
+  premium: ['summarize', 'simple', 'formal', 'emotion', 'storytelling', 'engaging', 'hashtag'], // 7개
+  pro: ['summarize', 'simple', 'formal', 'emotion', 'storytelling', 'engaging', 'hashtag', 'emoji', 'question'], // 9개 전체
+};
+
+// 특정 문장 다듬기 옵션에 접근 가능한지 확인
+export const canAccessPolishOption = (plan: PlanType, option: string): boolean => {
+  const availableOptions = POLISH_OPTIONS[plan] || POLISH_OPTIONS.free;
+  return availableOptions.includes(option);
+};
+
 // MyStyle 접근 권한
 export const MY_STYLE_ACCESS = {
   free: {

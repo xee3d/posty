@@ -14,7 +14,7 @@ export type LengthType = 'short' | 'medium' | 'long';
 
 export type PlatformType = 'instagram' | 'facebook' | 'twitter' | 'linkedin' | 'blog';
 
-export type PolishType = 'spelling' | 'refine' | 'improve';
+export type PolishType = 'summarize' | 'simple' | 'formal' | 'emotion' | 'storytelling' | 'engaging' | 'hashtag' | 'emoji' | 'question';
 
 export type UserType = 'business_manager' | 'influencer' | 'beginner' | 'casual_user';
 

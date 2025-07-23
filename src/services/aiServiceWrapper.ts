@@ -360,18 +360,24 @@ class AIServiceWrapper {
     const completionInstruction = '\n\n중요: 반드시 전체 내용을 빠짐없이 포함하여 완성된 글로 작성해주세요. 중간에 끊기지 않도록 주의해주세요.';
     
     switch (polishType) {
-      case 'spelling':
-        return `다음 텍스트의 맞춤법과 띄어쓰기를 교정해주세요. 원문의 의미와 내용은 그대로 유지하면서 맞춤법만 수정해주세요: "${text}"${lengthGuide}${completionInstruction}`;
-      case 'refine':
-        return `다음 텍스트를 더 매끄럽고 읽기 좋게 다듬어주세요. 원문의 핵심 내용은 모두 유지해주세요: "${text}"${lengthGuide}${completionInstruction}`;
-      case 'improve':
-        return `다음 텍스트의 표현을 더 풍부하고 매력적으로 개선해주세요. 모든 내용을 포함해주세요: "${text}"${lengthGuide}${completionInstruction}`;
-      case 'formal':
-        return `다음 텍스트를 격식있는 문체로 변환해주세요. 전체 내용을 빠짐없이 변환해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+      case 'summarize':
+        return `다음 텍스트의 핵심 내용만 간단히 요약해주세요. SNS에 적합한 짧고 간결한 문장으로 작성해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'simple':
         return `다음 텍스트를 쉽고 친근하게 풀어서 다시 써주세요. 모든 내용을 빠짐없이 포함해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+      case 'formal':
+        return `다음 텍스트를 격식있는 문체로 변환해주세요. 전체 내용을 빠짐없이 변환해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+      case 'emotion':
+        return `다음 텍스트에 감정 표현을 더 풍부하게 추가해주세요. 독자의 공감을 이끌어낼 수 있는 감성적인 표현으로 작성해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+      case 'storytelling':
+        return `다음 텍스트를 스토리텔링 형식으로 변환해주세요. 단순한 설명이 아닌 이야기로 만들어주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'engaging':
-        return `다음 텍스트를 더 재미있고 매력적으로 만들어주세요. 전체 내용을 빠짐없이 포함해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+        return `다음 텍스트를 더 재미있고 매력적으로 만들어주세요. 독자의 관심을 끌 수 있도록 작성해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+      case 'hashtag':
+        return `다음 텍스트에서 주요 키워드를 추출하고 SNS에 적합한 해시태그를 생성해주세요. 원문 내용과 함께 해시태그를 추가해주세요: "${text}"\n\n형식: [원문 내용]\n\n#해시태그 #해시태그 #해시태그${completionInstruction}`;
+      case 'emoji':
+        return `다음 텍스트에 적절한 이모지를 추가해주세요. 문장의 감정이나 내용에 맞는 이모지를 자연스럽게 삽입해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+      case 'question':
+        return `다음 텍스트를 질문형으로 변환해주세요. 평서문을 독자의 참여를 유도하는 질문형으로 바꿔주세요: "${text}"${lengthGuide}${completionInstruction}`;
       default:
         return `다음 텍스트를 개선해주세요: "${text}"${lengthGuide}${completionInstruction}`;
     }

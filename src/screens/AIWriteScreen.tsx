@@ -55,7 +55,8 @@ import {
   getImageAnalysisTokens,
   MY_STYLE_ACCESS,
   TREND_ACCESS,
-  PlanType 
+  PlanType,
+  canAccessPolishOption 
 } from '../config/adConfig';
 import { trendCacheUtils } from '../utils/trendCacheUtils';
 
@@ -123,7 +124,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   const [generatedContent, setGeneratedContent] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedPolishOption, setSelectedPolishOption] = useState<'spelling' | 'refine' | 'improve' | 'formal' | 'simple' | 'engaging'>('refine');
+  const [selectedPolishOption, setSelectedPolishOption] = useState<'summarize' | 'simple' | 'formal' | 'emotion' | 'storytelling' | 'engaging' | 'hashtag' | 'emoji' | 'question'>('engaging');
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [initialHashtagsList, setInitialHashtagsList] = useState<string[]>(initialHashtags || []);
   const [imageAnalysis, setImageAnalysis] = useState<string>('');
@@ -309,7 +310,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     setSelectedImageUri(null);
     setImageAnalysis('');
     setImageAnalysisResult(null);
-    setSelectedPolishOption('refine'); // 문장 정리 옵션 초기화
+    setSelectedPolishOption('engaging'); // 문장 정리 옵션 초기화
     // 톤과 길이는 유지 (사용자 편의)
     // 스타일 가이드는 초기화
     setStyleInfo(null);
@@ -945,114 +946,316 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                   {/* 정리 옵션 */}
                   <View style={styles.polishOptions}>
                     <Text style={styles.polishOptionTitle}>원하는 변환 방향</Text>
+                    {/* 첫 번째 줄: 3개 */}
                     <View style={styles.polishOptionButtons}>
                       <TouchableOpacity 
                         style={[
                           styles.polishOptionButton,
-                          selectedPolishOption === 'spelling' && styles.polishOptionButtonActive
+                          selectedPolishOption === 'summarize' && styles.polishOptionButtonActive,
+                          !canAccessPolishOption(userPlan, 'summarize') && styles.lockedItem
                         ]}
-                        onPress={() => setSelectedPolishOption('spelling')}
+                        onPress={() => {
+                          if (!canAccessPolishOption(userPlan, 'summarize')) {
+                            soundManager.playError();
+                            Alert.alert(
+                              '프리미엄 기능 🌟',
+                              `요약하기 기능은 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.`,
+                              [
+                                { text: '나중에', style: 'cancel' },
+                                { text: '플랜 보기', onPress: () => onNavigate?.('subscription') }
+                              ]
+                            );
+                            return;
+                          }
+                          setSelectedPolishOption('summarize');
+                        }}
                       >
                         <Icon 
-                          name="checkmark-circle-outline" 
+                          name="document-text-outline" 
                           size={18} 
-                          color={selectedPolishOption === 'spelling' ? colors.primary : colors.text.secondary} 
+                          color={selectedPolishOption === 'summarize' ? colors.primary : (!canAccessPolishOption(userPlan, 'summarize') ? colors.text.tertiary : colors.text.secondary)} 
                         />
                         <Text style={[
                           styles.polishOptionText,
-                          selectedPolishOption === 'spelling' && styles.polishOptionTextActive
-                        ]}>맞춤법 교정</Text>
+                          selectedPolishOption === 'summarize' && styles.polishOptionTextActive,
+                          !canAccessPolishOption(userPlan, 'summarize') && styles.lockedItemText
+                        ]}>요약하기</Text>
                       </TouchableOpacity>
                       <TouchableOpacity 
                         style={[
                           styles.polishOptionButton,
-                          selectedPolishOption === 'refine' && styles.polishOptionButtonActive
+                          selectedPolishOption === 'simple' && styles.polishOptionButtonActive,
+                          !canAccessPolishOption(userPlan, 'simple') && styles.lockedItem
                         ]}
-                        onPress={() => setSelectedPolishOption('refine')}
-                      >
-                        <Icon 
-                          name="color-wand-outline" 
-                          size={18} 
-                          color={selectedPolishOption === 'refine' ? colors.primary : colors.text.secondary} 
-                        />
-                        <Text style={[
-                          styles.polishOptionText,
-                          selectedPolishOption === 'refine' && styles.polishOptionTextActive
-                        ]}>문장 다듬기</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity 
-                        style={[
-                          styles.polishOptionButton,
-                          selectedPolishOption === 'improve' && styles.polishOptionButtonActive
-                        ]}
-                        onPress={() => setSelectedPolishOption('improve')}
-                      >
-                        <Icon 
-                          name="sparkles-outline" 
-                          size={18} 
-                          color={selectedPolishOption === 'improve' ? colors.primary : colors.text.secondary} 
-                        />
-                        <Text style={[
-                          styles.polishOptionText,
-                          selectedPolishOption === 'improve' && styles.polishOptionTextActive
-                        ]}>표현 개선</Text>
-                      </TouchableOpacity>
-                    </View>
-                    
-                    {/* 두 번째 줄: 새로운 3개 */}
-                    <View style={[styles.polishOptionButtons, { marginTop: SPACING.sm }]}>
-                      <TouchableOpacity 
-                        style={[
-                          styles.polishOptionButton,
-                          selectedPolishOption === 'formal' && styles.polishOptionButtonActive
-                        ]}
-                        onPress={() => setSelectedPolishOption('formal')}
-                      >
-                        <Icon 
-                          name="business-outline" 
-                          size={18} 
-                          color={selectedPolishOption === 'formal' ? colors.primary : colors.text.secondary} 
-                        />
-                        <Text style={[
-                          styles.polishOptionText,
-                          selectedPolishOption === 'formal' && styles.polishOptionTextActive
-                        ]}>격식체 변환</Text>
-                      </TouchableOpacity>
-                      
-                      <TouchableOpacity 
-                        style={[
-                          styles.polishOptionButton,
-                          selectedPolishOption === 'simple' && styles.polishOptionButtonActive
-                        ]}
-                        onPress={() => setSelectedPolishOption('simple')}
+                        onPress={() => {
+                          if (!canAccessPolishOption(userPlan, 'simple')) {
+                            soundManager.playError();
+                            Alert.alert(
+                              '프리미엄 기능 🌟',
+                              `쉽게 풀어쓰기 기능은 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.`,
+                              [
+                                { text: '나중에', style: 'cancel' },
+                                { text: '플랜 보기', onPress: () => onNavigate?.('subscription') }
+                              ]
+                            );
+                            return;
+                          }
+                          setSelectedPolishOption('simple');
+                        }}
                       >
                         <Icon 
                           name="happy-outline" 
                           size={18} 
-                          color={selectedPolishOption === 'simple' ? colors.primary : colors.text.secondary} 
+                          color={selectedPolishOption === 'simple' ? colors.primary : (!canAccessPolishOption(userPlan, 'simple') ? colors.text.tertiary : colors.text.secondary)} 
                         />
                         <Text style={[
                           styles.polishOptionText,
-                          selectedPolishOption === 'simple' && styles.polishOptionTextActive
+                          selectedPolishOption === 'simple' && styles.polishOptionTextActive,
+                          !canAccessPolishOption(userPlan, 'simple') && styles.lockedItemText
                         ]}>쉽게 풀어쓰기</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity 
+                        style={[
+                          styles.polishOptionButton,
+                          selectedPolishOption === 'formal' && styles.polishOptionButtonActive,
+                          !canAccessPolishOption(userPlan, 'formal') && styles.lockedItem
+                        ]}
+                        onPress={() => {
+                          if (!canAccessPolishOption(userPlan, 'formal')) {
+                            soundManager.playError();
+                            Alert.alert(
+                              '프리미엄 기능 🌟',
+                              `격식체 변환 기능은 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.`,
+                              [
+                                { text: '나중에', style: 'cancel' },
+                                { text: '플랜 보기', onPress: () => onNavigate?.('subscription') }
+                              ]
+                            );
+                            return;
+                          }
+                          setSelectedPolishOption('formal');
+                        }}
+                      >
+                        <Icon 
+                          name="business-outline" 
+                          size={18} 
+                          color={selectedPolishOption === 'formal' ? colors.primary : (!canAccessPolishOption(userPlan, 'formal') ? colors.text.tertiary : colors.text.secondary)} 
+                        />
+                        <Text style={[
+                          styles.polishOptionText,
+                          selectedPolishOption === 'formal' && styles.polishOptionTextActive,
+                          !canAccessPolishOption(userPlan, 'formal') && styles.lockedItemText
+                        ]}>격식체 변환</Text>
+                      </TouchableOpacity>
+                    </View>
+                    
+                    {/* 두 번째 줄: 3개 */}
+                    <View style={[styles.polishOptionButtons, { marginTop: SPACING.sm }]}>
+                      <TouchableOpacity 
+                        style={[
+                          styles.polishOptionButton,
+                          selectedPolishOption === 'emotion' && styles.polishOptionButtonActive,
+                          !canAccessPolishOption(userPlan, 'emotion') && styles.lockedItem
+                        ]}
+                        onPress={() => {
+                          if (!canAccessPolishOption(userPlan, 'emotion')) {
+                            soundManager.playError();
+                            Alert.alert(
+                              '프리미엄 기능 🌟',
+                              `감정 강화 기능은 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.`,
+                              [
+                                { text: '나중에', style: 'cancel' },
+                                { text: '플랜 보기', onPress: () => onNavigate?.('subscription') }
+                              ]
+                            );
+                            return;
+                          }
+                          setSelectedPolishOption('emotion');
+                        }}
+                      >
+                        <Icon 
+                          name="heart-outline" 
+                          size={18} 
+                          color={selectedPolishOption === 'emotion' ? colors.primary : (!canAccessPolishOption(userPlan, 'emotion') ? colors.text.tertiary : colors.text.secondary)} 
+                        />
+                        <Text style={[
+                          styles.polishOptionText,
+                          selectedPolishOption === 'emotion' && styles.polishOptionTextActive,
+                          !canAccessPolishOption(userPlan, 'emotion') && styles.lockedItemText
+                        ]}>감정 강화</Text>
                       </TouchableOpacity>
                       
                       <TouchableOpacity 
                         style={[
                           styles.polishOptionButton,
-                          selectedPolishOption === 'engaging' && styles.polishOptionButtonActive
+                          selectedPolishOption === 'storytelling' && styles.polishOptionButtonActive,
+                          !canAccessPolishOption(userPlan, 'storytelling') && styles.lockedItem
                         ]}
-                        onPress={() => setSelectedPolishOption('engaging')}
+                        onPress={() => {
+                          if (!canAccessPolishOption(userPlan, 'storytelling')) {
+                            soundManager.playError();
+                            Alert.alert(
+                              '프리미엄 기능 🌟',
+                              `스토리텔링 기능은 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.`,
+                              [
+                                { text: '나중에', style: 'cancel' },
+                                { text: '플랜 보기', onPress: () => onNavigate?.('subscription') }
+                              ]
+                            );
+                            return;
+                          }
+                          setSelectedPolishOption('storytelling');
+                        }}
                       >
                         <Icon 
-                          name="heart-outline" 
+                          name="book-outline" 
                           size={18} 
-                          color={selectedPolishOption === 'engaging' ? colors.primary : colors.text.secondary} 
+                          color={selectedPolishOption === 'storytelling' ? colors.primary : (!canAccessPolishOption(userPlan, 'storytelling') ? colors.text.tertiary : colors.text.secondary)} 
                         />
                         <Text style={[
                           styles.polishOptionText,
-                          selectedPolishOption === 'engaging' && styles.polishOptionTextActive
+                          selectedPolishOption === 'storytelling' && styles.polishOptionTextActive,
+                          !canAccessPolishOption(userPlan, 'storytelling') && styles.lockedItemText
+                        ]}>스토리텔링</Text>
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity 
+                        style={[
+                          styles.polishOptionButton,
+                          selectedPolishOption === 'engaging' && styles.polishOptionButtonActive,
+                          !canAccessPolishOption(userPlan, 'engaging') && styles.lockedItem
+                        ]}
+                        onPress={() => {
+                          if (!canAccessPolishOption(userPlan, 'engaging')) {
+                            soundManager.playError();
+                            Alert.alert(
+                              '프리미엄 기능 🌟',
+                              `매력적으로 기능은 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.`,
+                              [
+                                { text: '나중에', style: 'cancel' },
+                                { text: '플랜 보기', onPress: () => onNavigate?.('subscription') }
+                              ]
+                            );
+                            return;
+                          }
+                          setSelectedPolishOption('engaging');
+                        }}
+                      >
+                        <Icon 
+                          name="sparkles-outline" 
+                          size={18} 
+                          color={selectedPolishOption === 'engaging' ? colors.primary : (!canAccessPolishOption(userPlan, 'engaging') ? colors.text.tertiary : colors.text.secondary)} 
+                        />
+                        <Text style={[
+                          styles.polishOptionText,
+                          selectedPolishOption === 'engaging' && styles.polishOptionTextActive,
+                          !canAccessPolishOption(userPlan, 'engaging') && styles.lockedItemText
                         ]}>매력적으로</Text>
+                      </TouchableOpacity>
+                    </View>
+                    
+                    {/* 세 번째 줄: 3개 */}
+                    <View style={[styles.polishOptionButtons, { marginTop: SPACING.sm }]}>
+                      <TouchableOpacity 
+                        style={[
+                          styles.polishOptionButton,
+                          selectedPolishOption === 'hashtag' && styles.polishOptionButtonActive,
+                          !canAccessPolishOption(userPlan, 'hashtag') && styles.lockedItem
+                        ]}
+                        onPress={() => {
+                          if (!canAccessPolishOption(userPlan, 'hashtag')) {
+                            soundManager.playError();
+                            Alert.alert(
+                              '프리미엄 기능 🌟',
+                              `해시태그 추출 기능은 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.`,
+                              [
+                                { text: '나중에', style: 'cancel' },
+                                { text: '플랜 보기', onPress: () => onNavigate?.('subscription') }
+                              ]
+                            );
+                            return;
+                          }
+                          setSelectedPolishOption('hashtag');
+                        }}
+                      >
+                        <Icon 
+                          name="pricetag-outline" 
+                          size={18} 
+                          color={selectedPolishOption === 'hashtag' ? colors.primary : (!canAccessPolishOption(userPlan, 'hashtag') ? colors.text.tertiary : colors.text.secondary)} 
+                        />
+                        <Text style={[
+                          styles.polishOptionText,
+                          selectedPolishOption === 'hashtag' && styles.polishOptionTextActive,
+                          !canAccessPolishOption(userPlan, 'hashtag') && styles.lockedItemText
+                        ]}>해시태그 추출</Text>
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity 
+                        style={[
+                          styles.polishOptionButton,
+                          selectedPolishOption === 'emoji' && styles.polishOptionButtonActive,
+                          !canAccessPolishOption(userPlan, 'emoji') && styles.lockedItem
+                        ]}
+                        onPress={() => {
+                          if (!canAccessPolishOption(userPlan, 'emoji')) {
+                            soundManager.playError();
+                            Alert.alert(
+                              '프리미엄 기능 🌟',
+                              `이모지 추가 기능은 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.`,
+                              [
+                                { text: '나중에', style: 'cancel' },
+                                { text: '플랜 보기', onPress: () => onNavigate?.('subscription') }
+                              ]
+                            );
+                            return;
+                          }
+                          setSelectedPolishOption('emoji');
+                        }}
+                      >
+                        <Icon 
+                          name="happy" 
+                          size={18} 
+                          color={selectedPolishOption === 'emoji' ? colors.primary : (!canAccessPolishOption(userPlan, 'emoji') ? colors.text.tertiary : colors.text.secondary)} 
+                        />
+                        <Text style={[
+                          styles.polishOptionText,
+                          selectedPolishOption === 'emoji' && styles.polishOptionTextActive,
+                          !canAccessPolishOption(userPlan, 'emoji') && styles.lockedItemText
+                        ]}>이모지 추가</Text>
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity 
+                        style={[
+                          styles.polishOptionButton,
+                          selectedPolishOption === 'question' && styles.polishOptionButtonActive,
+                          !canAccessPolishOption(userPlan, 'question') && styles.lockedItem
+                        ]}
+                        onPress={() => {
+                          if (!canAccessPolishOption(userPlan, 'question')) {
+                            soundManager.playError();
+                            Alert.alert(
+                              '프리미엄 기능 🌟',
+                              `질문형 변환 기능은 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.`,
+                              [
+                                { text: '나중에', style: 'cancel' },
+                                { text: '플랜 보기', onPress: () => onNavigate?.('subscription') }
+                              ]
+                            );
+                            return;
+                          }
+                          setSelectedPolishOption('question');
+                        }}
+                      >
+                        <Icon 
+                          name="help-circle-outline" 
+                          size={18} 
+                          color={selectedPolishOption === 'question' ? colors.primary : (!canAccessPolishOption(userPlan, 'question') ? colors.text.tertiary : colors.text.secondary)} 
+                        />
+                        <Text style={[
+                          styles.polishOptionText,
+                          selectedPolishOption === 'question' && styles.polishOptionTextActive,
+                          !canAccessPolishOption(userPlan, 'question') && styles.lockedItemText
+                        ]}>질문형 변환</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
