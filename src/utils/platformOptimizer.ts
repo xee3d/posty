@@ -144,76 +144,25 @@ const transformToInstagram = (content: string, tone: string): string => {
     }
   }
   
-  // 줄바꿈을 활용한 시각적 구성 - 더 자연스럽고 감성적으로
+  // 줄바꿈을 활용한 시각적 구성
   if (transformed.length > 60) {
-    // 문장 단위로 분리
     const sentences = transformed.match(/[^\.!?]+[\.!?]+/g) || [transformed];
     
-    // 의미 단위로 자연스럽게 분리
     if (sentences.length >= 3) {
-      // 감정이나 시간 흐름에 따라 문단 나누기
-      const emotionalKeywords = ['그런데', '하지만', '그래서', '그러니까', '결국', '그리고', '그래도'];
-      const timeKeywords = ['오늘', '어제', '내일', '지금', '이제', '그때', '나중에'];
-      
-      let paragraphs = [];
+      const paragraphs = [];
       let currentParagraph = [];
       
       sentences.forEach((sentence, index) => {
         currentParagraph.push(sentence.trim());
         
-        // 다음 문장이 새로운 흐름을 시작하는지 확인
-        if (index < sentences.length - 1) {
-          const nextSentence = sentences[index + 1];
-          const hasEmotionalShift = emotionalKeywords.some(keyword => nextSentence.includes(keyword));
-          const hasTimeShift = timeKeywords.some(keyword => nextSentence.includes(keyword));
-          
-          // 감정 전환이나 시간 전환이 있으면 문단 나누기
-          if (hasEmotionalShift || hasTimeShift || currentParagraph.length >= 2) {
-            paragraphs.push(currentParagraph.join(' '));
-            currentParagraph = [];
-          }
+        if (currentParagraph.length >= 2 || index === sentences.length - 1) {
+          paragraphs.push(currentParagraph.join(' '));
+          currentParagraph = [];
         }
       });
       
-      // 마지막 문단 추가
-      if (currentParagraph.length > 0) {
-        paragraphs.push(currentParagraph.join(' '));
-      }
-      
-      // 문단이 너무 많으면 합치기
-      if (paragraphs.length > 3) {
-        const condensed = [];
-        for (let i = 0; i < paragraphs.length; i += 2) {
-          if (i + 1 < paragraphs.length) {
-            condensed.push(paragraphs[i] + ' ' + paragraphs[i + 1]);
-          } else {
-            condensed.push(paragraphs[i]);
-          }
-        }
-        paragraphs = condensed;
-      }
-      
-      transformed = paragraphs.join('\n\n');
-    } else if (transformed.length > 120) {
-      // 긴 문장은 의미 단위로 나누기
-      const breakPoints = ['하지만', '그런데', '그래서', '그리고', '또한', '게다가', '그러나'];
-      let bestBreakPoint = -1;
-      let bestBreakWord = '';
-      
-      // 가장 중간에 가까운 접속사 찾기
-      const midPoint = transformed.length / 2;
-      breakPoints.forEach(word => {
-        const index = transformed.indexOf(word);
-        if (index > 20 && Math.abs(index - midPoint) < Math.abs(bestBreakPoint - midPoint)) {
-          bestBreakPoint = index;
-          bestBreakWord = word;
-        }
-      });
-      
-      if (bestBreakPoint > 0) {
-        const firstPart = transformed.slice(0, bestBreakPoint).trim();
-        const secondPart = transformed.slice(bestBreakPoint).trim();
-        transformed = firstPart + '\n\n' + secondPart;
+      if (paragraphs.length > 1) {
+        transformed = paragraphs.join('\n\n');
       }
     }
   }
@@ -369,69 +318,24 @@ const transformToFacebook = (content: string, tone: string): string => {
     }
   }
   
-  // 문단 구분 추가 (긴 텍스트의 경우) - 의미 단위로 개선
+  // 문단 구분 추가 (긴 텍스트의 경우)
   if (transformed.length > 150) {
     const sentences = transformed.split(/(?<=[.!?])\s+/);
     
     if (sentences.length >= 4) {
-      // 의미 단위로 문단 나누기
-      const transitionWords = ['그런데', '하지만', '그래서', '그러나', '그리고', '또한', '한편', '결국', '드디어'];
-      const timeWords = ['오늘', '어제', '그때', '이제', '나중에', '처음', '마침내'];
-      
-      let paragraphs = [];
+      const paragraphs = [];
       let currentParagraph = [];
       
       sentences.forEach((sentence, index) => {
-        const trimmed = sentence.trim();
-        if (!trimmed) return;
+        currentParagraph.push(sentence.trim());
         
-        // 첫 문장은 무조건 추가
-        if (index === 0) {
-          currentParagraph.push(trimmed);
-          return;
-        }
-        
-        // 전환점 확인
-        const hasTransition = transitionWords.some(word => trimmed.startsWith(word));
-        const hasTimeShift = timeWords.some(word => trimmed.includes(word));
-        const isParagraphLong = currentParagraph.join(' ').length > 100;
-        
-        // 새 문단 시작 조건
-        if ((hasTransition || hasTimeShift || isParagraphLong) && currentParagraph.length > 0) {
+        if (currentParagraph.length >= 3 || index === sentences.length - 1) {
           paragraphs.push(currentParagraph.join(' '));
-          currentParagraph = [trimmed];
-        } else {
-          currentParagraph.push(trimmed);
+          currentParagraph = [];
         }
       });
       
-      // 마지막 문단 추가
-      if (currentParagraph.length > 0) {
-        paragraphs.push(currentParagraph.join(' '));
-      }
-      
-      // 너무 많은 문단은 합치기 (최대 4개)
-      while (paragraphs.length > 4) {
-        // 가장 짧은 문단을 찾아서 인접 문단과 합치기
-        let shortestIndex = 0;
-        let shortestLength = paragraphs[0].length;
-        
-        for (let i = 1; i < paragraphs.length - 1; i++) {
-          if (paragraphs[i].length < shortestLength) {
-            shortestIndex = i;
-            shortestLength = paragraphs[i].length;
-          }
-        }
-        
-        // 앞 문단과 합치기
-        if (shortestIndex > 0) {
-          paragraphs[shortestIndex - 1] += ' ' + paragraphs[shortestIndex];
-          paragraphs.splice(shortestIndex, 1);
-        }
-      }
-      
-      // 문단이 2개 미만이면 그대로 유지
-      if (paragraphs.length >= 2) {
+      if (paragraphs.length > 1) {
         transformed = paragraphs.join('\n\n');
       }
     }
@@ -585,6 +489,7 @@ const transformToTwitter = (content: string, tone: string): string => {
     if (twitterStyles[tone]) {
       transformed = twitterStyles[tone](transformed);
     }
+    
     
     // 트위터 특유의 마무리 (30% 확률로만 추가)
     const shouldAddEnding = Math.random() < 0.3;

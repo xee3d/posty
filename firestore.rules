@@ -22,9 +22,11 @@ service cloud.firestore {
       allow read: if isAuthenticated() && 
         (resource == null || resource.data.userId == request.auth.uid);
       allow create: if isAuthenticated() && 
-        request.resource.data.userId == request.auth.uid;
+        request.resource.data.userId == request.auth.uid &&
+        request.resource.data.keys().hasAll(['content', 'userId', 'createdAt']);
       allow update: if isAuthenticated() && 
-        resource.data.userId == request.auth.uid;
+        resource.data.userId == request.auth.uid &&
+        request.resource.data.userId == request.auth.uid;
       allow delete: if isAuthenticated() && 
         resource.data.userId == request.auth.uid;
     }
