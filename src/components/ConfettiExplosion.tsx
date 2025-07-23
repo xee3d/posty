@@ -33,13 +33,18 @@ interface ConfettiExplosionProps {
   isVisible: boolean;
   onAnimationEnd?: () => void;
   colors?: string[];
+  centerX?: number;
+  centerY?: number;
 }
 
 export const ConfettiExplosion: React.FC<ConfettiExplosionProps> = ({
   isVisible,
   onAnimationEnd,
   colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'],
+  centerX: propCenterX,
+  centerY: propCenterY,
 }) => {
+  console.log('[ConfettiExplosion] Rendering with isVisible:', isVisible);
   const particles = useRef<Particle[]>([]);
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
@@ -48,12 +53,12 @@ export const ConfettiExplosion: React.FC<ConfettiExplosionProps> = ({
   const createParticles = () => {
     const newParticles: Particle[] = [];
     const particleCount = 40; // View 성능을 위해 줄임
-    const centerX = SCREEN_WIDTH / 2;
-    const centerY = SCREEN_HEIGHT / 2;
+    const centerX = propCenterX || SCREEN_WIDTH / 2;
+    const centerY = propCenterY || SCREEN_HEIGHT / 3; // 모달 위치를 고려하여 상단으로 조정
 
     for (let i = 0; i < particleCount; i++) {
       const angle = (Math.PI * 2 * i) / particleCount;
-      const velocity = 5 + Math.random() * 10;
+      const velocity = 8 + Math.random() * 15; // 속도 증가
       
       newParticles.push({
         id: i,
@@ -62,7 +67,7 @@ export const ConfettiExplosion: React.FC<ConfettiExplosionProps> = ({
         vx: Math.cos(angle) * velocity,
         vy: Math.sin(angle) * velocity - 5, // 중력 효과
         color: colors[Math.floor(Math.random() * colors.length)],
-        size: 6 + Math.random() * 10,
+        size: 10 + Math.random() * 15, // 크기 증가
         shape: ['circle', 'star', 'square'][Math.floor(Math.random() * 3)] as any,
       });
     }
@@ -71,8 +76,10 @@ export const ConfettiExplosion: React.FC<ConfettiExplosionProps> = ({
   };
 
   useEffect(() => {
+    console.log('[ConfettiExplosion] useEffect triggered, isVisible:', isVisible);
     if (isVisible) {
       createParticles();
+      console.log('[ConfettiExplosion] Created', particles.current.length, 'particles');
       
       // 애니메이션 시작
       opacity.value = withSequence(
@@ -99,10 +106,13 @@ export const ConfettiExplosion: React.FC<ConfettiExplosionProps> = ({
     transform: [{ scale: scale.value }],
   }));
 
-  if (!isVisible) return null;
+  if (!isVisible) {
+    console.log('[ConfettiExplosion] Not visible, returning null');
+    return null;
+  }
 
   return (
-    <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
+    <View style={[StyleSheet.absoluteFillObject, { zIndex: 9999, backgroundColor: 'transparent' }]} pointerEvents="none">
       <Animated.View style={[StyleSheet.absoluteFillObject, containerStyle]}>
         {particles.current.map((particle) => (
           <ParticleComponent key={particle.id} particle={particle} />
@@ -121,13 +131,13 @@ const ParticleComponent: React.FC<{ particle: Particle }> = ({ particle }) => {
   const opacity = useSharedValue(1);
 
   useEffect(() => {
-    // 파티클 움직임
-    translateX.value = withTiming(particle.x + particle.vx * 50, {
+    // 파티클 움직임 - 더 멀리 퍼지도록
+    translateX.value = withTiming(particle.x + particle.vx * 80, {
       duration: 2000,
       easing: Easing.out(Easing.quad),
     });
     
-    translateY.value = withTiming(particle.y + particle.vy * 50 + 200, {
+    translateY.value = withTiming(particle.y + particle.vy * 80 + 150, {
       duration: 2000,
       easing: Easing.out(Easing.quad),
     });

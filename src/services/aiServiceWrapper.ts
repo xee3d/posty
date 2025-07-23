@@ -14,6 +14,7 @@ import { enhancePromptForPlatform, validateContentForPlatform } from '../utils/p
 import { store } from '../store';
 import { selectSubscriptionPlan } from '../store/slices/userSlice';
 import { SUBSCRIPTION_PLANS } from '../utils/adConfig';
+import { imageAnalysisCache } from '../utils/imageAnalysisCache';
 
 class AIServiceWrapper {
   // 사용자 구독 플랜 가져오기
@@ -178,6 +179,13 @@ class AIServiceWrapper {
         return this.getDefaultAnalysis();
       }
       
+      // 이미지 분석 캐시 확인
+      const cachedAnalysis = imageAnalysisCache.get(imageData);
+      if (cachedAnalysis) {
+        console.log('Using cached image analysis');
+        return cachedAnalysis;
+      }
+      
       // base64 형식인지 확인 (data:image로 시작하는지)
       const isBase64 = imageData.startsWith('data:image');
       
@@ -206,12 +214,17 @@ class AIServiceWrapper {
               !description.includes('목업') && 
               !description.includes('파스텔톤') &&
               !description.includes('이 사진 속')) {
-            return {
+            const analysis = {
               description,
               objects: this.extractObjects(description),
               mood: this.detectMood(description),
               suggestedContent: this.generateSuggestedContent(description),
             };
+            
+            // 캐시에 저장
+            imageAnalysisCache.set(imageData, analysis);
+            
+            return analysis;
           } else {
             console.log('Invalid or generic analysis, using smart default');
             return this.getSmartDefaultAnalysis();

@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Dimensions,
+  Platform,
+  Vibration,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -18,7 +20,7 @@ import Animated, {
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { soundManager } from '../utils/soundManager';
-import ConfettiExplosion from './ConfettiExplosion';
+import SimpleConfetti from './celebration/SimpleConfetti';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -46,8 +48,8 @@ export const PaymentSuccessModal: React.FC<PaymentSuccessModalProps> = ({
 
   React.useEffect(() => {
     if (visible) {
-      // 성공 사운드 재생
-      soundManager.playSuccess();
+      // 축하 사운드와 진동 재생
+      soundManager.playCelebration();
       
       // 모달 애니메이션
       scale.value = withSpring(1, {
@@ -88,9 +90,6 @@ export const PaymentSuccessModal: React.FC<PaymentSuccessModalProps> = ({
       onRequestClose={onClose}
     >
       <View style={styles.overlay}>
-        {/* 폭죽 애니메이션 */}
-        <ConfettiExplosion isVisible={visible} />
-        
         <Animated.View style={[styles.modalContainer, modalStyle]}>
           {/* 성공 아이콘 */}
           <Animated.View style={[styles.iconContainer, checkStyle]}>
@@ -125,12 +124,20 @@ export const PaymentSuccessModal: React.FC<PaymentSuccessModalProps> = ({
           {/* 확인 버튼 */}
           <TouchableOpacity 
             style={styles.confirmButton}
-            onPress={onClose}
+            onPress={() => {
+              soundManager.playTap();
+              onClose();
+            }}
             activeOpacity={0.8}
           >
             <Text style={styles.confirmButtonText}>확인</Text>
           </TouchableOpacity>
         </Animated.View>
+        
+        {/* 폭죽 애니메이션을 모달 위에 렌더링 */}
+        <View style={styles.confettiContainer}>
+          <SimpleConfetti isVisible={visible} />
+        </View>
       </View>
     </Modal>
   );
@@ -142,7 +149,12 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 9999,
+  },
+  confettiContainer: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: Platform.OS === 'ios' ? 100 : undefined,
+    elevation: Platform.OS === 'android' ? 100 : undefined,
+    pointerEvents: 'none' as 'none',
   },
   modalContainer: {
     width: SCREEN_WIDTH * 0.85,
@@ -155,6 +167,8 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     shadowOffset: { width: 0, height: 10 },
     shadowOpacity: 0.25,
     shadowRadius: 20,
+    zIndex: Platform.OS === 'ios' ? 1 : undefined,
+    elevation: Platform.OS === 'android' ? 5 : undefined,
   },
   iconContainer: {
     marginBottom: 20,
@@ -162,19 +176,19 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: colors.text,
+    color: colors.text.primary || colors.text,
     marginBottom: 10,
   },
   message: {
     fontSize: 16,
-    color: colors.subText,
+    color: colors.text.secondary || colors.subText,
     textAlign: 'center',
     marginBottom: 20,
     lineHeight: 24,
   },
   devModeText: {
     fontSize: 14,
-    color: colors.subText,
+    color: colors.text.secondary || colors.subText,
     textAlign: 'center',
     marginBottom: 15,
     fontStyle: 'italic',
@@ -191,7 +205,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   },
   benefitText: {
     fontSize: 14,
-    color: colors.text,
+    color: colors.text.primary || colors.text,
     marginLeft: 8,
   },
   confirmButton: {
@@ -200,9 +214,20 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     paddingVertical: 15,
     borderRadius: 25,
     minWidth: 150,
+    // 다크테마에서 버튼이 더 잘 보이도록 테두리 추가
+    borderWidth: isDark ? 1 : 0,
+    borderColor: isDark ? colors.primary : 'transparent',
+    // 그림자 효과 추가
+    ...(isDark ? {
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 5,
+    } : {}),
   },
   confirmButtonText: {
-    color: '#FFFFFF',
+    color: isDark ? colors.background : '#FFFFFF',
     fontSize: 16,
     fontWeight: 'bold',
     textAlign: 'center',

@@ -1396,6 +1396,14 @@ const createStyles = (colors: any, isDark: boolean) => {
       borderRadius: 10,
       marginTop: SPACING.medium,
       gap: 8,
+      // 다크테마에서 버튼이 더 잘 보이도록 개선
+      ...(isDark ? {
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 4,
+        elevation: 4,
+      } : {}),
     },
     cardPurchaseButtonDisabled: {
       borderWidth: 1,

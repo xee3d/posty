@@ -10,9 +10,11 @@ import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '../utils/constants';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { ScaleButton } from './AnimationComponents';
 import { launchSNSApp } from '../utils/snsLauncher';
+import { enhancedSNSLaunch } from '../utils/enhancedSNSLauncher';
 import { soundManager } from '../utils/soundManager';
 import missionService from '../services/missionService';
 import { Alert } from '../utils/customAlert';
+import { Share } from 'react-native';
 
 interface GeneratedContentProps {
   originalContent: string | any;
@@ -35,6 +37,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   const [showPlatformHint, setShowPlatformHint] = useState(false);
   const hintOpacity = useRef(new Animated.Value(0)).current;
   const [contentHeight, setContentHeight] = useState<number>(300); // 동적 높이 상태
+  const [showAllPlatforms, setShowAllPlatforms] = useState(false);
 
   // originalContent가 객체인 경우 처리
   const safeOriginalContent = typeof originalContent === 'string' 
@@ -80,7 +83,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     { id: 'original', name: '원본', icon: 'document-text-outline', color: colors.primary },
     { id: 'instagram', name: 'Instagram', icon: 'logo-instagram', color: '#E4405F' },
     { id: 'facebook', name: 'Facebook', icon: 'logo-facebook', color: '#1877F2' },
-    { id: 'twitter', name: 'X', icon: 'logo-twitter', color: '#000000' },
+    { id: 'twitter', name: 'X', icon: 'logo-twitter', color: isDark ? '#FFFFFF' : '#000000' },
   ];
 
   // 플랫폼별 콘텐츠 생성
@@ -201,10 +204,16 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
       
       soundManager.playCopy();
       
+      // 즉시 알림 표시 (타이밍 문제 해결)
+      const platformName = activePlatform === 'original' ? '원본' : 
+                         activePlatform === 'twitter' ? 'X' : 
+                         activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1);
+      
       Alert.alert(
-        '복사 완료! 📋',
-        `${activePlatform === 'original' ? '원본' : activePlatform.toUpperCase()} 버전이 클립보드에 복사되었습니다.`,
-        [{ text: '확인' }]
+        '📋 복사 완료!',
+        `${platformName} 버전이 클립보드에 복사되었습니다.\n\n원하는 앱에서 붙여넣기 하세요.`,
+        [{ text: '확인' }],
+        { cancelable: true }
       );
       
       setTimeout(() => {
@@ -219,32 +228,49 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
 
     soundManager.playTap();
 
-    // original 탭에서는 플랫폼 선택 모달 표시
+    // original 탭에서는 시스템 공유 시트 사용
     if (activePlatform === 'original') {
-      Alert.alert(
-        'SNS 선택',
-        '어느 SNS에 공유하시겠어요?',
-        [
-          { text: 'Instagram', onPress: () => launchSNSApp('instagram', content) },
-          { text: 'Facebook', onPress: () => launchSNSApp('facebook', content) },
-          { text: 'X(트위터)', onPress: () => launchSNSApp('twitter', content) },
-          { text: '취소', style: 'cancel' },
-        ]
-      );
+      try {
+        const result = await Share.share({
+          message: content,
+          title: 'Posty에서 생성한 콘텐츠',
+        });
+        
+        if (result.action === Share.sharedAction) {
+          // 미션 업데이트
+          const missionResult = await missionService.trackAction('share');
+          if (missionResult.rewardsEarned > 0) {
+            setTimeout(() => {
+              Alert.alert(
+                '미션 완료! 🎯',
+                `공유 미션을 완료하여 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`
+              );
+            }, 1000);
+          }
+        }
+      } catch (error) {
+        console.error('Share error:', error);
+      }
     } else {
-      // 특정 플랫폼 탭에서는 해당 앱 바로 실행
-      await launchSNSApp(activePlatform as any, content);
-    }
-    
-    // 미션 업데이트 (공유 액션)
-    const missionResult = await missionService.trackAction('share');
-    if (missionResult.rewardsEarned > 0) {
-      setTimeout(() => {
-        Alert.alert(
-          '미션 완료! 🎯',
-          `공유 미션을 완료하여 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`
-        );
-      }, 1000);
+      // 특정 플랫폼 탭에서는 향상된 공유 기능 사용
+      const success = await enhancedSNSLaunch({
+        platform: activePlatform as any,
+        content: content,
+        hashtags: platformContents[activePlatform]?.hashtags || []
+      });
+      
+      if (success) {
+        // 미션 업데이트
+        const missionResult = await missionService.trackAction('share');
+        if (missionResult.rewardsEarned > 0) {
+          setTimeout(() => {
+            Alert.alert(
+              '미션 완료! 🎯',
+              `공유 미션을 완료하여 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`
+            );
+          }, 1000);
+        }
+      }
     }
   };
 
@@ -385,7 +411,9 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
         >
           <Icon name="share-social-outline" size={20} color={colors.primary} />
           <Text style={[styles.actionButtonText, { color: colors.primary, marginLeft: 6 }]}>
-            {activePlatform === 'original' ? '공유' : `${activePlatform === 'twitter' ? 'X' : activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1)}`}
+            {activePlatform === 'original' ? '공유' : 
+             activePlatform === 'twitter' ? 'X에 바로 입력' : 
+             `${activePlatform.charAt(0).toUpperCase() + activePlatform.slice(1)}`}
           </Text>
         </ScaleButton>
 
@@ -399,6 +427,66 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
           </ScaleButton>
         )}
       </View>
+      
+      {/* 전체 플랫폼 모달 */}
+      {showAllPlatforms && (
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowAllPlatforms(false)}
+        >
+          <TouchableOpacity 
+            style={styles.modalContent}
+            activeOpacity={1}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>공유하기</Text>
+              <TouchableOpacity onPress={() => setShowAllPlatforms(false)}>
+                <Icon name="close" size={24} color={colors.text.primary} />
+              </TouchableOpacity>
+            </View>
+            
+            <View style={styles.platformGrid}>
+              {platforms.filter(p => p.id !== 'original').map((platform) => (
+                <TouchableOpacity
+                  key={platform.id}
+                  style={styles.platformGridItem}
+                  onPress={() => {
+                    setShowAllPlatforms(false);
+                    handleShareToSNS();
+                  }}
+                >
+                  <View style={[styles.platformIconLarge, { backgroundColor: platform.color }]}>
+                    <Icon name={platform.icon} size={28} color="#FFFFFF" />
+                  </View>
+                  <Text style={styles.platformLabel}>{platform.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+            
+            <TouchableOpacity
+              style={styles.systemShareButton}
+              onPress={() => {
+                setShowAllPlatforms(false);
+                Share.share({
+                  message: getCurrentContent(),
+                  title: 'Posty에서 생성한 콘텐츠',
+                });
+              }}
+            >
+              <Icon name="share-social-outline" size={24} color={colors.primary} />
+              <View style={styles.systemShareInfo}>
+                <Text style={styles.systemShareTitle}>더 많은 앱으로 공유</Text>
+                <Text style={styles.systemShareSubtitle}>
+                  WhatsApp, Telegram, 카카오톡, 이메일 등
+                </Text>
+              </View>
+              <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
+            </TouchableOpacity>
+          </TouchableOpacity>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -601,6 +689,92 @@ const createStyles = (colors: typeof COLORS, cardTheme: any, isDark: boolean) =>
       fontFamily: 'System',
       fontWeight: '600' as const,
       color: colors.text.primary,
+    },
+    modalOverlay: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      justifyContent: 'flex-end',
+    },
+    modalContent: {
+      backgroundColor: colors.surface,
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      paddingTop: 20,
+      paddingBottom: 40,
+      maxHeight: '80%',
+    },
+    modalHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      marginBottom: 20,
+    },
+    modalTitle: {
+      fontSize: 18,
+      fontFamily: 'System',
+      fontWeight: '600' as const,
+      color: colors.text.primary,
+    },
+    platformGrid: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      paddingHorizontal: 20,
+      justifyContent: 'space-around',
+    },
+    platformGridItem: {
+      alignItems: 'center',
+      marginBottom: 20,
+      width: '25%',
+      position: 'relative',
+    },
+    platformIconLarge: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
+    platformLabel: {
+      fontSize: 12,
+      fontFamily: 'System',
+      fontWeight: '500' as const,
+      color: colors.text.secondary,
+    },
+    favoriteIcon: {
+      position: 'absolute',
+      top: 0,
+      right: 10,
+    },
+    systemShareButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      paddingHorizontal: 20,
+      paddingVertical: 16,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    systemShareInfo: {
+      flex: 1,
+      marginLeft: 16,
+    },
+    systemShareTitle: {
+      fontSize: 15,
+      fontFamily: 'System',
+      fontWeight: '500' as const,
+      color: colors.text.primary,
+    },
+    systemShareSubtitle: {
+      fontSize: 13,
+      fontFamily: 'System',
+      fontWeight: '400' as const,
+      color: colors.text.tertiary,
+      marginTop: 2,
     },
   });
 

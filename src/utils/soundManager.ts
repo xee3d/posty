@@ -17,13 +17,13 @@ class SoundManager {
 
   private loadSounds() {
     // 사운드 파일들을 미리 로드
-    // 사운드 파일들을 미리 로드
     const soundFiles = {
       success: 'success.mp3',
       tap: 'tap.mp3',
       generate: 'generate.mp3',
       copy: 'copy.mp3',
       error: 'error.mp3',
+      celebration: 'celebration.mp3', // 폭죽/축하 사운드 추가
     };
 
     Object.entries(soundFiles).forEach(([key, filename]) => {
@@ -84,10 +84,24 @@ class SoundManager {
     this.haptic('light');
   }
 
-  // 성공 피드백
+  // 성공 피드백 (기존)
   playSuccess() {
     this.play('success');
     this.haptic('medium');
+  }
+  
+  // 축하 피드백 (새로 추가)
+  playCelebration() {
+    // celebration 사운드가 없으면 success 사운드 재생
+    if (this.sounds.celebration) {
+      this.play('celebration');
+    } else {
+      this.play('success');
+    }
+    // 축하 진동 패턴
+    if (this.isVibrationEnabled && Platform.OS !== 'web') {
+      Vibration.vibrate([0, 100, 50, 100, 50, 200]);
+    }
   }
 
   // 복사 피드백

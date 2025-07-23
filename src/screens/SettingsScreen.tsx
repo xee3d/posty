@@ -921,46 +921,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
 
         </View>
 
-        {/* 계정 연결 섹션 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>SNS 계정</Text>
-          {platformsData.map((platform) => (
-            <View key={platform.id} style={styles.platformItem}>
-              <View style={styles.platformLeft}>
-                <View style={[styles.platformIcon, { backgroundColor: platform.color }]}>
-                  <Icon 
-                  name={`logo-${platform.id}`} 
-                    size={20} 
-                  color="#FFFFFF" 
-                  />
-                </View>
-                <View style={styles.platformInfo}>
-                  <Text style={styles.platformName}>{platform.name}</Text>
-                  <Text style={styles.platformUsername}>{platform.username}</Text>
-                </View>
-              </View>
-              <TouchableOpacity
-                style={[
-                  styles.connectionButton,
-                  platform.connected && styles.connectedButton,
-                ]}
-                onPress={() => 
-                  platform.connected 
-                    ? handleDisconnectPlatform(platform.name)
-                    : handleConnectPlatform(platform.name)
-                }
-              >
-                <Text style={[
-                  styles.connectionButtonText,
-                  platform.connected && styles.connectedButtonText,
-                ]}>
-                  {platform.status}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-
         {/* 앱 설정 섹션 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>앱 설정</Text>

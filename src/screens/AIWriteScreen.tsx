@@ -460,11 +460,13 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
 
   const handleGenerate = async () => {
     if (!prompt.trim() && writeMode !== 'photo') {
+      soundManager.playError(); // 빈 입력 에러음
       Alert.alert('포스티 알림', '무엇에 대해 쓸지 알려주세요! 🤔');
       return;
     }
 
     if (writeMode === 'photo' && !selectedImage) {
+      soundManager.playError(); // 사진 없음 에러음
       Alert.alert('포스티 알림', '사진을 먼저 선택해주세요! 📸');
       return;
     }
@@ -472,9 +474,11 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     // 토큰 체크 - 플랜별 이미지 분석 토큰 적용
     const requiredTokens = writeMode === 'photo' ? getImageAnalysisTokens(userPlan) : 1;
     if (!checkTokenAvailability(requiredTokens)) {
+      soundManager.playError(); // 토큰 부족 에러음
       return;
     }
 
+    soundManager.playGenerate(); // AI 생성 시작음
     setIsGenerating(true);
     try {
       // 토큰 사용
@@ -563,6 +567,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       setGeneratedContent(result);
       console.log('[AIWriteScreen] generatedContent set, now releasing loading state');
       
+      soundManager.playSuccess(); // 생성 성공음
+      
       // 로딩 상태를 먼저 해제
       setIsGenerating(false);
       
@@ -605,6 +611,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       }
     } catch (error) {
       console.error('Generation error:', error);
+      soundManager.playError(); // 생성 실패음
       Alert.alert('포스티 알림', '앗! 뭔가 문제가 생겼어요. 다시 시도해주세요 🥺');
       // 에러 발생 시에만 로딩 해제
       setIsGenerating(false);
@@ -728,6 +735,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                 <ScaleButton
                   style={[styles.modeButton, writeMode === 'text' && styles.modeButtonActive]}
                   onPress={() => {
+                    soundManager.haptic('light'); // 모드 전환 햄틱
                     if (writeMode !== 'text') {
                       resetAllStates();
                     }
@@ -749,6 +757,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                 <ScaleButton
                   style={[styles.modeButton, writeMode === 'polish' && styles.modeButtonActive]}
                   onPress={() => {
+                    soundManager.haptic('light'); // 모드 전환 햄틱
                     if (writeMode !== 'polish') {
                       resetAllStates();
                     }
@@ -770,6 +779,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                 <ScaleButton
                   style={[styles.modeButton, writeMode === 'photo' && styles.modeButtonActive]}
                   onPress={() => {
+                    soundManager.haptic('light'); // 모드 전환 햄틱
                     if (writeMode !== 'photo') {
                       resetAllStates();
                     }
@@ -802,6 +812,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                     <TouchableOpacity
                       style={styles.refreshButton}
                       onPress={async () => {
+                        soundManager.playRefresh(); // 새로고침 사운드
                         console.log('[AIWriteScreen] Manual refresh triggered');
                         await loadTrendingData(true);
                         Alert.alert('트렌드 업데이트', '최신 트렌드를 불러왔어요!');
@@ -837,7 +848,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                           styles.hashtagChip,
                           trendingPrompts.includes(quickPrompt) && styles.hashtagChipActive
                         ]}
-                        onPress={() => handleQuickPrompt(quickPrompt)}
+                        onPress={() => {
+                          soundManager.haptic('light'); // 빠른 주제 선택 햄틱
+                          handleQuickPrompt(quickPrompt);
+                        }}
                       >
                         {trendingPrompts.includes(quickPrompt) && (
                           <Icon name="trending-up" size={12} color={colors.primary} style={{ marginRight: 4 }} />
@@ -1067,6 +1081,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                       ]}
                       onPress={() => {
                         if (!canAccessTone(userPlan, tone.id)) {
+                          soundManager.playError(); // 잠긴 톤 선택 시 에러음
                           Alert.alert(
                             '프리미엄 스타일 🌟',
                             `${tone.label} 스타일은 ${userPlan === 'free' ? 'Starter' : userPlan === 'starter' ? 'Premium' : 'Pro'} 플랜 이상에서 사용 가능해요.\n\n업그레이드하면 더 다양한 스타일로 글을 작성할 수 있어요!`,
@@ -1077,6 +1092,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                           );
                           return;
                         }
+                        soundManager.playTap(); // 톤 선택 사운드
                         setSelectedTone(tone.id);
                       }}
                       activeOpacity={0.7}
