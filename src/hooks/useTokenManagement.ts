@@ -63,9 +63,11 @@ export const useTokenManagement = ({ onNavigate }: UseTokenManagementProps = {})
 
   // 토큰 사용
   const consumeTokens = useCallback((amount: number, description: string) => {
-    console.log(`Consuming ${amount} tokens for: ${description}`);
+    console.log(`[TokenManagement] Consuming ${amount} tokens for: ${description}`);
+    console.log(`[TokenManagement] Current tokens before: ${currentTokens}`);
     dispatch(useTokens(amount));
-  }, [dispatch]);
+    console.log(`[TokenManagement] useTokens action dispatched`);
+  }, [dispatch, currentTokens]);
 
   // 토큰 추가 (보상)
   const handleEarnTokens = useCallback(async (tokens: number) => {

@@ -219,7 +219,7 @@ class ServerAIService {
       console.log('Estimated image size:', (imageBase64.length * 0.75 / 1024 / 1024).toFixed(2), 'MB');
       
       const requestBody = {
-        prompt: '사진을 보고 사진에 대한 설명을 한국어로 자연스럽게 작성해주세요. 사진 속 분위기, 배경, 주요 요소들을 포함해서 설명해주세요.',
+        prompt: '이 사진의 핵심만 간단히 설명해주세요. 무엇을, 어디서, 어떤 분위기인지 1-2문장으로.',
         image: imageBase64, // imageBase64 대신 image로 변경
         platform: 'instagram',
         tone: 'casual',

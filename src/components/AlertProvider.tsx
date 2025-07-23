@@ -18,10 +18,7 @@ export const AlertProvider = forwardRef((props: { children: React.ReactNode }, r
   const [visible, setVisible] = useState(false);
 
   useImperativeHandle(ref, () => {
-    if (__DEV__) {
-      console.log('AlertProvider useImperativeHandle called');
-    }
-    return {
+    const alertApi = {
       show: (config: AlertConfig) => {
         if (__DEV__) {
           console.log('AlertProvider.show called with:', {
@@ -38,6 +35,13 @@ export const AlertProvider = forwardRef((props: { children: React.ReactNode }, r
         setTimeout(() => setAlertConfig(null), 300);
       }
     };
+    
+    // AlertManager에 즉시 설정
+    setTimeout(() => {
+      AlertManager.setAlertRef(alertApi);
+    }, 0);
+    
+    return alertApi;
   }, []);
 
   const handleButtonPress = (onPress?: () => void) => {

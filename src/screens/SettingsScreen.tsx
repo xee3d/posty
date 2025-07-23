@@ -26,6 +26,7 @@ import { UserProfile } from '../types/achievement';
 import { cleanupFirestoreSubscription } from '../store/middleware/firestoreSyncMiddleware';
 import { Alert } from '../utils/customAlert';
 import AccountChangeSection from '../components/settings/AccountChangeSection';
+import OnboardingScreen from './OnboardingScreen';
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
@@ -67,6 +68,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
   const [showTrendSettings, setShowTrendSettings] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   
   // AI 토큰 및 통계
   const [stats, setStats] = useState({
@@ -815,6 +817,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   if (showTrendSettings) {
     return <TrendApiSettings onBack={() => setShowTrendSettings(false)} />;
   }
+  
+  if (showOnboarding) {
+    return <OnboardingScreen onComplete={() => setShowOnboarding(false)} />;
+  }
 
   if (loading) {
     return (
@@ -1029,7 +1035,60 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
           </View>
         </View>
 
-        {/* 데이터 관리 섹션 제거 */}
+        {/* 개발자 모드 섹션 - 개발 환경에서만 표시 */}
+        {__DEV__ && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>개발자 모드</Text>
+            
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => setShowOnboarding(true)}
+            >
+              <View style={styles.menuItemLeft}>
+                <Icon name="school-outline" size={20} color={colors.text.secondary} />
+                <Text style={styles.menuItemLabel}>온보딩 미리보기</Text>
+              </View>
+              <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={async () => {
+                Alert.alert(
+                  '온보딩 초기화',
+                  '온보딩 상태를 초기화하시겠습니까? 앱을 다시 시작하면 온보딩이 표시됩니다.',
+                  [
+                    { text: '취소', style: 'cancel' },
+                    { 
+                      text: '초기화', 
+                      onPress: async () => {
+                        await AsyncStorage.removeItem('@posty_onboarding_complete');
+                        Alert.alert('완료', '온보딩이 초기화되었습니다. 앱을 다시 시작하세요.');
+                      }
+                    }
+                  ]
+                );
+              }}
+            >
+              <View style={styles.menuItemLeft}>
+                <Icon name="refresh-outline" size={20} color={colors.text.secondary} />
+                <Text style={styles.menuItemLabel}>온보딩 상태 초기화</Text>
+              </View>
+              <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => setShowFirebaseTest(true)}
+            >
+              <View style={styles.menuItemLeft}>
+                <Icon name="flask-outline" size={20} color={colors.text.secondary} />
+                <Text style={styles.menuItemLabel}>Firebase 테스트</Text>
+              </View>
+              <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
+            </TouchableOpacity>
+          </View>
+        )}
 
         {/* 기타 메뉴 */}
         <View style={styles.section}>

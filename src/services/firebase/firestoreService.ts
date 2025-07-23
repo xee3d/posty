@@ -297,16 +297,24 @@ class FirestoreService {
     const userId = this.auth.currentUser?.uid;
     if (!userId) throw new Error('User not authenticated');
 
-    try {
-      const docRef = await addDoc(this.collections.posts, {
-        ...postData,
-        userId,
-        createdAt: serverTimestamp(),
-        status: 'draft',
-      });
+    const dataToSave = {
+      ...postData,
+      userId,
+      createdAt: serverTimestamp(),
+      status: 'draft',
+    };
+    
+    console.log('[FirestoreService] Saving post with data:', JSON.stringify({
+      ...dataToSave,
+      createdAt: 'serverTimestamp()', // 로깅용
+    }, null, 2));
 
-      // 토큰 차감
-      await this.updateTokens(-1, 'Content generation');
+    try {
+      const docRef = await addDoc(this.collections.posts, dataToSave);
+
+      // 토큰 차감은 AIWriteScreen에서 이미 처리됨
+      // 중복 차감 방지를 위해 여기서는 처리하지 않음
+      console.log('[FirestoreService] Token deduction already handled in AIWriteScreen');
 
       return docRef.id;
     } catch (error) {
@@ -437,6 +445,8 @@ class FirestoreService {
   async updateTokens(amount: number, description: string): Promise<void> {
     const userId = this.auth.currentUser?.uid;
     if (!userId) throw new Error('User not authenticated');
+
+    console.log('[FirestoreService] updateTokens called - userId:', userId, 'amount:', amount);
 
     try {
       await runTransaction(this.db, async (transaction) => {

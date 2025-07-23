@@ -270,6 +270,10 @@ const userSlice = createSlice({
     
     // 토큰 사용 - 최적화: 토큰 히스토리 관리 개선
     useTokens: (state, action: PayloadAction<number>) => {
+      console.log('[UserSlice] useTokens called with amount:', action.payload);
+      console.log('[UserSlice] Current plan:', state.subscriptionPlan);
+      console.log('[UserSlice] Current tokens before:', state.currentTokens);
+      
       // PRO 플랜은 무제한이므로 토큰 차감 안함
       if (state.subscriptionPlan === 'pro') {
         // 히스토리만 추가
@@ -289,6 +293,7 @@ const userSlice = createSlice({
       if (state.currentTokens >= amount) {
         state.currentTokens -= amount;
         state.tokens.current = state.currentTokens;
+        console.log('[UserSlice] Tokens deducted. New balance:', state.currentTokens);
         
         // 무료 토큰부터 차감
         if (state.freeTokens >= amount) {
@@ -310,6 +315,8 @@ const userSlice = createSlice({
         };
         
         state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
+      } else {
+        console.log('[UserSlice] Not enough tokens! Required:', amount, 'Available:', state.currentTokens);
       }
     },
     
@@ -339,7 +346,7 @@ const userSlice = createSlice({
       
       if (state.lastTokenResetDate !== today) {
         if (state.subscriptionPlan === 'free') {
-          // 무료: 매일 10개 충전
+          // 무료: 매일 10개로 리셋 (구매한 토큰 포함)
           state.freeTokens = 10;
           state.currentTokens = state.purchasedTokens + 10;
           

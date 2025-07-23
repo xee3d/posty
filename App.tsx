@@ -8,6 +8,8 @@ import {
   Dimensions,
   ActivityIndicator,
   InteractionManager,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 import Animated, {
   useSharedValue,
@@ -61,6 +63,8 @@ import { restoreTokenData, setupTokenPersistence, checkDailyResetAfterRestore } 
 import { fixTokenInconsistency } from './src/utils/tokenFix';
 import { AlertProvider } from './src/components/AlertProvider';
 import { AlertManager } from './src/components/CustomAlert';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import OnboardingScreen from './src/screens/OnboardingScreen';
 
 const { width } = Dimensions.get('window');
 
@@ -88,6 +92,8 @@ const App: React.FC = () => {
   const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const [showSplash, setShowSplash] = useState(true);
   const alertRef = useRef<any>(null);
+  const [needsOnboarding, setNeedsOnboarding] = useState(true);
+  const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
   
   // Reanimated shared values
   const opacity = useSharedValue(1);
@@ -96,25 +102,56 @@ const App: React.FC = () => {
 
   // 앱 초기화 시 네이티브 스플래시 스크린 숨기기
   useEffect(() => {
+    console.log('[App] Hiding splash screen');
     SplashScreen.hide();
   }, []);
 
-  // AlertManager ref 설정 - 스플래시 스크린이 숨겨진 후에만 실행
+  // 온보딩 상태 체크
   useEffect(() => {
+    console.log('[App] showSplash:', showSplash);
     if (!showSplash) {
-      // 약간의 지연을 주어 ref가 확실히 설정되도록 함
-      const timer = setTimeout(() => {
-        if (alertRef.current) {
-          if (__DEV__) {
-            console.log('Setting AlertManager ref');
-          }
-          AlertManager.setAlertRef(alertRef.current);
-        } else {
-          console.error('AlertRef is still null after timeout');
-        }
-      }, 100);
+      console.log('[App] Starting onboarding check');
+      checkOnboardingStatus();
+    }
+  }, [showSplash]);
+
+  const checkOnboardingStatus = async () => {
+    console.log('[Onboarding] Checking status...');
+    try {
+      // 실제 온보딩 상태 확인
+      const onboardingComplete = await AsyncStorage.getItem('@posty_onboarding_complete');
+      const shouldShowOnboarding = !onboardingComplete;
+      console.log('[Onboarding] Status:', { onboardingComplete, shouldShowOnboarding });
+      setNeedsOnboarding(shouldShowOnboarding);
+    } catch (error) {
+      console.error('[Onboarding] Failed to check status:', error);
+      setNeedsOnboarding(true);
+    } finally {
+      console.log('[Onboarding] Check complete, isCheckingOnboarding = false');
+      setIsCheckingOnboarding(false);
+    }
+  };
+
+  // 온보딩 완료 핸들러
+  const handleOnboardingComplete = async () => {
+    try {
+      // 온보딩 완료 표시 저장
+      await AsyncStorage.setItem('@posty_onboarding_complete', 'true');
+      setNeedsOnboarding(false);
       
-      return () => clearTimeout(timer);
+      // 로그인 화면으로 이동
+      setActiveTab('login');
+    } catch (error) {
+      console.error('Failed to save onboarding status:', error);
+    }
+  };
+
+  // AlertManager ref 설정 - 제거 (ref 콜백에서 처리)
+
+  // AlertProvider가 마운트된 후 ref 다시 설정
+  useEffect(() => {
+    if (!showSplash && alertRef.current) {
+      AlertManager.setAlertRef(alertRef.current);
     }
   }, [showSplash]);
   
@@ -343,7 +380,11 @@ const App: React.FC = () => {
 
   // renderScreen을 useMemo로 최적화
   const renderScreen = useMemo(() => {
-    if (isCheckingAuth) {
+    console.log('[Render] Screen render:', { isCheckingOnboarding, needsOnboarding, activeTab });
+    
+    // 온보딩 상태 체크 중
+    if (isCheckingOnboarding) {
+      console.log('[Render] Showing loading screen (checking onboarding)');
       return (
         <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
           <ActivityIndicator size="large" color={colors.primary} />
@@ -351,11 +392,33 @@ const App: React.FC = () => {
       );
     }
 
+    // 온보딩이 필요한 경우
+    if (needsOnboarding) {
+      console.log('[Render] Showing onboarding screen');
+      return (
+        <OnboardingScreen 
+          onComplete={handleOnboardingComplete}
+        />
+      );
+    }
+
+    if (isCheckingAuth) {
+      console.log('[Render] Showing auth loading screen');
+      return (
+        <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      );
+    }
+
+    console.log('[Render] Rendering main screen - activeTab:', activeTab);
+    
     // 각 스크린에 key prop 최적화
     const screenKey = `${activeTab}-${photoMode ? 'photo' : 'text'}`;
 
     switch (activeTab) {
       case 'login':
+        console.log('[Render] Showing LoginScreen');
         return <LoginScreen key="login" onNavigate={handleTabPress} />;
       case 'home':
         return <HomeScreen key="home" onNavigate={handleTabPress} />;
@@ -407,17 +470,23 @@ const App: React.FC = () => {
       default:
         return <HomeScreen key="home" onNavigate={handleTabPress} />;
     }
-  }, [activeTab, isCheckingAuth, colors.background, colors.primary, handleTabPress, 
-      navigationData, photoMode, styles]);
+  }, [activeTab, isCheckingAuth, isCheckingOnboarding, needsOnboarding, colors.background, colors.primary, handleTabPress, 
+      navigationData, photoMode, styles, handleOnboardingComplete]);
 
   // 애니메이션 스플래시 스크린을 표시
   if (showSplash) {
+    console.log('[App] Showing animated splash screen');
     return (
       <AnimatedSplashScreen 
-        onAnimationComplete={() => setShowSplash(false)} 
+        onAnimationComplete={() => {
+          console.log('[App] Splash animation complete');
+          setShowSplash(false);
+        }} 
       />
     );
   }
+
+  console.log('[App] Main render - showSplash:', showSplash, 'needsOnboarding:', needsOnboarding);
 
   return (
     <Provider store={store}>
@@ -429,7 +498,12 @@ const App: React.FC = () => {
         } 
         persistor={persistor}
       >
-        <AlertProvider ref={alertRef}>
+        <AlertProvider ref={(ref) => {
+          alertRef.current = ref;
+          if (ref) {
+            AlertManager.setAlertRef(ref);
+          }
+        }}>
           <View style={styles.container}>
             <StatusBar 
               backgroundColor={colors.surface} 
@@ -438,13 +512,13 @@ const App: React.FC = () => {
             <Animated.View style={[styles.content, animatedStyle]}>
               {renderScreen}
             </Animated.View>
-            {activeTab !== 'login' && (
+            {activeTab !== 'login' && !needsOnboarding && (
               <TabNavigator 
                 activeTab={activeTab} 
                 onTabPress={handleTabPress} 
               />
             )}
-            {activeTab !== 'login' && (
+            {activeTab !== 'login' && !needsOnboarding && (
               <AchievementNotification 
                 onNavigateToProfile={() => handleTabPress('profile')} 
               />

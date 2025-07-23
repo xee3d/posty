@@ -31,6 +31,7 @@ import { APP_TEXT, getText } from '../utils/textConstants';
 import { soundManager } from '../utils/soundManager';
 import trendService from '../services/trendService';
 import { Alert } from '../utils/customAlert';
+import { imageAnalysisCache } from '../utils/imageAnalysisCache';
 import { getPlaceholderText, getTimeBasedPrompts, getCategoryFromTone, extractHashtags } from '../utils/promptUtils';
 import {
   launchImageLibrary,
@@ -127,6 +128,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   const [initialHashtagsList, setInitialHashtagsList] = useState<string[]>(initialHashtags || []);
   const [imageAnalysis, setImageAnalysis] = useState<string>('');
   const [imageAnalysisResult, setImageAnalysisResult] = useState<any>(null);
+  const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
   const [trendingHashtags, setTrendingHashtags] = useState<string[]>([]);
   const [selectedHashtags, setSelectedHashtags] = useState<string[]>([]);
   const [trendingPrompts, setTrendingPrompts] = useState<string[]>([]);
@@ -335,7 +337,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
 
   const analyzeImageImmediately = async (imageUrl: string) => {
     try {
-      setImageAnalysis('이미지를 분석하는 중...');
+      console.log('[AIWriteScreen] Starting image analysis...');
+      setIsAnalyzingImage(true);
+      setImageAnalysis(''); // 분석 중일 때는 빈 문자열로 설정
       
       // 이미지 크기 체크
       if (imageUrl.startsWith('data:image')) {
@@ -345,6 +349,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         if (sizeInMB > 4) {
           Alert.alert('알림', '이미지가 너무 큽니다. 더 작은 이미지를 선택해주세요.');
           setImageAnalysis('이미지가 너무 큽니다.');
+          setIsAnalyzingImage(false);
           return null;
         }
       }
@@ -354,23 +359,31 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       });
       
       console.log('Image analysis completed:', analysis);
+      console.log('[AIWriteScreen] Analysis result:', typeof analysis, analysis);
       
       // 분석 결과 검증
-      if (analysis && analysis.description && analysis.description.length > 20) {
-        setImageAnalysis(analysis.description);
-        setImageAnalysisResult(analysis);
-        
-        // 추천 해시태그 설정
-        if (analysis.suggestedContent && analysis.suggestedContent.length > 0) {
-          const hashtags = analysis.suggestedContent.map(content => 
-            content.replace(/\s+/g, '')
-          ).slice(0, 3);
-          setSelectedHashtags(hashtags);
+      console.log('[AIWriteScreen] Checking analysis:', analysis);
+      
+      // aiServiceWrapper는 객체를 반환하므로 객체 처리도 추가
+      if (analysis) {
+        if (typeof analysis === 'string' && analysis.length > 5) {
+          // 문자열인 경우
+          setImageAnalysis(analysis);
+          setImageAnalysisResult({ description: analysis });
+        } else if (typeof analysis === 'object' && analysis.description) {
+          // 객체인 경우
+          setImageAnalysis(analysis.description);
+          setImageAnalysisResult(analysis);
+        } else {
+          console.log('[AIWriteScreen] Invalid analysis format');
+          setImageAnalysis('사진 분석에 실패했습니다. 다시 시도해주세요.');
         }
       } else {
+        console.log('[AIWriteScreen] Analysis is null or undefined');
         setImageAnalysis('사진 분석에 실패했습니다. 다시 시도해주세요.');
       }
       
+      setIsAnalyzingImage(false);
       return analysis;
     } catch (error) {
       console.error('Image analysis failed:', error);
@@ -387,11 +400,15 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       setImageAnalysis(fallbackAnalysis.description);
       setImageAnalysisResult(fallbackAnalysis);
       
-      return fallbackAnalysis;
+      setIsAnalyzingImage(false);
+      return fallbackAnalysis.description;
+    } finally {
+      setIsAnalyzingImage(false);
     }
   };
 
   const openImageLibrary = () => {
+    console.log('[AIWriteScreen] Opening image library...');
     const options: ImageLibraryOptions = {
       mediaType: 'photo',
       includeBase64: true,
@@ -401,6 +418,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     };
 
     launchImageLibrary(options, (response: ImagePickerResponse) => {
+      console.log('[AIWriteScreen] Image picker response:', { 
+        didCancel: response.didCancel,
+        hasError: !!response.errorMessage,
+        hasAssets: !!(response.assets && response.assets[0])
+      });
+      
       if (response.didCancel) {
         console.log('사용자가 이미지 선택을 취소했습니다');
       } else if (response.errorMessage) {
@@ -408,15 +431,28 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         Alert.alert('오류', '이미지를 선택하는 중 문제가 발생했습니다.');
       } else if (response.assets && response.assets[0]) {
         const asset = response.assets[0];
+        console.log('[AIWriteScreen] Selected asset:', { 
+          hasUri: !!asset.uri,
+          hasBase64: !!asset.base64 
+        });
+        
         if (asset.uri) {
+          // 새 이미지 선택 시 이전 분석 결과 즉시 초기화
+          console.log('[AIWriteScreen] Clearing previous analysis...');
+          setImageAnalysisResult(null);
+          setImageAnalysis('');
+          imageAnalysisCache.clear(); // 캐시도 클리어
+          
           setSelectedImageUri(asset.uri);
           
           if (asset.base64) {
             const base64Url = `data:image/jpeg;base64,${asset.base64}`;
             setSelectedImage(base64Url);
+            console.log('[AIWriteScreen] Starting analysis with base64...');
             analyzeImageImmediately(base64Url);
           } else {
             setSelectedImage(asset.uri);
+            console.log('[AIWriteScreen] Starting analysis with URI...');
             analyzeImageImmediately(asset.uri);
           }
         }
@@ -425,6 +461,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   };
 
   const openCamera = () => {
+    console.log('[AIWriteScreen] Opening camera...');
     const options: CameraOptions = {
       mediaType: 'photo',
       includeBase64: true,
@@ -435,6 +472,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
     };
 
     launchCamera(options, (response: ImagePickerResponse) => {
+      console.log('[AIWriteScreen] Camera response:', { 
+        didCancel: response.didCancel,
+        hasError: !!response.errorMessage,
+        hasAssets: !!(response.assets && response.assets[0])
+      });
+      
       if (response.didCancel) {
         console.log('사용자가 카메라 촬영을 취소했습니다');
       } else if (response.errorMessage) {
@@ -442,15 +485,28 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         Alert.alert('오류', '카메라를 사용하는 중 문제가 발생했습니다.');
       } else if (response.assets && response.assets[0]) {
         const asset = response.assets[0];
+        console.log('[AIWriteScreen] Camera asset:', { 
+          hasUri: !!asset.uri,
+          hasBase64: !!asset.base64 
+        });
+        
         if (asset.uri) {
+          // 새 이미지 선택 시 이전 분석 결과 즉시 초기화
+          console.log('[AIWriteScreen] Clearing previous analysis...');
+          setImageAnalysisResult(null);
+          setImageAnalysis('');
+          imageAnalysisCache.clear(); // 캐시도 클리어
+          
           setSelectedImageUri(asset.uri);
           
           if (asset.base64) {
             const base64Url = `data:image/jpeg;base64,${asset.base64}`;
             setSelectedImage(base64Url);
+            console.log('[AIWriteScreen] Starting analysis with base64...');
             analyzeImageImmediately(base64Url);
           } else {
             setSelectedImage(asset.uri);
+            console.log('[AIWriteScreen] Starting analysis with URI...');
             analyzeImageImmediately(asset.uri);
           }
         }
@@ -526,29 +582,30 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         // 사진 분석 결과를 기반으로 콘텐츠 생성
         let photoPrompt = '';
         
-        if (imageAnalysisResult && imageAnalysisResult.description) {
-          // 분석 결과가 있으면 사용
-          photoPrompt = `사진: ${imageAnalysisResult.description}\n\n`;
-          
-          // 분위기 추가
-          if (imageAnalysisResult.mood) {
-            const moodText = imageAnalysisResult.mood === 'positive' ? '긍정적이고 밝은' :
-                           imageAnalysisResult.mood === 'negative' ? '차분하고 여운적인' : '평온한';
-            photoPrompt += `분위기: ${moodText}\n`;
-          }
-          
-          // 사용자 입력이 있으면 추가
+        // 분석 중이거나 분석 결과가 없는 경우 체크
+        if (isAnalyzingImage) {
+          Alert.alert('포스티 알림', '사진 분석이 완료될 때까지 기다려주세요.');
+          setIsGenerating(false);
+          return;
+        }
+        
+        if (!imageAnalysis || imageAnalysis.trim() === '') {
+          Alert.alert('포스티 알림', '사진 분석을 먼저 완료해주세요.');
+          setIsGenerating(false);
+          return;
+        }
+        
+        // 더 자연스러운 프롬프트 구성
+        if (imageAnalysis && imageAnalysis !== '이미지를 분석하는 중...') {
+          // 사용자 입력이 있으면 자연스럽게 연결
           if (prompt.trim()) {
-            photoPrompt += `\n추가 요청: ${prompt.trim()}\n`;
+            photoPrompt = `${imageAnalysis} 이 사진과 함께 "${prompt.trim()}"이라는 내용을 포함해서 SNS 글을 작성해주세요.`;
+          } else {
+            photoPrompt = `${imageAnalysis} 이 순간을 SNS에 공유할 자연스러운 글을 작성해주세요.`;
           }
-          
-          photoPrompt += '\n위 사진에 어울리는 매력적인 SNS 글을 작성해주세요.';
         } else {
           // 분석 결과가 없으면 기본 프롬프트
-          photoPrompt = imageAnalysis || '사진을 보고 SNS에 올릴 매력적인 글을 작성해주세요.';
-          if (prompt.trim()) {
-            photoPrompt += `\n\n특히 다음 내용을 포함해주세요: ${prompt.trim()}`;
-          }
+          photoPrompt = prompt.trim() || '사진과 어울리는 자연스러운 SNS 글을 작성해주세요.';
         }
         
         console.log('Generating photo content with prompt:', photoPrompt);
@@ -1018,7 +1075,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                         <TouchableOpacity 
                         style={styles.changePhotoButton}
                         onPress={() => {
+                          // 이전 분석 결과만 초기화 (이미지는 유지)
                           setImageAnalysisResult(null);
+                          setImageAnalysis('');
+                          // 캐시 클리어하여 새로운 분석 강제
+                          imageAnalysisCache.clear();
+                          console.log('[AIWriteScreen] Cache cleared for new analysis');
                           handleSelectImage();
                         }}
                       >
@@ -1041,15 +1103,21 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                     )}
                   </ScaleButton>
 
-                  {/* 몰리의 분석 */}
-                  {imageAnalysis && (
+                  {/* 사진 분석 결과 - 더 간결하게 */}
+                  {(imageAnalysis || isAnalyzingImage) && (
                     <FadeInView delay={300}>
                       <View style={styles.analysisCard}>
-                        <View style={styles.analysisHeader}>
-                          <Icon name="sparkles" size={20} color="#7C3AED" />
-                          <Text style={styles.analysisTitle}>포스티가 본 사진</Text>
-                        </View>
-                        <Text style={styles.analysisText}>{imageAnalysis}</Text>
+                        <Text style={styles.analysisText}>
+                          {isAnalyzingImage ? (
+                            <>
+                              <ActivityIndicator size="small" color="#7C3AED" /> 사진을 분석하는 중...
+                            </>
+                          ) : (
+                            <>
+                              <Icon name="sparkles" size={14} color="#7C3AED" /> {imageAnalysis}
+                            </>
+                          )}
+                        </Text>
                       </View>
                     </FadeInView>
                   )}
@@ -1206,10 +1274,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                 style={[
                   styles.generateButton, 
                   isGenerating && styles.generateButtonDisabled,
-                  (currentTokens === 0 || (writeMode === 'photo' && currentTokens === 1)) && styles.generateButtonNoToken
+                  (currentTokens === 0 || (writeMode === 'photo' && currentTokens < getImageAnalysisTokens(userPlan))) && styles.generateButtonNoToken
                 ]}
                 onPress={handleGenerate}
-                disabled={currentTokens === 0 || (writeMode === 'photo' && currentTokens === 1)}
+                disabled={currentTokens === 0 || (writeMode === 'photo' && currentTokens < getImageAnalysisTokens(userPlan)) || (writeMode === 'photo' && isAnalyzingImage)}
               >
                 <View style={styles.generateButtonContent}>
                   <View style={styles.generateButtonMain}>
@@ -1219,38 +1287,24 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                       <Icon 
                         name="sparkles" 
                         size={20} 
-                        color={(currentTokens === 0 || (writeMode === 'photo' && currentTokens === 1)) ? colors.text.tertiary : "#FFFFFF"} 
+                        color={(currentTokens === 0 || (writeMode === 'photo' && currentTokens < getImageAnalysisTokens(userPlan))) ? colors.text.tertiary : "#FFFFFF"} 
                       />
                     )}
                     <Text style={[
                       styles.generateButtonText,
-                      (currentTokens === 0 || (writeMode === 'photo' && currentTokens === 1)) && styles.generateButtonTextDisabled
+                      (currentTokens === 0 || (writeMode === 'photo' && currentTokens < getImageAnalysisTokens(userPlan))) && styles.generateButtonTextDisabled
                     ]}>
-                      {isGenerating ? '포스티가 쓰는 중...' : '포스티에게 부탁하기'}
+                      {isGenerating ? '포스티가 쓰는 중...' : (writeMode === 'photo' && isAnalyzingImage) ? '사진 분석 중...' : '포스티에게 부탁하기'}
                     </Text>
+                    {!isGenerating && currentTokens > 0 && !(writeMode === 'photo' && currentTokens < getImageAnalysisTokens(userPlan)) && (
+                      <View style={styles.tokenBadgeInButton}>
+                        <Icon name="flash" size={14} color="#FFFFFF" />
+                        <Text style={styles.tokenTextInButton}>
+                          {writeMode === 'photo' ? getImageAnalysisTokens(userPlan).toString() : '1'}
+                        </Text>
+                      </View>
+                    )}
                   </View>
-                  {!isGenerating && currentTokens > 0 && !(writeMode === 'photo' && currentTokens === 1) && (
-                    <View style={styles.tokenCostBadge}>
-                      <Icon name="flash" size={14} color="#FFFFFF" />
-                      <Text style={styles.tokenCostText}>
-                        {writeMode === 'photo' ? '2' : '1'}
-                      </Text>
-                    </View>
-                  )}
-                  {writeMode === 'photo' && userPlan !== 'pro' && (
-                    <View style={styles.tokenRequiredBadge}>
-                      <Icon name="flash" size={12} color={colors.primary} />
-                      <Text style={styles.tokenRequiredText}>
-                        {getImageAnalysisTokens(userPlan)} 토큰
-                      </Text>
-                    </View>
-                  )}
-                  {!isGenerating && (currentTokens === 0 || (writeMode === 'photo' && currentTokens === 1)) && (
-                    <View style={[styles.tokenCostBadge, styles.tokenCostBadgeEmpty]}>
-                      <Icon name="flash-off" size={14} color={colors.text.tertiary} />
-                      <Text style={[styles.tokenCostText, styles.tokenCostTextEmpty]}>0</Text>
-                    </View>
-                  )}
                 </View>
               </ScaleButton>
               {currentTokens === 0 && (
@@ -1535,6 +1589,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: isDark ? 0 : 0.03,
+    aspectRatio: 1, // 1:1 정사각형 비율 추가
     shadowRadius: 4,
   },
   uploadPlaceholder: {
@@ -1584,11 +1639,16 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
   },
   selectedImageContainer: {
     position: 'relative',
+    width: '100%',
+    aspectRatio: 1, // 1:1 정사각형 비율
+    backgroundColor: isDark ? '#000000' : '#F5F5F5',
+    borderRadius: 20, // photoUploadArea와 동일한 둥근 모서리
+    overflow: 'hidden', // 둥근 모서리 밖으로 이미지가 나가지 않도록
   },
   selectedImage: {
     width: '100%',
-    height: 200,
-    resizeMode: 'cover',
+    height: '100%',
+    resizeMode: 'cover', // 정사각형에 맞춰 크롭
   },
   changePhotoButton: {
     position: 'absolute',
@@ -1608,11 +1668,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     fontWeight: '500',
   },
   analysisCard: {
-    backgroundColor: isDark ? colors.primary + '20' : '#F3E8FF',
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 16,
-    borderWidth: 1,
+    backgroundColor: isDark ? colors.surface : colors.lightGray,
+    borderRadius: 12,
+    padding: 12,
+    marginTop: 12,
+    borderWidth: 0,
     borderColor: colors.primary + '20',
   },
   analysisHeader: {
@@ -1627,9 +1687,10 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     color: colors.primary,
   },
   analysisText: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    lineHeight: 20,
+    fontSize: 13,
+    color: colors.text.tertiary,
+    lineHeight: 18,
+    fontStyle: 'italic',
   },
   optionSection: {
     paddingHorizontal: SPACING.lg,
@@ -1930,6 +1991,21 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, isDar
     fontSize: 13,
     fontWeight: '700',
     color: colors.white,
+  },
+  tokenBadgeInButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 10,
+    marginLeft: 8,
+    gap: 2,
+  },
+  tokenTextInButton: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
   },
   generateButtonNoToken: {
     backgroundColor: isDark ? '#2C2C2E' : '#F5F5F5',

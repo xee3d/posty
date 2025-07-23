@@ -406,6 +406,9 @@ const FirebaseTestScreen: React.FC<FirebaseTestScreenProps> = ({ onNavigate }) =
           <Icon name="cloud-off" size={20} color={colors.text.secondary} />
           <Text style={styles.offlineText}>오프라인 지원 활성화</Text>
         </TouchableOpacity>
+        
+        {/* 하단 여백 추가 */}
+        <View style={{ height: SPACING.xxl * 2 }} />
       </ScrollView>
 
       {loading && (
@@ -486,10 +489,11 @@ const createStyles = (colors: any, cardTheme: any) =>
       color: colors.text.secondary,
     },
     button: {
-      paddingVertical: SPACING.md,
+      paddingVertical: SPACING.md + 2,
       paddingHorizontal: SPACING.lg,
       borderRadius: 12,
       alignItems: 'center',
+      marginTop: SPACING.sm,
     },
     buttonText: {
       color: colors.white,
@@ -538,7 +542,7 @@ const createStyles = (colors: any, cardTheme: any) =>
       justifyContent: 'center',
       gap: SPACING.sm,
       marginHorizontal: SPACING.lg,
-      marginBottom: SPACING.xl,
+      marginBottom: SPACING.lg,
       padding: SPACING.md,
       borderRadius: 12,
     },

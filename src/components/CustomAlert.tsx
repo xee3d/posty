@@ -133,7 +133,9 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
           )}
 
           {/* 메시지 */}
-          <Text style={styles.message}>{message}</Text>
+          <Text style={styles.message}>
+            {message}
+          </Text>
 
           {/* 버튼들 */}
           <View style={[
@@ -183,7 +185,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     borderRadius: 24, // 28에서 24로 조정
     paddingTop: 24,
     paddingHorizontal: 24,
-    paddingBottom: 20, // 하단 패딩 조정
+    paddingBottom: 24, // 하단 패딩 증가
     width: '100%',
     maxWidth: 320, // 340에서 320으로 조정
     alignItems: 'center',
@@ -224,6 +226,8 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   buttonContainer: {
     width: '100%',
     gap: 12, // 버튼 사이 간격 추가
+    marginTop: 20,
+    marginBottom: 8, // 하단 여백 추가
   },
   twoButtons: {
     flexDirection: 'row',
@@ -325,15 +329,28 @@ class AlertManager {
     if (this.alertRef && this.alertRef.show) {
       this.alertRef.show({ title, message, buttons, ...options });
     } else {
-      console.error('AlertManager: No alertRef set! Make sure AlertProvider is properly initialized.');
-      // 기본 React Native Alert로 fallback
-      const RNAlert = require('react-native').Alert;
-      RNAlert.alert(
-        title || '',
-        message,
-        buttons,
-        { cancelable: true }
-      );
+      // AlertProvider가 아직 준비되지 않은 경우 재시도
+      if (__DEV__) {
+        console.log('AlertManager: Ref not ready, will retry in 100ms');
+      }
+      
+      setTimeout(() => {
+        if (this.alertRef && this.alertRef.show) {
+          this.alertRef.show({ title, message, buttons, ...options });
+        } else {
+          // 여전히 준비되지 않은 경우 fallback
+          if (__DEV__) {
+            console.log('AlertManager: Using fallback React Native Alert');
+          }
+          const RNAlert = require('react-native').Alert;
+          RNAlert.alert(
+            title || '',
+            message,
+            buttons,
+            { cancelable: true }
+          );
+        }
+      }, 100);
     }
   }
 }
