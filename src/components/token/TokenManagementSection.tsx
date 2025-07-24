@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { SPACING } from '../../utils/constants';
 import tokenService from '../../services/subscription/tokenService';
@@ -106,7 +106,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
       <View style={styles.tokenCard}>
         <View style={styles.tokenHeader}>
           <View style={styles.tokenInfo}>
-            <Icon name="flash-on" size={24} color={getPlanColor()} />
+            <Icon name="flash" size={24} color={getPlanColor()} />
             <View>
               <Text style={styles.tokenLabel}>보유 토큰</Text>
               <View style={styles.tokenCount}>
@@ -158,7 +158,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
                 }, 100);
               }}
             >
-              <Icon name="card-giftcard" size={18} color="#10B981" />
+              <Icon name="gift" size={18} color="#10B981" />
               <Text style={[styles.actionButtonText, { color: '#10B981' }]}>
                 무료 토큰 받기
               </Text>
@@ -190,7 +190,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
 
       {/* 빠른 정보 */}
       <View style={styles.quickInfo}>
-        <Icon name="info-outline" size={16} color={colors.text.tertiary} />
+        <Icon name="information-circle-outline" size={16} color={colors.text.tertiary} />
         <Text style={styles.quickInfoText}>
           {tokenInfo.plan === 'free' 
             ? '매일 자정에 10개의 무료 토큰이 충전됩니다'

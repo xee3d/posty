@@ -9,7 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { BlurView } from '@react-native-community/blur';
 import { SUBSCRIPTION_PLANS } from '../utils/adConfig';
 
@@ -38,7 +38,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
       icon: '🎯',
       gradient: ['#9CA3AF', '#6B7280'],
       features: [
-        { icon: 'flash-on', text: '매일 10개 토큰 무료 충전' },
+        { icon: 'flash', text: '매일 10개 토큰 무료 충전' },
         { icon: 'create', text: '기본 AI 글쓰기 기능' },
         { icon: 'image', text: '이미지 분석 기능' },
       ],
@@ -49,8 +49,8 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
       icon: '⚡',
       gradient: ['#A78BFA', '#8B5CF6'],
       features: [
-        { icon: 'flash-on', text: '매월 100개 토큰 제공' },
-        { icon: 'auto-awesome', text: 'GPT-4 기반 고급 AI' },
+        { icon: 'flash', text: '매월 100개 토큰 제공' },
+        { icon: 'sparkles', text: 'GPT-4 기반 고급 AI' },
         { icon: 'block', text: '광고 완전 제거' },
         { icon: 'speed', text: '우선 처리 속도' },
       ],
@@ -62,10 +62,10 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
       gradient: ['#FCD34D', '#F59E0B'],
       features: [
         { icon: 'all-inclusive', text: '무제한 토큰' },
-        { icon: 'auto-awesome', text: '최고급 AI 모델' },
+        { icon: 'sparkles', text: '최고급 AI 모델' },
         { icon: 'block', text: '광고 완전 제거' },
         { icon: 'support-agent', text: '1:1 프리미엄 지원' },
-        { icon: 'workspace-premium', text: '베타 기능 우선 체험' },
+        { icon: 'diamond', text: '베타 기능 우선 체험' },
       ],
       highlight: false,
     },
@@ -147,7 +147,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
               colors={['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.1)']}
               style={styles.tokenInfoGradient}
             >
-              <Icon name="flash-on" size={20} color="#FFFFFF" />
+              <Icon name="flash" size={20} color="#FFFFFF" />
               <Text style={styles.tokenInfoText}>
                 {plan.key === 'free' ? '일일 10개' :
                  plan.key === 'premium' ? '월 100개' : '무제한'}
@@ -244,7 +244,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <Icon name="flash-on" size={32} color="#FFFFFF" />
+            <Icon name="flash" size={32} color="#FFFFFF" />
             <Text style={styles.benefitTitle}>더 많은 토큰</Text>
             <Text style={styles.benefitDesc}>
               더 많은 콘텐츠를 제한 없이 생성하세요
@@ -257,7 +257,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <Icon name="auto-awesome" size={32} color="#FFFFFF" />
+            <Icon name="sparkles" size={32} color="#FFFFFF" />
             <Text style={styles.benefitTitle}>고급 AI</Text>
             <Text style={styles.benefitDesc}>
               GPT-4 기반의 더 똑똑한 AI 활용

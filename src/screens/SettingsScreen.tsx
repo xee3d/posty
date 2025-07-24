@@ -3,7 +3,6 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Swi
 import { User, Platform } from '../types';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, PLATFORMS, BRAND, CARD_THEME, TYPOGRAPHY, FONT_SIZES } from '../utils/constants';
 import Icon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { APP_TEXT } from '../utils/textConstants';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { storage } from '../utils/storage';
@@ -726,7 +725,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       case 'premium':
         return { text: 'PRO', color: '#F59E0B', icon: 'star' };
       case 'starter':
-        return { text: 'STARTER', color: '#10B981', icon: 'bolt' }; // flash-on -> bolt
+        return { text: 'STARTER', color: '#10B981', icon: 'flash' };
       default:
         return { text: 'FREE', color: colors.text.secondary, icon: 'person' };
     }

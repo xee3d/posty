@@ -110,7 +110,7 @@ const MissionModal: React.FC<MissionModalProps> = ({
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <>
-                  <Icon name="card-giftcard" size={16} color="#FFFFFF" />
+                  <Icon name="gift" size={16} color="#FFFFFF" />
                   <Text style={styles.claimButtonText}>받기</Text>
                 </>
               )}
@@ -206,7 +206,7 @@ const MissionModal: React.FC<MissionModalProps> = ({
                 </View>
 
                 <View style={[styles.infoBox, { backgroundColor: colors.primary + '10' }]}>
-                  <Icon name="info-outline" size={20} color={colors.primary} />
+                  <Icon name="information-circle-outline" size={20} color={colors.primary} />
                   <Text style={[styles.infoText, { color: colors.primary }]}>
                     미션을 완료하면 무료 토큰을 받을 수 있어요. 
                     일일 미션은 매일, 주간 미션은 매주 월요일에 초기화됩니다.

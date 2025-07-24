@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Animated,  } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { COLORS, SPACING } from '../../utils/constants';
 import { useAppTheme } from '../../hooks/useAppTheme';
 
@@ -200,7 +200,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
                 <Icon name="check" size={16} color="#10B981" />
               ) : (
                 <>
-                  <Icon name="flash-on" size={16} color={canClaim ? '#FFFFFF' : colors.primary} />
+                  <Icon name="flash" size={16} color={canClaim ? '#FFFFFF' : colors.primary} />
                   <Text style={[
                     styles.tokenAmount,
                     canClaim && styles.claimableText,
@@ -240,7 +240,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
         <View style={styles.tokenStat}>
           <Text style={styles.tokenStatLabel}>현재 토큰</Text>
           <View style={styles.tokenStatValue}>
-            <Icon name="flash-on" size={24} color={colors.primary} />
+            <Icon name="flash" size={24} color={colors.primary} />
             <Text style={styles.tokenStatNumber}>{availableTokens}</Text>
           </View>
         </View>
@@ -291,7 +291,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
 
         {/* 토큰 사용 안내 */}
         <View style={styles.infoSection}>
-          <Icon name="info-outline" size={20} color={colors.primary} />
+          <Icon name="information-circle-outline" size={20} color={colors.primary} />
           <Text style={styles.infoText}>
             획득한 토큰은 AI 콘텐츠 생성에 사용할 수 있습니다.
             토큰이 부족하다면 구매하거나 미션을 완료해보세요!

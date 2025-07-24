@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Modal,
 } from 'react-native';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { SPACING } from '../utils/constants';
 
@@ -38,11 +38,11 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
       <View style={styles.overlay}>
         <View style={styles.container}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <MaterialIcon name="close" size={24} color={colors.text.secondary} />
+            <Icon name="close" size={24} color={colors.text.secondary} />
           </TouchableOpacity>
 
           <View style={styles.iconContainer}>
-            <MaterialIcon name="battery-alert" size={48} color={colors.warning} />
+            <Icon name="battery-alert" size={48} color={colors.warning} />
           </View>
 
           <Text style={styles.title}>토큰이 부족해요!</Text>
@@ -57,7 +57,7 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
               style={[styles.button, styles.primaryButton]}
               onPress={onEarnTokens}
             >
-              <MaterialIcon name="card-giftcard" size={20} color={colors.white} />
+              <Icon name="gift" size={20} color={colors.white} />
               <Text style={styles.primaryButtonText}>무료 토큰 받기</Text>
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>최대 +20</Text>
@@ -68,7 +68,7 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
             <View style={styles.quickOptions}>
               <TouchableOpacity style={styles.quickOption}>
                 <View style={styles.quickOptionIcon}>
-                  <MaterialIcon name="play-circle-outline" size={24} color={colors.primary} />
+                  <Icon name="play-circle-outline" size={24} color={colors.primary} />
                 </View>
                 <Text style={styles.quickOptionText}>광고 시청</Text>
                 <Text style={styles.quickOptionReward}>+2 토큰</Text>
@@ -76,7 +76,7 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
 
               <TouchableOpacity style={styles.quickOption}>
                 <View style={styles.quickOptionIcon}>
-                  <MaterialIcon name="people-outline" size={24} color={colors.primary} />
+                  <Icon name="people-outline" size={24} color={colors.primary} />
                 </View>
                 <Text style={styles.quickOptionText}>친구 초대</Text>
                 <Text style={styles.quickOptionReward}>+5 토큰</Text>
@@ -88,7 +88,7 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
               style={[styles.button, styles.secondaryButton]}
               onPress={onUpgrade}
             >
-              <MaterialIcon name="workspace-premium" size={20} color={colors.primary} />
+              <Icon name="diamond" size={20} color={colors.primary} />
               <Text style={styles.secondaryButtonText}>Pro로 업그레이드</Text>
               <Text style={styles.buttonSubtext}>무제한 토큰</Text>
             </TouchableOpacity>
