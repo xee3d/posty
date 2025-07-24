@@ -7,6 +7,8 @@ import {
   StyleSheet,
   SafeAreaView,
   RefreshControl,
+  Clipboard,
+  Share,
 } from 'react-native';
 import { Post, Platform } from '../types';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, PLATFORMS, MOLLY_MESSAGES, BRAND, CARD_THEME, DARK_COLORS, FONT_SIZES } from '../utils/constants';
@@ -35,6 +37,7 @@ import { Alert } from '../utils/customAlert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NewUserWelcome from '../components/NewUserWelcome';
 import improvedStyleService from '../services/improvedStyleService';
+import { soundManager } from '../utils/soundManager';
 
 interface HomeScreenProps {
   onNavigate: (tab: string, content?: any) => void;
@@ -329,6 +332,27 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       console.error('Failed to refresh:', error);
     } finally {
       setRefreshing(false);
+    }
+  };
+
+  // 게시물 복사 핸들러
+  const handleCopyPost = (post: SavedContent) => {
+    const fullText = `${post.content}\n\n${post.hashtags.map(tag => `#${tag}`).join(' ')}`;
+    Clipboard.setString(fullText);
+    soundManager.playSuccess();
+    Alert.alert('복사 완료', '클립보드에 복사되었습니다.');
+  };
+
+  // 게시물 공유 핸들러
+  const handleSharePost = async (post: SavedContent) => {
+    try {
+      const fullText = `${post.content}\n\n${post.hashtags.map(tag => `#${tag}`).join(' ')}`;
+      await Share.share({
+        message: fullText,
+      });
+      soundManager.playTap();
+    } catch (error) {
+      console.error('Failed to share:', error);
     }
   };
 
@@ -897,7 +921,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 </TouchableOpacity>
               </View>
               
-              {recentPosts.slice(0, 5).map((post, index) => (
+              {recentPosts.slice(0, 3).map((post, index) => (
                 <AnimatedCard key={post.id} delay={750 + index * 50} style={styles.postCard}>
                   <TouchableOpacity 
                     onPress={() => setExpandedPostId(expandedPostId === post.id ? null : post.id)}
@@ -942,11 +966,32 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                         )}
                       </View>
                     )}
+
+                    {/* 액션 버튼들 */}
+                    <View style={styles.postActionButtons}>
+                      <TouchableOpacity 
+                        style={styles.postActionButton} 
+                        onPress={() => handleCopyPost(post)}
+                        activeOpacity={0.7}
+                      >
+                        <Icon name="copy-outline" size={18} color={colors.text.secondary} />
+                        <Text style={styles.postActionButtonText}>복사</Text>
+                      </TouchableOpacity>
+                      
+                      <TouchableOpacity 
+                        style={styles.postActionButton} 
+                        onPress={() => handleSharePost(post)}
+                        activeOpacity={0.7}
+                      >
+                        <Icon name="share-social-outline" size={18} color={colors.text.secondary} />
+                        <Text style={styles.postActionButtonText}>공유</Text>
+                      </TouchableOpacity>
+                    </View>
                   </TouchableOpacity>
                 </AnimatedCard>
               ))}
               
-              {recentPosts.length > 5 && (
+              {recentPosts.length > 3 && (
                 <TouchableOpacity
                   style={styles.viewAllButton}
                   onPress={() => setShowPostList(true)}
@@ -1416,6 +1461,27 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
   moreHashtags: {
     fontSize: 12,
     color: colors.text.tertiary,
+  },
+  postActionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: SPACING.md,
+    marginTop: SPACING.xs,
+    paddingTop: SPACING.sm,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  postActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.xs,
+    paddingVertical: SPACING.xs,
+    paddingHorizontal: SPACING.sm,
+  },
+  postActionButtonText: {
+    fontSize: 13,
+    color: colors.text.secondary,
+    fontWeight: '500',
   },
   viewAllButton: {
     flexDirection: 'row',
