@@ -18,7 +18,7 @@ import { soundManager } from '../utils/soundManager';
 // import DeviceInfo from 'react-native-device-info'; // 설치 필요
 import { Linking, Share } from 'react-native';
 import { Alert } from '../utils/customAlert';
-// import crypto from 'crypto-js'; // 설치 필요
+import { tokenSecurityManager } from '../utils/security/tokenSecurity';
 
 interface EarnTokenModalProps {
   visible: boolean;
@@ -64,9 +64,8 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
     const permanentTasks = await AsyncStorage.getItem('token_tasks_permanent');
     const permanentData = permanentTasks ? JSON.parse(permanentTasks) : {};
     
-    // 데이터 무결성 검증
-    const deviceId = await getDeviceId();
-    const isValidData = await validateTaskData(taskData, deviceId, today);
+    // 🔒 강화된 데이터 무결성 검증
+    const isValidData = await validateTaskData(taskData, today);
     
     if (!isValidData) {
       console.warn('Invalid task data detected, resetting...');
@@ -142,17 +141,21 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
       return;
     }
 
-    // 비정상 패턴 체크: 짧은 시간 내 반복 시도
-    const lastAttemptKey = `last_attempt_${task.id}`;
-    const lastAttempt = await AsyncStorage.getItem(lastAttemptKey);
-    if (lastAttempt) {
-      const timeSinceLastAttempt = Date.now() - parseInt(lastAttempt);
-      if (timeSinceLastAttempt < 30000) { // 30초 이내 재시도
-        Alert.alert('잠시만요', '너무 빠른 재시도입니다. 잠시 후 다시 시도해주세요.');
-        return;
-      }
+    // 🔒 강화된 보안 검증
+    const securityResult = await tokenSecurityManager.validateTokenRequest(
+      task.id,
+      task.tokens
+    );
+
+    if (!securityResult.isValid) {
+      Alert.alert('보안 알림', '비정상적인 요청이 감지되었습니다. 잠시 후 다시 시도해주세요.');
+      return;
     }
-    await AsyncStorage.setItem(lastAttemptKey, Date.now().toString());
+
+    // 의심스러운 활동 감지 시 경고
+    if (securityResult.suspiciousActivity) {
+      console.warn('🚨 Suspicious activity detected for task:', task.id);
+    }
 
     setProcessingTask(task.id);
     soundManager.playTap();
@@ -192,7 +195,14 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
         return;
       }
 
-      // 작업 완료 처리 - 해시값으로 무결성 검증
+      // 🔒 강화된 토큰 지급 처리 및 서명 생성
+      const timestamp = Date.now();
+      const signature = await tokenSecurityManager.generateTokenRequestSignature(
+        task.id,
+        timestamp,
+        task.tokens
+      );
+      
       const today = new Date().toDateString();
       const savedTasks = await AsyncStorage.getItem(`token_tasks_${today}`);
       const taskData = savedTasks ? JSON.parse(savedTasks) : {};
@@ -201,15 +211,17 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
       const permanentTasks = await AsyncStorage.getItem('token_tasks_permanent');
       const permanentData = permanentTasks ? JSON.parse(permanentTasks) : {};
       
-      // 무결성 검증용 해시 생성
-      const deviceId = await getDeviceId();
-      const hash = await generateHash(`${deviceId}-${task.id}-${today}`);
+      // 디바이스 핑거프린팅 생성
+      const deviceFingerprint = await tokenSecurityManager.generateDeviceFingerprint();
 
       // 영구 보상 미션 처리 (앱 평가하기)
       if (task.id === 'rate_app') {
         permanentData[task.id] = {
           completed: true,
           completedAt: new Date().toISOString(),
+          timestamp,
+          signature,
+          deviceFingerprint
         };
         await AsyncStorage.setItem('token_tasks_permanent', JSON.stringify(permanentData));
       } else if (task.dailyLimit) {
@@ -217,7 +229,9 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
         taskData[task.id] = {
           count: (taskData[task.id]?.count || 0) + 1,
           lastCompleted: new Date().toISOString(),
-          hash: hash,
+          timestamp,
+          signature,
+          deviceFingerprint
         };
         await AsyncStorage.setItem(`token_tasks_${today}`, JSON.stringify(taskData));
       } else {
@@ -225,7 +239,9 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
         taskData[task.id] = {
           completed: true,
           completedAt: new Date().toISOString(),
-          hash: hash,
+          timestamp,
+          signature,
+          deviceFingerprint
         };
         await AsyncStorage.setItem(`token_tasks_${today}`, JSON.stringify(taskData));
       }
@@ -257,51 +273,37 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
   };
 
   // 검증 함수들
-  const getDeviceId = async () => {
-    try {
-      // DeviceInfo 패키지 없이 대체 방법 사용
-      const deviceId = await AsyncStorage.getItem('device_unique_id');
-      if (!deviceId) {
-        // 랜덤 ID 생성
-        const newId = `device_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
-        await AsyncStorage.setItem('device_unique_id', newId);
-        return newId;
-      }
-      return deviceId;
-    } catch {
-      return 'unknown-device';
-    }
-  };
-
-  const generateHash = async (data: string) => {
-    // crypto-js 없이 간단한 해시 생성
-    // 실제 프로덕션에서는 적절한 해시 라이브러리 사용 필요
-    let hash = 0;
-    for (let i = 0; i < data.length; i++) {
-      const char = data.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32bit integer
-    }
-    return Math.abs(hash).toString(16);
-  };
+  // 🚫 약한 보안 함수들 제거됨 - tokenSecurityManager 사용
 
   const watchRewardedAd = async (): Promise<boolean> => {
     try {
-      // rewardAdService 사용
+      // 🔒 보안이 강화된 rewardAdService 사용
       const rewardAdService = (await import('../services/rewardAdService')).default;
       
-      // 광고 준비 상태 확인
-      const stats = await rewardAdService.getAdStats();
-      if (stats.remainingToday === 0) {
-        Alert.alert('일일 한도', '오늘의 광고 시청 횟수를 모두 사용했어요.');
+      // 강화된 광고 준비 상태 확인
+      const readyStatus = await rewardAdService.isReady();
+      if (!readyStatus.ready) {
+        Alert.alert('광고 준비 상태', readyStatus.reason || '광고를 준비 중입니다.');
         return false;
       }
       
-      // 광고 표시
+      // 보안 통계 확인
+      const stats = await rewardAdService.getAdStats();
+      if (stats.remainingToday === 0) {
+        Alert.alert('일일 한도', `오늘의 광고 시청 횟수를 모두 사용했어요. (${stats.dailyCount}/${stats.dailyLimit})`);
+        return false;
+      }
+
+      // 의심스러운 활동 감지 시 경고
+      if (stats.suspiciousAttempts > 10) {
+        console.warn('🚨 High suspicious activity detected:', stats.suspiciousAttempts);
+      }
+      
+      // 🔒 보안이 강화된 광고 표시
       const result = await rewardAdService.showRewardedAd();
       
       if (result.success) {
-        console.log('Ad watched successfully, reward:', result.reward);
+        console.log('🔒 Ad watched successfully with security verification, reward:', result.reward);
         return true;
       } else {
         if (result.error) {
@@ -311,14 +313,6 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
       }
     } catch (error) {
       console.error('Failed to watch ad:', error);
-      
-      // 개발 모드에서는 무시하고 성공으로 처리
-      if (__DEV__) {
-        console.log('Development mode: Simulating successful ad watch');
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        return true;
-      }
-      
       return false;
     }
   };
@@ -372,33 +366,39 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
     }
   };
 
-  // 데이터 무결성 검증
+  // 🔒 강화된 데이터 무결성 검증
   const validateTaskData = async (
     taskData: any, 
-    deviceId: string, 
     date: string
   ): Promise<boolean> => {
     try {
       for (const [taskId, data] of Object.entries(taskData)) {
         if (!data || typeof data !== 'object') return false;
         
-        // 해시 검증
-        if (data.hash) {
-          const expectedHash = await generateHash(`${deviceId}-${taskId}-${date}`);
-          if (data.hash !== expectedHash) {
-            console.warn(`Hash mismatch for task ${taskId}`);
+        // 서명 검증 (새로운 데이터만)
+        if (data.signature && data.timestamp) {
+          const isValidSignature = await tokenSecurityManager.validateTokenRequestSignature(
+            taskId,
+            data.timestamp,
+            data.tokens || 0,
+            data.signature
+          );
+          
+          if (!isValidSignature) {
+            console.warn(`🚨 Invalid signature for task ${taskId}`);
+            await tokenSecurityManager.logSuspiciousActivity('invalid_signature_validation', {
+              taskId,
+              timestamp: data.timestamp
+            });
             return false;
           }
         }
         
-        // 시간 유효성 검증
-        if (data.completedAt || data.lastCompleted) {
-          const timestamp = new Date(data.completedAt || data.lastCompleted).getTime();
-          const todayStart = new Date(date).setHours(0, 0, 0, 0);
-          const todayEnd = new Date(date).setHours(23, 59, 59, 999);
-          
-          if (timestamp < todayStart || timestamp > todayEnd) {
-            console.warn(`Invalid timestamp for task ${taskId}`);
+        // 시간 유효성 검증 (강화됨)
+        if (data.timestamp) {
+          const timestampResult = tokenSecurityManager.validateTimestamp(data.timestamp);
+          if (!timestampResult.isValid) {
+            console.warn(`🚨 Invalid timestamp for task ${taskId}: ${timestampResult.reason}`);
             return false;
           }
         }

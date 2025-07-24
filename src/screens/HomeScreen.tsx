@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { SafeIcon } from '../utils/SafeIcon';
 import { AnimatedCard, SlideInView, FadeInView, ScaleButton } from '../components/AnimationComponents';
 import { TokenBadge, SectionHeader } from '../components/common';
+import { TextSkeleton, PostSkeleton, FeedSkeleton } from '../components/SkeletonLoader';
 import { getSavedContents, SavedContent } from '../utils/storage';
 import PostListScreen from './PostListScreen';
 import { APP_TEXT, getText } from '../utils/textConstants';
@@ -84,7 +85,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   const [stats, setStats] = useState<any>(null); // 사용자 통계 추가
   const [tipIndex, setTipIndex] = useState(0); // 팁 인덱스 추가
   const [recommendations, setRecommendations] = useState<RecommendationCard[]>([]);
-  const [userLevel, setUserLevel] = useState<'new' | 'beginner' | 'regular' | 'expert'>('new');
+  const [isLoading, setIsLoading] = useState(false);
+  const [userLevel, setUserLevel] = useState<'new' | 'beginner' | 'regular' | 'expert'>('beginner');
   const [showWelcome, setShowWelcome] = useState(false);
   const [styleAnalysis, setStyleAnalysis] = useState<any>(null);
 
@@ -241,6 +243,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   // 맞춤 추천 가져오기
   const loadRecommendations = async () => {
     try {
+      setIsLoading(true);
       const userContext = {
         currentHour: new Date().getHours(),
         currentDay: new Date().getDay(),
@@ -258,6 +261,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       setRecommendations(cards);
     } catch (error) {
       console.error('Failed to load recommendations:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -412,15 +417,19 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   useEffect(() => {
     loadUserStats();
     loadRecentPosts();
+    // 초기 팁 로드 (stats와 독립적으로)
+    loadCoachingTip();
   }, []);
 
-  // 사용자 통계가 로드되면 팁과 해시태그 로드
+  // 사용자 통계가 로드되면 해시태그와 추천만 로드 (팁은 제외)
   useEffect(() => {
     if (stats && stats.totalPosts >= 0) {
-      loadCoachingTip();
       loadTrendingHashtags();
       loadRecommendations();
       loadStyleAnalysis();
+      
+      // stats 로드 후 팁을 한 번 더 로드 (더 정확한 개인화)
+      loadCoachingTip();
     }
   }, [stats?.totalPosts]); // totalPosts만 의존성으로 사용
 
@@ -621,8 +630,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                   </View>
                 </ScaleButton>
 
-                {/* 문장 정리하기 - 초보자 이상만 */}
-                {userLevel !== 'beginner' && (
+                {/* 문장 정리하기 - 신규 사용자 외 모든 레벨 */}
+                {userLevel !== 'new' && (
                   <ScaleButton 
                     style={styles.mainActionCard}
                     onPress={() => handleQuickAction('문장 정리하기')}
@@ -632,8 +641,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                         <Icon name="color-wand" size={24} color={colors.white} />
                       </View>
                       <View style={styles.mainActionTextContainer}>
-                        <Text style={styles.mainActionTitle}>문장 다듬기</Text>
-                        <Text style={styles.mainActionDesc}>내가 쓴 글 좀 다듬어줘</Text>
+                        <Text style={styles.mainActionTitle}>AI 글 완성도구</Text>
+                        <Text style={styles.mainActionDesc}>어색한 문장을 자연스럽게 다듬어줘</Text>
                       </View>
                     </View>
                   </ScaleButton>
@@ -660,42 +669,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
 
 
-        {/* 사용자 레벨에 따른 맞춤 팁 */}
-        {userLevel !== 'new' && (
-          <SlideInView direction="left" delay={550}>
-            <View style={styles.coachingSection}>
-              <View style={styles.sectionTitleContainer}>
-                <SafeIcon name="bulb" size={18} color={colors.warning} />
-                <Text style={styles.sectionTitle}>오늘의 쉬운 팁</Text>
-              </View>
-              
-              <View style={styles.coachingCard}>
-                <View style={styles.coachingIconContainer}>
-                  <Icon 
-                    name={userLevel === 'expert' ? "star" : "bulb"} 
-                    size={24} 
-                    color={colors.white} 
-                  />
-                </View>
-                <View style={styles.coachingContent}>
-                  <Text style={styles.coachingTitle}>
-                    포스티가 알려주는 꿀팁
-                  </Text>
-                  <Text style={styles.coachingText}>
-                    {coachingTip ? 
-                      `${coachingTip.value}${coachingTip.subtext ? ` ${coachingTip.subtext}` : ''}` :
-                     userLevel === 'beginner' ? 
-                      '짧은 글도 괜찮아! 일단 매일 하나씩 올려보는 게 중요해. 사진 하나에 한 줄만 써도 충분해 😊' :
-                     userLevel === 'expert' ?
-                      `이번 주 ${stats?.favoriteCategories?.[0] || '일상'} 관련 글이 가장 반응이 좋았어요. 비슷한 주제로 한 번 더 도전해보세요!` :
-                      '오늘도 멋진 이야기를 들려주세요!'
-                    }
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </SlideInView>
-        )}
 
         {/* 오늘의 트렌드 - 개인화된 해시태그 추천 */}
         <SlideInView direction="right" delay={575}>
@@ -825,7 +798,26 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                   </AnimatedCard>
                 ))
               ) : (
-                // 기본 추천 카드 (로드 중이거나 데이터가 없을 때)
+                // 로딩 중일 때 스켈레톤 표시
+                <>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <View key={`skeleton-${index}`} style={[styles.recommendCard, index > 0 && { marginLeft: SPACING.sm }]}>
+                      <View style={styles.recommendSkeletonHeader}>
+                        <View style={[styles.recommendIconContainer, { backgroundColor: '#E5E5E5' }]} />
+                        <View style={styles.recommendSkeletonBadge} />
+                      </View>
+                      <TextSkeleton lines={1} lineHeight={18} style={{ marginBottom: 8 }} />
+                      <TextSkeleton lines={2} lineHeight={14} lastLineWidth="80%" />
+                      <View style={styles.recommendSkeletonFooter}>
+                        <View style={styles.recommendSkeletonMeta} />
+                        <View style={styles.recommendSkeletonButton} />
+                      </View>
+                    </View>
+                  ))}
+                </>
+              )}
+              {recommendations.length === 0 && !isLoading && (
+                // 데이터가 없을 때만 기본 카드 표시
                 <>
                   <AnimatedCard delay={700} style={styles.recommendCard}>
                     <View style={styles.recommendIconContainer}>
