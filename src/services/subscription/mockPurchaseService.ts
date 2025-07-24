@@ -1,6 +1,10 @@
 /**
  * 개발 환경용 Mock 구매 서비스
  * 실제 스토어 연결 전 테스트용
+ * 
+ * 보안 강화:
+ * - 프로덕션 모드에서 완전 비활성화
+ * - 개발 모드에서만 제한적 동작
  */
 
 import tokenService from './tokenService';
@@ -12,14 +16,33 @@ import { DeviceEventEmitter } from 'react-native';
 
 class MockPurchaseService {
   private isInitialized = false;
+  private readonly isDevelopment = __DEV__;
 
   async initialize(): Promise<void> {
-    console.log('🔧 Mock Purchase Service initialized');
+    // 프로덕션 모드에서는 초기화 거부
+    if (!this.isDevelopment) {
+      console.warn('🚨 Mock Purchase Service is disabled in production mode');
+      throw new Error('Mock purchase service not available in production');
+    }
+    
+    console.log('🔧 Mock Purchase Service initialized (DEVELOPMENT ONLY)');
     this.isInitialized = true;
   }
 
+  private validateDevelopmentMode(): void {
+    if (!this.isDevelopment) {
+      throw new Error('Mock purchase service is only available in development mode');
+    }
+  }
+
   async purchaseSubscription(planId: string, isYearly: boolean = false): Promise<void> {
-    console.log(`🛒 Mock purchasing ${planId} subscription (${isYearly ? 'yearly' : 'monthly'})`);
+    this.validateDevelopmentMode();
+    
+    if (!this.isInitialized) {
+      throw new Error('Mock purchase service not initialized');
+    }
+    
+    console.log(`🛒 Mock purchasing ${planId} subscription (${isYearly ? 'yearly' : 'monthly'}) - DEVELOPMENT ONLY`);
     
     // 실제 구매 시뮬레이션 (2초 대기)
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -78,7 +101,13 @@ class MockPurchaseService {
   }
 
   async purchaseTokens(packageId: string): Promise<void> {
-    console.log(`🛒 Mock purchasing ${packageId} tokens`);
+    this.validateDevelopmentMode();
+    
+    if (!this.isInitialized) {
+      throw new Error('Mock purchase service not initialized');
+    }
+    
+    console.log(`🛒 Mock purchasing ${packageId} tokens - DEVELOPMENT ONLY`);
     
     // 토큰 수량 결정
     let tokens = 0;
@@ -120,7 +149,13 @@ class MockPurchaseService {
   }
 
   async restorePurchases(): Promise<void> {
-    console.log('🔄 Mock restore purchases');
+    this.validateDevelopmentMode();
+    
+    if (!this.isInitialized) {
+      throw new Error('Mock purchase service not initialized');
+    }
+    
+    console.log('🔄 Mock restore purchases - DEVELOPMENT ONLY');
     
     // 복원 시뮬레이션 (2초 대기)
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -151,6 +186,8 @@ class MockPurchaseService {
   }
 
   getProducts(): any[] {
+    this.validateDevelopmentMode();
+    
     return [
       {
         productId: 'com.posty.starter.monthly',

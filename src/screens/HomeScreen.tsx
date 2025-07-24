@@ -14,7 +14,7 @@ import { Post, Platform } from '../types';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, PLATFORMS, MOLLY_MESSAGES, BRAND, CARD_THEME, DARK_COLORS, FONT_SIZES } from '../utils/constants';
 import { useAppTheme } from '../hooks/useAppTheme';
 import Icon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import { SafeIcon } from '../utils/SafeIcon';
 import { AnimatedCard, SlideInView, FadeInView, ScaleButton } from '../components/AnimationComponents';
 import { TokenBadge, SectionHeader } from '../components/common';
 import { getSavedContents, SavedContent } from '../utils/storage';
@@ -505,7 +505,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     onPress={() => setShowEarnTokenModal(true)}
                     activeOpacity={0.7}
                   >
-                    <MaterialIcon name="add-circle" size={20} color={colors.primary} />
+                    <Icon name="add-circle" size={20} color={colors.primary} />
                     {currentTokens === 0 && (
                       <View style={styles.earnTokenBadge}>
                         <Text style={styles.earnTokenBadgeText}>!</Text>
@@ -517,6 +517,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
             </View>
           </View>
         </FadeInView>
+
+
 
         {/* 동기화 상태 표시 */}
         <View style={styles.syncIndicatorContainer}>
@@ -574,27 +576,27 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
               <View style={styles.templateSuggestions}>
                 <TouchableOpacity 
                   style={styles.templateCard}
-                  onPress={() => onNavigate('ai-write', { content: '안녕! 나는' })}
+                  onPress={() => onNavigate('ai-write', { content: '오늘 날씨가 좋아서' })}
                 >
-                  <Text style={styles.templateEmoji}>👋</Text>
-                  <Text style={styles.templateTitle}>자기소개</Text>
-                  <Text style={styles.templateDesc}>간단한 인사말부터</Text>
+                  <Icon name="sunny-outline" size={32} color={colors.primary} />
+                  <Text style={styles.templateTitle}>날씨 이야기</Text>
+                  <Text style={styles.templateDesc}>오늘 날씨로 시작해보기</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
                   style={styles.templateCard}
-                  onPress={() => onNavigate('ai-write', { content: '오늘은' })}
+                  onPress={() => onNavigate('ai-write', { content: '오늘 먹은' })}
                 >
-                  <Text style={styles.templateEmoji}>🌞</Text>
-                  <Text style={styles.templateTitle}>일상 공유</Text>
-                  <Text style={styles.templateDesc}>오늘 있었던 일</Text>
+                  <Icon name="restaurant-outline" size={32} color={colors.primary} />
+                  <Text style={styles.templateTitle}>음식 후기</Text>
+                  <Text style={styles.templateDesc}>오늘 먹은 맛있는 것</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
                   style={styles.templateCard}
                   onPress={() => onNavigate('ai-write', { mode: 'photo' })}
                 >
-                  <Text style={styles.templateEmoji}>📸</Text>
+                  <Icon name="camera-outline" size={32} color={colors.primary} />
                   <Text style={styles.templateTitle}>사진으로</Text>
                   <Text style={styles.templateDesc}>사진만 있으면 OK</Text>
                 </TouchableOpacity>
@@ -610,7 +612,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 >
                   <View style={styles.mainActionRow}>
                     <View style={styles.mainActionIcon}>
-                    <MaterialIcon name="edit" size={24} color={colors.white} />
+                    <Icon name="create" size={24} color={colors.white} />
                     </View>
                     <View style={styles.mainActionTextContainer}>
                       <Text style={styles.mainActionTitle}>글쓰기 도와줘</Text>
@@ -627,7 +629,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                   >
                     <View style={styles.mainActionRow}>
                       <View style={[styles.mainActionIcon, { backgroundColor: '#9C27B0' }]}>
-                        <MaterialIcon name="auto-fix-high" size={24} color={colors.white} />
+                        <Icon name="color-wand" size={24} color={colors.white} />
                       </View>
                       <View style={styles.mainActionTextContainer}>
                         <Text style={styles.mainActionTitle}>문장 다듬기</Text>
@@ -643,7 +645,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 >
                   <View style={styles.mainActionRow}>
                     <View style={[styles.mainActionIcon, { backgroundColor: '#E91E63' }]}>
-                    <MaterialIcon name="image" size={24} color={colors.white} />
+                    <Icon name="image" size={24} color={colors.white} />
                     </View>
                     <View style={styles.mainActionTextContainer}>
                       <Text style={styles.mainActionTitle}>사진으로 시작</Text>
@@ -656,59 +658,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </View>
         </FadeInView>
 
-        {/* 보조 기능들 */}
-        <FadeInView delay={200}>
-          <View style={styles.subActions}>
-              {/* 개발 환경에서만 표시 - 출시 시 주석 처리 */}
-              {__DEV__ && (
-                <>
-                  <AnimatedCard delay={400} style={styles.subActionCard}>
-                    <TouchableOpacity 
-                      style={styles.subActionContent}
-                      onPress={() => handleQuickAction('광고 테스트')}
-                    >
-                      <MaterialIcon name="monetization-on" size={20} color={colors.text.secondary} />
-                      <Text style={styles.subActionText}>광고 테스트</Text>
-                    </TouchableOpacity>
-                  </AnimatedCard>
-                  
-                  <AnimatedCard delay={450} style={styles.subActionCard}>
-                    <TouchableOpacity 
-                      style={styles.subActionContent}
-                      onPress={() => onNavigate('animation-examples')}
-                    >
-                      <MaterialIcon name="animation" size={20} color={colors.text.secondary} />
-                      <Text style={styles.subActionText}>애니메이션</Text>
-                    </TouchableOpacity>
-                  </AnimatedCard>
-                </>
-              )}
-              
-              {/* 구독 버튼 - 항상 표시 */}
-              <AnimatedCard delay={__DEV__ ? 500 : 400} style={[styles.subActionCard, !__DEV__ && styles.subscriptionCardFull]}>
-                <TouchableOpacity 
-                  style={styles.subActionContent}
-                  onPress={() => handleQuickAction('구독')}
-                >
-                  <MaterialIcon name="workspace-premium" size={20} color={colors.text.secondary} />
-                  <Text style={styles.subActionText}>구독</Text>
-                </TouchableOpacity>
-              </AnimatedCard>
-          </View>
-        </FadeInView>
+
 
         {/* 사용자 레벨에 따른 맞춤 팁 */}
         {userLevel !== 'new' && (
           <SlideInView direction="left" delay={550}>
             <View style={styles.coachingSection}>
-              <Text style={styles.sectionTitle}>
-                💡 오늘의 쉬운 팁
-              </Text>
+              <View style={styles.sectionTitleContainer}>
+                <SafeIcon name="bulb" size={18} color={colors.warning} />
+                <Text style={styles.sectionTitle}>오늘의 쉬운 팁</Text>
+              </View>
               
               <View style={styles.coachingCard}>
                 <View style={styles.coachingIconContainer}>
-                  <MaterialIcon 
-                    name={userLevel === 'expert' ? "star" : "tips-and-updates"} 
+                  <Icon 
+                    name={userLevel === 'expert' ? "star" : "bulb"} 
                     size={24} 
                     color={colors.white} 
                   />
@@ -733,9 +697,36 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </SlideInView>
         )}
 
+        {/* 오늘의 트렌드 - 개인화된 해시태그 추천 */}
+        <SlideInView direction="right" delay={575}>
+          <View style={styles.trendSection}>
+            <View style={styles.sectionTitleContainer}>
+              <SafeIcon name="pricetag" size={18} color={colors.primary} />
+              <Text style={styles.sectionTitle}>요즘 뜨는 해시태그</Text>
+            </View>
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hashtagScroll}>
+              {trendingHashtags.map((tag, index) => (
+                <TouchableOpacity
+                  key={`${tag}-${index}`}
+                  style={styles.hashtagChip}
+                  onPress={() => onNavigate('ai-write', { content: `#${tag} `, hashtags: [tag] })}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.hashtagText}>#{tag}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+            {trendingHashtags.length === 0 && (
+              <View style={styles.loadingHashtags}>
+                <Text style={styles.loadingText}>맞춤 해시태그를 준비 중...</Text>
+              </View>
+            )}
+          </View>
+        </SlideInView>
+
         {/* 나의 글쓰기 스타일 */}
         {styleAnalysis && stats?.totalPosts > 3 && (
-          <SlideInView direction="right" delay={575}>
+          <SlideInView direction="right" delay={600}>
             <TouchableOpacity 
               style={styles.styleCard}
               onPress={() => onNavigate('my-style')}
@@ -743,8 +734,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
             >
               <View style={styles.styleCardHeader}>
                 <View style={styles.styleIconContainer}>
-                  <MaterialIcon 
-                    name="palette" 
+                  <Icon 
+                    name="color-palette" 
                     size={20} 
                     color={colors.white} 
                   />
@@ -788,35 +779,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </SlideInView>
         )}
 
-        {/* 오늘의 트렌드 - 개인화된 해시태그 추천 */}
-        <SlideInView direction="left" delay={600}>
-          <View style={styles.trendSection}>
-            <Text style={styles.sectionTitle}>🏷️ 요즘 뜨는 해시태그</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hashtagScroll}>
-              {trendingHashtags.map((tag, index) => (
-                <TouchableOpacity
-                  key={`${tag}-${index}`}
-                  style={styles.hashtagChip}
-                  onPress={() => onNavigate('ai-write', { content: `#${tag} `, hashtags: [tag] })}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.hashtagText}>#{tag}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            {trendingHashtags.length === 0 && (
-              <View style={styles.loadingHashtags}>
-                <Text style={styles.loadingText}>맞춤 해시태그를 준비 중...</Text>
-              </View>
-            )}
-          </View>
-        </SlideInView>
+
 
         {/* 포스티의 맞춤 추천 */}
-        <SlideInView direction="right" delay={650}>
+        <SlideInView direction="right" delay={625}>
           <View style={styles.todaySection}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>🎯 오늘 뭐 쓸까?</Text>
+              <View style={styles.sectionTitleContainer}>
+                <SafeIcon name="target" size={18} color={colors.success} />
+                <Text style={styles.sectionTitle}>오늘 뭐 쓸까?</Text>
+              </View>
             </View>
             
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recommendScroll}>
@@ -828,7 +800,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     style={[styles.recommendCard, index > 0 && { marginLeft: SPACING.sm }]}
                   >
                     <View style={[styles.recommendIconContainer, { backgroundColor: card.iconColor }]}>
-                      <MaterialIcon name={card.icon} size={24} color={colors.white} />
+                      <Icon name={card.icon.replace('edit', 'create').replace('auto-fix-high', 'color-wand').replace('photo-camera', 'camera')} size={24} color={colors.white} />
                     </View>
                     <View style={styles.recommendBadge}>
                       <Text style={styles.recommendBadgeText}>{card.badge}</Text>
@@ -837,7 +809,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     <Text style={styles.recommendContent}>{card.content}</Text>
                     <View style={styles.recommendFooter}>
                       <View style={styles.recommendMeta}>
-                        <MaterialIcon name={card.meta.icon} size={14} color={colors.text.secondary} />
+                        <SafeIcon name={card.meta.icon} size={14} color={colors.text.secondary} />
                         <Text style={styles.recommendMetaText}>{card.meta.text}</Text>
                       </View>
                       <ScaleButton 
@@ -857,7 +829,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 <>
                   <AnimatedCard delay={700} style={styles.recommendCard}>
                     <View style={styles.recommendIconContainer}>
-                      <MaterialIcon name="edit" size={24} color={colors.white} />
+                      <Icon name="create" size={24} color={colors.white} />
                     </View>
                     <View style={styles.recommendBadge}>
                       <Text style={styles.recommendBadgeText}>🔥 쉬워요</Text>
@@ -882,7 +854,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                   
                   <AnimatedCard delay={750} style={[styles.recommendCard, { marginLeft: SPACING.sm }]}>
                     <View style={[styles.recommendIconContainer, { backgroundColor: '#E91E63' }]}>
-                      <MaterialIcon name="photo-camera" size={24} color={colors.white} />
+                      <Icon name="camera" size={24} color={colors.white} />
                     </View>
                     <View style={styles.recommendBadge}>
                       <Text style={styles.recommendBadgeText}>📸 더 쉬워요</Text>
@@ -912,10 +884,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
         {/* 최근 게시물 섹션 */}
         {recentPosts.length > 0 && (
-          <SlideInView direction="up" delay={700}>
+          <SlideInView direction="up" delay={650}>
             <View style={styles.recentPostsSection}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>📝 내가 쓴 글</Text>
+                <View style={styles.sectionTitleContainer}>
+                  <SafeIcon name="document-text" size={18} color={colors.text.primary} />
+                  <Text style={styles.sectionTitle}>내가 쓴 글</Text>
+                </View>
                 <TouchableOpacity onPress={() => setShowPostList(true)}>
                   <Text style={styles.moreText}>전체보기</Text>
                 </TouchableOpacity>
@@ -993,6 +968,49 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
               
             </View>
           </SlideInView>
+        )}
+
+        {/* 기타 기능들 - 개발 모드에서만 표시 */}
+        {__DEV__ && (
+          <FadeInView delay={800}>
+            <View style={styles.bottomActionsSection}>
+              <View style={styles.sectionTitleContainer}>
+                <SafeIcon name="construct" size={18} color={colors.text.secondary} />
+                <Text style={styles.sectionTitle}>기타 기능</Text>
+              </View>
+              <View style={styles.subActions}>
+                <AnimatedCard delay={850} style={styles.subActionCard}>
+                  <TouchableOpacity 
+                    style={styles.subActionContent}
+                    onPress={() => handleQuickAction('광고 테스트')}
+                  >
+                    <Icon name="cash" size={20} color={colors.text.secondary} />
+                    <Text style={styles.subActionText}>광고 테스트</Text>
+                  </TouchableOpacity>
+                </AnimatedCard>
+                
+                <AnimatedCard delay={900} style={styles.subActionCard}>
+                  <TouchableOpacity 
+                    style={styles.subActionContent}
+                    onPress={() => onNavigate('animation-examples')}
+                  >
+                    <Icon name="play-circle" size={20} color={colors.text.secondary} />
+                    <Text style={styles.subActionText}>애니메이션</Text>
+                  </TouchableOpacity>
+                </AnimatedCard>
+                
+                <AnimatedCard delay={950} style={styles.subActionCard}>
+                  <TouchableOpacity 
+                    style={styles.subActionContent}
+                    onPress={() => handleQuickAction('구독')}
+                  >
+                    <Icon name="diamond" size={20} color={colors.text.secondary} />
+                    <Text style={styles.subActionText}>구독</Text>
+                  </TouchableOpacity>
+                </AnimatedCard>
+              </View>
+            </View>
+          </FadeInView>
         )}
 
         <View style={styles.bottomSpace} />
@@ -1180,7 +1198,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
   // 빠른 생성
   quickActions: {
     paddingHorizontal: SPACING.lg,
-    marginTop: SPACING.xl,
+    marginTop: SPACING.lg,
   },
   mainActions: {
     gap: SPACING.sm,
@@ -1229,6 +1247,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
     flexDirection: 'row',
     gap: SPACING.sm,
   },
+  bottomActionsSection: {
+    paddingHorizontal: SPACING.lg,
+    marginTop: SPACING.xl,
+    marginBottom: SPACING.md,
+  },
   subActionCard: {
     flex: 1,
     backgroundColor: colors.lightGray,
@@ -1265,13 +1288,18 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
   // AI 코칭
   coachingSection: {
     paddingHorizontal: SPACING.lg,
-    marginTop: SPACING.xl,
+    marginTop: SPACING.lg,
+  },
+  sectionTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.sm,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: '700',
     color: theme?.colors.text.primary || colors.text.primary,
-    marginBottom: SPACING.md,
+    marginLeft: SPACING.xs,
     letterSpacing: -0.3,
   },
   coachingCard: {
@@ -1306,10 +1334,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
   },
   // 추천 섹션
   todaySection: {
-    marginTop: SPACING.xl,
+    marginTop: SPACING.lg,
   },
   recommendScroll: {
     paddingLeft: SPACING.lg,
+    paddingBottom: SPACING.xs,
   },
   recommendCard: {
     backgroundColor: colors.surface,
@@ -1404,11 +1433,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
     letterSpacing: -0.2,
   },
   bottomSpace: {
-    height: SPACING.xxl,
+    height: SPACING.xl,
   },
   recentPostsSection: {
     paddingHorizontal: SPACING.lg,
-    marginTop: SPACING.xl,
+    marginTop: SPACING.lg,
   },
   postCard: {
     backgroundColor: colors.surface,
@@ -1473,15 +1502,14 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
     color: colors.text.secondary,
     fontWeight: '500',
   },
-  subscriptionCardFull: {
-    flex: 1,
-  },
   trendSection: {
-    marginBottom: SPACING.xl,
+    marginTop: SPACING.xl,
+    marginBottom: SPACING.md,
     paddingHorizontal: SPACING.lg,
   },
   hashtagScroll: {
-    marginTop: SPACING.sm,
+    marginTop: SPACING.md,
+    paddingBottom: SPACING.xs,
   },
   hashtagChip: {
     backgroundColor: colors.surface,
@@ -1515,7 +1543,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
   // 스타일 카드
   styleCard: {
     marginHorizontal: SPACING.lg,
-    marginBottom: SPACING.lg,
+    marginTop: SPACING.md,
+    marginBottom: SPACING.md,
     backgroundColor: colors.surface,
     borderRadius: 16,
     padding: SPACING.lg,
@@ -1637,10 +1666,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
     alignItems: 'center',
     ...cardTheme.default.shadow,
   },
-  templateEmoji: {
-    fontSize: 32,
-    marginBottom: SPACING.xs,
-  },
+
   templateTitle: {
     fontSize: 14,
     fontWeight: '600',

@@ -159,13 +159,31 @@ const userSlice = createSlice({
       }
     },
     
-    // 구독 정보 업데이트
+    // 구독 정보 업데이트 - 보안 강화
     updateSubscription: (state, action: PayloadAction<{
       plan: 'free' | 'starter' | 'premium' | 'pro';
       expiresAt?: string;
       autoRenew?: boolean;
+      isServerVerified?: boolean; // 서버에서 검증된 업데이트인지 표시
     }>) => {
       const previousPlan = state.subscriptionPlan;
+      
+      // 보안 검증: 서버에서 검증되지 않은 상향 업그레이드 차단
+      if (!action.payload.isServerVerified && action.payload.plan !== 'free') {
+        const planPriority = { 'free': 0, 'starter': 1, 'premium': 2, 'pro': 3 };
+        const currentPriority = planPriority[previousPlan];
+        const newPriority = planPriority[action.payload.plan];
+        
+        if (newPriority > currentPriority) {
+          console.warn('[UserSlice] Unauthorized subscription upgrade attempt blocked:', {
+            from: previousPlan,
+            to: action.payload.plan,
+            serverVerified: action.payload.isServerVerified
+          });
+          return; // 업그레이드 차단
+        }
+      }
+      
       state.subscriptionPlan = action.payload.plan;
       state.subscriptionExpiresAt = action.payload.expiresAt || null;
       if (action.payload.autoRenew !== undefined) {
