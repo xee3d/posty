@@ -396,13 +396,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   };
 
   useEffect(() => {
-    // 플랜에 따라 접근 권한 확인
-    const hasAccess = styleAccess?.hasAccess ?? false;
-    if (!hasAccess) {
-      setLoading(false);
-      return;
-    }
-    
+    // 개요 탭은 모두 접근 가능하므로 바로 데이터 로드
     loadDataAndAnalyze();
   }, []);
 
@@ -667,7 +661,30 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     </Animated.View>
   );
 
-  const renderAnalyticsTab = () => (
+  const renderAnalyticsTab = () => {
+    // 분석 탭은 구독 권한 확인
+    const hasAccess = styleAccess?.hasAccess ?? false;
+    if (!hasAccess) {
+      return (
+        <View style={styles.accessDeniedContainer}>
+          <View style={styles.accessDeniedIcon}>
+            <Icon name="lock-closed" size={40} color={colors.text.tertiary} />
+          </View>
+          <Text style={styles.accessDeniedTitle}>프리미엄 기능입니다</Text>
+          <Text style={styles.accessDeniedSubtitle}>
+            STARTER 플랜부터 상세 분석을 확인할 수 있습니다.
+          </Text>
+          <TouchableOpacity
+            style={styles.upgradeButton}
+            onPress={() => onNavigate?.('subscription')}
+          >
+            <Text style={styles.upgradeButtonText}>구독 플랜 보기</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    return (
     <View>
       {/* 성장 그래프 */}
       <View style={[styles.growthSection, cardTheme.card]}>
@@ -743,9 +760,33 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         </View>
       </View>
     </View>
-  );
+    );
+  };
 
-  const renderTemplatesTab = () => (
+  const renderTemplatesTab = () => {
+    // 템플릿 탭도 구독 권한 확인
+    const hasAccess = styleAccess?.hasAccess ?? false;
+    if (!hasAccess) {
+      return (
+        <View style={styles.accessDeniedContainer}>
+          <View style={styles.accessDeniedIcon}>
+            <Icon name="lock-closed" size={40} color={colors.text.tertiary} />
+          </View>
+          <Text style={styles.accessDeniedTitle}>프리미엄 기능입니다</Text>
+          <Text style={styles.accessDeniedSubtitle}>
+            STARTER 플랜부터 템플릿을 사용할 수 있습니다.
+          </Text>
+          <TouchableOpacity
+            style={styles.upgradeButton}
+            onPress={() => onNavigate?.('subscription')}
+          >
+            <Text style={styles.upgradeButtonText}>구독 플랜 보기</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    return (
     <View>
       <Animated.View style={{
         opacity: fadeAnim,
@@ -918,7 +959,8 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         ))}
       </View>
     </View>
-  );
+    );
+  };
 
   if (loading) {
     return (
@@ -931,35 +973,6 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     );
   }
 
-  // 접근 권한이 없을 때
-  const hasAccess = styleAccess?.hasAccess ?? false;
-  if (!hasAccess) {
-    return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.headerTitle}>내 스타일</Text>
-            <Text style={styles.headerSubtitle}>나만의 콘텐츠 브랜드를 만들어가세요</Text>
-          </View>
-        </View>
-        <View style={styles.accessDeniedContainer}>
-          <View style={styles.accessDeniedIcon}>
-            <Icon name="lock-closed" size={48} color={colors.text.tertiary} />
-          </View>
-          <Text style={styles.accessDeniedTitle}>프리미엄 기능입니다</Text>
-          <Text style={styles.accessDeniedSubtitle}>
-            {styleAccess?.message || 'STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.'}
-          </Text>
-          <TouchableOpacity
-            style={styles.upgradeButton}
-            onPress={() => onNavigate?.('subscription')}
-          >
-            <Text style={styles.upgradeButtonText}>구독 플랜 보기</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
   
   // 데이터가 없을 때
   if (!stats || stats.totalPosts === 0) {
