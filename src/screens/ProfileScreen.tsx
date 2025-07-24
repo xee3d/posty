@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -40,7 +40,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
   const [isLoading, setIsLoading] = useState(true);
   const [expProgress, setExpProgress] = useState({ current: 0, required: 100, percentage: 0 });
   
-  const progressAnim = new Animated.Value(0);
+  const progressAnim = useRef(new Animated.Value(0)).current;
   
   // 디버깅을 위해 userInfo 확인
   useEffect(() => {
@@ -85,13 +85,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
       setProfile(userProfile);
       setAchievements(userAchievements);
       setExpProgress(expData);
-      
-      // 진행률 애니메이션
-      Animated.timing(progressAnim, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: false,
-      }).start();
     } catch (error) {
       console.error('Failed to load profile data:', error);
     } finally {
@@ -126,7 +119,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
 
   const unlockedCount = achievements.filter(a => a.isUnlocked).length;
   const totalCount = achievements.length;
-  const completionRate = Math.round((unlockedCount / totalCount) * 100);
+  const completionRate = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
+  
+  console.log('[ProfileScreen] Achievement progress:', {
+    unlockedCount,
+    totalCount,
+    completionRate
+  });
 
   const styles = createStyles(colors, isDark);
 
@@ -242,14 +241,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
                 </Text>
               </View>
               <View style={styles.levelProgressBar}>
-                <Animated.View 
+                <View 
                   style={[
                     styles.levelProgressFill,
                     {
-                      width: progressAnim.interpolate({
-                        inputRange: [0, 1],
-                        outputRange: ['0%', `${expProgress.percentage}%`]
-                      })
+                      width: `${expProgress.percentage}%`
                     }
                   ]}
                 />
@@ -266,14 +262,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
               <Text style={styles.progressText}>{completionRate}%</Text>
             </View>
             <View style={styles.progressBar}>
-              <Animated.View 
+              <View 
                 style={[
                   styles.progressFill,
                   {
-                    width: progressAnim.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: ['0%', `${completionRate}%`]
-                    })
+                    width: `${completionRate}%`
                   }
                 ]}
               />
@@ -398,7 +391,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
                           <View 
                             style={[
                               styles.achievementProgressFill,
-                              { width: `${achievementService.getProgress(achievement)}%` }
+                              { 
+                                width: `${Math.min(
+                                  ((achievement.requirement.current || 0) / (achievement.requirement.target || 1)) * 100, 
+                                  100
+                                )}%` 
+                              }
                             ]}
                           />
                         </View>
@@ -671,7 +669,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   },
   levelProgressBar: {
     height: 6,
-    backgroundColor: colors.border,
+    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E5E5EA',
     borderRadius: 3,
     overflow: 'hidden',
   },
@@ -706,7 +704,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   },
   progressBar: {
     height: 8,
-    backgroundColor: colors.border,
+    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E5E5EA',
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -805,7 +803,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   },
   achievementProgressBar: {
     height: 4,
-    backgroundColor: colors.border,
+    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E5E5EA',
     borderRadius: 2,
     overflow: 'hidden',
   },

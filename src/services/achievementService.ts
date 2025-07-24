@@ -324,16 +324,54 @@ class AchievementService {
   async getAchievements(): Promise<Achievement[]> {
     try {
       const saved = await this.getSavedAchievements();
+      const postService = getSimplePostService();
+      const stats = await postService.getStats();
       
-      // 저장된 업적이 없으면 기본 업적 반환
-      if (saved.length === 0) {
-        return ACHIEVEMENTS;
-      }
-      
-      // 새로운 업적이 추가된 경우를 위해 머지
+      // 새로운 업적이 추가된 경우를 위해 머지하고 현재 진행도 업데이트
       return ACHIEVEMENTS.map(achievement => {
         const savedAchievement = saved.find(a => a.id === achievement.id);
-        return savedAchievement || achievement;
+        
+        // 현재 진행도 계산
+        let current = 0;
+        switch (achievement.requirement.type) {
+          case 'post_count':
+            current = stats.totalPosts || 0;
+            break;
+          case 'style_challenge':
+            // 챌린지 완료 여부는 저장된 데이터 사용
+            const completedChallenges = saved
+              .filter(a => a.category === 'style' && a.isUnlocked)
+              .length;
+            current = completedChallenges;
+            break;
+          case 'streak':
+            // 연속 작성 일수는 별도 처리
+            current = savedAchievement?.requirement.current || 0;
+            break;
+          case 'special_event':
+            // 특별 이벤트는 저장된 데이터 사용
+            current = savedAchievement?.requirement.current || 0;
+            break;
+        }
+        
+        // 저장된 업적이 있으면 병합, 없으면 기본값에 현재 진행도 추가
+        if (savedAchievement) {
+          return {
+            ...savedAchievement,
+            requirement: {
+              ...savedAchievement.requirement,
+              current
+            }
+          };
+        } else {
+          return {
+            ...achievement,
+            requirement: {
+              ...achievement.requirement,
+              current
+            }
+          };
+        }
       });
     } catch (error) {
       console.error('Failed to get achievements:', error);

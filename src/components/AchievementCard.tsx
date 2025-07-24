@@ -19,8 +19,8 @@ interface AchievementCardProps {
 
 const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onPress }) => {
   const progress = achievement.requirement.current || 0;
-  const target = achievement.requirement.target;
-  const progressPercentage = (progress / target) * 100;
+  const target = achievement.requirement.target || 1;
+  const progressPercentage = Math.min((progress / target) * 100, 100);
 
   const rarityColors = {
     common: '#8B5CF6',
@@ -95,7 +95,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({ achievement, onPress 
                 style={[
                   styles.progressFill,
                   { 
-                    width: `${progressPercentage}%`,
+                    width: `${Math.max(progressPercentage, 0)}%`,
                     backgroundColor: rarityColors[achievement.rarity]
                   }
                 ]}
