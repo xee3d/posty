@@ -199,12 +199,14 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
         
-        setPosts(sortedPosts);
+        // 최대 10개만 표시
+        setPosts(sortedPosts.slice(0, 10));
       }
     } catch (error) {
       console.error('Failed to load posts:', error);
       const localPosts = await localAnalyticsService.getAllPosts();
-      setPosts(localPosts);
+      // 에러 시에도 최대 10개만 표시
+      setPosts(localPosts.slice(0, 10));
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);
@@ -217,7 +219,7 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
     
     if (auth().currentUser) {
       const unsubscribe = firestoreService.subscribeToUserPosts(
-        50,
+        10, // 최대 10개로 제한
         (firestorePosts: FirestorePost[]) => {
           const formattedPosts = firestorePosts.map(post => ({
             id: post.id,

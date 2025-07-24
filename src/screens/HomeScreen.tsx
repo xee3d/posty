@@ -991,16 +991,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 </AnimatedCard>
               ))}
               
-              {recentPosts.length > 3 && (
-                <TouchableOpacity
-                  style={styles.viewAllButton}
-                  onPress={() => setShowPostList(true)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.viewAllText}>전체 {recentPosts.length}개 게시물 보기</Text>
-                  <Icon name="arrow-forward" size={16} color={colors.primary} />
-                </TouchableOpacity>
-              )}
             </View>
           </SlideInView>
         )}
@@ -1482,21 +1472,6 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
     fontSize: 13,
     color: colors.text.secondary,
     fontWeight: '500',
-  },
-  viewAllButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: SPACING.xs,
-    paddingVertical: SPACING.md,
-    marginTop: SPACING.xs,
-    backgroundColor: colors.lightGray,
-    borderRadius: 8,
-  },
-  viewAllText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.primary,
   },
   subscriptionCardFull: {
     flex: 1,

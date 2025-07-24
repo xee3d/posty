@@ -68,8 +68,8 @@ export const saveContent = async (content: Omit<SavedContent, 'id' | 'createdAt'
     
     savedContents.unshift(newContent); // 최신 글을 앞에 추가
     
-    // 최대 50개까지만 저장
-    if (savedContents.length > 50) {
+    // 최대 10개까지만 저장
+    while (savedContents.length > 10) {
       savedContents.pop();
     }
     
