@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,10 +11,12 @@ import {
   Animated,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import IoniconsIcon from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import LinearGradient from 'react-native-linear-gradient';
 import { Alert } from '../utils/customAlert';
+import { SPACING, FONT_SIZES } from '../utils/constants';
 
 interface OnboardingScreenProps {
   onComplete?: () => void;
@@ -28,7 +30,7 @@ interface Agreements {
 }
 
 const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
-  const { colors, isDark } = useAppTheme();
+  const { colors, isDark, cardTheme } = useAppTheme();
   const [currentStep, setCurrentStep] = useState(1);
   const [allAgreed, setAllAgreed] = useState(false);
   const [agreements, setAgreements] = useState<Agreements>({
@@ -39,6 +41,34 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
   });
   const [showModal, setShowModal] = useState(false);
   const [modalContent, setModalContent] = useState({ title: '', content: '' });
+  
+  // 애니메이션 값들
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(50)).current;
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  
+  // 스텝 변경 시 애니메이션
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 8,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, [currentStep]);
 
   const handleAllAgreement = () => {
     const newState = !allAgreed;
@@ -120,6 +150,14 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
       {checked && <Icon name="check" size={16} color="#FFFFFF" />}
     </View>
   );
+  
+  // 아이콘 배경색 생성 함수
+  const getIconBgColor = (color: string) => {
+    if (isDark) {
+      return color + '30'; // 다크모드에서는 30% 투명도
+    }
+    return color + '15'; // 라이트모드에서는 15% 투명도
+  };
 
   const styles = StyleSheet.create({
     container: {
@@ -128,11 +166,11 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
     },
     progressContainer: {
       paddingTop: Platform.OS === 'ios' ? 50 : 20,
-      paddingHorizontal: 20,
-      paddingBottom: 20,
+      paddingHorizontal: SPACING.lg,
+      paddingBottom: SPACING.lg,
       backgroundColor: colors.background,
-      borderBottomWidth: 1,
-      borderBottomColor: isDark ? '#1A1A1A' : '#E5E5E5',
+      borderBottomWidth: 0,
+      ...cardTheme.shadow,
     },
     progressHeader: {
       flexDirection: 'row',
@@ -151,33 +189,34 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
       color: isDark ? '#9CA3AF' : '#666',
     },
     progressBar: {
-      height: 2,
+      height: 4,
       backgroundColor: isDark ? '#2A2A2A' : '#E5E5E5',
-      borderRadius: 1,
+      borderRadius: 2,
     },
     progressFill: {
-      height: 2,
+      height: 4,
       backgroundColor: colors.primary,
-      borderRadius: 1,
+      borderRadius: 2,
     },
     content: {
       flex: 1,
-      paddingHorizontal: 20,
-      paddingTop: 30,
+      paddingHorizontal: SPACING.lg,
+      paddingTop: SPACING.xl,
     },
     title: {
-      fontSize: 28,
-      fontWeight: 'bold',
-      color: colors.text,
-      marginBottom: 30,
+      fontSize: FONT_SIZES.xxl,
+      fontWeight: '800',
+      color: colors.text.primary,
+      marginBottom: SPACING.xl,
+      letterSpacing: -0.5,
     },
     allAgreeContainer: {
-      backgroundColor: isDark ? '#1A1A1A' : '#F8F8F8',
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 20,
-      borderWidth: 1,
-      borderColor: isDark ? '#252525' : '#E5E5E5',
+      backgroundColor: colors.primary + (isDark ? '20' : '10'),
+      borderRadius: 16,
+      padding: SPACING.lg,
+      marginBottom: SPACING.xl,
+      borderWidth: 2,
+      borderColor: colors.primary + '30',
     },
     allAgreeRow: {
       flexDirection: 'row',
@@ -230,15 +269,17 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
     },
     button: {
       height: 56,
-      borderRadius: 12,
+      borderRadius: 28,
       alignItems: 'center',
       justifyContent: 'center',
+      ...cardTheme.primary.shadow,
     },
     buttonEnabled: {
       backgroundColor: colors.primary,
     },
     buttonDisabled: {
-      backgroundColor: isDark ? '#1A1A1A' : '#E5E5E5',
+      backgroundColor: isDark ? colors.surface : '#E5E5E5',
+      shadowOpacity: 0,
     },
     buttonText: {
       fontSize: 17,
@@ -258,20 +299,21 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
     },
     permissionItem: {
       flexDirection: 'row',
-      backgroundColor: isDark ? '#141414' : '#FFFFFF',
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 12,
-      borderWidth: 1,
-      borderColor: isDark ? '#252525' : '#E5E5E5',
+      backgroundColor: isDark ? colors.surface : '#FFFFFF',
+      borderRadius: 16,
+      padding: SPACING.lg,
+      marginBottom: SPACING.md,
+      borderWidth: isDark ? 0 : 1,
+      borderColor: isDark ? 'transparent' : colors.border,
+      ...cardTheme.default.shadow,
     },
     permissionIcon: {
-      width: 44,
-      height: 44,
-      borderRadius: 10,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
       alignItems: 'center',
       justifyContent: 'center',
-      marginRight: 12,
+      marginRight: SPACING.md,
     },
     permissionContent: {
       flex: 1,
@@ -367,19 +409,25 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
       {currentStep === 1 && (
         <>
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            <Text style={styles.title}>약관 동의</Text>
-            
-            {/* All Agree Section */}
-            <TouchableOpacity 
-              style={styles.allAgreeContainer}
-              onPress={handleAllAgreement}
-              activeOpacity={0.7}
-            >
-              <View style={styles.allAgreeRow}>
-                {renderCheckbox(allAgreed)}
-                <Text style={styles.allAgreeText}>모든 약관에 동의합니다</Text>
-              </View>
-            </TouchableOpacity>
+            <Animated.View style={{
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }]
+            }}>
+              <Text style={styles.title}>약관 동의</Text>
+              
+              {/* All Agree Section */}
+              <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+                <TouchableOpacity 
+                  style={styles.allAgreeContainer}
+                  onPress={handleAllAgreement}
+                  activeOpacity={0.7}
+                >
+                  <View style={styles.allAgreeRow}>
+                    {renderCheckbox(allAgreed)}
+                    <Text style={styles.allAgreeText}>모든 약관에 동의합니다</Text>
+                  </View>
+                </TouchableOpacity>
+              </Animated.View>
 
             {/* Individual Terms */}
             <View>
@@ -451,6 +499,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
                 </TouchableOpacity>
               </TouchableOpacity>
             </View>
+            </Animated.View>
           </ScrollView>
 
           <View style={styles.buttonContainer}>
@@ -478,15 +527,28 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
       {currentStep === 2 && (
         <>
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-            <Text style={styles.title}>앱 권한 설정</Text>
-            <Text style={styles.subtitle}>
-              원활한 서비스 이용을 위해{'\n'}아래 권한을 허용해 주세요
-            </Text>
+            <Animated.View style={{
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }]
+            }}>
+              <Text style={styles.title}>앱 권한 설정</Text>
+              <Text style={styles.subtitle}>
+                원활한 서비스 이용을 위해{'\n'}아래 권한을 허용해 주세요
+              </Text>
+            </Animated.View>
 
             <View>
-              <View style={styles.permissionItem}>
-                <View style={[styles.permissionIcon, { backgroundColor: isDark ? 'rgba(167, 139, 250, 0.15)' : 'rgba(59, 130, 246, 0.1)' }]}>
-                  <Icon name="photo-camera" size={24} color={isDark ? '#A78BFA' : colors.primary} />
+              <Animated.View 
+                style={[
+                  styles.permissionItem,
+                  {
+                    opacity: fadeAnim,
+                    transform: [{ translateY: slideAnim }]
+                  }
+                ]}
+              >
+                <View style={[styles.permissionIcon, { backgroundColor: getIconBgColor('#E91E63') }]}>
+                  <IoniconsIcon name="camera" size={28} color="#E91E63" />
                 </View>
                 <View style={styles.permissionContent}>
                   <Text style={styles.permissionTitle}>카메라</Text>
@@ -494,11 +556,19 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
                     프로필 사진 촬영 및 콘텐츠 생성을 위해 필요합니다
                   </Text>
                 </View>
-              </View>
+              </Animated.View>
 
-              <View style={styles.permissionItem}>
-                <View style={[styles.permissionIcon, { backgroundColor: isDark ? 'rgba(134, 239, 172, 0.15)' : 'rgba(34, 197, 94, 0.1)' }]}>
-                  <Icon name="image" size={24} color={isDark ? '#86EFAC' : '#22C55E'} />
+              <Animated.View 
+                style={[
+                  styles.permissionItem,
+                  {
+                    opacity: fadeAnim,
+                    transform: [{ translateY: Animated.multiply(slideAnim, 1.2) }]
+                  }
+                ]}
+              >
+                <View style={[styles.permissionIcon, { backgroundColor: getIconBgColor('#4CAF50') }]}>
+                  <IoniconsIcon name="images" size={28} color="#4CAF50" />
                 </View>
                 <View style={styles.permissionContent}>
                   <Text style={styles.permissionTitle}>사진</Text>
@@ -506,11 +576,19 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
                     갤러리에서 이미지를 선택하여 콘텐츠를 생성합니다
                   </Text>
                 </View>
-              </View>
+              </Animated.View>
 
-              <View style={styles.permissionItem}>
-                <View style={[styles.permissionIcon, { backgroundColor: isDark ? 'rgba(253, 224, 71, 0.15)' : 'rgba(251, 146, 60, 0.1)' }]}>
-                  <Icon name="edit" size={24} color={isDark ? '#FDE047' : '#FB923C'} />
+              <Animated.View 
+                style={[
+                  styles.permissionItem,
+                  {
+                    opacity: fadeAnim,
+                    transform: [{ translateY: Animated.multiply(slideAnim, 1.4) }]
+                  }
+                ]}
+              >
+                <View style={[styles.permissionIcon, { backgroundColor: getIconBgColor('#FF9800') }]}>
+                  <IoniconsIcon name="notifications" size={28} color="#FF9800" />
                 </View>
                 <View style={styles.permissionContent}>
                   <Text style={styles.permissionTitle}>알림</Text>
@@ -518,11 +596,19 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
                     중요한 소식과 콘텐츠 생성 완료 알림을 받습니다
                   </Text>
                 </View>
-              </View>
+              </Animated.View>
 
-              <View style={styles.permissionItem}>
-                <View style={[styles.permissionIcon, { backgroundColor: isDark ? 'rgba(196, 181, 253, 0.15)' : 'rgba(168, 85, 247, 0.1)' }]}>
-                  <Icon name="auto-fix-high" size={24} color={isDark ? '#C4B5FD' : '#A855F7'} />
+              <Animated.View 
+                style={[
+                  styles.permissionItem,
+                  {
+                    opacity: fadeAnim,
+                    transform: [{ translateY: Animated.multiply(slideAnim, 1.6) }]
+                  }
+                ]}
+              >
+                <View style={[styles.permissionIcon, { backgroundColor: getIconBgColor('#2196F3') }]}>
+                  <IoniconsIcon name="location" size={28} color="#2196F3" />
                 </View>
                 <View style={styles.permissionContent}>
                   <Text style={styles.permissionTitle}>위치</Text>
@@ -530,7 +616,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
                     지역별 트렌드와 맞춤 콘텐츠를 제공합니다
                   </Text>
                 </View>
-              </View>
+              </Animated.View>
             </View>
           </ScrollView>
 
