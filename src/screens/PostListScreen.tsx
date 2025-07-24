@@ -1,6 +1,6 @@
 // src/screens/PostListScreen.tsx
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, ActivityIndicator, RefreshControl, ListRenderItem,  } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, FlatList, SafeAreaView, ActivityIndicator, RefreshControl, ListRenderItem, Clipboard, Share } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { COLORS, FONTS, SPACING, BORDER_RADIUS, CARD_THEME } from '../utils/constants';
@@ -11,7 +11,7 @@ import { storage } from '../utils/storage';
 import auth from '@react-native-firebase/auth';
 import firestoreService from '../services/firebase/firestoreService';
 import { Post as FirestorePost } from '../types/firestore';
-
+import { soundManager } from '../utils/soundManager';
 import { Alert } from '../utils/customAlert';
 interface PostListScreenProps {
   onClose: () => void;
@@ -77,6 +77,27 @@ const PostItemComponent = React.memo<{
   const isExpanded = expandedPostId === item.id;
   const styles = useMemo(() => createPostStyles(colors, cardTheme), [colors, cardTheme]);
 
+  // 복사하기 핸들러
+  const handleCopy = useCallback(() => {
+    const fullText = `${item.content}\n\n${item.hashtags.map(tag => `#${tag}`).join(' ')}`;
+    Clipboard.setString(fullText);
+    soundManager.playSuccess();
+    Alert.alert('복사 완료', '클립보드에 복사되었습니다.');
+  }, [item]);
+
+  // 공유하기 핸들러
+  const handleShare = useCallback(async () => {
+    try {
+      const fullText = `${item.content}\n\n${item.hashtags.map(tag => `#${tag}`).join(' ')}`;
+      await Share.share({
+        message: fullText,
+      });
+      soundManager.playTap();
+    } catch (error) {
+      console.error('Failed to share:', error);
+    }
+  }, [item]);
+
   return (
     <AnimatedCard delay={index * 50} style={styles.postCard}>
       <TouchableOpacity 
@@ -116,6 +137,27 @@ const PostItemComponent = React.memo<{
           {item.hashtags.length > 3 && (
             <Text style={styles.moreHashtags}>+{item.hashtags.length - 3}</Text>
           )}
+        </View>
+
+        {/* 액션 버튼들 */}
+        <View style={styles.actionButtons}>
+          <TouchableOpacity 
+            style={styles.actionButton} 
+            onPress={handleCopy}
+            activeOpacity={0.7}
+          >
+            <Icon name="copy-outline" size={18} color={colors.text.secondary} />
+            <Text style={styles.actionButtonText}>복사</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.actionButton} 
+            onPress={handleShare}
+            activeOpacity={0.7}
+          >
+            <Icon name="share-social-outline" size={18} color={colors.text.secondary} />
+            <Text style={styles.actionButtonText}>공유</Text>
+          </TouchableOpacity>
         </View>
       </TouchableOpacity>
     </AnimatedCard>
@@ -411,6 +453,27 @@ const createPostStyles = (colors: typeof COLORS, cardTheme: any) =>
     moreHashtags: {
       fontSize: 12,
       color: colors.text.tertiary,
+    },
+    actionButtons: {
+      flexDirection: 'row',
+      justifyContent: 'flex-end',
+      gap: SPACING.md,
+      marginTop: SPACING.xs,
+      paddingTop: SPACING.sm,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    actionButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: SPACING.xs,
+      paddingVertical: SPACING.xs,
+      paddingHorizontal: SPACING.sm,
+    },
+    actionButtonText: {
+      fontSize: 13,
+      color: colors.text.secondary,
+      fontWeight: '500',
     },
   });
 

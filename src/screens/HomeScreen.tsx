@@ -9,7 +9,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Post, Platform } from '../types';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, PLATFORMS, MOLLY_MESSAGES, BRAND, CARD_THEME, DARK_COLORS } from '../utils/constants';
+import { COLORS, FONTS, SPACING, BORDER_RADIUS, PLATFORMS, MOLLY_MESSAGES, BRAND, CARD_THEME, DARK_COLORS, FONT_SIZES } from '../utils/constants';
 import { useAppTheme } from '../hooks/useAppTheme';
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
@@ -32,6 +32,9 @@ import { Post as FirestorePost } from '../types/firestore';
 import { SyncIndicator } from '../components/SyncIndicator';
 import { useScreenTracking } from '../hooks/analytics/useScreenTracking';
 import { Alert } from '../utils/customAlert';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import NewUserWelcome from '../components/NewUserWelcome';
+import improvedStyleService from '../services/improvedStyleService';
 
 interface HomeScreenProps {
   onNavigate: (tab: string, content?: any) => void;
@@ -69,7 +72,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     console.log('Redux user.purchasedTokens:', reduxState.purchasedTokens);
   }, [currentTokens, reduxState]);
   
-  const [posts, setPosts] = useState<Post[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [coachingTip, setCoachingTip] = useState<any>(null);
   const [trendingHashtags, setTrendingHashtags] = useState<string[]>(['일상', '주말', '카페', '맛집', '여행', '운동', '책스타그램']);
@@ -79,32 +81,107 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   const [stats, setStats] = useState<any>(null); // 사용자 통계 추가
   const [tipIndex, setTipIndex] = useState(0); // 팁 인덱스 추가
   const [recommendations, setRecommendations] = useState<RecommendationCard[]>([]);
+  const [userLevel, setUserLevel] = useState<'new' | 'beginner' | 'regular' | 'expert'>('new');
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [styleAnalysis, setStyleAnalysis] = useState<any>(null);
 
   // 앱 시작 시 매일 토큰 리셋 체크
   useEffect(() => {
     dispatch(resetDailyTokens());
   }, [dispatch]);
 
-  // 샘플 데이터
-  const samplePosts: Post[] = [
-    {
-      id: '1',
-      title: '주말 브런치 후기',
-      content: '오늘도 든든한 카페인 충전 ☕ 월요일 아침을 시작하는 나만의 루틴',
-      platform: 'instagram',
-      status: 'published',
-      createdAt: new Date('2024-01-15T10:30:00'),
-      updatedAt: new Date('2024-01-15T10:30:00'),
-      tags: ['카페', '브런치', '주말'],
-      engagement: { likes: 245, comments: 23, shares: 5 },
-    },
-  ];
+  // 사용자 레벨 판단
+  const getUserLevel = (postCount: number): 'new' | 'beginner' | 'regular' | 'expert' => {
+    if (postCount === 0) return 'new';
+    if (postCount <= 10) return 'beginner';
+    if (postCount <= 30) return 'regular';
+    return 'expert';
+  };
+
+  // 개인화된 인사말
+  const getPersonalizedGreeting = () => {
+    const hour = new Date().getHours();
+    const userName = reduxState.displayName || '친구';
+    const postCount = stats?.totalPosts || 0;
+    const level = getUserLevel(postCount);
+    
+    // 신규 사용자
+    if (level === 'new') {
+      return {
+        emoji: '👋',
+        title: `안녕! 나는 포스티야`,
+        message: '글쓰기 도와줄게! 부담 갖지 말고 편하게 시작해보자 😊',
+        action: '첫 글 쓰기',
+        subMessage: '한 줄만 써도 내가 멋지게 만들어줄게!'
+      };
+    }
+    
+    // 시간대별 인사
+    if (hour < 6) {
+      return {
+        emoji: '🌙',
+        title: `${userName}, 새벽감성이네?`,
+        message: '이 시간의 생각들은 특별해. 기록해볼까?',
+        action: '새벽 감성 글쓰기'
+      };
+    } else if (hour < 10) {
+      return {
+        emoji: '☕',
+        title: `좋은 아침! ${userName}`,
+        message: '오늘은 뭐 올릴거야? 모닝커피 사진이라도 좋아!',
+        action: '아침 일상 공유'
+      };
+    } else if (hour < 14) {
+      return {
+        emoji: '🍴',
+        title: `${userName}, 점심은 먹었어?`,
+        message: '맛있는 거 먹었으면 자랑해야지!',
+        action: '점심 리뷰',
+        quickTemplates: ['오늘 점심 ✨', 'JMT 발견!', '이거 먹고 힘내자']
+      };
+    } else if (hour < 18) {
+      return {
+        emoji: '🚀',
+        title: `${userName}, 오후도 힙내자!`,
+        message: level === 'regular' ? 
+          '오늘 벨써 ' + postCount + '개나 썼네! 대단해 👍' :
+          '짧은 글이라도 좋아. 오늘의 순간을 기록해보자',
+        action: '일상 공유'
+      };
+    } else if (hour < 22) {
+      return {
+        emoji: '🌃',
+        title: `${userName}, 오늘 하루 어땠어?`,
+        message: '하루를 마무리하는 글 하나 쓸까? 간단하게라도 좋아',
+        action: '저녁 감성 글',
+        quickTemplates: ['오늘도 수고했어 🌙', '내일은 더 좋은 날', '하루 끝!']
+      };
+    } else {
+      return {
+        emoji: '🌜',
+        title: `${userName}, 아직 안 자?`,
+        message: '잠들기 전 오늘 있었던 일 기록해볼까?',
+        action: '밤 감성 글'
+      };
+    }
+  };
 
   // 사용자 통계 가져오기
   const loadUserStats = async () => {
     try {
       const userStats = await simplePostService.getStats();
       setStats(userStats);
+      // 사용자 레벨 업데이트
+      const level = getUserLevel(userStats?.totalPosts || 0);
+      setUserLevel(level);
+      
+      // 신규 사용자이고 온보딩을 보지 않았다면 표시
+      if (level === 'new') {
+        const hasSeenWelcome = await AsyncStorage.getItem('HAS_SEEN_WELCOME');
+        if (!hasSeenWelcome) {
+          setShowWelcome(true);
+        }
+      }
     } catch (error) {
       console.error('Failed to load user stats:', error);
     }
@@ -181,6 +258,29 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     }
   };
 
+  // 스타일 분석 가져오기
+  const loadStyleAnalysis = async () => {
+    try {
+      const posts = await simplePostService.getRecentPosts(20);
+      if (posts.length > 0) {
+        const analysis = await improvedStyleService.analyzeUserStyle(posts);
+        setStyleAnalysis(analysis);
+        
+        // 주간 포스트 수 계산 - stats 업데이트 제거
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        const weeklyPosts = posts.filter(post => 
+          new Date(post.createdAt) >= weekAgo
+        ).length;
+        
+        // stats 대신 styleAnalysis에 포함
+        setStyleAnalysis(prev => ({ ...analysis, weeklyPosts }));
+      }
+    } catch (error) {
+      console.error('Failed to load style analysis:', error);
+    }
+  };
+
   // 날짜 포맷팅 함수
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -202,20 +302,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     return `${Math.floor(diffDays / 30)}개월 전`;
   };
 
-  useEffect(() => {
-    setPosts(samplePosts);
-    loadUserStats();
-  }, []);
-
-  // 사용자 통계가 로드되면 팁과 해시태그 로드
-  useEffect(() => {
-    if (stats || recentPosts.length > 0) {
-      loadCoachingTip();
-      loadTrendingHashtags();
-      loadRecommendations();
-    }
-  }, [stats, recentPosts]);
-
   // 최근 게시물 불러오기
   const loadRecentPosts = async () => {
     try {
@@ -226,39 +312,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     }
   };
 
-  // Firestore에서 실시간 데이터 구독
-  useEffect(() => {
-    // 비로그인 상태에서도 로컬 데이터 표시
-    loadRecentPosts();
-    
-    // 로그인한 경우 Firestore 데이터 구독
-    if (auth().currentUser) {
-      const unsubscribe = firestoreService.subscribeToUserPosts(
-        5, // limit
-        (posts: FirestorePost[]) => {
-          // Firestore 데이터를 SavedContent 형식으로 변환
-          const convertedPosts: SavedContent[] = posts.map(post => ({
-            id: post.id,
-            content: post.content,
-            hashtags: post.hashtags,
-            tone: post.tone,
-            length: post.length,
-            platform: post.platform,
-            createdAt: post.createdAt.toDate ? post.createdAt.toDate().toISOString() : new Date().toISOString(),
-            prompt: post.originalPrompt,
-          }));
-          setRecentPosts(convertedPosts);
-        }
-      );
-      
-      return () => unsubscribe();
-    }
-  }, []);
 
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      setPosts(samplePosts);
       await loadUserStats();
       await loadCoachingTip();
       await loadTrendingHashtags();
@@ -302,12 +359,85 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       case '구독':
         onNavigate('subscription');
         break;
+      // 개인화된 액션들
+      case '첫 글 쓰기':
+      case '새벽 감성 글쓰기':
+      case '아침 일상 공유':
+      case '점심 리뷰':
+      case '일상 공유':
+      case '저녁 감성 글':
+      case '밤 감성 글':
+        onNavigate('ai-write');
+        break;
       default:
+        // 기본적으로 ai-write로 이동
+        onNavigate('ai-write');
         break;
     }
   };
 
   const styles = createStyles(colors, cardTheme, theme);
+
+  // 온보딩 완료 처리
+  const handleWelcomeComplete = async () => {
+    await AsyncStorage.setItem('HAS_SEEN_WELCOME', 'true');
+    setShowWelcome(false);
+  };
+
+  // useEffect 모음
+  useEffect(() => {
+    loadUserStats();
+    loadRecentPosts();
+  }, []);
+
+  // 사용자 통계가 로드되면 팁과 해시태그 로드
+  useEffect(() => {
+    if (stats && stats.totalPosts >= 0) {
+      loadCoachingTip();
+      loadTrendingHashtags();
+      loadRecommendations();
+      loadStyleAnalysis();
+    }
+  }, [stats?.totalPosts]); // totalPosts만 의존성으로 사용
+
+  // Firestore에서 실시간 데이터 구독
+  useEffect(() => {
+    // 비로그인 상태에서도 로컬 데이터 표시
+    loadRecentPosts();
+    
+    // 로그인한 경우 Firestore 데이터 구독
+    if (auth().currentUser) {
+      const unsubscribe = firestoreService.subscribeToUserPosts(
+        5, // limit
+        (posts: FirestorePost[]) => {
+          // Firestore 데이터를 SavedContent 형식으로 변환
+          const convertedPosts: SavedContent[] = posts.map(post => ({
+            id: post.id,
+            content: post.content,
+            hashtags: post.hashtags,
+            tone: post.tone,
+            length: post.length,
+            platform: post.platform,
+            createdAt: post.createdAt.toDate ? post.createdAt.toDate().toISOString() : new Date().toISOString(),
+            prompt: post.originalPrompt,
+          }));
+          setRecentPosts(convertedPosts);
+        }
+      );
+      
+      return () => unsubscribe();
+    }
+  }, []);
+
+  // 신규 사용자 온보딩 표시
+  if (showWelcome) {
+    return (
+      <NewUserWelcome 
+        onStart={handleWelcomeComplete}
+        onDismiss={handleWelcomeComplete}
+      />
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -369,73 +499,142 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           <SyncIndicator />
         </View>
 
-        {/* Molly 인사 배너 */}
+        {/* 개인화된 인사 배너 */}
         <FadeInView delay={50} duration={200}>
           <View style={styles.mollyBanner}>
             <View style={styles.mollyAvatar}>
-              <Text style={styles.mollyAvatarText}>👋</Text>
+              <Text style={styles.mollyAvatarText}>{getPersonalizedGreeting().emoji}</Text>
             </View>
             <View style={styles.mollyBannerContent}>
-              <Text style={styles.mollyBannerTitle}>{APP_TEXT.home.header.greeting}</Text>
-              <Text style={styles.mollyBannerSubtitle}>{BRAND.subTagline}</Text>
+              <Text style={styles.mollyBannerTitle}>{getPersonalizedGreeting().title}</Text>
+              <Text style={styles.mollyBannerSubtitle}>{getPersonalizedGreeting().message}</Text>
             </View>
+          </View>
+          
+          {/* 신규 사용자를 위한 추가 메시지 */}
+          {userLevel === 'new' && getPersonalizedGreeting().subMessage && (
+            <View style={styles.welcomeSubMessage}>
+              <Text style={styles.welcomeSubText}>💡 {getPersonalizedGreeting().subMessage}</Text>
+            </View>
+          )}
+          
+          {/* 빠른 템플릿 (시간대별) */}
+          {getPersonalizedGreeting().quickTemplates && (
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              style={styles.quickTemplateScroll}
+            >
+              {getPersonalizedGreeting().quickTemplates.map((template, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.quickTemplateChip}
+                  onPress={() => onNavigate('ai-write', { content: template })}
+                >
+                  <Text style={styles.quickTemplateText}>{template}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          )}
+        </FadeInView>
+
+        {/* 빠른 생성 - 사용자 레벨에 따라 다르게 표시 */}
+        <FadeInView delay={175}>
+          <View style={styles.quickActions}>
+            <Text style={styles.sectionTitle}>
+              {userLevel === 'new' ? '뭘 써야 할지 모르겠다면?' : '오늘은 뭘 올릴까?'}
+            </Text>
+            
+            {/* 신규 사용자를 위한 간단한 템플릿 */}
+            {userLevel === 'new' && (
+              <View style={styles.templateSuggestions}>
+                <TouchableOpacity 
+                  style={styles.templateCard}
+                  onPress={() => onNavigate('ai-write', { content: '안녕! 나는' })}
+                >
+                  <Text style={styles.templateEmoji}>👋</Text>
+                  <Text style={styles.templateTitle}>자기소개</Text>
+                  <Text style={styles.templateDesc}>간단한 인사말부터</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.templateCard}
+                  onPress={() => onNavigate('ai-write', { content: '오늘은' })}
+                >
+                  <Text style={styles.templateEmoji}>🌞</Text>
+                  <Text style={styles.templateTitle}>일상 공유</Text>
+                  <Text style={styles.templateDesc}>오늘 있었던 일</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity 
+                  style={styles.templateCard}
+                  onPress={() => onNavigate('ai-write', { mode: 'photo' })}
+                >
+                  <Text style={styles.templateEmoji}>📸</Text>
+                  <Text style={styles.templateTitle}>사진으로</Text>
+                  <Text style={styles.templateDesc}>사진만 있으면 OK</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            
+            {/* 기존 사용자를 위한 메인 액션 */}
+            {userLevel !== 'new' && (
+              <View style={styles.mainActions}>
+                <ScaleButton 
+                  style={styles.mainActionCard}
+                  onPress={() => handleQuickAction(getPersonalizedGreeting().action || APP_TEXT.home.quickActions.writePost)}
+                >
+                  <View style={styles.mainActionRow}>
+                    <View style={styles.mainActionIcon}>
+                    <MaterialIcon name="edit" size={24} color={colors.white} />
+                    </View>
+                    <View style={styles.mainActionTextContainer}>
+                      <Text style={styles.mainActionTitle}>글쓰기 도와줘</Text>
+                      <Text style={styles.mainActionDesc}>한 줄만 써도 멋지게 만들어줄게</Text>
+                    </View>
+                  </View>
+                </ScaleButton>
+
+                {/* 문장 정리하기 - 초보자 이상만 */}
+                {userLevel !== 'beginner' && (
+                  <ScaleButton 
+                    style={styles.mainActionCard}
+                    onPress={() => handleQuickAction('문장 정리하기')}
+                  >
+                    <View style={styles.mainActionRow}>
+                      <View style={[styles.mainActionIcon, { backgroundColor: '#9C27B0' }]}>
+                        <MaterialIcon name="auto-fix-high" size={24} color={colors.white} />
+                      </View>
+                      <View style={styles.mainActionTextContainer}>
+                        <Text style={styles.mainActionTitle}>문장 다듬기</Text>
+                        <Text style={styles.mainActionDesc}>내가 쓴 글 좀 다듬어줘</Text>
+                      </View>
+                    </View>
+                  </ScaleButton>
+                )}
+
+                <ScaleButton 
+                  style={styles.mainActionCard}
+                  onPress={() => handleQuickAction(APP_TEXT.home.quickActions.analyzePhoto)}
+                >
+                  <View style={styles.mainActionRow}>
+                    <View style={[styles.mainActionIcon, { backgroundColor: '#E91E63' }]}>
+                    <MaterialIcon name="image" size={24} color={colors.white} />
+                    </View>
+                    <View style={styles.mainActionTextContainer}>
+                      <Text style={styles.mainActionTitle}>사진으로 시작</Text>
+                      <Text style={styles.mainActionDesc}>사진만 보여주면 글 써줄게</Text>
+                    </View>
+                  </View>
+                </ScaleButton>
+              </View>
+            )}
           </View>
         </FadeInView>
 
-        {/* 빠른 생성 */}
-        <FadeInView delay={175}>
-          <View style={styles.quickActions}>
-            <Text style={styles.sectionTitle}>{APP_TEXT.home.quickActions.title}</Text>
-            <View style={styles.mainActions}>
-              <ScaleButton 
-                style={styles.mainActionCard}
-                onPress={() => handleQuickAction(APP_TEXT.home.quickActions.writePost)}
-              >
-                <View style={styles.mainActionRow}>
-                  <View style={styles.mainActionIcon}>
-                  <MaterialIcon name="edit" size={24} color={colors.white} />
-                  </View>
-                  <View style={styles.mainActionTextContainer}>
-                    <Text style={styles.mainActionTitle}>{APP_TEXT.home.quickActions.writePost}</Text>
-                    <Text style={styles.mainActionDesc}>{APP_TEXT.home.quickActions.writePostDesc}</Text>
-                  </View>
-                </View>
-              </ScaleButton>
-
-              {/* 문장 정리하기 - 새로 추가 */}
-              <ScaleButton 
-                style={styles.mainActionCard}
-                onPress={() => handleQuickAction('문장 정리하기')}
-              >
-                <View style={styles.mainActionRow}>
-                  <View style={[styles.mainActionIcon, { backgroundColor: '#9C27B0' }]}>
-                    <MaterialIcon name="auto-fix-high" size={24} color={colors.white} />
-                  </View>
-                  <View style={styles.mainActionTextContainer}>
-                    <Text style={styles.mainActionTitle}>문장 정리하기</Text>
-                    <Text style={styles.mainActionDesc}>작성한 글을 더 멋지게 다듬어드려요</Text>
-                  </View>
-                </View>
-              </ScaleButton>
-
-              <ScaleButton 
-                style={styles.mainActionCard}
-                onPress={() => handleQuickAction(APP_TEXT.home.quickActions.analyzePhoto)}
-              >
-                <View style={styles.mainActionRow}>
-                  <View style={[styles.mainActionIcon, { backgroundColor: '#E91E63' }]}>
-                  <MaterialIcon name="image" size={24} color={colors.white} />
-                  </View>
-                  <View style={styles.mainActionTextContainer}>
-                    <Text style={styles.mainActionTitle}>{APP_TEXT.home.quickActions.analyzePhoto}</Text>
-                    <Text style={styles.mainActionDesc}>{APP_TEXT.home.quickActions.analyzePhotoDesc}</Text>
-                  </View>
-                </View>
-              </ScaleButton>
-            </View>
-
-            {/* 보조 기능들 */}
-            <View style={styles.subActions}>
+        {/* 보조 기능들 */}
+        <FadeInView delay={200}>
+          <View style={styles.subActions}>
               {/* 개발 환경에서만 표시 - 출시 시 주석 처리 */}
               {__DEV__ && (
                 <>
@@ -471,41 +670,104 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                   <Text style={styles.subActionText}>구독</Text>
                 </TouchableOpacity>
               </AnimatedCard>
-            </View>
           </View>
         </FadeInView>
 
-        {/* 포스티의 특별 조언 */}
-        <SlideInView direction="left" delay={550}>
-          <View style={styles.coachingSection}>
-            <Text style={styles.sectionTitle}>포스티의 특별 조언</Text>
-            
-            <View style={styles.coachingCard}>
-              <View style={styles.coachingIconContainer}>
-                <MaterialIcon name="tips-and-updates" size={24} color={colors.white} />
-              </View>
-              <View style={styles.coachingContent}>
-                <Text style={styles.coachingTitle}>
-                  {coachingTip ? `${coachingTip.emoji} ${coachingTip.label}` : '💡 오늘의 꿀팁'}
-                </Text>
-                <Text style={styles.coachingText}>
-                  {coachingTip ? 
-                    (coachingTip.value.includes('\n') ? 
-                      `${coachingTip.value.replace('\n', ' ')} - ${coachingTip.subtext}` : 
-                      `${coachingTip.value}! ${coachingTip.subtext}`
-                    ) : 
-                    '카페 사진은 자연광이 들어오는 창가에서 찍으면 더 예쁘게 나와요. 오전 10-11시가 가장 좋은 시간대예요!'
-                  }
-                </Text>
+        {/* 사용자 레벨에 따른 맞춤 팁 */}
+        {userLevel !== 'new' && (
+          <SlideInView direction="left" delay={550}>
+            <View style={styles.coachingSection}>
+              <Text style={styles.sectionTitle}>
+                💡 오늘의 쉬운 팁
+              </Text>
+              
+              <View style={styles.coachingCard}>
+                <View style={styles.coachingIconContainer}>
+                  <MaterialIcon 
+                    name={userLevel === 'expert' ? "star" : "tips-and-updates"} 
+                    size={24} 
+                    color={colors.white} 
+                  />
+                </View>
+                <View style={styles.coachingContent}>
+                  <Text style={styles.coachingTitle}>
+                    포스티가 알려주는 꿀팁
+                  </Text>
+                  <Text style={styles.coachingText}>
+                    {coachingTip ? 
+                      `${coachingTip.value}${coachingTip.subtext ? ` ${coachingTip.subtext}` : ''}` :
+                     userLevel === 'beginner' ? 
+                      '짧은 글도 괜찮아! 일단 매일 하나씩 올려보는 게 중요해. 사진 하나에 한 줄만 써도 충분해 😊' :
+                     userLevel === 'expert' ?
+                      `이번 주 ${stats?.favoriteCategories?.[0] || '일상'} 관련 글이 가장 반응이 좋았어요. 비슷한 주제로 한 번 더 도전해보세요!` :
+                      '오늘도 멋진 이야기를 들려주세요!'
+                    }
+                  </Text>
+                </View>
               </View>
             </View>
-          </View>
-        </SlideInView>
+          </SlideInView>
+        )}
+
+        {/* 나의 글쓰기 스타일 */}
+        {styleAnalysis && stats?.totalPosts > 3 && (
+          <SlideInView direction="right" delay={575}>
+            <TouchableOpacity 
+              style={styles.styleCard}
+              onPress={() => onNavigate('my-style')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.styleCardHeader}>
+                <View style={styles.styleIconContainer}>
+                  <MaterialIcon 
+                    name="palette" 
+                    size={20} 
+                    color={colors.white} 
+                  />
+                </View>
+                <Text style={styles.styleCardTitle}>나의 글쓰기 스타일</Text>
+                <Icon name="chevron-forward" size={20} color={colors.text.secondary} />
+              </View>
+              
+              <View style={styles.styleCardContent}>
+                <View style={styles.styleMainInfo}>
+                  <Text style={styles.styleType}>
+                    {styleAnalysis.dominantStyle === 'minimalist' ? '🎯 미니멀리스트' :
+                     styleAnalysis.dominantStyle === 'storyteller' ? '📖 스토리텔러' :
+                     styleAnalysis.dominantStyle === 'visualist' ? '📸 비주얼리스트' :
+                     styleAnalysis.dominantStyle === 'trendsetter' ? '✨ 트렌드세터' :
+                     '🎨 나만의 스타일'}
+                  </Text>
+                  <View style={styles.styleStats}>
+                    <View style={styles.styleStat}>
+                      <Text style={styles.styleStatLabel}>일관성</Text>
+                      <Text style={styles.styleStatValue}>{styleAnalysis.consistency}%</Text>
+                    </View>
+                    <View style={styles.styleStatDivider} />
+                    <View style={styles.styleStat}>
+                      <Text style={styles.styleStatLabel}>이번 주</Text>
+                      <Text style={styles.styleStatValue}>{stats?.weeklyPosts || 0}개</Text>
+                    </View>
+                  </View>
+                </View>
+                
+                <View style={styles.styleProgressBar}>
+                  <View 
+                    style={[
+                      styles.styleProgressFill,
+                      { width: `${styleAnalysis.consistency}%` }
+                    ]}
+                  />
+                </View>
+              </View>
+            </TouchableOpacity>
+          </SlideInView>
+        )}
 
         {/* 오늘의 트렌드 - 개인화된 해시태그 추천 */}
         <SlideInView direction="left" delay={600}>
           <View style={styles.trendSection}>
-            <Text style={styles.sectionTitle}>오늘의 추천 해시태그</Text>
+            <Text style={styles.sectionTitle}>🏷️ 요즘 뜨는 해시태그</Text>
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hashtagScroll}>
               {trendingHashtags.map((tag, index) => (
                 <TouchableOpacity
@@ -530,7 +792,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
         <SlideInView direction="right" delay={650}>
           <View style={styles.todaySection}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>{APP_TEXT.brand.characterNameKo}의 맞춤 추천</Text>
+              <Text style={styles.sectionTitle}>🎯 오늘 뭐 쓸까?</Text>
             </View>
             
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.recommendScroll}>
@@ -574,11 +836,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                       <MaterialIcon name="edit" size={24} color={colors.white} />
                     </View>
                     <View style={styles.recommendBadge}>
-                      <Text style={styles.recommendBadgeText}>🔥 시작하기</Text>
+                      <Text style={styles.recommendBadgeText}>🔥 쉬워요</Text>
                     </View>
-                    <Text style={styles.recommendTitle}>첨 포스팅 도전!</Text>
+                    <Text style={styles.recommendTitle}>한 줄로 시작해요</Text>
                     <Text style={styles.recommendContent}>
-                      포스티와 함께 오늘의 이야기를{"\n"}만들어보세요!
+                      긴 글 필요 없어요!{"\n"}오늘 뭐했는지만 써도 OK
                     </Text>
                     <View style={styles.recommendFooter}>
                       <View style={styles.recommendMeta}>
@@ -599,11 +861,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                       <MaterialIcon name="photo-camera" size={24} color={colors.white} />
                     </View>
                     <View style={styles.recommendBadge}>
-                      <Text style={styles.recommendBadgeText}>📸 사진 활용</Text>
+                      <Text style={styles.recommendBadgeText}>📸 더 쉬워요</Text>
                     </View>
-                    <Text style={styles.recommendTitle}>사진으로 시작하기</Text>
+                    <Text style={styles.recommendTitle}>사진만 있으면 끝!</Text>
                     <Text style={styles.recommendContent}>
-                      갤러리의 사진에{"\n"}이야기를 더해보세요!
+                      사진 하나 골라주면{"\n"}글은 내가 써줄게!
                     </Text>
                     <View style={styles.recommendFooter}>
                       <View style={styles.recommendMeta}>
@@ -629,13 +891,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           <SlideInView direction="up" delay={700}>
             <View style={styles.recentPostsSection}>
               <View style={styles.sectionHeader}>
-                <Text style={styles.sectionTitle}>내 게시물</Text>
+                <Text style={styles.sectionTitle}>📝 내가 쓴 글</Text>
                 <TouchableOpacity onPress={() => setShowPostList(true)}>
                   <Text style={styles.moreText}>전체보기</Text>
                 </TouchableOpacity>
               </View>
               
-              {recentPosts.slice(0, 3).map((post, index) => (
+              {recentPosts.slice(0, 5).map((post, index) => (
                 <AnimatedCard key={post.id} delay={750 + index * 50} style={styles.postCard}>
                   <TouchableOpacity 
                     onPress={() => setExpandedPostId(expandedPostId === post.id ? null : post.id)}
@@ -684,7 +946,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 </AnimatedCard>
               ))}
               
-              {recentPosts.length > 3 && (
+              {recentPosts.length > 5 && (
                 <TouchableOpacity
                   style={styles.viewAllButton}
                   onPress={() => setShowPostList(true)}
@@ -1208,6 +1470,146 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
     fontSize: 14,
     color: colors.text.secondary,
     fontStyle: 'italic',
+  },
+  // 스타일 카드
+  styleCard: {
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: SPACING.lg,
+    ...cardTheme.default.shadow,
+  },
+  styleCardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: SPACING.md,
+  },
+  styleIconContainer: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: SPACING.sm,
+  },
+  styleCardTitle: {
+    fontSize: FONT_SIZES.medium,
+    fontWeight: '600',
+    color: colors.text.primary,
+    flex: 1,
+  },
+  styleCardContent: {
+    gap: SPACING.sm,
+  },
+  styleMainInfo: {
+    gap: SPACING.sm,
+  },
+  styleType: {
+    fontSize: FONT_SIZES.large,
+    fontWeight: '700',
+    color: colors.text.primary,
+    marginBottom: SPACING.xs,
+  },
+  styleStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.md,
+  },
+  styleStat: {
+    alignItems: 'center',
+  },
+  styleStatLabel: {
+    fontSize: FONT_SIZES.small,
+    color: colors.text.secondary,
+    marginBottom: 2,
+  },
+  styleStatValue: {
+    fontSize: FONT_SIZES.medium,
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  styleStatDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: colors.border,
+  },
+  styleProgressBar: {
+    height: 4,
+    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E5E5EA',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginTop: SPACING.xs,
+  },
+  styleProgressFill: {
+    height: '100%',
+    backgroundColor: colors.primary,
+    borderRadius: 2,
+  },
+  // 신규 사용자를 위한 추가 메시지
+  welcomeSubMessage: {
+    backgroundColor: colors.warning + '15',
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.sm,
+    padding: SPACING.md,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.warning + '30',
+  },
+  welcomeSubText: {
+    fontSize: 14,
+    color: colors.warning,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  // 빠른 템플릿
+  quickTemplateScroll: {
+    marginTop: SPACING.sm,
+    marginHorizontal: SPACING.lg,
+  },
+  quickTemplateChip: {
+    backgroundColor: colors.primary + '15',
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: 20,
+    marginRight: SPACING.sm,
+    borderWidth: 1,
+    borderColor: colors.primary + '30',
+  },
+  quickTemplateText: {
+    fontSize: 14,
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  // 신규 사용자 템플릿
+  templateSuggestions: {
+    flexDirection: 'row',
+    gap: SPACING.sm,
+    marginTop: SPACING.md,
+  },
+  templateCard: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    padding: SPACING.md,
+    alignItems: 'center',
+    ...cardTheme.default.shadow,
+  },
+  templateEmoji: {
+    fontSize: 32,
+    marginBottom: SPACING.xs,
+  },
+  templateTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: colors.text.primary,
+    marginBottom: 4,
+  },
+  templateDesc: {
+    fontSize: 12,
+    color: colors.text.secondary,
+    textAlign: 'center',
   },
   });
 };
