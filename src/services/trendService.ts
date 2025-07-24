@@ -28,7 +28,7 @@ class TrendService {
   private readonly CACHE_KEY = 'TREND_CACHE';
   private readonly CACHE_VERSION_KEY = 'TREND_CACHE_VERSION';
   private readonly CACHE_VERSION = '2.0'; // 버전 변경 시 캐시 초기화
-  private readonly CACHE_DURATION = 1000 * 60 * 10; // 10분마다 업데이트 (실시간성 향상)
+  private readonly CACHE_DURATION = 1000 * 60 * 60 * 4; // 4시간마다 업데이트 (트렌드는 자주 변하지 않음)
   
   // NewsAPI 키 (무료 플랜)
   private readonly NEWS_API_KEY = NEWS_API_KEY || '';
@@ -54,8 +54,8 @@ class TrendService {
         return cached;
       } else if (cached && this.USE_REAL_API) {
         const cacheInfo = await this.getCacheAge();
-        // 실시간 API 사용 시 10분 이상 된 캐시는 무시
-        if (cacheInfo.ageInMinutes < 10) {
+        // 실시간 API 사용 시 4시간 이상 된 캐시는 무시
+        if (cacheInfo.ageInMinutes < 240) { // 4시간 = 240분
           console.log(`[TrendService] Using cached trends (age: ${cacheInfo.ageInMinutes} minutes)`);
           return cached;
         }
@@ -69,12 +69,23 @@ class TrendService {
         allTrends = await this.fetchRealTimeTrends();
       } else {
         // 기존 로직 사용
-        // 병렬로 여러 소스에서 트렌드 가져오기
-        const [newsTraends, redditTrends, naverTrends] = await Promise.allSettled([
-          this.getNewsTrends(),
-          this.getRedditTrends(),
-          this.getNaverTrends(),
-        ]);
+        // 병렬로 여러 소스에서 트렌드 가져오기 (타임아웃 적용)
+        const promises = [
+          Promise.race([
+            this.getNewsTrends(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('News API timeout')), 5000))
+          ]),
+          Promise.race([
+            this.getRedditTrends(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Reddit API timeout')), 5000))
+          ]),
+          Promise.race([
+            this.getNaverTrends(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Naver trends timeout')), 3000))
+          ]),
+        ];
+        
+        const [newsTraends, redditTrends, naverTrends] = await Promise.allSettled(promises);
         
         // 네이버 트렌드 우선 (한국 콘텐츠)
         if (naverTrends.status === 'fulfilled' && naverTrends.value) {
@@ -783,7 +794,7 @@ class TrendService {
       console.log('[TrendService] API URL:', `${this.API_BASE_URL}/trends`);
       
       const response = await axios.get(`${this.API_BASE_URL}/trends`, {
-        timeout: 10000, // 10초 타임아웃
+        timeout: 8000, // 8초 타임아웃 (더 빠른 응답)
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json',

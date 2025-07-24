@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -14,12 +14,15 @@ import { COLORS, FONTS, SPACING, BORDER_RADIUS, BRAND } from '../utils/constants
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../hooks/useAppTheme';
+// import { useFocusEffect } from '@react-navigation/native'; // NavigationContainer 밖에서 사용 불가
 import { soundManager } from '../utils/soundManager';
 import trendService from '../services/trendService';
 import { AnimatedCard, SlideInView, FadeInView } from '../components/AnimationComponents';
 import { useAppSelector } from '../hooks/redux';
 import { getUserPlan, TREND_ACCESS, PlanType } from '../config/adConfig';
 import { Alert } from '../utils/customAlert';
+import { TrendPageSkeleton, TrendCardSkeleton, MyHashtagsSkeleton } from '../components/SkeletonLoader';
+import trendCache from '../utils/trendCache';
 
 type TrendCategory = 'all' | 'news' | 'social' | 'keywords';
 
@@ -44,51 +47,145 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   const [selectedCategory, setSelectedCategory] = useState<TrendCategory>('all');
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isUserTrendsLoading, setIsUserTrendsLoading] = useState(false);
   const [trends, setTrends] = useState<any[]>([]);
   const [userTrends, setUserTrends] = useState<any>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [lastLoadTime, setLastLoadTime] = useState<number>(0);
+  const [hasInitialized, setHasInitialized] = useState<boolean>(false);
 
-  const loadTrends = async () => {
+  const loadTrends = async (forceRefresh = false) => {
+    const now = Date.now();
+    const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4시간
+    
+    // 강제 새로고침이 아니고, 최근에 로드했고, 데이터가 있으면 스킵
+    if (!forceRefresh && trends.length > 0 && (now - lastLoadTime) < CACHE_DURATION) {
+      console.log('[TrendScreen] Using cached data, skipping API call');
+      setIsLoading(false);
+      setIsInitialLoading(false);
+      return;
+    }
+    
     try {
-      setIsLoading(true);
-      
-      // 외부 트렌드 데이터 가져오기
-      const trendData = await trendService.getAllTrends();
-      setTrends(trendData);
-      
-      // 사용자 트렌드 분석 (기존 서비스 사용)
-      try {
-        const improvedUserTrendsService = require('../services/improvedUserTrendsService').default;
-        const userTrendData = await improvedUserTrendsService.analyzeTrends('week');
-        setUserTrends(userTrendData);
-      } catch (error) {
-        console.log('User trends not available');
+      setError(null);
+      if (!forceRefresh) {
+        setIsLoading(true);
       }
+      
+      console.log('[TrendScreen] Loading trends from API...');
+      
+      // 트렌드 데이터와 사용자 트렌드를 병렬로 로드
+      const [trendData, userTrendData] = await Promise.allSettled([
+        trendService.getAllTrends(),
+        loadUserTrends(),
+      ]);
+      
+      // 트렌드 데이터 처리
+      if (trendData.status === 'fulfilled') {
+        setTrends(trendData.value);
+        setLastLoadTime(now); // 로드 시간 업데이트
+        console.log('[TrendScreen] Trends loaded successfully');
+        
+        // 메모리 캐시에 저장
+        trendCache.set({
+          trends: trendData.value,
+          userTrends: userTrendData.status === 'fulfilled' ? userTrendData.value : null,
+          lastLoadTime: now,
+          error: null
+        });
+        
+      } else {
+        console.error('Failed to load trends:', trendData.reason);
+        const errorMsg = '트렌드를 불러오는 중 오류가 발생했습니다.';
+        setError(errorMsg);
+        setTrends([]);
+        
+        // 에러도 캐시에 저장
+        trendCache.set({
+          trends: [],
+          userTrends: null,
+          lastLoadTime: now,
+          error: errorMsg
+        });
+      }
+      
+      // 사용자 트렌드 데이터 처리
+      if (userTrendData.status === 'fulfilled') {
+        setUserTrends(userTrendData.value);
+      }
+      
     } catch (error) {
       console.error('Failed to load trends:', error);
+      setError('트렌드를 불러오는 중 오류가 발생했습니다.');
+      setTrends([]);
     } finally {
       setIsLoading(false);
+      setIsInitialLoading(false);
       setRefreshing(false);
     }
   };
 
+  const loadUserTrends = async () => {
+    try {
+      setIsUserTrendsLoading(true);
+      const improvedUserTrendsService = require('../services/improvedUserTrendsService').default;
+      const userTrendData = await improvedUserTrendsService.analyzeTrends('week');
+      return userTrendData;
+    } catch (error) {
+      console.log('User trends not available');
+      return null;
+    } finally {
+      setIsUserTrendsLoading(false);
+    }
+  };
+
+  // 컴포넌트 마운트 시 한 번만 실행
   useEffect(() => {
-    console.log('[TrendScreen] useEffect - checking access');
-    console.log('[TrendScreen] trendAccess:', trendAccess);
-    console.log('[TrendScreen] Current userPlan:', userPlan);
+    console.log('[TrendScreen] Component mounted');
     
     // trendAccess가 존재하지 않으면 기본값 사용
     const hasAccess = trendAccess?.hasAccess ?? true;
     
     // 플랜에 따라 접근 권한 확인
     if (!hasAccess) {
-      console.log('[TrendScreen] Access denied - showing premium screen');
-      // 접근 불가 로직은 렌더링 후에 처리
+      console.log('[TrendScreen] Access denied');
       setIsLoading(false);
+      setIsInitialLoading(false);
       return;
     }
     
-    console.log('[TrendScreen] Access granted - loading trends');
-    loadTrends();
+    // 캐시된 데이터 먼저 로드 시도
+    loadCachedDataFirst();
+    
+  }, []); // 빈 의존성 배열로 한 번만 실행
+  
+  // 캐시된 데이터 먼저 로드하는 함수
+  const loadCachedDataFirst = useCallback(async () => {
+    try {
+      console.log('[TrendScreen] Checking memory cache...');
+      
+      // 메모리 캐시 확인
+      const cached = trendCache.get();
+      
+      if (cached) {
+        console.log(`[TrendScreen] Memory cache hit (age: ${trendCache.getAge()} minutes)`);
+        setTrends(cached.trends);
+        setUserTrends(cached.userTrends);
+        setError(cached.error);
+        setLastLoadTime(cached.lastLoadTime);
+        setIsLoading(false);
+        setIsInitialLoading(false);
+        return;
+      }
+      
+      console.log('[TrendScreen] Memory cache miss - loading data');
+      await loadTrends();
+      
+    } catch (error) {
+      console.error('[TrendScreen] Error loading cached data:', error);
+      await loadTrends();
+    }
   }, []);
 
   const onRefresh = async () => {
@@ -96,23 +193,23 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
     setRefreshing(true);
     
     try {
-      // 캐시를 무시하고 강제로 새로간 데이터 가져오기
+      // 메모리 캐시와 서비스 캐시 모두 클리어
+      trendCache.clear();
       await trendService.clearCache();
-      console.log('[TrendScreen] Cache cleared, fetching fresh data...');
-      await loadTrends();
+      console.log('[TrendScreen] All caches cleared, fetching fresh data...');
+      await loadTrends(true); // forceRefresh = true
     } catch (error) {
       console.error('[TrendScreen] Refresh error:', error);
-    } finally {
-      setRefreshing(false);
+      setError('새로고침 중 오류가 발생했습니다.');
     }
   };
 
-  const handleCategoryChange = (category: TrendCategory) => {
+  const handleCategoryChange = useCallback((category: TrendCategory) => {
     soundManager.playTap();
     setSelectedCategory(category);
-  };
+  }, []);
 
-  const handleTrendPress = (trend: any) => {
+  const handleTrendPress = useCallback((trend: any) => {
     soundManager.playTap();
     if (onNavigate) {
       const prompt = trend.title || trendService.generatePromptFromTrend(trend);
@@ -121,26 +218,29 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         initialHashtags: trend.hashtags || [],
       });
     }
-  };
+  }, [onNavigate]);
 
-  const filteredTrends = selectedCategory === 'all' 
-    ? trends 
-    : trends.filter(trend => {
-        if (selectedCategory === 'news') return trend.source === 'news';
-        if (selectedCategory === 'social') return trend.source === 'social';
-        if (selectedCategory === 'keywords') return trend.source === 'naver' || trend.source === 'google';
-        return true;
-      });
+  // 메모이제이션을 통한 필터링 최적화
+  const filteredTrends = useMemo(() => {
+    if (selectedCategory === 'all') return trends;
+    
+    return trends.filter(trend => {
+      switch (selectedCategory) {
+        case 'news': return trend.source === 'news';
+        case 'social': return trend.source === 'social';
+        case 'keywords': return trend.source === 'naver' || trend.source === 'google';
+        default: return true;
+      }
+    });
+  }, [trends, selectedCategory]);
 
   const styles = createStyles(colors, isDark);
 
-  if (isLoading) {
+  // 초기 로딩 시 전체 스켈레톤 표시
+  if (isInitialLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>실시간 트렌드를 가져오는 중...</Text>
-        </View>
+        <TrendPageSkeleton />
       </SafeAreaView>
     );
   }
@@ -256,28 +356,34 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         </SlideInView>
 
         {/* 내 트렌드 요약 (있는 경우) */}
-        {userPlan === 'pro' && userTrends && userTrends.hashtags?.length > 0 && (
-          <SlideInView direction="right" delay={200}>
-            <View style={styles.myTrendsSection}>
-              <Text style={styles.sectionTitle}>내가 자주 쓴 태그</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                {userTrends.hashtags.slice(0, 5).map((tag: any, index: number) => (
-                  <AnimatedCard
-                    key={tag.hashtag}
-                    delay={250 + index * 50}
-                    style={styles.myHashtagChip}
-                    onPress={() => handleTrendPress({ 
-                      title: `#${tag.hashtag}`, 
-                      hashtags: [tag.hashtag] 
-                    })}
-                  >
-                    <Text style={styles.myHashtagText}>#{tag.hashtag}</Text>
-                    <Text style={styles.myHashtagCount}>{tag.count}</Text>
-                  </AnimatedCard>
-                ))}
-              </ScrollView>
-            </View>
-          </SlideInView>
+        {userPlan === 'pro' && (
+          <>
+            {isUserTrendsLoading ? (
+              <MyHashtagsSkeleton />
+            ) : userTrends && userTrends.hashtags?.length > 0 ? (
+              <SlideInView direction="right" delay={200}>
+                <View style={styles.myTrendsSection}>
+                  <Text style={styles.sectionTitle}>내가 자주 쓴 태그</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    {userTrends.hashtags.slice(0, 5).map((tag: any, index: number) => (
+                      <AnimatedCard
+                        key={tag.hashtag}
+                        delay={250 + index * 50}
+                        style={styles.myHashtagChip}
+                        onPress={() => handleTrendPress({ 
+                          title: `#${tag.hashtag}`, 
+                          hashtags: [tag.hashtag] 
+                        })}
+                      >
+                        <Text style={styles.myHashtagText}>#{tag.hashtag}</Text>
+                        <Text style={styles.myHashtagCount}>{tag.count}</Text>
+                      </AnimatedCard>
+                    ))}
+                  </ScrollView>
+                </View>
+              </SlideInView>
+            ) : null}
+          </>
         )}
 
         {/* 실시간 트렌드 리스트 */}
@@ -288,7 +394,28 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
              selectedCategory === 'social' ? '커뮤니티' : '인기 검색어'}
           </Text>
 
-          {filteredTrends.length > 0 ? (
+          {/* 에러 상태 표시 */}
+          {error && (
+            <View style={styles.errorContainer}>
+              <Icon name="alert-circle-outline" size={48} color={colors.error} />
+              <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity 
+                style={styles.retryButton}
+                onPress={() => loadTrends()}
+              >
+                <Text style={styles.retryButtonText}>다시 시도</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* 로딩 중일 때 스켈레톤 표시 */}
+          {isLoading && !error ? (
+            <>
+              {[1, 2, 3, 4, 5].map((_, index) => (
+                <TrendCardSkeleton key={index} />
+              ))}
+            </>
+          ) : filteredTrends.length > 0 ? (
             filteredTrends.map((trend, index) => (
               <AnimatedCard
                 key={trend.id}
@@ -346,7 +473,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
                 </View>
               </AnimatedCard>
             ))
-          ) : (
+          ) : !error && (
             <View style={styles.emptyState}>
               <Icon name="trending-up-outline" size={48} color={colors.text.tertiary} />
               <Text style={styles.emptyText}>트렌드를 불러올 수 없어요</Text>
@@ -732,6 +859,31 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       fontSize: 13,
       color: colors.text.secondary,
       fontWeight: '500',
+    },
+    
+    // 에러 상태 스타일
+    errorContainer: {
+      alignItems: 'center',
+      paddingVertical: SPACING.xxl * 2,
+    },
+    errorText: {
+      fontSize: 16,
+      fontWeight: '500',
+      color: colors.error || colors.text.secondary,
+      marginTop: SPACING.md,
+      marginBottom: SPACING.lg,
+      textAlign: 'center',
+    },
+    retryButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.sm,
+      borderRadius: 20,
+    },
+    retryButtonText: {
+      fontSize: 14,
+      fontWeight: '600',
+      color: colors.white,
     },
   });
 

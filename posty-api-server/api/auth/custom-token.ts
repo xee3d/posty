@@ -31,7 +31,7 @@ if (!admin.apps.length) {
 }
 
 interface CustomTokenRequest {
-  provider: 'google' | 'naver' | 'kakao';
+  provider: 'google' | 'naver' | 'kakao' | 'facebook' | 'apple';
   profile: {
     id: string;
     email?: string;
@@ -39,6 +39,20 @@ interface CustomTokenRequest {
     nickname?: string;
     photo?: string;
     profile_image?: string;
+    profileImageUrl?: string;
+    profile_image_url?: string;
+    properties?: {
+      nickname?: string;
+      profile_image?: string;
+    };
+    kakao_account?: {
+      email?: string;
+      name?: string;
+      profile?: {
+        nickname?: string;
+        profile_image_url?: string;
+      };
+    };
     accessToken?: string;
   };
 }
@@ -78,19 +92,119 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // 사용자 고유 ID 생성
-    const uid = `${provider}_${profile.id}`;
+    console.log('프로필 처리 시작, 받은 데이터:', JSON.stringify(profile, null, 2));
 
-    // 프로필 이미지 URL 처리 (null이면 undefined로)
-    const photoURL = profile.photo || profile.profile_image || undefined;
-    
-    // 이름 처리 (nickname 우선)
-    const displayName = profile.name || profile.nickname || `${provider} User`;
+    // 사용자 고유 ID 생성
+    let uid: string;
+    let email: string;
+    let displayName: string;
+    let photoURL: string | undefined;
+
+    if (provider === 'kakao') {
+      uid = `kakao_${profile.id}`;
+      
+      // 카카오 이메일 처리 (다양한 경로 시도)
+      let rawEmail = profile.email || 
+                     profile.kakao_account?.email || 
+                     null;
+      
+      // 이메일 유효성 검사 및 정리
+      if (rawEmail && typeof rawEmail === 'string' && rawEmail.trim().length > 0) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(rawEmail.trim())) {
+          email = rawEmail.trim();
+        } else {
+          console.log('카카오 이메일 형식 오류:', rawEmail);
+          email = `${profile.id}@kakao.local`;
+        }
+      } else {
+        email = `${profile.id}@kakao.local`;
+      }
+      
+      // 카카오 닉네임 처리 (다양한 경로 시도)
+      displayName = profile.nickname || 
+                    profile.properties?.nickname ||
+                    profile.kakao_account?.profile?.nickname ||
+                    profile.kakao_account?.name ||
+                    'Kakao User';
+      
+      // 카카오 프로필 이미지 처리 (다양한 경로 시도)
+      photoURL = profile.profileImageUrl || 
+                 profile.profile_image_url ||
+                 profile.properties?.profile_image ||
+                 profile.kakao_account?.profile?.profile_image_url ||
+                 profile.photo ||
+                 profile.profile_image;
+      
+      console.log('카카오 프로필 처리 결과:', {
+        uid,
+        email,
+        displayName,
+        photoURL,
+        originalProfile: profile,
+        rawEmail
+      });
+    } else if (provider === 'facebook') {
+      uid = `facebook_${profile.id}`;
+      
+      // Facebook 이메일 처리
+      let rawEmail = profile.email;
+      if (rawEmail && typeof rawEmail === 'string' && rawEmail.trim().length > 0) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(rawEmail.trim())) {
+          email = rawEmail.trim();
+        } else {
+          email = `${profile.id}@facebook.local`;
+        }
+      } else {
+        email = `${profile.id}@facebook.local`;
+      }
+      
+      // Facebook 닉네임 처리
+      displayName = profile.name || profile.nickname || 'Facebook User';
+      
+      // Facebook 프로필 이미지 처리 (다양한 경로 시도)
+      photoURL = profile.picture || 
+                 profile.profile_image ||
+                 profile.photo;
+      
+      console.log('Facebook 프로필 처리 결과:', {
+        uid,
+        email,
+        displayName,
+        photoURL,
+        originalProfile: profile
+      });
+    } else {
+      uid = `${provider}_${profile.id}`;
+      
+      let rawEmail = profile.email;
+      if (rawEmail && typeof rawEmail === 'string' && rawEmail.trim().length > 0) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(rawEmail.trim())) {
+          email = rawEmail.trim();
+        } else {
+          email = `${profile.id}@${provider}.local`;
+        }
+      } else {
+        email = `${profile.id}@${provider}.local`;
+      }
+      
+      displayName = profile.name || profile.nickname || `${provider} User`;
+      photoURL = profile.photo || profile.profile_image;
+    }
+
+    // 최종 이메일 검증
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      console.error('최종 이메일 형식 오류:', email);
+      email = `${provider}_${profile.id}@${provider}.local`;
+    }
 
     // Custom claims 설정
     const customClaims = {
       provider,
-      email: profile.email || `${profile.id}@${provider}.local`,
+      email: email,
       name: displayName,
       picture: photoURL || null,
     };
@@ -102,7 +216,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         user = await admin.auth().getUser(uid);
         // 기존 사용자 업데이트
         const updateData: any = {
-          email: customClaims.email,
+          email: email,
           displayName: displayName,
           emailVerified: true,
         };
@@ -117,7 +231,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         // 새 사용자 생성
         const createData: any = {
           uid,
-          email: customClaims.email,
+          email: email,
           displayName: displayName,
           emailVerified: true,
         };

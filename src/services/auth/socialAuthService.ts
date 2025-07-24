@@ -288,11 +288,20 @@ class SocialAuthService {
       
       // 카카오 로그인
       const token = await kakaoLogin();
-      console.log('카카오 토큰 받음:', token);
+      console.log('카카오 토큰 받음:', JSON.stringify(token, null, 2));
       
       // 카카오 사용자 정보 가져오기
       const profile = await getKakaoProfile();
-      console.log('카카오 프로필 정보:', profile);
+      console.log('=== 카카오 프로필 정보 상세 분석 ===');
+      console.log('전체 프로필 객체:', JSON.stringify(profile, null, 2));
+      console.log('프로필 객체 키들:', Object.keys(profile));
+      console.log('직접 접근 테스트:');
+      console.log('- profile.id:', profile.id);
+      console.log('- profile.nickname:', profile.nickname);
+      console.log('- profile.profileImageUrl:', profile.profileImageUrl);
+      console.log('- profile.properties:', profile.properties);
+      console.log('- profile.kakao_account:', profile.kakao_account);
+      console.log('=====================================');
       
       // Firebase Custom Token으로 로그인 (서버에서 생성 필요)
       console.log('Firebase custom token 요청 시작...');
@@ -315,14 +324,30 @@ class SocialAuthService {
         // 카카오 프로필 정보를 포함한 UserProfile 반환
         const userProfile = this.formatUserProfile(userCredential.user, 'kakao');
         
-        // 카카오 프로필 이미지 추가
-        if (profile.profileImageUrl) {
-          userProfile.photoURL = profile.profileImageUrl;
+        // 카카오 프로필 이미지 추가 (다양한 필드명 처리)
+        const profileImage = profile.profileImageUrl || 
+                           profile.profile_image_url || 
+                           profile.properties?.profile_image ||
+                           profile.kakao_account?.profile?.profile_image_url;
+        if (profileImage) {
+          userProfile.photoURL = profileImage;
+          console.log('카카오 프로필 이미지 설정됨:', profileImage);
+        } else {
+          console.log('카카오 프로필 이미지 없음. 사용 가능한 필드:', Object.keys(profile));
         }
         
-        // 카카오 닉네임 사용
-        if (profile.nickname) {
-          userProfile.displayName = profile.nickname;
+        // 카카오 닉네임 사용 (다양한 필드명 처리)
+        const nickname = profile.nickname || 
+                        profile.properties?.nickname ||
+                        profile.kakao_account?.profile?.nickname ||
+                        profile.kakao_account?.name;
+        if (nickname) {
+          userProfile.displayName = nickname;
+          console.log('카카오 닉네임 설정됨:', nickname);
+        } else {
+          console.log('카카오 닉네임 없음. 사용 가능한 필드:', Object.keys(profile));
+          console.log('properties:', profile.properties);
+          console.log('kakao_account:', profile.kakao_account);
         }
         
         console.log('카카오 로그인 완료:', userProfile);
@@ -449,7 +474,13 @@ class SocialAuthService {
       const url = `${serverUrl}/api/auth/custom-token`;
       
       console.log('Custom token 요청 URL:', url);
-      console.log('Custom token 요청 데이터:', { provider, profile });
+      console.log('Custom token 요청 데이터:');
+      console.log('- provider:', provider);
+      console.log('- profile keys:', Object.keys(profile));
+      console.log('- profile.id:', profile.id);
+      console.log('- profile.email:', profile.email);
+      console.log('- profile.nickname:', profile.nickname);
+      console.log('- profile 전체:', JSON.stringify(profile, null, 2));
       
       const response = await fetch(url, {
         method: 'POST',
@@ -463,26 +494,39 @@ class SocialAuthService {
       });
       
       console.log('Custom token 응답 상태:', response.status);
+      console.log('Custom token 응답 헤더:', response.headers.get('content-type'));
       
       const responseText = await response.text();
-      console.log('Custom token 응답 텍스트:', responseText.substring(0, 200));
+      console.log('Custom token 전체 응답:', responseText);
       
       let data;
       try {
         data = JSON.parse(responseText);
+        console.log('파싱된 응답 데이터:', data);
       } catch (parseError) {
         console.error('JSON 파싱 오류:', parseError);
-        console.error('응답 내용:', responseText);
-        throw new Error('서버 응답이 JSON 형식이 아닙니다');
+        console.error('파싱 실패한 응답 내용:', responseText);
+        throw new Error(`서버 응답이 JSON 형식이 아닙니다: ${responseText.substring(0, 100)}`);
       }
       
       if (!response.ok) {
-        throw new Error(data.error || `HTTP error! status: ${response.status}`);
+        console.error('서버 오류 응답:', data);
+        const errorMessage = data.error || data.details || `HTTP error! status: ${response.status}`;
+        throw new Error(errorMessage);
       }
       
+      if (!data.customToken) {
+        console.error('Custom token이 응답에 없음:', data);
+        throw new Error('서버에서 custom token을 반환하지 않았습니다');
+      }
+      
+      console.log('Custom token 생성 성공, 길이:', data.customToken.length);
       return data.customToken;
     } catch (error) {
-      console.error('Custom token 생성 실패:', error);
+      console.error('Custom token 생성 실패 상세:', error);
+      console.error('오류 타입:', typeof error);
+      console.error('오류 메시지:', error.message);
+      console.error('오류 스택:', error.stack);
       throw error;
     }
   }
@@ -548,10 +592,12 @@ class SocialAuthService {
         return await this.mockLogin('facebook');
       }
 
+      console.log('Facebook 로그인 시작...');
+      
       // Facebook SDK import (lazy loading)
       const { LoginManager, AccessToken } = await import('react-native-fbsdk-next');
       
-      console.log('Facebook 로그인 시작...');
+      console.log('Facebook SDK import 성공');
       
       // 기존 로그인 정보 초기화
       await LoginManager.logOut();
@@ -571,27 +617,43 @@ class SocialAuthService {
       
       console.log('Facebook access token 획득');
       
-      // Facebook 사용자 정보 가져오기
+      // Facebook 사용자 정보 가져오기 (프로필 이미지 URL 직접 요청)
       const response = await fetch(
-        `https://graph.facebook.com/me?access_token=${data.accessToken}&fields=id,name,email,picture.type(large)`
+        `https://graph.facebook.com/me?access_token=${data.accessToken}&fields=id,name,email,picture.type(large).redirect(false)`
       );
       const userInfo = await response.json();
       
-      console.log('Facebook 사용자 정보:', userInfo);
+      console.log('Facebook 사용자 정보 상세:', JSON.stringify(userInfo, null, 2));
+      console.log('Facebook 프로필 이미지 데이터:', userInfo.picture);
       
-      // 이메일이 없는 경우 처리
+      // 이메일이 없는 경우 처리  
       if (!userInfo.email) {
         console.warn('Facebook 계정에 이메일이 없거나 권한이 거부되었습니다.');
         // Facebook ID를 기반으로 임시 이메일 생성
         userInfo.email = `${userInfo.id}@facebook.local`;
       }
       
+      // Facebook 프로필 이미지 URL 추출 (다양한 경로 시도)
+      let profileImageUrl = null;
+      if (userInfo.picture) {
+        if (userInfo.picture.data && userInfo.picture.data.url) {
+          profileImageUrl = userInfo.picture.data.url;
+        } else if (typeof userInfo.picture === 'string') {
+          profileImageUrl = userInfo.picture;
+        } else if (userInfo.picture.url) {
+          profileImageUrl = userInfo.picture.url;
+        }
+      }
+      
+      console.log('Facebook 프로필 이미지 URL:', profileImageUrl);
+      
       // Firebase Custom Token으로 로그인
       const customToken = await this.getFirebaseCustomToken('facebook', {
         id: userInfo.id,
         name: userInfo.name,
         email: userInfo.email,
-        picture: userInfo.picture?.data?.url,
+        picture: profileImageUrl,
+        profile_image: profileImageUrl, // 서버에서 다른 필드명으로도 처리할 수 있도록
         accessToken: data.accessToken,
       });
       
