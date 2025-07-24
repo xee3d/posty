@@ -21,11 +21,12 @@ import inAppPurchaseService from '../services/subscription/inAppPurchaseService'
 import TokenManagementSection from '../components/token/TokenManagementSection';
 import { resetAllMissionData, resetAdData, debugMissionData } from '../utils/missionUtils';
 import achievementService from '../services/achievementService';
-import { UserProfile } from '../types/achievement';
+import { UserProfile, Achievement } from '../types/achievement';
 import { cleanupFirestoreSubscription } from '../store/middleware/firestoreSyncMiddleware';
 import { Alert } from '../utils/customAlert';
 import AccountChangeSection from '../components/settings/AccountChangeSection';
 import OnboardingScreen from './OnboardingScreen';
+import NewUserWelcome from '../components/NewUserWelcome';
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
@@ -66,8 +67,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const [showFirebaseTest, setShowFirebaseTest] = useState(false);
   const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
   const [showTrendSettings, setShowTrendSettings] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile & { achievements?: Achievement[] } | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showNewUserWelcome, setShowNewUserWelcome] = useState(false);
   
   // AI 토큰 및 통계
   const [stats, setStats] = useState({
@@ -147,7 +149,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
       
       // 프로필 정보 로드
       const profile = await achievementService.getUserProfile();
-      setUserProfile(profile);
+      const achievements = await achievementService.getAchievements();
+      setUserProfile({
+        ...profile,
+        achievements: achievements
+      });
     } catch (error) {
       console.error('Failed to load user data:', error);
     }
@@ -821,6 +827,17 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
     return <OnboardingScreen onComplete={() => setShowOnboarding(false)} />;
   }
 
+  if (showNewUserWelcome) {
+    return (
+      <View style={styles.container}>
+        <NewUserWelcome 
+          onStart={() => setShowNewUserWelcome(false)}
+          onDismiss={() => setShowNewUserWelcome(false)}
+        />
+      </View>
+    );
+  }
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
@@ -854,7 +871,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
               <View style={styles.profileInfo}>
                 <View style={[
                   styles.profileAvatar,
-                  userProfile?.selectedBadge && { backgroundColor: colors.white }
+                  userProfile?.selectedBadge && { 
+                    backgroundColor: userProfile.achievements.find(a => a.id === userProfile.selectedBadge)?.badgeColor || colors.primary 
+                  }
                 ]}>
                   {userProfile?.selectedBadge ? (
                     <Icon 
@@ -905,7 +924,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
                   // 프로필에서 돌아온 후 데이터 새로고침을 위해 타이머 설정
                   setTimeout(async () => {
                     const profile = await achievementService.getUserProfile();
-                    setUserProfile(profile);
+                    const achievements = await achievementService.getAchievements();
+                    setUserProfile({
+                      ...profile,
+                      achievements: achievements
+                    });
                   }, 1000);
                 }
               }}
@@ -1046,6 +1069,17 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
               <View style={styles.menuItemLeft}>
                 <Icon name="school-outline" size={20} color={colors.text.secondary} />
                 <Text style={styles.menuItemLabel}>온보딩 미리보기</Text>
+              </View>
+              <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={styles.menuItem}
+              onPress={() => setShowNewUserWelcome(true)}
+            >
+              <View style={styles.menuItemLeft}>
+                <Icon name="person-add" size={20} color={colors.text.secondary} />
+                <Text style={styles.menuItemLabel}>신규 사용자 환영 화면</Text>
               </View>
               <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
             </TouchableOpacity>
@@ -1219,6 +1253,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     alignItems: 'center',
     marginRight: SPACING.md,
     overflow: 'hidden',
+    borderWidth: 2,
+    borderColor: colors.border,
   },
   profileAvatarImage: {
     width: '100%',
