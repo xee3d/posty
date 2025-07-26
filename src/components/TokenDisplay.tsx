@@ -7,7 +7,7 @@ import {
   ViewStyle,
   TextStyle,
 } from 'react-native';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { useAppSelector } from '../hooks/redux';
 import { selectCurrentTokens, selectSubscriptionPlan } from '../store/slices/userSlice';
@@ -72,8 +72,8 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
       activeOpacity={onPress ? 0.7 : 1}
       disabled={!onPress}
     >
-      <MaterialIcon 
-        name="flash-on" 
+      <Icon 
+        name="flash" 
         size={sizeStyles.icon.size} 
         color={colors.white} 
       />
@@ -85,7 +85,7 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
         {subscriptionPlan === 'pro' ? '무제한' : currentTokens}
       </Text>
       {showAddButton && onPress && (
-        <MaterialIcon 
+        <Icon 
           name="add-circle-outline" 
           size={sizeStyles.icon.size + 2} 
           color={colors.white} 

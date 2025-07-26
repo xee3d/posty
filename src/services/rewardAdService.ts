@@ -7,6 +7,7 @@ import {
   MobileAds,
 } from 'react-native-google-mobile-ads';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { adVerificationManager } from '../utils/security/adVerification';
 
 const STORAGE_KEYS = {
   DAILY_AD_COUNT: 'daily_ad_count',
@@ -240,29 +241,38 @@ class RewardAdService {
     return { canWatch: true };
   }
 
-  // 광고 표시 및 리워드 처리
+  // 🔒 보안이 강화된 광고 표시 및 리워드 처리
   async showRewardedAd(): Promise<{ success: boolean; reward?: number; error?: string }> {
     try {
-      // 개발 모드에서는 시뮬레이션
+      // 1. 사전 보안 검증
+      const preCheck = await adVerificationManager.preAdSecurityCheck();
+      if (!preCheck.isValid) {
+        return {
+          success: false,
+          error: preCheck.reason
+        };
+      }
+
+      // 2. 광고 시청 시작 기록
+      adVerificationManager.startAdViewing();
+
+      // 개발 모드에서도 보안 검증 적용
       if (__DEV__) {
-        console.log('Development mode: Simulating ad display');
+        console.log('🔒 Development mode: Enhanced security verification enabled');
         
-        // 일일 카운트 확인
-        const dailyCount = await this.getDailyAdCount();
-        if (dailyCount >= this.dailyAdLimit) {
+        // 시뮬레이션된 광고 시청 (최소 시간 대기)
+        await new Promise(resolve => setTimeout(resolve, 16000)); // 16초 대기
+        
+        // 3. 광고 시청 완료 검증
+        const completionResult = await adVerificationManager.verifyAdCompletion(2);
+        if (!completionResult.isValid) {
           return {
             success: false,
-            error: `일일 광고 시청 제한 (${this.dailyAdLimit}회)에 도달했습니다.`,
+            error: completionResult.reason
           };
         }
         
-        // 2초 대기 후 리워드 지급 (시뮬레이션)
-        await new Promise(resolve => setTimeout(resolve, 2000));
-        
-        // 일일 카운트 증가
-        await this.incrementDailyAdCount();
-        
-        // 총 리워드 업데이트
+        // 총 리워드 업데이트 (기존 로직 유지)
         await this.updateTotalRewards(2);
         
         return { success: true, reward: 2 };
@@ -279,21 +289,30 @@ class RewardAdService {
       }
 
       return new Promise((resolve) => {
-        // 리워드 이벤트 리스너 (일회성)
+        // 🔒 보안이 강화된 리워드 이벤트 리스너 (일회성)
         const unsubscribeReward = this.rewardedAd!.addAdEventListener(
           RewardedAdEventType.EARNED_REWARD,
           async (reward) => {
-            console.log('Reward earned:', reward);
+            console.log('🔒 Reward earned with security verification:', reward);
             
-            // 일일 카운트 증가
+            // 광고 시청 완료 검증
+            const completionResult = await adVerificationManager.verifyAdCompletion(2);
+            if (!completionResult.isValid) {
+              console.warn('🚨 Ad completion verification failed:', completionResult.reason);
+              unsubscribeReward();
+              resolve({ 
+                success: false, 
+                error: completionResult.reason || '광고 시청 검증에 실패했습니다.' 
+              });
+              return;
+            }
+            
+            // 검증 통과 시에만 기존 로직 실행
             await this.incrementDailyAdCount();
-            
-            // 총 리워드 업데이트
-            await this.updateTotalRewards(reward.amount);
+            await this.updateTotalRewards(completionResult.reward);
             
             unsubscribeReward();
-            // 항상 2개의 토큰을 지급 (reward.amount에 관계없이)
-            resolve({ success: true, reward: 2 });
+            resolve({ success: true, reward: completionResult.reward });
           }
         );
 
@@ -343,17 +362,23 @@ class RewardAdService {
     }
   }
 
-  // 광고 통계 가져오기
+  // 🔒 보안이 강화된 광고 통계 가져오기
   async getAdStats() {
     try {
-      const dailyCount = await this.getDailyAdCount();
+      // 새로운 보안 통계 시스템 사용
+      const securityStats = await adVerificationManager.getAdStatistics();
       const totalRewards = await AsyncStorage.getItem(STORAGE_KEYS.TOTAL_REWARDS);
       
       return {
-        dailyCount,
-        remainingToday: Math.max(0, this.dailyAdLimit - dailyCount),
+        dailyCount: securityStats.dailyCount,
+        remainingToday: securityStats.remainingToday,
         totalRewardsEarned: totalRewards ? parseInt(totalRewards, 10) : 0,
         dailyLimit: this.dailyAdLimit,
+        // 추가 보안 정보
+        totalShown: securityStats.totalShown,
+        successRate: Math.round(securityStats.successRate * 100),
+        averageViewTime: securityStats.averageViewTime,
+        suspiciousAttempts: securityStats.suspiciousAttempts
       };
     } catch (error) {
       console.error('Error getting ad stats:', error);
@@ -362,17 +387,38 @@ class RewardAdService {
         remainingToday: this.dailyAdLimit,
         totalRewardsEarned: 0,
         dailyLimit: this.dailyAdLimit,
+        totalShown: 0,
+        successRate: 0,
+        averageViewTime: 0,
+        suspiciousAttempts: 0
       };
     }
   }
 
-  // 광고 준비 상태 확인
-  isReady(): boolean {
-    // 개발 모드에서는 항상 준비 상태로 간주
-    if (__DEV__) {
-      return true;
+  // 🔒 보안이 강화된 광고 준비 상태 확인
+  async isReady(): Promise<{ ready: boolean; reason?: string }> {
+    // 보안 검증 수행
+    const securityCheck = await adVerificationManager.preAdSecurityCheck();
+    if (!securityCheck.isValid) {
+      return {
+        ready: false,
+        reason: securityCheck.reason
+      };
     }
-    return this.isAdLoaded && !this.isAdShowing;
+
+    // 개발 모드에서도 보안 검증 적용
+    if (__DEV__) {
+      return { ready: true };
+    }
+
+    if (!this.isAdLoaded || this.isAdShowing) {
+      return {
+        ready: false,
+        reason: '광고를 로드 중이거나 표시 중입니다.'
+      };
+    }
+
+    return { ready: true };
   }
 
   // 수동으로 광고 로드

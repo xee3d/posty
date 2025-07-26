@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Linking, Share, Platform,  } from 'react-native';
 import { COLORS, SPACING } from '../../utils/constants';
 import { SUBSCRIPTION_PLANS } from '../../config/adConfig';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { useAppSelector } from '../../hooks/redux';
 import { selectCurrentTokens, selectSubscriptionPlan, selectSubscriptionAutoRenew, cancelSubscription } from '../../store/slices/userSlice';
@@ -512,7 +513,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
         <View style={styles.planHeader}>
           <View style={styles.planTitleRow}>
-            <Icon 
+            <MaterialIcon 
               name={planIcons[planKey]} 
               size={24} 
               color={isSelected ? planColor : colors.text.secondary} 
@@ -529,7 +530,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           </View>
           {isSelected && (
             <View style={[styles.selectedCheckmark, { backgroundColor: planColor }]}>
-              <Icon name="check" size={16} color="#FFFFFF" />
+              <Icon name="checkmark" size={16} color="#FFFFFF" />
             </View>
           )}
         </View>
@@ -542,7 +543,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         </View>
 
         <View style={[styles.tokenInfo, { backgroundColor: isDowngrade ? colors.lightGray + '50' : planColor + '15' }]}>
-          <Icon name="flash-on" size={18} color={isDowngrade ? colors.text.secondary : planColor} />
+          <Icon name="flash" size={18} color={isDowngrade ? colors.text.secondary : planColor} />
           <Text style={[styles.tokenText, { color: isDowngrade ? colors.text.secondary : planColor }]}>
           {isDowngrade ? '하위 플랜으로 변경 불가' :
            planKey === 'free' ? '매일 10개 무료 충전' : 
@@ -555,7 +556,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         <View style={styles.features}>
           {plan.features?.slice(0, 3).map((feature, index) => (
             <View key={index} style={styles.featureItem}>
-              <Icon name="check" size={16} color={isSelected ? planColor : '#10B981'} />
+              <Icon name="checkmark" size={16} color={isSelected ? planColor : '#10B981'} />
               <Text style={styles.featureText}>{feature}</Text>
             </View>
           ))}
@@ -579,7 +580,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             ]}>
               {isCurrent ? '현재 이용중' : isDowngrade ? '구매 불가' : '구독하기'}
             </Text>
-            {!isCurrent && !isDowngrade && <Icon name="arrow-forward" size={18} color="#FFFFFF" />}
+            {!isCurrent && !isDowngrade && <Icon name="arrow-forward-outline" size={18} color="#FFFFFF" />}
           </TouchableOpacity>
         )}
       </TouchableOpacity>
@@ -595,7 +596,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Icon name="arrow-back" size={24} color={colors.text.primary} />
+          <Icon name="arrow-back-outline" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {activeTab === 'subscription' ? '구독 플랜' : activeTab === 'tokens' ? '토큰 구매' : '무료 토큰'}
@@ -604,7 +605,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           style={styles.headerButton}
           onPress={() => setShowEarnTokenModal(true)}
         >
-          <Icon name="flash-on" size={20} color={colors.primary} />
+          <Icon name="flash" size={20} color={colors.primary} />
           <Text style={styles.currentTokens}>{subscriptionPlan === 'pro' ? '무제한' : currentTokens}</Text>
         </TouchableOpacity>
       </View>
@@ -617,7 +618,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           ]}
           onPress={() => setActiveTab('subscription')}
         >
-          <Icon 
+          <MaterialIcon 
             name="workspace-premium" 
             size={20} 
             color={activeTab === 'subscription' ? colors.primary : colors.text.secondary} 
@@ -638,7 +639,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           onPress={() => setActiveTab('tokens')}
         >
           <Icon 
-            name="flash-on" 
+            name="flash" 
             size={20} 
             color={activeTab === 'tokens' ? colors.primary : colors.text.secondary} 
           />
@@ -657,7 +658,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           ]}
           onPress={() => setActiveTab('manage')}
         >
-          <Icon 
+          <MaterialIcon 
             name="account-balance-wallet" 
             size={20} 
             color={activeTab === 'manage' ? colors.primary : colors.text.secondary} 
@@ -698,7 +699,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               
               <View style={styles.benefitCard}>
                 <View style={[styles.benefitIcon, { backgroundColor: '#8B5CF6' + '20' }]}>
-                  <Icon name="flash-on" size={24} color="#8B5CF6" />
+                  <Icon name="flash" size={24} color="#8B5CF6" />
                 </View>
                 <View style={styles.benefitContent}>
                   <Text style={styles.benefitTitle}>더 많은 토큰</Text>
@@ -710,7 +711,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
               <View style={styles.benefitCard}>
                 <View style={[styles.benefitIcon, { backgroundColor: '#EC4899' + '20' }]}>
-                  <Icon name="auto-awesome" size={24} color="#EC4899" />
+                  <MaterialIcon name="auto-awesome" size={24} color="#EC4899" />
                 </View>
                 <View style={styles.benefitContent}>
                   <Text style={styles.benefitTitle}>고급 AI 모델</Text>
@@ -722,7 +723,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
               <View style={styles.benefitCard}>
                 <View style={[styles.benefitIcon, { backgroundColor: '#10B981' + '20' }]}>
-                  <Icon name="block" size={24} color="#10B981" />
+                  <MaterialIcon name="block" size={24} color="#10B981" />
                 </View>
                 <View style={styles.benefitContent}>
                   <Text style={styles.benefitTitle}>광고 제거</Text>
@@ -756,7 +757,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   </View>
                   
                   <View style={styles.expiryInfoContainer}>
-                    <Icon name="event" size={20} color={colors.primary} />
+                    <MaterialIcon name="event" size={20} color={colors.primary} />
                     <View style={styles.expiryTextContainer}>
                       <Text style={styles.expiryLabel}>다음 결제일</Text>
                       <Text style={styles.expiryDate}>
@@ -769,7 +770,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   </View>
                   
                   <View style={styles.autoRenewInfo}>
-                    <Icon name="autorenew" size={16} color={subscriptionAutoRenew ? colors.text.secondary : colors.error || '#FF3B30'} />
+                    <MaterialIcon name="autorenew" size={16} color={subscriptionAutoRenew ? colors.text.secondary : colors.error || '#FF3B30'} />
                     <Text style={[styles.autoRenewText, !subscriptionAutoRenew && { color: colors.error || '#FF3B30' }]}>
                       {subscriptionAutoRenew ? '자동 갱신 활성화됨' : '자동 갱신 취소됨'}
                     </Text>
@@ -781,7 +782,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     style={styles.cancelButton}
                     onPress={() => handleCancelSubscription()}
                   >
-                    <Icon name="cancel" size={20} color={colors.error || '#FF3B30'} />
+                    <MaterialIcon name="cancel" size={20} color={colors.error || '#FF3B30'} />
                     <Text style={styles.cancelButtonText}>구독 취소</Text>
                   </TouchableOpacity>
                 )}
@@ -819,7 +820,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             </View>
 
             <View style={styles.tokenInfoBanner}>
-              <Icon name="info-outline" size={16} color={colors.text.secondary} />
+              <Icon name="information-circle-outline" size={16} color={colors.text.secondary} />
               <Text style={styles.tokenInfoText}>
                 현재 {stats.totalTokens}개의 토큰을 보유하고 있습니다
               </Text>
@@ -832,13 +833,13 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   onPress={() => handleWatchAd()}
                 >
                   <View style={[styles.earnTokenIcon, { backgroundColor: '#8B5CF6' + '20' }]}>
-                    <Icon name="play-circle" size={24} color="#8B5CF6" />
+                    <MaterialIcon name="play-circle" size={24} color="#8B5CF6" />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>광고 보기</Text>
                     <Text style={styles.earnTokenDesc}>+2 토큰 ({adStats.remainingToday}/{adStats.dailyLimit || 10}회 남음)</Text>
                   </View>
-                  <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
+                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
                 </TouchableOpacity>
 
                 <TouchableOpacity 
@@ -846,13 +847,13 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   onPress={() => handleDailyCheck()}
                 >
                   <View style={[styles.earnTokenIcon, { backgroundColor: '#10B981' + '20' }]}>
-                    <Icon name="event-available" size={24} color="#10B981" />
+                    <MaterialIcon name="event-available" size={24} color="#10B981" />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>일일 출석</Text>
                     <Text style={styles.earnTokenDesc}>+1 토큰 (오늘 가능)</Text>
                   </View>
-                  <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
+                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
                 </TouchableOpacity>
 
                 <TouchableOpacity 
@@ -860,13 +861,13 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   onPress={() => handleShareSNS()}
                 >
                   <View style={[styles.earnTokenIcon, { backgroundColor: '#EC4899' + '20' }]}>
-                    <Icon name="share" size={24} color="#EC4899" />
+                    <Icon name="share-social-outline" size={24} color="#EC4899" />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>SNS 공유</Text>
                     <Text style={styles.earnTokenDesc}>+3 토큰 (1/1회 남음)</Text>
                   </View>
-                  <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
+                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
                 </TouchableOpacity>
 
                 <TouchableOpacity 
@@ -874,13 +875,13 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   onPress={() => handleInviteFriend()}
                 >
                   <View style={[styles.earnTokenIcon, { backgroundColor: '#F59E0B' + '20' }]}>
-                    <Icon name="person-add" size={24} color="#F59E0B" />
+                    <Icon name="person-add-outline" size={24} color="#F59E0B" />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>친구 초대</Text>
                     <Text style={styles.earnTokenDesc}>+5 토큰 (친구당)</Text>
                   </View>
-                  <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
+                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
                 </TouchableOpacity>
 
                 <TouchableOpacity 
@@ -888,13 +889,13 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   onPress={() => handleRateApp()}
                 >
                   <View style={[styles.earnTokenIcon, { backgroundColor: '#6366F1' + '20' }]}>
-                    <Icon name="star" size={24} color="#6366F1" />
+                    <Icon name="star-outline" size={24} color="#6366F1" />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>앱 평가하기</Text>
                     <Text style={styles.earnTokenDesc}>+10 토큰 (1회)</Text>
                   </View>
-                  <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
+                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
                 </TouchableOpacity>
 
                 <TouchableOpacity 
@@ -902,25 +903,25 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   onPress={() => handleCompleteMission()}
                 >
                   <View style={[styles.earnTokenIcon, { backgroundColor: '#14B8A6' + '20' }]}>
-                    <Icon name="task-alt" size={24} color="#14B8A6" />
+                    <MaterialIcon name="task-alt" size={24} color="#14B8A6" />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>미션 완료</Text>
                     <Text style={styles.earnTokenDesc}>+3 토큰 (일일 미션)</Text>
                   </View>
-                  <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
+                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
                 </TouchableOpacity>
               </View>
 
               <View style={styles.earnTokenTip}>
-                <Icon name="lightbulb-outline" size={20} color={colors.primary} />
+                <Icon name="bulb-outline" size={20} color={colors.primary} />
                 <Text style={styles.earnTokenTipText}>
                   무료 플랜 사용자는 매일 자정에 10개의 토큰이 자동 충전됩니다
                 </Text>
               </View>
 
               <View style={styles.premiumNotice}>
-                <Icon name="workspace-premium" size={20} color={colors.primary} />
+                <MaterialIcon name="workspace-premium" size={20} color={colors.primary} />
                 <Text style={styles.premiumNoticeText}>
                   {realSubscriptionPlan === 'free' ? '무료 회원은 매일 10개의 토큰이 자동 충전됩니다' : 
                    realSubscriptionPlan === 'starter' ? 'STARTER 회원은 가입 시 300개 + 매일 10개씩 추가 토큰을 받습니다' : 

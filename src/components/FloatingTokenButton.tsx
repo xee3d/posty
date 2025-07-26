@@ -6,7 +6,7 @@ import {
   StyleSheet,
   Animated,
 } from 'react-native';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { SPACING } from '../utils/constants';
 
@@ -62,7 +62,7 @@ export const FloatingTokenButton: React.FC<FloatingTokenButtonProps> = ({
         activeOpacity={0.8}
       >
         <View style={styles.iconContainer}>
-          <MaterialIcon name="card-giftcard" size={24} color={colors.white} />
+          <Icon name="gift" size={24} color={colors.white} />
         </View>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>무료</Text>

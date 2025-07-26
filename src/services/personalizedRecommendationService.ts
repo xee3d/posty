@@ -49,11 +49,61 @@ interface UserContext {
 class PersonalizedRecommendationService {
   // 추천 카드 템플릿
   private recommendationTemplates: RecommendationCard[] = [
+    // 초보자를 위한 쉬운 시작
+    {
+      id: 'easy-start-selfie',
+      type: 'milestone',
+      icon: 'photo-camera',
+      iconColor: '#E91E63',
+      badge: '🤳 쉬운 시작',
+      badgeEmoji: '🤳',
+      title: '셀카 한 장이면 충분해!',
+      content: '오늘의 내 모습을 한 장 찍고\n간단한 인사말만 써도 멋진 글이 돼요',
+      meta: {
+        icon: 'psychology',
+        text: '부담 제로'
+      },
+      actionText: '시작하기',
+      actionPayload: {
+        prompt: '오늘의 나는',
+        category: 'daily',
+        hashtags: ['셀카', '일상', '오늘의나']
+      },
+      priority: 10,
+      conditions: {
+        maxPosts: 3
+      }
+    },
+    {
+      id: 'easy-food',
+      type: 'timing',
+      icon: 'restaurant',
+      iconColor: '#4CAF50',
+      badge: '🍜 쉬운 포스팅',
+      badgeEmoji: '🍜',
+      title: '뭐 먹었어? 이거면 끝!',
+      content: '음식 사진 하나만 있으면 돼요\n"맛있다" 한 마디면 충분해요',
+      meta: {
+        icon: 'fastfood',
+        text: '1분 완성'
+      },
+      actionText: '음식 사진',
+      actionPayload: {
+        mode: 'photo',
+        prompt: '오늘 먹은 음식',
+        category: 'food',
+        hashtags: ['먹스타그램', '맛있다', '오늘뭐먹지']
+      },
+      priority: 9,
+      conditions: {
+        hour: [11, 12, 13, 18, 19, 20]
+      }
+    },
     // 시간대 기반 추천
     {
       id: 'morning-routine',
       type: 'timing',
-      icon: 'light-mode',
+      icon: 'sunny',
       iconColor: '#FF9800',
       badge: '🌅 아침 루틴',
       badgeEmoji: '🌅',
@@ -109,7 +159,7 @@ class PersonalizedRecommendationService {
       title: '황금빛 사진 타임',
       content: '해질녘 황금빛이 가장 예쁜 시간!\n감성 사진 찍기 좋은 때예요',
       meta: {
-        icon: 'light-mode',
+        icon: 'sunny',
         text: '일몰 1시간 전'
       },
       actionText: '사진 팁 보기',
@@ -223,14 +273,14 @@ class PersonalizedRecommendationService {
     {
       id: 'sunny-day',
       type: 'weather',
-      icon: 'light-mode',
+      icon: 'sunny',
       iconColor: '#FFC107',
       badge: '☀️ 맑은 날',
       badgeEmoji: '☀️',
       title: '화창한 날씨',
       content: '맑은 날씨를 만끽할 수 있는\n야외 활동 어떠세요?',
       meta: {
-        icon: 'light-mode',
+        icon: 'sunny',
         text: '맑음'
       },
       actionText: '글쓰기',
@@ -341,25 +391,147 @@ class PersonalizedRecommendationService {
       priority: 6
     },
 
-    // 완성 유도 추천
+    // 완성 유도 추천 - 미구현으로 주석 처리
+    // {
+    //   id: 'complete-draft',
+    //   type: 'completion',
+    //   icon: 'edit-note',
+    //   iconColor: '#795548',
+    //   badge: '📝 미완성 글',
+    //   badgeEmoji: '📝',
+    //   title: '작성 중인 글이 있어요',
+    //   content: '조금만 더 다듬어서\n멋진 포스팅을 완성해보세요!',
+    //   meta: {
+    //     icon: 'hourglass-empty',
+    //     text: '70% 완성'
+    //   },
+    //   actionText: '이어쓰기',
+    //   actionPayload: {
+    //     mode: 'continue'
+    //   },
+    //   priority: 8
+    // },
+    
+    // 일반인을 위한 쉬운 추천
     {
-      id: 'complete-draft',
-      type: 'completion',
-      icon: 'edit-note',
-      iconColor: '#795548',
-      badge: '📝 미완성 글',
-      badgeEmoji: '📝',
-      title: '작성 중인 글이 있어요',
-      content: '조금만 더 다듬어서\n멋진 포스팅을 완성해보세요!',
+      id: 'simple-daily',
+      type: 'milestone',
+      icon: 'edit',
+      iconColor: '#2196F3',
+      badge: '✍️ 간단 일기',
+      badgeEmoji: '✍️',
+      title: '오늘 하루 한 줄 일기',
+      content: '긴 글 필요 없어요!\n오늘 있었던 일 한 줄만 써보세요',
       meta: {
-        icon: 'hourglass-empty',
-        text: '70% 완성'
+        icon: 'timer',
+        text: '30초 완성'
       },
-      actionText: '이어쓰기',
+      actionText: '한 줄 쓰기',
       actionPayload: {
-        mode: 'continue'
+        prompt: '오늘 하루를 한 줄로 표현하면',
+        category: 'daily',
+        hashtags: ['한줄일기', '오늘하루', '일상']
       },
-      priority: 8
+      priority: 9,
+      conditions: {
+        hour: [20, 21, 22, 23]
+      }
+    },
+    {
+      id: 'pet-photo',
+      type: 'photo',
+      icon: 'pets',
+      iconColor: '#795548',
+      badge: '🐕 반려동물',
+      badgeEmoji: '🐕',
+      title: '우리 아이 자랑하기',
+      content: '귀여운 반려동물 사진 하나면\n충분해요! 이름만 써도 OK',
+      meta: {
+        icon: 'favorite',
+        text: '쉽고 간단'
+      },
+      actionText: '사진 올리기',
+      actionPayload: {
+        mode: 'photo',
+        prompt: '우리집 반려동물',
+        category: 'pet',
+        hashtags: ['반려동물', '펫스타그램', '우리아이']
+      },
+      priority: 7
+    },
+    {
+      id: 'weather-talk',
+      type: 'timing',
+      icon: 'cloud',
+      iconColor: '#00BCD4',
+      badge: '🌤️ 날씨 토크',
+      badgeEmoji: '🌤️',
+      title: '오늘 날씨 어때?',
+      content: '날씨 얘기는 언제나 쉬워요\n"덥다", "춥다"만 써도 OK!',
+      meta: {
+        icon: 'thermostat',
+        text: '부담없이'
+      },
+      actionText: '날씨 얘기',
+      actionPayload: {
+        prompt: '오늘 날씨는',
+        category: 'daily',
+        hashtags: ['날씨', '오늘날씨', '일상']
+      },
+      priority: 6,
+      conditions: {
+        hour: [7, 8, 9, 10, 14, 15, 16]
+      }
+    },
+    {
+      id: 'weekend-rest',
+      type: 'calendar',
+      icon: 'weekend',
+      iconColor: '#9C27B0',
+      badge: '😴 주말 휴식',
+      badgeEmoji: '😴',
+      title: '주말엔 쉬어도 돼!',
+      content: '침대에서 뒹굴거리는 것도\n멋진 주말 일상이에요',
+      meta: {
+        icon: 'hotel',
+        text: '휴식 중'
+      },
+      actionText: '휴식 기록',
+      actionPayload: {
+        prompt: '오늘은 쉬는 날',
+        category: 'daily',
+        hashtags: ['주말', '휴식', '힐링']
+      },
+      priority: 8,
+      conditions: {
+        dayOfWeek: [0, 6],
+        hour: [10, 11, 12, 13, 14, 15]
+      }
+    },
+    {
+      id: 'coffee-time',
+      type: 'timing',
+      icon: 'local-cafe',
+      iconColor: '#795548',
+      badge: '☕ 카페 타임',
+      badgeEmoji: '☕',
+      title: '카페에서 한 컷?',
+      content: '예쁜 카페 사진 하나면\n오늘의 포스팅 완성!',
+      meta: {
+        icon: 'photo-camera',
+        text: '분위기 있게'
+      },
+      actionText: '카페 사진',
+      actionPayload: {
+        mode: 'photo',
+        prompt: '카페에서의 여유로운 시간',
+        category: 'cafe',
+        hashtags: ['카페', '카페스타그램', '커피']
+      },
+      priority: 7,
+      conditions: {
+        hour: [14, 15, 16, 17]
+      }
     }
   ];
 

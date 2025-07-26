@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(npm run lint)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(echo $TMUX)",
+      "Bash(npx react-native start:*)",
+      "Bash(find:*)",
+      "Bash(tmux source-file:*)",
+      "Bash(npm run android:*)",
+      "Bash(pkill:*)",
+      "Bash(npm install:*)",
+      "Bash(true)",
+      "Bash(ls:*)",
+      "Bash(rm:*)",
+      "Bash(npx @react-native-community/cli start:*)",
+      "Bash(npm run start:clean:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(adb:*)"
+    ],
+    "deny": []
+  }
+}

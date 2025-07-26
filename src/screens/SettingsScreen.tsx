@@ -1070,7 +1070,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
                 <Icon name="school-outline" size={20} color={colors.text.secondary} />
                 <Text style={styles.menuItemLabel}>온보딩 미리보기</Text>
               </View>
-              <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
+              <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
             </TouchableOpacity>
             
             <TouchableOpacity
@@ -1081,7 +1081,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
                 <Icon name="person-add" size={20} color={colors.text.secondary} />
                 <Text style={styles.menuItemLabel}>신규 사용자 환영 화면</Text>
               </View>
-              <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
+              <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
             </TouchableOpacity>
             
             <TouchableOpacity
@@ -1107,7 +1107,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
                 <Icon name="refresh-outline" size={20} color={colors.text.secondary} />
                 <Text style={styles.menuItemLabel}>온보딩 상태 초기화</Text>
               </View>
-              <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
+              <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
             </TouchableOpacity>
             
             <TouchableOpacity
@@ -1118,7 +1118,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
                 <Icon name="flask-outline" size={20} color={colors.text.secondary} />
                 <Text style={styles.menuItemLabel}>Firebase 테스트</Text>
               </View>
-              <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
+              <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
             </TouchableOpacity>
           </View>
         )}
@@ -1137,7 +1137,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
                 <Icon name={item.icon} size={20} color={colors.text.secondary} />
                 <Text style={styles.menuItemLabel}>{item.label}</Text>
               </View>
-              <Icon name="chevron-right" size={20} color={colors.text.tertiary} />
+              <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
             </TouchableOpacity>
           ))}
         </View>

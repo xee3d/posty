@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator, Platform, KeyboardAvoidingView,  } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator, Platform, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import Animated, {
@@ -9,6 +9,8 @@ import Animated, {
   withTiming,
   FadeIn,
   FadeInDown,
+  SlideInDown,
+  SlideOutDown,
 } from 'react-native-reanimated';
 import AppLogo from '../components/AppLogo';
 
@@ -21,6 +23,7 @@ import { setUser } from '../store/slices/userSlice';
 import { BRAND } from '../utils/constants';
 
 import { Alert } from '../utils/customAlert';
+
 interface LoginScreenProps {
   onNavigate: (screen: string, data?: any) => void;
 }
@@ -30,9 +33,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
   
   const logoScale = useSharedValue(0.8);
   const logoOpacity = useSharedValue(0);
+
+
 
   useEffect(() => {
     // 로고 애니메이션
@@ -134,10 +140,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
     const isThisLoading = loadingProvider === provider;
     
     return (
-      <Animated.View
-        entering={FadeInDown.delay(delay).duration(600).springify()}
-        style={styles.socialButtonContainer}
-      >
+      <View style={styles.socialButtonContainer}>
         <TouchableOpacity
           style={[
             styles.socialButton,
@@ -177,7 +180,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
             </>
           )}
         </TouchableOpacity>
-      </Animated.View>
+      </View>
     );
   };
 
@@ -200,96 +203,121 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
 
           {/* 소셜 로그인 버튼들 */}
           <View style={styles.buttonContainer}>
-            <Animated.Text
-              entering={FadeIn.delay(300).duration(600)}
-              style={styles.loginTitle}
-            >
-              간편 로그인
-            </Animated.Text>
-
-            {renderSocialButton(
-              'google',
-              'Google로 시작하기',
-              'google',
-              '#FFFFFF',
-              '#1F1F1F',
-              400
-            )}
-
-            {renderSocialButton(
-              'naver',
-              '네이버로 시작하기',
-              'naver',
-              '#03C75A',
-              '#FFFFFF',
-              500
-            )}
-
-            {renderSocialButton(
-              'kakao',
-              '카카오로 시작하기',
-              'kakao',
-              '#FEE500',
-              '#191919',
-              600
-            )}
-
-            {renderSocialButton(
-              'facebook',
-              'Facebook으로 시작하기',
-              'facebook',
-              '#1877F2',
-              '#FFFFFF',
-              700
-            )}
-
-            {Platform.OS === 'ios' && renderSocialButton(
-              'apple',
-              'Apple로 시작하기',
-              'apple',
-              '#000000',
-              '#FFFFFF',
-              800
-            )}
           </View>
 
-          {/* 약관 안내 */}
-          <Animated.View
-            entering={FadeInDown.delay(700).duration(600)}
-            style={styles.termsContainer}
-          >
-            <Text style={styles.termsText}>
-              로그인 시{' '}
-              <Text
-                style={styles.termsLink}
-                onPress={() => onNavigate('terms')}
-              >
-                이용약관
-              </Text>
-              {' 및 '}
-              <Text
-                style={styles.termsLink}
-                onPress={() => onNavigate('privacy')}
-              >
-                개인정보처리방침
-              </Text>
-              에{'\n'}동의하는 것으로 간주됩니다.
-            </Text>
-          </Animated.View>
-
-          {/* 게스트 모드 */}
-          <Animated.View
-            entering={FadeInDown.delay(800).duration(600)}
-            style={styles.guestContainer}
-          >
-            <TouchableOpacity
-              style={styles.guestButton}
-              onPress={() => onNavigate('home')}
-              disabled={isLoading}
+          {/* 하단 고정 버튼 영역 */}
+          <View style={styles.fixedButtonContainer}>
+            {/* 간편 로그인 타이틀 */}
+            <Animated.View
+              entering={FadeIn.delay(300).duration(600)}
             >
-              <Text style={styles.guestButtonText}>둘러보기</Text>
-            </TouchableOpacity>
-          </Animated.View>
+              <Text style={styles.loginTitle}>
+                간편 로그인
+              </Text>
+            </Animated.View>
+
+            {/* 카카오 로그인 버튼 */}
+            <Animated.View
+              entering={FadeInDown.delay(400).duration(600).springify()}
+              style={styles.socialButtonContainer}
+            >
+              <TouchableOpacity
+                style={[
+                  styles.socialButton,
+                  { backgroundColor: '#FEE500' },
+                  isLoading && loadingProvider !== 'kakao' && styles.disabledButton,
+                ]}
+                onPress={() => handleSocialLogin('kakao')}
+                disabled={isLoading}
+                activeOpacity={0.8}
+              >
+                {loadingProvider === 'kakao' ? (
+                  <ActivityIndicator size="small" color="#191919" />
+                ) : (
+                  <>
+                    <View style={styles.socialIconContainer}>
+                      <Icon name="chat-bubble" size={20} color="#191919" />
+                    </View>
+                    <Text style={[styles.socialButtonText, { color: '#191919' }]}>
+                      카카오로 시작하기
+                    </Text>
+                  </>
+                )}
+              </TouchableOpacity>
+            </Animated.View>
+
+            {/* 다른 계정으로 연결 버튼 - 다른 옵션이 나타나면 숨김 */}
+            {!showMoreOptions && (
+              <Animated.View
+                entering={FadeInDown.delay(500).duration(600).springify()}
+                exiting={SlideOutDown.duration(200)}
+                style={styles.moreOptionsContainer}
+              >
+                <TouchableOpacity
+                  style={styles.moreOptionsButton}
+                  onPress={() => setShowMoreOptions(true)}
+                  disabled={isLoading}
+                >
+                  <Text style={styles.moreOptionsText}>다른 계정으로 연결</Text>
+                </TouchableOpacity>
+              </Animated.View>
+            )}
+
+            {/* 추가 로그인 옵션들 - 다른 계정으로 연결 클릭 시 표시 */}
+            {showMoreOptions && (
+              <Animated.View
+                entering={SlideInDown.duration(500).springify().damping(15).stiffness(120)}
+                exiting={SlideOutDown.duration(300)}
+                style={styles.expandedOptionsContainer}
+              >
+                <Animated.View entering={FadeInDown.delay(100).duration(400).springify()}>
+                  {renderSocialButton(
+                    'google',
+                    'Google로 시작하기',
+                    'google',
+                    '#FFFFFF',
+                    '#1F1F1F',
+                    0
+                  )}
+                </Animated.View>
+
+                <Animated.View entering={FadeInDown.delay(200).duration(400).springify()}>
+                  {renderSocialButton(
+                    'naver',
+                    '네이버로 시작하기',
+                    'naver',
+                    '#03C75A',
+                    '#FFFFFF',
+                    0
+                  )}
+                </Animated.View>
+
+                <Animated.View entering={FadeInDown.delay(300).duration(400).springify()}>
+                  {renderSocialButton(
+                    'facebook',
+                    'Facebook으로 시작하기',
+                    'facebook',
+                    '#1877F2',
+                    '#FFFFFF',
+                    0
+                  )}
+                </Animated.View>
+
+                {Platform.OS === 'ios' && (
+                  <Animated.View entering={FadeInDown.delay(400).duration(400).springify()}>
+                    {renderSocialButton(
+                      'apple',
+                      'Apple로 시작하기',
+                      'apple',
+                      '#000000',
+                      '#FFFFFF',
+                      0
+                    )}
+                  </Animated.View>
+                )}
+              </Animated.View>
+            )}
+          </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -314,6 +342,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     marginTop: 60,
     marginBottom: 60,
   },
+
   buttonContainer: {
     marginBottom: 40,
   },
@@ -325,6 +354,10 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     textAlign: 'center',
     letterSpacing: -0.3,
   },
+  fixedButtonContainer: {
+    marginTop: 'auto',
+    paddingBottom: 40,
+  },
   socialButtonContainer: {
     marginBottom: 12,
   },
@@ -334,7 +367,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     justifyContent: 'center',
     paddingVertical: 14,
     paddingHorizontal: 20,
-    borderRadius: 12,
+    borderRadius: 24,
     elevation: 2,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
@@ -360,31 +393,24 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     fontWeight: '600',
     letterSpacing: -0.2,
   },
-  termsContainer: {
+  moreOptionsContainer: {
+    marginTop: 20,
     alignItems: 'center',
-    marginBottom: 30,
   },
-  termsText: {
-    fontSize: 13,
+  moreOptionsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+  },
+  moreOptionsText: {
+    fontSize: 16,
     color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 20,
+    fontWeight: '500',
   },
-  termsLink: {
-    color: colors.primary,
-    textDecorationLine: 'underline',
-  },
-  guestContainer: {
-    alignItems: 'center',
-  },
-  guestButton: {
-    paddingVertical: 12,
-    paddingHorizontal: 32,
-  },
-  guestButtonText: {
-    fontSize: 17,
-    color: colors.primary,
-    fontWeight: '700',
+  expandedOptionsContainer: {
+    marginTop: 16,
+    paddingHorizontal: 0,
   },
   googleButton: {
     borderWidth: 1,

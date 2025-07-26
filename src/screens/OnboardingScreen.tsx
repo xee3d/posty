@@ -170,7 +170,6 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
       paddingBottom: SPACING.lg,
       backgroundColor: colors.background,
       borderBottomWidth: 0,
-      ...cardTheme.shadow,
     },
     progressHeader: {
       flexDirection: 'row',
@@ -238,7 +237,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
     allAgreeText: {
       fontSize: 16,
       fontWeight: '600',
-      color: colors.text,
+      color: colors.text.primary,
     },
     agreementItem: {
       flexDirection: 'row',
@@ -255,7 +254,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
     },
     agreementText: {
       fontSize: 15,
-      color: colors.text,
+      color: colors.text.primary,
       flex: 1,
     },
     detailButton: {
@@ -272,7 +271,11 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
       borderRadius: 28,
       alignItems: 'center',
       justifyContent: 'center',
-      ...cardTheme.primary.shadow,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.2,
+      shadowRadius: 8,
+      elevation: 4,
     },
     buttonEnabled: {
       backgroundColor: colors.primary,
@@ -305,7 +308,11 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
       marginBottom: SPACING.md,
       borderWidth: isDark ? 0 : 1,
       borderColor: isDark ? 'transparent' : colors.border,
-      ...cardTheme.default.shadow,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: isDark ? 0.15 : 0.05,
+      shadowRadius: 8,
+      elevation: isDark ? 4 : 2,
     },
     permissionIcon: {
       width: 56,
@@ -321,7 +328,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
     permissionTitle: {
       fontSize: 16,
       fontWeight: '600',
-      color: colors.text,
+      color: colors.text.primary,
       marginBottom: 4,
     },
     permissionDesc: {
@@ -353,7 +360,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
     modalTitle: {
       fontSize: 18,
       fontWeight: '600',
-      color: colors.text,
+      color: colors.text.primary,
     },
     modalCloseButton: {
       width: 32,
@@ -366,7 +373,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
     },
     modalText: {
       fontSize: 15,
-      color: colors.text,
+      color: colors.text.primary,
       lineHeight: 22,
     },
     modalButton: {
@@ -393,7 +400,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
             style={styles.backButton}
             onPress={() => currentStep > 1 && setCurrentStep(currentStep - 1)}
           >
-            {currentStep > 1 && <Icon name="arrow-back" size={24} color={colors.text} />}
+            {currentStep > 1 && <Icon name="arrow-back" size={24} color={colors.text.primary} />}
           </TouchableOpacity>
           <Text style={styles.stepIndicator}>{currentStep}/2</Text>
           <View style={{ width: 40 }} />
@@ -649,7 +656,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete }) => {
                 style={styles.modalCloseButton}
                 onPress={() => setShowModal(false)}
               >
-                <Icon name="close" size={24} color={colors.text} />
+                <Icon name="close" size={24} color={colors.text.primary} />
               </TouchableOpacity>
             </View>
             <ScrollView style={styles.modalBody}>

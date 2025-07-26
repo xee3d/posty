@@ -9,6 +9,7 @@ import {
 import trendService from '../services/trendService';
 import debugUtils from '../utils/debug/debugUtils';
 import { COLORS, SPACING } from '../utils/constants';
+import { SkeletonLoader, FeedSkeleton } from '../components/SkeletonLoader';
 
 const TrendDebugScreen = () => {
   const [trends, setTrends] = React.useState<any[]>([]);
@@ -53,7 +54,13 @@ const TrendDebugScreen = () => {
         </TouchableOpacity>
       </View>
 
-      {loading && <Text style={styles.loading}>로딩 중...</Text>}
+      {loading && (
+        <View style={styles.loadingContainer}>
+          <SkeletonLoader width="60%" height={20} style={{ marginBottom: 8 }} />
+          <SkeletonLoader width="40%" height={16} style={{ marginBottom: 16 }} />
+          <FeedSkeleton count={2} />
+        </View>
+      )}
 
       {analysis && (
         <View style={styles.section}>
@@ -162,6 +169,12 @@ const styles = StyleSheet.create({
   trendInfo: {
     fontSize: 12,
     color: COLORS.text.tertiary,
+  },
+  loadingContainer: {
+    padding: SPACING.md,
+    backgroundColor: COLORS.background.secondary,
+    borderRadius: 8,
+    marginBottom: SPACING.lg,
   },
 });
 

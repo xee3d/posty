@@ -196,29 +196,30 @@ const NewUserWelcome: React.FC<NewUserWelcomeProps> = ({ onStart, onDismiss }) =
             ))}
           </View>
         </Animated.View>
-
-        <View style={styles.footer}>
-          <View style={styles.dots}>
-            {welcomeSteps.map((_, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.dot,
-                  { backgroundColor: colors.text.tertiary },
-                  index === currentStep && [styles.activeDot, { backgroundColor: colors.primary }]
-                ]}
-              />
-            ))}
-          </View>
-
-          <TouchableOpacity style={[styles.nextButton, { backgroundColor: colors.primary }]} onPress={handleNext}>
-            <Text style={[styles.nextButtonText, { color: colors.white }]}>
-              {currentStep === welcomeSteps.length - 1 ? '시작하기' : '다음'}
-            </Text>
-            <Icon name="arrow-forward" size={20} color={colors.white} />
-          </TouchableOpacity>
-        </View>
       </ScrollView>
+
+      {/* 하단 버튼 영역을 고정 위치로 이동 */}
+      <View style={[styles.footer, { backgroundColor: colors.background }]}>
+        <View style={styles.dots}>
+          {welcomeSteps.map((_, index) => (
+            <View
+              key={index}
+              style={[
+                styles.dot,
+                { backgroundColor: colors.text.tertiary },
+                index === currentStep && [styles.activeDot, { backgroundColor: colors.primary }]
+              ]}
+            />
+          ))}
+        </View>
+
+        <TouchableOpacity style={[styles.nextButton, { backgroundColor: colors.primary }]} onPress={handleNext}>
+          <Text style={[styles.nextButtonText, { color: colors.white }]}>
+            {currentStep === welcomeSteps.length - 1 ? '시작하기' : '다음'}
+          </Text>
+          <Icon name="arrow-forward" size={20} color={colors.white} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     paddingHorizontal: SPACING.xl,
     paddingTop: SPACING.xl,
-    paddingBottom: SPACING.xxl,
+    paddingBottom: 160, // 하단 버튼 영역을 위한 여백
   },
   mainContent: {
     flex: 1,
@@ -311,7 +312,18 @@ const styles = StyleSheet.create({
     textAlign: 'left',
   },
   footer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     paddingBottom: SPACING.xl,
+    paddingTop: SPACING.md,
+    paddingHorizontal: SPACING.xl,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   dots: {
     flexDirection: 'row',

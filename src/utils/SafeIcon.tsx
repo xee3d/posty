@@ -23,6 +23,61 @@ const ICON_MAPPING: Record<string, { type: 'ionicons' | 'material' | 'material-c
   'schedule': { type: 'ionicons', name: 'calendar-outline' },
   'access-alarm': { type: 'ionicons', name: 'alarm-outline' },
   'query-builder': { type: 'ionicons', name: 'time-outline' },
+  'trending_up': { type: 'ionicons', name: 'trending-up' },
+  'star_rate': { type: 'ionicons', name: 'star' },
+  'access_time': { type: 'ionicons', name: 'time-outline' },
+  'psychology': { type: 'ionicons', name: 'bulb' },
+  'water': { type: 'ionicons', name: 'water' },
+  'water_drop': { type: 'ionicons', name: 'water' },
+  'local_drink': { type: 'ionicons', name: 'wine' },
+  'spa': { type: 'ionicons', name: 'leaf' },
+  'light-mode': { type: 'ionicons', name: 'sunny' },
+  'dark-mode': { type: 'ionicons', name: 'moon' },
+  // Common Material Design Icons to Ionicons mapping
+  'edit': { type: 'ionicons', name: 'create' },
+  'auto-fix-high': { type: 'ionicons', name: 'color-wand' },
+  'photo-camera': { type: 'ionicons', name: 'camera' },
+  'monetization-on': { type: 'ionicons', name: 'cash' },
+  'animation': { type: 'ionicons', name: 'play-circle' },
+  'workspace-premium': { type: 'ionicons', name: 'diamond' },
+  'palette': { type: 'ionicons', name: 'color-palette' },
+  'tips-and-updates': { type: 'ionicons', name: 'bulb' },
+  'info-outline': { type: 'ionicons', name: 'information-circle-outline' },
+  'info': { type: 'ionicons', name: 'information-circle' },
+  'help-outline': { type: 'ionicons', name: 'help-circle-outline' },
+  'error-outline': { type: 'ionicons', name: 'alert-circle-outline' },
+  'warning-outline': { type: 'ionicons', name: 'warning-outline' },
+  'check-circle-outline': { type: 'ionicons', name: 'checkmark-circle-outline' },
+  'play-circle-outline': { type: 'ionicons', name: 'play-circle-outline' },
+  'people-outline': { type: 'ionicons', name: 'people-outline' },
+  'sync-outline': { type: 'ionicons', name: 'sync-outline' },
+  'pencil-outline': { type: 'ionicons', name: 'pencil-outline' },
+  'sparkles-outline': { type: 'ionicons', name: 'sparkles-outline' },
+  'add-circle-outline': { type: 'ionicons', name: 'add-circle-outline' },
+  'notifications-outline': { type: 'ionicons', name: 'notifications-outline' },
+  'trophy-outline': { type: 'ionicons', name: 'trophy-outline' },
+  'bulb-outline': { type: 'ionicons', name: 'bulb-outline' },
+  'create-outline': { type: 'ionicons', name: 'create-outline' },
+  'target': { type: 'ionicons', name: 'radio-button-on' },
+  'pricetag': { type: 'ionicons', name: 'pricetag' },
+  'construct': { type: 'ionicons', name: 'construct' },
+  'document-text': { type: 'ionicons', name: 'document-text' },
+  'public': { type: 'ionicons', name: 'globe' },
+  'card-giftcard': { type: 'ionicons', name: 'gift' },
+  'arrow-forward': { type: 'ionicons', name: 'arrow-forward' },
+  'refresh': { type: 'ionicons', name: 'refresh' },
+  'information-circle': { type: 'ionicons', name: 'information-circle' },
+  'checkmark-circle': { type: 'ionicons', name: 'checkmark-circle' },
+  'chevron-forward': { type: 'ionicons', name: 'chevron-forward' },
+  'block': { type: 'ionicons', name: 'ban' },
+  'auto-awesome': { type: 'ionicons', name: 'sparkles' },
+  'event': { type: 'ionicons', name: 'calendar' },
+  'check': { type: 'ionicons', name: 'checkmark' },
+  'arrow-back': { type: 'ionicons', name: 'arrow-back' },
+  'flight-takeoff': { type: 'ionicons', name: 'airplane' },
+  'account-circle': { type: 'ionicons', name: 'person-circle' },
+  'workspace-premium': { type: 'ionicons', name: 'diamond' },
+  'account-balance-wallet': { type: 'ionicons', name: 'wallet' },
   
   // Add more mappings as needed
 };
@@ -51,28 +106,14 @@ export const SafeIcon: React.FC<SafeIconProps> = ({
           return <MaterialCommunityIcon name={name} size={size} color={color} />;
         case 'ionicons':
         default:
-          // List of valid Ionicons names (partial list for common ones)
-          const validIonicons = [
-            'home', 'home-outline', 'person', 'person-outline', 'settings', 'settings-outline',
-            'sunny', 'moon', 'contrast', 'partly-sunny', 'cloudy', 'create', 'create-outline',
-            'trending-up', 'trending-up-outline', 'palette', 'notifications', 'notifications-outline',
-            'star', 'star-outline', 'heart', 'heart-outline', 'camera', 'camera-outline',
-            'image', 'image-outline', 'add', 'close', 'checkmark', 'chevron-forward', 'chevron-back',
-          ];
-          
-          // Check if it's a valid ionicon
-          const baseIconName = name.replace(/-outline|-sharp$/, '');
-          const isValid = validIonicons.some(validName => {
-            const validBase = validName.replace(/-outline|-sharp$/, '');
-            return validBase === baseIconName;
-          });
-          
-          if (!isValid) {
+          // For now, trust the icon names and let Ionicons handle validation
+          // We'll catch errors and show fallback if needed
+          try {
+            return <Icon name={name} size={size} color={color} />;
+          } catch (iconError) {
             console.warn(`Invalid icon name: ${name}. Using fallback icon.`);
             return <Icon name="help-circle-outline" size={size} color={color} />;
           }
-          
-          return <Icon name={name} size={size} color={color} />;
       }
     } catch (error) {
       console.error(`Error rendering icon ${name}:`, error);

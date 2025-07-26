@@ -12,7 +12,7 @@ export const PLAN_FEATURES = {
     tones: ['casual', 'professional', 'humorous'], // 3개
     lengths: ['short', 'medium'],
     hasAds: true,
-    imageAnalysisTokens: 2,
+    imageAnalysisTokens: 1,
   },
   starter: {
     dailyTokens: -1, // 일일 제한 없음
@@ -22,7 +22,7 @@ export const PLAN_FEATURES = {
     tones: ['casual', 'professional', 'humorous', 'emotional'], // 4개
     lengths: ['short', 'medium', 'long'],
     hasAds: false,
-    imageAnalysisTokens: 2,
+    imageAnalysisTokens: 1,
   },
   premium: {
     dailyTokens: -1, // 일일 제한 없음

@@ -85,7 +85,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       basePrice: 1900,  // ₩63/개 - STARTER 한달치와 동일 가격
       originalPrice: 2400,
       baseDiscount: 20,  // 기본 20% 할인
-      gradient: ['#E0C3FC', '#8EC5FC'],
+      gradient: ['#6366F1', '#4F46E5'],  // 인디고 그라데이션
       accentColor: '#8B5CF6',
       popular: false,
       icon: '✨',
@@ -98,7 +98,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       basePrice: 4900,  // ₩49/개 - PREMIUM 한달치와 동일 가격
       originalPrice: 6500,
       baseDiscount: 25,  // 기본 25% 할인
-      gradient: ['#FA709A', '#FEE140'],
+      gradient: ['#F59E0B', '#DC2626'],  // 주황색-빨간색 그라데이션
       accentColor: '#EC4899',
       popular: true,
       icon: '🔥',
@@ -111,7 +111,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       basePrice: 9900,  // ₩33/개 - 대량 구매 혜택
       originalPrice: 15000,
       baseDiscount: 35,  // 기본 35% 할인
-      gradient: ['#667EEA', '#764BA2'],
+      gradient: ['#10B981', '#059669'],  // 민트 귷린 그라데이션
       accentColor: '#6366F1',
       popular: false,
       icon: '💎',
@@ -124,7 +124,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       basePrice: 19900,  // ₩20/개 - 최고 할인율
       originalPrice: 40000,
       baseDiscount: 50,  // 기본 50% 할인
-      gradient: ['#F687B3', '#D53F8C'],
+      gradient: ['#7C3AED', '#5B21B6'],  // 진한 보라색 그라데이션
       accentColor: '#EC4899',
       popular: false,
       icon: '🚀',
@@ -271,7 +271,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                 </View>
                 {pkg.bonus && (
                   <LinearGradient
-                    colors={['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.1)']}
+                  colors={['rgba(255,255,255,0.4)', 'rgba(255,255,255,0.2)']}
                     style={styles.bonusBadge}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
@@ -293,7 +293,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                       ₩{pkg.originalPrice.toLocaleString()}
                     </Text>
                     <LinearGradient
-                      colors={['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.2)']}
+                      colors={['rgba(255,255,255,0.4)', 'rgba(255,255,255,0.25)']}
                       style={styles.discountBadge}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
@@ -305,14 +305,14 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               </View>
 
               <View style={styles.unitPriceWrapper}>
-                <Icon name="info-outline" size={14} color="rgba(255,255,255,0.8)" />
+                <Icon name="info-outline" size={14} color="#FFFFFF" />
                 <Text style={styles.unitPriceText}>
                   토큰당 ₩{Math.round(pkg.price / (pkg.amount + (pkg.bonus || 0)))}
                 </Text>
               </View>
 
               <LinearGradient
-                colors={['rgba(255,255,255,0.25)', 'rgba(255,255,255,0.15)']}
+                colors={['rgba(255,255,255,0.3)', 'rgba(255,255,255,0.2)']}
                 style={styles.purchaseButton}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
@@ -527,7 +527,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',  // 약한 다크 오버레이로 색상 선명도 유지
   },
   packageHeader: {
     flexDirection: 'row',
@@ -547,10 +547,14 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: -0.3,
     marginBottom: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   packageTagline: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.8)',
+    color: '#FFFFFF',
+    opacity: 0.9,
   },
   tokenSection: {
     flexDirection: 'row',
@@ -568,11 +572,14 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     fontWeight: '800',
     color: '#FFFFFF',
     letterSpacing: -1,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   tokenLabel: {
     fontSize: 18,
     fontWeight: '500',
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: '#FFFFFF',
   },
   bonusBadge: {
     flexDirection: 'row',
@@ -605,6 +612,9 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     fontWeight: '800',
     color: '#FFFFFF',
     letterSpacing: -0.5,
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   discountRow: {
     flexDirection: 'row',
@@ -614,7 +624,8 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   },
   originalPrice: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.5)',
+    color: '#FFFFFF',
+    opacity: 0.6,
     textDecorationLine: 'line-through',
   },
   discountBadge: {
@@ -635,7 +646,8 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   },
   unitPriceText: {
     fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: '#FFFFFF',
+    opacity: 0.9,
   },
   purchaseButton: {
     flexDirection: 'row',
@@ -645,7 +657,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
+    borderColor: 'rgba(255, 255, 255, 0.4)',
   },
   purchaseButtonText: {
     fontSize: 16,

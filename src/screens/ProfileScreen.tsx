@@ -235,7 +235,9 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
             {/* 레벨 진행률 */}
             <View style={styles.levelProgressSection}>
               <View style={styles.levelProgressHeader}>
-                <Text style={styles.levelProgressLabel}>Lv.{profile?.level} → Lv.{(profile?.level || 1) + 1}</Text>
+                <Text style={styles.levelProgressLabel}>
+                  Lv.{profile?.level} → Lv.{(profile?.level || 1) + 1}
+                </Text>
                 <Text style={styles.levelProgressExp}>
                   {expProgress.current} / {expProgress.required} EXP
                 </Text>
@@ -656,16 +658,19 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: SPACING.sm,
+    gap: SPACING.md, // 레벨과 경험치 사이 간격 추가
   },
   levelProgressLabel: {
     fontSize: FONT_SIZES.small,
     fontWeight: '600',
     color: colors.text.secondary,
+    flex: 1, // 남은 공간 차지
   },
   levelProgressExp: {
     fontSize: FONT_SIZES.small,
     fontWeight: '700',
     color: colors.primary,
+    marginLeft: SPACING.md, // 추가 간격
   },
   levelProgressBar: {
     height: 6,
