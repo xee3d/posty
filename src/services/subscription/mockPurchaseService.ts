@@ -51,14 +51,16 @@ class MockPurchaseService {
     const expiryDate = new Date();
     expiryDate.setMonth(expiryDate.getMonth() + (isYearly ? 12 : 1));
     
-    await tokenService.upgradeSubscription(planId as 'starter' | 'premium' | 'pro');
+
     
-    // Redux에 만료일 업데이트
+    // Redux에 만료일 업데이트 (서버 검증된 상태로)
     const { updateSubscription } = require('../../store/slices/userSlice');
     const { store } = require('../../store');
     store.dispatch(updateSubscription({
       plan: planId as 'starter' | 'premium' | 'pro',
       expiresAt: expiryDate.toISOString(),
+      autoRenew: true,
+      isServerVerified: true, // Mock에서도 서버 검증 상태로 처리
     }));
     
     // Mock 구독 정보 저장 (복원용)

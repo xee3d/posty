@@ -194,67 +194,64 @@ const userSlice = createSlice({
       
       // 구독 플랜별 토큰 처리
       if (action.payload.plan === 'starter' && previousPlan !== 'starter') {
-        // STARTER: 초기 300개 + 일일 10개 추가
+        // STARTER: 초기 300개 즉시 지급 + 일일 10개 추가
+        console.log('[UserSlice] STARTER 구독 활성화 - 초기 300개 토큰 지급');
+        
+        // 플랜별 처리
         if (previousPlan === 'free') {
           // 무료에서 업그레이드: 기존 토큰 + 300개 추가
           state.freeTokens += 300;
           state.currentTokens += 300;
         } else if (previousPlan === 'premium' || previousPlan === 'pro') {
-          // 상위 플랜에서 다운그레이드: 기존 구매 토큰은 유지, 무료 토큰만 조정
-          state.freeTokens = Math.min(state.freeTokens, 300);
-          state.currentTokens = state.purchasedTokens + state.freeTokens;
+          // 상위 플랜에서 다운그레이드: 무료 토큰을 300개로 조정
+          state.freeTokens = 300;
+          state.currentTokens = state.purchasedTokens + 300;
         }
+        
         state.tokens.current = state.currentTokens;
         
-        // 히스토리 추가
-        const newHistory: TokenHistory = {
-          id: Date.now().toString(),
-          date: new Date().toISOString(),
-          type: 'earn',
-          amount: previousPlan === 'free' ? 300 : 0,
-          description: 'STARTER 플랜 가입 보너스',
-          balance: state.currentTokens,
-        };
+        // 히스토리 추가 (무료에서 업그레이드인 경우만)
         if (previousPlan === 'free') {
+          const newHistory: TokenHistory = {
+            id: Date.now().toString(),
+            date: new Date().toISOString(),
+            type: 'earn',
+            amount: 300,
+            description: 'STARTER 구독 초기 토큰 지급',
+            balance: state.currentTokens,
+          };
           state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
         }
         
         console.log('[UserSlice] STARTER plan activated: tokens =', state.currentTokens);
       } else if (action.payload.plan === 'premium' && previousPlan !== 'premium') {
-        // PREMIUM: 초기 500개 + 일일 20개 추가
+        // PREMIUM: 초기 500개 즉시 지급 + 일일 20개 추가
+        console.log('[UserSlice] PREMIUM 구독 활성화 - 초기 500개 토큰 지급');
+        
         if (previousPlan === 'free') {
           // 무료에서 업그레이드: 기존 토큰 + 500개 추가
           state.freeTokens += 500;
           state.currentTokens += 500;
         } else if (previousPlan === 'starter') {
-          // STARTER에서 업그레이드: 전액 500개 추가 (누적 방식)
+          // STARTER에서 업그레이드: 기존 토큰 + 500개 추가
           state.freeTokens += 500;
           state.currentTokens += 500;
         } else if (previousPlan === 'pro') {
-          // PRO에서 다운그레이드: 기존 구매 토큰은 유지, 무료 토큰만 조정
-          state.freeTokens = Math.min(state.freeTokens, 500);
-          state.currentTokens = state.purchasedTokens + state.freeTokens;
+          // PRO에서 다운그레이드: 무료 토큰을 500개로 조정
+          state.freeTokens = 500;
+          state.currentTokens = state.purchasedTokens + 500;
         }
+        
         state.tokens.current = state.currentTokens;
         
-        // 히스토리 추가
-        let bonusAmount = 0;
-        let description = '';
-        if (previousPlan === 'free') {
-          bonusAmount = 500;
-          description = 'PREMIUM 플랜 가입 보너스';
-        } else if (previousPlan === 'starter') {
-          bonusAmount = 500;
-          description = 'PREMIUM 플랜 업그레이드 보너스 (전액)';
-        }
-        
-        if (bonusAmount > 0) {
+        // 히스토리 추가 (업그레이드인 경우만)
+        if (previousPlan === 'free' || previousPlan === 'starter') {
           const newHistory: TokenHistory = {
             id: Date.now().toString(),
             date: new Date().toISOString(),
             type: 'earn',
-            amount: bonusAmount,
-            description: description,
+            amount: 500,
+            description: 'PREMIUM 구독 초기 토큰 지급',
             balance: state.currentTokens,
           };
           state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];

@@ -305,7 +305,22 @@ class InAppPurchaseService {
     if (subscriptionIds.includes(productId)) {
       // 구독 처리
       const planId = this.getPlanIdFromSku(productId);
-      await tokenService.upgradeSubscription(planId);
+      
+      // Redux를 통해 구독 업데이트 (서버 검증된 상태로 처리)
+      const { updateSubscription } = require('../../store/slices/userSlice');
+      const { store } = require('../../store');
+      
+      const expiryDate = new Date();
+      expiryDate.setMonth(expiryDate.getMonth() + 1); // 1달 후 만료
+      
+      store.dispatch(updateSubscription({
+        plan: planId as 'starter' | 'premium' | 'pro',
+        expiresAt: expiryDate.toISOString(),
+        autoRenew: true,
+        isServerVerified: true, // 서버에서 검증된 업데이트
+      }));
+      
+      console.log(`[InAppPurchase] 구독 성공: ${planId} - 초기 토큰 지급 완료`);
       
       // 구독 성공 이벤트 발생
       DeviceEventEmitter.emit('purchaseSuccess', {
