@@ -220,5 +220,5 @@ xcodebuild -workspace Posty.xcworkspace -scheme Posty -configuration Release
 <div align="center">
   Made with ❤️ by Posty Team
   
-  *최종 업데이트: 2025년 7월 23일*
+  *최종 업데이트: 2025년 7월 31일*
 </div>
