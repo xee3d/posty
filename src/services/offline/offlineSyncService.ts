@@ -154,6 +154,16 @@ class OfflineSyncService {
     return queue.length;
   }
 
+  // 큐 상태 가져오기 (SyncIndicator에서 사용)
+  async getQueueStatus(): Promise<{ count: number; isSyncing: boolean; isOnline: boolean }> {
+    const queue = await this.getQueue();
+    return {
+      count: queue.length,
+      isSyncing: this.isSyncing,
+      isOnline: this.isOnline
+    };
+  }
+
   // 서비스 정리
   destroy(): void {
     if (this.unsubscribeNetInfo) {
