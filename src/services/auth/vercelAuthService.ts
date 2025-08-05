@@ -26,7 +26,7 @@ try {
   NAVER_CONSUMER_KEY = 'mock-naver-key';
   NAVER_CONSUMER_SECRET = 'mock-naver-secret';
   KAKAO_APP_KEY = 'mock-kakao-key';
-  SERVER_URL = 'https://posty-server-new.vercel.app';
+  SERVER_URL = 'https://posty-api.vercel.app';
 }
 
 export interface UserProfile {

@@ -388,7 +388,7 @@ class TrendService {
     /*
     try {
       const response = await axios.get(
-        'https://posty-server-new.vercel.app/api/trends',
+        'https://posty-api.vercel.app/api/trends',
         {
           params: {
             region: 'kr',

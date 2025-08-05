@@ -4,10 +4,9 @@
 const SERVER_CONFIGS = {
   // 가능한 서버 URL들 (우선순위 순)
   SERVERS: [
-    'https://posty-ai.vercel.app',  // 새로운 AI 서버 (작동 확인)
+    'https://posty-ai.vercel.app',  // AI 서버 (작동 확인)
+    'https://posty-api.vercel.app',  // API 서버 (작동 확인) 
     'https://posty-ai-server.vercel.app',
-    'https://posty-server-new.vercel.app',
-    'https://posty-server.vercel.app',
   ],
   
   // 현재 작동하는 서버 URL (동적으로 설정됨)
