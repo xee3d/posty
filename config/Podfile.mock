@@ -1,0 +1,54 @@
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+platform :ios, '14.0'
+use_modular_headers!
+
+target 'Posty' do
+  config = use_native_modules!
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :hermes_enabled => false
+  )
+
+  # 🎯 Mock 모드: Firebase 없이 안정적인 실행
+  # 핵심 기능만 설치 (Firebase 완전 제외)
+  pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
+  pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+  pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
+  pod 'RNReanimated', :path => '../node_modules/react-native-reanimated'
+  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-async-storage/async-storage'
+  pod 'RNGestureHandler', :path => '../node_modules/react-native-gesture-handler'
+  pod 'RNScreens', :path => '../node_modules/react-native-screens'
+  
+  # 소셜 로그인 (Firebase 없이)
+  pod 'RNGoogleSignin', :path => '../node_modules/@react-native-google-signin/google-signin'
+  pod 'kakao-login', :path => '../node_modules/@react-native-seoul/kakao-login'
+  pod 'RNNaverLogin', :path => '../node_modules/@react-native-seoul/naver-login'
+  pod 'RNAppleAuthentication', :path => '../node_modules/@invertase/react-native-apple-authentication'
+  
+  # 기타 필수 기능
+  pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
+  pod 'RNDeviceInfo', :path => '../node_modules/react-native-device-info'
+  pod 'react-native-image-resizer', :path => '../node_modules/react-native-image-resizer'
+  pod 'react-native-netinfo', :path => '../node_modules/@react-native-community/netinfo'
+  pod 'RNLocalize', :path => '../node_modules/react-native-localize'
+  pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
+  pod 'RNSound', :path => '../node_modules/react-native-sound'
+  pod 'RNCClipboard', :path => '../node_modules/@react-native-clipboard/clipboard'
+
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false
+    )
+    
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+      end
+    end
+  end
+end

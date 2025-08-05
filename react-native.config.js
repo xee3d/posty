@@ -30,5 +30,28 @@ module.exports = {
         ios: null,
       },
     },
+    // ReactCommon 모듈 중복 방지
+    'ReactCommon': {
+      platforms: {
+        ios: null,
+      },
+    },
+    'React-Codegen': {
+      platforms: {
+        ios: null,
+      },
+    },
+    'FBReactNativeSpec': {
+      platforms: {
+        ios: null,
+      },
+    },
+  },
+  // New Architecture 완전 비활성화
+  project: {
+    ios: {
+      sourceDir: './ios',
+    },
+    android: {},
   },
 };

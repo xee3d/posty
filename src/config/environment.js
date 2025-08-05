@@ -7,22 +7,23 @@
  */
 
 export const FEATURES = {
-  // 🔥 Firebase 기능 제어 (기본: 비활성화)
-  USE_FIREBASE: false,
-  FIREBASE_READY: false,
+  // 🔥 Firebase 기능 제어 (Auth만 활성화)
+  USE_FIREBASE: true,
+  USE_FIREBASE_AUTH: true,     // Auth만 활성화
+  FIREBASE_READY: true,
   
   // 📱 기타 외부 서비스 제어
-  USE_ADS: false,
+  USE_ADS: false,              // AdMob은 독립적으로 관리
   USE_IAP: false,
-  USE_ANALYTICS: false,
+  USE_ANALYTICS: false,        // Firebase Analytics 비활성화
   
   // 🛠️ 개발 도구
   DEBUG_MODE: __DEV__,
   ENABLE_DEBUGGING: __DEV__,
   
-  // 🎯 Mock 시스템 설정
-  MOCK_SYSTEM_ENABLED: true,
-  MOCK_DATA_PERSISTENCE: true
+  // 🎯 Mock 시스템 설정 (Firebase Auth 제외)
+  MOCK_SYSTEM_ENABLED: false,   // Auth는 실제 사용
+  MOCK_DATA_PERSISTENCE: true   // 데이터는 여전히 로컬
 };
 
 export const ENVIRONMENT_CONFIG = {

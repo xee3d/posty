@@ -13,7 +13,7 @@ import {
   resetMonthlyTokens
 } from '../../store/slices/userSlice';
 import auth from '@react-native-firebase/auth';
-import firestoreService from '../firebase/firestoreService';
+// Firestore는 제거됨
 
 export interface TokenUsage {
   timestamp: string;
@@ -54,51 +54,51 @@ class TokenService {
         return;
       }
       
-      // 2. 로그인된 사용자가 있으면 Firestore에서 데이터 가져오기
+      // 2. Firebase 비활성화 상태에서는 로컬 스토리지만 사용
       const currentUser = auth().currentUser;
-      if (currentUser) {
-        console.log('TokenService: Fetching from Firestore for user:', currentUser.uid);
-        
-        // Firestore에서 사용자 데이터 가져오기
-        const userData = await firestoreService.getUser();
-        if (userData && userData.tokens) {
-          const firestoreTokens = userData.tokens.current;
-          console.log('TokenService: Got tokens from Firestore:', firestoreTokens);
-          
-          // Redux와 로컬 스토리지에 저장
-          store.dispatch(setTokens(firestoreTokens));
-          // subscriptionPlan 필드를 우선 사용, 없으면 subscription.plan 사용
-          const plan = userData.subscriptionPlan || userData.subscription?.plan || 'free';
-          store.dispatch(setSubscriptionPlan(plan));
-          
-          // 로컬 스토리지에도 저장 (백업)
-          await AsyncStorage.setItem(this.TOKEN_KEY, JSON.stringify({
-            current: firestoreTokens,
-            total: firestoreTokens,
-            lastUpdated: new Date().toISOString(),
-          }));
-          
-          await AsyncStorage.setItem(this.SUBSCRIPTION_KEY, JSON.stringify({
-            ...this.getDefaultSubscription(),
-            subscriptionPlan: plan,
-            dailyTokens: firestoreTokens,
-          }));
-          
-          return;
-        } else {
-          // Firestore에 데이터가 없으면 초기 사용자로 생성
-          console.log('TokenService: Creating new user in Firestore');
-          await firestoreService.createOrUpdateUser({
-            tokens: {
-              current: 10,
-              total: 0,
-              lastUpdated: new Date().toISOString(),
-            },
-          });
-          store.dispatch(setTokens(10));
-        }
-      } else {
-        // 3. 로그인하지 않은 상태면 로컬 스토리지 확인
+      // if (currentUser) {
+      //   console.log('TokenService: Fetching from Firestore for user:', currentUser.uid);
+      //   
+      //   // Firestore에서 사용자 데이터 가져오기
+      //   const userData = await firestoreService.getUser();
+      //   if (userData && userData.tokens) {
+      //     const firestoreTokens = userData.tokens.current;
+      //     console.log('TokenService: Got tokens from Firestore:', firestoreTokens);
+      //     
+      //     // Redux와 로컬 스토리지에 저장
+      //     store.dispatch(setTokens(firestoreTokens));
+      //     // subscriptionPlan 필드를 우선 사용, 없으면 subscription.plan 사용
+      //     const plan = userData.subscriptionPlan || userData.subscription?.plan || 'free';
+      //     store.dispatch(setSubscriptionPlan(plan));
+      //     
+      //     // 로컬 스토리지에도 저장 (백업)
+      //     await AsyncStorage.setItem(this.TOKEN_KEY, JSON.stringify({
+      //       current: firestoreTokens,
+      //       total: firestoreTokens,
+      //       lastUpdated: new Date().toISOString(),
+      //     }));
+      //     
+      //     await AsyncStorage.setItem(this.SUBSCRIPTION_KEY, JSON.stringify({
+      //       ...this.getDefaultSubscription(),
+      //       subscriptionPlan: plan,
+      //       dailyTokens: firestoreTokens,
+      //     }));
+      //     
+      //     return;
+      //   } else {
+      //     // Firestore에 데이터가 없으면 초기 사용자로 생성
+      //     console.log('TokenService: Creating new user in Firestore');
+      //     await firestoreService.createOrUpdateUser({
+      //       tokens: {
+      //         current: 10,
+      //         total: 0,
+      //         lastUpdated: new Date().toISOString(),
+      //       },
+      //     });
+      //     store.dispatch(setTokens(10));
+      //   }
+      // } else {
+        // 3. Firebase 비활성화 상태에서는 항상 로컬 스토리지 확인
         console.log('TokenService: No user logged in, checking local storage');
         const savedTokens = await AsyncStorage.getItem(this.TOKEN_KEY);
         
@@ -113,7 +113,7 @@ class TokenService {
           console.log('TokenService: No data found, using defaults');
           await this.resetToDefault();
         }
-      }
+      // }
       
       // 일일 리셋 체크
       const subscription = await this.getSubscription();

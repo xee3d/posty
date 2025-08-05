@@ -7,26 +7,23 @@ const config = {
   transformer: {
     minifierPath: 'metro-minify-terser',
     minifierConfig: {
-      // Terser 옵션으로 번들 크기 최적화
       keep_fnames: false,
       mangle: {
         keep_fnames: false,
       },
       compress: {
-        drop_console: true, // 프로덕션에서 console.log 제거
+        drop_console: true,
         drop_debugger: true,
         pure_funcs: ['console.log', 'console.info', 'console.warn'],
       },
       output: {
-        comments: false, // 주석 제거
+        comments: false,
         ascii_only: true,
       },
     },
   },
   resolver: {
-    // 에러 스택 트레이스 개선
     sourceExts: ['jsx', 'js', 'ts', 'tsx', 'json'],
-    // 빌드 디렉토리 제외
     blockList: [
       /node_modules\/.*\/android\/build\/.*/,
       /android\/build\/.*/,
@@ -34,9 +31,15 @@ const config = {
       /\.gradle\/.*/,
       /\.git\/.*/,
     ],
+    // Firebase Mock Aliasing (문서에서 언급한 방법)
+    alias: {
+      '@react-native-firebase/auth': './src/mocks/firebase-auth-mock.js',
+      '@react-native-firebase/firestore': './src/mocks/firebase-firestore-mock.js',
+      '@react-native-firebase/analytics': './src/mocks/firebase-analytics-mock.js',
+      '@react-native-firebase/app': './src/mocks/firebase-app-mock.js',
+    },
   },
   server: {
-    // 더 자세한 로그 출력
     enhanceMiddleware: (middleware) => {
       return (req, res, next) => {
         if (req.url.includes('symbolicate')) {
@@ -47,13 +50,9 @@ const config = {
     },
   },
   watchFolders: [],
-  // File watcher 설정
   watcher: {
-    // Watchman 대신 Node watcher 사용 (더 안정적)
     useWatchman: false,
-    // 파일 변경 감지 지연 시간
     crawlDelay: 300,
-    // 빌드 폴더 무시
     ignore: [
       '**/android/build/**',
       '**/android/app/build/**',

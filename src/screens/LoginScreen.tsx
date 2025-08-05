@@ -91,15 +91,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         // 사용자 프로필 로컬 저장
         await socialAuthService.saveUserProfile(userProfile);
         
-        // Firestore에 provider 정보 포함하여 저장
-        const firestoreService = (await import('../services/firebase/firestoreService')).default;
-        await firestoreService.createOrUpdateUser({
-          uid: userProfile.uid,
-          email: userProfile.email,
-          displayName: userProfile.displayName,
-          photoURL: userProfile.photoURL,
-          provider: userProfile.provider,
-        });
+        // Firebase removed - using local storage only
         
         // 새 사용자로 업적 초기화
         await achievementService.resetForNewUser();

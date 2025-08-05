@@ -11,7 +11,7 @@ import {
 } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import userReducer from './slices/userSlice';
-import { firestoreSyncMiddleware } from './middleware/firestoreSyncMiddleware';
+// Firestore middleware 제거됨
 
 // 개발 모드에서 성능 모니터링 - 임계값 상향 조정
 const performanceMiddleware = (store: any) => (next: any) => (action: any) => {
@@ -94,7 +94,7 @@ export const store = configureStore({
       // 직렬화 체크 비활성화로 성능 개선
       serializableCheck: false,
     })
-      .concat(firestoreSyncMiddleware)
+      // Firestore middleware 제거됨
       .concat(__DEV__ ? [performanceMiddleware] : []),
   devTools: __DEV__ && {
     name: 'Posty App',

@@ -29,9 +29,6 @@ import { resetDailyTokens } from '../store/slices/userSlice';
 import { useTokenManagement } from '../hooks/useTokenManagement';
 import EarnTokenModal from '../components/EarnTokenModal';
 import { LowTokenPrompt } from '../components/LowTokenPrompt';
-import auth from '@react-native-firebase/auth';
-import firestoreService from '../services/firebase/firestoreService';
-import { Post as FirestorePost } from '../types/firestore';
 import { SyncIndicator } from '../components/SyncIndicator';
 import { useScreenTracking } from '../hooks/analytics/useScreenTracking';
 import { Alert } from '../utils/customAlert';
@@ -329,9 +326,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       await loadTrendingHashtags();
       await loadRecommendations();
       // 로그인 상태에 따라 적절히 새로고침
-      if (!auth().currentUser) {
+      // if (!auth().currentUser) {
         await loadRecentPosts();
-      }
+      // }
       // Firestore 구독은 자동으로 업데이트됨
     } catch (error) {
       console.error('Failed to refresh:', error);
@@ -439,27 +436,27 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     loadRecentPosts();
     
     // 로그인한 경우 Firestore 데이터 구독
-    if (auth().currentUser) {
-      const unsubscribe = firestoreService.subscribeToUserPosts(
-        5, // limit
-        (posts: FirestorePost[]) => {
-          // Firestore 데이터를 SavedContent 형식으로 변환
-          const convertedPosts: SavedContent[] = posts.map(post => ({
-            id: post.id,
-            content: post.content,
-            hashtags: post.hashtags,
-            tone: post.tone,
-            length: post.length,
-            platform: post.platform,
-            createdAt: post.createdAt.toDate ? post.createdAt.toDate().toISOString() : new Date().toISOString(),
-            prompt: post.originalPrompt,
-          }));
-          setRecentPosts(convertedPosts);
-        }
-      );
+    // if (auth().currentUser) {
+    //   const unsubscribe = firestoreService.subscribeToUserPosts(
+    //     5, // limit
+    //     (posts: FirestorePost[]) => {
+    //       // Firestore 데이터를 SavedContent 형식으로 변환
+    //       const convertedPosts: SavedContent[] = posts.map(post => ({
+    //         id: post.id,
+    //         content: post.content,
+    //         hashtags: post.hashtags,
+    //         tone: post.tone,
+    //         length: post.length,
+    //         platform: post.platform,
+    //         createdAt: post.createdAt.toDate ? post.createdAt.toDate().toISOString() : new Date().toISOString(),
+    //         prompt: post.originalPrompt,
+    //       }));
+    //       setRecentPosts(convertedPosts);
+    //     }
+    //   );
       
-      return () => unsubscribe();
-    }
+    //   return () => unsubscribe();
+    // }
   }, []);
 
   // 신규 사용자 온보딩 표시

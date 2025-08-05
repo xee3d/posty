@@ -2,7 +2,7 @@
 import { Platform, PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import analyticsService from '../analytics/analyticsService';
-import firestoreService from '../firebase/firestoreService';
+// Firebase service removed
 
 import { Alert } from '../../utils/customAlert';
 const FCM_TOKEN_KEY = '@fcm_token';

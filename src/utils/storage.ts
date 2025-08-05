@@ -1,218 +1,149 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import auth from '@react-native-firebase/auth';
 import { User } from '../types';
-import firestoreService from '../services/firebase/firestoreService';
 import offlineSyncService from '../services/offline/offlineSyncService';
 
 export interface SavedContent {
   id: string;
   content: string;
   hashtags: string[];
+  platform: string;
   tone: string;
   length: string;
-  platform: string;
   createdAt: string;
   prompt?: string;
 }
 
 const STORAGE_KEYS = {
-  SAVED_CONTENTS: 'molly_saved_contents',
-  USER_PREFERENCES: 'molly_user_preferences',
-  USER_DATA: 'molly_user_data',
+  SAVED_CONTENTS: 'saved_contents',
+  USER_PREFERENCES: 'user_preferences',
+  USER_STATS: 'user_stats',
 };
 
-// 콘텐츠 저장 - Firestore와 로컬 둘 다 저장
+// 콘텐츠 저장 - 로컬 스토리지만 사용
 export const saveContent = async (content: Omit<SavedContent, 'id' | 'createdAt'>): Promise<void> => {
   try {
-    // 1. Firestore에 저장 (로그인된 경우)
-    const currentUser = auth().currentUser;
-    if (currentUser) {
-      try {
-        await firestoreService.savePost({
-          content: content.content,
-          originalPrompt: content.prompt || '',
-          platform: content.platform as any,
-          tone: content.tone as any,
-          length: content.length as any,
-          style: 'general',
-          hashtags: content.hashtags,
-          category: getCategoryFromTone(content.tone),
-        });
-        console.log('Content saved to Firestore');
-      } catch (firestoreError) {
-        console.error('Failed to save to Firestore:', firestoreError);
-        
-        // 오프라인 큐에 추가
-        if (!offlineSyncService.getNetworkStatus()) {
-          await offlineSyncService.addToQueue('savePost', {
-            content: content.content,
-            originalPrompt: content.prompt || '',
-            platform: content.platform as any,
-            tone: content.tone as any,
-            length: content.length as any,
-            style: 'general',
-            hashtags: content.hashtags,
-            category: getCategoryFromTone(content.tone),
-          });
-        }
-      }
-    }
-    
-    // 2. 로컬에도 저장 (오프라인 지원 및 비로그인 사용자)
-    const savedContents = await getSavedContents();
     const newContent: SavedContent = {
       ...content,
       id: Date.now().toString(),
       createdAt: new Date().toISOString(),
     };
+
+    // 기존 콘텐츠 가져오기
+    const existingContents = await getSavedContents();
+    const updatedContents = [newContent, ...existingContents];
     
-    savedContents.unshift(newContent); // 최신 글을 앞에 추가
+    // 최대 100개만 유지
+    const limitedContents = updatedContents.slice(0, 100);
     
-    // 최대 10개까지만 저장
-    while (savedContents.length > 10) {
-      savedContents.pop();
-    }
+    await AsyncStorage.setItem(STORAGE_KEYS.SAVED_CONTENTS, JSON.stringify(limitedContents));
     
-    await AsyncStorage.setItem(STORAGE_KEYS.SAVED_CONTENTS, JSON.stringify(savedContents));
+    // 오프라인 동기화 큐에 추가 (나중에 서버와 동기화할 때 사용)
+    await offlineSyncService.addToQueue('savePost', newContent);
+    
+    console.log('Content saved to local storage');
   } catch (error) {
-    console.error('Error saving content:', error);
-    throw error; // 에러 전파
+    console.error('Failed to save content:', error);
+    throw error;
   }
 };
 
-// 저장된 콘텐츠 불러오기 - Firestore 우선, 실패시 로컬
+// 카테고리 추출 함수
+const getCategoryFromTone = (tone: string): string => {
+  const toneMap: { [key: string]: string } = {
+    friendly: 'lifestyle',
+    professional: 'business',
+    casual: 'personal',
+    formal: 'business',
+    playful: 'entertainment',
+    inspiring: 'motivation',
+  };
+  return toneMap[tone] || 'general';
+};
+
+// 저장된 콘텐츠 가져오기
 export const getSavedContents = async (): Promise<SavedContent[]> => {
   try {
-    // 1. Firestore에서 가져오기 시도 (로그인된 경우)
-    const currentUser = auth().currentUser;
-    if (currentUser) {
-      try {
-        const posts = await firestoreService.getUserPosts();
-        
-        // Firestore 데이터를 SavedContent 형식으로 변환
-        const firestoreContents: SavedContent[] = posts.map(post => ({
-          id: post.id,
-          content: post.content,
-          hashtags: post.hashtags,
-          tone: post.tone,
-          length: post.length,
-          platform: post.platform,
-          createdAt: post.createdAt.toDate().toISOString(),
-          prompt: post.originalPrompt,
-        }));
-        
-        return firestoreContents;
-      } catch (firestoreError) {
-        console.error('Failed to load from Firestore:', firestoreError);
-        // Firestore 실패시 로컬 데이터 반환
-      }
-    }
-    
-    // 2. 로컬에서 가져오기 (비로그인 또는 Firestore 실패)
-    const savedContentsJson = await AsyncStorage.getItem(STORAGE_KEYS.SAVED_CONTENTS);
-    return savedContentsJson ? JSON.parse(savedContentsJson) : [];
+    const data = await AsyncStorage.getItem(STORAGE_KEYS.SAVED_CONTENTS);
+    return data ? JSON.parse(data) : [];
   } catch (error) {
-    console.error('Error loading saved contents:', error);
+    console.error('Failed to get saved contents:', error);
     return [];
   }
 };
 
-// 특정 콘텐츠 삭제 - Firestore와 로컬 둘 다
+// 콘텐츠 삭제
 export const deleteContent = async (id: string): Promise<void> => {
   try {
-    // 1. Firestore에서 삭제 (로그인된 경우)
-    const currentUser = auth().currentUser;
-    if (currentUser) {
-      try {
-        await firestoreService.deletePost(id);
-        console.log('Content deleted from Firestore');
-      } catch (firestoreError) {
-        console.error('Failed to delete from Firestore:', firestoreError);
-        
-        // 오프라인 큐에 추가
-        if (!offlineSyncService.getNetworkStatus()) {
-          await offlineSyncService.addToQueue('deletePost', { postId: id });
-        }
-      }
-    }
+    const existingContents = await getSavedContents();
+    const updatedContents = existingContents.filter(content => content.id !== id);
     
-    // 2. 로컬에서도 삭제
-    const savedContents = await getSavedContents();
-    const filteredContents = savedContents.filter(content => content.id !== id);
-    await AsyncStorage.setItem(STORAGE_KEYS.SAVED_CONTENTS, JSON.stringify(filteredContents));
+    await AsyncStorage.setItem(STORAGE_KEYS.SAVED_CONTENTS, JSON.stringify(updatedContents));
+    
+    // 오프라인 동기화 큐에 추가
+    await offlineSyncService.addToQueue('deletePost', { id });
+    
+    console.log('Content deleted from local storage');
   } catch (error) {
-    console.error('Error deleting content:', error);
+    console.error('Failed to delete content:', error);
+    throw error;
   }
 };
 
-// 사용자 설정 저장 - Firestore와 로컬 둘 다
+// 사용자 설정 저장
 export const saveUserPreferences = async (preferences: any): Promise<void> => {
   try {
-    // 1. Firestore에 저장 (로그인된 경우)
-    const currentUser = auth().currentUser;
-    if (currentUser) {
-      try {
-        await firestoreService.updateUserSettings(preferences);
-        console.log('Preferences saved to Firestore');
-      } catch (firestoreError) {
-        console.error('Failed to save preferences to Firestore:', firestoreError);
-        
-        // 오프라인 큐에 추가
-        if (!offlineSyncService.getNetworkStatus()) {
-          await offlineSyncService.addToQueue('updateUserSettings', { settings: preferences });
-        }
-      }
-    }
-    
-    // 2. 로컬에도 저장
     await AsyncStorage.setItem(STORAGE_KEYS.USER_PREFERENCES, JSON.stringify(preferences));
+    
+    // 오프라인 동기화 큐에 추가
+    await offlineSyncService.addToQueue('updateUserSettings', preferences);
+    
+    console.log('User preferences saved to local storage');
   } catch (error) {
-    console.error('Error saving preferences:', error);
+    console.error('Failed to save user preferences:', error);
+    throw error;
   }
 };
 
-// 사용자 설정 불러오기 - Firestore 우선, 실패시 로컬
+// 사용자 설정 가져오기
 export const getUserPreferences = async (): Promise<any> => {
   try {
-    // 1. Firestore에서 가져오기 시도 (로그인된 경우)
-    const currentUser = auth().currentUser;
-    if (currentUser) {
-      try {
-        const userData = await firestoreService.getUser();
-        if (userData?.settings) {
-          return userData.settings;
-        }
-      } catch (firestoreError) {
-        console.error('Failed to load preferences from Firestore:', firestoreError);
-      }
-    }
-    
-    // 2. 로컬에서 가져오기
-    const preferencesJson = await AsyncStorage.getItem(STORAGE_KEYS.USER_PREFERENCES);
-    return preferencesJson ? JSON.parse(preferencesJson) : null;
+    const data = await AsyncStorage.getItem(STORAGE_KEYS.USER_PREFERENCES);
+    return data ? JSON.parse(data) : {};
   } catch (error) {
-    console.error('Error loading preferences:', error);
-    return null;
+    console.error('Failed to get user preferences:', error);
+    return {};
   }
 };
 
-// 사용자 정보 저장
-export const setUser = async (user: User): Promise<void> => {
+// 사용자 통계 저장
+export const saveUserStats = async (stats: any): Promise<void> => {
   try {
-    await AsyncStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+    await AsyncStorage.setItem(STORAGE_KEYS.USER_STATS, JSON.stringify(stats));
+    console.log('User stats saved to local storage');
   } catch (error) {
-    console.error('Error saving user data:', error);
+    console.error('Failed to save user stats:', error);
+    throw error;
   }
 };
 
-// 사용자 정보 불러오기
-export const getUser = async (): Promise<User | null> => {
+// 사용자 통계 가져오기
+export const getUserStats = async (): Promise<any> => {
   try {
-    const userJson = await AsyncStorage.getItem(STORAGE_KEYS.USER_DATA);
-    return userJson ? JSON.parse(userJson) : null;
+    const data = await AsyncStorage.getItem(STORAGE_KEYS.USER_STATS);
+    return data ? JSON.parse(data) : {
+      totalPosts: 0,
+      totalTokensUsed: 0,
+      favoriteCategories: [],
+      topHashtags: [],
+    };
   } catch (error) {
-    console.error('Error loading user data:', error);
-    return null;
+    console.error('Failed to get user stats:', error);
+    return {
+      totalPosts: 0,
+      totalTokensUsed: 0,
+      favoriteCategories: [],
+      topHashtags: [],
+    };
   }
 };
 
@@ -222,38 +153,71 @@ export const clearAllData = async (): Promise<void> => {
     await AsyncStorage.multiRemove([
       STORAGE_KEYS.SAVED_CONTENTS,
       STORAGE_KEYS.USER_PREFERENCES,
-      STORAGE_KEYS.USER_DATA,
+      STORAGE_KEYS.USER_STATS,
     ]);
+    console.log('All data cleared from local storage');
   } catch (error) {
-    console.error('Error clearing data:', error);
+    console.error('Failed to clear data:', error);
+    throw error;
   }
 };
 
-// 톤에서 카테고리 추출
-function getCategoryFromTone(tone: string): string {
-  const toneToCategory: { [key: string]: string } = {
-    'casual': '일상',
-    'professional': '비즈니스',
-    'humorous': '유머',
-    'emotional': '감성',
-    'genz': '트렌드',
-    'millennial': '라이프스타일',
-    'minimalist': '미니멀',
-    'storytelling': '스토리',
-    'motivational': '동기부여',
-  };
-  
-  return toneToCategory[tone] || '일상';
-}
+// 백업 데이터 내보내기
+export const exportData = async (): Promise<string> => {
+  try {
+    const contents = await getSavedContents();
+    const preferences = await getUserPreferences();
+    const stats = await getUserStats();
+    
+    const backupData = {
+      contents,
+      preferences,
+      stats,
+      exportDate: new Date().toISOString(),
+      version: '1.0',
+    };
+    
+    return JSON.stringify(backupData, null, 2);
+  } catch (error) {
+    console.error('Failed to export data:', error);
+    throw error;
+  }
+};
 
-// storage 객체로 모든 함수 export
+// 백업 데이터 가져오기
+export const importData = async (backupJson: string): Promise<void> => {
+  try {
+    const backupData = JSON.parse(backupJson);
+    
+    if (backupData.contents) {
+      await AsyncStorage.setItem(STORAGE_KEYS.SAVED_CONTENTS, JSON.stringify(backupData.contents));
+    }
+    
+    if (backupData.preferences) {
+      await AsyncStorage.setItem(STORAGE_KEYS.USER_PREFERENCES, JSON.stringify(backupData.preferences));
+    }
+    
+    if (backupData.stats) {
+      await AsyncStorage.setItem(STORAGE_KEYS.USER_STATS, JSON.stringify(backupData.stats));
+    }
+    
+    console.log('Data imported successfully');
+  } catch (error) {
+    console.error('Failed to import data:', error);
+    throw error;
+  }
+};
+
+// 기본 storage export (기존 호환성 유지)
 export const storage = {
   saveContent,
   getSavedContents,
   deleteContent,
   saveUserPreferences,
   getUserPreferences,
-  setUser,
-  getUser,
+  saveUserStats,
+  getUserStats,
   clearAllData,
+  exportData,
+  importData,
 };

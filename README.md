@@ -6,8 +6,9 @@
   **창의적인 SNS 콘텐츠를 AI로 쉽고 빠르게**
   
   [![React Native](https://img.shields.io/badge/React%20Native-0.74.5-61DAFB?logo=react)](https://reactnative.dev/)
+  [![RN CLI](https://img.shields.io/badge/RN%20CLI-0.73.10-61DAFB?logo=react)](https://github.com/react-native-community/cli)
   [![TypeScript](https://img.shields.io/badge/TypeScript-5.0.4-3178C6?logo=typescript)](https://www.typescriptlang.org/)
-  [![Firebase](https://img.shields.io/badge/Firebase-22.4.0-FFCA28?logo=firebase)](https://firebase.google.com/)
+  [![Firebase](https://img.shields.io/badge/Firebase%20Auth-22.4.0-FFCA28?logo=firebase)](https://firebase.google.com/)
   [![License](https://img.shields.io/badge/License-Private-red)](./LICENSE)
 </div>
 
@@ -70,10 +71,12 @@ Posty는 AI(GPT-4o-mini)를 활용하여 매력적인 SNS 콘텐츠를 생성하
 ## 🚀 시작하기
 
 ### 필수 요구사항
-- Node.js 18+
+- Node.js 18+ (권장: 18.20.4)
+- npm 8.0.0+ (권장: 10.7.0)
+- **React Native CLI 0.73.10** (중요: 이 버전으로 테스트됨)
 - React Native 개발 환경 ([설정 가이드](https://reactnative.dev/docs/environment-setup))
 - Android Studio / Xcode
-- Firebase 프로젝트
+- Firebase 프로젝트 (Auth만 사용)
 
 ### 설치 및 실행
 
@@ -88,14 +91,23 @@ npm install
 # iOS 의존성 설치 (Mac only)
 cd ios && pod install && cd ..
 
-# Metro 시작
+# CLI 버전 확인 (중요: 0.73.10 권장)
+npx react-native --version
+
+# CLI 버전이 다르면 캐시 클리어
+npx clear-npx-cache
+
+# Metro 시작 (테스트된 CLI 버전 사용)
 npm start
+# 또는 npx react-native@0.73.10 start --reset-cache
 
 # Android 실행
 npm run android
+# 또는 npx react-native@0.73.10 run-android
 
 # iOS 실행 (Mac only)
 npm run ios
+# 또는 npm run ios:simulator (iPhone 16 Pro로 실행)
 ```
 
 ### 환경 변수 설정
@@ -167,11 +179,19 @@ xcodebuild -workspace Posty.xcworkspace -scheme Posty -configuration Release
 
 ## 📱 유틸리티 스크립트
 
-- `npm run start:clean` - Metro 캐시 클리어 후 시작
-- `npm run android:wireless` - 무선 디버깅 모드로 실행
+### 개발 실행 (검증된 CLI 버전)
+- `npx react-native@0.73.10 start --reset-cache` - Metro 캐시 클리어 후 시작
+- `npx react-native@0.73.10 run-ios` - iOS 실행
+- `npx react-native@0.73.10 run-android` - Android 실행
+
+### 배포 스크립트
 - `deploy-all.bat` - 모든 서버 배포
 - `verify-deployment.bat` - 배포 상태 확인
 - `fresh-deploy.bat` - 클린 빌드 및 실행
+
+### 버전 관리
+- `npx react-native --version` - CLI 버전 확인
+- `npx clear-npx-cache` - NPX 캐시 클리어
 
 ## 📈 최근 업데이트
 
@@ -190,10 +210,12 @@ xcodebuild -workspace Posty.xcworkspace -scheme Posty -configuration Release
 
 ## 📚 문서
 
+- **[버전 호환성 가이드](./docs/VERSION_COMPATIBILITY.md)** ⭐ (필수 읽기)
 - [프로젝트 종합 문서](./PROJECT_COMPREHENSIVE_DOC.md)
 - [서버 아키텍처](./SERVER_ARCHITECTURE.md)
 - [구독 시스템 가이드](./SUBSCRIPTION_UPDATE.md)
 - [빠른 시작 가이드](./QUICK_START.md)
+- [환경 설정 가이드](./docs/setup/ENV_SETUP_GUIDE.md)
 - [배포 문제 해결](./DEPLOYMENT_TROUBLESHOOTING.md)
 
 ## 🤝 기여하기

@@ -9,8 +9,7 @@ import { ScaleButton, FadeInView, AnimatedCard } from '../components/AnimationCo
 import localAnalyticsService from '../services/analytics/localAnalyticsService';
 import { storage } from '../utils/storage';
 import auth from '@react-native-firebase/auth';
-import firestoreService from '../services/firebase/firestoreService';
-import { Post as FirestorePost } from '../types/firestore';
+// Firestore는 제거됨 (firestoreService 및 FirestorePost 타입)
 import { soundManager } from '../utils/soundManager';
 import { Alert } from '../utils/customAlert';
 interface PostListScreenProps {
@@ -176,32 +175,31 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
   // 메인 스타일 메모이제이션
   const styles = useMemo(() => createStyles(colors, cardTheme), [colors, cardTheme]);
 
-  // 게시물 로드
+  // 게시물 로드 - 로컬 데이터 사용 (Firestore는 제거됨)
   const loadPosts = useCallback(async (showLoading = true) => {
     if (showLoading) setIsLoading(true);
     
     try {
-      if (!auth().currentUser) {
-        // 비로그인 상태에서 로컬 데이터 로드
-        const savedContents = await storage.getSavedContents();
-        
-        const formattedPosts = savedContents.map(content => ({
-          id: content.id,
-          content: content.content,
-          hashtags: content.hashtags,
-          platform: content.platform || 'instagram',
-          category: getCategoryFromTone(content.tone),
-          tone: content.tone,
-          createdAt: content.createdAt,
-        }));
-        
-        const sortedPosts = formattedPosts.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-        
-        // 최대 10개만 표시
-        setPosts(sortedPosts.slice(0, 10));
-      }
+      // Firebase Auth는 유지되나 Firestore는 사용하지 않음
+      // 로컬 데이터만 로드
+      const savedContents = await storage.getSavedContents();
+      
+      const formattedPosts = savedContents.map(content => ({
+        id: content.id,
+        content: content.content,
+        hashtags: content.hashtags,
+        platform: content.platform || 'instagram',
+        category: getCategoryFromTone(content.tone),
+        tone: content.tone,
+        createdAt: content.createdAt,
+      }));
+      
+      const sortedPosts = formattedPosts.sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      
+      // 최대 10개만 표시
+      setPosts(sortedPosts.slice(0, 10));
     } catch (error) {
       console.error('Failed to load posts:', error);
       const localPosts = await localAnalyticsService.getAllPosts();
@@ -213,31 +211,9 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
     }
   }, []);
 
-  // 초기 로드 및 실시간 구독
+  // 초기 로드
   useEffect(() => {
     loadPosts();
-    
-    if (auth().currentUser) {
-      const unsubscribe = firestoreService.subscribeToUserPosts(
-        10, // 최대 10개로 제한
-        (firestorePosts: FirestorePost[]) => {
-          const formattedPosts = firestorePosts.map(post => ({
-            id: post.id,
-            content: post.content,
-            hashtags: post.hashtags,
-            platform: post.platform,
-            category: post.category || getCategoryFromTone(post.tone),
-            tone: post.tone,
-            createdAt: post.createdAt.toDate ? post.createdAt.toDate().toISOString() : new Date().toISOString(),
-          }));
-          
-          setPosts(formattedPosts);
-          setIsLoading(false);
-        }
-      );
-      
-      return () => unsubscribe();
-    }
   }, [loadPosts]);
 
   // 새로고침 핸들러

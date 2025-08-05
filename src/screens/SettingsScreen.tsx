@@ -22,7 +22,7 @@ import TokenManagementSection from '../components/token/TokenManagementSection';
 import { resetAllMissionData, resetAdData, debugMissionData } from '../utils/missionUtils';
 import achievementService from '../services/achievementService';
 import { UserProfile, Achievement } from '../types/achievement';
-import { cleanupFirestoreSubscription } from '../store/middleware/firestoreSyncMiddleware';
+// Firebase middleware removed
 import { Alert } from '../utils/customAlert';
 import AccountChangeSection from '../components/settings/AccountChangeSection';
 import OnboardingScreen from './OnboardingScreen';
@@ -491,11 +491,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
           style: 'destructive',
           onPress: async () => {
             try {
-              // Firestore 구독 먼저 정리
-              cleanupFirestoreSubscription();
-              
-              // 약간의 지연 후 로그아웃 진행
-              await new Promise(resolve => setTimeout(resolve, 100));
+              // 로그아웃 진행
               
               // 소셜 로그인 로그아웃 (에러 무시)
               await socialAuthService.signOut().catch(err => {
@@ -528,7 +524,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
             } catch (error) {
               console.error('로그아웃 중 예상치 못한 에러:', error);
               // 그래도 로그아웃 처리
-              cleanupFirestoreSubscription();
               dispatch(resetUser());
               if (onNavigate) {
                 setTimeout(() => {

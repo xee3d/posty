@@ -1,5 +1,23 @@
 # React Native 환경변수 설정 가이드
 
+## 🎯 테스트된 환경 (중요!)
+
+이 프로젝트는 다음 버전에서 테스트되었습니다:
+- **Node.js**: 18.20.4
+- **npm**: 10.7.0  
+- **React Native CLI**: 0.73.10 (중요: 이 버전 사용 권장)
+- **React Native**: 0.74.5
+- **TypeScript**: 5.0.4
+
+```bash
+# 현재 CLI 버전 확인
+npx react-native --version
+
+# 필요시 캐시 클리어 후 정확한 버전 사용
+npx clear-npx-cache
+npx react-native@0.73.10 --version
+```
+
 ## 옵션 1: 직접 API 키 입력 (빠른 시작)
 
 `src/services/openaiService.ts` 파일에서:

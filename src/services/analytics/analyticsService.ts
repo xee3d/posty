@@ -2,9 +2,27 @@ let analytics: any;
 try {
   analytics = require('@react-native-firebase/analytics').default;
 } catch (error) {
-  console.warn('Firebase Analytics not installed yet');
+  console.warn('Firebase Analytics not installed - using mock');
+  // Mock analytics for when Firebase Analytics is not installed
+  analytics = () => ({
+    logEvent: () => Promise.resolve(),
+    setUserId: () => Promise.resolve(),
+    setUserProperties: () => Promise.resolve(),
+    setAnalyticsCollectionEnabled: () => Promise.resolve(),
+  });
 }
-import auth from '@react-native-firebase/auth';
+
+let auth: any;
+try {
+  auth = require('@react-native-firebase/auth').default;
+} catch (error) {
+  console.warn('Firebase Auth not installed yet');
+  // Mock auth object
+  auth = {
+    currentUser: null,
+    onAuthStateChanged: () => () => {},
+  };
+}
 import { Platform } from 'react-native';
 
 interface UserProperties {

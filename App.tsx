@@ -25,8 +25,23 @@ import Animated, {
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/store';
-import { loadUserFromFirestore, subscribeToFirestoreUser } from './src/store/middleware/firestoreSyncMiddleware';
-import auth from '@react-native-firebase/auth';
+// Firebase imports - conditional loading to prevent crashes
+let auth: any;
+let firestoreMiddleware: any;
+try {
+  auth = require('@react-native-firebase/auth').default;
+  firestoreMiddleware = require('./src/store/middleware/firestoreSyncMiddleware');
+} catch (error) {
+  console.warn('Firebase modules not available, using mock');
+  auth = {
+    currentUser: null,
+    onAuthStateChanged: () => () => {},
+  };
+  firestoreMiddleware = {
+    loadUserFromFirestore: () => {},
+    subscribeToFirestoreUser: () => {},
+  };
+}
 
 // Import screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -265,8 +280,10 @@ const App: React.FC = () => {
           try {
             // 병렬 처리로 성능 개선
             const [, migrationResult] = await Promise.all([
-              // Firestore에서 사용자 데이터 로드
-              loadUserFromFirestore(store.dispatch),
+              // Firestore에서 사용자 데이터 로드 (Firebase 사용 가능한 경우에만)
+              firestoreMiddleware?.loadUserFromFirestore 
+                ? firestoreMiddleware.loadUserFromFirestore(store.dispatch)
+                : Promise.resolve(),
               // 자동 마이그레이션 체크 (비동기)
               autoMigrationService.silentMigration().catch(err => {
                 console.log('Migration check failed:', err);
@@ -274,8 +291,10 @@ const App: React.FC = () => {
               })
             ]);
             
-            // 실시간 구독은 데이터 로드 후 시작
-            unsubscribeFirestore = subscribeToFirestoreUser(store.dispatch);
+            // 실시간 구독은 데이터 로드 후 시작 (Firebase 사용 가능한 경우에만)
+            if (firestoreMiddleware?.subscribeToFirestoreUser) {
+              unsubscribeFirestore = firestoreMiddleware.subscribeToFirestoreUser(store.dispatch);
+            }
           } catch (error) {
             console.error('Failed to setup user data:', error);
           }

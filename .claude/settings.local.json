@@ -20,7 +20,12 @@
       "Bash(node:*)",
       "Bash(npm:*)",
       "Bash(npx:*)",
-      "Bash(adb:*)"
+      "Bash(adb:*)",
+      "Bash(pod cache clean:*)",
+      "Bash(pod deintegrate:*)",
+      "Bash(pod install:*)",
+      "Bash(RCT_NEW_ARCH_ENABLED=0 USE_FABRIC=0 USE_CODEGEN=0 pod install --verbose)",
+      "Bash(xcodebuild:*)"
     ],
     "deny": []
   }

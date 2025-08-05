@@ -1,0 +1,32 @@
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+
+platform :ios, '14.0'
+use_modular_headers!
+
+target 'Posty' do
+  config = use_native_modules!
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :hermes_enabled => false
+  )
+
+  # 최소한의 핵심 패키지만 설치
+  pod 'react-native-splash-screen', :path => '../node_modules/react-native-splash-screen'
+  pod 'react-native-safe-area-context', :path => '../node_modules/react-native-safe-area-context'
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
+  post_install do |installer|
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false
+    )
+    
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
+      end
+    end
+  end
+end
