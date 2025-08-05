@@ -18,6 +18,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { useTokenManagement } from '../hooks/useTokenManagement';
+import { useTimer } from '../hooks/useCleanup';
 import EarnTokenModal from '../components/EarnTokenModal';
 import { LowTokenPrompt } from '../components/LowTokenPrompt';
 import { AnimatedCard, SlideInView, FadeInView, ScaleButton } from '../components/AnimationComponents';
@@ -76,6 +77,7 @@ interface AIWriteScreenProps {
 const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode = 'text', initialText, initialHashtags, initialTitle, initialTone, style, tips }) => {
   // console.log('AIWriteScreen mounted with:', { initialText, initialHashtags, initialTitle });
   const { colors, cardTheme, isDark } = useAppTheme();
+  const timer = useTimer();
   
   // 토큰 관리 훅 사용
   const {
@@ -658,7 +660,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         // 미션 업데이트
         const missionResult = await missionService.trackAction('create');
         if (missionResult.rewardsEarned > 0) {
-          setTimeout(() => {
+          timer.setTimeout(() => {
             Alert.alert(
               '미션 완료! 🎯',
               `콘텐츠 생성 미션을 완료하여 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`,

@@ -89,11 +89,13 @@ export const GeneratingIndicator: React.FC<GeneratingIndicatorProps> = ({
   ];
 
   React.useEffect(() => {
+    let tipInterval: NodeJS.Timeout | null = null;
+
     if (visible) {
-      // 팁 로테이션
-      const tipInterval = setInterval(() => {
+      // 팁 로테이션 (배터리 최적화: 빈도 줄임)
+      tipInterval = setInterval(() => {
         setCurrentTip(prev => (prev + 1) % tips.length);
-      }, 3000);
+      }, 5000); // 3초에서 5초로 변경
 
       // 페이드인 애니메이션
       Animated.timing(animatedValue, {
@@ -101,10 +103,6 @@ export const GeneratingIndicator: React.FC<GeneratingIndicatorProps> = ({
         duration: 300,
         useNativeDriver: true,
       }).start();
-
-      return () => {
-        clearInterval(tipInterval);
-      };
     } else {
       // 페이드아웃
       Animated.timing(animatedValue, {
@@ -113,6 +111,12 @@ export const GeneratingIndicator: React.FC<GeneratingIndicatorProps> = ({
         useNativeDriver: true,
       }).start();
     }
+
+    return () => {
+      if (tipInterval) {
+        clearInterval(tipInterval);
+      }
+    };
   }, [visible]);
 
   if (!visible) return null;

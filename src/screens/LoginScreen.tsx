@@ -80,6 +80,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
       }
 
       if (userProfile) {
+        console.log('✅ 로그인 성공:', {
+          provider,
+          displayName: userProfile.user.displayName,
+          email: userProfile.user.email,
+          hasToken: !!userProfile.token
+        });
+
         // Redux에 사용자 정보 저장
         dispatch(setUser({
           uid: userProfile.user.uid,
@@ -92,7 +99,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         // 사용자 프로필 로컬 저장
         await vercelAuthService.saveUserProfile(userProfile.user);
         
-        // Vercel 기반 JWT 토큰 저장
+        // JWT 토큰 저장
         await vercelAuthService.saveAuthToken(userProfile.token);
         
         // 새 사용자로 업적 초기화
@@ -100,8 +107,9 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         
         // 이미 달성한 업적이 있는지 확인 (기존 사용자)
         const achievements = await achievementService.getUserAchievements();
-        console.log(`User ${userProfile.user.displayName} has ${achievements.filter(a => a.isUnlocked).length} achievements`);
+        console.log(`✅ 사용자 ${userProfile.user.displayName}님 - 업적 ${achievements.filter(a => a.isUnlocked).length}개 보유`);
 
+        console.log('🏠 홈 화면으로 이동');
         // 홈 화면으로 이동
         onNavigate('home');
       }
@@ -110,10 +118,23 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
       
       let errorMessage = '로그인에 실패했습니다. 다시 시도해주세요.';
       
-      if (error.code === 'auth/account-exists-with-different-credential') {
+      if (error.message && error.message.includes('Vercel SSO')) {
+        errorMessage = '서버 인증 중입니다. 잠시 후 다시 시도해주세요.';
+      } else if (error.code === 'auth/account-exists-with-different-credential') {
         errorMessage = '이미 다른 방법으로 가입된 계정입니다.';
       } else if (error.code === 'auth/cancelled') {
         errorMessage = '로그인이 취소되었습니다.';
+      } else if (error.message.includes('구글 로그인 취소') || error.message.includes('cancelled')) {
+        errorMessage = '로그인이 취소되었습니다.';
+      }
+      
+      // 개발 환경에서는 상세 에러 표시
+      if (__DEV__) {
+        console.log('상세 에러 정보:', {
+          message: error.message,
+          code: error.code,
+          stack: error.stack
+        });
       }
       
       Alert.alert('로그인 실패', errorMessage);

@@ -15,14 +15,39 @@ class SimplePostService {
   
   // 현재 사용자 UID 가져오기
   private async getCurrentUserId(): Promise<string> {
-    const vercelUser = await vercelAuthService.getCurrentUser();
-    return vercelUser?.uid || 'default';
+    try {
+      const vercelUser = await vercelAuthService.getCurrentUser();
+      const uid = vercelUser?.uid;
+      
+      if (!uid || uid === 'undefined' || uid === 'null' || uid.trim() === '') {
+        console.warn('⚠️ SimplePostService.getCurrentUserId: Invalid or missing UID, using fallback');
+        return 'default_user';
+      }
+      
+      return uid;
+    } catch (error) {
+      console.error('❌ SimplePostService.getCurrentUserId: Error getting user ID:', error);
+      return 'default_user';
+    }
   }
   
   // 사용자별 스토리지 키 생성
   private async getStorageKey(): Promise<string> {
-    const userId = await this.getCurrentUserId();
-    return `${this.STORAGE_KEY_PREFIX}${userId}`;
+    try {
+      const userId = await this.getCurrentUserId();
+      const key = `${this.STORAGE_KEY_PREFIX}${userId}`;
+      
+      // Key validation
+      if (!key || key.includes('undefined') || key.includes('null')) {
+        console.error('❌ SimplePostService.getStorageKey: Generated invalid key:', key);
+        return `SIMPLE_POSTS_fallback_${Date.now()}`;
+      }
+      
+      return key;
+    } catch (error) {
+      console.error('❌ SimplePostService.getStorageKey: Error generating key:', error);
+      return `SIMPLE_POSTS_fallback_${Date.now()}`;
+    }
   }
   
   // 이벤트 리스너 등록
@@ -57,7 +82,8 @@ class SimplePostService {
 
     const posts = await this.getPosts();
     posts.push(newPost);
-    await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(posts));
+    const storageKey = await this.getStorageKey();
+    await AsyncStorage.setItem(storageKey, JSON.stringify(posts));
     
     // 이벤트 리스너들 호출
     await Promise.all(this.postEventListeners.map(listener => listener()));
@@ -71,7 +97,8 @@ class SimplePostService {
   // 모든 포스트 가져오기
   async getPosts(): Promise<SimplePost[]> {
     try {
-      const postsJson = await AsyncStorage.getItem(this.STORAGE_KEY);
+      const storageKey = await this.getStorageKey();
+      const postsJson = await AsyncStorage.getItem(storageKey);
       return postsJson ? JSON.parse(postsJson) : [];
     } catch {
       return [];

@@ -18,6 +18,7 @@ import Animated, {
 import { useAppTheme } from '../hooks/useAppTheme';
 import offlineSyncService from '../services/offline/offlineSyncService';
 import NetInfo from '@react-native-community/netinfo';
+import { batteryOptimizer } from '../utils/batteryOptimization';
 
 interface SyncIndicatorProps {
   style?: any;
@@ -42,12 +43,20 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({ style }) => {
     // 초기 상태 체크
     checkSyncStatus();
     
-    // 주기적으로 동기화 상태 체크 (5초마다)
-    const interval = setInterval(checkSyncStatus, 5000);
+    // 배터리 최적화: 동기화 상태 체크 주기를 30초로 늘림
+    batteryOptimizer.registerInterval(
+      'sync-status-check',
+      checkSyncStatus,
+      30 * 1000, // 30초로 변경 (기존 5초에서 배터리 절약)
+      {
+        runInBackground: false,
+        priority: 'normal'
+      }
+    );
     
     return () => {
       unsubscribe();
-      clearInterval(interval);
+      batteryOptimizer.clearInterval('sync-status-check');
     };
   }, []);
   

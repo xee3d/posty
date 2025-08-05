@@ -164,16 +164,30 @@ class GoogleTrendsService {
     };
   }
 
-  // 실시간 업데이트 시뮬레이션
+  // 실시간 업데이트 시뮬레이션 (배터리 최적화)
   subscribeToTrends(callback: (trends: TrendHashtag[]) => void): () => void {
-    // 5분마다 업데이트 시뮬레이션
-    const interval = setInterval(async () => {
-      const trends = await this.getTrendsAsHashtags();
-      callback(trends);
-    }, 5 * 60 * 1000);
+    // 배터리 최적화: batteryOptimizer 사용
+    import('../utils/batteryOptimization').then(({ batteryOptimizer }) => {
+      batteryOptimizer.registerInterval(
+        'trends-update',
+        async () => {
+          const trends = await this.getTrendsAsHashtags();
+          callback(trends);
+        },
+        60 * 60 * 1000, // 1시간으로 늘림 (배터리 절약)
+        {
+          runInBackground: false,
+          priority: 'low'
+        }
+      );
+    });
 
     // cleanup 함수 반환
-    return () => clearInterval(interval);
+    return () => {
+      import('../utils/batteryOptimization').then(({ batteryOptimizer }) => {
+        batteryOptimizer.clearInterval('trends-update');
+      });
+    };
   }
 }
 

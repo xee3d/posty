@@ -24,6 +24,7 @@ import achievementService from '../services/achievementService';
 import { UserProfile, Achievement } from '../types/achievement';
 // Firebase middleware removed
 import { Alert } from '../utils/customAlert';
+import { useTimer } from '../hooks/useCleanup';
 import AccountChangeSection from '../components/settings/AccountChangeSection';
 import OnboardingScreen from './OnboardingScreen';
 import NewUserWelcome from '../components/NewUserWelcome';
@@ -36,6 +37,7 @@ interface SettingsScreenProps {
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const { themeMode, changeTheme, colors, cardTheme } = useAppTheme();
   const dispatch = useAppDispatch();
+  const timer = useTimer();
   const reduxUser = useAppSelector(state => state.user);
   const reduxSubscriptionPlan = useAppSelector(state => state.user.subscriptionPlan);
   const [user, setUser] = useState<User>({
@@ -126,9 +128,20 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
   const loadUserData = async () => {
     try {
-      const savedUser = await storage.getUser();
+      const savedUser = await vercelAuthService.getCurrentUser();
       if (savedUser) {
-        setUser(savedUser);
+        setUser({
+          id: savedUser.uid || '1',
+          name: savedUser.displayName || 'User',
+          email: savedUser.email || 'user@example.com',
+          connectedPlatforms: [],
+          preferences: {
+            defaultPlatform: 'instagram',
+            autoSchedule: true,
+            notificationsEnabled: true,
+            aiRecommendationFrequency: 'medium',
+          }
+        });
       }
 
       // 연결된 계정 확인
@@ -516,7 +529,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               
               // 로그인 화면으로 이동
               if (onNavigate) {
-                setTimeout(() => {
+                timer.setTimeout(() => {
                   onNavigate('login');
                 }, 100);
               }
@@ -525,7 +538,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               // 그래도 로그아웃 처리
               dispatch(resetUser());
               if (onNavigate) {
-                setTimeout(() => {
+                timer.setTimeout(() => {
                   onNavigate('login');
                 }, 100);
               }
@@ -622,7 +635,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
       await loadStats();
       
       // 화면 새로고침
-      setTimeout(() => {
+      timer.setTimeout(() => {
         setShowEarnTokenModal(false);
       }, 1000);
     } catch (error) {
@@ -914,7 +927,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                 if (onNavigate) {
                   onNavigate('profile');
                   // 프로필에서 돌아온 후 데이터 새로고침을 위해 타이머 설정
-                  setTimeout(async () => {
+                  timer.setTimeout(async () => {
                     const profile = await achievementService.getUserProfile();
                     const achievements = await achievementService.getAchievements();
                     setUserProfile({

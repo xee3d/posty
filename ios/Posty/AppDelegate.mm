@@ -1,16 +1,16 @@
 #import "AppDelegate.h"
 
 #import <React/RCTBundleURLProvider.h>
-#import <Firebase.h>
 #import <NaverThirdPartyLogin/NaverThirdPartyLoginConnection.h>
 #import <RNKakaoLogins/RNKakaoLogins.h>
+#import <KakaoSDKCommon/KakaoSDKCommon.h>
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-  // Firebase 초기화
-  [FIRApp configure];
+  // Kakao SDK 초기화
+  [KakaoSDK initSDKWithAppKey:@"566cba5c08009852b6b5f1a31c3b28d8"];
   
   self.moduleName = @"Posty";
   // You can add your custom initial props in the dictionary below.

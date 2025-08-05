@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { safeAsyncStorage } from '../utils/safeAsyncStorage';
 import { Achievement, ACHIEVEMENTS, UserProfile } from '../types/achievement';
 import { PostStats } from './types/postTypes';
 import { soundManager } from '../utils/soundManager';
@@ -23,44 +24,72 @@ class AchievementService {
   
   // 현재 사용자 UID 가져오기
   private async getCurrentUserId(): Promise<string> {
-    const vercelUser = await vercelAuthService.getCurrentUser();
-    return vercelUser?.uid || 'default';
+    try {
+      const vercelUser = await vercelAuthService.getCurrentUser();
+      const uid = vercelUser?.uid;
+      
+      if (!uid || uid === 'undefined' || uid === 'null' || uid.trim() === '') {
+        console.warn('⚠️ getCurrentUserId: Invalid or missing UID, using fallback');
+        return 'default_user';
+      }
+      
+      return uid;
+    } catch (error) {
+      console.error('❌ getCurrentUserId: Error getting user ID:', error);
+      return 'default_user';
+    }
   }
   
-  // 사용자별 스토리지 키 생성
-  private getUserStorageKey(baseKey: string): string {
-    const userId = this.getCurrentUserId();
-    return `${baseKey}${userId}`;
+  // 사용자별 스토리지 키 생성 (async)
+  private async getUserStorageKey(baseKey: string): Promise<string> {
+    if (!baseKey || typeof baseKey !== 'string') {
+      console.error('❌ getUserStorageKey: Invalid baseKey:', baseKey);
+      baseKey = 'INVALID_BASE_KEY_';
+    }
+    
+    const userId = await this.getCurrentUserId();
+    const key = `${baseKey}${userId}`;
+    
+    // Key validation
+    if (!key || key.includes('undefined') || key.includes('null')) {
+      console.error('❌ getUserStorageKey: Generated invalid key:', key);
+      return `SAFE_KEY_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    }
+    
+    return key;
   }
   
-  // 기존 키들을 사용자별로 변환
-  private get STORAGE_KEY(): string {
-    return this.getUserStorageKey(this.STORAGE_KEY_PREFIX);
+  // 기존 키들을 사용자별로 변환 (async methods)
+  private async getStorageKey(): Promise<string> {
+    return await this.getUserStorageKey(this.STORAGE_KEY_PREFIX);
   }
   
-  private get PROFILE_KEY(): string {
-    return this.getUserStorageKey(this.PROFILE_KEY_PREFIX);
+  private async getProfileKey(): Promise<string> {
+    return await this.getUserStorageKey(this.PROFILE_KEY_PREFIX);
   }
   
-  private get STREAK_KEY(): string {
-    return this.getUserStorageKey(this.STREAK_KEY_PREFIX);
+  private async getStreakKey(): Promise<string> {
+    return await this.getUserStorageKey(this.STREAK_KEY_PREFIX);
   }
   
   // 사용자 변경 시 업적 초기화
   async resetForNewUser(): Promise<void> {
     try {
       console.log('Resetting achievements for new user...');
-      const userId = this.getCurrentUserId();
+      const userId = await this.getCurrentUserId();
       console.log('New user ID:', userId);
       
       // 현재 사용자의 저장된 데이터 확인
-      const existingData = await AsyncStorage.getItem(this.STORAGE_KEY);
+      const storageKey = await this.getStorageKey();
+      const existingData = await AsyncStorage.getItem(storageKey);
       if (!existingData) {
         console.log('No existing achievements for this user, creating new profile');
         // 새 사용자이므로 기본 프로필 생성
         const defaultProfile = this.getDefaultProfile();
-        await AsyncStorage.setItem(this.PROFILE_KEY, JSON.stringify(defaultProfile));
-        await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify([]));
+        const profileKey = await this.getProfileKey();
+        const storageKey = await this.getStorageKey();
+        await AsyncStorage.setItem(profileKey, JSON.stringify(defaultProfile));
+        await AsyncStorage.setItem(storageKey, JSON.stringify([]));
       } else {
         console.log('Found existing achievements for this user');
       }
@@ -114,11 +143,12 @@ class AchievementService {
       const state = store.getState();
       const currentUser = state.user;
       
-      // Firebase Auth에서 현재 사용자 확인
-      const firebaseUser = socialAuthService.getCurrentUser();
+      // Vercel Auth에서 현재 사용자 확인
+      const firebaseUser = await vercelAuthService.getCurrentUser();
       
       // 저장된 프로필 가져오기
-      const saved = await AsyncStorage.getItem(this.PROFILE_KEY);
+      const profileKey = await this.getProfileKey();
+      const saved = await AsyncStorage.getItem(profileKey);
       const savedProfile = saved ? JSON.parse(saved) : null;
       
       // 로그인한 사용자 정보가 있으면 사용
@@ -152,7 +182,7 @@ class AchievementService {
       };
       
       // 프로필 저장
-      await AsyncStorage.setItem(this.PROFILE_KEY, JSON.stringify(profile));
+      await AsyncStorage.setItem(profileKey, JSON.stringify(profile));
       
       return profile;
     } catch (error) {
@@ -166,7 +196,8 @@ class AchievementService {
     try {
       const current = await this.getUserProfile();
       const updated = { ...current, ...updates };
-      await AsyncStorage.setItem(this.PROFILE_KEY, JSON.stringify(updated));
+      const profileKey = await this.getProfileKey();
+      await AsyncStorage.setItem(profileKey, JSON.stringify(updated));
     } catch (error) {
       console.error('Failed to update profile:', error);
     }
@@ -413,7 +444,8 @@ class AchievementService {
   // Private 메서드들
   private async getSavedAchievements(): Promise<Achievement[]> {
     try {
-      const saved = await AsyncStorage.getItem(this.STORAGE_KEY);
+      const storageKey = await this.getStorageKey();
+      const saved = await AsyncStorage.getItem(storageKey);
       return saved ? JSON.parse(saved) : [];
     } catch (error) {
       console.error('Failed to get saved achievements:', error);
@@ -423,7 +455,8 @@ class AchievementService {
   
   private async saveAchievements(achievements: Achievement[]): Promise<void> {
     try {
-      await AsyncStorage.setItem(this.STORAGE_KEY, JSON.stringify(achievements));
+      const storageKey = await this.getStorageKey();
+      await AsyncStorage.setItem(storageKey, JSON.stringify(achievements));
     } catch (error) {
       console.error('Failed to save achievements:', error);
     }
@@ -510,7 +543,8 @@ class AchievementService {
   // 연속 작성 일수 가져오기
   private async getCurrentStreak(): Promise<number> {
     try {
-      const streakData = await AsyncStorage.getItem(this.STREAK_KEY);
+      const streakKey = await this.getStreakKey();
+      const streakData = await AsyncStorage.getItem(streakKey);
       if (!streakData) return 0;
       
       const { count, lastPostDate } = JSON.parse(streakData);
@@ -530,12 +564,13 @@ class AchievementService {
   // 연속 작성 업데이트
   private async updateStreak(): Promise<void> {
     try {
-      const streakData = await AsyncStorage.getItem(this.STREAK_KEY);
+      const streakKey = await this.getStreakKey();
+      const streakData = await AsyncStorage.getItem(streakKey);
       const today = new Date().toDateString();
       
       if (!streakData) {
         // 첫 streak
-        await AsyncStorage.setItem(this.STREAK_KEY, JSON.stringify({
+        await AsyncStorage.setItem(streakKey, JSON.stringify({
           count: 1,
           lastPostDate: today,
           startDate: today
@@ -555,7 +590,7 @@ class AchievementService {
       if (diffDays === 1) {
         // 연속 작성
         const newCount = count + 1;
-        await AsyncStorage.setItem(this.STREAK_KEY, JSON.stringify({
+        await AsyncStorage.setItem(streakKey, JSON.stringify({
           count: newCount,
           lastPostDate: today,
           startDate: JSON.parse(streakData).startDate
@@ -571,7 +606,7 @@ class AchievementService {
         }
       } else {
         // Streak 깨짐 - 다시 시작
-        await AsyncStorage.setItem(this.STREAK_KEY, JSON.stringify({
+        await AsyncStorage.setItem(streakKey, JSON.stringify({
           count: 1,
           lastPostDate: today,
           startDate: today
@@ -697,9 +732,12 @@ class AchievementService {
   // 비어 있는 업적 초기화
   async clearAchievements(): Promise<void> {
     try {
-      await AsyncStorage.removeItem(this.STORAGE_KEY);
-      await AsyncStorage.removeItem(this.PROFILE_KEY);
-      await AsyncStorage.removeItem(this.STREAK_KEY);
+      const storageKey = await this.getStorageKey();
+      const profileKey = await this.getProfileKey();
+      const streakKey = await this.getStreakKey();
+      await AsyncStorage.removeItem(storageKey);
+      await AsyncStorage.removeItem(profileKey);
+      await AsyncStorage.removeItem(streakKey);
       console.log('Achievements cleared for current user');
     } catch (error) {
       console.error('Failed to clear achievements:', error);

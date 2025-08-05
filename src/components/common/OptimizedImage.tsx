@@ -12,6 +12,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useAnimatedValue } from '../../hooks/useAnimations';
+import { useOptimizedAnimation } from '../../utils/animationOptimizer';
 
 interface OptimizedImageProps extends Omit<ImageProps, 'source'> {
   source: ImageProps['source'];
@@ -56,6 +57,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [thumbnailLoaded, setThumbnailLoaded] = useState(false);
   const opacity = useAnimatedValue(0);
   const thumbnailOpacity = useAnimatedValue(1);
+  const { getConfig, shouldAnimate } = useOptimizedAnimation();
 
   // 스타일 계산
   const imageStyle = useMemo(() => {
@@ -110,20 +112,28 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     setLoading(false);
     setError(false);
 
-    // 페이드인 애니메이션
-    Animated.timing(opacity, {
-      toValue: 1,
-      duration: fadeInDuration,
-      useNativeDriver: true,
-    }).start();
-
-    // 썸네일 페이드아웃
-    if (thumbnailSource && thumbnailLoaded) {
-      Animated.timing(thumbnailOpacity, {
-        toValue: 0,
+    // 배터리 효율적인 페이드인 애니메이션
+    if (shouldAnimate()) {
+      Animated.timing(opacity, getConfig({
+        toValue: 1,
         duration: fadeInDuration,
         useNativeDriver: true,
-      }).start();
+      })).start();
+
+      // 썸네일 페이드아웃
+      if (thumbnailSource && thumbnailLoaded) {
+        Animated.timing(thumbnailOpacity, getConfig({
+          toValue: 0,
+          duration: fadeInDuration,
+          useNativeDriver: true,
+        })).start();
+      }
+    } else {
+      // 애니메이션 없이 즉시 변경
+      opacity.setValue(1);
+      if (thumbnailSource && thumbnailLoaded) {
+        thumbnailOpacity.setValue(0);
+      }
     }
 
     onLoad?.(event);
@@ -132,12 +142,16 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   // 썸네일 로드 완료 처리
   const handleThumbnailLoad = useCallback(() => {
     setThumbnailLoaded(true);
-    Animated.timing(thumbnailOpacity, {
-      toValue: 1,
-      duration: 150,
-      useNativeDriver: true,
-    }).start();
-  }, [thumbnailOpacity]);
+    if (shouldAnimate()) {
+      Animated.timing(thumbnailOpacity, getConfig({
+        toValue: 1,
+        duration: 150,
+        useNativeDriver: true,
+      })).start();
+    } else {
+      thumbnailOpacity.setValue(1);
+    }
+  }, [thumbnailOpacity, getConfig, shouldAnimate]);
 
   // 오류 처리
   const handleError = useCallback((error: any) => {

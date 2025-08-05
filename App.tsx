@@ -64,6 +64,7 @@ import { AlertProvider } from './src/components/AlertProvider';
 import { AlertManager } from './src/components/CustomAlert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import OnboardingScreen from './src/screens/OnboardingScreen';
+import { batteryOptimizer } from './src/utils/batteryOptimization';
 
 const { width } = Dimensions.get('window');
 
@@ -227,11 +228,12 @@ const App: React.FC = () => {
     }
   }, [isAuthenticated, isCheckingAuth]);
   
-  // 앱 종료 시 서비스 정리
+  // 앱 종료 시 서비스 정리 (배터리 최적화 정리 포함)
   useEffect(() => {
     return () => {
       offlineSyncService.destroy();
       notificationService.cleanup();
+      batteryOptimizer.cleanup(); // 배터리 최적화 정리
     };
   }, []);
 
@@ -239,6 +241,14 @@ const App: React.FC = () => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
+        // 서버 연결 상태 먼저 테스트
+        const serverOnline = await vercelAuthService.testServerConnection();
+        if (!serverOnline) {
+          console.warn('⚠️ 서버 인증 실패 (Vercel SSO 필요) - 로컬 모드로 동작합니다');
+        } else {
+          console.log('✅ 서버 연결 성공');
+        }
+        
         // Vercel API에서 인증 상태 확인
         const user = await vercelAuthService.getCurrentUser();
         setIsAuthenticated(!!user);

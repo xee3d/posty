@@ -6,6 +6,7 @@ import {
   Animated,
   Dimensions,
   TouchableOpacity,
+  AppState,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
@@ -32,10 +33,37 @@ const AchievementNotification: React.FC<AchievementNotificationProps> = ({
   useEffect(() => {
     checkNewAchievements();
     
-    // 주기적으로 업적 체크 (5분마다)
-    const interval = setInterval(checkNewAchievements, 5 * 60 * 1000);
+    // 앱이 포그라운드에 있을 때만 주기적으로 업적 체크 (30분마다로 배터리 최적화)
+    let interval: NodeJS.Timeout | null = null;
     
-    return () => clearInterval(interval);
+    const startInterval = () => {
+      if (interval) clearInterval(interval);
+      interval = setInterval(() => {
+        if (AppState.currentState === 'active') {
+          checkNewAchievements();
+        }
+      }, 30 * 60 * 1000); // 30분으로 변경
+    };
+
+    const handleAppStateChange = (nextAppState: string) => {
+      if (nextAppState === 'active') {
+        checkNewAchievements(); // 앱이 활성화될 때 즉시 체크
+        startInterval();
+      } else {
+        if (interval) {
+          clearInterval(interval);
+          interval = null;
+        }
+      }
+    };
+
+    startInterval();
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    
+    return () => {
+      if (interval) clearInterval(interval);
+      subscription?.remove();
+    };
   }, []);
   
   useEffect(() => {
