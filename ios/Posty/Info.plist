@@ -58,6 +58,11 @@
 		<string>kakaolink</string>
 		<string>kakaotalk</string>
 		<string>kakaostory</string>
+		<string>naversearchapp</string>
+		<string>naversearchthirdlogin</string>
+		<string>fb</string>
+		<string>fbapi</string>
+		<string>fbauth2</string>
 	</array>
 	<key>UIAppFonts</key>
 	<array>
@@ -100,6 +105,22 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>kakao566cba5c08009852b6b5f1a31c3b28d8</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>NAVER</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>postynaverlogin</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>FACEBOOK</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>fb757255383655974</string>
 			</array>
 		</dict>
 	</array>
