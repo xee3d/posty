@@ -1,10 +1,12 @@
 // Vercel 기반 소셜 인증 서비스
-import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import NaverLogin from '@react-native-seoul/naver-login';
-import { login as kakaoLogin, getProfile as getKakaoProfile } from '@react-native-seoul/kakao-login';
-import { appleAuth } from '@invertase/react-native-apple-authentication';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
+
+// 소셜 로그인 라이브러리들
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import NaverLogin from '@react-native-seoul/naver-login';
+import * as KakaoLogin from '@react-native-seoul/kakao-login';
+import { appleAuth } from '@invertase/react-native-apple-authentication';
 
 // 환경변수 안전 처리
 let GOOGLE_WEB_CLIENT_ID: string;
@@ -13,47 +15,49 @@ let NAVER_CONSUMER_SECRET: string;
 let KAKAO_APP_KEY: string;
 let SERVER_URL: string;
 
-try {
-  const envVars = require('@env');
-  GOOGLE_WEB_CLIENT_ID = envVars.GOOGLE_WEB_CLIENT_ID;
-  NAVER_CONSUMER_KEY = envVars.NAVER_CONSUMER_KEY;
-  NAVER_CONSUMER_SECRET = envVars.NAVER_CONSUMER_SECRET;
-  KAKAO_APP_KEY = envVars.KAKAO_APP_KEY;
-  SERVER_URL = envVars.SERVER_URL;
-} catch (error) {
-  console.warn('Environment variables not configured - using defaults');
-  GOOGLE_WEB_CLIENT_ID = 'mock-google-client-id';
-  NAVER_CONSUMER_KEY = 'mock-naver-key';
-  NAVER_CONSUMER_SECRET = 'mock-naver-secret';
-  KAKAO_APP_KEY = 'mock-kakao-key';
-  SERVER_URL = 'https://posty-api.vercel.app';
-}
+// 환경변수 하드코딩 (임시 - dotenv 모듈 문제 회피)
+GOOGLE_WEB_CLIENT_ID = '457030848293-ln3opq1i78fqglmq1tt8h0ajt4oo2n83.apps.googleusercontent.com';
+NAVER_CONSUMER_KEY = 'jXC0jUWPhSCotIWBrKrB';
+NAVER_CONSUMER_SECRET = 'RND5w7pcJt';
+KAKAO_APP_KEY = '566cba5c08009852b6b5f1a31c3b28d8';
+// 서버 설정 - 자체 JWT 서버 사용 (Firebase 없음)
+SERVER_URL = 'https://posty-2yxu8otnr-ethan-chois-projects.vercel.app'; // 자체 JWT 인증 서버
+
+console.log('VercelAuthService: 환경변수 하드코딩 적용 - 서버 복구 완료');
 
 export interface UserProfile {
   uid: string;
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
-  provider: 'google' | 'naver' | 'kakao' | 'apple' | 'email';
+  provider: string;
 }
 
-interface AuthResult {
+export interface AuthResult {
   user: UserProfile;
   isNewUser: boolean;
   token: string;
 }
 
-// Vercel 기반 소셜 인증 서비스
 class VercelAuthService {
+  
+  constructor() {
+    console.log('VercelAuthService 초기화됨');
+    this.initialize();
+  }
+  
+  async initialize() {
+    await this.initializeGoogleSignIn();
+  }
 
-  async initialize(): Promise<void> {
-    console.log('VercelAuthService: 초기화');
-    
-    // Google Sign-In 설정
+  // Google Sign-In 초기화
+  async initializeGoogleSignIn() {
     try {
+      console.log('Google Sign-In 초기화 시작');
       GoogleSignin.configure({
         webClientId: GOOGLE_WEB_CLIENT_ID,
       });
+      console.log('Google Sign-In 초기화 완료');
     } catch (error) {
       console.log('Google Sign-In 설정 실패:', error);
     }
@@ -62,18 +66,15 @@ class VercelAuthService {
   async signInWithGoogle(): Promise<AuthResult> {
     console.log('VercelAuthService: Google 로그인 시작');
     try {
-      // Google Sign-In
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
-      
-      if (!userInfo || typeof userInfo !== 'object') {
-        throw new Error('Google 사용자 정보를 가져올 수 없습니다');
-      }
-      
-      // ID Token 별도 가져오기
       const tokens = await GoogleSignin.getTokens();
       
-      // Vercel 서버로 인증 요청
+      if (!tokens.idToken) {
+        throw new Error('Google ID Token을 가져올 수 없습니다');
+      }
+      
+      // 서버로 인증 요청
       const response = await fetch(`${SERVER_URL}/api/auth/google`, {
         method: 'POST',
         headers: {
@@ -98,7 +99,7 @@ class VercelAuthService {
       
       return {
         user: authData.user,
-        isNewUser: true, // 서버에서 판단 로직 필요시 추가
+        isNewUser: authData.isNewUser || false,
         token: authData.token
       };
       
@@ -122,16 +123,11 @@ class VercelAuthService {
       // 로그인 실행
       const result = await NaverLogin.login();
       
-      if (!result.isSuccess) {
+      if (!result.isSuccess || !result.successResponse?.accessToken) {
         throw new Error('Naver 로그인 실패');
       }
       
-      // 프로필 정보로 토큰 확인 (대체 방법)
-      if (!result.successResponse || !result.successResponse.accessToken) {
-        throw new Error('Naver Access Token을 가져올 수 없습니다');
-      }
-      
-      // Vercel 서버로 인증 요청
+      // 서버로 인증 요청
       const response = await fetch(`${SERVER_URL}/api/auth/naver`, {
         method: 'POST',
         headers: {
@@ -155,7 +151,7 @@ class VercelAuthService {
       
       return {
         user: authData.user,
-        isNewUser: true,
+        isNewUser: authData.isNewUser || false,
         token: authData.token
       };
       
@@ -168,13 +164,13 @@ class VercelAuthService {
   async signInWithKakao(): Promise<AuthResult> {
     console.log('VercelAuthService: Kakao 로그인 시작');
     try {
-      const result = await kakaoLogin();
+      const result = await KakaoLogin.login();
       
       if (!result.accessToken) {
         throw new Error('Kakao 로그인 실패');
       }
       
-      // Vercel 서버로 인증 요청
+      // 서버로 인증 요청
       const response = await fetch(`${SERVER_URL}/api/auth/kakao`, {
         method: 'POST',
         headers: {
@@ -198,7 +194,7 @@ class VercelAuthService {
       
       return {
         user: authData.user,
-        isNewUser: true,
+        isNewUser: authData.isNewUser || false,
         token: authData.token
       };
       
@@ -225,7 +221,7 @@ class VercelAuthService {
         throw new Error('Apple Identity Token을 가져올 수 없습니다');
       }
 
-      // Vercel 서버로 인증 요청
+      // 서버로 인증 요청
       const response = await fetch(`${SERVER_URL}/api/auth/apple`, {
         method: 'POST',
         headers: {
@@ -250,7 +246,7 @@ class VercelAuthService {
       
       return {
         user: authData.user,
-        isNewUser: true,
+        isNewUser: authData.isNewUser || false,
         token: authData.token
       };
       
@@ -260,131 +256,117 @@ class VercelAuthService {
     }
   }
 
-  async signOut(): Promise<void> {
-    console.log('VercelAuthService: 로그아웃 시작');
+  // Facebook 로그인은 현재 지원하지 않음
+
+  // 토큰 관리
+  async saveAuthToken(token: string): Promise<void> {
     try {
-      // Google Sign-In 로그아웃
-      try {
-        await GoogleSignin.signOut();
-      } catch (error) {
-        console.log('Google Sign-Out 실패:', error);
+      await AsyncStorage.setItem('@auth_token', token);
+      console.log('Auth token saved successfully');
+    } catch (error) {
+      console.error('Failed to save auth token:', error);
+      throw error;
+    }
+  }
+
+  async getAuthToken(): Promise<string | null> {
+    try {
+      const token = await AsyncStorage.getItem('@auth_token');
+      return token;
+    } catch (error) {
+      console.error('Failed to get auth token:', error);
+      return null;
+    }
+  }
+
+  async removeAuthToken(): Promise<void> {
+    try {
+      await AsyncStorage.removeItem('@auth_token');
+      console.log('Auth token removed successfully');
+    } catch (error) {
+      console.error('Failed to remove auth token:', error);
+      throw error;
+    }
+  }
+
+  // 사용자 프로필 관리
+  async saveUserProfile(user: UserProfile): Promise<void> {
+    try {
+      await AsyncStorage.setItem('@user_profile', JSON.stringify(user));
+      console.log('User profile saved successfully');
+    } catch (error) {
+      console.error('Failed to save user profile:', error);
+      throw error;
+    }
+  }
+
+  async getUserProfile(): Promise<UserProfile | null> {
+    try {
+      const userString = await AsyncStorage.getItem('@user_profile');
+      if (userString) {
+        return JSON.parse(userString);
       }
+      return null;
+    } catch (error) {
+      console.error('Failed to get user profile:', error);
+      return null;
+    }
+  }
+
+  async removeUserProfile(): Promise<void> {
+    try {
+      await AsyncStorage.removeItem('@user_profile');
+      console.log('User profile removed successfully');
+    } catch (error) {
+      console.error('Failed to remove user profile:', error);
+      throw error;
+    }
+  }
+
+  // 로그아웃
+  async signOut(): Promise<void> {
+    try {
+      console.log('VercelAuthService: 로그아웃 시작');
       
-      // 로컬 저장된 토큰 및 사용자 정보 삭제
-      await AsyncStorage.removeItem('authToken');
-      await AsyncStorage.removeItem('userProfile');
+      // 로컬 스토리지 정리
+      await this.removeAuthToken();
+      await this.removeUserProfile();
       
+      console.log('로그아웃 완료');
     } catch (error) {
       console.error('로그아웃 실패:', error);
       throw error;
     }
   }
 
+  // 현재 사용자 정보 가져오기
   async getCurrentUser(): Promise<UserProfile | null> {
     try {
-      // 저장된 토큰 확인
+      const user = await this.getUserProfile();
       const token = await this.getAuthToken();
-      if (!token) {
-        return null;
+      
+      if (user && token) {
+        console.log('getCurrentUser: 사용자 정보 반환됨', user.displayName);
+        return user;
       }
       
-      // 토큰 검증
-      const response = await fetch(`${SERVER_URL}/api/auth/verify`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      });
-      
-      if (!response.ok) {
-        // 토큰이 유효하지 않음
-        await this.signOut();
-        return null;
-      }
-      
-      const data = await response.json();
-      return data.user;
-      
+      console.log('getCurrentUser: 로그인되지 않은 상태');
+      return null;
     } catch (error) {
       console.error('getCurrentUser 실패:', error);
       return null;
     }
   }
 
-  async refreshToken(): Promise<string | null> {
+  // 인증 상태 확인
+  async isAuthenticated(): Promise<boolean> {
     try {
       const token = await this.getAuthToken();
-      if (!token) {
-        return null;
-      }
-      
-      const response = await fetch(`${SERVER_URL}/api/auth/refresh`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        }
-      });
-      
-      if (!response.ok) {
-        await this.signOut();
-        return null;
-      }
-      
-      const data = await response.json();
-      await this.saveAuthToken(data.token);
-      
-      return data.token;
-      
+      const user = await this.getUserProfile();
+      return !!(token && user);
     } catch (error) {
-      console.error('토큰 갱신 실패:', error);
-      return null;
-    }
-  }
-
-  async deleteAccount(): Promise<void> {
-    console.log('VercelAuthService: 계정 삭제 시작');
-    // 계정 삭제는 서버 API 추가 필요
-    await this.signOut();
-  }
-
-  // JWT 토큰 저장
-  async saveAuthToken(token: string): Promise<void> {
-    try {
-      await AsyncStorage.setItem('authToken', token);
-    } catch (error) {
-      console.error('토큰 저장 실패:', error);
-    }
-  }
-
-  // JWT 토큰 가져오기
-  async getAuthToken(): Promise<string | null> {
-    try {
-      return await AsyncStorage.getItem('authToken');
-    } catch (error) {
-      console.error('토큰 가져오기 실패:', error);
-      return null;
-    }
-  }
-
-  // 사용자 프로필 저장 (로컬)
-  async saveUserProfile(profile: UserProfile): Promise<void> {
-    try {
-      await AsyncStorage.setItem('userProfile', JSON.stringify(profile));
-    } catch (error) {
-      console.error('사용자 프로필 저장 실패:', error);
-    }
-  }
-
-  // 사용자 프로필 가져오기 (로컬)
-  async getUserProfile(): Promise<UserProfile | null> {
-    try {
-      const profileData = await AsyncStorage.getItem('userProfile');
-      return profileData ? JSON.parse(profileData) : null;
-    } catch (error) {
-      console.error('사용자 프로필 가져오기 실패:', error);
-      return null;
+      console.error('Failed to check authentication status:', error);
+      return false;
     }
   }
 }
