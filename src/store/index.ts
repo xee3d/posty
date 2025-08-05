@@ -56,8 +56,7 @@ const persistConfig = {
     'subscription', // 서버에서 가져옴
     'tokens', // currentTokens로 대체
   ],
-  // 병렬 처리로 성능 개선
-  serialize: true,
+  // 병렬 처리로 성능 개선 
   writeFailHandler: (err: Error) => {
     console.error('Redux persist write failed:', err);
   },
@@ -91,8 +90,6 @@ export const store = configureStore({
       },
       // 개발 모드에서만 불변성 체크, 임계값 상향
       immutableCheck: __DEV__ ? { warnAfter: 512 } : false,
-      // 직렬화 체크 비활성화로 성능 개선
-      serializableCheck: false,
     })
       // Firestore middleware 제거됨
       .concat(__DEV__ ? [performanceMiddleware] : []),

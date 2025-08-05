@@ -25,7 +25,8 @@
       "Bash(pod deintegrate:*)",
       "Bash(pod install:*)",
       "Bash(RCT_NEW_ARCH_ENABLED=0 USE_FABRIC=0 USE_CODEGEN=0 pod install --verbose)",
-      "Bash(xcodebuild:*)"
+      "Bash(xcodebuild:*)",
+      "WebFetch(domain:posty-api.vercel.app)"
     ],
     "deny": []
   }

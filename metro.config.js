@@ -21,6 +21,13 @@ const config = {
         ascii_only: true,
       },
     },
+    // JSCRuntime 메모리 누수 방지
+    getTransformOptions: async () => ({
+      transform: {
+        experimentalImportSupport: false,
+        inlineRequires: true,
+      },
+    }),
   },
   resolver: {
     sourceExts: ['jsx', 'js', 'ts', 'tsx', 'json'],
@@ -50,15 +57,10 @@ const config = {
     },
   },
   watchFolders: [],
-  watcher: {
-    useWatchman: false,
-    crawlDelay: 300,
-    ignore: [
-      '**/android/build/**',
-      '**/android/app/build/**',
-      '**/android/.gradle/**',
-    ],
-  },
+  // 메모리 누수 방지를 위한 설정
+  maxWorkers: 2,
+  resetCache: true,
+  cacheVersion: '1.0',
 };
 
 module.exports = mergeConfig(defaultConfig, config);
