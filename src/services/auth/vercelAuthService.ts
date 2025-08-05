@@ -66,9 +66,12 @@ class VercelAuthService {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       
-      if (!userInfo.idToken) {
-        throw new Error('Google ID Token을 가져올 수 없습니다');
+      if (!userInfo || typeof userInfo !== 'object') {
+        throw new Error('Google 사용자 정보를 가져올 수 없습니다');
       }
+      
+      // ID Token 별도 가져오기
+      const tokens = await GoogleSignin.getTokens();
       
       // Vercel 서버로 인증 요청
       const response = await fetch(`${SERVER_URL}/api/auth/google`, {
@@ -77,7 +80,8 @@ class VercelAuthService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          idToken: userInfo.idToken
+          idToken: tokens.idToken,
+          userInfo: userInfo
         })
       });
       
@@ -107,15 +111,24 @@ class VercelAuthService {
   async signInWithNaver(): Promise<AuthResult> {
     console.log('VercelAuthService: Naver 로그인 시작');
     try {
-      const result = await NaverLogin.login({
+      // 네이버 로그인 초기화
+      NaverLogin.initialize({
         appName: 'Posty',
         consumerKey: NAVER_CONSUMER_KEY,
         consumerSecret: NAVER_CONSUMER_SECRET,
-        serviceUrlScheme: 'posty',
+        serviceUrlSchemeIOS: 'postynaverlogin',
       });
       
-      if (!result.isSuccess || !result.accessToken) {
+      // 로그인 실행
+      const result = await NaverLogin.login();
+      
+      if (!result.isSuccess) {
         throw new Error('Naver 로그인 실패');
+      }
+      
+      // 프로필 정보로 토큰 확인 (대체 방법)
+      if (!result.successResponse || !result.successResponse.accessToken) {
+        throw new Error('Naver Access Token을 가져올 수 없습니다');
       }
       
       // Vercel 서버로 인증 요청
@@ -125,7 +138,7 @@ class VercelAuthService {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          accessToken: result.accessToken
+          accessToken: result.successResponse.accessToken
         })
       });
       
