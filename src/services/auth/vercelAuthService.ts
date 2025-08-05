@@ -607,11 +607,19 @@ class VercelAuthService {
     try {
       console.log('VercelAuthService: 로그아웃 시작');
       
+      // Google Sign-In 캐시 클리어
+      try {
+        await GoogleSignin.signOut();
+        console.log('Google Sign-In 캐시 클리어 완료');
+      } catch (googleError) {
+        console.log('Google Sign-In 캐시 클리어 실패 (무시됨):', googleError);
+      }
+      
       // 로컬 스토리지 정리
       await this.removeAuthToken();
       await this.removeUserProfile();
       
-      console.log('로그아웃 완료');
+      console.log('로그아웃 완료 - 다음 로그인 시 실제 Google 계정 정보 사용');
     } catch (error) {
       console.error('로그아웃 실패:', error);
       throw error;
