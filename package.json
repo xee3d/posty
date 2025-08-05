@@ -9,7 +9,13 @@
     "type": "git",
     "url": "https://github.com/xee3d/posty_new.git"
   },
-  "keywords": ["react-native", "ai", "sns", "content-generation", "firebase"],
+  "keywords": [
+    "react-native",
+    "ai",
+    "sns",
+    "content-generation",
+    "vercel"
+  ],
   "developmentPeriod": "2025-07-04 ~ 현재",
   "scripts": {
     "android": "npx react-native@0.73.10 run-android",
@@ -34,8 +40,6 @@
     "@react-native-async-storage/async-storage": "^1.24.0",
     "@react-native-clipboard/clipboard": "1.16.3",
     "@react-native-community/netinfo": "^11.4.1",
-    "@react-native-firebase/app": "^22.4.0",
-    "@react-native-firebase/auth": "^22.4.0",
     "@react-native-google-signin/google-signin": "^15.0.0",
     "@react-native-seoul/kakao-login": "^5.4.1",
     "@react-native-seoul/naver-login": "^4.1.3",

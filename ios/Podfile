@@ -7,7 +7,6 @@ ENV['USE_CODEGEN'] = '0'
 
 platform :ios, '14.0'
 use_modular_headers!
-use_frameworks! :linkage => :static
 
 target 'Posty' do
   config = use_native_modules!
@@ -22,8 +21,7 @@ target 'Posty' do
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
   
-  # Firebase Auth (Auth만 사용)
-  pod 'Firebase/Auth'
+  # Firebase 제거 - Vercel 기반 소셜 로그인으로 대체
   
   # 소셜 로그인
   pod 'RNGoogleSignin', :path => '../node_modules/@react-native-google-signin/google-signin'
@@ -36,12 +34,14 @@ target 'Posty' do
       :mac_catalyst_enabled => false
     )
     
+
+    
     # Fix module redefinition
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
         config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '14.0'
         
-        # C++20 설정 (React Native 0.74.5+ 호환성)
+        # C++20 설정 (원래 설정 유지)
         config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++20'
         # 모든 타겟에 GNU C 확장 적용 (typeof 등 지원)
         config.build_settings['GCC_C_LANGUAGE_STANDARD'] = 'gnu99'
@@ -49,6 +49,11 @@ target 'Posty' do
         # ReactCommon 모듈 중복 완전 해결
         config.build_settings['OTHER_SWIFT_FLAGS'] = '$(inherited) -Xcc -Wno-error=non-modular-include-in-framework-module'
         config.build_settings['CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'YES'
+        
+        # Boost 라이브러리 오류 우회
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+        config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'BOOST_NO_CONFIG=1'
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -DBOOST_NO_AUTO_PTR'
         config.build_settings['DEFINES_MODULE'] = 'NO'
         config.build_settings['SWIFT_SUPPRESS_WARNINGS'] = 'YES'
         
@@ -59,7 +64,26 @@ target 'Posty' do
         
         # Xcode 버전 호환성을 위해 컴파일러 플래그 수정
         config.build_settings['OTHER_CFLAGS'] = '$(inherited) -Wno-error -Wno-duplicate-decl-specifier'
-        config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -Wno-error -Wno-duplicate-decl-specifier'
+        config.build_settings['OTHER_CPLUSPLUSFLAGS'] = '$(inherited) -Wno-error -Wno-duplicate-decl-specifier -DFOLLY_CFG_NO_COROUTINES=1'
+        
+        # RCT-Folly 특별 설정 - C++17 호환성 강화
+        if target.name == 'RCT-Folly'
+          config.build_settings['HEADER_SEARCH_PATHS'] = [
+            "$(inherited)",  
+            "$(PODS_ROOT)/DoubleConversion",
+            "$(PODS_ROOT)/RCT-Folly",
+            "${PODS_ROOT}/Headers/Private/RCT-Folly",
+          ]
+          config.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+          config.build_settings['COMPILER_INDEX_STORE_ENABLE'] = 'NO'
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= ['$(inherited)']
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'BOOST_NO_AUTO_PTR=1'
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'BOOST_NO_CXX98_FUNCTION_BASE=1'
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'FMT_HEADER_ONLY=1'
+          config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] << 'FOLLY_HAVE_LOCALE=0'
+          # boost와 fmt 라이브러리 충돌 방지
+          config.build_settings['HEADER_SEARCH_PATHS'].delete_if { |path| path.include?('boost') || path.include?('fmt') }
+        end
       end
     end
   end

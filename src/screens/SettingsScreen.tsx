@@ -9,11 +9,11 @@ import { storage } from '../utils/storage';
 import socialMediaService from '../services/socialMediaService';
 // ProfileEditModal 제거
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import socialAuthService from '../services/auth/socialAuthService';
+import vercelAuthService from '../services/auth/vercelAuthService';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { resetUser } from '../store/slices/userSlice';
 import { UserGuideScreen, TermsOfServiceScreen, PrivacyPolicyScreen, ContactScreen } from './documents';
-import FirebaseTestScreen from './FirebaseTestScreen';
+
 import TrendApiSettings from './settings/TrendApiSettings';
 import { soundManager } from '../utils/soundManager';
 import tokenService from '../services/subscription/tokenService';
@@ -30,11 +30,10 @@ import NewUserWelcome from '../components/NewUserWelcome';
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
-  onFirebaseTest?: () => void;
   refreshKey?: number;
 }
 
-const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseTest }) => {
+const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const { themeMode, changeTheme, colors, cardTheme } = useAppTheme();
   const dispatch = useAppDispatch();
   const reduxUser = useAppSelector(state => state.user);
@@ -64,7 +63,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showContact, setShowContact] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [showFirebaseTest, setShowFirebaseTest] = useState(false);
+
   const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
   const [showTrendSettings, setShowTrendSettings] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile & { achievements?: Achievement[] } | null>(null);
@@ -494,7 +493,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
               // 로그아웃 진행
               
               // 소셜 로그인 로그아웃 (에러 무시)
-              await socialAuthService.signOut().catch(err => {
+              await vercelAuthService.signOut().catch((err: any) => {
                 console.log('로그아웃 에러 (continued):', err);
               });
               
@@ -810,9 +809,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate, onFirebaseT
     return <ContactScreen onBack={() => setShowContact(false)} onNavigate={onNavigate} />;
   }
   
-  if (showFirebaseTest) {
-    return <FirebaseTestScreen onNavigate={onNavigate} />;
-  }
+
   
   if (showTrendSettings) {
     return <TrendApiSettings onBack={() => setShowTrendSettings(false)} />;

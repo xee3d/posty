@@ -2,7 +2,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SimplePost, PostStats } from './types/postTypes';
 
-import socialAuthService from './auth/socialAuthService';
+import vercelAuthService from './auth/vercelAuthService';
 
 // achievementService를 직접 import하지 않고 이벤트 방식으로 변경
 type PostEventListener = () => Promise<void>;
@@ -14,14 +14,14 @@ class SimplePostService {
   private specialEventListeners: SpecialEventListener[] = [];
   
   // 현재 사용자 UID 가져오기
-  private getCurrentUserId(): string {
-    const firebaseUser = socialAuthService.getCurrentUser();
-    return firebaseUser?.uid || 'default';
+  private async getCurrentUserId(): Promise<string> {
+    const vercelUser = await vercelAuthService.getCurrentUser();
+    return vercelUser?.uid || 'default';
   }
   
   // 사용자별 스토리지 키 생성
-  private get STORAGE_KEY(): string {
-    const userId = this.getCurrentUserId();
+  private async getStorageKey(): Promise<string> {
+    const userId = await this.getCurrentUserId();
     return `${this.STORAGE_KEY_PREFIX}${userId}`;
   }
   

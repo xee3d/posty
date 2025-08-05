@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
-import socialAuthService from '../auth/socialAuthService';
+import vercelAuthService from '../auth/vercelAuthService';
 
 export interface SubscriptionPlan {
   id: string;
@@ -51,12 +51,12 @@ class ServerSubscriptionService {
    */
   async getUserSubscription(): Promise<UserSubscription | null> {
     try {
-      const user = socialAuthService.getCurrentUser();
+      const user = await vercelAuthService.getCurrentUser();
       if (!user) return null;
 
       const response = await fetch(`${this.baseUrl}/subscriptions/user/${user.uid}`, {
         headers: {
-          'Authorization': `Bearer ${await user.getIdToken()}`,
+          'Authorization': `Bearer ${await vercelAuthService.getAuthToken()}`,
           'Content-Type': 'application/json',
         },
       });
@@ -194,13 +194,13 @@ class ServerSubscriptionService {
     platform: 'ios' | 'android'
   ): Promise<UserSubscription> {
     try {
-      const user = socialAuthService.getCurrentUser();
+      const user = await vercelAuthService.getCurrentUser();
       if (!user) throw new Error('User not authenticated');
 
       const response = await fetch(`${this.baseUrl}/subscriptions/purchase`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${await user.getIdToken()}`,
+          'Authorization': `Bearer ${await vercelAuthService.getAuthToken()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -238,13 +238,13 @@ class ServerSubscriptionService {
    */
   async verifySubscription(): Promise<boolean> {
     try {
-      const user = socialAuthService.getCurrentUser();
+      const user = await vercelAuthService.getCurrentUser();
       if (!user) return false;
 
       const response = await fetch(`${this.baseUrl}/subscriptions/verify`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${await user.getIdToken()}`,
+          'Authorization': `Bearer ${await vercelAuthService.getAuthToken()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -286,13 +286,13 @@ class ServerSubscriptionService {
    */
   async cancelSubscription(): Promise<void> {
     try {
-      const user = socialAuthService.getCurrentUser();
+      const user = await vercelAuthService.getCurrentUser();
       if (!user) throw new Error('User not authenticated');
 
       const response = await fetch(`${this.baseUrl}/subscriptions/cancel`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${await user.getIdToken()}`,
+          'Authorization': `Bearer ${await vercelAuthService.getAuthToken()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -318,7 +318,7 @@ class ServerSubscriptionService {
    */
   async syncTokenUsage(tokensUsed: number, action: string): Promise<void> {
     try {
-      const user = socialAuthService.getCurrentUser();
+      const user = await vercelAuthService.getCurrentUser();
       if (!user) return;
 
       // 일단 로컬에 저장
@@ -347,13 +347,13 @@ class ServerSubscriptionService {
    */
   private async syncToServer(userId: string, usage: any[]): Promise<void> {
     try {
-      const user = socialAuthService.getCurrentUser();
+      const user = await vercelAuthService.getCurrentUser();
       if (!user) return;
 
       await fetch(`${this.baseUrl}/subscriptions/usage`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${await user.getIdToken()}`,
+          'Authorization': `Bearer ${await vercelAuthService.getAuthToken()}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

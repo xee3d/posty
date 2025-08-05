@@ -13,7 +13,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import { SPACING, BORDER_RADIUS, FONTS } from '../../utils/constants';
-import socialAuthService from '../../services/auth/socialAuthService';
+import vercelAuthService from '../../services/auth/vercelAuthService';
 import { Alert } from '../../utils/customAlert';
 import { useAppSelector, useAppDispatch } from '../../hooks/redux';
 import { setUser } from '../../store/slices/userSlice';
@@ -86,20 +86,23 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
         }
       }
       
-      // 계정 변경 실행
-      const newProfile = await socialAuthService.changeAccount(providerId);
+      // TODO: Implement account switching for Vercel auth
+      throw new Error('계정 변경 기능은 현재 개발 중입니다.');
       
-      // Redux 상태 업데이트
-      dispatch(setUser({
-        uid: newProfile.uid,
-        email: newProfile.email,
-        displayName: newProfile.displayName,
-        photoURL: newProfile.photoURL,
-        provider: newProfile.provider,
-      }));
-      
-      // 프로필 저장
-      await socialAuthService.saveUserProfile(newProfile);
+      // // 계정 변경 실행
+      // const newProfile = await vercelAuthService.changeAccount(providerId);
+      // 
+      // // Redux 상태 업데이트
+      // dispatch(setUser({
+      //   uid: newProfile.uid,
+      //   email: newProfile.email,
+      //   displayName: newProfile.displayName,
+      //   photoURL: newProfile.photoURL,
+      //   provider: newProfile.provider,
+      // }));
+      // 
+      // // 프로필 저장
+      // await vercelAuthService.saveUserProfile(newProfile);
       
       // 업적 초기화 (사용자별로 분리)
       const achievementService = require('../../services/achievementService').default;

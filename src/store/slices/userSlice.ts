@@ -18,7 +18,7 @@ interface UserState {
   email: string | null;
   displayName: string | null;
   photoURL: string | null;
-  provider: 'google' | 'naver' | 'kakao' | 'email' | null;
+  provider: 'google' | 'naver' | 'kakao' | 'apple' | 'email' | null;
   
   // 구독 정보 (레거시 - 더 이상 사용하지 않음)
   subscription: {

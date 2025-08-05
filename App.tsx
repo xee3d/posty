@@ -25,23 +25,7 @@ import Animated, {
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/store';
-// Firebase imports - conditional loading to prevent crashes
-let auth: any;
-let firestoreMiddleware: any;
-try {
-  auth = require('@react-native-firebase/auth').default;
-  firestoreMiddleware = require('./src/store/middleware/firestoreSyncMiddleware');
-} catch (error) {
-  console.warn('Firebase modules not available, using mock');
-  auth = {
-    currentUser: null,
-    onAuthStateChanged: () => () => {},
-  };
-  firestoreMiddleware = {
-    loadUserFromFirestore: () => {},
-    subscribeToFirestoreUser: () => {},
-  };
-}
+// Auth removed - using Vercel-based social login instead
 
 // Import screens
 import HomeScreen from './src/screens/HomeScreen';
@@ -69,7 +53,7 @@ import soundManager from './src/utils/soundManager';
 import socialAuthService from './src/services/auth/socialAuthService';
 import inAppPurchaseService from './src/services/subscription/inAppPurchaseService';
 import tokenService from './src/services/subscription/tokenService';
-import autoMigrationService from './src/services/firebase/autoMigrationService';
+
 import offlineSyncService from './src/services/offline/offlineSyncService';
 import analyticsService from './src/services/analytics/analyticsService';
 import notificationService from './src/services/notification/notificationService';
@@ -251,70 +235,34 @@ const App: React.FC = () => {
     };
   }, []);
 
-  // 로그인 상태 확인
+  // 로그인 상태 확인 (Vercel 기반 인증으로 변경)
   useEffect(() => {
-    let unsubscribeFirestore: (() => void) | null = null;
-    
-    const unsubscribe = socialAuthService.onAuthStateChanged((user) => {
-      setIsAuthenticated(!!user);
-      setIsCheckingAuth(false);
-      
-      // Analytics 사용자 ID 설정
-      if (user) {
-        analyticsService.setUserId(user.uid);
-      } else {
-        analyticsService.setUserId(null);
-      }
-      
-      // 개발 모드에서도 로그인 화면을 보여주기 위해 false로 설정
-      const SKIP_LOGIN = false; // 로그인 화면을 표시
-      
-      // 로그인된 경우 홈으로, 아니면 로그인 화면으로
-      if (!SKIP_LOGIN && !user && activeTab !== 'login') {
-        setActiveTab('login');
-      }
-      
-      // 로그인된 경우 처리
-      if (user) {
-        InteractionManager.runAfterInteractions(async () => {
-          try {
-            // 병렬 처리로 성능 개선
-            const [, migrationResult] = await Promise.all([
-              // Firestore에서 사용자 데이터 로드 (Firebase 사용 가능한 경우에만)
-              firestoreMiddleware?.loadUserFromFirestore 
-                ? firestoreMiddleware.loadUserFromFirestore(store.dispatch)
-                : Promise.resolve(),
-              // 자동 마이그레이션 체크 (비동기)
-              autoMigrationService.silentMigration().catch(err => {
-                console.log('Migration check failed:', err);
-                return null;
-              })
-            ]);
-            
-            // 실시간 구독은 데이터 로드 후 시작 (Firebase 사용 가능한 경우에만)
-            if (firestoreMiddleware?.subscribeToFirestoreUser) {
-              unsubscribeFirestore = firestoreMiddleware.subscribeToFirestoreUser(store.dispatch);
-            }
-          } catch (error) {
-            console.error('Failed to setup user data:', error);
-          }
-        });
-      } else {
-        // 로그아웃 시 Firestore 구독 정리
-        if (unsubscribeFirestore) {
-          unsubscribeFirestore();
-          unsubscribeFirestore = null;
+    const checkAuthStatus = async () => {
+      try {
+        // Vercel API에서 인증 상태 확인
+        const user = await socialAuthService.getCurrentUser();
+        setIsAuthenticated(!!user);
+        
+        // Analytics 사용자 ID 설정
+        if (user) {
+          analyticsService.setUserId(user.uid);
+        } else {
+          analyticsService.setUserId(null);
         }
-      }
-    });
-
-    // 컴포넌트 언마운트 시 cleanup
-    return () => {
-      unsubscribe();
-      if (unsubscribeFirestore) {
-        unsubscribeFirestore();
+        
+        // 로그인된 경우 홈으로, 아니면 로그인 화면으로
+        if (!user && activeTab !== 'login') {
+          setActiveTab('login');
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setIsAuthenticated(false);
+      } finally {
+        setIsCheckingAuth(false);
       }
     };
+
+    checkAuthStatus();
   }, [activeTab]);
 
   // Reanimated animated style

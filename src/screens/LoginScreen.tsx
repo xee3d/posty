@@ -16,7 +16,7 @@ import AppLogo from '../components/AppLogo';
 
 import { useAppTheme } from '../hooks/useAppTheme';
 import { AppIcon } from '../components/AppIcon';
-import socialAuthService from '../services/auth/socialAuthService';
+import vercelAuthService from '../services/auth/vercelAuthService';
 import achievementService from '../services/achievementService';
 import { useAppDispatch } from '../hooks/redux';
 import { setUser } from '../store/slices/userSlice';
@@ -62,43 +62,45 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
       
       switch (provider) {
         case 'google':
-          userProfile = await socialAuthService.signInWithGoogle();
+          userProfile = await vercelAuthService.signInWithGoogle();
           break;
         case 'naver':
-          userProfile = await socialAuthService.signInWithNaver();
+          userProfile = await vercelAuthService.signInWithNaver();
           break;
         case 'kakao':
-          userProfile = await socialAuthService.signInWithKakao();
+          userProfile = await vercelAuthService.signInWithKakao();
           break;
         case 'facebook':
-          userProfile = await socialAuthService.signInWithFacebook();
+          // Facebook not implemented in vercelAuthService yet
+          throw new Error('Facebook login not available');
           break;
         case 'apple':
-          userProfile = await socialAuthService.signInWithApple();
+          userProfile = await vercelAuthService.signInWithApple();
           break;
       }
 
       if (userProfile) {
         // Redux에 사용자 정보 저장
         dispatch(setUser({
-          uid: userProfile.uid,
-          email: userProfile.email,
-          displayName: userProfile.displayName,
-          photoURL: userProfile.photoURL,
-          provider: userProfile.provider,
+          uid: userProfile.user.uid,
+          email: userProfile.user.email,
+          displayName: userProfile.user.displayName,
+          photoURL: userProfile.user.photoURL,
+          provider: userProfile.user.provider,
         }));
 
         // 사용자 프로필 로컬 저장
-        await socialAuthService.saveUserProfile(userProfile);
+        await vercelAuthService.saveUserProfile(userProfile.user);
         
-        // Firebase removed - using local storage only
+        // Vercel 기반 JWT 토큰 저장
+        await vercelAuthService.saveAuthToken(userProfile.token);
         
         // 새 사용자로 업적 초기화
         await achievementService.resetForNewUser();
         
         // 이미 달성한 업적이 있는지 확인 (기존 사용자)
         const achievements = await achievementService.getUserAchievements();
-        console.log(`User ${userProfile.displayName} has ${achievements.filter(a => a.isUnlocked).length} achievements`);
+        console.log(`User ${userProfile.user.displayName} has ${achievements.filter(a => a.isUnlocked).length} achievements`);
 
         // 홈 화면으로 이동
         onNavigate('home');
