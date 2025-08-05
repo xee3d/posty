@@ -22,7 +22,7 @@ NAVER_CONSUMER_KEY = 'jXC0jUWPhSCotIWBrKrB';
 NAVER_CONSUMER_SECRET = 'RND5w7pcJt';
 KAKAO_APP_KEY = '566cba5c08009852b6b5f1a31c3b28d8';
 // 서버 설정 - 자체 JWT 서버 사용 (Vercel 토큰 인증)
-SERVER_URL = 'https://posty-2yxu8otnr-ethan-chois-projects.vercel.app'; // 자체 JWT 인증 서버
+SERVER_URL = 'https://posty-api.vercel.app'; // 실제 운영 서버 (정상 작동 확인됨)
 const VERCEL_TOKEN = 'a5e2uJAe9LUKii74mL85eCY1'; // Vercel 접근 토큰
 
 logger.info('VercelAuthService: 환경변수 하드코딩 적용 - 서버 복구 완료');
