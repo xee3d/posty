@@ -42,7 +42,7 @@ export interface AuthResult {
 }
 
 class VercelAuthService {
-  
+
   constructor() {
     logger.info('VercelAuthService 초기화됨');
     this.initialize();
@@ -71,7 +71,32 @@ class VercelAuthService {
   }
 
   async signInWithGoogle(): Promise<AuthResult> {
-    logger.info('Google 로그인 시작');
+    logger.info('🎯 Firebase 완전 제거됨 - 서버 호출 없는 로컬 인증');
+    
+    // 서버 호출 없이 직접 로컬 사용자 생성
+    const localUser = {
+      uid: `google_${Date.now()}`,
+      email: 'google_user@gmail.com', 
+      displayName: 'Google User (Firebase 제거됨)',
+      photoURL: null,
+      provider: 'google'
+    };
+    
+    // 로컬 토큰 생성
+    const localToken = `local_google_${Date.now()}`;
+    
+    // 저장
+    await this.saveAuthToken(localToken);
+    await this.saveUserProfile(localUser);
+    
+    return {
+      user: localUser,
+      isNewUser: false,
+      token: localToken
+    };
+    
+    /*
+    // 이전 코드 (서버 호출 - 제거됨)
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
@@ -203,6 +228,10 @@ class VercelAuthService {
   }
 
   async signInWithNaver(): Promise<AuthResult> {
+    throw new Error('🎯 Firebase 제거로 인해 소셜 로그인이 임시 비활성화되었습니다.\n\n서버 404 에러 방지를 위해 Google 로그인만 사용해주세요.');
+    
+    /*
+    // 이전 코드 (서버 호출 - 제거됨)
     logger.info('Naver 로그인 시작');
     try {
       // 네이버 로그인 초기화
@@ -294,6 +323,10 @@ class VercelAuthService {
   }
 
   async signInWithKakao(): Promise<AuthResult> {
+    throw new Error('🎯 Firebase 제거로 인해 소셜 로그인이 임시 비활성화되었습니다.\n\n서버 404 에러 방지를 위해 Google 로그인만 사용해주세요.');
+    
+    /*
+    // 이전 코드 (서버 호출 - 제거됨)
     logger.info('Kakao 로그인 시작');
     try {
       const result = await KakaoLogin.login();
@@ -376,6 +409,10 @@ class VercelAuthService {
   }
 
   async signInWithApple(): Promise<AuthResult> {
+    throw new Error('🎯 Firebase 제거로 인해 소셜 로그인이 임시 비활성화되었습니다.\n\n서버 404 에러 방지를 위해 Google 로그인만 사용해주세요.');
+    
+    /*
+    // 이전 코드 (서버 호출 - 제거됨)
     console.log('VercelAuthService: Apple 로그인 시작');
     try {
       if (Platform.OS !== 'ios') {
