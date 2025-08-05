@@ -1,28 +1,24 @@
-export default function handler(req, res) {
-  // CORS 헤더 설정
+export default async function handler(req, res) {
+  // CORS 설정
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-  
-  // OPTIONS 요청 처리
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Authorization');
+
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
   }
-  
-  const deploymentInfo = {
-    status: 'healthy',
+
+  return res.status(200).json({
+    status: 'OK',
+    message: 'Posty API Server is running',
     timestamp: new Date().toISOString(),
-    deployment: process.env.VERCEL_URL || 'unknown',
-    region: process.env.VERCEL_REGION || 'unknown',
-    env: process.env.VERCEL_ENV || 'unknown',
-    node_version: process.version,
-    uptime: process.uptime(),
-    memory: process.memoryUsage(),
-    headers: req.headers,
-    query: req.query,
-    method: req.method
-  };
-  
-  res.status(200).json(deploymentInfo);
+    version: '1.0.0',
+    endpoints: [
+      '/api/health',
+      '/api/auth/google',
+      '/api/auth/kakao', 
+      '/api/auth/naver',
+      '/api/auth/apple'
+    ]
+  });
 }
