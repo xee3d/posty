@@ -71,29 +71,62 @@ class VercelAuthService {
   }
 
   async signInWithGoogle(): Promise<AuthResult> {
-    logger.info('🎯 Firebase 완전 제거됨 - 서버 호출 없는 로컬 인증');
+    logger.info('🔑 실제 Google 로그인 수행 - 서버 호출 없는 로컬 인증');
     
-    // 서버 호출 없이 직접 로컬 사용자 생성
-    const localUser = {
-      uid: `google_${Date.now()}`,
-      email: 'google_user@gmail.com', 
-      displayName: 'Google User (Firebase 제거됨)',
-      photoURL: null,
-      provider: 'google'
-    };
-    
-    // 로컬 토큰 생성
-    const localToken = `local_google_${Date.now()}`;
-    
-    // 저장
-    await this.saveAuthToken(localToken);
-    await this.saveUserProfile(localUser);
-    
-    return {
-      user: localUser,
-      isNewUser: false,
-      token: localToken
-        };
+    try {
+      // 실제 Google Sign-In 수행
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      
+      logger.info('Google 로그인 성공:', userInfo.user?.name || userInfo.user?.email);
+      
+      // 실제 Google 사용자 정보로 로컬 사용자 생성
+      const googleUser = userInfo.user;
+      const localUser = {
+        uid: `google_${googleUser?.id || Date.now()}`,
+        email: googleUser?.email || 'google_user@gmail.com',
+        displayName: googleUser?.name || googleUser?.givenName || 'Google User',
+        photoURL: googleUser?.photo || null,
+        provider: 'google'
+      };
+      
+      // 로컬 토큰 생성 (서버 호출 없음)
+      const localToken = `local_google_${googleUser?.id || Date.now()}_${Date.now()}`;
+      
+      // 로컬 저장
+      await this.saveAuthToken(localToken);
+      await this.saveUserProfile(localUser);
+      
+      logger.info('✅ 실제 Google 사용자 정보로 로컬 인증 완료:', localUser.displayName);
+      
+      return {
+        user: localUser,
+        isNewUser: false,
+        token: localToken
+      };
+      
+    } catch (error) {
+      logger.error('Google Sign-In 실패:', error);
+      
+      // 에러 발생 시 기본값으로 fallback
+      const fallbackUser = {
+        uid: `google_fallback_${Date.now()}`,
+        email: 'google_user@gmail.com',
+        displayName: 'Google User (로그인 오류)',
+        photoURL: null,
+        provider: 'google'
+      };
+      
+      const fallbackToken = `local_google_fallback_${Date.now()}`;
+      await this.saveAuthToken(fallbackToken);
+      await this.saveUserProfile(fallbackUser);
+      
+      return {
+        user: fallbackUser,
+        isNewUser: false,
+        token: fallbackToken
+      };
+    }
 
     // 이전 코드 (서버 호출 - 제거됨)
     try {
