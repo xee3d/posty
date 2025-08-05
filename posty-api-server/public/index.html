@@ -1,0 +1,148 @@
+# 루트 페이지용 간단한 HTML
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Posty API Server</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .status {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #10b981;
+            color: white;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+        .endpoints {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .endpoint {
+            margin: 10px 0;
+            font-family: monospace;
+        }
+        .method {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .get { background: #3b82f6; color: white; }
+        .post { background: #10b981; color: white; }
+        .patch { background: #f59e0b; color: white; }
+        code {
+            background: #e5e7eb;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .note {
+            background: #fef3c7;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #f59e0b;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Posty API Server</h1>
+        <span class="status">Operational</span>
+        
+        <p>Authentication and core API server for Posty mobile app.</p>
+        
+        <div class="endpoints">
+            <h3>Available Endpoints:</h3>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <code>/api/health</code> - Server health check
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <code>/api/auth/custom-token</code> - Firebase custom token generation
+            </div>
+            <div class="endpoint">
+                <span class="method get">GET</span>
+                <code>/api/trends</code> - Social media trends data
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <code>/api/auth/google</code> - Google OAuth authentication
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <code>/api/auth/naver</code> - Naver OAuth authentication
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <code>/api/auth/kakao</code> - Kakao OAuth authentication
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <code>/api/auth/apple</code> - Apple Sign-In authentication
+            </div>
+            <div class="endpoint">
+                <span class="method post">POST</span>
+                <code>/api/auth/facebook</code> - Facebook OAuth authentication
+            </div>
+        </div>
+        
+        <div class="note">
+            <strong>⚠️ Authentication Required:</strong> Most endpoints require proper authentication headers. Social login endpoints need valid OAuth tokens.
+        </div>
+        
+        <p><strong>Note:</strong> This is a backend API server. To use these endpoints, send HTTP requests with appropriate headers and body data from the Posty mobile app.</p>
+        
+        <div style="margin-top: 30px; padding: 20px; background: #f3f4f6; border-radius: 8px;">
+            <h4>🚀 Quick Health Check</h4>
+            <p>Current server status: <strong style="color: #10b981;">Operational</strong></p>
+            <p>Last updated: <span id="timestamp"></span></p>
+        </div>
+        
+        <p style="margin-top: 40px; color: #666; font-size: 14px;">
+            Part of the Posty project • API Server v1.0.0 • Deployed on Vercel
+        </p>
+    </div>
+
+    <script>
+        // 현재 시간 표시
+        document.getElementById('timestamp').textContent = new Date().toLocaleString();
+        
+        // 실시간 health check (선택사항)
+        setInterval(async () => {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                if (data.status === 'ok') {
+                    document.querySelector('.status').style.background = '#10b981';
+                    document.querySelector('.status').textContent = 'Operational';
+                }
+            } catch (error) {
+                document.querySelector('.status').style.background = '#ef4444';
+                document.querySelector('.status').textContent = 'Issues Detected';
+            }
+        }, 30000); // 30초마다 체크
+    </script>
+</body>
+</html>
