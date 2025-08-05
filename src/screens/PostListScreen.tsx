@@ -8,8 +8,7 @@ import { useAppTheme } from '../hooks/useAppTheme';
 import { ScaleButton, FadeInView, AnimatedCard } from '../components/AnimationComponents';
 import localAnalyticsService from '../services/analytics/localAnalyticsService';
 import { storage } from '../utils/storage';
-import auth from '@react-native-firebase/auth';
-// Firestore는 제거됨 (firestoreService 및 FirestorePost 타입)
+// Firebase 제거 - Vercel 기반 인증으로 변경됨
 import { soundManager } from '../utils/soundManager';
 import { Alert } from '../utils/customAlert';
 interface PostListScreenProps {

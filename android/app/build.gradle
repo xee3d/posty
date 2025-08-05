@@ -1,7 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: "org.jetbrains.kotlin.android"
 apply plugin: "com.facebook.react"
-apply plugin: "com.google.gms.google-services"  // Firebase 활성화
+// Firebase 제거됨 - google-services 플러그인 비활성화
 
 /**
  * This is the configuration block to customize your React Native Android app.
@@ -111,7 +111,7 @@ dependencies {
     // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
     implementation("androidx.swiperefreshlayout:swiperefreshlayout:1.0.0")
-    implementation platform('com.google.firebase:firebase-bom:33.6.0')  // Firebase 활성화
+    // Firebase 제거됨 - BOM 의존성 제거
     implementation 'com.facebook.android:facebook-android-sdk:[17.0.2]'  // Facebook SDK
 
     if (hermesEnabled.toBoolean()) {

@@ -8,15 +8,7 @@ import { LogBox } from 'react-native';
 
 // LogBox로 경고 숨기기
 LogBox.ignoreLogs([
-  // Firebase 관련 모든 경고
-  /.*@react-native-firebase.*/,
-  /.*firebase.*/i,
-  /.*deprecated.*method.*/i,
-  /.*will be removed.*/i,
-  /.*Please use.*/i,
-  /.*getApp.*/,
-  /.*getAuth.*/,
-  /.*getFirestore.*/,
+  // Firebase 제거됨 - 관련 경고 제거
   
   // 터치 이벤트 관련 경고
   'Cannot record touch move without a touch start',

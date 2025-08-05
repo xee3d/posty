@@ -50,7 +50,7 @@ import { useAppTheme } from './src/hooks/useAppTheme';
 import adService from './src/services/adService';
 import subscriptionService from './src/services/subscriptionService';
 import soundManager from './src/utils/soundManager';
-import socialAuthService from './src/services/auth/socialAuthService';
+import vercelAuthService from './src/services/auth/vercelAuthService';
 import inAppPurchaseService from './src/services/subscription/inAppPurchaseService';
 import tokenService from './src/services/subscription/tokenService';
 
@@ -240,7 +240,7 @@ const App: React.FC = () => {
     const checkAuthStatus = async () => {
       try {
         // Vercel API에서 인증 상태 확인
-        const user = await socialAuthService.getCurrentUser();
+        const user = await vercelAuthService.getCurrentUser();
         setIsAuthenticated(!!user);
         
         // Analytics 사용자 ID 설정

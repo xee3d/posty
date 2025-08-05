@@ -1,7 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { NetInfoState } from '@react-native-community/netinfo';
-import auth from '@react-native-firebase/auth';
-// Firestore는 제거됨
+// Firebase 제거 - Vercel 기반 인증으로 변경됨
 
 interface QueueItem {
   id: string;
