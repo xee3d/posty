@@ -7,6 +7,7 @@ ENV['USE_CODEGEN'] = '0'
 
 platform :ios, '14.0'
 use_modular_headers!
+use_frameworks! :linkage => :static
 
 target 'Posty' do
   config = use_native_modules!

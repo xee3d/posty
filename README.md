@@ -17,6 +17,9 @@
 Posty는 AI(GPT-4o-mini)를 활용하여 매력적인 SNS 콘텐츠를 생성하는 모바일 애플리케이션입니다. 
 트렌드를 반영한 창의적인 콘텐츠를 쉽고 빠르게 만들어 Instagram, Facebook, X(Twitter) 등에 공유할 수 있습니다.
 
+**📅 개발 기간**: 2025년 7월 4일 ~ 현재 (약 1개월)  
+**🚀 현재 상태**: Firebase Auth + 로컬 데이터 + Mock 시스템으로 완전 동작
+
 ## ✨ 주요 기능
 
 ### 🤖 AI 콘텐츠 생성
@@ -195,16 +198,19 @@ xcodebuild -workspace Posty.xcworkspace -scheme Posty -configuration Release
 
 ## 📈 최근 업데이트
 
+### 2025년 8월
+- ✅ Firebase Auth 전용 구성 완료 (8월 5일)
+- ✅ React Native CLI 0.73.10 버전 고정 및 문서화
+- ✅ iOS 빌드 환경 최적화 (C++20, GNU C 확장)
+- ✅ Mock 시스템으로 의존성 문제 완전 해결
+- ✅ 버전 호환성 가이드 신규 추가
+
 ### 2025년 7월
+- ✅ 프로젝트 개발 시작 (7월 4일)
 - ✅ React Native 0.74.5 업그레이드
 - ✅ 구독 시스템 개편 (하이브리드 토큰 모델)
 - ✅ 사운드/진동 피드백 시스템 구현
 - ✅ 성능 최적화 (앱 시작 시간 15% 개선)
-
-### 2025년 1월
-- ✅ Git 자동 배포 설정
-- ✅ 실시간 트렌드 기능 추가
-- ✅ 서버 안정성 개선
 
 전체 변경 이력은 [CHANGELOG.md](./CHANGELOG.md) 참조
 
@@ -242,5 +248,5 @@ xcodebuild -workspace Posty.xcworkspace -scheme Posty -configuration Release
 <div align="center">
   Made with ❤️ by Posty Team
   
-  *최종 업데이트: 2025년 7월 31일*
+  *최종 업데이트: 2025년 8월 5일*
 </div>

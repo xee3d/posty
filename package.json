@@ -1,7 +1,16 @@
 {
   "name": "Posty",
   "version": "1.0.0",
+  "description": "AI 기반 SNS 콘텐츠 생성 모바일 앱",
   "private": true,
+  "author": "Posty Team",
+  "homepage": "https://github.com/xee3d/posty_new",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xee3d/posty_new.git"
+  },
+  "keywords": ["react-native", "ai", "sns", "content-generation", "firebase"],
+  "developmentPeriod": "2025-07-04 ~ 현재",
   "scripts": {
     "android": "npx react-native@0.73.10 run-android",
     "ios": "npx react-native@0.73.10 run-ios",

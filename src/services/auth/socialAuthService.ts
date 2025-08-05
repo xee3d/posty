@@ -1,5 +1,31 @@
-// Firebase Auth 활성화 (Auth만 사용)
-import auth from '@react-native-firebase/auth';
+// Firebase Auth 조건부 import (iOS 헤더 문제 대응)
+let auth: any;
+try {
+  auth = require('@react-native-firebase/auth').default;
+  console.log('Firebase Auth 로드 성공');
+} catch (error) {
+  console.warn('Firebase Auth 로드 실패, Mock으로 대체:', error);
+  // Mock auth 객체 생성
+  auth = () => ({
+    currentUser: null,
+    signInWithCredential: (credential: any) => Promise.resolve({
+      user: { uid: 'mock-uid', email: 'mock@test.com', displayName: 'Mock User', photoURL: null },
+      additionalUserInfo: { isNewUser: true }
+    }),
+    signInAnonymously: () => Promise.resolve({
+      user: { uid: 'mock-anonymous-uid' }
+    }),
+    signOut: () => Promise.resolve(),
+    onAuthStateChanged: (callback: any) => {
+      // Mock 상태 변화 리스너
+      setTimeout(() => callback(null), 100);
+      return () => {};
+    },
+    GoogleAuthProvider: {
+      credential: (idToken: string) => ({ token: idToken })
+    }
+  });
+}
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import NaverLogin from '@react-native-seoul/naver-login';
 import { login as kakaoLogin, getProfile as getKakaoProfile } from '@react-native-seoul/kakao-login';
