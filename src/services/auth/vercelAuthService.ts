@@ -78,15 +78,40 @@ class VercelAuthService {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
       
-      logger.info('Google 로그인 성공:', userInfo.user?.name || userInfo.user?.email);
+      // 🔍 디버깅: 실제 응답 구조 확인
+      console.log('🔍 Google Sign-In 전체 응답:', JSON.stringify(userInfo, null, 2));
+      console.log('🔍 userInfo.user:', JSON.stringify(userInfo.user, null, 2));
+      console.log('🔍 userInfo keys:', Object.keys(userInfo));
+      if (userInfo.user) {
+        console.log('🔍 userInfo.user keys:', Object.keys(userInfo.user));
+      }
       
-      // 실제 Google 사용자 정보로 로컬 사용자 생성
-      const googleUser = userInfo.user;
+      logger.info('Google 로그인 성공:', userInfo.data?.user?.name || userInfo.data?.user?.email || 'no name/email found');
+      
+      // 실제 Google 사용자 정보로 로컬 사용자 생성 (올바른 경로 수정)
+      const googleUser = userInfo.data?.user;
+      
+      // 🎯 다양한 필드 시도해서 실제 이름 가져오기
+      const userName = googleUser?.name || 
+                     googleUser?.displayName || 
+                     googleUser?.givenName || 
+                     googleUser?.familyName || 
+                     'Google User';
+      
+      const userEmail = googleUser?.email || 'google_user@gmail.com';
+      const userPhoto = googleUser?.photo || googleUser?.picture || null;
+      
+      console.log('🎯 추출된 사용자 정보:', {
+        name: userName,
+        email: userEmail,
+        photo: userPhoto
+      });
+      
       const localUser = {
         uid: `google_${googleUser?.id || Date.now()}`,
-        email: googleUser?.email || 'google_user@gmail.com',
-        displayName: googleUser?.name || googleUser?.givenName || 'Google User',
-        photoURL: googleUser?.photo || null,
+        email: userEmail,
+        displayName: userName,
+        photoURL: userPhoto,
         provider: 'google'
       };
       
