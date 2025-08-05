@@ -93,9 +93,8 @@ class VercelAuthService {
       user: localUser,
       isNewUser: false,
       token: localToken
-    };
-    
-    /*
+        };
+
     // 이전 코드 (서버 호출 - 제거됨)
     try {
       await GoogleSignin.hasPlayServices();
@@ -230,7 +229,7 @@ class VercelAuthService {
   async signInWithNaver(): Promise<AuthResult> {
     throw new Error('🎯 Firebase 제거로 인해 소셜 로그인이 임시 비활성화되었습니다.\n\n서버 404 에러 방지를 위해 Google 로그인만 사용해주세요.');
     
-    /*
+    //
     // 이전 코드 (서버 호출 - 제거됨)
     logger.info('Naver 로그인 시작');
     try {
@@ -325,7 +324,7 @@ class VercelAuthService {
   async signInWithKakao(): Promise<AuthResult> {
     throw new Error('🎯 Firebase 제거로 인해 소셜 로그인이 임시 비활성화되었습니다.\n\n서버 404 에러 방지를 위해 Google 로그인만 사용해주세요.');
     
-    /*
+    //
     // 이전 코드 (서버 호출 - 제거됨)
     logger.info('Kakao 로그인 시작');
     try {
@@ -411,7 +410,7 @@ class VercelAuthService {
   async signInWithApple(): Promise<AuthResult> {
     throw new Error('🎯 Firebase 제거로 인해 소셜 로그인이 임시 비활성화되었습니다.\n\n서버 404 에러 방지를 위해 Google 로그인만 사용해주세요.');
     
-    /*
+    //
     // 이전 코드 (서버 호출 - 제거됨)
     console.log('VercelAuthService: Apple 로그인 시작');
     try {
