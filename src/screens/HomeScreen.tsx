@@ -29,7 +29,7 @@ import { resetDailyTokens } from '../store/slices/userSlice';
 import { useTokenManagement } from '../hooks/useTokenManagement';
 import EarnTokenModal from '../components/EarnTokenModal';
 import { LowTokenPrompt } from '../components/LowTokenPrompt';
-import { SyncIndicator } from '../components/SyncIndicator';
+// import { SyncIndicator } from '../components/SyncIndicator'; // Firebase 제거로 인해 비활성화
 import { useScreenTracking } from '../hooks/analytics/useScreenTracking';
 import { Alert } from '../utils/customAlert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -526,10 +526,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
 
 
-        {/* 동기화 상태 표시 */}
-        <View style={styles.syncIndicatorContainer}>
+        {/* 동기화 상태 표시 - Firebase 제거로 인해 비활성화 */}
+        {/* <View style={styles.syncIndicatorContainer}>
           <SyncIndicator />
-        </View>
+        </View> */}
 
         {/* 개인화된 인사 배너 */}
         <FadeInView delay={50} duration={200}>
