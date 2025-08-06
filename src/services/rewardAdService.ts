@@ -259,6 +259,72 @@ class RewardAdService {
       limits: this.getAdLimits(),
     };
   }
+
+  // 광고 프리로드 (호환성을 위한 메서드)
+  async preloadAd(): Promise<boolean> {
+    console.log('RewardAdService: 광고 프리로드 시작');
+    return await this.loadAd();
+  }
+
+  // 광고 시청 가능 여부 확인 (상세 정보 포함)
+  async canWatchAd(): Promise<{ canWatch: boolean; reason?: string }> {
+    try {
+      if (!this.isInitialized) {
+        return { canWatch: false, reason: '광고 서비스가 초기화되지 않았습니다.' };
+      }
+
+      if (!this.isAdLoaded) {
+        return { canWatch: false, reason: '광고가 로드되지 않았습니다.' };
+      }
+
+      if (this.isAdShowing) {
+        return { canWatch: false, reason: '다른 광고가 이미 재생 중입니다.' };
+      }
+
+      const dailyCount = await this.getDailyAdCount();
+      const weeklyCount = await this.getWeeklyAdCount();
+      
+      if (dailyCount >= this.adLimits.dailyLimit) {
+        return { canWatch: false, reason: '일일 광고 시청 한도에 도달했습니다.' };
+      }
+
+      if (weeklyCount >= this.adLimits.weeklyLimit) {
+        return { canWatch: false, reason: '주간 광고 시청 한도에 도달했습니다.' };
+      }
+
+      return { canWatch: true };
+    } catch (error) {
+      console.error('광고 시청 가능 여부 확인 실패:', error);
+      return { canWatch: false, reason: '시스템 오류가 발생했습니다.' };
+    }
+  }
+
+  // 보상형 광고 표시 (통합 메서드)
+  async showRewardedAd(): Promise<{ success: boolean; reward?: AdReward; error?: string }> {
+    try {
+      console.log('RewardAdService: 보상형 광고 표시 시작');
+      
+      const { canWatch, reason } = await this.canWatchAd();
+      if (!canWatch) {
+        return { success: false, error: reason };
+      }
+
+      const reward = await this.showAd();
+      if (reward) {
+        return { success: true, reward };
+      } else {
+        return { success: false, error: '광고 시청에 실패했습니다.' };
+      }
+    } catch (error) {
+      console.error('보상형 광고 표시 실패:', error);
+      return { success: false, error: '시스템 오류가 발생했습니다.' };
+    }
+  }
+
+  // 광고 준비 상태 확인 (EarnTokenModal 호환성)
+  async isReady(): Promise<boolean> {
+    return this.isAdReady();
+  }
 }
 
 export default new RewardAdService();
