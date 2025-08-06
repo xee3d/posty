@@ -164,7 +164,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             const result = await rewardAdService.showRewardedAd();
             
             if (result.success && result.reward) {
-              await handleEarnTokens(result.reward);
+              await handleEarnTokens(result.reward.amount);
               
               const missionResult = await missionService.trackAction('ad_watch');
               if (missionResult.rewardsEarned > 0) {

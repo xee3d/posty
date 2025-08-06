@@ -131,7 +131,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             const result = await rewardAdService.showRewardedAd();
             
             if (result.success && result.reward) {
-              await handleEarnTokens(result.reward);
+              await handleEarnTokens(result.reward.amount);
               
               // 미션 업데이트
               const missionResult = await missionService.trackAction('ad_watch');
