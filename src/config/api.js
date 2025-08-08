@@ -4,7 +4,7 @@ const API_CONFIG = {
   USE_SERVER: true,  // 서버 사용
   
   // AI 콘텐츠 생성 서버
-  BASE_URL: 'https://posty-ai.vercel.app',
+  BASE_URL: 'https://posty-ai-new.vercel.app',
   
   // 통합 API 서버 (트렌드, 인증, 기타)
   TRENDS_URL: 'https://posty-api.vercel.app/api',
