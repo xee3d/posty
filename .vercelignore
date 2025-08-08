@@ -1,0 +1,84 @@
+# Dependencies
+node_modules/
+.yarn/
+.pnp.*
+
+# Build outputs
+build/
+dist/
+*.tsbuildinfo
+
+# Development files
+.env.local
+.env.development
+.env.test
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# Testing
+.nyc_output
+.coverage
+
+# Mobile development
+ios/
+android/
+.expo/
+.expo-shared/
+
+# Backup files
+*_backup.*
+*.backup
+
+# Screenshots and demos
+screenshot/
+screenshots/
+demo/
+
+# Temporary files
+*.tmp
+*.temp
+nul
+
+# React Native specific
+.metro-health-check*
+.haste_cache/
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Gradle
+.gradle/
+gradle/
+gradlew
+gradlew.bat
+
+# SVN
+.svn/
+
+# Git
+.git/
+
+# Other
+commit_message.txt
