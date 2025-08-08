@@ -225,7 +225,7 @@ class PersonalizedRecommendationService {
     {
       id: 'weekend-vibes',
       type: 'calendar',
-      icon: 'calendar-today',
+      icon: 'today',
       iconColor: '#00BCD4',
       badge: '🌈 주말',
       badgeEmoji: '🌈',

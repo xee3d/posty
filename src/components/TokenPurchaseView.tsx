@@ -195,7 +195,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <Icon name="celebration" size={20} color="#FFFFFF" />
+          <Icon name="card-giftcard" size={20} color="#FFFFFF" />
           <View style={styles.firstPurchaseContent}>
             <Text style={styles.firstPurchaseTitle}>첫 구매 특별 혜택</Text>
             <Text style={styles.firstPurchaseDesc}>

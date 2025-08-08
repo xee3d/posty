@@ -143,7 +143,7 @@ const SimpleStatsView: React.FC = () => {
         
         <FadeInView delay={200}>
           <StatCard
-            icon={<MaterialIcon name="calendar-today" size={24} color="#10B981" />}
+            icon={<MaterialIcon name="today" size={24} color="#10B981" />}
             value={`${stats.postingPatterns.mostActiveDay}요일`}
             label="활발한 요일"
             color="#10B981"

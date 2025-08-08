@@ -118,9 +118,11 @@ class VercelAuthService {
       // 로컬 토큰 생성 (서버 호출 없음)
       const localToken = `local_google_${googleUser?.id || Date.now()}_${Date.now()}`;
       
-      // 로컬 저장
-      await this.saveAuthToken(localToken);
-      await this.saveUserProfile(localUser);
+      // 로컬 저장 (배치 처리로 우선순위 역전 방지)
+      await AsyncStorage.multiSet([
+        ['@auth_token', localToken],
+        ['@user_profile', JSON.stringify(localUser)]
+      ]);
       
       logger.info('✅ 실제 Google 사용자 정보로 로컬 인증 완료:', localUser.displayName);
       
@@ -143,8 +145,10 @@ class VercelAuthService {
       };
       
       const fallbackToken = `local_google_fallback_${Date.now()}`;
-      await this.saveAuthToken(fallbackToken);
-      await this.saveUserProfile(fallbackUser);
+      await AsyncStorage.multiSet([
+        ['@auth_token', fallbackToken],
+        ['@user_profile', JSON.stringify(fallbackUser)]
+      ]);
       
       return {
         user: fallbackUser,
@@ -640,9 +644,8 @@ class VercelAuthService {
         console.log('Google Sign-In 캐시 클리어 실패 (무시됨):', googleError);
       }
       
-      // 로컬 스토리지 정리
-      await this.removeAuthToken();
-      await this.removeUserProfile();
+      // 로컬 스토리지 정리 (배치 삭제로 우선순위 역전 방지)
+      await AsyncStorage.multiRemove(['@auth_token', '@user_profile']);
       
       console.log('로그아웃 완료 - 다음 로그인 시 실제 Google 계정 정보 사용');
     } catch (error) {
@@ -651,13 +654,13 @@ class VercelAuthService {
     }
   }
 
-  // 현재 사용자 정보 가져오기
+  // 현재 사용자 정보 가져오기 (배치 읽기로 우선순위 역전 방지)
   async getCurrentUser(): Promise<UserProfile | null> {
     try {
-      const user = await this.getUserProfile();
-      const token = await this.getAuthToken();
+      const [userString, token] = await AsyncStorage.multiGet(['@user_profile', '@auth_token']);
       
-      if (user && token) {
+      if (userString[1] && token[1]) {
+        const user = JSON.parse(userString[1]);
         console.log('getCurrentUser: 사용자 정보 반환됨', user.displayName);
         return user;
       }
@@ -670,12 +673,11 @@ class VercelAuthService {
     }
   }
 
-  // 인증 상태 확인
+  // 인증 상태 확인 (배치 읽기로 우선순위 역전 방지)
   async isAuthenticated(): Promise<boolean> {
     try {
-      const token = await this.getAuthToken();
-      const user = await this.getUserProfile();
-      return !!(token && user);
+      const [userString, token] = await AsyncStorage.multiGet(['@user_profile', '@auth_token']);
+      return !!(token[1] && userString[1]);
     } catch (error) {
       logger.error('Failed to check authentication status:', error);
       return false;
