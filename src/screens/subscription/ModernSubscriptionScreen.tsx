@@ -16,6 +16,7 @@ import missionService from '../../services/missionService';
 import TokenPurchaseView from '../../components/TokenPurchaseView';
 import EarnTokenModal from '../../components/EarnTokenModal';
 import PaymentSuccessModal from '../../components/PaymentSuccessModal';
+import { AdaptiveNativeAd, SmartAdPlacement } from '../../components/ads';
 
 import { Alert } from '../../utils/customAlert';
 import { DeviceEventEmitter } from 'react-native';

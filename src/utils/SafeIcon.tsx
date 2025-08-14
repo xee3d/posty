@@ -3,6 +3,69 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
+// Ionicons에 실제로 존재하는 기본 아이콘 목록 (일부)
+const VALID_IONICONS = [
+  'home', 'home-outline', 'home-sharp',
+  'create', 'create-outline', 'create-sharp',
+  'camera', 'camera-outline', 'camera-sharp',
+  'star', 'star-outline', 'star-half',
+  'heart', 'heart-outline', 'heart-sharp',
+  'calendar', 'calendar-outline', 'calendar-sharp',
+  'time', 'time-outline', 'time-sharp',
+  'settings', 'settings-outline', 'settings-sharp',
+  'person', 'person-outline', 'person-sharp',
+  'notifications', 'notifications-outline', 'notifications-sharp',
+  'search', 'search-outline', 'search-sharp',
+  'add', 'add-outline', 'add-circle', 'add-circle-outline',
+  'checkmark', 'checkmark-outline', 'checkmark-circle', 'checkmark-circle-outline',
+  'close', 'close-outline', 'close-circle', 'close-circle-outline',
+  'arrow-back', 'arrow-forward', 'chevron-back', 'chevron-forward',
+  'chevron-up', 'chevron-down', 'chevron-up-outline', 'chevron-down-outline',
+  'menu', 'menu-outline', 'ellipsis-horizontal', 'ellipsis-vertical',
+  'image', 'images', 'play', 'pause', 'stop',
+  'share', 'share-outline', 'copy', 'copy-outline',
+  'edit', 'trash', 'trash-outline', 'refresh', 'refresh-outline',
+  'information-circle', 'information-circle-outline',
+  'warning', 'warning-outline', 'alert-circle', 'alert-circle-outline',
+  'help-circle', 'help-circle-outline',
+  'location', 'location-outline', 'map', 'map-outline',
+  'mail', 'mail-outline', 'call', 'call-outline',
+  'globe', 'globe-outline', 'wifi', 'wifi-outline',
+  'battery-full', 'battery-half', 'battery-dead',
+  'sunny', 'moon', 'cloudy', 'rainy', 'partly-sunny',
+  'restaurant', 'restaurant-outline', 'car', 'car-outline',
+  'airplane', 'airplane-outline', 'train', 'train-outline',
+  'musical-notes', 'musical-notes-outline',
+  'headset', 'headset-outline', 'volume-high', 'volume-low', 'volume-mute',
+  'diamond', 'diamond-outline', 'trophy', 'trophy-outline',
+  'gift', 'gift-outline', 'cash', 'cash-outline', 'card', 'card-outline',
+  'business', 'business-outline', 'school', 'school-outline',
+  'library', 'library-outline', 'book', 'book-outline',
+  'bulb', 'bulb-outline', 'color-palette', 'color-palette-outline',
+  'brush', 'brush-outline', 'color-wand', 'color-wand-outline',
+  'sparkles', 'sparkles-outline', 'flash', 'flash-outline',
+  'construct', 'construct-outline', 'hammer', 'hammer-outline',
+  'telescope', 'telescope-outline', 'eye', 'eye-outline',
+  'document', 'document-outline', 'document-text', 'document-text-outline',
+  'folder', 'folder-outline', 'folder-open', 'folder-open-outline',
+  'archive', 'archive-outline', 'download', 'download-outline',
+  'cloud', 'cloud-outline', 'cloud-upload', 'cloud-download',
+  'link', 'link-outline', 'unlink', 'unlink-outline',
+  'lock-closed', 'lock-open', 'key', 'key-outline',
+  'shield', 'shield-outline', 'shield-checkmark', 'shield-checkmark-outline',
+  'pricetag', 'pricetag-outline', 'pricetags', 'pricetags-outline',
+  'people', 'people-outline', 'person-add', 'person-remove',
+  'chatbubble', 'chatbubble-outline', 'chatbubbles', 'chatbubbles-outline',
+  'thumbs-up', 'thumbs-down', 'thumbs-up-outline', 'thumbs-down-outline',
+  'trending-up', 'trending-down', 'stats-chart', 'stats-chart-outline',
+  'pie-chart', 'pie-chart-outline', 'bar-chart', 'bar-chart-outline',
+  'radio-button-on', 'radio-button-off', 'checkbox', 'checkbox-outline',
+  'toggle', 'toggle-outline', 'options', 'options-outline',
+  'filter', 'filter-outline', 'funnel', 'funnel-outline',
+  'scan', 'scan-outline', 'qr-code', 'qr-code-outline',
+  'fingerprint', 'fingerprint-outline', 'hand-left', 'hand-right'
+];
+
 interface SafeIconProps {
   name: string;
   size?: number;
@@ -96,7 +159,7 @@ export const SafeIcon: React.FC<SafeIconProps> = ({
     type = mapping.type;
   }
 
-  // Validate and provide fallback
+  // 아이콘 이름 검증 및 폴백 로직
   const validateAndRenderIcon = () => {
     try {
       switch (type) {
@@ -106,19 +169,55 @@ export const SafeIcon: React.FC<SafeIconProps> = ({
           return <MaterialCommunityIcon name={name} size={size} color={color} />;
         case 'ionicons':
         default:
-          // For now, trust the icon names and let Ionicons handle validation
-          // We'll catch errors and show fallback if needed
+          // Ionicons의 경우 유효한 아이콘인지 먼저 검증
+          if (!VALID_IONICONS.includes(name)) {
+            console.warn(`⚠️ Invalid Ionicons name: "${name}". Using fallback icon "help-circle-outline".`);
+            // 일반적인 폴백 매핑 시도
+            const fallbackName = getFallbackIconName(name);
+            if (VALID_IONICONS.includes(fallbackName)) {
+              return <Icon name={fallbackName} size={size} color={color} />;
+            }
+            return <Icon name="help-circle-outline" size={size} color={color} />;
+          }
+          
           try {
             return <Icon name={name} size={size} color={color} />;
           } catch (iconError) {
-            console.warn(`Invalid icon name: ${name}. Using fallback icon.`);
+            console.warn(`Error rendering icon "${name}". Using fallback.`, iconError);
             return <Icon name="help-circle-outline" size={size} color={color} />;
           }
       }
     } catch (error) {
-      console.error(`Error rendering icon ${name}:`, error);
+      console.error(`Critical error rendering icon "${name}":`, error);
       return <Icon name="help-circle-outline" size={size} color={color} />;
     }
+  };
+
+  // 폴백 아이콘 이름을 추천하는 함수
+  const getFallbackIconName = (iconName: string): string => {
+    // 일반적인 패턴 매칭으로 적절한 폴백 찾기
+    if (iconName.includes('event') || iconName.includes('calendar')) return 'calendar-outline';
+    if (iconName.includes('star') || iconName.includes('rate')) return 'star-outline';
+    if (iconName.includes('time') || iconName.includes('clock') || iconName.includes('schedule')) return 'time-outline';
+    if (iconName.includes('photo') || iconName.includes('camera') || iconName.includes('image')) return 'camera-outline';
+    if (iconName.includes('create') || iconName.includes('edit') || iconName.includes('write')) return 'create-outline';
+    if (iconName.includes('person') || iconName.includes('user') || iconName.includes('account')) return 'person-outline';
+    if (iconName.includes('info') || iconName.includes('information')) return 'information-circle-outline';
+    if (iconName.includes('warning') || iconName.includes('alert')) return 'warning-outline';
+    if (iconName.includes('check') || iconName.includes('done') || iconName.includes('success')) return 'checkmark-circle-outline';
+    if (iconName.includes('home') || iconName.includes('house')) return 'home-outline';
+    if (iconName.includes('setting') || iconName.includes('config')) return 'settings-outline';
+    if (iconName.includes('search') || iconName.includes('find')) return 'search-outline';
+    if (iconName.includes('mail') || iconName.includes('email') || iconName.includes('message')) return 'mail-outline';
+    if (iconName.includes('location') || iconName.includes('place') || iconName.includes('map')) return 'location-outline';
+    if (iconName.includes('share')) return 'share-outline';
+    if (iconName.includes('copy')) return 'copy-outline';
+    if (iconName.includes('heart') || iconName.includes('like') || iconName.includes('favorite')) return 'heart-outline';
+    if (iconName.includes('play') || iconName.includes('video')) return 'play-outline';
+    if (iconName.includes('music') || iconName.includes('audio') || iconName.includes('sound')) return 'musical-notes-outline';
+    
+    // 기본 폴백
+    return 'help-circle-outline';
   };
 
   return validateAndRenderIcon();

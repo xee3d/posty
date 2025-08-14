@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		092DF4FFA737DF760855D5D4 /* libPods-Posty.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DFA675D913199B4461CC130 /* libPods-Posty.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		5B468EE105D177D2F495403E /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = A507B00D1207ABF3C9B7BFD5 /* PrivacyInfo.xcprivacy */; };
+		779F02B02DFDE818EF42F01C /* libPods-Posty.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B60CA1953B17237DB318AB15 /* libPods-Posty.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -22,11 +22,11 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		3DFA675D913199B4461CC130 /* libPods-Posty.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Posty.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
+		91E9111858F3526451C94851 /* Pods-Posty.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Posty.debug.xcconfig"; path = "Target Support Files/Pods-Posty/Pods-Posty.debug.xcconfig"; sourceTree = "<group>"; };
 		A507B00D1207ABF3C9B7BFD5 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		D2BC4C52105E54086EB44343 /* Pods-Posty.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Posty.release.xcconfig"; path = "Target Support Files/Pods-Posty/Pods-Posty.release.xcconfig"; sourceTree = "<group>"; };
-		D4D54DDBD18CA8A902BDBBE7 /* Pods-Posty.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Posty.debug.xcconfig"; path = "Target Support Files/Pods-Posty/Pods-Posty.debug.xcconfig"; sourceTree = "<group>"; };
+		B4A5D5A5F1B8BABB83021414 /* Pods-Posty.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Posty.release.xcconfig"; path = "Target Support Files/Pods-Posty/Pods-Posty.release.xcconfig"; sourceTree = "<group>"; };
+		B60CA1953B17237DB318AB15 /* libPods-Posty.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Posty.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -34,7 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				092DF4FFA737DF760855D5D4 /* libPods-Posty.a in Frameworks */,
+				779F02B02DFDE818EF42F01C /* libPods-Posty.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -60,8 +60,8 @@
 			children = (
 				13B07FAE1A68108700A75B9A /* Posty */,
 				83CBBA001A601CBA00E9B192 /* Products */,
-				97D5DC6986F4048E73301CED /* Pods */,
-				AD0C35BF92308E3266E3CE2B /* Frameworks */,
+				CBD756B1D7606E2B54BED2B0 /* Pods */,
+				83FA058F1B142010483EA7CC /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -73,22 +73,22 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		97D5DC6986F4048E73301CED /* Pods */ = {
+		83FA058F1B142010483EA7CC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				D4D54DDBD18CA8A902BDBBE7 /* Pods-Posty.debug.xcconfig */,
-				D2BC4C52105E54086EB44343 /* Pods-Posty.release.xcconfig */,
+				B60CA1953B17237DB318AB15 /* libPods-Posty.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CBD756B1D7606E2B54BED2B0 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				91E9111858F3526451C94851 /* Pods-Posty.debug.xcconfig */,
+				B4A5D5A5F1B8BABB83021414 /* Pods-Posty.release.xcconfig */,
 			);
 			name = Pods;
 			path = Pods;
-			sourceTree = "<group>";
-		};
-		AD0C35BF92308E3266E3CE2B /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				3DFA675D913199B4461CC130 /* libPods-Posty.a */,
-			);
-			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -98,12 +98,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "Posty" */;
 			buildPhases = (
-				EE1E6AE5A6EDA75C182A6D9D /* [CP] Check Pods Manifest.lock */,
+				44043B73FB8C5A61A82F2E83 /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
-				AE2CD20927CBB3F6D1E0802F /* [CP] Embed Pods Frameworks */,
-				9C5E9E827755A37FB8F121EF /* [CP] Copy Pods Resources */,
+				B767164A3C777CACC788E2BF /* [CP] Embed Pods Frameworks */,
+				6519D975FACB2B887B84C063 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -159,41 +159,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		9C5E9E827755A37FB8F121EF /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		AE2CD20927CBB3F6D1E0802F /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		EE1E6AE5A6EDA75C182A6D9D /* [CP] Check Pods Manifest.lock */ = {
+		44043B73FB8C5A61A82F2E83 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -215,6 +181,40 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		6519D975FACB2B887B84C063 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B767164A3C777CACC788E2BF /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Posty/Pods-Posty-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -232,7 +232,7 @@
 /* Begin XCBuildConfiguration section */
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D4D54DDBD18CA8A902BDBBE7 /* Pods-Posty.debug.xcconfig */;
+			baseConfigurationReference = 91E9111858F3526451C94851 /* Pods-Posty.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -259,7 +259,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D2BC4C52105E54086EB44343 /* Pods-Posty.release.xcconfig */;
+			baseConfigurationReference = B4A5D5A5F1B8BABB83021414 /* Pods-Posty.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;

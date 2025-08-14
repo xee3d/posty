@@ -102,7 +102,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       <ScrollView style={styles.content}>
         <View style={[styles.section, { backgroundColor: colors.card }]}>
           <View style={styles.sectionHeader}>
-            <Icon name="trending-up" size={24} color={colors.primary} />
+            <Icon name="trending-up-outline" size={24} color={colors.primary} />
             <Text style={[styles.title, { color: colors.text }]}>
               트렌드 API 설정
             </Text>

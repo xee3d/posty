@@ -36,6 +36,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NewUserWelcome from '../components/NewUserWelcome';
 import improvedStyleService from '../services/improvedStyleService';
 import { soundManager } from '../utils/soundManager';
+import { BannerCarousel, AdaptiveNativeAd, SmartAdPlacement } from '../components/ads';
+import AdIntegrationService from '../services/AdIntegrationService';
 
 interface HomeScreenProps {
   onNavigate: (tab: string, content?: any) => void;
@@ -379,9 +381,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       case '트렌드':
         onNavigate('trend');
         break;
-      case '광고 테스트':
-        onNavigate('feed-ads');
-        break;
       case '구독':
         onNavigate('subscription');
         break;
@@ -570,6 +569,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           )}
         </FadeInView>
 
+        {/* 상단 배너 광고 - 조건부 표시 */}
+        {Date.now() % 2 === 0 && (
+          <SlideInView delay={100} duration={300}>
+            <BannerCarousel 
+              autoPlay={true}
+              autoPlayInterval={6000}
+              showIndicators={true}
+            />
+          </SlideInView>
+        )}
+
         {/* 빠른 생성 - 사용자 레벨에 따라 다르게 표시 */}
         <FadeInView delay={175}>
           <View style={styles.quickActions}>
@@ -750,7 +760,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
         )}
 
 
-
         {/* 포스티의 맞춤 추천 */}
         <SlideInView direction="right" delay={625}>
           <View style={styles.todaySection}>
@@ -770,7 +779,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     style={[styles.recommendCard, index > 0 && { marginLeft: SPACING.sm }]}
                   >
                     <View style={[styles.recommendIconContainer, { backgroundColor: card.iconColor }]}>
-                      <Icon name={card.icon.replace('edit', 'create').replace('auto-fix-high', 'color-wand').replace('photo-camera', 'camera')} size={24} color={colors.white} />
+                      <SafeIcon name={card.icon} size={24} color={colors.white} />
                     </View>
                     <View style={styles.recommendBadge}>
                       <Text style={styles.recommendBadgeText}>{card.badge}</Text>
@@ -968,15 +977,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 <Text style={styles.sectionTitle}>기타 기능</Text>
               </View>
               <View style={styles.subActions}>
-                <AnimatedCard delay={850} style={styles.subActionCard}>
-                  <TouchableOpacity 
-                    style={styles.subActionContent}
-                    onPress={() => handleQuickAction('광고 테스트')}
-                  >
-                    <Icon name="cash" size={20} color={colors.text.secondary} />
-                    <Text style={styles.subActionText}>광고 테스트</Text>
-                  </TouchableOpacity>
-                </AnimatedCard>
                 
                 <AnimatedCard delay={900} style={styles.subActionCard}>
                   <TouchableOpacity 
@@ -993,13 +993,25 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     style={styles.subActionContent}
                     onPress={() => handleQuickAction('구독')}
                   >
-                    <Icon name="diamond" size={20} color={colors.text.secondary} />
+                    <Icon name="diamond-outline" size={20} color={colors.text.secondary} />
                     <Text style={styles.subActionText}>구독</Text>
                   </TouchableOpacity>
                 </AnimatedCard>
               </View>
             </View>
           </FadeInView>
+        )}
+
+        {/* 하단 인라인 광고 - 개발 모드에서만 표시 */}
+        {recentPosts.length > 0 && (
+          <SmartAdPlacement position={10} context="home">
+            <SlideInView delay={400} duration={500}>
+              <AdaptiveNativeAd 
+                layout="inline"
+                onPress={() => AdIntegrationService.trackUserAction('ad_click')}
+              />
+            </SlideInView>
+          </SmartAdPlacement>
         )}
 
         <View style={styles.bottomSpace} />

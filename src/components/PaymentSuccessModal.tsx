@@ -17,7 +17,7 @@ import Animated, {
   withDelay,
   interpolate,
 } from 'react-native-reanimated';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { soundManager } from '../utils/soundManager';
 import SimpleConfetti from './celebration/SimpleConfetti';
@@ -93,7 +93,7 @@ export const PaymentSuccessModal: React.FC<PaymentSuccessModalProps> = ({
         <Animated.View style={[styles.modalContainer, modalStyle]}>
           {/* 성공 아이콘 */}
           <Animated.View style={[styles.iconContainer, checkStyle]}>
-            <Icon name="check-circle" size={80} color="#4CAF50" />
+            <Icon name="checkmark-circle" size={80} color="#4CAF50" />
           </Animated.View>
           
           {/* 메시지 */}

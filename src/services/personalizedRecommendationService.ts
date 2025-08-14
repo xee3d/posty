@@ -84,7 +84,7 @@ class PersonalizedRecommendationService {
       title: '뭐 먹었어? 이거면 끝!',
       content: '음식 사진 하나만 있으면 돼요\n"맛있다" 한 마디면 충분해요',
       meta: {
-        icon: 'fastfood',
+        icon: 'fast-food',
         text: '1분 완성'
       },
       actionText: '음식 사진',
@@ -305,7 +305,7 @@ class PersonalizedRecommendationService {
       title: '첫 포스팅 도전!',
       content: '포스티와 함께하는 첫 포스팅,\n부담없이 시작해보세요!',
       meta: {
-        icon: 'rocket-launch',
+        icon: 'rocket-outline',
         text: '시작이 반'
       },
       actionText: '첫 글쓰기',
@@ -440,14 +440,14 @@ class PersonalizedRecommendationService {
     {
       id: 'pet-photo',
       type: 'photo',
-      icon: 'pets',
+      icon: 'pet-friendly',
       iconColor: '#795548',
       badge: '🐕 반려동물',
       badgeEmoji: '🐕',
       title: '우리 아이 자랑하기',
       content: '귀여운 반려동물 사진 하나면\n충분해요! 이름만 써도 OK',
       meta: {
-        icon: 'favorite',
+        icon: 'star',
         text: '쉽고 간단'
       },
       actionText: '사진 올리기',

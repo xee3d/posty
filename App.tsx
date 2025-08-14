@@ -33,12 +33,10 @@ import AIWriteScreen from './src/screens/AIWriteScreen';
 import TrendScreen from './src/screens/TrendScreen';
 import MyStyleScreen from './src/screens/MyStyleScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
-import FeedWithAdsExample from './src/screens/FeedWithAdsExample';
 import ModernSubscriptionScreen from './src/screens/subscription/ModernSubscriptionScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import { TermsOfServiceScreen, PrivacyPolicyScreen } from './src/screens/documents';
 import TabNavigator from './src/components/TabNavigator';
-import TokenDebugScreen from './src/screens/debug/TokenDebugScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
 import AchievementNotification from './src/components/AchievementNotification';
 
@@ -48,6 +46,7 @@ import { useAppTheme } from './src/hooks/useAppTheme';
 
 // Import services
 import adService from './src/services/adService';
+import { MemoryOptimizer, cleanupOnAppExit } from './src/utils/memoryOptimizer';
 import subscriptionService from './src/services/subscriptionService';
 import soundManager from './src/utils/soundManager';
 import vercelAuthService from './src/services/auth/vercelAuthService';
@@ -104,6 +103,18 @@ const App: React.FC = () => {
   useEffect(() => {
     console.log('[App] Hiding splash screen');
     SplashScreen.hide();
+    
+    // 메모리 최적화 초기화
+    MemoryOptimizer.checkMemoryUsage();
+    
+    // 개발 환경에서 메모리 모니터링
+    if (__DEV__) {
+      const memoryCheckInterval = MemoryOptimizer.setInterval(() => {
+        MemoryOptimizer.checkMemoryUsage();
+      }, 30000); // 30초마다 체크
+      
+      return () => MemoryOptimizer.clearInterval(memoryCheckInterval);
+    }
   }, []);
 
   // 온보딩 상태 체크
@@ -219,7 +230,10 @@ const App: React.FC = () => {
   useEffect(() => {
     if (isAuthenticated && !isCheckingAuth) {
       InteractionManager.runAfterInteractions(() => {
-        inAppPurchaseService.initialize().catch(console.error);
+        inAppPurchaseService.initialize().catch((error) => {
+          // IAP 초기화 실패 시 로그만 출력하고 앱은 계속 실행
+          console.warn('IAP 초기화 실패 (정상 - 시뮬레이터 환경):', error.message);
+        });
       });
       
       return () => {
@@ -228,12 +242,22 @@ const App: React.FC = () => {
     }
   }, [isAuthenticated, isCheckingAuth]);
   
-  // 앱 종료 시 서비스 정리 (배터리 최적화 정리 포함)
+  // 앱 종료 시 서비스 정리 및 메모리 최적화
   useEffect(() => {
     return () => {
+      console.log('🧹 App cleanup started');
+      
+      // 서비스 정리
       offlineSyncService.destroy();
       notificationService.cleanup();
-      batteryOptimizer.cleanup(); // 배터리 최적화 정리
+      batteryOptimizer.cleanup();
+      vercelAuthService.cleanup();
+      
+      // 메모리 최적화 정리
+      MemoryOptimizer.clearAllTimers();
+      cleanupOnAppExit();
+      
+      console.log('✅ App cleanup completed');
     };
   }, []);
 
@@ -419,13 +443,6 @@ const App: React.FC = () => {
         return <MyStyleScreen key="my-style" onNavigate={handleTabPress} />;
       case 'settings':
         return <SettingsScreen key="settings" onNavigate={handleTabPress} />;
-      case 'feed-ads':
-        return (
-          <FeedWithAdsExample 
-            key="feed-ads" 
-            navigation={{ navigate: handleTabPress }} 
-          />
-        );
       case 'subscription':
         return (
           <ModernSubscriptionScreen 
@@ -440,8 +457,6 @@ const App: React.FC = () => {
         return <TermsOfServiceScreen key="terms" onNavigate={handleTabPress} />;
       case 'privacy':
         return <PrivacyPolicyScreen key="privacy" onNavigate={handleTabPress} />;
-      case 'token-debug':
-        return <TokenDebugScreen key="token-debug" />;
       case 'profile':
         return <ProfileScreen key="profile" navigation={{ goBack: () => handleTabPress('settings') }} />;
       default:

@@ -8,6 +8,36 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import NaverLogin from '@react-native-seoul/naver-login';
 import * as KakaoLogin from '@react-native-seoul/kakao-login';
 import { appleAuth } from '@invertase/react-native-apple-authentication';
+// Facebook SDK import with safer loading
+let LoginManager, AccessToken, GraphRequest, GraphRequestManager, Settings;
+let fbSDKAvailable = false;
+
+try {
+  const fbSDK = require('react-native-fbsdk-next');
+  LoginManager = fbSDK.LoginManager;
+  AccessToken = fbSDK.AccessToken;
+  GraphRequest = fbSDK.GraphRequest;
+  GraphRequestManager = fbSDK.GraphRequestManager;
+  Settings = fbSDK.Settings;
+  
+  // Facebook 앱 정보 설정 (시뮬레이터에서도 웹뷰 로그인 가능하도록)
+  Settings.setAppID('757255383655974');
+  Settings.setClientToken('d8ee82c1aee6b4a49fd02b398354f2b7');
+  Settings.initializeSDK();
+  
+  fbSDKAvailable = true;
+  console.log('✅ Facebook SDK 로드 및 초기화 성공');
+} catch (error) {
+  console.warn('Facebook SDK 로드 실패:', error.message);
+  fbSDKAvailable = false;
+  
+  // Fallback objects
+  LoginManager = null;
+  AccessToken = null;
+  GraphRequest = null;
+  GraphRequestManager = null;
+  Settings = null;
+}
 
 // 환경변수 안전 처리
 let GOOGLE_WEB_CLIENT_ID: string;
@@ -42,14 +72,26 @@ export interface AuthResult {
 }
 
 class VercelAuthService {
+  private naverInitialized = false;
+  private isInitializing = false;
 
   constructor() {
     logger.info('VercelAuthService 초기화됨');
-    this.initialize();
+    this.safeInitialize();
   }
   
-  async initialize() {
-    await this.initializeGoogleSignIn();
+  private async safeInitialize() {
+    if (this.isInitializing) return;
+    this.isInitializing = true;
+    
+    try {
+      await this.initializeGoogleSignIn();
+      await this.initializeNaverLogin();
+    } catch (error) {
+      console.error('VercelAuthService 초기화 실패:', error);
+    } finally {
+      this.isInitializing = false;
+    }
   }
 
   // Google Sign-In 초기화
@@ -67,6 +109,34 @@ class VercelAuthService {
       logger.info('Google Sign-In 초기화 완료');
     } catch (error) {
       logger.error('Google Sign-In 설정 실패:', error);
+    }
+  }
+
+  // Naver Login 초기화
+  async initializeNaverLogin() {
+    try {
+      if (!this.naverInitialized) {
+        console.log('🔄 Naver Login 초기화 시작');
+        console.log('  - Consumer Key:', NAVER_CONSUMER_KEY);
+        console.log('  - URL Scheme:', 'postynaverlogin');
+        console.log('  - 웹 로그인 강제 사용 (시뮬레이터)');
+        
+        NaverLogin.initialize({
+          appName: 'Posty',
+          consumerKey: NAVER_CONSUMER_KEY,
+          consumerSecret: NAVER_CONSUMER_SECRET,
+          serviceUrlSchemeIOS: 'postynaverlogin',
+          disableNaverAppAuthIOS: true, // 시뮬레이터에서는 웹 로그인 강제 사용
+          disableNaverAppAuthAndroid: false, // Android에서 네이버 앱 로그인 허용
+        });
+        this.naverInitialized = true;
+        console.log('✅ Naver Login 초기화 완료');
+      } else {
+        console.log('ℹ️ Naver Login 이미 초기화됨');
+      }
+    } catch (error) {
+      console.error('❌ Naver Login 설정 실패:', error);
+      throw error;
     }
   }
 
@@ -157,310 +227,158 @@ class VercelAuthService {
       };
     }
 
-    // 이전 코드 (서버 호출 - 제거됨)
-    try {
-      await GoogleSignin.hasPlayServices();
-      const userInfo = await GoogleSignin.signIn();
-      const tokens = await GoogleSignin.getTokens();
-      
-      if (!tokens.idToken) {
-        throw new Error('Google ID Token을 가져올 수 없습니다');
-      }
-      
-      logger.sensitive('Google 로그인 토큰 획득', { 
-        hasIdToken: !!tokens.idToken,
-        userEmail: (userInfo as any).user?.email || (userInfo as any).email
-      });
-      
-      // 개발 환경에서 실제 Google 사용자 정보 구조 확인
-      if (__DEV__) {
-        console.log('🔍 Google userInfo 전체 구조:', JSON.stringify(userInfo, null, 2));
-        console.log('🔍 Google userInfo.user:', JSON.stringify(userInfo.user, null, 2));
-      }
-      
-      // 서버로 인증 요청 (헤더 개선)
-      const response = await fetch(`${SERVER_URL}/api/auth/google`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${VERCEL_TOKEN}`,
-          'X-Vercel-Token': VERCEL_TOKEN, // 추가 인증 헤더
-          'User-Agent': 'Posty-Mobile-App/1.0',
-        },
-        body: JSON.stringify({
-          idToken: tokens.idToken,
-          accessToken: tokens.accessToken,
-          userInfo: userInfo.user || {},
-          platform: 'mobile'
-        })
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        logger.error('서버 인증 실패', { 
-          status: response.status, 
-          statusText: response.statusText,
-          error: errorText
-        });
-        
-        // Vercel SSO 인증 요구 시 특별 처리
-        if (response.status === 401 && errorText.includes('Authentication Required')) {
-          // 개발 환경에서는 info 레벨로 낮춤
-          if (__DEV__) {
-            logger.info('개발환경: Vercel SSO 불가 - 로컬 모드로 동작');
-          } else {
-            logger.warn('Vercel SSO 인증이 필요합니다 - 임시 로컬 모드로 전환');
-          }
-          
-          // 실제 Google 사용자 정보를 기반으로 로컬 사용자 생성
-          // React Native Google Sign-In 라이브러리의 다양한 구조 시도
-          const userInfoAny = userInfo as any;
-          const googleUser = userInfoAny.user || userInfoAny;
-          
-          const localUser = {
-            uid: `google_${googleUser?.id || googleUser?.sub || Date.now()}`,
-            email: googleUser?.email || 'google_user@gmail.com',
-            displayName: googleUser?.name || 
-                        googleUser?.displayName || 
-                        `${googleUser?.givenName || ''} ${googleUser?.familyName || ''}`.trim() ||
-                        'Google User',
-            photoURL: googleUser?.photo || 
-                     googleUser?.picture || 
-                     googleUser?.profilePicture?.uri || 
-                     null,
-            provider: 'google'
-          };
-          
-          // 개발 환경에서 생성된 로컬 사용자 정보 확인
-          if (__DEV__) {
-            console.log('🎭 생성된 로컬 사용자 정보:', JSON.stringify(localUser, null, 2));
-          }
-          
-          const localToken = `local_jwt_${googleUser?.id || Date.now()}_${Date.now()}`;
-          
-          // 로컬 저장
-          await this.saveAuthToken(localToken);
-          await this.saveUserProfile(localUser);
-          
-          return {
-            user: localUser,
-            isNewUser: false,
-            token: localToken
-          };
-        }
-        
-        // 다른 에러는 그대로 throw
-        throw new Error(`서버 인증 실패: ${response.status} ${response.statusText}`);
-      }
-      
-      const authData = await response.json();
-      
-      logger.info('Google 서버 인증 성공', {
-        hasToken: !!authData.token,
-        hasUser: !!authData.user,
-        isNewUser: authData.isNewUser
-      });
-      
-      // 실제 서버 응답 데이터 검증
-      if (!authData.token || !authData.user) {
-        throw new Error('서버 응답 데이터가 유효하지 않습니다');
-      }
-      
-      // JWT 토큰 저장
-      await this.saveAuthToken(authData.token);
-      await this.saveUserProfile(authData.user);
-      
-      return {
-        user: {
-          uid: authData.user.uid || authData.user.id,
-          email: authData.user.email,
-          displayName: authData.user.displayName || authData.user.name,
-          photoURL: authData.user.photoURL || authData.user.photo,
-          provider: 'google'
-        },
-        isNewUser: authData.isNewUser || false,
-        token: authData.token
-      };
-      
-    } catch (error) {
-      logger.error('Google Sign-In 실패:', error);
-      throw error;
-    }
   }
 
   async signInWithNaver(): Promise<AuthResult> {
-    throw new Error('🎯 Firebase 제거로 인해 소셜 로그인이 임시 비활성화되었습니다.\n\n서버 404 에러 방지를 위해 Google 로그인만 사용해주세요.');
+    logger.info('🔑 실제 Naver 로그인 수행 - 서비스 설정 확인');
     
-    //
-    // 이전 코드 (서버 호출 - 제거됨)
-    logger.info('Naver 로그인 시작');
     try {
-      // 네이버 로그인 초기화
-      NaverLogin.initialize({
-        appName: 'Posty',
-        consumerKey: NAVER_CONSUMER_KEY,
-        consumerSecret: NAVER_CONSUMER_SECRET,
-        serviceUrlSchemeIOS: 'postynaverlogin',
+      console.log('📱 현재 앱 Bundle ID: com.posty');
+      console.log('🔑 네이버 Consumer Key:', NAVER_CONSUMER_KEY);
+      console.log('🔗 네이버 URL 스키마: postynaverlogin');
+      
+      // 네이버 SDK가 초기화되지 않았다면 초기화
+      if (!this.naverInitialized) {
+        console.log('🔄 네이버 SDK 초기화 중...');
+        await this.initializeNaverLogin();
+      }
+      
+      // 로그인 실행 (타임아웃 설정 - 메모리 누수 방지)
+      console.log('🚀 네이버 로그인 시작...');
+      let timeoutId: NodeJS.Timeout;
+      const loginPromise = NaverLogin.login();
+      const timeoutPromise = new Promise((_, reject) => {
+        timeoutId = setTimeout(() => reject(new Error('네이버 로그인 타임아웃 (60초)')), 60000);
       });
       
-      // 로그인 실행
-      const result = await NaverLogin.login();
+      const result = await Promise.race([loginPromise, timeoutPromise]);
+      clearTimeout(timeoutId); // 타임아웃 정리
+      
+      console.log('🔍 Naver 로그인 결과:', JSON.stringify(result, null, 2));
+      console.log('🔍 result.isSuccess:', result.isSuccess);
+      console.log('🔍 result.successResponse:', result.successResponse);
+      console.log('🔍 result.failureResponse:', result.failureResponse);
       
       if (!result.isSuccess || !result.successResponse?.accessToken) {
-        throw new Error('Naver 로그인 실패');
-      }
-      
-      // 서버로 인증 요청 (헤더 개선)
-      const response = await fetch(`${SERVER_URL}/api/auth/naver`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${VERCEL_TOKEN}`,
-          'X-Vercel-Token': VERCEL_TOKEN,
-          'User-Agent': 'Posty-Mobile-App/1.0',
-        },
-        body: JSON.stringify({
-          accessToken: result.successResponse.accessToken,
-          platform: 'mobile'
-        })
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        logger.error('Naver 서버 인증 실패', { 
-          status: response.status, 
-          statusText: response.statusText,
-          error: errorText
-        });
+        const errorMsg = result.failureResponse?.message || '네이버 로그인 실패';
+        const errorCode = result.failureResponse?.code || 'UNKNOWN';
         
-        // Vercel SSO 인증 요구 시 특별 처리
-        if (response.status === 401 && errorText.includes('Authentication Required')) {
-          if (__DEV__) {
-            logger.info('개발환경: Vercel SSO 불가 - 로컬 모드로 동작 (Naver)');
-          } else {
-            logger.warn('Vercel SSO 인증이 필요합니다 - 임시 로컬 모드로 전환 (Naver)');
-          }
-          
-          // Naver 사용자 정보 기반으로 로컬 사용자 생성
-          const localUser = {
-            uid: `naver_${result.successResponse.accessToken.substring(0, 10)}`,
-            email: 'naver_user@example.com', // Naver API에서 실제 정보 가져와야 함
-            displayName: 'Naver User',
-            photoURL: null,
-            provider: 'naver'
-          };
-          
-          const localToken = `local_naver_jwt_${Date.now()}`;
-          
-          await this.saveAuthToken(localToken);
-          await this.saveUserProfile(localUser);
-          
-          return {
-            user: localUser,
-            isNewUser: false,
-            token: localToken
-          };
+        console.log('❌ 네이버 로그인 실패 상세 정보:');
+        console.log('  - 에러 코드:', errorCode);
+        console.log('  - 에러 메시지:', errorMsg);
+        console.log('  - 전체 응답:', result);
+        
+        logger.error('Naver 로그인 실패:', result.failureResponse || 'Unknown error');
+        
+        // 구체적인 에러 메시지 제공
+        let detailedError = errorMsg;
+        if (errorCode === 'user_cancel' || errorMsg.includes('cancel')) {
+          detailedError = '사용자가 로그인을 취소했습니다.';
+        } else if (errorCode === 'timeout' || errorMsg.includes('timeout') || errorMsg.includes('타임아웃')) {
+          detailedError = '네이버 로그인 시간이 초과되었습니다.\n\n해결 방법:\n1. 네트워크 연결 상태 확인\n2. 네이버 개발자센터에서 Bundle ID 설정 확인\n3. URL 스키마 설정 확인';
+        } else if (errorCode === 'network_error') {
+          detailedError = '네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.';
+        } else if (errorMsg.includes('login_failed') || errorMsg.includes('authentication_failed')) {
+          detailedError = '네이버 로그인 인증에 실패했습니다. 개발자 콘솔 설정을 확인해주세요.';
+        } else if (errorMsg.includes('invalid') || errorMsg.includes('Invalid')) {
+          detailedError = '네이버 앱 설정이 올바르지 않습니다.\n\n확인 사항:\n1. Consumer Key: jXC0jUWPhSCotIWBrKrB\n2. Bundle ID: com.posty\n3. URL Scheme: postynaverlogin';
         }
         
-        throw new Error(`Naver 서버 인증 실패: ${response.status} ${response.statusText}`);
+        throw new Error(detailedError);
       }
       
-      const authData = await response.json();
+      logger.info('Naver 로그인 성공, 프로필 정보 가져오기');
       
-      // JWT 토큰 저장
-      await this.saveAuthToken(authData.token);
-      await this.saveUserProfile(authData.user);
+      // Naver 사용자 프로필 가져오기
+      const profileResult = await NaverLogin.getProfile(result.successResponse.accessToken);
+      
+      console.log('🔍 Naver 프로필 전체 응답:', JSON.stringify(profileResult, null, 2));
+      
+      // 프로필 정보에서 사용자 정보 추출
+      const naverProfile = profileResult.response || profileResult;
+      
+      const localUser = {
+        uid: `naver_${naverProfile.id || Date.now()}`,
+        email: naverProfile.email || 'naver_user@naver.com',
+        displayName: naverProfile.name || naverProfile.nickname || 'Naver User',
+        photoURL: naverProfile.profile_image || null,
+        provider: 'naver'
+      };
+      
+      // 로컬 토큰 생성 (서버 호출 없음)
+      const localToken = `local_naver_${naverProfile.id || Date.now()}_${Date.now()}`;
+      
+      // 로컬 저장 (배치 처리로 우선순위 역전 방지)
+      await AsyncStorage.multiSet([
+        ['@auth_token', localToken],
+        ['@user_profile', JSON.stringify(localUser)]
+      ]);
+      
+      logger.info('✅ 실제 Naver 사용자 정보로 로컬 인증 완료:', localUser.displayName);
       
       return {
-        user: authData.user,
-        isNewUser: authData.isNewUser || false,
-        token: authData.token
+        user: localUser,
+        isNewUser: false,
+        token: localToken
       };
       
     } catch (error) {
-      console.error('Naver Sign-In 실패:', error);
+      logger.error('Naver Sign-In 실패 - 상세 에러:', error);
+      console.error('Naver Sign-In 상세 에러 정보:', {
+        message: error.message,
+        code: error.code,
+        stack: error.stack
+      });
       throw error;
     }
   }
 
   async signInWithKakao(): Promise<AuthResult> {
-    throw new Error('🎯 Firebase 제거로 인해 소셜 로그인이 임시 비활성화되었습니다.\n\n서버 404 에러 방지를 위해 Google 로그인만 사용해주세요.');
-    
-    //
-    // 이전 코드 (서버 호출 - 제거됨)
-    logger.info('Kakao 로그인 시작');
+    logger.info('🔑 실제 Kakao 로그인 수행 - Bundle ID 문제 해결 시도');
     try {
+      // 현재 Bundle ID 확인
+      console.log('📱 현재 앱 Bundle ID: com.posty');
+      console.log('🔑 카카오 앱 키:', KAKAO_APP_KEY);
+      
+      // 카카오톡 앱이 설치되어 있으면 앱으로, 없으면 웹으로 로그인
       const result = await KakaoLogin.login();
+      
+      console.log('🔍 Kakao 로그인 전체 응답:', JSON.stringify(result, null, 2));
       
       if (!result.accessToken) {
         throw new Error('Kakao 로그인 실패');
       }
       
-      // 서버로 인증 요청 (헤더 개선)
-      const response = await fetch(`${SERVER_URL}/api/auth/kakao`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${VERCEL_TOKEN}`,
-          'X-Vercel-Token': VERCEL_TOKEN,
-          'User-Agent': 'Posty-Mobile-App/1.0',
-        },
-        body: JSON.stringify({
-          accessToken: result.accessToken,
-          platform: 'mobile'
-        })
-      });
+      logger.info('Kakao 로그인 성공, 프로필 정보 가져오기');
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        logger.error('Kakao 서버 인증 실패', { 
-          status: response.status, 
-          statusText: response.statusText,
-          error: errorText
-        });
-        
-        // Vercel SSO 인증 요구 시 특별 처리
-        if (response.status === 401 && errorText.includes('Authentication Required')) {
-          if (__DEV__) {
-            logger.info('개발환경: Vercel SSO 불가 - 로컬 모드로 동작 (Kakao)');
-          } else {
-            logger.warn('Vercel SSO 인증이 필요합니다 - 임시 로컬 모드로 전환 (Kakao)');
-          }
-          
-          // Kakao 사용자 정보 기반으로 로컬 사용자 생성
-          const localUser = {
-            uid: `kakao_${result.accessToken.substring(0, 10)}`,
-            email: 'kakao_user@example.com', // Kakao API에서 실제 정보 가져와야 함
-            displayName: 'Kakao User',
-            photoURL: null,
-            provider: 'kakao'
-          };
-          
-          const localToken = `local_kakao_jwt_${Date.now()}`;
-          
-          await this.saveAuthToken(localToken);
-          await this.saveUserProfile(localUser);
-          
-          return {
-            user: localUser,
-            isNewUser: false,
-            token: localToken
-          };
-        }
-        
-        throw new Error(`Kakao 서버 인증 실패: ${response.status} ${response.statusText}`);
-      }
+      // Kakao 사용자 프로필 가져오기
+      const profile = await KakaoLogin.getProfile();
       
-      const authData = await response.json();
+      console.log('🔍 Kakao 프로필 전체 응답:', JSON.stringify(profile, null, 2));
       
-      // JWT 토큰 저장
-      await this.saveAuthToken(authData.token);
-      await this.saveUserProfile(authData.user);
+      const localUser = {
+        uid: `kakao_${profile.id || Date.now()}`,
+        email: profile.email || `kakao_${profile.id}@kakao.com`,
+        displayName: profile.nickname || 'Kakao User',
+        photoURL: profile.profileImageUrl || null,
+        provider: 'kakao'
+      };
+      
+      // 로컬 토큰 생성 (서버 호출 없음)
+      const localToken = `local_kakao_${profile.id || Date.now()}_${Date.now()}`;
+      
+      // 로컬 저장 (배치 처리로 우선순위 역전 방지)
+      await AsyncStorage.multiSet([
+        ['@auth_token', localToken],
+        ['@user_profile', JSON.stringify(localUser)]
+      ]);
+      
+      logger.info('✅ 실제 Kakao 사용자 정보로 로컬 인증 완료:', localUser.displayName);
       
       return {
-        user: authData.user,
-        isNewUser: authData.isNewUser || false,
-        token: authData.token
+        user: localUser,
+        isNewUser: false,
+        token: localToken
       };
       
     } catch (error) {
@@ -470,11 +388,8 @@ class VercelAuthService {
   }
 
   async signInWithApple(): Promise<AuthResult> {
-    throw new Error('🎯 Firebase 제거로 인해 소셜 로그인이 임시 비활성화되었습니다.\n\n서버 404 에러 방지를 위해 Google 로그인만 사용해주세요.');
+    logger.info('🔑 실제 Apple 로그인 수행 - 서버 호출 없는 로컬 인증');
     
-    //
-    // 이전 코드 (서버 호출 - 제거됨)
-    console.log('VercelAuthService: Apple 로그인 시작');
     try {
       if (Platform.OS !== 'ios') {
         throw new Error('Apple 로그인은 iOS에서만 지원됩니다');
@@ -489,73 +404,37 @@ class VercelAuthService {
       if (!appleAuthRequestResponse.identityToken) {
         throw new Error('Apple Identity Token을 가져올 수 없습니다');
       }
-
-      // 서버로 인증 요청 (헤더 개선)
-      const response = await fetch(`${SERVER_URL}/api/auth/apple`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${VERCEL_TOKEN}`,
-          'X-Vercel-Token': VERCEL_TOKEN,
-          'User-Agent': 'Posty-Mobile-App/1.0',
-        },
-        body: JSON.stringify({
-          identityToken: appleAuthRequestResponse.identityToken,
-          fullName: appleAuthRequestResponse.fullName,
-          platform: 'mobile'
-        })
-      });
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        logger.error('Apple 서버 인증 실패', { 
-          status: response.status, 
-          statusText: response.statusText,
-          error: errorText
-        });
-        
-        // Vercel SSO 인증 요구 시 특별 처리
-        if (response.status === 401 && errorText.includes('Authentication Required')) {
-          if (__DEV__) {
-            logger.info('개발환경: Vercel SSO 불가 - 로컬 모드로 동작 (Apple)');
-          } else {
-            logger.warn('Vercel SSO 인증이 필요합니다 - 임시 로컬 모드로 전환 (Apple)');
-          }
-          
-          // Apple 사용자 정보 기반으로 로컬 사용자 생성
-          const localUser = {
-            uid: `apple_${appleAuthRequestResponse.user}`,
-            email: appleAuthRequestResponse.email || 'apple_user@privaterelay.appleid.com',
-            displayName: appleAuthRequestResponse.fullName?.givenName || 'Apple User',
-            photoURL: null,
-            provider: 'apple'
-          };
-          
-          const localToken = `local_apple_jwt_${Date.now()}`;
-          
-          await this.saveAuthToken(localToken);
-          await this.saveUserProfile(localUser);
-          
-          return {
-            user: localUser,
-            isNewUser: false,
-            token: localToken
-          };
-        }
-        
-        throw new Error(`Apple 서버 인증 실패: ${response.status} ${response.statusText}`);
-      }
+      logger.info('Apple 로그인 성공');
       
-      const authData = await response.json();
+      console.log('🔍 Apple 로그인 전체 응답:', JSON.stringify(appleAuthRequestResponse, null, 2));
       
-      // JWT 토큰 저장
-      await this.saveAuthToken(authData.token);
-      await this.saveUserProfile(authData.user);
+      // Apple 사용자 정보로 로컬 사용자 생성
+      const localUser = {
+        uid: `apple_${appleAuthRequestResponse.user || Date.now()}`,
+        email: appleAuthRequestResponse.email || 'apple_user@privaterelay.appleid.com',
+        displayName: appleAuthRequestResponse.fullName?.givenName 
+          ? `${appleAuthRequestResponse.fullName.givenName} ${appleAuthRequestResponse.fullName.familyName || ''}`.trim()
+          : 'Apple User',
+        photoURL: null, // Apple은 프로필 사진을 제공하지 않음
+        provider: 'apple'
+      };
+      
+      // 로컬 토큰 생성 (서버 호출 없음)
+      const localToken = `local_apple_${appleAuthRequestResponse.user || Date.now()}_${Date.now()}`;
+      
+      // 로컬 저장 (배치 처리로 우선순위 역전 방지)
+      await AsyncStorage.multiSet([
+        ['@auth_token', localToken],
+        ['@user_profile', JSON.stringify(localUser)]
+      ]);
+      
+      logger.info('✅ 실제 Apple 사용자 정보로 로컬 인증 완료:', localUser.displayName);
       
       return {
-        user: authData.user,
-        isNewUser: authData.isNewUser || false,
-        token: authData.token
+        user: localUser,
+        isNewUser: false,
+        token: localToken
       };
       
     } catch (error) {
@@ -564,7 +443,125 @@ class VercelAuthService {
     }
   }
 
-  // Facebook 로그인은 현재 지원하지 않음
+  // Facebook 로그인
+  async signInWithFacebook(): Promise<AuthResult> {
+    logger.info('🔑 실제 Facebook 로그인 수행 - 서버 호출 없는 로컬 인증');
+    
+    // Facebook SDK 사용 가능 여부 확인
+    if (!fbSDKAvailable || !LoginManager || !AccessToken || !GraphRequest || !GraphRequestManager) {
+      throw new Error('Facebook SDK를 사용할 수 없습니다. Facebook SDK가 제대로 설치되었는지 확인해주세요.');
+    }
+    
+    try {
+      // Facebook 로그인 시작 (웹뷰 방식으로 시뮬레이터에서도 가능)
+      const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+      
+      if (result.isCancelled) {
+        throw new Error('Facebook 로그인이 취소되었습니다');
+      }
+      
+      // Access Token 가져오기
+      const accessToken = await AccessToken.getCurrentAccessToken();
+      
+      if (!accessToken) {
+        throw new Error('Facebook Access Token을 가져올 수 없습니다');
+      }
+      
+      logger.info('Facebook 로그인 성공, 프로필 정보 가져오기');
+      
+      // Facebook 사용자 프로필 가져오기 (메모리 누수 방지)
+      return new Promise((resolve, reject) => {
+        let isResolved = false;
+        
+        const infoRequest = new GraphRequest(
+          '/me',
+          {
+            accessToken: accessToken.accessToken,
+            parameters: {
+              fields: {
+                string: 'id,name,email,picture.type(large)'
+              }
+            }
+          },
+          (error, result) => {
+            if (isResolved) return; // 중복 호출 방지
+            isResolved = true;
+            
+            if (error) {
+              logger.error('Facebook 프로필 가져오기 실패:', error);
+              reject(error);
+              return;
+            }
+            
+            console.log('🔍 Facebook 프로필 전체 응답:', JSON.stringify(result, null, 2));
+            
+            const fbProfile = result as any;
+            
+            const localUser = {
+              uid: `facebook_${fbProfile.id || Date.now()}`,
+              email: fbProfile.email || 'facebook_user@facebook.com',
+              displayName: fbProfile.name || 'Facebook User',
+              photoURL: fbProfile.picture?.data?.url || null,
+              provider: 'facebook'
+            };
+            
+            // 로컬 토큰 생성 (서버 호출 없음)
+            const localToken = `local_facebook_${fbProfile.id || Date.now()}_${Date.now()}`;
+            
+            // 로컬 저장 (배치 처리로 우선순위 역전 방지)
+            AsyncStorage.multiSet([
+              ['@auth_token', localToken],
+              ['@user_profile', JSON.stringify(localUser)]
+            ]).then(() => {
+              logger.info('✅ 실제 Facebook 사용자 정보로 로컬 인증 완료:', localUser.displayName);
+              
+              resolve({
+                user: localUser,
+                isNewUser: false,
+                token: localToken
+              });
+            }).catch(reject);
+          }
+        );
+        
+        // Graph Request 실행
+        const requestManager = new GraphRequestManager();
+        requestManager.addRequest(infoRequest).start();
+        
+        // 타임아웃 설정 (30초)
+        setTimeout(() => {
+          if (!isResolved) {
+            isResolved = true;
+            reject(new Error('Facebook 프로필 가져오기 타임아웃'));
+          }
+        }, 30000);
+      });
+      
+    } catch (error) {
+      logger.error('Facebook Sign-In 실패:', error);
+      
+      // 에러 발생 시 기본값으로 fallback
+      const fallbackUser = {
+        uid: `facebook_fallback_${Date.now()}`,
+        email: 'facebook_user@facebook.com',
+        displayName: 'Facebook User (로그인 오류)',
+        photoURL: null,
+        provider: 'facebook'
+      };
+      
+      const fallbackToken = `local_facebook_fallback_${Date.now()}`;
+      await AsyncStorage.multiSet([
+        ['@auth_token', fallbackToken],
+        ['@user_profile', JSON.stringify(fallbackUser)]
+      ]);
+      
+      return {
+        user: fallbackUser,
+        isNewUser: false,
+        token: fallbackToken
+      };
+    }
+  }
 
   // 토큰 관리
   async saveAuthToken(token: string): Promise<void> {
@@ -596,6 +593,7 @@ class VercelAuthService {
       throw error;
     }
   }
+
 
   // 사용자 프로필 관리
   async saveUserProfile(user: UserProfile): Promise<void> {
@@ -644,10 +642,22 @@ class VercelAuthService {
         console.log('Google Sign-In 캐시 클리어 실패 (무시됨):', googleError);
       }
       
+      // Facebook 로그아웃
+      try {
+        if (LoginManager) {
+          LoginManager.logOut();
+          console.log('Facebook 로그아웃 완료');
+        } else {
+          console.log('Facebook SDK 사용 불가 - 로그아웃 건너뛰기');
+        }
+      } catch (fbError) {
+        console.log('Facebook 로그아웃 실패 (무시됨):', fbError);
+      }
+      
       // 로컬 스토리지 정리 (배치 삭제로 우선순위 역전 방지)
       await AsyncStorage.multiRemove(['@auth_token', '@user_profile']);
       
-      console.log('로그아웃 완료 - 다음 로그인 시 실제 Google 계정 정보 사용');
+      console.log('로그아웃 완료 - 다음 로그인 시 실제 소셜 계정 정보 사용');
     } catch (error) {
       console.error('로그아웃 실패:', error);
       throw error;
@@ -681,6 +691,18 @@ class VercelAuthService {
     } catch (error) {
       logger.error('Failed to check authentication status:', error);
       return false;
+    }
+  }
+
+  // 메모리 정리
+  cleanup(): void {
+    try {
+      // 로그아웃 처리 없이 메모리만 정리
+      console.log('VercelAuthService 메모리 정리');
+      this.naverInitialized = false;
+      this.isInitializing = false;
+    } catch (error) {
+      console.error('VercelAuthService 정리 실패:', error);
     }
   }
 

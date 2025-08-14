@@ -100,7 +100,7 @@ export const UNIFIED_STYLES: StyleDefinition[] = [
     id: 'trendsetter',
     name: '트렌드세터',
     description: '최신 트렌드를 반영하는 스타일',
-    icon: 'trending-up',
+    icon: 'trending-up-outline',
     emoji: '🔥',
     color: '#4ECDC4',
     characteristics: {

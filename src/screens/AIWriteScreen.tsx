@@ -47,6 +47,7 @@ import { PLATFORM_STYLES, getRandomEndingStyle, transformContentForPlatform, gen
 import missionService from '../services/missionService';
 import improvedStyleService, { STYLE_TEMPLATES } from '../services/improvedStyleService';
 import { UNIFIED_STYLES, getStyleById, getStyleByAiTone } from '../utils/unifiedStyleConstants';
+import { CompactBanner } from '../components/ads';
 import { 
   getUserPlan, 
   getAvailableTones, 
@@ -914,7 +915,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                         }}
                       >
                         {trendingPrompts.includes(quickPrompt) && (
-                          <Icon name="trending-up" size={12} color={colors.primary} style={{ marginRight: 4 }} />
+                          <Icon name="trending-up-outline" size={12} color={colors.primary} style={{ marginRight: 4 }} />
                         )}
                         <Text style={[
                           styles.hashtagText,
@@ -1539,6 +1540,13 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                     <Text style={styles.mollyCommentText}>{getRandomEncouragement()}</Text>
                   </View>
                 </FadeInView>
+                
+                {/* 글쓰기 결과 위 광고 배너 - 조건부 표시 */}
+                {generatedContent && Date.now() % 3 === 0 && (
+                  <AnimatedCard delay={150}>
+                    <CompactBanner size="large" style={{ marginVertical: 12 }} />
+                  </AnimatedCard>
+                )}
                 
                 {/* 새로운 GeneratedContentDisplay 컴포넌트 사용 */}
                 <AnimatedCard delay={200}>

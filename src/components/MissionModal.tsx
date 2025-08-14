@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Modal, ScrollView, ActivityIndicator,  } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { SPACING } from '../utils/constants';
 import missionService, { Mission } from '../services/missionService';
@@ -110,19 +110,19 @@ const MissionModal: React.FC<MissionModalProps> = ({
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <>
-                  <Icon name="gift" size={16} color="#FFFFFF" />
+                  <Icon name="gift-outline" size={16} color="#FFFFFF" />
                   <Text style={styles.claimButtonText}>받기</Text>
                 </>
               )}
             </TouchableOpacity>
           ) : mission.claimedReward ? (
             <View style={styles.claimedBadge}>
-              <Icon name="check-circle" size={20} color="#10B981" />
+              <Icon name="checkmark-circle" size={20} color="#10B981" />
               <Text style={[styles.claimedText, { color: '#10B981' }]}>완료</Text>
             </View>
           ) : (
             <View style={styles.rewardBadge}>
-              <Icon name="flash-on" size={16} color={colors.primary} />
+              <Icon name="flash" size={16} color={colors.primary} />
               <Text style={[styles.rewardText, { color: colors.primary }]}>
                 +{mission.reward}
               </Text>

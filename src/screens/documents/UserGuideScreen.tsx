@@ -109,7 +109,7 @@ const UserGuideScreen: React.FC<UserGuideScreenProps> = ({ onBack, onContact }) 
       {/* 히어로 섹션 */}
       <View style={styles.hero}>
         <View style={styles.heroIconContainer}>
-          <Icon name="rocket" size={32} color={colors.primary} />
+          <Icon name="rocket-outline" size={32} color={colors.primary} />
         </View>
         <Text style={styles.heroTitle}>Posty 시작하기</Text>
         <Text style={styles.heroSubtitle}>

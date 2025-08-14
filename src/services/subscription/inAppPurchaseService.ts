@@ -1,33 +1,39 @@
-import {
-  purchaseErrorListener,
-  purchaseUpdatedListener,
-  type ProductPurchase,
-  type PurchaseError,
-  type SubscriptionPurchase,
-  type Purchase,
-  finishTransaction,
-  getProducts,
-  initConnection,
-  endConnection,
-  requestPurchase,
-  requestSubscription,
-  getAvailablePurchases,
-  type Product,
-  flushFailedPurchasesCachedAsPendingAndroid,
-  acknowledgePurchaseAndroid,
-  validateReceiptIos,
-  getReceiptIOS,
-} from 'react-native-iap';
+// Safe import for react-native-iap
+let purchaseErrorListener, purchaseUpdatedListener, ProductPurchase, PurchaseError, 
+    SubscriptionPurchase, Purchase, finishTransaction, getProducts, initConnection, 
+    endConnection, requestPurchase, requestSubscription, getAvailablePurchases, 
+    Product, flushFailedPurchasesCachedAsPendingAndroid, acknowledgePurchaseAndroid, 
+    validateReceiptIos, getReceiptIOS;
+
+try {
+  const iap = require('react-native-iap');
+  purchaseErrorListener = iap.purchaseErrorListener;
+  purchaseUpdatedListener = iap.purchaseUpdatedListener;
+  ProductPurchase = iap.ProductPurchase;
+  PurchaseError = iap.PurchaseError;
+  SubscriptionPurchase = iap.SubscriptionPurchase;
+  Purchase = iap.Purchase;
+  finishTransaction = iap.finishTransaction;
+  getProducts = iap.getProducts;
+  initConnection = iap.initConnection;
+  endConnection = iap.endConnection;
+  requestPurchase = iap.requestPurchase;
+  requestSubscription = iap.requestSubscription;
+  getAvailablePurchases = iap.getAvailablePurchases;
+  Product = iap.Product;
+  flushFailedPurchasesCachedAsPendingAndroid = iap.flushFailedPurchasesCachedAsPendingAndroid;
+  acknowledgePurchaseAndroid = iap.acknowledgePurchaseAndroid;
+  validateReceiptIos = iap.validateReceiptIos;
+  getReceiptIOS = iap.getReceiptIOS;
+} catch (error) {
+  console.warn('react-native-iap 로드 실패 (시뮬레이터 환경):', error.message);
+}
 import { Platform, EmitterSubscription } from 'react-native';
 import { DeviceEventEmitter } from 'react-native';
 import serverSubscriptionService from './serverSubscriptionService';
 import tokenService from './tokenService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import mockPurchaseService from './mockPurchaseService';
-
 import { Alert } from '../../utils/customAlert';
-// 개발 모드에서는 Mock 서비스 사용
-const USE_MOCK = __DEV__ && true; // 프로덕션에서는 false로 변경
 
 // 상품 ID 정의
 const productIds = Platform.select({
@@ -82,15 +88,21 @@ class InAppPurchaseService {
    * 인앱 결제 초기화
    */
   async initialize(): Promise<void> {
-    if (USE_MOCK) {
-      // 개발 모드: Mock 서비스 사용
-      console.log('🎭 Using Mock Purchase Service (Development Mode)');
-      return mockPurchaseService.initialize();
-    }
-
     if (this.isInitialized) return;
 
     try {
+      // 시뮬레이터에서는 IAP 초기화를 건너뛰고 로그만 출력
+      if (Platform.OS === 'ios' && __DEV__) {
+        console.log('🎭 시뮬레이터 환경 - IAP 초기화 건너뛰기');
+        this.isInitialized = true;
+        return;
+      }
+
+      // IAP 함수들이 로드되지 않은 경우 처리
+      if (!initConnection || !getProducts) {
+        throw new Error('IAP 라이브러리를 사용할 수 없습니다.');
+      }
+
       // 연결 초기화
       const result = await initConnection();
       console.log('IAP Connection result:', result);
@@ -110,6 +122,14 @@ class InAppPurchaseService {
       console.log('IAP initialized successfully');
     } catch (error) {
       console.error('Failed to initialize IAP:', error);
+      
+      // IAP를 사용할 수 없는 환경에서는 경고만 출력하고 계속 진행
+      if (error.message?.includes('E_IAP_NOT_AVAILABLE')) {
+        console.warn('⚠️ IAP를 사용할 수 없는 환경입니다 (시뮬레이터 또는 테스트 환경)');
+        this.isInitialized = true;
+        return;
+      }
+      
       throw error;
     }
   }
@@ -201,9 +221,11 @@ class InAppPurchaseService {
    * 구독 구매
    */
   async purchaseSubscription(planId: string, isYearly: boolean = false): Promise<void> {
-    if (USE_MOCK) {
-      return mockPurchaseService.purchaseSubscription(planId, isYearly);
+    // 시뮬레이터 환경에서는 구매 불가 메시지 표시
+    if (Platform.OS === 'ios' && __DEV__) {
+      throw new Error('시뮬레이터에서는 인앱 결제를 테스트할 수 없습니다. 실제 기기에서 테스트해주세요.');
     }
+    
     try {
       const sku = this.getSubscriptionSku(planId, isYearly);
       const product = this.products.find(p => p.productId === sku);
@@ -237,9 +259,11 @@ class InAppPurchaseService {
    * 토큰 구매
    */
   async purchaseTokens(packageId: string): Promise<void> {
-    if (USE_MOCK) {
-      return mockPurchaseService.purchaseTokens(packageId);
+    // 시뮬레이터 환경에서는 구매 불가 메시지 표시
+    if (Platform.OS === 'ios' && __DEV__) {
+      throw new Error('시뮬레이터에서는 인앱 결제를 테스트할 수 없습니다. 실제 기기에서 테스트해주세요.');
     }
+    
     try {
       const sku = this.getTokenSku(packageId);
       const product = this.products.find(p => p.productId === sku);
@@ -355,9 +379,6 @@ class InAppPurchaseService {
    * 구독 복원
    */
   async restorePurchases(): Promise<void> {
-    if (USE_MOCK) {
-      return mockPurchaseService.restorePurchases();
-    }
     try {
       console.log('Restoring purchases...');
       const purchases = await getAvailablePurchases();
@@ -406,8 +427,9 @@ class InAppPurchaseService {
    * 상품 정보 가져오기
    */
   getProducts(): Product[] {
-    if (USE_MOCK) {
-      return mockPurchaseService.getProducts() as Product[];
+    // 시뮬레이터 환경에서는 빈 배열 반환
+    if (Platform.OS === 'ios' && __DEV__) {
+      return [];
     }
     return this.products;
   }
@@ -423,9 +445,13 @@ class InAppPurchaseService {
    * 연결 종료
    */
   async disconnect(): Promise<void> {
-    if (USE_MOCK) {
-      return mockPurchaseService.disconnect();
+    // 시뮬레이터 환경에서는 disconnect를 건너뛰기
+    if (Platform.OS === 'ios' && __DEV__) {
+      console.log('🎭 시뮬레이터 환경 - IAP disconnect 건너뛰기');
+      this.isInitialized = false;
+      return;
     }
+
     if (this.purchaseUpdateSubscription) {
       this.purchaseUpdateSubscription.remove();
       this.purchaseUpdateSubscription = null;
@@ -436,7 +462,13 @@ class InAppPurchaseService {
       this.purchaseErrorSubscription = null;
     }
 
-    await endConnection();
+    try {
+      await endConnection();
+    } catch (error) {
+      // endConnection 오류는 무시하고 계속 진행
+      console.warn('IAP disconnect 오류 (무시됨):', error.message);
+    }
+    
     this.isInitialized = false;
   }
 

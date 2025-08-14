@@ -66,7 +66,7 @@ const MissionItem: React.FC<MissionItemProps> = ({ mission, onPress }) => {
 
       {mission.completed && (
         <View style={styles.completedBadge}>
-          <Icon name="check-circle" size={20} color="#4CAF50" />
+          <Icon name="checkmark-circle" size={20} color="#4CAF50" />
           <Text style={styles.completedText}>완료</Text>
         </View>
       )}

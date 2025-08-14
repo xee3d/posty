@@ -26,8 +26,19 @@
       "Bash(pod install:*)",
       "Bash(RCT_NEW_ARCH_ENABLED=0 USE_FABRIC=0 USE_CODEGEN=0 pod install --verbose)",
       "Bash(xcodebuild:*)",
-      "WebFetch(domain:posty-api.vercel.app)"
+      "WebFetch(domain:posty-api.vercel.app)",
+      "Bash(xcrun simctl list:*)",
+      "Bash(open ios/Posty.xcworkspace)",
+      "Bash(xcrun simctl openurl:*)",
+      "Bash(xcrun simctl erase:*)",
+      "Bash(xcrun simctl shutdown:*)",
+      "Bash(watchman watch-del-all:*)",
+      "Bash(xcrun simctl spawn:*)",
+      "Bash(xcrun simctl install:*)",
+      "Bash(open:*)",
+      "Bash(rg:*)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits"
   }
 }

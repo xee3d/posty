@@ -17,6 +17,7 @@ import { saveContent } from '../utils/storage';
 import { Alert } from '../utils/customAlert';
 import { useAppSelector } from '../hooks/redux';
 import { getUserPlan, MY_STYLE_ACCESS, PlanType } from '../config/adConfig';
+import { CompactBanner, SmartAdPlacement } from '../components/ads';
 const { width } = Dimensions.get('window');
 
 interface MyStyleScreenProps {
@@ -382,7 +383,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       id: '3',
       name: '성장 스토리',
       description: '도전과 성취를 담은 글',
-      icon: 'rocket',
+      icon: 'rocket-outline',
       color: colors.success,
       structure: {
         hook: '흥미로운 도입',
@@ -1040,6 +1041,11 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             </Text>
           </TouchableOpacity>
         </View>
+
+        {/* 광고 배너 */}
+        <SmartAdPlacement position={2} context="style">
+          <CompactBanner size="large" />
+        </SmartAdPlacement>
 
         {/* 탭 컨텐츠 */}
         <View style={styles.tabContent}>

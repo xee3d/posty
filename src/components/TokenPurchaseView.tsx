@@ -9,7 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -173,7 +173,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <Icon name="card-giftcard" size={20} color="#FFFFFF" />
+          <Icon name="gift" size={20} color="#FFFFFF" />
           <View style={styles.planBenefitContent}>
             <Text style={styles.planBenefitTitle}>
               {userPlan === 'starter' ? 'STARTER' : userPlan === 'premium' ? 'PRO' : userPlan === 'pro' ? 'MAX' : userPlan.toUpperCase()} 플랜 혜택
@@ -195,7 +195,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <Icon name="card-giftcard" size={20} color="#FFFFFF" />
+          <Icon name="gift" size={20} color="#FFFFFF" />
           <View style={styles.firstPurchaseContent}>
             <Text style={styles.firstPurchaseTitle}>첫 구매 특별 혜택</Text>
             <Text style={styles.firstPurchaseDesc}>
@@ -244,15 +244,17 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               </LinearGradient>
             )}
             
-            <LinearGradient
-              colors={pkg.gradient}
+            <View
               style={[
-                styles.packageCard,
                 pkg.popular && styles.popularPackage,
               ]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
             >
+              <LinearGradient
+                colors={pkg.gradient}
+                style={styles.packageCard}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
               {/* Glass effect overlay */}
               <View style={styles.glassOverlay} />
               
@@ -276,7 +278,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 0 }}
                   >
-                    <Icon name="card-giftcard" size={14} color="#FFFFFF" />
+                    <Icon name="gift" size={14} color="#FFFFFF" />
                     <Text style={styles.bonusText}>+{pkg.bonus} 보너스</Text>
                   </LinearGradient>
                 )}
@@ -305,7 +307,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               </View>
 
               <View style={styles.unitPriceWrapper}>
-                <Icon name="info-outline" size={14} color="#FFFFFF" />
+                <Icon name="information-circle-outline" size={14} color="#FFFFFF" />
                 <Text style={styles.unitPriceText}>
                   토큰당 ₩{Math.round(pkg.price / (pkg.amount + (pkg.bonus || 0)))}
                 </Text>
@@ -320,7 +322,8 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                 <Text style={styles.purchaseButtonText}>구매하기</Text>
                 <Icon name="arrow-forward" size={18} color="#FFFFFF" />
               </LinearGradient>
-            </LinearGradient>
+              </LinearGradient>
+            </View>
           </TouchableOpacity>
         ))}
       </View>
@@ -342,7 +345,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <Icon name="trending-up" size={24} color="#FFFFFF" />
+              <Icon name="trending-up-outline" size={24} color="#FFFFFF" />
             </LinearGradient>
             <Text style={styles.featureTitle}>대량 구매 혜택</Text>
             <Text style={styles.featureDesc}>
@@ -363,7 +366,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <Icon name="lock-open" size={24} color="#FFFFFF" />
+              <Icon name="lock-open-outline" size={24} color="#FFFFFF" />
             </LinearGradient>
             <Text style={styles.featureTitle}>유연한 사용</Text>
             <Text style={styles.featureDesc}>
@@ -384,7 +387,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <Icon name="rocket-launch" size={24} color="#FFFFFF" />
+              <Icon name="rocket-outline" size={24} color="#FFFFFF" />
             </LinearGradient>
             <Text style={styles.featureTitle}>영구 소유</Text>
             <Text style={styles.featureDesc}>
@@ -405,7 +408,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <Icon name="favorite" size={24} color="#FFFFFF" />
+              <Icon name="star" size={24} color="#FFFFFF" />
             </LinearGradient>
             <Text style={styles.featureTitle}>플랜 혜택</Text>
             <Text style={styles.featureDesc}>
@@ -421,7 +424,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
         <Text style={styles.sectionTitle}>토큰 구매 vs 구독 플랜</Text>
         
         <View style={styles.comparisonCard}>
-          <Icon name="help-outline" size={20} color={colors.primary} />
+          <Icon name="help-circle-outline" size={20} color={colors.primary} />
           <View style={styles.comparisonContent}>
             <Text style={styles.comparisonTitle}>어떤 경우 토큰 구매가 좋나요?</Text>
             <Text style={styles.comparisonDesc}>
@@ -433,7 +436,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
         </View>
         
         <View style={styles.comparisonCard}>
-          <Icon name="workspace-premium" size={20} color={colors.primary} />
+          <Icon name="diamond-outline" size={20} color={colors.primary} />
           <View style={styles.comparisonContent}>
             <Text style={styles.comparisonTitle}>구독 플랜의 장점</Text>
             <Text style={styles.comparisonDesc}>
@@ -453,17 +456,17 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
         end={{ x: 0, y: 1 }}
       >
         <View style={styles.trustBadge}>
-          <Icon name="verified-user" size={20} color={colors.primary} />
+          <Icon name="shield-checkmark-outline" size={20} color={colors.primary} />
           <Text style={styles.trustText}>안전한 결제</Text>
         </View>
         <View style={styles.trustDivider} />
         <View style={styles.trustBadge}>
-          <Icon name="autorenew" size={20} color={colors.primary} />
+          <Icon name="refresh-outline" size={20} color={colors.primary} />
           <Text style={styles.trustText}>즉시 환불</Text>
         </View>
         <View style={styles.trustDivider} />
         <View style={styles.trustBadge}>
-          <Icon name="support-agent" size={20} color={colors.primary} />
+          <Icon name="headset-outline" size={20} color={colors.primary} />
           <Text style={styles.trustText}>24/7 지원</Text>
         </View>
       </LinearGradient>

@@ -379,7 +379,7 @@ export const ACHIEVEMENTS: Achievement[] = [
     category: 'special',
     name: '백일 연속',
     description: '100일 연속 글을 작성했어요',
-    icon: 'rocket',
+    icon: 'rocket-outline',
     iconColor: '#9C27B0',
     badgeColor: '#F3E5F5',
     requirement: { type: 'streak', target: 100 },

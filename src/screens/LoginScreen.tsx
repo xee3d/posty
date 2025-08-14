@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, ActivityIndicator, Platform, KeyboardAvoidingView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -53,11 +53,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
     };
   });
 
-  const handleSocialLogin = async (provider: 'google' | 'naver' | 'kakao' | 'facebook' | 'apple') => {
+  const handleSocialLogin = useCallback(async (provider: 'google' | 'naver' | 'kakao' | 'facebook' | 'apple') => {
     setIsLoading(true);
     setLoadingProvider(provider);
 
     try {
+      console.log(`${provider} 로그인 시작`);
+
       let userProfile;
       
       switch (provider) {
@@ -71,8 +73,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
           userProfile = await vercelAuthService.signInWithKakao();
           break;
         case 'facebook':
-          // Facebook not implemented in vercelAuthService yet
-          throw new Error('Facebook login not available');
+          userProfile = await vercelAuthService.signInWithFacebook();
           break;
         case 'apple':
           userProfile = await vercelAuthService.signInWithApple();
@@ -126,6 +127,16 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         errorMessage = '로그인이 취소되었습니다.';
       } else if (error.message.includes('구글 로그인 취소') || error.message.includes('cancelled')) {
         errorMessage = '로그인이 취소되었습니다.';
+      } else if (error.message.includes('invalid android_key_hash or ios_bundle_id')) {
+        errorMessage = '카카오 개발자 콘솔에서 Bundle ID 설정을 확인해주세요.\n현재 Bundle ID: com.posty';
+      } else if (error.message.includes('타임아웃')) {
+        errorMessage = '로그인 시간이 초과되었습니다. 다시 시도해주세요.';
+      } else if (provider === 'kakao' && error.code === 'RNKakaoLogins') {
+        errorMessage = '카카오 로그인 실패\n1. 카카오 개발자 콘솔에서 Bundle ID 확인\n2. 카카오톡 앱 설치 확인';
+      } else if (provider === 'naver') {
+        errorMessage = '네이버 로그인 실패\n1. 네이버 개발자센터에서 Bundle ID 확인\n2. URL 스키마 설정 확인';
+      } else if (error.message.includes('misconfigured')) {
+        errorMessage = `${provider} 서비스 설정 오류\n개발자 콘솔에서 앱 설정을 확인해주세요.`;
       }
       
       // 개발 환경에서는 상세 에러 표시
@@ -142,7 +153,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
       setIsLoading(false);
       setLoadingProvider(null);
     }
-  };
+  }, [dispatch, onNavigate]);
 
   const renderSocialButton = (
     provider: 'google' | 'naver' | 'kakao' | 'facebook' | 'apple',
@@ -216,9 +227,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
             <AppLogo size={100} showText={true} />
           </Animated.View>
 
-          {/* 소셜 로그인 버튼들 */}
-          <View style={styles.buttonContainer}>
-          </View>
+
 
           {/* 하단 고정 버튼 영역 */}
           <View style={styles.fixedButtonContainer}>

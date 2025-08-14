@@ -1,27 +1,27 @@
 // 광고 관련 상수 및 타입 정의
 
 export const AD_CONFIG = {
-  // Google AdMob IDs (실제 ID로 교체 필요)
+  // Google AdMob IDs - 테스트 ID 사용 중 (실제 배포 시 교체 필요)
   admob: {
     appId: {
-      ios: 'ca-app-pub-xxxxxxxxxxxxx~yyyyyyyyyy',
-      android: 'ca-app-pub-xxxxxxxxxxxxx~yyyyyyyyyy',
+      ios: 'ca-app-pub-3940256099942544~1458002511',
+      android: 'ca-app-pub-3940256099942544~3347511713',
     },
     unitIds: {
       // 네이티브 광고
       native: {
-        ios: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy',
-        android: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy',
+        ios: 'ca-app-pub-3940256099942544/2247696110', // iOS 테스트 네이티브 광고 ID
+        android: 'ca-app-pub-3940256099942544/2247696110', // Android 테스트 네이티브 광고 ID
       },
       // 보상형 광고 (추가 생성 횟수)
       rewarded: {
-        ios: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy',
-        android: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy',
+        ios: 'ca-app-pub-3940256099942544/1712485313', // iOS 테스트 보상형 광고 ID
+        android: 'ca-app-pub-3940256099942544/5224354917', // Android 테스트 보상형 광고 ID
       },
       // 전면 광고 (선택적)
       interstitial: {
-        ios: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy',
-        android: 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy',
+        ios: 'ca-app-pub-3940256099942544/4411468910', // iOS 테스트 전면 광고 ID
+        android: 'ca-app-pub-3940256099942544/1033173712', // Android 테스트 전면 광고 ID
       },
     },
   },

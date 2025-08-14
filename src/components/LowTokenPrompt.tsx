@@ -88,7 +88,7 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
               style={[styles.button, styles.secondaryButton]}
               onPress={onUpgrade}
             >
-              <Icon name="diamond" size={20} color={colors.primary} />
+              <Icon name="diamond-outline" size={20} color={colors.primary} />
               <Text style={styles.secondaryButtonText}>Pro로 업그레이드</Text>
               <Text style={styles.buttonSubtext}>무제한 토큰</Text>
             </TouchableOpacity>

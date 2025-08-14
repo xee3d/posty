@@ -41,7 +41,7 @@ export const ICON_NAMES = {
   BULB: Platform.select({ ios: 'bulb-outline', android: 'bulb-outline' }),
   CASH: Platform.select({ ios: 'cash-outline', android: 'cash-outline' }),
   FLAG: Platform.select({ ios: 'flag-outline', android: 'flag-outline' }),
-  ROCKET: Platform.select({ ios: 'rocket-outline', android: 'rocket-outline' }),
+  ROCKET: 'rocket-outline',
   FLAME: Platform.select({ ios: 'flame-outline', android: 'flame-outline' }),
   HOURGLASS: Platform.select({ ios: 'hourglass-outline', android: 'hourglass-outline' }),
   PULSE: Platform.select({ ios: 'pulse-outline', android: 'pulse-outline' }),
@@ -87,7 +87,7 @@ export const MATERIAL_ICON_NAMES = {
   COLLECTIONS: 'collections',
   EMOJI_EVENTS: 'emoji-events',
   GRADE: 'grade',
-  ROCKET_LAUNCH: 'rocket-launch',
+  ROCKET_LAUNCH: 'rocket-outline',
   WB_TWILIGHT: 'wb-twilight',
 } as const;
 
