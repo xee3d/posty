@@ -118,30 +118,30 @@ export default async function handler(req, res) {
     - 요청된 길이(${lengthGuides[length]?.ko || lengthGuides.medium.ko})에 맞춰 작성하세요
     - 요청된 톤에 완벽하게 맞춰 작성하세요
     - ${emojiGuide}
-    - 반드시 한국어로 응답하세요
+    ${!generatePlatformVersions ? '- 반드시 한국어로 응답하세요' : ''}
     
     ${generatePlatformVersions ? `
-    당신은 반드시 JSON 형식으로만 응답해야 합니다. 다른 형식은 절대 불가능합니다.
+    CRITICAL: You must respond ONLY in valid JSON format. Content must be in Korean.
     
-    주제를 각 플랫폼에 완전히 새롭게 재작성하세요:
+    Create completely different content for each platform:
     
-    - Instagram: 스토리텔링, 감성적, 해시태그 자연스럽게 5-7개
-    - Facebook: 개인적 경험담, 한 문단 자연스럽게, 공감대 형성  
-    - Twitter: 280자 활용, 위트 있게, 임팩트 있는 한 줄. 해시태그 1-2개만
-    - LinkedIn: 비즈니스/성장 관점으로 완전 재해석, 전문적 인사이트
-    - TikTok: 150자 압축, 트렌드 언어, 후킹 시작
+    - Instagram: Storytelling, emotional, natural hashtags 5-7
+    - Facebook: Personal experience, one paragraph flow
+    - Twitter: 280 chars max, witty, impactful, 1-2 hashtags
+    - LinkedIn: Business/growth perspective, professional insights
+    - TikTok: 150 chars, trending language, hook start
     
-    각 플랫폼마다 완전히 다른 내용과 톤으로 작성하세요.
+    Each platform must have completely different content and tone.
     
-    JSON 응답 형식:
+    JSON format example:
     {
-      "original": "기본 콘텐츠",
+      "original": "기본 한국어 콘텐츠",
       "platforms": {
-        "instagram": "인스타그램 전용 콘텐츠",
-        "facebook": "페이스북 전용 콘텐츠",
-        "twitter": "트위터 전용 콘텐츠",
-        "linkedin": "링크드인 전용 콘텐츠",
-        "tiktok": "틱톡 전용 콘텐츠"
+        "instagram": "인스타그램용 한국어 콘텐츠",
+        "facebook": "페이스북용 한국어 콘텐츠",
+        "twitter": "트위터용 한국어 콘텐츠",
+        "linkedin": "링크드인용 한국어 콘텐츠",
+        "tiktok": "틱톡용 한국어 콘텐츠"
       }
     }` : ''}`,
       
@@ -160,45 +160,42 @@ export default async function handler(req, res) {
     - Keep content to the requested length (${lengthGuides[length]?.en || lengthGuides.medium.en})
     - Match the requested tone perfectly
     - ${emojiGuide}
-    - Always respond in English
+    ${!generatePlatformVersions ? '- Always respond in English' : ''}
     
     ${generatePlatformVersions ? `
-    ** IMPORTANT: Respond ONLY in JSON format **
+    CRITICAL: You must respond ONLY in valid JSON format. No other text allowed.
     
-    Create completely different content for each platform following 2024-2025 trends. Each version must be SIGNIFICANTLY different, not just reformatted:
+    Create completely different content for each platform:
     
-    - Instagram: Short sentences, minimal line breaks, story format. NO excessive line breaks. Natural hashtags 5-8 only
-    - Facebook: Single paragraph flow, conversational. Minimize line breaks. Focus on personal experience  
-    - Twitter: One-liner impact, witty, meme vibes. 1-2 hashtags max. Use full 280 chars
-    - LinkedIn: Business insights, completely reframe from professional angle. Minimal line breaks
-    - TikTok: Ultra-compressed 150 chars, trendy language, hook start. Use "POV:", "nobody knows", "real" etc
+    - Instagram: Short sentences, story format, natural hashtags 5-8
+    - Facebook: Single paragraph, conversational, personal experience
+    - Twitter: One-liner, witty, meme vibes, 1-2 hashtags, 280 chars max
+    - LinkedIn: Business insights, professional angle, minimal line breaks
+    - TikTok: 150 chars, trendy language, hook start
     
-    ❌ BANNED: Excessive line breaks, obvious hashtags, cliché expressions
-    ✅ REQUIRED: Completely different tone and structure for each platform
+    Each platform must have completely different content and tone.
     
-    Respond with this exact JSON format only. Do not include any other text or explanations:
+    JSON format example:
     {
-      "original": "write basic content here",
+      "original": "basic English content",
       "platforms": {
         "instagram": "Instagram optimized content",
-        "facebook": "Facebook optimized content", 
+        "facebook": "Facebook optimized content",
         "twitter": "Twitter optimized content",
         "linkedin": "LinkedIn optimized content",
         "tiktok": "TikTok optimized content"
       }
-    }
-    
-    You must follow this JSON format exactly.` : ''}`
+    }` : ''}`
     };
     
     const systemPrompt = systemPrompts[language] || systemPrompts.ko;
     
     // 길이에 따른 max_tokens 설정
     const maxTokensMap = {
-      short: 150,
-      medium: 300,
-      long: 600,
-      extra: 1200
+      short: generatePlatformVersions ? 400 : 150,
+      medium: generatePlatformVersions ? 800 : 300,
+      long: generatePlatformVersions ? 1200 : 600,
+      extra: generatePlatformVersions ? 2000 : 1200
     };
     
     // 클라이언트에서 보낸 max_tokens를 우선 사용, 없으면 기본값 사용
@@ -357,7 +354,7 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
         model: apiModel,
         messages: messages,
         max_tokens: finalMaxTokens,
-        temperature: generatePlatformVersions ? 0.2 : 0.8, // Lower temperature for JSON consistency
+        temperature: generatePlatformVersions ? 0.1 : 0.8, // Very low temperature for JSON consistency
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
         ...(generatePlatformVersions && {
