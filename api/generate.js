@@ -121,13 +121,25 @@ export default async function handler(req, res) {
     ${!generatePlatformVersions ? '- 반드시 한국어로 응답하세요' : ''}
     
     ${generatePlatformVersions ? `
-    다음 주제로 3가지 다른 스타일의 SNS 글을 작성해주세요:
 
-    1. Instagram 스타일: 감성적이고 스토리텔링, 해시태그 5-7개, 줄바꿈 활용
-    2. Facebook 스타일: 친근한 대화체, 개인적 경험담, 한 문단으로 자연스럽게
-    3. Twitter(X) 스타일: 280자 이내, 위트있고 임팩트 있게, 해시태그 1-2개
+    🔹 중요: 반드시 3가지 플랫폼별로 다르게 작성해주세요 🔹
 
-    각각 완전히 다른 톤과 내용으로 작성해주세요.` : ''}`,
+    1. Instagram 스타일:
+    - 감성적이고 스토리텔링 방식
+    - 해시태그 5-7개 포함
+    - 줄바꿈 활용한 시각적 구성
+
+    2. Facebook 스타일:
+    - 친근한 대화체로 자연스럽게
+    - 개인적 경험담 중심
+    - 한 문단으로 연결성 있게
+
+    3. Twitter(X) 스타일:
+    - 280자 이내로 간결하게
+    - 위트있고 임팩트 있게
+    - 해시태그 1-2개만
+
+    각 플랫폼마다 완전히 다른 내용과 톤으로 작성하세요.` : ''}`,
       
       en: `You are Posty, a creative AI assistant specialized in creating engaging social media content.
     
