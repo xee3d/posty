@@ -58,7 +58,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, tone, platform, model, language = 'ko', length = 'medium', image, max_tokens, includeEmojis = true, generatePlatformVersions = true } = req.body;
+    const { prompt, tone, platform, model, language = 'ko', length = 'medium', image, max_tokens, includeEmojis = true, generatePlatformVersions = false } = req.body;
     
     // 입력 검증
     if (!prompt || prompt.trim().length === 0) {

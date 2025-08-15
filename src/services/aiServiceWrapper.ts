@@ -86,16 +86,51 @@ class AIServiceWrapper {
       const aiModel = this.getModelByPlan(userPlan, params.length);
       console.log('Using AI model:', aiModel, 'for plan:', userPlan);
       
-      // 서버 API 호출 - 플랫폼별 생성 활성화
-      const response = await serverAIService.generateContent({
-        prompt: finalPrompt,
-        tone: params.tone || 'casual',
-        platform: params.platform,
-        length: params.length,
-        model: aiModel, // 플랜별 모델 전달
-        includeEmojis: params.includeEmojis,
-        generatePlatformVersions: true, // 항상 플랫폼별 생성 요청
-      });
+      // 플랫폼별로 개별 API 호출하여 각기 다른 콘텐츠 생성
+      const platforms = ['instagram', 'facebook', 'twitter'];
+      const platformContents: Record<string, string> = {};
+      
+      console.log('Generating platform-specific content via multiple API calls...');
+      
+      // 각 플랫폼별로 최적화된 프롬프트와 함께 개별 호출
+      for (const platformId of platforms) {
+        try {
+          let platformPrompt = finalPrompt;
+          
+          // 플랫폼별 특화 프롬프트 추가
+          if (platformId === 'instagram') {
+            platformPrompt += '\n\n[Instagram 스타일로 작성: 감성적이고 시각적으로, 줄바꿈을 활용해서 스토리텔링하듯 작성해주세요. 해시태그 5-7개 포함]';
+          } else if (platformId === 'facebook') {
+            platformPrompt += '\n\n[Facebook 스타일로 작성: 친근하고 대화형으로, 개인적인 경험을 공유하는 톤으로 한 문단으로 자연스럽게 작성해주세요]';
+          } else if (platformId === 'twitter') {
+            platformPrompt += '\n\n[Twitter 스타일로 작성: 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그 1-2개만]';
+          }
+          
+          const platformResponse = await serverAIService.generateContent({
+            prompt: platformPrompt,
+            tone: params.tone || 'casual',
+            platform: platformId,
+            length: params.length,
+            model: aiModel,
+            includeEmojis: params.includeEmojis,
+            generatePlatformVersions: false, // 개별 호출이므로 false
+          });
+          
+          platformContents[platformId] = platformResponse.content;
+          console.log(`✅ Generated content for ${platformId}`);
+          
+        } catch (error) {
+          console.error(`❌ Failed to generate content for ${platformId}:`, error);
+          // 실패한 플랫폼은 원본 사용
+          platformContents[platformId] = finalPrompt;
+        }
+      }
+      
+      // 첫 번째 성공한 플랫폼을 메인 콘텐츠로 사용
+      const response = {
+        content: platformContents.instagram || platformContents.facebook || platformContents.twitter || finalPrompt,
+        platforms: platformContents
+      };
       
       console.log('AIServiceWrapper received response:', response);
       
