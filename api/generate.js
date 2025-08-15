@@ -58,7 +58,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, tone, platform, model, language = 'ko', length = 'medium', image, max_tokens, includeEmojis = true, generatePlatformVersions = false } = req.body;
+    const { prompt, tone, platform, model, language = 'ko', length = 'medium', image, max_tokens, includeEmojis = true, generatePlatformVersions = true } = req.body;
     
     // 입력 검증
     if (!prompt || prompt.trim().length === 0) {
@@ -128,18 +128,16 @@ export default async function handler(req, res) {
     
     ${generatePlatformVersions ? `
 
-    🚨🚨🚨 매우 중요 🚨🚨🚨
-    
+    🔥 다음과 같이 3가지 플랫폼 스타일로 각각 다르게 작성해주세요:
+
     INSTAGRAM:
-    [Instagram 스타일 콘텐츠 - 감성적, 줄바꿈 활용, 해시태그 5-7개]
+    (감성적이고 시각적인 스타일로, 줄바꿈을 활용해서 작성)
     
-    FACEBOOK:
-    [Facebook 스타일 콘텐츠 - 친근한 대화체, 한 문단으로 자연스럽게]
+    FACEBOOK: 
+    (친근하고 대화형 스타일로, 한 문단으로 자연스럽게 작성)
     
     TWITTER:
-    [Twitter 스타일 콘텐츠 - 280자 이내, 간결하고 위트있게, 해시태그 1-2개]
-    
-    위 형식 그대로 3가지 버전 모두 작성하세요!` : ''}`,
+    (간결하고 임팩트 있게, 280자 이내로 작성)` : ''}`,
       
       en: `You are Posty, a creative AI assistant specialized in creating engaging social media content.
     
