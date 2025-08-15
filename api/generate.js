@@ -121,19 +121,13 @@ export default async function handler(req, res) {
     ${!generatePlatformVersions ? '- 반드시 한국어로 응답하세요' : ''}
     
     ${generatePlatformVersions ? `
-    RESPOND ONLY IN JSON FORMAT. NO OTHER TEXT.
-    
-    Create different Korean content for 3 platforms.
-    
-    JSON response:
-    {
-      "original": "기본 콘텐츠",
-      "platforms": {
-        "instagram": "인스타그램 콘텐츠",
-        "facebook": "페이스북 콘텐츠", 
-        "twitter": "트위터 콘텐츠"
-      }
-    }` : ''}`,
+    다음 주제로 3가지 다른 스타일의 SNS 글을 작성해주세요:
+
+    1. Instagram 스타일: 감성적이고 스토리텔링, 해시태그 5-7개, 줄바꿈 활용
+    2. Facebook 스타일: 친근한 대화체, 개인적 경험담, 한 문단으로 자연스럽게
+    3. Twitter(X) 스타일: 280자 이내, 위트있고 임팩트 있게, 해시태그 1-2개
+
+    각각 완전히 다른 톤과 내용으로 작성해주세요.` : ''}`,
       
       en: `You are Posty, a creative AI assistant specialized in creating engaging social media content.
     
@@ -340,12 +334,9 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
         model: apiModel,
         messages: messages,
         max_tokens: finalMaxTokens,
-        temperature: generatePlatformVersions ? 0.1 : 0.8, // Very low temperature for JSON consistency
+        temperature: generatePlatformVersions ? 0.7 : 0.8, // Normal temperature for natural writing
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
-        ...(generatePlatformVersions && {
-          response_format: { type: "json_object" }
-        }),
       }),
     });
     
@@ -509,30 +500,54 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
     let responseContent = data.choices[0].message.content;
     let parsedContent = null;
     
-    // JSON 응답인지 확인 (플랫폼별 최적화가 요청된 경우)
+    // 플랫폼별 콘텐츠 요청인 경우 자연어 응답에서 플랫폼별 내용 추출
     if (generatePlatformVersions) {
       console.log('Processing platform-specific content...');
       console.log('Raw response content:', responseContent);
-      console.log('Response content type:', typeof responseContent);
       
       try {
-        // response_format: json_object를 사용할 때는 이미 JSON 문자열이므로 직접 파싱
-        parsedContent = JSON.parse(responseContent);
-        console.log('Successfully parsed JSON response:', {
-          hasOriginal: !!parsedContent.original,
-          hasPlatforms: !!parsedContent.platforms,
-          platformKeys: parsedContent.platforms ? Object.keys(parsedContent.platforms) : []
+        // 자연어 응답에서 플랫폼별 내용 추출
+        const platforms = {};
+        let original = responseContent;
+        
+        // Instagram 스타일 추출 (1. Instagram으로 시작하는 부분)
+        const instagramMatch = responseContent.match(/1\.\s*Instagram[^:]*:?\s*([\s\S]*?)(?=2\.|$)/i);
+        if (instagramMatch) {
+          platforms.instagram = instagramMatch[1].trim();
+        }
+        
+        // Facebook 스타일 추출 (2. Facebook으로 시작하는 부분)
+        const facebookMatch = responseContent.match(/2\.\s*Facebook[^:]*:?\s*([\s\S]*?)(?=3\.|$)/i);
+        if (facebookMatch) {
+          platforms.facebook = facebookMatch[1].trim();
+        }
+        
+        // Twitter 스타일 추출 (3. Twitter로 시작하는 부분)
+        const twitterMatch = responseContent.match(/3\.\s*Twitter[^:]*:?\s*([\s\S]*?)$/i);
+        if (twitterMatch) {
+          platforms.twitter = twitterMatch[1].trim();
+        }
+        
+        // 첫 번째 스타일을 원본으로 사용
+        if (platforms.instagram) {
+          original = platforms.instagram;
+        }
+        
+        console.log('Extracted platforms:', {
+          hasInstagram: !!platforms.instagram,
+          hasFacebook: !!platforms.facebook,
+          hasTwitter: !!platforms.twitter,
+          platformKeys: Object.keys(platforms)
         });
         
-        // 필수 필드 검증
-        if (!parsedContent.original || !parsedContent.platforms) {
-          console.warn('Invalid JSON structure - missing original or platforms');
-          parsedContent = null;
+        if (Object.keys(platforms).length > 0) {
+          parsedContent = {
+            original: original,
+            platforms: platforms
+          };
         }
       } catch (parseError) {
-        console.warn('Failed to parse JSON response:', parseError.message);
-        console.warn('Response content:', responseContent);
-        // JSON 파싱 실패시 원본 텍스트 사용
+        console.warn('Failed to parse platform content:', parseError.message);
         parsedContent = null;
       }
     }
