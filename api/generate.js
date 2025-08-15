@@ -129,28 +129,22 @@ export default async function handler(req, res) {
     ${generatePlatformVersions ? `
 
     🚨🚨🚨 매우 중요 🚨🚨🚨
-    반드시 아래 예시처럼 3가지 버전을 모두 작성해주세요:
+    반드시 다음 JSON 형식으로 응답해주세요:
 
-    === 예시 ===
-    1. Instagram 스타일:
-    오늘 아침 ☀️
-    특별한 커피 한 잔으로 시작했어요
+    {
+      "instagram": "Instagram용 콘텐츠 (감성적, 스토리텔링, 해시태그 5-7개, 줄바꿈 활용)",
+      "facebook": "Facebook용 콘텐츠 (친근한 대화체, 개인적 경험, 한 문단으로 자연스럽게)",
+      "twitter": "Twitter용 콘텐츠 (280자 이내, 간결하고 위트있게, 해시태그 1-2개)"
+    }
 
-    향긋한 원두의 깊은 맛이
-    하루를 더욱 풍요롭게 만들어줘요
+    예시:
+    {
+      "instagram": "오늘 아침 ☀️\\n특별한 커피 한 잔으로 시작했어요\\n\\n향긋한 원두의 깊은 맛이\\n하루를 더욱 풍요롭게 만들어줘요\\n\\n여러분도 이런 소소한 행복 찾으셨나요? ✨\\n\\n#모닝커피 #일상의행복 #커피사랑 #아침루틴 #소확행",
+      "facebook": "아침에 마신 커피가 정말 맛있었어요! 요즘 집에서 내리는 커피에 푹 빠져있는데, 오늘따라 유독 향이 좋더라고요. 다들 아침에 뭘 드시나요? 커피파? 차파? 궁금해요 😊",
+      "twitter": "오늘 커피 맛이 유독 좋네 ☕ 작은 행복이란 게 이런 거구나 #커피 #소확행"
+    }
 
-    여러분도 이런 소소한 행복 찾으셨나요? ✨
-
-    #모닝커피 #일상의행복 #커피사랑 #아침루틴 #소확행
-
-    2. Facebook 스타일:
-    아침에 마신 커피가 정말 맛있었어요! 요즘 집에서 내리는 커피에 푹 빠져있는데, 오늘따라 유독 향이 좋더라고요. 다들 아침에 뭘 드시나요? 커피파? 차파? 궁금해요 😊
-
-    3. Twitter 스타일:
-    오늘 커피 맛이 유독 좋네 ☕ 작은 행복이란 게 이런 거구나 #커피 #소확행
-
-    === 실제 작성 ===
-    위 예시 형식을 따라 반드시 3개의 다른 스타일로 작성하세요!` : ''}`,
+    절대 다른 형식으로 응답하지 마세요!` : ''}`,
       
       en: `You are Posty, a creative AI assistant specialized in creating engaging social media content.
     
@@ -236,7 +230,12 @@ export default async function handler(req, res) {
     // 이미지가 있는 경우 Vision API 사용
     let messages;
     // 플랫폼별 생성시에는 더 강력한 모델 사용
-    let apiModel = model || (generatePlatformVersions ? 'gpt-4o' : 'gpt-4o-mini');
+    let apiModel;
+    if (generatePlatformVersions) {
+      apiModel = 'gpt-4o'; // 플랫폼별 생성 시 강제로 GPT-4o 사용
+    } else {
+      apiModel = model || 'gpt-4o-mini';
+    }
     
     console.log('🤖 Selected AI model:', apiModel, '(Platform generation:', generatePlatformVersions, ')');
     
@@ -360,9 +359,10 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
         model: apiModel,
         messages: messages,
         max_tokens: finalMaxTokens,
-        temperature: generatePlatformVersions ? 0.7 : 0.8, // Normal temperature for natural writing
+        temperature: generatePlatformVersions ? 0.3 : 0.8, // Lower temperature for structured output
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
+        ...(generatePlatformVersions && { response_format: { type: "json_object" } })
       }),
     });
     
@@ -533,45 +533,54 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
       console.log('🔎 Looking for numbered sections (1. Instagram, 2. Facebook, 3. Twitter)...');
       
       try {
-        // 자연어 응답에서 플랫폼별 내용 추출
-        const platforms = {};
-        let original = responseContent;
-        
-        // Instagram 스타일 추출 (1. Instagram으로 시작하는 부분)
-        const instagramMatch = responseContent.match(/1\.\s*Instagram[^:]*:?\s*([\s\S]*?)(?=2\.|$)/i);
-        if (instagramMatch) {
-          platforms.instagram = instagramMatch[1].trim();
+        // JSON 응답 파싱 시도
+        let jsonData = null;
+        try {
+          jsonData = JSON.parse(responseContent);
+          console.log('✅ Successfully parsed JSON response');
+        } catch (jsonError) {
+          console.log('❌ Failed to parse as JSON, trying to extract JSON from text...');
+          // JSON이 텍스트에 포함되어 있는 경우 추출 시도
+          const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            try {
+              jsonData = JSON.parse(jsonMatch[0]);
+              console.log('✅ Successfully extracted and parsed JSON from text');
+            } catch (extractError) {
+              console.log('❌ Failed to extract JSON from text');
+            }
+          }
         }
         
-        // Facebook 스타일 추출 (2. Facebook으로 시작하는 부분)
-        const facebookMatch = responseContent.match(/2\.\s*Facebook[^:]*:?\s*([\s\S]*?)(?=3\.|$)/i);
-        if (facebookMatch) {
-          platforms.facebook = facebookMatch[1].trim();
-        }
-        
-        // Twitter 스타일 추출 (3. Twitter로 시작하는 부분)
-        const twitterMatch = responseContent.match(/3\.\s*Twitter[^:]*:?\s*([\s\S]*?)$/i);
-        if (twitterMatch) {
-          platforms.twitter = twitterMatch[1].trim();
-        }
-        
-        // 첫 번째 스타일을 원본으로 사용
-        if (platforms.instagram) {
-          original = platforms.instagram;
-        }
-        
-        console.log('Extracted platforms:', {
-          hasInstagram: !!platforms.instagram,
-          hasFacebook: !!platforms.facebook,
-          hasTwitter: !!platforms.twitter,
-          platformKeys: Object.keys(platforms)
-        });
-        
-        if (Object.keys(platforms).length > 0) {
-          parsedContent = {
-            original: original,
-            platforms: platforms
+        if (jsonData && typeof jsonData === 'object') {
+          const platforms = {
+            instagram: jsonData.instagram || jsonData.Instagram,
+            facebook: jsonData.facebook || jsonData.Facebook,
+            twitter: jsonData.twitter || jsonData.Twitter || jsonData.x
           };
+          
+          // 첫 번째 유효한 플랫폼을 원본으로 사용
+          const original = platforms.instagram || platforms.facebook || platforms.twitter || responseContent;
+          
+          console.log('🎯 JSON-based platforms extracted:', {
+            hasInstagram: !!platforms.instagram,
+            hasFacebook: !!platforms.facebook,
+            hasTwitter: !!platforms.twitter,
+            platformKeys: Object.keys(platforms).filter(k => platforms[k])
+          });
+          
+          // 최소 하나의 플랫폼이라도 있으면 성공
+          const validPlatforms = Object.keys(platforms).filter(k => platforms[k]);
+          if (validPlatforms.length > 0) {
+            parsedContent = {
+              original: original,
+              platforms: platforms
+            };
+          }
+        } else {
+          console.log('❌ No valid JSON data found, using fallback parsing...');
+          // 기존 자연어 파싱 로직을 백업으로 유지
+          parsedContent = null;
         }
       } catch (parseError) {
         console.warn('Failed to parse platform content:', parseError.message);
