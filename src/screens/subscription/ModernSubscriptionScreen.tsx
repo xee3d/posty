@@ -758,7 +758,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   </View>
                   
                   <View style={styles.expiryInfoContainer}>
-                    <MaterialIcon name="today" size={20} color={colors.primary} />
+                    <MaterialIcon name="calendar-today" size={20} color={colors.primary} />
                     <View style={styles.expiryTextContainer}>
                       <Text style={styles.expiryLabel}>다음 결제일</Text>
                       <Text style={styles.expiryDate}>

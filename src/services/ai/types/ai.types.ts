@@ -36,6 +36,8 @@ export interface GenerateContentParams {
   platform?: PlatformType;
   hashtags?: string[];
   userProfile?: UserProfile;
+  includeEmojis?: boolean;
+  generatePlatformVersions?: boolean;
   options?: {
     timeOfDay?: string;
     includeImage?: boolean;
@@ -59,6 +61,13 @@ export interface GeneratedContent {
   content: string;
   hashtags: string[];
   platform: string;
+  platforms?: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    tiktok?: string;
+  };
   estimatedEngagement?: number;
   metadata?: {
     tokensUsed?: number;

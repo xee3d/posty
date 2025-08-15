@@ -11,19 +11,29 @@ interface ServerGenerateParams {
   imageBase64?: string;
   length?: string;
   model?: string;
+  includeEmojis?: boolean;
+  generatePlatformVersions?: boolean;
 }
 
 interface ServerResponse {
   success: boolean;
-  data?: {
-    content: string;
-    usage?: any;
-    model?: string;
+  content?: string;
+  contentLength?: number;
+  usage?: any;
+  platforms?: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    tiktok?: string;
   };
   metadata?: {
     tone: string;
     platform: string;
+    includeEmojis: boolean;
+    generatePlatformVersions: boolean;
     timestamp: string;
+    model: string;
   };
   error?: string;
   message?: string;
@@ -66,7 +76,7 @@ class ServerAIService {
   }
 
   // 콘텐츠 생성 (서버 API 호출)
-  async generateContent(params: ServerGenerateParams): Promise<string> {
+  async generateContent(params: ServerGenerateParams): Promise<{ content: string; platforms?: any }> {
     try {
       const apiUrl = getApiUrl(API_CONFIG.ENDPOINTS.GENERATE);
       console.log('Calling server API:', apiUrl);
@@ -98,6 +108,8 @@ class ServerAIService {
           language: 'ko', // getCurrentLanguage(), // 현재 언어 추가
           length: params.length || 'medium', // 길이 추가
           model: params.model, // AI 모델 추가
+          includeEmojis: params.includeEmojis ?? true,
+          generatePlatformVersions: params.generatePlatformVersions ?? false,
           // 길이에 따른 max_tokens 설정
           max_tokens: this.getMaxTokensByLength(params.length),
           // 이미지가 있으면 base64 전송
@@ -114,7 +126,31 @@ class ServerAIService {
       // JSON 파싱 시도
       let data: ServerResponse;
       try {
-        data = JSON.parse(responseText);
+        const parsed = JSON.parse(responseText);
+        
+        // 서버가 data wrapper를 사용하는 경우 처리
+        if (parsed.success && parsed.data) {
+          data = {
+            success: parsed.success,
+            content: parsed.data.content,
+            contentLength: parsed.data.contentLength || parsed.data.content?.length,
+            usage: parsed.data.usage,
+            platforms: parsed.data.platforms,
+            metadata: parsed.metadata || parsed.data.metadata,
+            error: parsed.error,
+            message: parsed.message
+          };
+        } else {
+          data = parsed;
+        }
+        
+        console.log('Parsed server data structure:', {
+          success: data.success,
+          hasContent: !!data.content,
+          hasPlatforms: !!data.platforms,
+          keys: Object.keys(data),
+          rawData: data
+        });
       } catch (parseError) {
         console.error('JSON parse error:', parseError);
         console.error('Response text:', responseText.substring(0, 200));
@@ -140,19 +176,22 @@ class ServerAIService {
         throw new Error(data.error || `Server error: ${response.status}`);
       }
       
-      if (!data.success || !data.data?.content) {
+      if (!data.success || !data.content) {
         throw new Error('Invalid response from server');
       }
       
       console.log('Server response:', {
         success: data.success,
-        contentLength: data.data.content.length,
-        usage: data.data.usage,
-        content: data.data.content, // 실제 콘텐츠도 출력
+        contentLength: data.contentLength,
+        usage: data.usage,
+        hasPlatforms: !!data.platforms,
+        platformKeys: data.platforms ? Object.keys(data.platforms) : [],
+        content: data.content.substring(0, 100) + '...', // 일부만 출력
+        rawResponse: data, // 전체 응답 구조 확인
       });
       
       // 사진과 관련 없는 내용 필터링 (임시 조치)
-      let content = data.data.content;
+      let content = data.content;
       
       // 이미지가 있는 경우에만 필터링 적용
       if (params.imageBase64) {
@@ -178,7 +217,10 @@ class ServerAIService {
         content = content.replace(/\n{3,}/g, '\n\n').trim();
       }
       
-      return content;
+      return {
+        content: content,
+        platforms: data.platforms || null
+      };
       
     } catch (error: any) {
       console.error('Server API error:', error);

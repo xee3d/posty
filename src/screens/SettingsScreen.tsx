@@ -28,6 +28,7 @@ import { useTimer } from '../hooks/useCleanup';
 import AccountChangeSection from '../components/settings/AccountChangeSection';
 import OnboardingScreen from './OnboardingScreen';
 import NewUserWelcome from '../components/NewUserWelcome';
+import MinimalWelcome from '../components/MinimalWelcome';
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
@@ -835,9 +836,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   if (showNewUserWelcome) {
     return (
       <View style={styles.container}>
-        <NewUserWelcome 
-          onStart={() => setShowNewUserWelcome(false)}
-          onDismiss={() => setShowNewUserWelcome(false)}
+        <MinimalWelcome 
+          onComplete={() => setShowNewUserWelcome(false)}
         />
       </View>
     );
@@ -1117,14 +1117,31 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
             
             <TouchableOpacity
               style={styles.menuItem}
-              onPress={() => setShowFirebaseTest(true)}
+              onPress={async () => {
+                Alert.alert(
+                  '환영 화면 초기화',
+                  '환영 화면과 온보딩 상태를 모두 초기화하시겠습니까? 앱을 다시 시작하면 새로운 환영 화면이 표시됩니다.',
+                  [
+                    { text: '취소', style: 'cancel' },
+                    { 
+                      text: '초기화', 
+                      onPress: async () => {
+                        await AsyncStorage.removeItem('@posty_welcome_complete');
+                        await AsyncStorage.removeItem('@posty_onboarding_complete');
+                        Alert.alert('완료', '환영 화면과 온보딩이 초기화되었습니다. 앱을 다시 시작하세요.');
+                      }
+                    }
+                  ]
+                );
+              }}
             >
               <View style={styles.menuItemLeft}>
-                <Icon name="flask-outline" size={20} color={colors.text.secondary} />
-                <Text style={styles.menuItemLabel}>Firebase 테스트</Text>
+                <Icon name="star-outline" size={20} color={colors.text.secondary} />
+                <Text style={styles.menuItemLabel}>환영 화면 초기화 (새 기능)</Text>
               </View>
               <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
             </TouchableOpacity>
+            
           </View>
         )}
 

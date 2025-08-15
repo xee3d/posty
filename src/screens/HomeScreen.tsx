@@ -569,17 +569,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           )}
         </FadeInView>
 
-        {/* 상단 배너 광고 - 조건부 표시 */}
-        {Date.now() % 2 === 0 && (
-          <SlideInView delay={100} duration={300}>
-            <BannerCarousel 
-              autoPlay={true}
-              autoPlayInterval={6000}
-              showIndicators={true}
-            />
-          </SlideInView>
-        )}
-
         {/* 빠른 생성 - 사용자 레벨에 따라 다르게 표시 */}
         <FadeInView delay={175}>
           <View style={styles.quickActions}>
@@ -703,6 +692,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
             )}
           </View>
         </SlideInView>
+
+        {/* 작은 배너 광고 - 해시태그 아래 배치 */}
+        {Date.now() % 2 === 0 && (
+          <SlideInView delay={600} duration={300}>
+            <View style={styles.smallBannerContainer}>
+              <BannerCarousel 
+                autoPlay={true}
+                autoPlayInterval={8000}
+                showIndicators={false}
+                style={styles.smallBanner}
+              />
+            </View>
+          </SlideInView>
+        )}
 
         {/* 나의 글쓰기 스타일 */}
         {styleAnalysis && stats?.totalPosts > 3 && (
@@ -1525,6 +1528,16 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
     fontSize: 14,
     color: colors.text.primary,
     fontWeight: '500',
+  },
+  smallBannerContainer: {
+    marginTop: SPACING.lg,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.md,
+  },
+  smallBanner: {
+    height: 100, // 기존 160px에서 100px로 축소
+    borderRadius: 12,
+    overflow: 'hidden',
   },
   syncIndicatorContainer: {
     position: 'absolute',

@@ -7,6 +7,7 @@ import {
   Text,
   TouchableOpacity,
   Animated,
+  ViewStyle,
 } from 'react-native';
 import {
   BannerAd,
@@ -21,56 +22,71 @@ interface BannerCarouselProps {
   autoPlay?: boolean;
   autoPlayInterval?: number;
   showIndicators?: boolean;
+  style?: ViewStyle;
 }
 
 const BannerCarousel: React.FC<BannerCarouselProps> = ({
   autoPlay = true,
   autoPlayInterval = 5000,
   showIndicators = true,
+  style,
 }) => {
   const scrollViewRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const fadeAnim = useRef(new Animated.Value(1)).current;
+  const [isPaused, setIsPaused] = useState(false);
   
-  // 여러 광고 유닛 ID (캐러셀용)
-  const adUnitIds = __DEV__ 
-    ? [TestIds.BANNER, TestIds.BANNER, TestIds.BANNER] // 테스트 모드
-    : [
-        'ca-app-pub-xxxxxxxxxxxxx/banner1',
-        'ca-app-pub-xxxxxxxxxxxxx/banner2', 
-        'ca-app-pub-xxxxxxxxxxxxx/banner3',
-      ];
+  // 여러 광고 유닛 ID (캐러셀용) - 모두 테스트 ID 사용
+  const adUnitIds = [
+    TestIds.BANNER, 
+    TestIds.BANNER, 
+    TestIds.BANNER, 
+    TestIds.BANNER, 
+    TestIds.BANNER
+  ];
   
   const bannerData = [
     {
       gradient: ['#667eea', '#764ba2'],
-      title: '프리미엄 업그레이드',
+      title: '🚀 프리미엄 업그레이드',
       subtitle: '무제한 토큰으로 더 많은 콘텐츠를!',
       cta: '지금 시작하기',
     },
     {
       gradient: ['#f093fb', '#f5576c'],
-      title: '신규 기능 출시',
-      subtitle: 'AI 이미지 생성 기능을 만나보세요',
+      title: '✨ AI 이미지 생성',
+      subtitle: '텍스트로 이미지를 만들어보세요',
       cta: '체험하기',
     },
     {
       gradient: ['#4facfe', '#00f2fe'],
-      title: '특별 할인',
-      subtitle: '첫 구독 50% 할인 이벤트',
+      title: '🎯 특별 할인 이벤트',
+      subtitle: '첫 구독 50% 할인 + 보너스 토큰',
       cta: '혜택 받기',
+    },
+    {
+      gradient: ['#43e97b', '#38f9d7'],
+      title: '📱 모바일 최적화',
+      subtitle: '어디서든 빠르고 쉬운 콘텐츠 생성',
+      cta: '더 알아보기',
+    },
+    {
+      gradient: ['#fa709a', '#fee140'],
+      title: '🔥 인기 템플릿',
+      subtitle: '트렌디한 SNS 콘텐츠 템플릿 모음',
+      cta: '구경하기',
     },
   ];
   
   useEffect(() => {
-    if (autoPlay) {
+    if (autoPlay && !isPaused) {
       const timer = setInterval(() => {
         handleAutoScroll();
       }, autoPlayInterval);
       
       return () => clearInterval(timer);
     }
-  }, [currentIndex, autoPlay]);
+  }, [currentIndex, autoPlay, isPaused]);
   
   const handleAutoScroll = () => {
     const nextIndex = (currentIndex + 1) % bannerData.length;
@@ -108,7 +124,7 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
   };
   
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <ScrollView
         ref={scrollViewRef}
         horizontal
@@ -116,6 +132,10 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
         showsHorizontalScrollIndicator={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
+        onTouchStart={() => setIsPaused(true)}
+        onTouchEnd={() => {
+          setTimeout(() => setIsPaused(false), 3000); // 3초 후 자동 재생 재개
+        }}
       >
         {bannerData.map((banner, index) => (
           <Animated.View
@@ -184,17 +204,18 @@ const styles = StyleSheet.create({
   bannerWrapper: {
     width: screenWidth - 32,
     marginHorizontal: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 6,
+    backgroundColor: 'transparent',
   },
   banner: {
     flex: 1,
     borderRadius: 16,
     padding: 16,
     justifyContent: 'space-between',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
   },
   bannerContent: {
     flex: 1,

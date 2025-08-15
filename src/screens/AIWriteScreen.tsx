@@ -125,6 +125,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
   const [selectedTone, setSelectedTone] = useState('casual');
   const [selectedLength, setSelectedLength] = useState('medium');
   const [generatedContent, setGeneratedContent] = useState('');
+  const [generatedPlatforms, setGeneratedPlatforms] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedPolishOption, setSelectedPolishOption] = useState<'summarize' | 'simple' | 'formal' | 'emotion' | 'storytelling' | 'engaging' | 'hashtag' | 'emoji' | 'question'>('engaging');
@@ -568,9 +569,15 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
           tone: selectedTone as any,
           length: selectedLength,
           hashtags: selectedHashtags.length > 0 ? selectedHashtags : (initialHashtagsList.length > 0 ? initialHashtagsList : undefined),
+          includeEmojis: true, // 기본값으로 이모지 포함하여 생성
+          generatePlatformVersions: true,
         });
         // 객체에서 content 문자열만 추출
         result = response.content;
+        // 플랫폼별 콘텐츠 저장
+        if (response.platforms) {
+          setGeneratedPlatforms(response.platforms);
+        }
       } else if (writeMode === 'polish') {
         console.log('Polishing content with text:', prompt);
         console.log('Selected length:', selectedLength); // 길이 로그 추가
@@ -620,8 +627,14 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
           length: selectedLength,
           hashtags: selectedHashtags.length > 0 ? selectedHashtags : 
                    (imageAnalysisResult?.suggestedContent || initialHashtagsList || undefined),
+          includeEmojis: true, // 기본값으로 이모지 포함하여 생성
+          generatePlatformVersions: true,
         });
         result = response.content;
+        // 플랫폼별 콘텐츠 저장
+        if (response.platforms) {
+          setGeneratedPlatforms(response.platforms);
+        }
       }
       
       console.log('[AIWriteScreen] About to set generatedContent with:', result.substring(0, 50) + '...');
@@ -1450,6 +1463,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
             </View>
           </SlideInView>
 
+
           {/* 선택된 해시태그 표시 */}
           {selectedHashtags.length > 0 && (
             <SlideInView direction="up" delay={1100}>
@@ -1553,11 +1567,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
                   <GeneratedContentDisplay
                     originalContent={generatedContent}
                     tone={selectedTone}
-
+                    platforms={generatedPlatforms}
                     onEdit={(content) => {
                       setGeneratedContent(content);
                     }}
-                    onSave={(platform) => handleSaveContent(platform, generatedContent)}
                   />
                 </AnimatedCard>
               </View>

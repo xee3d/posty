@@ -63,6 +63,7 @@ import { AlertProvider } from './src/components/AlertProvider';
 import { AlertManager } from './src/components/CustomAlert';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import OnboardingScreen from './src/screens/OnboardingScreen';
+import MinimalWelcome from './src/components/MinimalWelcome';
 import { batteryOptimizer } from './src/utils/batteryOptimization';
 
 const { width } = Dimensions.get('window');
@@ -93,6 +94,7 @@ const App: React.FC = () => {
   const alertRef = useRef<any>(null);
   const [needsOnboarding, setNeedsOnboarding] = useState(true);
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
+  const [showMinimalWelcome, setShowMinimalWelcome] = useState(false);
   
   // Reanimated shared values
   const opacity = useSharedValue(1);
@@ -129,17 +131,57 @@ const App: React.FC = () => {
   const checkOnboardingStatus = async () => {
     console.log('[Onboarding] Checking status...');
     try {
-      // 실제 온보딩 상태 확인
+      // 온보딩과 환영 화면 상태 확인
       const onboardingComplete = await AsyncStorage.getItem('@posty_onboarding_complete');
+      const welcomeComplete = await AsyncStorage.getItem('@posty_welcome_complete');
+      
       const shouldShowOnboarding = !onboardingComplete;
-      console.log('[Onboarding] Status:', { onboardingComplete, shouldShowOnboarding });
+      const shouldShowWelcome = !welcomeComplete && !onboardingComplete;
+      
+      console.log('[Onboarding] Status:', { 
+        onboardingComplete, 
+        welcomeComplete, 
+        shouldShowOnboarding, 
+        shouldShowWelcome 
+      });
+      
+      console.log('[Welcome] showMinimalWelcome will be set to:', shouldShowWelcome);
+      
       setNeedsOnboarding(shouldShowOnboarding);
+      setShowMinimalWelcome(shouldShowWelcome);
     } catch (error) {
       console.error('[Onboarding] Failed to check status:', error);
       setNeedsOnboarding(true);
+      setShowMinimalWelcome(true);
     } finally {
       console.log('[Onboarding] Check complete, isCheckingOnboarding = false');
       setIsCheckingOnboarding(false);
+    }
+  };
+
+  // 환영 화면 완료 핸들러
+  const handleWelcomeComplete = async () => {
+    try {
+      // 환영 화면 완료 표시 저장
+      await AsyncStorage.setItem('@posty_welcome_complete', 'true');
+      setShowMinimalWelcome(false);
+      // 온보딩 화면은 아직 필요함
+    } catch (error) {
+      console.error('Failed to save welcome status:', error);
+    }
+  };
+
+  // 환영 화면 건너뛰기 핸들러
+  const handleWelcomeSkip = async () => {
+    try {
+      // 환영 화면과 온보딩 모두 건너뛰고 바로 로그인으로
+      await AsyncStorage.setItem('@posty_welcome_complete', 'true');
+      await AsyncStorage.setItem('@posty_onboarding_complete', 'true');
+      setShowMinimalWelcome(false);
+      setNeedsOnboarding(false);
+      setActiveTab('login');
+    } catch (error) {
+      console.error('Failed to save skip status:', error);
     }
   };
 
@@ -381,7 +423,12 @@ const App: React.FC = () => {
 
   // renderScreen을 useMemo로 최적화
   const renderScreen = useMemo(() => {
-    console.log('[Render] Screen render:', { isCheckingOnboarding, needsOnboarding, activeTab });
+    console.log('[Render] Screen render:', { 
+      isCheckingOnboarding, 
+      needsOnboarding, 
+      showMinimalWelcome, 
+      activeTab 
+    });
     
     // 온보딩 상태 체크 중
     if (isCheckingOnboarding) {
@@ -390,6 +437,17 @@ const App: React.FC = () => {
         <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
+      );
+    }
+
+    // 환영 화면 표시 (온보딩 전에 먼저 표시)
+    if (showMinimalWelcome) {
+      console.log('[Render] Showing minimal welcome screen');
+      return (
+        <MinimalWelcome 
+          onComplete={handleWelcomeComplete}
+          onSkip={handleWelcomeSkip}
+        />
       );
     }
 
@@ -462,8 +520,8 @@ const App: React.FC = () => {
       default:
         return <HomeScreen key="home" onNavigate={handleTabPress} />;
     }
-  }, [activeTab, isCheckingAuth, isCheckingOnboarding, needsOnboarding, colors.background, colors.primary, handleTabPress, 
-      navigationData, photoMode, styles, handleOnboardingComplete]);
+  }, [activeTab, isCheckingAuth, isCheckingOnboarding, needsOnboarding, showMinimalWelcome, colors.background, colors.primary, handleTabPress, 
+      navigationData, photoMode, styles, handleOnboardingComplete, handleWelcomeComplete, handleWelcomeSkip]);
 
   // 애니메이션 스플래시 스크린을 표시
   if (showSplash) {
@@ -504,13 +562,13 @@ const App: React.FC = () => {
             <Animated.View style={[styles.content, animatedStyle]}>
               {renderScreen}
             </Animated.View>
-            {activeTab !== 'login' && !needsOnboarding && (
+            {activeTab !== 'login' && !needsOnboarding && !showMinimalWelcome && (
               <TabNavigator 
                 activeTab={activeTab} 
                 onTabPress={handleTabPress} 
               />
             )}
-            {activeTab !== 'login' && !needsOnboarding && (
+            {activeTab !== 'login' && !needsOnboarding && !showMinimalWelcome && (
               <AchievementNotification 
                 onNavigateToProfile={() => handleTabPress('profile')} 
               />

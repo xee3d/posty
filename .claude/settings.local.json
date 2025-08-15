@@ -36,7 +36,12 @@
       "Bash(xcrun simctl spawn:*)",
       "Bash(xcrun simctl install:*)",
       "Bash(open:*)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(gh auth:*)",
+      "Bash(ssh:*)",
+      "Bash(git push:*)",
+      "Bash(xcrun simctl boot:*)",
+      "WebFetch(domain:posty-ai-new.vercel.app)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits"

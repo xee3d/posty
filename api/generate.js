@@ -122,27 +122,24 @@ export default async function handler(req, res) {
     
     ${generatePlatformVersions ? `
 
-    🚨 필수 작업: 반드시 아래 3가지 플랫폼별로 완전히 다른 글을 작성하세요 🚨
+    🚨🚨🚨 매우 중요 🚨🚨🚨
+    반드시 다음 형식으로 3가지 버전을 모두 작성해주세요:
 
-    1. Instagram 스타일로 작성:
-    - 감성적이고 아름다운 스토리텔링
-    - 여러 문단으로 나누어 시각적 구성
-    - 관련 해시태그 5-7개 포함
-    - 줄바꿈으로 보기 좋게 구성
+    1. Instagram 스타일:
+    [여기에 Instagram용 콘텐츠 작성]
 
-    2. Facebook 스타일로 작성:
-    - 친근하고 개인적인 대화체
-    - 개인 경험이나 생각을 공유하는 톤
-    - 한 문단으로 자연스럽게 연결
-    - 친구들과의 소통을 유도
+    2. Facebook 스타일:
+    [여기에 Facebook용 콘텐츠 작성]
 
-    3. Twitter(X) 스타일로 작성:
-    - 280자 이내로 간결하고 임팩트 있게
-    - 위트있거나 생각을 자극하는 표현
-    - 해시태그 1-2개만 사용
-    - 한 줄로 강렬한 인상
+    3. Twitter 스타일:
+    [여기에 Twitter용 콘텐츠 작성]
 
-    ⚠️ 주의: 각 플랫폼마다 완전히 다른 접근 방식과 내용으로 작성해야 합니다.` : ''}`,
+    각 플랫폼별 특징:
+    - Instagram: 감성적, 스토리텔링, 해시태그 5-7개, 줄바꿈 활용
+    - Facebook: 친근한 대화체, 개인적 경험, 한 문단으로 자연스럽게
+    - Twitter: 280자 이내, 간결하고 위트있게, 해시태그 1-2개
+
+    🔥 절대로 하나의 통합된 글만 쓰지 마세요. 반드시 3개의 서로 다른 글을 작성해주세요!` : ''}`,
       
       en: `You are Posty, a creative AI assistant specialized in creating engaging social media content.
     

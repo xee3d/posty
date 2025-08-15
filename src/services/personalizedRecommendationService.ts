@@ -84,7 +84,7 @@ class PersonalizedRecommendationService {
       title: '뭐 먹었어? 이거면 끝!',
       content: '음식 사진 하나만 있으면 돼요\n"맛있다" 한 마디면 충분해요',
       meta: {
-        icon: 'fast-food',
+        icon: 'restaurant',
         text: '1분 완성'
       },
       actionText: '음식 사진',
@@ -209,7 +209,7 @@ class PersonalizedRecommendationService {
       title: '불타는 금요일!',
       content: '한 주 수고한 나를 위한\n주말 계획을 공유해보세요',
       meta: {
-        icon: 'celebration',
+        icon: 'happy',
         text: '주말 시작'
       },
       actionText: '글쓰기',
@@ -232,7 +232,7 @@ class PersonalizedRecommendationService {
       title: '여유로운 주말',
       content: '주말 나들이나 휴식 시간을\n기록해보는 건 어떨까요?',
       meta: {
-        icon: 'park',
+        icon: 'leaf',
         text: '주말 활동'
       },
       actionText: '글쓰기',
@@ -250,14 +250,14 @@ class PersonalizedRecommendationService {
     {
       id: 'rainy-day',
       type: 'weather',
-      icon: 'umbrella',
+      icon: 'umbrella-outline',
       iconColor: '#607D8B',
       badge: '🌧️ 비오는 날',
       badgeEmoji: '🌧️',
       title: '감성 비 오는 날',
       content: '빗소리와 함께하는 감성적인\n순간을 기록해보세요',
       meta: {
-        icon: 'water',
+        icon: 'water-outline',
         text: '비 예보'
       },
       actionText: '글쓰기',
@@ -322,14 +322,14 @@ class PersonalizedRecommendationService {
     {
       id: 'milestone-10',
       type: 'milestone',
-      icon: 'emoji-events',
+      icon: 'trophy',
       iconColor: '#FF9800',
       badge: '🏆 10개 달성',
       badgeEmoji: '🏆',
       title: '10번째 포스팅!',
       content: '벌써 10개의 이야기를 남기셨네요!\n특별한 회고를 해보는 건 어떨까요?',
       meta: {
-        icon: 'grade',
+        icon: 'star',
         text: '축하해요!'
       },
       actionText: '회고 쓰기',
