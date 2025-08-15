@@ -107,6 +107,8 @@ export default async function handler(req, res) {
     } else {
       console.log('📝 Single content generation mode');
     }
+    
+    console.log('🤖 Selected AI model:', apiModel || (generatePlatformVersions ? 'gpt-4o' : 'gpt-4o-mini'));
 
     const systemPrompts = {
       ko: `당신은 창의적인 소셜 미디어 콘텐츠를 만드는 AI 어시스턴트 '포스티'입니다.
@@ -129,23 +131,28 @@ export default async function handler(req, res) {
     ${generatePlatformVersions ? `
 
     🚨🚨🚨 매우 중요 🚨🚨🚨
-    반드시 다음 형식으로 3가지 버전을 모두 작성해주세요:
+    반드시 아래 예시처럼 3가지 버전을 모두 작성해주세요:
 
+    === 예시 ===
     1. Instagram 스타일:
-    [여기에 Instagram용 콘텐츠 작성]
+    오늘 아침 ☀️
+    특별한 커피 한 잔으로 시작했어요
+
+    향긋한 원두의 깊은 맛이
+    하루를 더욱 풍요롭게 만들어줘요
+
+    여러분도 이런 소소한 행복 찾으셨나요? ✨
+
+    #모닝커피 #일상의행복 #커피사랑 #아침루틴 #소확행
 
     2. Facebook 스타일:
-    [여기에 Facebook용 콘텐츠 작성]
+    아침에 마신 커피가 정말 맛있었어요! 요즘 집에서 내리는 커피에 푹 빠져있는데, 오늘따라 유독 향이 좋더라고요. 다들 아침에 뭘 드시나요? 커피파? 차파? 궁금해요 😊
 
     3. Twitter 스타일:
-    [여기에 Twitter용 콘텐츠 작성]
+    오늘 커피 맛이 유독 좋네 ☕ 작은 행복이란 게 이런 거구나 #커피 #소확행
 
-    각 플랫폼별 특징:
-    - Instagram: 감성적, 스토리텔링, 해시태그 5-7개, 줄바꿈 활용
-    - Facebook: 친근한 대화체, 개인적 경험, 한 문단으로 자연스럽게
-    - Twitter: 280자 이내, 간결하고 위트있게, 해시태그 1-2개
-
-    🔥 절대로 하나의 통합된 글만 쓰지 마세요. 반드시 3개의 서로 다른 글을 작성해주세요!` : ''}`,
+    === 실제 작성 ===
+    위 예시 형식을 따라 반드시 3개의 다른 스타일로 작성하세요!` : ''}`,
       
       en: `You are Posty, a creative AI assistant specialized in creating engaging social media content.
     
@@ -230,7 +237,8 @@ export default async function handler(req, res) {
     
     // 이미지가 있는 경우 Vision API 사용
     let messages;
-    let apiModel = model || 'gpt-4o-mini'; // 기본 모델을 gpt-4o-mini로 변경
+    // 플랫폼별 생성시에는 더 강력한 모델 사용
+    let apiModel = model || (generatePlatformVersions ? 'gpt-4o' : 'gpt-4o-mini');
     
     if (image) {
       console.log('Image detected, using Vision-capable model');
