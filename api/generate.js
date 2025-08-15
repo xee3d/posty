@@ -123,25 +123,21 @@ export default async function handler(req, res) {
     ${generatePlatformVersions ? `
     CRITICAL: You must respond ONLY in valid JSON format. Content must be in Korean.
     
-    Create completely different content for each platform:
+    Create completely different content for each of these 3 platforms:
     
     - Instagram: Storytelling, emotional, natural hashtags 5-7
-    - Facebook: Personal experience, one paragraph flow
+    - Facebook: Personal experience, one paragraph flow  
     - Twitter: 280 chars max, witty, impactful, 1-2 hashtags
-    - LinkedIn: Business/growth perspective, professional insights
-    - TikTok: 150 chars, trending language, hook start
     
     Each platform must have completely different content and tone.
     
-    JSON format example:
+    You must respond with this exact JSON structure:
     {
       "original": "기본 한국어 콘텐츠",
       "platforms": {
         "instagram": "인스타그램용 한국어 콘텐츠",
         "facebook": "페이스북용 한국어 콘텐츠",
-        "twitter": "트위터용 한국어 콘텐츠",
-        "linkedin": "링크드인용 한국어 콘텐츠",
-        "tiktok": "틱톡용 한국어 콘텐츠"
+        "twitter": "트위터용 한국어 콘텐츠"
       }
     }` : ''}`,
       
@@ -165,37 +161,33 @@ export default async function handler(req, res) {
     ${generatePlatformVersions ? `
     CRITICAL: You must respond ONLY in valid JSON format. No other text allowed.
     
-    Create completely different content for each platform:
+    Create completely different content for each of these 3 platforms:
     
     - Instagram: Short sentences, story format, natural hashtags 5-8
     - Facebook: Single paragraph, conversational, personal experience
     - Twitter: One-liner, witty, meme vibes, 1-2 hashtags, 280 chars max
-    - LinkedIn: Business insights, professional angle, minimal line breaks
-    - TikTok: 150 chars, trendy language, hook start
     
     Each platform must have completely different content and tone.
     
-    JSON format example:
+    You must respond with this exact JSON structure:
     {
       "original": "basic English content",
       "platforms": {
         "instagram": "Instagram optimized content",
         "facebook": "Facebook optimized content",
-        "twitter": "Twitter optimized content",
-        "linkedin": "LinkedIn optimized content",
-        "tiktok": "TikTok optimized content"
+        "twitter": "Twitter optimized content"
       }
     }` : ''}`
     };
     
     const systemPrompt = systemPrompts[language] || systemPrompts.ko;
     
-    // 길이에 따른 max_tokens 설정
+    // 길이에 따른 max_tokens 설정 (플랫폼별 생성시 크게 증가)
     const maxTokensMap = {
-      short: generatePlatformVersions ? 400 : 150,
-      medium: generatePlatformVersions ? 800 : 300,
-      long: generatePlatformVersions ? 1200 : 600,
-      extra: generatePlatformVersions ? 2000 : 1200
+      short: generatePlatformVersions ? 600 : 150,
+      medium: generatePlatformVersions ? 1000 : 300,
+      long: generatePlatformVersions ? 1500 : 600,
+      extra: generatePlatformVersions ? 2500 : 1200
     };
     
     // 클라이언트에서 보낸 max_tokens를 우선 사용, 없으면 기본값 사용
