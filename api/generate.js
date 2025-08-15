@@ -522,55 +522,25 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
     if (generatePlatformVersions) {
       console.log('Processing platform-specific content...');
       console.log('Raw response content:', responseContent);
+      console.log('Response content type:', typeof responseContent);
       
       try {
-        // 다양한 JSON 추출 방법 시도
-        let jsonString = null;
+        // response_format: json_object를 사용할 때는 이미 JSON 문자열이므로 직접 파싱
+        parsedContent = JSON.parse(responseContent);
+        console.log('Successfully parsed JSON response:', {
+          hasOriginal: !!parsedContent.original,
+          hasPlatforms: !!parsedContent.platforms,
+          platformKeys: parsedContent.platforms ? Object.keys(parsedContent.platforms) : []
+        });
         
-        // 1. 마크다운 코드 블록에서 추출
-        const markdownMatch = responseContent.match(/```json\s*([\s\S]*?)\s*```/);
-        if (markdownMatch) {
-          jsonString = markdownMatch[1];
-          console.log('Found JSON in markdown block');
-        }
-        
-        // 2. 중괄호 블록에서 추출
-        if (!jsonString) {
-          const braceMatch = responseContent.match(/\{[\s\S]*\}/);
-          if (braceMatch) {
-            jsonString = braceMatch[0];
-            console.log('Found JSON in brace block');
-          }
-        }
-        
-        // 3. 전체 응답이 JSON인지 확인
-        if (!jsonString && responseContent.trim().startsWith('{')) {
-          jsonString = responseContent.trim();
-          console.log('Entire response is JSON');
-        }
-        
-        if (jsonString) {
-          // JSON 문자열 정리 (불필요한 문자 제거)
-          jsonString = jsonString.trim();
-          
-          parsedContent = JSON.parse(jsonString);
-          console.log('Successfully parsed platform-specific content:', {
-            hasOriginal: !!parsedContent.original,
-            hasPlatforms: !!parsedContent.platforms,
-            platformKeys: parsedContent.platforms ? Object.keys(parsedContent.platforms) : []
-          });
-          
-          // 필수 필드 검증
-          if (!parsedContent.original || !parsedContent.platforms) {
-            console.warn('Invalid JSON structure - missing original or platforms');
-            parsedContent = null;
-          }
-        } else {
-          console.warn('No valid JSON found in response');
+        // 필수 필드 검증
+        if (!parsedContent.original || !parsedContent.platforms) {
+          console.warn('Invalid JSON structure - missing original or platforms');
+          parsedContent = null;
         }
       } catch (parseError) {
         console.warn('Failed to parse JSON response:', parseError.message);
-        console.warn('JSON string that failed:', jsonString);
+        console.warn('Response content:', responseContent);
         // JSON 파싱 실패시 원본 텍스트 사용
         parsedContent = null;
       }
