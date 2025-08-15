@@ -100,6 +100,7 @@ export default async function handler(req, res) {
     
     // 플랫폼별 콘텐츠 생성 시 더 명확한 지시사항
     console.log('Generate platform versions:', generatePlatformVersions);
+    console.log('Request params:', { prompt, tone, platform, language, length, includeEmojis });
 
     const systemPrompts = {
       ko: `당신은 창의적인 소셜 미디어 콘텐츠를 만드는 AI 어시스턴트 '포스티'입니다.
@@ -338,6 +339,13 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
     
     // OpenAI API 호출
     console.log('Calling OpenAI API with model:', apiModel);
+    console.log('Request body:', JSON.stringify({
+      model: apiModel,
+      messages: messages.map(m => ({ role: m.role, content: m.content?.length > 100 ? m.content.substring(0, 100) + '...' : m.content })),
+      max_tokens: finalMaxTokens,
+      temperature: generatePlatformVersions ? 0.2 : 0.8,
+      ...(generatePlatformVersions && { response_format: { type: "json_object" } })
+    }, null, 2));
     
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
