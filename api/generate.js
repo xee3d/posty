@@ -120,26 +120,25 @@ export default async function handler(req, res) {
     - 반드시 한국어로 응답하세요
     
     ${generatePlatformVersions ? `
-    ** 매우 중요: 오직 JSON 형식으로만 응답하세요! 다른 텍스트 절대 금지! **
+    당신은 반드시 JSON 형식으로만 응답해야 합니다. 다른 형식은 절대 불가능합니다.
     
-    주제를 각 플랫폼에 완전히 새롭게 재작성하세요. 단순 변형이 아닌 완전히 다른 콘텐츠:
+    주제를 각 플랫폼에 완전히 새롭게 재작성하세요:
     
-    - Instagram: 스토리텔링, 감성적, 해시태그 자연스럽게 5-7개. 줄바꿈 최소화
-    - Facebook: 개인적 경험담, 한 문단 자연스럽게, 공감대 형성
+    - Instagram: 스토리텔링, 감성적, 해시태그 자연스럽게 5-7개
+    - Facebook: 개인적 경험담, 한 문단 자연스럽게, 공감대 형성  
     - Twitter: 280자 활용, 위트 있게, 임팩트 있는 한 줄. 해시태그 1-2개만
     - LinkedIn: 비즈니스/성장 관점으로 완전 재해석, 전문적 인사이트
-    - TikTok: 150자 압축, 트렌드 언어, 후킹 시작 ("POV", "아무도", "진짜" 등)
+    - TikTok: 150자 압축, 트렌드 언어, 후킹 시작
     
-    🚫 금지사항: 접두사/접미사, 상투적 표현, 과도한 줄바꿈
-    ✅ 필수사항: 각 플랫폼마다 완전히 다른 내용과 톤
+    각 플랫폼마다 완전히 다른 내용과 톤으로 작성하세요.
     
-    반드시 아래 JSON 형식만 사용:
+    JSON 응답 형식:
     {
       "original": "기본 콘텐츠",
       "platforms": {
         "instagram": "인스타그램 전용 콘텐츠",
         "facebook": "페이스북 전용 콘텐츠",
-        "twitter": "트위터 전용 콘텐츠", 
+        "twitter": "트위터 전용 콘텐츠",
         "linkedin": "링크드인 전용 콘텐츠",
         "tiktok": "틱톡 전용 콘텐츠"
       }
@@ -353,6 +352,9 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
         temperature: generatePlatformVersions ? 0.2 : 0.8, // Lower temperature for JSON consistency
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
+        ...(generatePlatformVersions && {
+          response_format: { type: "json_object" }
+        }),
       }),
     });
     
