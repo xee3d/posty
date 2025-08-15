@@ -121,23 +121,17 @@ export default async function handler(req, res) {
     ${!generatePlatformVersions ? '- 반드시 한국어로 응답하세요' : ''}
     
     ${generatePlatformVersions ? `
-    CRITICAL: You must respond ONLY in valid JSON format. Content must be in Korean.
+    RESPOND ONLY IN JSON FORMAT. NO OTHER TEXT.
     
-    Create completely different content for each of these 3 platforms:
+    Create different Korean content for 3 platforms.
     
-    - Instagram: Storytelling, emotional, natural hashtags 5-7
-    - Facebook: Personal experience, one paragraph flow  
-    - Twitter: 280 chars max, witty, impactful, 1-2 hashtags
-    
-    Each platform must have completely different content and tone.
-    
-    You must respond with this exact JSON structure:
+    JSON response:
     {
-      "original": "기본 한국어 콘텐츠",
+      "original": "기본 콘텐츠",
       "platforms": {
-        "instagram": "인스타그램용 한국어 콘텐츠",
-        "facebook": "페이스북용 한국어 콘텐츠",
-        "twitter": "트위터용 한국어 콘텐츠"
+        "instagram": "인스타그램 콘텐츠",
+        "facebook": "페이스북 콘텐츠", 
+        "twitter": "트위터 콘텐츠"
       }
     }` : ''}`,
       
