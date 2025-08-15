@@ -58,7 +58,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, tone, platform, model, language = 'ko', length = 'medium', image, max_tokens, includeEmojis = true, generatePlatformVersions = true } = req.body;
+    const { prompt, tone, platform, model, language = 'ko', length = 'medium', image, max_tokens, includeEmojis = true, generatePlatformVersions = false } = req.body;
     
     // 입력 검증
     if (!prompt || prompt.trim().length === 0) {
@@ -122,24 +122,27 @@ export default async function handler(req, res) {
     
     ${generatePlatformVersions ? `
 
-    🔹 중요: 반드시 3가지 플랫폼별로 다르게 작성해주세요 🔹
+    🚨 필수 작업: 반드시 아래 3가지 플랫폼별로 완전히 다른 글을 작성하세요 🚨
 
-    1. Instagram 스타일:
-    - 감성적이고 스토리텔링 방식
-    - 해시태그 5-7개 포함
-    - 줄바꿈 활용한 시각적 구성
+    1. Instagram 스타일로 작성:
+    - 감성적이고 아름다운 스토리텔링
+    - 여러 문단으로 나누어 시각적 구성
+    - 관련 해시태그 5-7개 포함
+    - 줄바꿈으로 보기 좋게 구성
 
-    2. Facebook 스타일:
-    - 친근한 대화체로 자연스럽게
-    - 개인적 경험담 중심
-    - 한 문단으로 연결성 있게
+    2. Facebook 스타일로 작성:
+    - 친근하고 개인적인 대화체
+    - 개인 경험이나 생각을 공유하는 톤
+    - 한 문단으로 자연스럽게 연결
+    - 친구들과의 소통을 유도
 
-    3. Twitter(X) 스타일:
-    - 280자 이내로 간결하게
-    - 위트있고 임팩트 있게
-    - 해시태그 1-2개만
+    3. Twitter(X) 스타일로 작성:
+    - 280자 이내로 간결하고 임팩트 있게
+    - 위트있거나 생각을 자극하는 표현
+    - 해시태그 1-2개만 사용
+    - 한 줄로 강렬한 인상
 
-    각 플랫폼마다 완전히 다른 내용과 톤으로 작성하세요.` : ''}`,
+    ⚠️ 주의: 각 플랫폼마다 완전히 다른 접근 방식과 내용으로 작성해야 합니다.` : ''}`,
       
       en: `You are Posty, a creative AI assistant specialized in creating engaging social media content.
     

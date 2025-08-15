@@ -86,30 +86,33 @@ class AIServiceWrapper {
       const aiModel = this.getModelByPlan(userPlan, params.length);
       console.log('Using AI model:', aiModel, 'for plan:', userPlan);
       
-      // 서버 API 호출
-      const content = await serverAIService.generateContent({
+      // 서버 API 호출 - 플랫폼별 생성 활성화
+      const response = await serverAIService.generateContent({
         prompt: finalPrompt,
         tone: params.tone || 'casual',
         platform: params.platform,
         length: params.length,
         model: aiModel, // 플랜별 모델 전달
+        includeEmojis: params.includeEmojis,
+        generatePlatformVersions: true, // 항상 플랫폼별 생성 요청
       });
       
-      console.log('AIServiceWrapper received content:', content);
+      console.log('AIServiceWrapper received response:', response);
       
       // 플랫폼별 콘텐츠 검증
-      const validation = validateContentForPlatform(content, platform as any);
+      const validation = validateContentForPlatform(response.content, platform as any);
       if (!validation.valid) {
         console.warn('Content validation warning:', validation.message);
       }
       
       // 해시태그 추출 (서버에서 안 하면 클라이언트에서)
-      const hashtags = params.hashtags || extractHashtags(content);
+      const hashtags = params.hashtags || extractHashtags(response.content);
       
       return {
-        content,
+        content: response.content,
         hashtags,
         platform: params.platform || 'instagram',
+        platforms: response.platforms,
         estimatedEngagement: 0,
         metadata: {
           provider: 'posty-server',
