@@ -19,7 +19,7 @@ const PLATFORM_CONFIGS: Record<string, PlatformConfig> = {
       lineBreaks: true,
       emojis: 'moderate',
       tone: 'visual_storytelling',
-      features: ['emoji_art', 'line_breaks', 'call_to_action']
+      features: ['emoji_art', 'line_breaks', 'call_to_action', 'aesthetic_spacing']
     }
   },
   facebook: {
@@ -29,7 +29,7 @@ const PLATFORM_CONFIGS: Record<string, PlatformConfig> = {
       lineBreaks: true,
       emojis: 'minimal',
       tone: 'conversational',
-      features: ['questions', 'detailed_story', 'engagement_hook']
+      features: ['questions', 'detailed_story', 'engagement_hook', 'community_feel']
     }
   },
   twitter: {
@@ -39,14 +39,34 @@ const PLATFORM_CONFIGS: Record<string, PlatformConfig> = {
       lineBreaks: false,
       emojis: 'minimal',
       tone: 'concise_witty',
-      features: ['thread_hook', 'trending_format', 'quick_wit']
+      features: ['thread_hook', 'trending_format', 'quick_wit', 'char_limit_strict']
+    }
+  },
+  linkedin: {
+    maxLength: 3000,
+    hashtagCount: { min: 3, max: 5 },
+    style: {
+      lineBreaks: true,
+      emojis: 'minimal',
+      tone: 'professional_insights',
+      features: ['industry_focus', 'thought_leadership', 'networking_cta']
+    }
+  },
+  tiktok: {
+    maxLength: 150,
+    hashtagCount: { min: 3, max: 8 },
+    style: {
+      lineBreaks: false,
+      emojis: 'heavy',
+      tone: 'trendy_youth',
+      features: ['viral_format', 'challenge_ready', 'gen_z_language']
     }
   }
 };
 
 export const optimizeForPlatform = (
   originalContent: string,
-  platform: 'instagram' | 'facebook' | 'twitter',
+  platform: 'instagram' | 'facebook' | 'twitter' | 'linkedin' | 'tiktok',
   tone: string
 ): { content: string; hashtags: string[] } => {
   console.log(`[platformOptimizer] Starting optimization for ${platform}`);
@@ -80,6 +100,16 @@ export const optimizeForPlatform = (
       case 'twitter':
         optimizedContent = transformToTwitter(contentWithoutHashtags, tone);
         optimizedHashtags = optimizedHashtags.slice(0, config.hashtagCount.max);
+        break;
+        
+      case 'linkedin':
+        optimizedContent = transformToLinkedIn(contentWithoutHashtags, tone);
+        optimizedHashtags = adjustHashtagsForLinkedIn(optimizedHashtags);
+        break;
+        
+      case 'tiktok':
+        optimizedContent = transformToTikTok(contentWithoutHashtags, tone);
+        optimizedHashtags = adjustHashtagsForTikTok(optimizedHashtags);
         break;
     }
     
@@ -239,80 +269,48 @@ const transformToFacebook = (content: string, tone: string): string => {
   }
   
   // 페이스북은 원본 내용을 존중하면서 자연스럽게 확장
-  // 스토리 시작은 20% 확률로만 추가 (tone에 따라)
-  const shouldAddStarter = Math.random() < 0.2;
+  // Facebook은 원본을 자연스럽게 확장 (상투적 표현 제거)
+  // 시작 문구는 매우 제한적으로만 사용 (5% 확률)
+  const shouldAddStarter = Math.random() < 0.05;
   
   if (shouldAddStarter && tone !== 'professional' && tone !== 'minimalist') {
-    // 원본 내용의 첫 문장을 분석해서 어울리는 시작만 선택
+    // 원본 내용과 매우 자연스럽게 어우러지는 경우만
     const firstSentence = content.split(/[.!?]/)[0].toLowerCase();
     
-    // 특정 키워드가 있으면 시작 문구 추가하지 않음
-    const skipKeywords = ['오늘', '어제', '방금', '이미', '드디어', '결국', '처음', '마침내'];
+    // 이미 완성된 문장들은 건드리지 않음
+    const skipKeywords = ['오늘', '어제', '방금', '이미', '드디어', '결국', '처음', '마침내', '지금', '요즘', '최근'];
     const hasSkipKeyword = skipKeywords.some(keyword => firstSentence.includes(keyword));
     
     if (!hasSkipKeyword) {
-      const contextualStarters = [
-        '이런 생각이 들었어요.\n\n',
-        '문득 떠오른 이야기.\n\n',
-        '공유하고 싶은 순간.\n\n'
+      // 매우 자연스러운 연결어만 사용
+      const naturalConnectors = [
+        '그런데 말이에요.\n\n',
+        '생각해보니까.\n\n'
       ];
-      transformed = contextualStarters[Math.floor(Math.random() * contextualStarters.length)] + transformed;
+      transformed = naturalConnectors[Math.floor(Math.random() * naturalConnectors.length)] + transformed;
     }
   }
   
-  // 종결부는 내용과 tone을 고려해서 추가 (50% 확률)
-  const shouldAddEnding = Math.random() < 0.5;
+  // 종결부도 매우 제한적으로만 추가 (20% 확률, 자연스러운 경우만)
+  const shouldAddEnding = Math.random() < 0.2;
   
   if (shouldAddEnding) {
-    // 원본 내용의 감정 분석
-    const negativeWords = ['힘들', '어려', '슬프', '아프', '우울', '지치', '못', '안', '실패', '포기'];
-    const positiveWords = ['좋', '행복', '기쁘', '감사', '사랑', '성공', '해냈', '이뤘', '달성'];
-    const questionWords = ['어떻게', '뭐가', '왜', '언제', '어디', '누가', '있을까', '일까', '할까'];
-    
-    const hasNegative = negativeWords.some(word => transformed.includes(word));
-    const hasPositive = positiveWords.some(word => transformed.includes(word));
-    const hasQuestion = questionWords.some(word => transformed.includes(word));
-    
-    // 이미 질문으로 끝나면 추가 종결 없음
-    if (transformed.trim().endsWith('?')) {
+    // 이미 완성된 문장이면 건드리지 않음
+    if (transformed.trim().endsWith('?') || transformed.trim().endsWith('!') || 
+        transformed.includes('그래서') || transformed.includes('그런데')) {
       return transformed;
     }
     
-    let selectedEndings = [];
+    // 매우 자연스러운 마무리만 사용
+    const naturalEndings = [
+      '\n\n그런 날이었어요.',
+      '', // 대부분은 종결 없이 원본 그대로
+      '', 
+      '',
+      '\n\n뭔가 그렇더라고요.'
+    ];
     
-    if (hasNegative && !hasPositive) {
-      // 부정적인 내용일 때는 공감이나 위로
-      selectedEndings = [
-        '\n\n모두가 비슷한 경험을 하며 살아가고 있어요.',
-        '\n\n함께 이겨낼 수 있을 거예요.',
-        '\n\n내일은 더 나은 날이 되길.',
-        '' // 종결 없이
-      ];
-    } else if (hasPositive && !hasNegative) {
-      // 긍정적인 내용일 때만 긍정적 종결
-      selectedEndings = [
-        '\n\n이런 순간들이 모여 행복이 되는 것 같아요.',
-        '\n\n오늘도 감사한 하루였네요.',
-        '\n\n작지만 확실한 행복.',
-        '' // 종결 없이
-      ];
-    } else if (hasQuestion) {
-      // 질문이 포함된 경우 대화 유도
-      selectedEndings = [
-        '\n\n여러분의 생각은 어떠신가요?',
-        '\n\n댓글로 의견을 나눠주세요.',
-        '' // 종결 없이
-      ];
-    } else {
-      // 중립적이거나 복합적인 경우
-      selectedEndings = [
-        '\n\n오늘의 기록을 남깁니다.',
-        '\n\n이런 일상의 한 페이지.',
-        '' // 종결 없이
-      ];
-    }
-    
-    const ending = selectedEndings[Math.floor(Math.random() * selectedEndings.length)];
+    const ending = naturalEndings[Math.floor(Math.random() * naturalEndings.length)];
     if (ending) {
       transformed += ending;
     }
@@ -569,6 +567,103 @@ const adjustHashtagsForInstagram = (hashtags: string[] = []): string[] => {
   return safeHashtags.slice(0, 15);
 };
 
+const transformToLinkedIn = (content: string, tone: string): string => {
+  let transformed = content;
+  
+  // LinkedIn은 전문적이고 인사이트가 있는 톤으로 변환
+  if (tone !== 'professional') {
+    // 전문적 어투로 변환
+    transformed = transformed
+      .replace(/ㅋㅋ|ㅎㅎ|ㅠㅠ/g, '') // 인터넷 용어 제거
+      .replace(/진짜|완전|대박/g, '정말로') // 캐주얼한 표현 변경
+      .replace(/그냥|막/g, '') // 불필요한 부사 제거
+      .trim();
+  }
+  
+  // 인사이트나 교훈으로 마무리
+  const shouldAddInsight = Math.random() < 0.6;
+  if (shouldAddInsight && !transformed.endsWith('?')) {
+    const insights = [
+      '\n\n이런 경험에서 배우는 점이 많습니다.',
+      '\n\n업무와 삶의 균형에 대해 다시 생각해보게 됩니다.',
+      '\n\n여러분의 경험은 어떠신가요?',
+      '\n\n지속적인 성장의 중요성을 느끼게 됩니다.'
+    ];
+    
+    transformed += insights[Math.floor(Math.random() * insights.length)];
+  }
+  
+  return transformed;
+};
+
+const transformToTikTok = (content: string, tone: string): string => {
+  let transformed = content;
+  
+  // TikTok은 150자 제한으로 매우 짧게
+  const maxLength = 120; // 해시태그 공간 확보
+  
+  if (transformed.length > maxLength) {
+    const sentences = transformed.split(/[.!?]/).filter(s => s.trim());
+    if (sentences.length > 0) {
+      transformed = sentences[0].trim();
+      if (transformed.length > maxLength) {
+        transformed = transformed.substring(0, maxLength - 3) + '...';
+      }
+    }
+  }
+  
+  // TikTok 스타일로 변환
+  const tikTokStyles = [
+    transformed + ' 🔥',
+    'POV: ' + transformed,
+    transformed + ' (말이 됨?)',
+    '아무도 예상 못한 ' + transformed,
+    transformed + ' fr fr 💯'
+  ];
+  
+  return tikTokStyles[Math.floor(Math.random() * tikTokStyles.length)];
+};
+
+const adjustHashtagsForLinkedIn = (hashtags: string[] = []): string[] => {
+  const professionalTags = [
+    '직장인', '업무', '성장', '인사이트', '경험공유',
+    '리더십', '커리어', '동기부여', '생산성', '전문성'
+  ];
+  
+  const safeHashtags = hashtags || [];
+  
+  // 전문적인 해시태그 추가
+  while (safeHashtags.length < 3 && professionalTags.length > 0) {
+    const randomIndex = Math.floor(Math.random() * professionalTags.length);
+    const tag = professionalTags.splice(randomIndex, 1)[0];
+    if (!safeHashtags.includes(tag)) {
+      safeHashtags.push(tag);
+    }
+  }
+  
+  return safeHashtags.slice(0, 5);
+};
+
+const adjustHashtagsForTikTok = (hashtags: string[] = []): string[] => {
+  const trendyTags = [
+    'fyp', 'viral', 'trending', 'foryou', 'relatable',
+    '일상', 'real', 'mood', 'vibe', 'facts'
+  ];
+  
+  const safeHashtags = hashtags || [];
+  
+  // 트렌디한 해시태그 추가
+  while (safeHashtags.length < 5 && trendyTags.length > 0) {
+    const randomIndex = Math.floor(Math.random() * trendyTags.length);
+    const tag = trendyTags.splice(randomIndex, 1)[0];
+    if (!safeHashtags.includes(tag)) {
+      safeHashtags.push(tag);
+    }
+  }
+  
+  return safeHashtags.slice(0, 8);
+};
+
 export const getPlatformTips = (platform: string): string => {
   const tips: Record<string, string[]> = {
     instagram: [
@@ -598,6 +693,20 @@ export const getPlatformTips = (platform: string): string => {
       '🔥 임팩트 있는 첫 문장과 훅 형식으로 변환했어요',
       '🧵 스레드 형식을 고려한 글머리 기호를 추가했어요',
       '🚀 RT를 유도하는 위트 있는 표현으로 바꿨어요',
+    ],
+    linkedin: [
+      '💼 전문적이고 인사이트가 있는 톤으로 변환했어요',
+      '📈 비즈니스 네트워킹에 적합한 표현으로 다듬었어요',
+      '🎯 커리어 성장과 관련된 관점을 추가했어요',
+      '🤝 업계 전문가들과의 소통을 유도하는 방식으로 마무리했어요',
+      '📊 경험에서 얻은 교훈과 인사이트를 강조했어요',
+    ],
+    tiktok: [
+      '🔥 150자 제한에 맞춰 임팩트 있게 압축했어요',
+      '💯 Gen Z 스타일의 트렌디한 표현으로 변환했어요',
+      '⚡ 바이럴 가능성을 높이는 훅으로 시작했어요',
+      '🎵 TikTok 특유의 리듬감 있는 문장으로 재구성했어요',
+      '✨ #fyp #viral 등 트렌딩 해시태그를 추가했어요',
     ]
   };
   

@@ -119,12 +119,15 @@ export default async function handler(req, res) {
     ${generatePlatformVersions ? `
     ** 중요: 반드시 JSON 형식으로만 응답하세요 **
     
-    각 플랫폼별로 최적화된 버전을 생성하세요:
-    - Instagram: 감성적이고 시각적인 스토리텔링, 해시태그 많이 사용
-    - Facebook: 대화형이고 친근한 톤, 스토리 기반
-    - Twitter: 간결하고 임팩트 있는 표현, 280자 제한 고려
-    - LinkedIn: 전문적이고 인사이트가 있는 내용
-    - TikTok: 트렌디하고 젊은 감성, 짧고 강렬한 표현
+    같은 주제로 각 플랫폼에 완전히 새롭게 작성하세요. 단순히 접두사/접미사를 붙이지 말고, 각 플랫폼의 문화와 사용자에게 맞는 완전히 다른 글로 새로 써주세요:
+    
+    - Instagram: 감성적 스토리텔링, 미적 줄바꿈, 많은 해시태그. "공유하고 싶은 순간" 같은 상투적 표현 금지
+    - Facebook: 자연스러운 대화톤, 개인적 경험 중심. "댓글로 의견을 나눠주세요" 같은 틀에 박힌 표현 금지  
+    - Twitter: 280자 내 임팩트 있는 한 줄, 위트 있게. 억지스러운 해시태그나 멘션 금지
+    - LinkedIn: 전문적 인사이트, 업무/성장 관점에서 재해석. "네트워킹" 같은 뻔한 표현 금지
+    - TikTok: Gen Z 언어, 트렌드 반영, 150자 내로 강렬하게. "바이럴" 같은 직접적 표현 금지
+    
+    각 플랫폼마다 완전히 다른 접근법과 표현으로 새로 작성하세요.
     
     다음 JSON 형식으로만 응답하세요. 다른 설명이나 텍스트는 절대 포함하지 마세요:
     {
@@ -160,12 +163,15 @@ export default async function handler(req, res) {
     ${generatePlatformVersions ? `
     ** IMPORTANT: Respond ONLY in JSON format **
     
-    Create optimized versions for each platform:
-    - Instagram: Emotional and visual storytelling, many hashtags
-    - Facebook: Conversational and friendly tone, story-based
-    - Twitter: Concise and impactful expression, consider 280 character limit
-    - LinkedIn: Professional and insightful content
-    - TikTok: Trendy and youthful vibe, short and powerful expression
+    Completely rewrite the same topic for each platform. Don't just add prefixes/suffixes - create entirely different content that fits each platform's culture and users:
+    
+    - Instagram: Aesthetic storytelling with line breaks, many hashtags. NO cliché phrases like "sharing this moment"
+    - Facebook: Natural conversational tone, personal experience focus. NO formulaic phrases like "share your thoughts in comments"
+    - Twitter: Impactful one-liner within 280 chars, witty. NO forced hashtags or mentions  
+    - LinkedIn: Professional insights, reframe from work/growth perspective. NO generic phrases like "networking"
+    - TikTok: Gen Z language, trend-aware, punchy under 150 chars. NO direct phrases like "viral"
+    
+    Write each platform version with completely different approach and expressions.
     
     Respond with this exact JSON format only. Do not include any other text or explanations:
     {
