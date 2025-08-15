@@ -108,8 +108,6 @@ export default async function handler(req, res) {
       console.log('📝 Single content generation mode');
     }
     
-    console.log('🤖 Selected AI model:', apiModel || (generatePlatformVersions ? 'gpt-4o' : 'gpt-4o-mini'));
-
     const systemPrompts = {
       ko: `당신은 창의적인 소셜 미디어 콘텐츠를 만드는 AI 어시스턴트 '포스티'입니다.
     
@@ -239,6 +237,8 @@ export default async function handler(req, res) {
     let messages;
     // 플랫폼별 생성시에는 더 강력한 모델 사용
     let apiModel = model || (generatePlatformVersions ? 'gpt-4o' : 'gpt-4o-mini');
+    
+    console.log('🤖 Selected AI model:', apiModel, '(Platform generation:', generatePlatformVersions, ')');
     
     if (image) {
       console.log('Image detected, using Vision-capable model');
