@@ -97,6 +97,9 @@ export default async function handler(req, res) {
     const emojiGuide = includeEmojis 
       ? (language === 'ko' ? '이모지를 적절히 사용하여 감정을 표현하세요' : 'Use emojis appropriately to express emotions')
       : (language === 'ko' ? '이모지를 사용하지 마세요' : 'Do not use any emojis');
+    
+    // 플랫폼별 콘텐츠 생성 시 더 명확한 지시사항
+    console.log('Generate platform versions:', generatePlatformVersions);
 
     const systemPrompts = {
       ko: `당신은 창의적인 소셜 미디어 콘텐츠를 만드는 AI 어시스턴트 '포스티'입니다.
@@ -117,32 +120,30 @@ export default async function handler(req, res) {
     - 반드시 한국어로 응답하세요
     
     ${generatePlatformVersions ? `
-    ** 중요: 반드시 JSON 형식으로만 응답하세요 **
+    ** 매우 중요: 오직 JSON 형식으로만 응답하세요! 다른 텍스트 절대 금지! **
     
-    2024-2025 최신 트렌드에 맞춰 각 플랫폼에 완전히 다르게 작성하세요:
+    주제를 각 플랫폼에 완전히 새롭게 재작성하세요. 단순 변형이 아닌 완전히 다른 콘텐츠:
     
-    - Instagram: 짧은 문장, 최소 줄바꿈, 스토리 형식. 과도한 줄바꿈 금지. 자연스러운 해시태그 5-8개만
-    - Facebook: 한 문단으로 자연스럽게, 대화체. 줄바꿈 최소화. 개인 경험담 중심
-    - Twitter: 한 줄 완성형, 임팩트 있게, 밈 감성. 해시태그 1-2개만. 280자 최대한 활용
-    - LinkedIn: 비즈니스 인사이트로 완전 재해석. 전문적이지만 접근 가능한 톤. 줄바꿈 최소
-    - TikTok: 초압축 150자, 트렌드 언어, 훅 있는 시작. "POV:", "아무도 모르는", "진짜" 등 활용
+    - Instagram: 스토리텔링, 감성적, 해시태그 자연스럽게 5-7개. 줄바꿈 최소화
+    - Facebook: 개인적 경험담, 한 문단 자연스럽게, 공감대 형성
+    - Twitter: 280자 활용, 위트 있게, 임팩트 있는 한 줄. 해시태그 1-2개만
+    - LinkedIn: 비즈니스/성장 관점으로 완전 재해석, 전문적 인사이트
+    - TikTok: 150자 압축, 트렌드 언어, 후킹 시작 ("POV", "아무도", "진짜" 등)
     
-    ❌ 금지: 과도한 줄바꿈, 뻔한 해시태그, 상투적 표현
-    ✅ 필수: 플랫폼별 완전히 다른 문체와 구조
+    🚫 금지사항: 접두사/접미사, 상투적 표현, 과도한 줄바꿈
+    ✅ 필수사항: 각 플랫폼마다 완전히 다른 내용과 톤
     
-    다음 JSON 형식으로만 응답하세요. 다른 설명이나 텍스트는 절대 포함하지 마세요:
+    반드시 아래 JSON 형식만 사용:
     {
-      "original": "여기에 기본 콘텐츠 작성",
+      "original": "기본 콘텐츠",
       "platforms": {
-        "instagram": "인스타그램용 최적화 콘텐츠",
-        "facebook": "페이스북용 최적화 콘텐츠", 
-        "twitter": "트위터용 최적화 콘텐츠",
-        "linkedin": "링크드인용 최적화 콘텐츠",
-        "tiktok": "틱톡용 최적화 콘텐츠"
+        "instagram": "인스타그램 전용 콘텐츠",
+        "facebook": "페이스북 전용 콘텐츠",
+        "twitter": "트위터 전용 콘텐츠", 
+        "linkedin": "링크드인 전용 콘텐츠",
+        "tiktok": "틱톡 전용 콘텐츠"
       }
-    }
-    
-    반드시 이 JSON 형식을 정확히 따라주세요.` : ''}`,
+    }` : ''}`,
       
       en: `You are Posty, a creative AI assistant specialized in creating engaging social media content.
     
@@ -349,7 +350,7 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
         model: apiModel,
         messages: messages,
         max_tokens: finalMaxTokens,
-        temperature: generatePlatformVersions ? 0.3 : 0.8, // Lower temperature for JSON consistency
+        temperature: generatePlatformVersions ? 0.2 : 0.8, // Lower temperature for JSON consistency
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
       }),

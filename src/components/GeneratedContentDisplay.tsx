@@ -5,7 +5,7 @@ import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator, ScrollView
 import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import Clipboard from '@react-native-clipboard/clipboard';
-import { optimizeForPlatform, getPlatformTips } from '../utils/platformOptimizer';
+// import { optimizeForPlatform, getPlatformTips } from '../utils/platformOptimizer'; // 제거 - API에서만 처리
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '../utils/constants';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { ScaleButton } from './AnimationComponents';
@@ -19,12 +19,20 @@ import { Share } from 'react-native';
 interface GeneratedContentProps {
   originalContent: string | any;
   tone: string;
+  platforms?: {
+    instagram?: string;
+    facebook?: string;
+    twitter?: string;
+    linkedin?: string;
+    tiktok?: string;
+  };
   onEdit?: (content: string) => void;
 }
 
 export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   originalContent,
   tone,
+  platforms: apiPlatforms,
   onEdit,
 }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
@@ -38,6 +46,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   const hintOpacity = useRef(new Animated.Value(0)).current;
   const [contentHeight, setContentHeight] = useState<number>(300); // 동적 높이 상태
   const [showAllPlatforms, setShowAllPlatforms] = useState(false);
+  const [showEmojis, setShowEmojis] = useState(true); // 이모지 표시 토글
 
   // originalContent가 객체인 경우 처리
   const safeOriginalContent = typeof originalContent === 'string' 
@@ -90,19 +99,30 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   useEffect(() => {
     const generatePlatformContents = async () => {
       console.log('[GeneratedContentDisplay] Generating platform contents...');
+      console.log('[GeneratedContentDisplay] API platforms available:', !!apiPlatforms);
       setIsOptimizing(true);
       const contents: Record<string, { content: string; hashtags: string[] }> = {};
       
       try {
         // 원본을 제외한 플랫폼들만 처리
         for (const platform of platforms.filter(p => p.id !== 'original')) {
-          console.log(`[GeneratedContentDisplay] Optimizing for ${platform.id}`);
-          const optimized = optimizeForPlatform(
-            safeOriginalContent,
-            platform.id as 'instagram' | 'facebook' | 'twitter',
-            tone
-          );
-          contents[platform.id] = optimized;
+          console.log(`[GeneratedContentDisplay] Processing ${platform.id}`);
+          
+          // API에서 받은 플랫폼별 콘텐츠만 사용 (프론트엔드 최적화 제거)
+          if (apiPlatforms && apiPlatforms[platform.id as keyof typeof apiPlatforms]) {
+            console.log(`[GeneratedContentDisplay] Using API content for ${platform.id}`);
+            contents[platform.id] = {
+              content: apiPlatforms[platform.id as keyof typeof apiPlatforms]!,
+              hashtags: []
+            };
+          } else {
+            // API에서 플랫폼별 콘텐츠가 없으면 원본 사용 (대기 상태)
+            console.log(`[GeneratedContentDisplay] No API content for ${platform.id}, using original`);
+            contents[platform.id] = {
+              content: safeOriginalContent + '\n\n(플랫폼별 최적화를 위해 새로 생성해주세요)',
+              hashtags: []
+            };
+          }
         }
         
         setPlatformContents(contents);
@@ -116,50 +136,21 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     if (safeOriginalContent && safeOriginalContent.length > 0) {
       generatePlatformContents();
     }
-  }, [safeOriginalContent, tone]);
+  }, [safeOriginalContent, tone, apiPlatforms]);
 
   const handlePlatformChange = async (platformId: string) => {
     soundManager.playTap();
     
-    // 이미 선택된 플랫폼을 다시 클릭하면 재생성
+    // 이미 선택된 플랫폼을 다시 클릭하면 새 생성 요청
     if (activePlatform === platformId && platformId !== 'original') {
-      setIsOptimizing(true);
-      
-      // 새로운 버전 생성
-      const optimized = optimizeForPlatform(
-        safeOriginalContent,
-        platformId as 'instagram' | 'facebook' | 'twitter',
-        tone
-      );
-      
-      setPlatformContents(prev => ({
-        ...prev,
-        [platformId]: optimized
-      }));
-      
-      // 재생성 횟수 추적
-      setRegenerateCount(prev => ({
-        ...prev,
-        [platformId]: (prev[platformId] || 0) + 1
-      }));
-      
-      // 새로운 팁 메시지 표시
-      const tips = [
-        `✨ ${platformId === 'twitter' ? 'X' : platformId.charAt(0).toUpperCase() + platformId.slice(1)}의 새로운 스타일로 변환했어요!`,
-        `🔄 다른 버전으로 다시 작성했어요. 마음에 드시나요?`,
-        `🎲 새로운 느낌으로 바꿔봤어요!`,
-        `💡 이번엔 조금 다른 스타일로 써봤어요!`
-      ];
-      setOptimizationTip(tips[Math.floor(Math.random() * tips.length)]);
-      
-      setIsOptimizing(false);
+      // TODO: API 재호출로 새로운 플랫폼별 콘텐츠 생성 요청
+      setOptimizationTip('🔄 새로운 버전을 생성하려면 AI 글쓰기에서 다시 생성해주세요');
     } else {
       // 다른 플랫폼으로 전환
       setActivePlatform(platformId as any);
       
       if (platformId !== 'original') {
-        const tip = getPlatformTips(platformId);
-        setOptimizationTip(tip);
+        setOptimizationTip('📱 API에서 생성된 플랫폼 최적화 콘텐츠입니다');
       } else {
         setOptimizationTip('');
       }
@@ -168,20 +159,33 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
 
   const getCurrentContent = () => {
     try {
+      let content = '';
+      
       if (activePlatform === 'original') {
-        return safeOriginalContent || '';
+        content = safeOriginalContent || '';
+      } else {
+        const platformData = platformContents[activePlatform];
+        if (!platformData || !platformData.content) {
+          console.log(`[GeneratedContentDisplay] No content for platform: ${activePlatform}`);
+          return '';
+        }
+        
+        const hashtagString = platformData.hashtags && platformData.hashtags.length > 0 
+          ? platformData.hashtags.map(tag => `#${tag}`).join(' ')
+          : '';
+        content = hashtagString ? `${platformData.content}\n\n${hashtagString}` : platformData.content;
       }
       
-      const platformData = platformContents[activePlatform];
-      if (!platformData || !platformData.content) {
-        console.log(`[GeneratedContentDisplay] No content for platform: ${activePlatform}`);
-        return '';
+      // 이모지 제거 옵션이 활성화된 경우
+      if (!showEmojis) {
+        // 이모지만 제거하고 줄바꿈/띄어쓰기는 그대로 유지
+        const emojiPattern = /[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{1F900}-\u{1F9FF}]|[\u{1FA70}-\u{1FAFF}]|[\u{1F700}-\u{1F77F}]|[\u{1F780}-\u{1F7FF}]|[\u{1F800}-\u{1F8FF}]|[\u{2300}-\u{23FF}]|[\u{2460}-\u{24FF}]|[\u{25A0}-\u{25FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]|[\u{2900}-\u{297F}]|[\u{2B00}-\u{2BFF}]|[\u{3030}]|[\u{00A9}]|[\u{00AE}]|[\u{2122}]|[\u{2139}]|[\u{2194}-\u{2199}]|[\u{21A9}-\u{21AA}]|[\u{231A}-\u{231B}]|[\u{2328}]|[\u{23CF}]|[\u{23E9}-\u{23F3}]|[\u{23F8}-\u{23FA}]|[\u{24C2}]|[\u{25AA}-\u{25AB}]|[\u{25B6}]|[\u{25C0}]|[\u{25FB}-\u{25FE}]/gu;
+        
+        // 이모지만 제거 (공백으로 대체하지 않고 완전 제거)
+        content = content.replace(emojiPattern, '');
       }
       
-      const hashtagString = platformData.hashtags && platformData.hashtags.length > 0 
-        ? platformData.hashtags.map(tag => `#${tag}`).join(' ')
-        : '';
-      return hashtagString ? `${platformData.content}\n\n${hashtagString}` : platformData.content;
+      return content;
     } catch (error) {
       console.error('[GeneratedContentDisplay] Error getting content:', error);
       return safeOriginalContent || '';
@@ -371,9 +375,33 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
               <Text style={styles.originalBadgeText}>생성된 원본</Text>
             </View>
           )}
-          <Text style={styles.contentLengthText}>
-            본문 {getContentLength()}자
-          </Text>
+          <View style={styles.contentHeaderRight}>
+            <TouchableOpacity
+              style={[
+                styles.emojiToggle,
+                showEmojis ? styles.emojiToggleActive : styles.emojiToggleInactive
+              ]}
+              onPress={() => {
+                setShowEmojis(!showEmojis);
+                soundManager.playTap();
+              }}
+            >
+              <Icon 
+                name={showEmojis ? "happy" : "text"} 
+                size={18} 
+                color={showEmojis ? colors.primary : colors.text.primary}
+              />
+              <Text style={[
+                styles.emojiToggleText,
+                showEmojis ? styles.emojiToggleTextActive : styles.emojiToggleTextInactive
+              ]}>
+                {showEmojis ? '이모지ON' : '이모지OFF'}
+              </Text>
+            </TouchableOpacity>
+            <Text style={styles.contentLengthText}>
+              본문 {getContentLength()}자
+            </Text>
+          </View>
         </View>
         <ScrollView 
           style={[styles.contentScrollView, { maxHeight: contentHeight }]} 
@@ -566,6 +594,39 @@ const createStyles = (colors: typeof COLORS, cardTheme: any, isDark: boolean) =>
       justifyContent: 'space-between',
       alignItems: 'center',
       marginBottom: SPACING.sm,
+    },
+    contentHeaderRight: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: SPACING.sm,
+    },
+    emojiToggle: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 4,
+      paddingHorizontal: SPACING.sm,
+      paddingVertical: 6,
+      borderRadius: 16,
+      borderWidth: 1,
+    },
+    emojiToggleActive: {
+      backgroundColor: colors.primary + '10',
+      borderColor: colors.primary,
+    },
+    emojiToggleInactive: {
+      backgroundColor: colors.surface,
+      borderColor: colors.border,
+    },
+    emojiToggleText: {
+      fontSize: 11,
+      fontFamily: 'System',
+      fontWeight: '600' as const,
+    },
+    emojiToggleTextActive: {
+      color: colors.primary,
+    },
+    emojiToggleTextInactive: {
+      color: colors.text.secondary,
     },
     contentLengthText: {
       fontSize: 12,
