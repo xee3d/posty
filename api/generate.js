@@ -101,6 +101,12 @@ export default async function handler(req, res) {
     // 플랫폼별 콘텐츠 생성 시 더 명확한 지시사항
     console.log('Generate platform versions:', generatePlatformVersions);
     console.log('Request params:', { prompt, tone, platform, language, length, includeEmojis });
+    
+    if (generatePlatformVersions) {
+      console.log('🔥 Platform generation is ENABLED - expecting 3 distinct versions');
+    } else {
+      console.log('📝 Single content generation mode');
+    }
 
     const systemPrompts = {
       ko: `당신은 창의적인 소셜 미디어 콘텐츠를 만드는 AI 어시스턴트 '포스티'입니다.
@@ -514,8 +520,9 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
     
     // 플랫폼별 콘텐츠 요청인 경우 자연어 응답에서 플랫폼별 내용 추출
     if (generatePlatformVersions) {
-      console.log('Processing platform-specific content...');
-      console.log('Raw response content:', responseContent);
+      console.log('🔍 Processing platform-specific content...');
+      console.log('📝 Raw response content (length: ' + responseContent.length + '):', responseContent);
+      console.log('🔎 Looking for numbered sections (1. Instagram, 2. Facebook, 3. Twitter)...');
       
       try {
         // 자연어 응답에서 플랫폼별 내용 추출
