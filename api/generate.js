@@ -58,7 +58,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { prompt, tone, platform, model, language = 'ko', length = 'medium', image, max_tokens } = req.body;
+    const { prompt, tone, platform, model, language = 'ko', length = 'medium', image, max_tokens, includeEmojis = true, generatePlatformVersions = true } = req.body;
     
     // 입력 검증
     if (!prompt || prompt.trim().length === 0) {
@@ -94,6 +94,10 @@ export default async function handler(req, res) {
       extra: { ko: '500-700자', en: '500-700 characters' }
     };
     
+    const emojiGuide = includeEmojis 
+      ? (language === 'ko' ? '이모지를 적절히 사용하여 감정을 표현하세요' : 'Use emojis appropriately to express emotions')
+      : (language === 'ko' ? '이모지를 사용하지 마세요' : 'Do not use any emojis');
+
     const systemPrompts = {
       ko: `당신은 창의적인 소셜 미디어 콘텐츠를 만드는 AI 어시스턴트 '포스티'입니다.
     
@@ -101,6 +105,7 @@ export default async function handler(req, res) {
     - 톤: ${tone || 'friendly'}
     - 플랫폼: ${platform || 'general'}
     - 길이: ${lengthGuides[length]?.ko || lengthGuides.medium.ko}
+    - 이모지: ${includeEmojis ? '사용' : '사용 안 함'}
     
     가이드라인:
     - 창의적이고 매력적인 콘텐츠를 작성하세요
@@ -108,7 +113,30 @@ export default async function handler(req, res) {
     - 적절한 해시태그를 사용하세요
     - 요청된 길이(${lengthGuides[length]?.ko || lengthGuides.medium.ko})에 맞춰 작성하세요
     - 요청된 톤에 완벽하게 맞춰 작성하세요
-    - 반드시 한국어로 응답하세요`,
+    - ${emojiGuide}
+    - 반드시 한국어로 응답하세요
+    
+    ${generatePlatformVersions ? `
+    ** 중요: 반드시 JSON 형식으로만 응답하세요 **
+    
+    각 플랫폼별로 최적화된 버전을 생성하세요:
+    - Instagram: 감성적이고 시각적인 스토리텔링, 해시태그 많이 사용
+    - Facebook: 대화형이고 친근한 톤, 스토리 기반
+    - Twitter: 간결하고 임팩트 있는 표현, 280자 제한 고려
+    - LinkedIn: 전문적이고 인사이트가 있는 내용
+    - TikTok: 트렌디하고 젊은 감성, 짧고 강렬한 표현
+    
+    다음 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
+    {
+      "original": "여기에 기본 콘텐츠 작성",
+      "platforms": {
+        "instagram": "인스타그램용 최적화 콘텐츠",
+        "facebook": "페이스북용 최적화 콘텐츠", 
+        "twitter": "트위터용 최적화 콘텐츠",
+        "linkedin": "링크드인용 최적화 콘텐츠",
+        "tiktok": "틱톡용 최적화 콘텐츠"
+      }
+    }` : ''}`,
       
       en: `You are Posty, a creative AI assistant specialized in creating engaging social media content.
     
@@ -116,6 +144,7 @@ export default async function handler(req, res) {
     - Tone: ${tone || 'friendly'}
     - Platform: ${platform || 'general'}
     - Length: ${lengthGuides[length]?.en || lengthGuides.medium.en}
+    - Emojis: ${includeEmojis ? 'Enabled' : 'Disabled'}
     
     Guidelines:
     - Be creative and engaging
@@ -123,7 +152,30 @@ export default async function handler(req, res) {
     - Use appropriate hashtags when relevant
     - Keep content to the requested length (${lengthGuides[length]?.en || lengthGuides.medium.en})
     - Match the requested tone perfectly
-    - Always respond in English`
+    - ${emojiGuide}
+    - Always respond in English
+    
+    ${generatePlatformVersions ? `
+    ** IMPORTANT: Respond ONLY in JSON format **
+    
+    Create optimized versions for each platform:
+    - Instagram: Emotional and visual storytelling, many hashtags
+    - Facebook: Conversational and friendly tone, story-based
+    - Twitter: Concise and impactful expression, consider 280 character limit
+    - LinkedIn: Professional and insightful content
+    - TikTok: Trendy and youthful vibe, short and powerful expression
+    
+    Respond with this exact JSON format (no other text):
+    {
+      "original": "write basic content here",
+      "platforms": {
+        "instagram": "Instagram optimized content",
+        "facebook": "Facebook optimized content", 
+        "twitter": "Twitter optimized content",
+        "linkedin": "LinkedIn optimized content",
+        "tiktok": "TikTok optimized content"
+      }
+    }` : ''}`
     };
     
     const systemPrompt = systemPrompts[language] || systemPrompts.ko;
@@ -320,17 +372,35 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
           
           if (retryResponse.ok) {
             const retryData = await retryResponse.json();
+            let retryContent = retryData.choices[0].message.content;
+            let retryParsed = null;
+            
+            if (generatePlatformVersions) {
+              try {
+                const jsonMatch = retryContent.match(/```json\s*([\s\S]*?)\s*```/) || 
+                                 retryContent.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                  const jsonString = jsonMatch[1] || jsonMatch[0];
+                  retryParsed = JSON.parse(jsonString);
+                }
+              } catch (parseError) {
+                console.warn('Retry: Failed to parse JSON, using original');
+              }
+            }
+            
             return res.status(200).json({
               success: true,
-              data: {
-                content: retryData.choices[0].message.content,
-                usage: retryData.usage,
-                model: retryData.model,
-              },
+              content: retryParsed?.original || retryContent,
+              contentLength: (retryParsed?.original || retryContent).length,
+              usage: retryData.usage,
+              platforms: retryParsed?.platforms || null,
               metadata: {
                 tone,
                 platform,
+                includeEmojis,
+                generatePlatformVersions,
                 timestamp: new Date().toISOString(),
+                model: retryData.model,
               },
             });
           }
@@ -374,17 +444,35 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
         
         if (fallbackResponse.ok) {
           const fallbackData = await fallbackResponse.json();
+          let fallbackContent = fallbackData.choices[0].message.content;
+          let fallbackParsed = null;
+          
+          if (generatePlatformVersions) {
+            try {
+              const jsonMatch = fallbackContent.match(/```json\s*([\s\S]*?)\s*```/) || 
+                               fallbackContent.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                const jsonString = jsonMatch[1] || jsonMatch[0];
+                fallbackParsed = JSON.parse(jsonString);
+              }
+            } catch (parseError) {
+              console.warn('Fallback: Failed to parse JSON, using original');
+            }
+          }
+          
           return res.status(200).json({
             success: true,
-            data: {
-              content: fallbackData.choices[0].message.content,
-              usage: fallbackData.usage,
-              model: fallbackData.model,
-            },
+            content: fallbackParsed?.original || fallbackContent,
+            contentLength: (fallbackParsed?.original || fallbackContent).length,
+            usage: fallbackData.usage,
+            platforms: fallbackParsed?.platforms || null,
             metadata: {
               tone,
               platform,
+              includeEmojis,
+              generatePlatformVersions,
               timestamp: new Date().toISOString(),
+              model: fallbackData.model,
               fallback: true,
             },
           });
@@ -412,18 +500,81 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
     
     console.log('OpenAI response:', JSON.stringify(data, null, 2));
     
+    let responseContent = data.choices[0].message.content;
+    let parsedContent = null;
+    
+    // JSON 응답인지 확인 (플랫폼별 최적화가 요청된 경우)
+    if (generatePlatformVersions) {
+      console.log('Processing platform-specific content...');
+      console.log('Raw response content:', responseContent);
+      
+      try {
+        // 다양한 JSON 추출 방법 시도
+        let jsonString = null;
+        
+        // 1. 마크다운 코드 블록에서 추출
+        const markdownMatch = responseContent.match(/```json\s*([\s\S]*?)\s*```/);
+        if (markdownMatch) {
+          jsonString = markdownMatch[1];
+          console.log('Found JSON in markdown block');
+        }
+        
+        // 2. 중괄호 블록에서 추출
+        if (!jsonString) {
+          const braceMatch = responseContent.match(/\{[\s\S]*\}/);
+          if (braceMatch) {
+            jsonString = braceMatch[0];
+            console.log('Found JSON in brace block');
+          }
+        }
+        
+        // 3. 전체 응답이 JSON인지 확인
+        if (!jsonString && responseContent.trim().startsWith('{')) {
+          jsonString = responseContent.trim();
+          console.log('Entire response is JSON');
+        }
+        
+        if (jsonString) {
+          // JSON 문자열 정리 (불필요한 문자 제거)
+          jsonString = jsonString.trim();
+          
+          parsedContent = JSON.parse(jsonString);
+          console.log('Successfully parsed platform-specific content:', {
+            hasOriginal: !!parsedContent.original,
+            hasPlatforms: !!parsedContent.platforms,
+            platformKeys: parsedContent.platforms ? Object.keys(parsedContent.platforms) : []
+          });
+          
+          // 필수 필드 검증
+          if (!parsedContent.original || !parsedContent.platforms) {
+            console.warn('Invalid JSON structure - missing original or platforms');
+            parsedContent = null;
+          }
+        } else {
+          console.warn('No valid JSON found in response');
+        }
+      } catch (parseError) {
+        console.warn('Failed to parse JSON response:', parseError.message);
+        console.warn('JSON string that failed:', jsonString);
+        // JSON 파싱 실패시 원본 텍스트 사용
+        parsedContent = null;
+      }
+    }
+    
     // 성공 응답
     return res.status(200).json({
       success: true,
-      data: {
-        content: data.choices[0].message.content,
-        usage: data.usage,
-        model: data.model,
-      },
+      content: parsedContent?.original || responseContent,
+      contentLength: (parsedContent?.original || responseContent).length,
+      usage: data.usage,
+      platforms: parsedContent?.platforms || null,
       metadata: {
         tone,
         platform,
+        includeEmojis,
+        generatePlatformVersions,
         timestamp: new Date().toISOString(),
+        model: data.model,
       },
     });
     
