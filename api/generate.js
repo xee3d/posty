@@ -119,15 +119,16 @@ export default async function handler(req, res) {
     ${generatePlatformVersions ? `
     ** 중요: 반드시 JSON 형식으로만 응답하세요 **
     
-    같은 주제로 각 플랫폼에 완전히 새롭게 작성하세요. 단순히 접두사/접미사를 붙이지 말고, 각 플랫폼의 문화와 사용자에게 맞는 완전히 다른 글로 새로 써주세요:
+    2024-2025 최신 트렌드에 맞춰 각 플랫폼에 완전히 다르게 작성하세요:
     
-    - Instagram: 감성적 스토리텔링, 미적 줄바꿈, 많은 해시태그. "공유하고 싶은 순간" 같은 상투적 표현 금지
-    - Facebook: 자연스러운 대화톤, 개인적 경험 중심. "댓글로 의견을 나눠주세요" 같은 틀에 박힌 표현 금지  
-    - Twitter: 280자 내 임팩트 있는 한 줄, 위트 있게. 억지스러운 해시태그나 멘션 금지
-    - LinkedIn: 전문적 인사이트, 업무/성장 관점에서 재해석. "네트워킹" 같은 뻔한 표현 금지
-    - TikTok: Gen Z 언어, 트렌드 반영, 150자 내로 강렬하게. "바이럴" 같은 직접적 표현 금지
+    - Instagram: 짧은 문장, 최소 줄바꿈, 스토리 형식. 과도한 줄바꿈 금지. 자연스러운 해시태그 5-8개만
+    - Facebook: 한 문단으로 자연스럽게, 대화체. 줄바꿈 최소화. 개인 경험담 중심
+    - Twitter: 한 줄 완성형, 임팩트 있게, 밈 감성. 해시태그 1-2개만. 280자 최대한 활용
+    - LinkedIn: 비즈니스 인사이트로 완전 재해석. 전문적이지만 접근 가능한 톤. 줄바꿈 최소
+    - TikTok: 초압축 150자, 트렌드 언어, 훅 있는 시작. "POV:", "아무도 모르는", "진짜" 등 활용
     
-    각 플랫폼마다 완전히 다른 접근법과 표현으로 새로 작성하세요.
+    ❌ 금지: 과도한 줄바꿈, 뻔한 해시태그, 상투적 표현
+    ✅ 필수: 플랫폼별 완전히 다른 문체와 구조
     
     다음 JSON 형식으로만 응답하세요. 다른 설명이나 텍스트는 절대 포함하지 마세요:
     {
@@ -163,15 +164,16 @@ export default async function handler(req, res) {
     ${generatePlatformVersions ? `
     ** IMPORTANT: Respond ONLY in JSON format **
     
-    Completely rewrite the same topic for each platform. Don't just add prefixes/suffixes - create entirely different content that fits each platform's culture and users:
+    Create completely different content for each platform following 2024-2025 trends. Each version must be SIGNIFICANTLY different, not just reformatted:
     
-    - Instagram: Aesthetic storytelling with line breaks, many hashtags. NO cliché phrases like "sharing this moment"
-    - Facebook: Natural conversational tone, personal experience focus. NO formulaic phrases like "share your thoughts in comments"
-    - Twitter: Impactful one-liner within 280 chars, witty. NO forced hashtags or mentions  
-    - LinkedIn: Professional insights, reframe from work/growth perspective. NO generic phrases like "networking"
-    - TikTok: Gen Z language, trend-aware, punchy under 150 chars. NO direct phrases like "viral"
+    - Instagram: Short sentences, minimal line breaks, story format. NO excessive line breaks. Natural hashtags 5-8 only
+    - Facebook: Single paragraph flow, conversational. Minimize line breaks. Focus on personal experience  
+    - Twitter: One-liner impact, witty, meme vibes. 1-2 hashtags max. Use full 280 chars
+    - LinkedIn: Business insights, completely reframe from professional angle. Minimal line breaks
+    - TikTok: Ultra-compressed 150 chars, trendy language, hook start. Use "POV:", "nobody knows", "real" etc
     
-    Write each platform version with completely different approach and expressions.
+    ❌ BANNED: Excessive line breaks, obvious hashtags, cliché expressions
+    ✅ REQUIRED: Completely different tone and structure for each platform
     
     Respond with this exact JSON format only. Do not include any other text or explanations:
     {
