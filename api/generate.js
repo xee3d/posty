@@ -126,7 +126,7 @@ export default async function handler(req, res) {
     - LinkedIn: 전문적이고 인사이트가 있는 내용
     - TikTok: 트렌디하고 젊은 감성, 짧고 강렬한 표현
     
-    다음 JSON 형식으로만 응답하세요 (다른 텍스트 없이):
+    다음 JSON 형식으로만 응답하세요. 다른 설명이나 텍스트는 절대 포함하지 마세요:
     {
       "original": "여기에 기본 콘텐츠 작성",
       "platforms": {
@@ -136,7 +136,9 @@ export default async function handler(req, res) {
         "linkedin": "링크드인용 최적화 콘텐츠",
         "tiktok": "틱톡용 최적화 콘텐츠"
       }
-    }` : ''}`,
+    }
+    
+    반드시 이 JSON 형식을 정확히 따라주세요.` : ''}`,
       
       en: `You are Posty, a creative AI assistant specialized in creating engaging social media content.
     
@@ -165,7 +167,7 @@ export default async function handler(req, res) {
     - LinkedIn: Professional and insightful content
     - TikTok: Trendy and youthful vibe, short and powerful expression
     
-    Respond with this exact JSON format (no other text):
+    Respond with this exact JSON format only. Do not include any other text or explanations:
     {
       "original": "write basic content here",
       "platforms": {
@@ -175,7 +177,9 @@ export default async function handler(req, res) {
         "linkedin": "LinkedIn optimized content",
         "tiktok": "TikTok optimized content"
       }
-    }` : ''}`
+    }
+    
+    You must follow this JSON format exactly.` : ''}`
     };
     
     const systemPrompt = systemPrompts[language] || systemPrompts.ko;
@@ -337,7 +341,7 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
         model: apiModel,
         messages: messages,
         max_tokens: finalMaxTokens,
-        temperature: 0.8,
+        temperature: generatePlatformVersions ? 0.3 : 0.8, // Lower temperature for JSON consistency
         presence_penalty: 0.1,
         frequency_penalty: 0.1,
       }),
