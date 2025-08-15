@@ -108,7 +108,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
         for (const platform of platforms.filter(p => p.id !== 'original')) {
           console.log(`[GeneratedContentDisplay] Processing ${platform.id}`);
           
-          // API에서 받은 플랫폼별 콘텐츠만 사용 (프론트엔드 최적화 제거)
+          // API에서 받은 플랫폼별 콘텐츠 우선 사용
           if (apiPlatforms && apiPlatforms[platform.id as keyof typeof apiPlatforms]) {
             console.log(`[GeneratedContentDisplay] Using API content for ${platform.id}`);
             contents[platform.id] = {
@@ -116,10 +116,40 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
               hashtags: []
             };
           } else {
-            // API에서 플랫폼별 콘텐츠가 없으면 원본 사용 (대기 상태)
-            console.log(`[GeneratedContentDisplay] No API content for ${platform.id}, using original`);
+            // API에서 플랫폼별 콘텐츠가 없으면 임시 플랫폼별 최적화 적용
+            console.log(`[GeneratedContentDisplay] No API content for ${platform.id}, applying temporary optimization`);
+            
+            // 임시 플랫폼별 변형 (API 수정까지의 임시 조치)
+            let optimizedContent = safeOriginalContent;
+            
+            if (platform.id === 'instagram') {
+              // Instagram: 줄바꿈 추가, 더 감성적으로
+              optimizedContent = safeOriginalContent
+                .replace(/\. /g, '.\n\n')  // 문장 끝에 줄바꿈 추가
+                .replace(/! /g, '!\n\n')
+                .replace(/\? /g, '?\n\n') +
+                '\n\n✨ 여러분의 이야기도 들려주세요!';
+            } else if (platform.id === 'facebook') {
+              // Facebook: 더 친근하고 대화형으로
+              optimizedContent = safeOriginalContent + 
+                '\n\n여러분은 어떠신가요? 댓글로 공유해주세요! 😊';
+            } else if (platform.id === 'twitter') {
+              // Twitter: 간결하게 줄이기
+              const words = safeOriginalContent.split(' ');
+              if (words.length > 20) {
+                optimizedContent = words.slice(0, 15).join(' ') + '... 🔥';
+              } else {
+                optimizedContent = safeOriginalContent;
+              }
+              // 해시태그 개수 줄이기
+              const hashtagCount = (optimizedContent.match(/#/g) || []).length;
+              if (hashtagCount > 2) {
+                const parts = optimizedContent.split('#');
+                optimizedContent = parts[0] + '#' + parts[1] + '#' + parts[2];
+              }
+            }
             contents[platform.id] = {
-              content: safeOriginalContent + '\n\n(플랫폼별 최적화를 위해 새로 생성해주세요)',
+              content: optimizedContent,
               hashtags: []
             };
           }
