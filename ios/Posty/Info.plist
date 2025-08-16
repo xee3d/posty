@@ -343,6 +343,14 @@
 				<string>fb757255383655974</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>APPLE_SIGN_IN</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.posty</string>
+			</array>
+		</dict>
 	</array>
 </dict>
 </plist>
