@@ -43,7 +43,8 @@
       "Bash(xcrun simctl boot:*)",
       "WebFetch(domain:posty-ai-new.vercel.app)",
       "WebFetch(domain:github.com)",
-      "Bash(uv:*)"
+      "Bash(uv:*)",
+      "Bash(killall:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
