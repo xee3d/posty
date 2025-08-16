@@ -357,11 +357,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         </SlideInView>
 
         {/* 광고 배너 */}
-        <SmartAdPlacement position={1} context="trend">
-          <SlideInView direction="up" delay={150}>
-            <CompactBanner size="standard" />
-          </SlideInView>
-        </SmartAdPlacement>
+        <SmartAdPlacement position={1} context="feed" />
 
         {/* 내 트렌드 요약 (있는 경우) */}
         {userPlan === 'pro' && (

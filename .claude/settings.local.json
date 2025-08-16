@@ -41,9 +41,14 @@
       "Bash(ssh:*)",
       "Bash(git push:*)",
       "Bash(xcrun simctl boot:*)",
-      "WebFetch(domain:posty-ai-new.vercel.app)"
+      "WebFetch(domain:posty-ai-new.vercel.app)",
+      "WebFetch(domain:github.com)",
+      "Bash(uv:*)"
     ],
     "deny": [],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": [
+      "/Users/ethanchoi"
+    ]
   }
 }

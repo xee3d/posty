@@ -31,6 +31,7 @@ import contentSaveService from '../services/contentSaveService';
 import { APP_TEXT, getText } from '../utils/textConstants';
 import { soundManager } from '../utils/soundManager';
 import trendService from '../services/trendService';
+import personalizedHashtagService from '../services/personalizedHashtagService';
 import { Alert } from '../utils/customAlert';
 import { imageAnalysisCache } from '../utils/imageAnalysisCache';
 import { getPlaceholderText, getTimeBasedPrompts, getCategoryFromTone, extractHashtags } from '../utils/promptUtils';
@@ -107,6 +108,29 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       setPrompt(initialText);
     }
   }, [initialText]);
+
+  // 프롬프트 변경 시 개인화된 해시태그 업데이트
+  useEffect(() => {
+    const updatePersonalizedHashtags = async () => {
+      if (prompt.trim().length > 2) { // 최소 3글자 이상 입력했을 때
+        try {
+          console.log('[AIWriteScreen] Updating hashtags for prompt:', prompt);
+          const personalizedTags = await personalizedHashtagService.getPersonalizedHashtags(
+            prompt.trim(),
+            10
+          );
+          setTrendingHashtags(personalizedTags);
+          console.log('[AIWriteScreen] Updated hashtags:', personalizedTags);
+        } catch (error) {
+          console.error('Failed to update personalized hashtags:', error);
+        }
+      }
+    };
+
+    // 디바운스: 사용자가 타이핑을 멈춘 후 1초 뒤에 실행
+    const timeoutId = setTimeout(updatePersonalizedHashtags, 1000);
+    return () => clearTimeout(timeoutId);
+  }, [prompt]);
   
   // 스타일 정보 로드
   useEffect(() => {
@@ -202,23 +226,16 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         await trendCacheUtils.clearCache();
       }
       
+      // 개인화된 해시태그 로드 (새로운 시스템)
+      const personalizedTags = await personalizedHashtagService.getPersonalizedHashtags(
+        prompt || undefined, // 현재 입력된 프롬프트 반영
+        12 // 12개 추천
+      );
+      console.log('[AIWriteScreen] Personalized hashtags:', personalizedTags);
+      setTrendingHashtags(personalizedTags);
+      
       const trends = await trendService.getAllTrends();
       console.log('[AIWriteScreen] Received trends:', trends.length, 'items');
-      
-      // 트렌드에서 해시태그 추출 (최대 10개)
-      const hashtags = new Set<string>();
-      trends.forEach(trend => {
-        if (trend.hashtags) {
-          trend.hashtags.forEach(tag => {
-            if (hashtags.size < 10) {
-              hashtags.add(tag.replace('#', ''));
-            }
-          });
-        }
-      });
-      const hashtagArray = Array.from(hashtags);
-      console.log('[AIWriteScreen] Extracted hashtags:', hashtagArray);
-      setTrendingHashtags(hashtagArray);
       
       // 트렌드 제목을 그대로 주제로 사용 (최대 8개)
       const prompts = trends
@@ -239,6 +256,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       console.error('[AIWriteScreen] Failed to load trending data:', error);
       // 오류 시 기본 키워드 사용
       setTrendingPrompts(getDefaultKeywords());
+      setTrendingHashtags(getDefaultKeywords());
     }
   };
 
@@ -649,6 +667,18 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       // 데이터 자동 저장
       if (result) {
         const hashtags = extractHashtags(result);
+        
+        // 해시태그 사용 기록 저장 (개인화 시스템)
+        if (hashtags.length > 0) {
+          await personalizedHashtagService.saveHashtagUsage(hashtags);
+          console.log('Hashtag usage saved for personalization:', hashtags);
+        }
+        
+        // 검색 쿼리 저장 (프롬프트가 검색어 역할)
+        if (prompt.trim()) {
+          await personalizedHashtagService.saveSearchQuery(prompt.trim());
+          console.log('Search query saved for personalization:', prompt.trim());
+        }
         
         // storage.ts의 saveContent 호출
         await saveContent({

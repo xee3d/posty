@@ -232,7 +232,7 @@ class PersonalizedRecommendationService {
       title: '여유로운 주말',
       content: '주말 나들이나 휴식 시간을\n기록해보는 건 어떨까요?',
       meta: {
-        icon: 'leaf',
+        icon: 'flower-outline',
         text: '주말 활동'
       },
       actionText: '글쓰기',

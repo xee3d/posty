@@ -33,7 +33,7 @@ export const ICON_NAMES = {
   TROPHY: Platform.select({ ios: 'trophy-outline', android: 'trophy-outline' }),
   
   // 자연/장소 관련
-  LEAF: Platform.select({ ios: 'leaf-outline', android: 'leaf-outline' }),
+  LEAF: Platform.select({ ios: 'flower-outline', android: 'flower-outline' }),
   RESTAURANT: Platform.select({ ios: 'restaurant-outline', android: 'restaurant-outline' }),
   
   // 기타 UI 아이콘

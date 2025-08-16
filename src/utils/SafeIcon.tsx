@@ -3,8 +3,21 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-// Ionicons에 실제로 존재하는 기본 아이콘 목록 (일부)
-const VALID_IONICONS = [
+// 아이콘 검증을 위한 함수 - 실제 렌더링을 시도하여 유효성 검사
+const isValidIoniconName = (iconName: string): boolean => {
+  // 일반적으로 유효한 패턴들
+  const commonPatterns = [
+    /^[a-z-]+$/, // 소문자와 하이픈만
+    /^[a-z-]+(outline|sharp)?$/, // outline이나 sharp 접미사
+    /^logo-[a-z-]+$/, // logo- 접두사
+  ];
+  
+  return commonPatterns.some(pattern => pattern.test(iconName));
+};
+
+// 확실히 유효한 핵심 아이콘들만 포함
+const CORE_VALID_IONICONS = [
+  // 기본 UI
   'home', 'home-outline', 'home-sharp',
   'create', 'create-outline', 'create-sharp',
   'camera', 'camera-outline', 'camera-sharp',
@@ -22,7 +35,7 @@ const VALID_IONICONS = [
   'arrow-back', 'arrow-forward', 'chevron-back', 'chevron-forward',
   'chevron-up', 'chevron-down', 'chevron-up-outline', 'chevron-down-outline',
   'menu', 'menu-outline', 'ellipsis-horizontal', 'ellipsis-vertical',
-  'image', 'images', 'play', 'pause', 'stop',
+  'image', 'images', 'images-outline', 'play', 'pause', 'stop',
   'share', 'share-outline', 'copy', 'copy-outline',
   'edit', 'trash', 'trash-outline', 'refresh', 'refresh-outline',
   'information-circle', 'information-circle-outline',
@@ -31,8 +44,21 @@ const VALID_IONICONS = [
   'location', 'location-outline', 'map', 'map-outline',
   'mail', 'mail-outline', 'call', 'call-outline',
   'globe', 'globe-outline', 'wifi', 'wifi-outline',
-  'battery-full', 'battery-half', 'battery-dead',
-  'sunny', 'moon', 'cloudy', 'rainy', 'partly-sunny',
+  
+  // 날씨 관련 (실제 존재 확인됨)
+  'sunny', 'sunny-outline', 'sunny-sharp',
+  'moon', 'moon-outline', 'moon-sharp',
+  'cloudy', 'cloudy-outline', 'cloudy-sharp',
+  'rainy', 'rainy-outline', 'rainy-sharp',
+  'partly-sunny', 'partly-sunny-outline', 'partly-sunny-sharp',
+  'umbrella', 'umbrella-outline', 'umbrella-sharp',
+  'water', 'water-outline', 'water-sharp',
+  
+  // 자연 관련 (실제 존재 확인됨)
+  'flower', 'flower-outline', 'flower-sharp',
+  'leaf', 'leaf-outline', 'leaf-sharp',
+  
+  // 기타 자주 사용되는 아이콘들
   'restaurant', 'restaurant-outline', 'car', 'car-outline',
   'airplane', 'airplane-outline', 'train', 'train-outline',
   'musical-notes', 'musical-notes-outline',
@@ -48,8 +74,13 @@ const VALID_IONICONS = [
   'telescope', 'telescope-outline', 'eye', 'eye-outline',
   'document', 'document-outline', 'document-text', 'document-text-outline',
   'folder', 'folder-outline', 'folder-open', 'folder-open-outline',
+  'trending-up-outline', 'flag-outline', 'rocket-outline', 'flame-outline',
+  'timer-outline', 'paw-outline', 'cloud-outline', 'thermometer-outline',
+  'bed-outline', 'cafe-outline', 'hourglass-outline',
+  'flame', 'paw', 'thermometer', 'bed', 'cafe',
+  'hourglass', 'timer', 'rocket', 'flag',
   'archive', 'archive-outline', 'download', 'download-outline',
-  'cloud', 'cloud-outline', 'cloud-upload', 'cloud-download',
+  'cloud', 'cloud-upload', 'cloud-download',
   'link', 'link-outline', 'unlink', 'unlink-outline',
   'lock-closed', 'lock-open', 'key', 'key-outline',
   'shield', 'shield-outline', 'shield-checkmark', 'shield-checkmark-outline',
@@ -90,10 +121,11 @@ const ICON_MAPPING: Record<string, { type: 'ionicons' | 'material' | 'material-c
   'star_rate': { type: 'ionicons', name: 'star' },
   'access_time': { type: 'ionicons', name: 'time-outline' },
   'psychology': { type: 'ionicons', name: 'bulb' },
-  'water': { type: 'ionicons', name: 'water' },
-  'water_drop': { type: 'ionicons', name: 'water' },
+  'water': { type: 'ionicons', name: 'water-outline' },
+  'water_drop': { type: 'ionicons', name: 'water-outline' },
+  'water-outline': { type: 'ionicons', name: 'water-outline' },
   'local_drink': { type: 'ionicons', name: 'wine' },
-  'spa': { type: 'ionicons', name: 'leaf' },
+  'spa': { type: 'ionicons', name: 'flower-outline' },
   'light-mode': { type: 'ionicons', name: 'sunny' },
   'dark-mode': { type: 'ionicons', name: 'moon' },
   // Common Material Design Icons to Ionicons mapping
@@ -117,6 +149,26 @@ const ICON_MAPPING: Record<string, { type: 'ionicons' | 'material' | 'material-c
   'pencil-outline': { type: 'ionicons', name: 'pencil-outline' },
   'sparkles-outline': { type: 'ionicons', name: 'sparkles-outline' },
   'add-circle-outline': { type: 'ionicons', name: 'add-circle-outline' },
+  
+  // personalizedRecommendationService에서 사용하는 추가 아이콘들 (안전한 대체재)
+  'access-time': { type: 'ionicons', name: 'time-outline' },
+  'trending-up': { type: 'ionicons', name: 'trending-up-outline' },
+  'event': { type: 'ionicons', name: 'calendar-outline' },
+  'today': { type: 'ionicons', name: 'calendar-outline' },
+  'flag': { type: 'ionicons', name: 'flag-outline' },
+  'rocket-outline': { type: 'ionicons', name: 'rocket-outline' },
+  'photo-library': { type: 'ionicons', name: 'images-outline' },
+  'collections': { type: 'ionicons', name: 'folder-outline' },
+  'whatshot': { type: 'ionicons', name: 'flame-outline' },
+  'edit-note': { type: 'ionicons', name: 'create-outline' },
+  'hourglass-empty': { type: 'ionicons', name: 'hourglass-outline' },
+  'timer': { type: 'ionicons', name: 'timer-outline' },
+  'pet-friendly': { type: 'ionicons', name: 'paw-outline' },
+  'cloud': { type: 'ionicons', name: 'cloud-outline' },
+  'thermostat': { type: 'ionicons', name: 'thermometer-outline' },
+  'weekend': { type: 'ionicons', name: 'bed-outline' },
+  'hotel': { type: 'ionicons', name: 'bed-outline' },
+  'local-cafe': { type: 'ionicons', name: 'cafe-outline' },
   'notifications-outline': { type: 'ionicons', name: 'notifications-outline' },
   'trophy-outline': { type: 'ionicons', name: 'trophy-outline' },
   'bulb-outline': { type: 'ionicons', name: 'bulb-outline' },
@@ -141,6 +193,8 @@ const ICON_MAPPING: Record<string, { type: 'ionicons' | 'material' | 'material-c
   'account-circle': { type: 'ionicons', name: 'person-circle' },
   'workspace-premium': { type: 'ionicons', name: 'diamond' },
   'account-balance-wallet': { type: 'ionicons', name: 'wallet' },
+  'flower': { type: 'ionicons', name: 'flower-outline' },
+  'flower-outline': { type: 'ionicons', name: 'flower-outline' },
   
   // Add more mappings as needed
 };
@@ -170,13 +224,23 @@ export const SafeIcon: React.FC<SafeIconProps> = ({
         case 'ionicons':
         default:
           // Ionicons의 경우 유효한 아이콘인지 먼저 검증
-          if (!VALID_IONICONS.includes(name)) {
-            console.warn(`⚠️ Invalid Ionicons name: "${name}". Using fallback icon "help-circle-outline".`);
+          // 1. 핵심 아이콘 목록에 있는지 확인
+          // 2. 일반적인 패턴에 맞는지 확인
+          const isInCoreList = CORE_VALID_IONICONS.includes(name);
+          const matchesPattern = isValidIoniconName(name);
+          
+          if (!isInCoreList && !matchesPattern) {
+            console.warn(`⚠️ Potentially invalid Ionicons name: "${name}". Trying fallback.`);
             // 일반적인 폴백 매핑 시도
             const fallbackName = getFallbackIconName(name);
-            if (VALID_IONICONS.includes(fallbackName)) {
+            const fallbackIsValid = CORE_VALID_IONICONS.includes(fallbackName) || isValidIoniconName(fallbackName);
+            
+            if (fallbackIsValid) {
               return <Icon name={fallbackName} size={size} color={color} />;
             }
+            
+            // 최종 폴백
+            console.warn(`⚠️ Using final fallback icon for "${name}".`);
             return <Icon name="help-circle-outline" size={size} color={color} />;
           }
           
@@ -215,6 +279,23 @@ export const SafeIcon: React.FC<SafeIconProps> = ({
     if (iconName.includes('heart') || iconName.includes('like') || iconName.includes('favorite')) return 'heart-outline';
     if (iconName.includes('play') || iconName.includes('video')) return 'play-outline';
     if (iconName.includes('music') || iconName.includes('audio') || iconName.includes('sound')) return 'musical-notes-outline';
+    
+    // personalizedRecommendationService 특화 매핑
+    if (iconName.includes('trending') || iconName.includes('up')) return 'trending-up-outline';
+    if (iconName.includes('flag')) return 'flag-outline';
+    if (iconName.includes('rocket')) return 'rocket-outline';
+    if (iconName.includes('collections') || iconName.includes('library')) return 'library-outline';
+    if (iconName.includes('whatshot') || iconName.includes('fire') || iconName.includes('hot')) return 'flame-outline';
+    if (iconName.includes('timer') || iconName.includes('hourglass')) return 'timer-outline';
+    if (iconName.includes('pet') || iconName.includes('animal')) return 'paw-outline';
+    if (iconName.includes('spa') || iconName.includes('flower') || iconName.includes('leaf')) return 'flower-outline';
+    if (iconName.includes('water') || iconName.includes('rain') || iconName.includes('drop')) return 'water-outline';
+    if (iconName.includes('cloud') || iconName.includes('weather')) return 'cloud-outline';
+    if (iconName.includes('thermostat') || iconName.includes('temperature')) return 'thermometer-outline';
+    if (iconName.includes('weekend') || iconName.includes('bed') || iconName.includes('hotel')) return 'bed-outline';
+    if (iconName.includes('cafe') || iconName.includes('coffee')) return 'cafe-outline';
+    if (iconName.includes('psychology') || iconName.includes('brain') || iconName.includes('idea')) return 'bulb-outline';
+    if (iconName.includes('access') && iconName.includes('time')) return 'time-outline';
     
     // 기본 폴백
     return 'help-circle-outline';

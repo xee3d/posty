@@ -666,32 +666,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
 
 
-        {/* 오늘의 트렌드 - 개인화된 해시태그 추천 */}
-        <SlideInView direction="right" delay={575}>
-          <View style={styles.trendSection}>
-            <View style={styles.sectionTitleContainer}>
-              <SafeIcon name="pricetag" size={18} color={colors.primary} />
-              <Text style={styles.sectionTitle}>요즘 뜨는 해시태그</Text>
-            </View>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.hashtagScroll}>
-              {trendingHashtags.map((tag, index) => (
-                <TouchableOpacity
-                  key={`${tag}-${index}`}
-                  style={styles.hashtagChip}
-                  onPress={() => onNavigate('ai-write', { content: `#${tag} `, hashtags: [tag] })}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.hashtagText}>#{tag}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            {trendingHashtags.length === 0 && (
-              <View style={styles.loadingHashtags}>
-                <Text style={styles.loadingText}>맞춤 해시태그를 준비 중...</Text>
-              </View>
-            )}
-          </View>
-        </SlideInView>
 
         {/* 작은 배너 광고 - 해시태그 아래 배치 */}
         {Date.now() % 2 === 0 && (
@@ -1007,14 +981,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
         {/* 하단 인라인 광고 - 개발 모드에서만 표시 */}
         {recentPosts.length > 0 && (
-          <SmartAdPlacement position={10} context="home">
-            <SlideInView delay={400} duration={500}>
-              <AdaptiveNativeAd 
-                layout="inline"
-                onPress={() => AdIntegrationService.trackUserAction('ad_click')}
-              />
-            </SlideInView>
-          </SmartAdPlacement>
+          <SmartAdPlacement position={10} context="home" />
         )}
 
         <View style={styles.bottomSpace} />

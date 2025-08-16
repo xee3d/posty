@@ -1043,9 +1043,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         </View>
 
         {/* 광고 배너 */}
-        <SmartAdPlacement position={2} context="style">
-          <CompactBanner size="large" />
-        </SmartAdPlacement>
+        <SmartAdPlacement position={2} context="profile" />
 
         {/* 탭 컨텐츠 */}
         <View style={styles.tabContent}>
