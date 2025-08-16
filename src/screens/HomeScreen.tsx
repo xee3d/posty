@@ -945,39 +945,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </SlideInView>
         )}
 
-        {/* 기타 기능들 - 개발 모드에서만 표시 */}
-        {__DEV__ && (
-          <FadeInView delay={800}>
-            <View style={styles.bottomActionsSection}>
-              <View style={styles.sectionTitleContainer}>
-                <SafeIcon name="construct" size={18} color={colors.text.secondary} />
-                <Text style={styles.sectionTitle}>기타 기능</Text>
-              </View>
-              <View style={styles.subActions}>
-                
-                <AnimatedCard delay={900} style={styles.subActionCard}>
-                  <TouchableOpacity 
-                    style={styles.subActionContent}
-                    onPress={() => onNavigate('animation-examples')}
-                  >
-                    <Icon name="play-circle" size={20} color={colors.text.secondary} />
-                    <Text style={styles.subActionText}>애니메이션</Text>
-                  </TouchableOpacity>
-                </AnimatedCard>
-                
-                <AnimatedCard delay={950} style={styles.subActionCard}>
-                  <TouchableOpacity 
-                    style={styles.subActionContent}
-                    onPress={() => handleQuickAction('구독')}
-                  >
-                    <Icon name="diamond-outline" size={20} color={colors.text.secondary} />
-                    <Text style={styles.subActionText}>구독</Text>
-                  </TouchableOpacity>
-                </AnimatedCard>
-              </View>
-            </View>
-          </FadeInView>
-        )}
 
         {/* 하단 인라인 광고 - 개발 모드에서만 표시 */}
         {recentPosts.length > 0 && (
