@@ -186,12 +186,18 @@ class ServerAIService {
         usage: data.usage,
         hasPlatforms: !!data.platforms,
         platformKeys: data.platforms ? Object.keys(data.platforms) : [],
-        content: data.content.substring(0, 100) + '...', // 일부만 출력
+        content: typeof data.content === 'string' ? data.content.substring(0, 100) + '...' : data.content, // 일부만 출력
         rawResponse: data, // 전체 응답 구조 확인
       });
       
       // 사진과 관련 없는 내용 필터링 (임시 조치)
       let content = data.content;
+      
+      // content가 문자열인지 확인
+      if (typeof content !== 'string') {
+        console.error('Content is not a string:', typeof content, content);
+        content = String(content || '');
+      }
       
       // 이미지가 있는 경우에만 필터링 적용
       if (params.imageBase64) {

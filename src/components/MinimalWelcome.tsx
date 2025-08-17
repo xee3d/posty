@@ -28,12 +28,16 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const cursorOpacity = useRef(new Animated.Value(1)).current;
+  
+  // 타이핑 인터벌 참조
+  const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // 슬로건 배열
   const slogans = [
-    "당신의 이야기를\n세상에 전하세요",
-    "간단한 한 줄이\n특별한 순간이 됩니다",
-    "Posty가 도와드릴게요\n더 나은 글쓰기를",
+    "당신의 이야기를\n세상에 전하세요.",
+    "간단한 한 줄이\n특별한 순간이 됩니다.",
+    "Posty가 도와드릴게요.\n더 나은 글쓰기를.",
     "시작해볼까요?"
   ];
 
@@ -47,6 +51,14 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
     let charIndex = 0;
     setDisplayText('');
     setIsTyping(true);
+
+    // 기존 인터벌 및 타임아웃 정리
+    if (typingIntervalRef.current) {
+      clearInterval(typingIntervalRef.current);
+    }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
 
     // 페이드인 애니메이션 (더 부드럽게)
     Animated.parallel([
@@ -62,17 +74,20 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
       })
     ]).start();
 
-    const typingInterval = setInterval(() => {
+    typingIntervalRef.current = setInterval(() => {
       if (charIndex <= currentSlogan.length) {
         setDisplayText(currentSlogan.slice(0, charIndex));
         charIndex++;
       } else {
-        clearInterval(typingInterval);
+        if (typingIntervalRef.current) {
+          clearInterval(typingIntervalRef.current);
+          typingIntervalRef.current = null;
+        }
         setIsTyping(false);
         
         // 마지막 슬로건이 아니면 다음으로 이동
         if (currentSloganIndex < slogans.length - 1) {
-          setTimeout(() => {
+          timeoutRef.current = setTimeout(() => {
             // 페이드아웃 (더 빠르게)
             Animated.parallel([
               Animated.timing(fadeAnim, {
@@ -95,7 +110,14 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
       }
     }, 50); // 타이핑 속도 (더 빠르게)
 
-    return () => clearInterval(typingInterval);
+    return () => {
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+      }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, [currentSloganIndex]);
 
   // 커서 깜빡임 애니메이션
@@ -125,11 +147,63 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
     return () => cursorBlink.stop();
   }, [isTyping, currentSloganIndex]);
 
+  // 화면 탭 시 애니메이션 즉시 완료 및 다음으로 이동
+  const handleScreenTap = () => {
+    // 타이핑 중이거나 대기 중인 경우
+    if (isTyping || timeoutRef.current) {
+      // 애니메이션 즉시 완료
+      if (typingIntervalRef.current) {
+        clearInterval(typingIntervalRef.current);
+        typingIntervalRef.current = null;
+      }
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      
+      // 현재 슬로건 전체 텍스트 즉시 표시
+      const currentSlogan = slogans[currentSloganIndex];
+      setDisplayText(currentSlogan);
+      setIsTyping(false);
+      
+      // 마지막 슬로건이 아니면 다음으로 이동
+      if (currentSloganIndex < slogans.length - 1) {
+        setTimeout(() => {
+          Animated.parallel([
+            Animated.timing(fadeAnim, {
+              toValue: 0,
+              duration: 250,
+              useNativeDriver: true,
+            }),
+            Animated.timing(scaleAnim, {
+              toValue: 0.8,
+              duration: 250,
+              useNativeDriver: true,
+            })
+          ]).start(() => {
+            setSloganIndex(currentSloganIndex + 1);
+            fadeAnim.setValue(0);
+            scaleAnim.setValue(0.8);
+          });
+        }, 300); // 짧은 대기 후 다음 슬로건
+      } else {
+        // 마지막 슬로건인 경우 시작하기 버튼 활성화를 위해 상태만 업데이트
+      }
+    } else if (currentSloganIndex === slogans.length - 1) {
+      // 마지막 슬로건이고 타이핑 완료된 경우 시작하기
+      onComplete();
+    }
+  };
+
   // 시작하기 버튼 표시 조건
   const showStartButton = currentSloganIndex === slogans.length - 1 && !isTyping;
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <TouchableOpacity 
+      style={[styles.container, { backgroundColor: colors.background }]}
+      onPress={handleScreenTap}
+      activeOpacity={1}
+    >
       {/* 메인 콘텐츠 */}
       <View style={styles.content}>
         <Animated.View
@@ -204,7 +278,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
           />
         ))}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

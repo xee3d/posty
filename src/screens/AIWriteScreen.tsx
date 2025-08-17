@@ -604,9 +604,15 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
           polishType: selectedPolishOption,
           tone: selectedTone as any,
           length: selectedLength, // 길이 추가
+          platform: 'instagram', // 기본 플랫폼 (플랫폼별 생성을 위함)
         });
         // 객체에서 content 문자열만 추출
         result = response.content;
+        
+        // 플랫폼별 콘텐츠 저장
+        if (response.platforms) {
+          setGeneratedPlatforms(response.platforms);
+        }
       } else if (writeMode === 'photo') {
         // 사진 분석 결과를 기반으로 콘텐츠 생성
         let photoPrompt = '';

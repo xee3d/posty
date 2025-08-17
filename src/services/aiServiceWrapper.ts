@@ -116,7 +116,10 @@ class AIServiceWrapper {
             generatePlatformVersions: false, // 개별 호출이므로 false
           });
           
-          platformContents[platformId] = platformResponse.content;
+          // platformResponse.content가 문자열인지 확인
+          platformContents[platformId] = typeof platformResponse.content === 'string' 
+            ? platformResponse.content 
+            : String(platformResponse.content || '');
           console.log(`✅ Generated content for ${platformId}`);
           
         } catch (error) {
@@ -180,18 +183,56 @@ class AIServiceWrapper {
       const userPlan = await this.getUserPlan();
       const aiModel = this.getModelByPlan(userPlan);
       
-      const content = await serverAIService.generateContent({
-        prompt: polishPrompt,
-        tone: params.tone || 'casual',
-        platform: params.platform,
-        length: selectedLength,
-        model: aiModel, // 플랜별 모델 전달
-      });
+      // 플랫폼별로 개별 API 호출하여 각기 다른 콘텐츠 생성 (글쓰기와 동일한 로직)
+      const platforms = ['instagram', 'facebook', 'twitter'];
+      const platformContents: Record<string, string> = {};
+      
+      console.log('Polishing content with platform-specific optimization...');
+      
+      // 각 플랫폼별로 최적화된 프롬프트와 함께 개별 호출
+      for (const platformId of platforms) {
+        try {
+          let platformPrompt = polishPrompt;
+          
+          // 플랫폼별 특화 프롬프트 추가
+          if (platformId === 'instagram') {
+            platformPrompt += '\n\n[Instagram 스타일로 최적화: 감성적이고 시각적으로, 줄바꿈을 활용해서 스토리텔링하듯 작성해주세요. 해시태그 5-7개 포함]';
+          } else if (platformId === 'facebook') {
+            platformPrompt += '\n\n[Facebook 스타일로 최적화: 친근하고 대화형으로, 개인적인 경험을 공유하는 톤으로 한 문단으로 자연스럽게 작성해주세요]';
+          } else if (platformId === 'twitter') {
+            platformPrompt += '\n\n[Twitter 스타일로 최적화: 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그 1-2개만]';
+          }
+          
+          const platformResponse = await serverAIService.generateContent({
+            prompt: platformPrompt,
+            tone: params.tone || 'casual',
+            platform: platformId,
+            length: selectedLength,
+            model: aiModel,
+            generatePlatformVersions: false, // 개별 호출이므로 false
+          });
+          
+          // platformResponse.content가 문자열인지 확인
+          platformContents[platformId] = typeof platformResponse.content === 'string' 
+            ? platformResponse.content 
+            : String(platformResponse.content || '');
+          console.log(`✅ Polished content for ${platformId}`);
+          
+        } catch (error) {
+          console.error(`❌ Failed to polish content for ${platformId}:`, error);
+          // 실패한 플랫폼은 원본 사용
+          platformContents[platformId] = params.text;
+        }
+      }
+      
+      // 첫 번째 성공한 플랫폼을 메인 콘텐츠로 사용
+      const mainContent = platformContents.instagram || platformContents.facebook || platformContents.twitter || params.text;
       
       return {
-        content,
-        hashtags: extractHashtags(content),
+        content: mainContent,
+        hashtags: extractHashtags(mainContent),
         platform: params.platform || 'instagram',
+        platforms: platformContents, // 플랫폼별 콘텐츠 포함
         estimatedEngagement: 0,
       };
     } catch (error) {
