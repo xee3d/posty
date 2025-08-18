@@ -44,7 +44,12 @@
       "WebFetch(domain:posty-ai-new.vercel.app)",
       "WebFetch(domain:github.com)",
       "Bash(uv:*)",
-      "Bash(killall:*)"
+      "Bash(killall:*)",
+      "Bash(cat:*)",
+      "Bash(sudo rm:*)",
+      "Bash(chmod:*)",
+      "Bash(mv:*)",
+      "Bash(cp:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

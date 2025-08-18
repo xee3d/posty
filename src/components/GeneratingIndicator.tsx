@@ -269,6 +269,7 @@ const styles = StyleSheet.create({
     maxWidth: 320,
     padding: SPACING.xl,
     borderRadius: 20,
+    backgroundColor: '#FFFFFF', // 기본 배경색 추가
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,

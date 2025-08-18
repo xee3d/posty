@@ -288,6 +288,7 @@ const styles = StyleSheet.create({
     padding: SPACING.md,
     borderRadius: 12,
     marginBottom: SPACING.sm,
+    backgroundColor: '#FFFFFF', // 기본 배경색 추가
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.03,
@@ -319,6 +320,7 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.xl,
     paddingTop: SPACING.md,
     paddingHorizontal: SPACING.xl,
+    backgroundColor: '#FFFFFF', // 기본 배경색 추가
     elevation: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -2 },

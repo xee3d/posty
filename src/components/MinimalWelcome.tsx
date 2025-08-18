@@ -327,6 +327,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
     minWidth: 200,
     alignItems: 'center',
+    backgroundColor: '#7C3AED', // 기본 배경색 추가 (보라색)
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

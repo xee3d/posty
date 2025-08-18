@@ -29,6 +29,7 @@ import AccountChangeSection from '../components/settings/AccountChangeSection';
 import OnboardingScreen from './OnboardingScreen';
 import NewUserWelcome from '../components/NewUserWelcome';
 import MinimalWelcome from '../components/MinimalWelcome';
+import AppLogo from '../components/AppLogo';
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
@@ -1166,6 +1167,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
         {/* 버전 정보 */}
         <View style={styles.versionSection}>
+          <AppLogo />
           <Text style={styles.versionText}>Posty v1.0.0</Text>
           <Text style={styles.copyrightText}>© 2024 Posty AI. Made with 💕</Text>
         </View>

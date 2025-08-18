@@ -38,6 +38,7 @@ import improvedStyleService from '../services/improvedStyleService';
 import { soundManager } from '../utils/soundManager';
 import { BannerCarousel, AdaptiveNativeAd, SmartAdPlacement } from '../components/ads';
 import AdIntegrationService from '../services/AdIntegrationService';
+import AppLogo from '../components/AppLogo';
 
 interface HomeScreenProps {
   onNavigate: (tab: string, content?: any) => void;
@@ -486,13 +487,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 onPress={() => onNavigate('profile')}
                 activeOpacity={0.7}
               >
-              <View style={styles.logoCircle}>
-                <Text style={styles.mollyIcon}>{APP_TEXT.brand.characterName.charAt(0)}</Text>
-              </View>
-              <View>
-              <Text style={styles.appTitle}>{BRAND.name}</Text>
-              <Text style={styles.appSubtitle}>{BRAND.tagline}</Text>
-              </View>
+                <AppLogo size={40} showText={false} />
+                <View style={styles.logoTextContainer}>
+                  <Text style={styles.appTitle}>{BRAND.name}</Text>
+                  <Text style={styles.appSubtitle}>{BRAND.tagline}</Text>
+                </View>
               </TouchableOpacity>
               
               {/* 토큰 잔액 표시 - TokenBadge 컴포넌트 사용 */}
@@ -1008,6 +1007,9 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
     flexDirection: 'row',
     alignItems: 'center',
   },
+  logoTextContainer: {
+    marginLeft: SPACING.sm,
+  },
   logoCircle: {
     width: 50,
     height: 50,
@@ -1064,7 +1066,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.white,
+    backgroundColor: colors.white || '#FFFFFF', // 기본값 추가
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -1144,7 +1146,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
   },
   // 기존 스타일 (2줄 버전)
   mainActionCard: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.surface || '#FFFFFF', // 기본값 추가
     borderRadius: 12,
     paddingVertical: 20,
     paddingHorizontal: 20,
@@ -1159,7 +1161,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
     width: 44,
     height: 44,
     borderRadius: 12,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primary || '#7C3AED', // 기본값 추가
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,

@@ -4,6 +4,7 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 # Codegen 완전 비활성화
 ENV['RCT_NEW_ARCH_ENABLED'] = '0'
 ENV['USE_CODEGEN'] = '0'
+ENV['NODE_BINARY'] = '/Users/ethanchoi/.nvm/versions/node/v20.11.0/bin/node'
 
 platform :ios, '14.0'
 use_modular_headers!

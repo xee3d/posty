@@ -552,6 +552,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: SPACING.lg,
     borderRadius: 16,
+    backgroundColor: '#FFFFFF', // 기본 배경색 추가
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,

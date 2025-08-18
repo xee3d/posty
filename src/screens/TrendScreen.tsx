@@ -24,6 +24,7 @@ import { Alert } from '../utils/customAlert';
 import { TrendPageSkeleton, TrendCardSkeleton, MyHashtagsSkeleton } from '../components/SkeletonLoader';
 import { CompactBanner, SmartAdPlacement } from '../components/ads';
 import trendCache from '../utils/trendCache';
+import AppLogo from '../components/AppLogo';
 
 type TrendCategory = 'all' | 'news' | 'social' | 'keywords';
 
@@ -306,9 +307,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         <FadeInView delay={0}>
           <View style={styles.header}>
             <View style={styles.headerTop}>
-              <View style={styles.mollyBadge}>
-                <Text style={styles.mollyBadgeText}>T</Text>
-              </View>
+              <AppLogo size={32} showText={false} />
               <Text style={styles.headerTitle}>실시간 트렌드</Text>
             </View>
             <Text style={styles.headerSubtitle}>{BRAND.slogans.creative}</Text>

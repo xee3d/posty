@@ -201,7 +201,7 @@ const createStyles = (colors: typeof COLORS) =>
   StyleSheet.create({
     container: {
       flexDirection: 'row',
-      backgroundColor: colors.surface,
+      backgroundColor: colors.surface || '#FFFFFF', // 기본 배경색 추가
       borderTopWidth: 1,
       borderTopColor: colors.border,
       paddingBottom: 20,
