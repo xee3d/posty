@@ -49,7 +49,14 @@
       "Bash(sudo rm:*)",
       "Bash(chmod:*)",
       "Bash(mv:*)",
-      "Bash(cp:*)"
+      "Bash(cp:*)",
+      "Bash(./gradlew:*)",
+      "Bash(/opt/homebrew/share/android-commandlinetools/platform-tools/adb:*)",
+      "Bash(../gradlew assembleDebug)",
+      "Bash(mkdir:*)",
+      "Bash(sips:*)",
+      "Bash(python3:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

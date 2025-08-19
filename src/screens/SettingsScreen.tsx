@@ -1167,9 +1167,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
         {/* 버전 정보 */}
         <View style={styles.versionSection}>
-          <AppLogo useAppIcon={true} size={80} />
+          <AppLogo useAppIcon={true} size={80} showRoundBackground={true} />
           <Text style={styles.versionText}>Posty v1.0.0</Text>
-          <Text style={styles.copyrightText}>© 2024 Posty AI. Made with 💕</Text>
+          <Text style={styles.copyrightText}>© 2025 Posty AI. Made with 💕</Text>
         </View>
 
         {/* 로그아웃 버튼 */}
@@ -1587,6 +1587,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     paddingVertical: SPACING.lg,
     marginHorizontal: SPACING.md,
   },
+  // appIconContainer 제거됨 - AppLogo 컴포넌트 자체에서 라운드 배경 처리
   versionText: {
     fontSize: FONT_SIZES.small,
     color: colors.text.tertiary,

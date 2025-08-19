@@ -1,0 +1,42 @@
+// Android-specific fix for react-native-screens compatibility
+// This file patches react-native-screens to work with RN 0.73
+project.afterEvaluate {
+    if (project.name == 'react-native-screens') {
+        android {
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_17
+                targetCompatibility JavaVersion.VERSION_17
+            }
+        }
+        
+        // Override Kotlin compilation issues
+        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+            kotlinOptions {
+                jvmTarget = "17"
+                freeCompilerArgs += [
+                    "-Xskip-prerelease-check",
+                    "-Xopt-in=kotlin.RequiresOptIn"
+                ]
+            }
+        }
+    }
+    
+    if (project.name == 'react-native-google-mobile-ads') {
+        android {
+            compileOptions {
+                sourceCompatibility JavaVersion.VERSION_17
+                targetCompatibility JavaVersion.VERSION_17
+            }
+        }
+        
+        tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
+            kotlinOptions {
+                jvmTarget = "17"
+                freeCompilerArgs += [
+                    "-Xskip-prerelease-check",
+                    "-Xopt-in=kotlin.RequiresOptIn"
+                ]
+            }
+        }
+    }
+}

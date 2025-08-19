@@ -224,7 +224,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         >
           {/* 로고 영역 */}
           <Animated.View style={[styles.logoContainer, logoAnimatedStyle]}>
-            <AppLogo size={100} showText={true} />
+            <AppLogo size={150} showText={true} useAppIcon={true} />
           </Animated.View>
 
 

@@ -22,7 +22,7 @@ import { useAppSelector } from '../hooks/redux';
 import { getUserPlan, TREND_ACCESS, PlanType } from '../config/adConfig';
 import { Alert } from '../utils/customAlert';
 import { TrendPageSkeleton, TrendCardSkeleton, MyHashtagsSkeleton } from '../components/SkeletonLoader';
-import { CompactBanner, SmartAdPlacement } from '../components/ads';
+// import { CompactBanner, SmartAdPlacement } from '../components/ads'; // 앱스토어 스크린샷용 임시 비활성화
 import trendCache from '../utils/trendCache';
 import AppLogo from '../components/AppLogo';
 
@@ -356,7 +356,9 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         </SlideInView>
 
         {/* 광고 배너 */}
+        {/* 앱스토어 스크린샷용 임시 비활성화
         <SmartAdPlacement position={1} context="feed" />
+        */}
 
         {/* 내 트렌드 요약 (있는 경우) */}
         {userPlan === 'pro' && (

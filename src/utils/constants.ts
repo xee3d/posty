@@ -49,8 +49,8 @@ const LIGHT_COLORS = {
   lightGray: '#F3F4F6',
   darkGray: '#4B5563',
   
-  background: '#FAFAFA',
-  lightBackground: '#F5F5F5',
+  background: '#FFFFFF',
+  lightBackground: '#FAFAFA',
   surface: '#FFFFFF',
   border: '#E5E7EB',
   

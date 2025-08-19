@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
@@ -16,6 +16,24 @@ const AppLogo: React.FC<AppLogoProps> = ({
   useAppIcon = false 
 }) => {
   const isWhite = variant === 'white';
+  const [displayedText, setDisplayedText] = useState('');
+  const fullText = 'AI가 쓰고, 나는 빛나고';
+  
+  useEffect(() => {
+    if (showText && useAppIcon) {
+      let currentIndex = 0;
+      const typingInterval = setInterval(() => {
+        if (currentIndex <= fullText.length) {
+          setDisplayedText(fullText.slice(0, currentIndex));
+          currentIndex++;
+        } else {
+          clearInterval(typingInterval);
+        }
+      }, 100); // 100ms마다 한 글자씩 타이핑
+      
+      return () => clearInterval(typingInterval);
+    }
+  }, [showText, useAppIcon]);
   
   return (
     <View style={styles.container}>
@@ -45,8 +63,10 @@ const AppLogo: React.FC<AppLogoProps> = ({
       
       {showText && (
         <View style={styles.textContainer}>
-          <Text style={[styles.appName, isWhite && styles.whiteAppName]}>Posty</Text>
-          <Text style={[styles.tagline, isWhite && styles.whiteTagline]}>AI가 쓰고, 나는 빛나고</Text>
+          {!useAppIcon && <Text style={[styles.appName, isWhite && styles.whiteAppName]}>Posty</Text>}
+          <Text style={[styles.tagline, isWhite && styles.whiteTagline]}>
+            {useAppIcon ? displayedText : 'AI가 쓰고, 나는 빛나고'}
+          </Text>
         </View>
       )}
     </View>
@@ -70,14 +90,9 @@ const styles = StyleSheet.create({
   imageContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#7C3AED',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 5,
   },
   appIconImage: {
-    borderRadius: 20, // 이미지에 라운드 효과
+    // borderRadius 제거하여 원본 이미지 그대로 표시
   },
   whiteLogoBox: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -107,8 +122,8 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   tagline: {
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: 20,
+    fontWeight: '600',
     color: '#666666',
     letterSpacing: -0.3,
   },
