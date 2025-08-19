@@ -2,3 +2,17 @@ rootProject.name = 'Posty'
 apply from: file("../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesSettingsGradle(settings)
 include ':app'
 includeBuild('../node_modules/@react-native/gradle-plugin')
+
+// Apply Android-specific fixes for library compatibility
+gradle.allprojects {
+    afterEvaluate { project ->
+        if (project.name == 'react-native-screens' || project.name == 'react-native-google-mobile-ads') {
+            project.android {
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
+                }
+            }
+        }
+    }
+}

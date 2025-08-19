@@ -181,8 +181,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       setUserLevel(level);
       
       // 신규 사용자이고 온보딩을 보지 않았다면 표시
+      // App.tsx의 MinimalWelcome과 통합된 키 사용
       if (level === 'new') {
-        const hasSeenWelcome = await AsyncStorage.getItem('HAS_SEEN_WELCOME');
+        const hasSeenWelcome = await AsyncStorage.getItem('@posty_welcome_complete');
         if (!hasSeenWelcome) {
           setShowWelcome(true);
         }
@@ -406,7 +407,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
   // 온보딩 완료 처리
   const handleWelcomeComplete = async () => {
-    await AsyncStorage.setItem('HAS_SEEN_WELCOME', 'true');
+    await AsyncStorage.setItem('@posty_welcome_complete', 'true');
     setShowWelcome(false);
   };
 

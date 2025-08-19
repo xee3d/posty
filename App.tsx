@@ -136,6 +136,7 @@ const App: React.FC = () => {
       const welcomeComplete = await AsyncStorage.getItem('@posty_welcome_complete');
       
       const shouldShowOnboarding = !onboardingComplete;
+      // MinimalWelcome은 첫 방문자만 표시 (온보딩도 안 본 경우)
       const shouldShowWelcome = !welcomeComplete && !onboardingComplete;
       
       console.log('[Onboarding] Status:', { 

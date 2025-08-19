@@ -134,3 +134,23 @@ project.ext.vectoricons = [
     iconFontNames: [ 'MaterialIcons.ttf', 'EvilIcons.ttf', 'FontAwesome.ttf', 'Ionicons.ttf' ]
 ]
 apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
+
+// Android-specific fixes for library compatibility issues
+// This only affects Android builds and has no impact on iOS
+configurations.all {
+    resolutionStrategy {
+        // Force specific Kotlin version for all modules
+        force "org.jetbrains.kotlin:kotlin-stdlib:1.9.22"
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22"
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.22"
+    }
+}
+
+// Exclude problematic modules from specific libraries
+android {
+    packagingOptions {
+        exclude 'META-INF/kotlin-stdlib.kotlin_module'
+        exclude 'META-INF/kotlin-stdlib-jdk7.kotlin_module'
+        exclude 'META-INF/kotlin-stdlib-jdk8.kotlin_module'
+    }
+}
