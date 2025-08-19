@@ -13,6 +13,7 @@ import Animated, {
   SlideOutDown,
 } from 'react-native-reanimated';
 import AppLogo from '../components/AppLogo';
+import LinearGradient from 'react-native-linear-gradient';
 
 import { useAppTheme } from '../hooks/useAppTheme';
 import { AppIcon } from '../components/AppIcon';
@@ -155,7 +156,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
     }
   }, [dispatch, onNavigate]);
 
-  const renderSocialButton = (
+  const renderSocialButton = useCallback((
     provider: 'google' | 'naver' | 'kakao' | 'facebook' | 'apple',
     text: string,
     iconName: string,
@@ -208,16 +209,22 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         </TouchableOpacity>
       </View>
     );
-  };
+  }, [loadingProvider, isLoading, handleSocialLogin]);
 
   const styles = createStyles(colors, isDark);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoidingView}
-      >
+    <LinearGradient
+      colors={['#FFFFFF', '#F5F3FF', '#FFFFFF']} // 미묘한 보라색 그라데이션
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.container}
+    >
+      <SafeAreaView style={styles.safeArea}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoidingView}
+        >
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           showsVerticalScrollIndicator={false}
@@ -343,15 +350,26 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
             )}
           </View>
         </ScrollView>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 };
 
-const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
+interface ThemeColors {
+  text: {
+    primary: string;
+    secondary: string;
+  };
+}
+
+const createStyles = (colors: ThemeColors, isDark: boolean) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
+  },
+  safeArea: {
+    flex: 1,
+    backgroundColor: 'transparent',
   },
   keyboardAvoidingView: {
     flex: 1,
@@ -363,8 +381,8 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 60,
-    marginBottom: 60,
+    marginTop: 100,
+    marginBottom: 80,
   },
 
   buttonContainer: {

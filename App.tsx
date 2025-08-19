@@ -101,22 +101,26 @@ const App: React.FC = () => {
   const translateX = useSharedValue(0);
   const scale = useSharedValue(1);
 
-  // 앱 초기화 시 네이티브 스플래시 스크린 숨기기
+  // 앱 초기화
   useEffect(() => {
-    console.log('[App] Hiding splash screen');
-    SplashScreen.hide();
+    console.log('[App] App initialization started');
     
     // 메모리 최적화 초기화
     MemoryOptimizer.checkMemoryUsage();
     
     // 개발 환경에서 메모리 모니터링
+    let memoryCheckInterval: NodeJS.Timeout | undefined;
     if (__DEV__) {
-      const memoryCheckInterval = MemoryOptimizer.setInterval(() => {
+      memoryCheckInterval = MemoryOptimizer.setInterval(() => {
         MemoryOptimizer.checkMemoryUsage();
       }, 30000); // 30초마다 체크
-      
-      return () => MemoryOptimizer.clearInterval(memoryCheckInterval);
     }
+    
+    return () => {
+      if (memoryCheckInterval) {
+        MemoryOptimizer.clearInterval(memoryCheckInterval);
+      }
+    };
   }, []);
 
   // 온보딩 상태 체크
@@ -530,8 +534,9 @@ const App: React.FC = () => {
     return (
       <AnimatedSplashScreen 
         onAnimationComplete={() => {
-          console.log('[App] Splash animation complete');
-          setShowSplash(false);
+          console.log('[App] Splash animation complete, hiding native splash');
+          SplashScreen.hide(); // 네이티브 스플래시 숨기기
+          setShowSplash(false); // React Native 스플래시 숨기기
         }} 
       />
     );

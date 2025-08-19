@@ -90,9 +90,15 @@ const styles = StyleSheet.create({
   imageContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 20,
+    shadowColor: '#D4A574', // 황금색 그림자
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 12,
+    elevation: 8,
   },
   appIconImage: {
-    // borderRadius 제거하여 원본 이미지 그대로 표시
+    borderRadius: 20,
   },
   whiteLogoBox: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',
@@ -124,11 +130,11 @@ const styles = StyleSheet.create({
   tagline: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#666666',
+    color: '#D4A574', // 황금색으로 변경
     letterSpacing: -0.3,
   },
   whiteTagline: {
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: '#D4A574', // 황금색 유지
   },
 });
 

@@ -56,7 +56,8 @@
       "Bash(mkdir:*)",
       "Bash(sips:*)",
       "Bash(python3:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "mcp__sequential-thinking__sequentialthinking"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

@@ -23,16 +23,19 @@ export const BRAND = {
 // 라이트 테마 색상
 const LIGHT_COLORS = {
   primary: '#8B5CF6', // 이미지와 동일한 보라색 (Violet-500)
-  secondary: '#A78BFA', // Violet-400
+  secondary: '#D4A574', // 로고의 황금색
   success: '#10B981',
   warning: '#F59E0B',
   error: '#EF4444',
   info: '#3B82F6',
   
-  // 보라색과 잘 어울리는 색상들
+  // 로고 컬러 기반 색상들
   accent: '#7C3AED', // Violet-600
   accentLight: '#F5F3FF', // Violet-50 (매우 연한 보라색)
   accentDark: '#6D28D9', // Violet-700
+  gold: '#D4A574', // 로고의 황금색
+  goldLight: '#F4E4D7', // 연한 황금색
+  goldDark: '#B8935F', // 진한 황금색
   
   text: {
     primary: '#1F2937',
@@ -60,7 +63,7 @@ const LIGHT_COLORS = {
 // 다크 테마 색상 - 블랙 배경 기준
 const DARK_COLORS = {
   primary: '#A78BFA', // 밝은 보라색 (Violet-400)
-  secondary: '#C4B5FD', // Violet-300
+  secondary: '#E5C392', // 밝은 황금색
   success: '#86EFAC',
   warning: '#FDE047',
   error: '#FCA5A5',
@@ -69,6 +72,9 @@ const DARK_COLORS = {
   accent: '#8B5CF6', // Violet-500
   accentLight: '#1F1F1F', // 거의 블랙에 가까운 카드 배경
   accentDark: '#DDD6FE', // Violet-200
+  gold: '#E5C392', // 밝은 황금색 (다크 모드용)
+  goldLight: '#2A241D', // 어두운 황금색 배경
+  goldDark: '#F2D5A8', // 매우 밝은 황금색
   
   text: {
     primary: '#FFFFFF', // 순백색

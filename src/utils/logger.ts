@@ -1,4 +1,4 @@
-// 프로덕션 환경을 고려한 안전한 로거
+// Production-ready logger with enhanced security and performance
 const LOG_LEVELS = {
   DEBUG: 0,
   INFO: 1,
@@ -8,69 +8,127 @@ const LOG_LEVELS = {
 
 type LogLevel = keyof typeof LOG_LEVELS;
 
+interface LogContext {
+  userId?: string;
+  action?: string;
+  component?: string;
+  [key: string]: any;
+}
+
 class Logger {
   private level: LogLevel = __DEV__ ? 'DEBUG' : 'WARN';
   private isProduction: boolean = !__DEV__;
+  private logBuffer: Array<{ timestamp: number; level: LogLevel; message: string; context?: LogContext }> = [];
+  private readonly MAX_BUFFER_SIZE = 50;
 
   setLevel(level: LogLevel) {
     this.level = level;
   }
 
   private sanitizeData(data: any): any {
-    if (this.isProduction && typeof data === 'object' && data !== null) {
-      // 프로덕션에서는 민감한 정보 제거
-      const sanitized = { ...data };
+    if (typeof data === 'object' && data !== null) {
+      // Always sanitize sensitive information
+      const sanitized = Array.isArray(data) ? [...data] : { ...data };
       
       const sensitiveKeys = [
         'password', 'token', 'secret', 'key', 'accessToken', 
         'refreshToken', 'idToken', 'apiKey', 'consumerSecret',
-        'email', 'phone', 'uid', 'vercelToken'
+        'email', 'phone', 'uid', 'vercelToken', 'authToken'
       ];
       
-      sensitiveKeys.forEach(key => {
-        if (key in sanitized) {
-          sanitized[key] = '[REDACTED]';
+      const sanitizeObject = (obj: any): any => {
+        if (Array.isArray(obj)) {
+          return obj.map(item => this.sanitizeData(item));
         }
-      });
+        if (typeof obj === 'object' && obj !== null) {
+          const result: any = {};
+          for (const [key, value] of Object.entries(obj)) {
+            if (sensitiveKeys.some(sensitiveKey => 
+              key.toLowerCase().includes(sensitiveKey.toLowerCase())
+            )) {
+              result[key] = '[REDACTED]';
+            } else {
+              result[key] = this.sanitizeData(value);
+            }
+          }
+          return result;
+        }
+        return obj;
+      };
       
-      return sanitized;
+      return sanitizeObject(sanitized);
     }
     return data;
   }
 
-  debug(...args: any[]) {
+  private addToBuffer(level: LogLevel, message: string, context?: LogContext): void {
+    if (this.logBuffer.length >= this.MAX_BUFFER_SIZE) {
+      this.logBuffer.shift(); // Remove oldest entry
+    }
+    this.logBuffer.push({
+      timestamp: Date.now(),
+      level,
+      message,
+      context: this.sanitizeData(context)
+    });
+  }
+
+  debug(message: string, context?: LogContext) {
     if (LOG_LEVELS[this.level] <= LOG_LEVELS.DEBUG) {
-      const sanitizedArgs = args.map(arg => this.sanitizeData(arg));
-      console.log('🐛 [DEBUG]', ...sanitizedArgs);
+      this.addToBuffer('DEBUG', message, context);
+      const sanitizedContext = this.sanitizeData(context);
+      console.log(`🐛 [DEBUG] ${message}`, sanitizedContext || '');
     }
   }
 
-  info(...args: any[]) {
+  info(message: string, context?: LogContext) {
     if (LOG_LEVELS[this.level] <= LOG_LEVELS.INFO) {
-      const sanitizedArgs = args.map(arg => this.sanitizeData(arg));
-      console.log('ℹ️ [INFO]', ...sanitizedArgs);
+      this.addToBuffer('INFO', message, context);
+      const sanitizedContext = this.sanitizeData(context);
+      console.log(`ℹ️ [INFO] ${message}`, sanitizedContext || '');
     }
   }
 
-  warn(...args: any[]) {
+  warn(message: string, context?: LogContext) {
     if (LOG_LEVELS[this.level] <= LOG_LEVELS.WARN) {
-      const sanitizedArgs = args.map(arg => this.sanitizeData(arg));
-      console.warn('⚠️ [WARN]', ...sanitizedArgs);
+      this.addToBuffer('WARN', message, context);
+      const sanitizedContext = this.sanitizeData(context);
+      console.warn(`⚠️ [WARN] ${message}`, sanitizedContext || '');
     }
   }
 
-  error(...args: any[]) {
-    if (LOG_LEVELS[this.level] <= LOG_LEVELS.ERROR) {
-      const sanitizedArgs = args.map(arg => this.sanitizeData(arg));
-      console.error('🚨 [ERROR]', ...sanitizedArgs);
-    }
+  error(message: string, context?: LogContext, error?: Error) {
+    const errorContext = {
+      ...context,
+      ...(error && {
+        errorMessage: error.message,
+        errorStack: __DEV__ ? error.stack : undefined
+      })
+    };
+    
+    this.addToBuffer('ERROR', message, errorContext);
+    const sanitizedContext = this.sanitizeData(errorContext);
+    console.error(`🚨 [ERROR] ${message}`, sanitizedContext || '');
   }
 
-  // 민감한 정보 로깅용 (개발 환경에서만)
+  // Sensitive information logging (development only)
   sensitive(message: string, data: any) {
     if (!this.isProduction) {
       console.log(`🔒 [SENSITIVE] ${message}`, data);
     }
+  }
+
+  // Get recent logs for debugging
+  getRecentLogs(level?: LogLevel) {
+    if (level) {
+      return this.logBuffer.filter(log => log.level === level);
+    }
+    return [...this.logBuffer];
+  }
+
+  // Clear log buffer
+  clearBuffer() {
+    this.logBuffer = [];
   }
 
   // Performance logging
@@ -88,5 +146,11 @@ class Logger {
 }
 
 const logger = new Logger();
+
+// Convenience exports
+export const logDebug = (message: string, context?: LogContext) => logger.debug(message, context);
+export const logInfo = (message: string, context?: LogContext) => logger.info(message, context);
+export const logWarn = (message: string, context?: LogContext) => logger.warn(message, context);
+export const logError = (message: string, context?: LogContext, error?: Error) => logger.error(message, context, error);
 
 export default logger;

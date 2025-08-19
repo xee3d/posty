@@ -105,7 +105,7 @@ export type AppDispatch = typeof store.dispatch;
 
 // persistor 생성 - 재수화 완료 콜백 최적화
 export const persistor = persistStore(store, null, () => {
-  if (__DEV__) {
+  if (__DEV__ && process.env.REACT_NATIVE_DEBUG_PERSIST !== 'false') {
     console.log('Redux persist: rehydration complete');
   }
 });

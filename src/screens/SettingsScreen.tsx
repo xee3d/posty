@@ -1591,6 +1591,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   versionText: {
     fontSize: FONT_SIZES.small,
     color: colors.text.tertiary,
+    marginTop: SPACING.md,
     marginBottom: 4,
   },
   copyrightText: {
