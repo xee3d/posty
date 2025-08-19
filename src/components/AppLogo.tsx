@@ -1,23 +1,34 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 
 interface AppLogoProps {
   size?: number;
   showText?: boolean;
   variant?: 'primary' | 'white';
+  useAppIcon?: boolean; // 새로운 prop: 실제 앱 아이콘 이미지 사용 여부
 }
 
 const AppLogo: React.FC<AppLogoProps> = ({ 
   size = 100, 
   showText = false,
-  variant = 'primary' 
+  variant = 'primary',
+  useAppIcon = false 
 }) => {
   const isWhite = variant === 'white';
   
   return (
     <View style={styles.container}>
-      {isWhite ? (
+      {useAppIcon ? (
+        // 실제 앱 아이콘 이미지 사용
+        <View style={[styles.imageContainer, { width: size, height: size }]}>
+          <Image 
+            source={require('../assets/images/app_icon.png')}
+            style={[styles.appIconImage, { width: size, height: size }]}
+            resizeMode="contain"
+          />
+        </View>
+      ) : isWhite ? (
         <View style={[styles.logoBox, { width: size, height: size }, styles.whiteLogoBox]}>
           <Text style={[styles.logoText, { fontSize: size * 0.5 }, styles.whiteLogoText]}>P</Text>
         </View>
@@ -55,6 +66,18 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 16,
     elevation: 10,
+  },
+  imageContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#7C3AED',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  appIconImage: {
+    borderRadius: 20, // 이미지에 라운드 효과
   },
   whiteLogoBox: {
     backgroundColor: 'rgba(255, 255, 255, 0.95)',

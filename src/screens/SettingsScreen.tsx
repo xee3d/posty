@@ -1167,7 +1167,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
         {/* 버전 정보 */}
         <View style={styles.versionSection}>
-          <AppLogo />
+          <AppLogo useAppIcon={true} size={80} />
           <Text style={styles.versionText}>Posty v1.0.0</Text>
           <Text style={styles.copyrightText}>© 2024 Posty AI. Made with 💕</Text>
         </View>
