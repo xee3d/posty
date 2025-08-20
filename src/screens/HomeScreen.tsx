@@ -36,7 +36,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import NewUserWelcome from '../components/NewUserWelcome';
 import improvedStyleService from '../services/improvedStyleService';
 import { soundManager } from '../utils/soundManager';
-// import { BannerCarousel, AdaptiveNativeAd, SmartAdPlacement } from '../components/ads'; // 앱스토어 스크린샷용 임시 비활성화
+import { BannerCarousel, AdaptiveNativeAd, SmartAdPlacement } from '../components/ads';
 import AdIntegrationService from '../services/AdIntegrationService';
 import AppLogo from '../components/AppLogo';
 
@@ -668,7 +668,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
 
         {/* 작은 배너 광고 - 해시태그 아래 배치 */}
-        {/* 앱스토어 스크린샷용 임시 비활성화
         {Date.now() % 2 === 0 && (
           <SlideInView delay={600} duration={300}>
             <View style={styles.smallBannerContainer}>
@@ -681,7 +680,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
             </View>
           </SlideInView>
         )}
-        */}
 
         {/* 나의 글쓰기 스타일 */}
         {styleAnalysis && stats?.totalPosts > 3 && (
@@ -949,11 +947,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
 
         {/* 하단 인라인 광고 - 개발 모드에서만 표시 */}
-        {/* 앱스토어 스크린샷용 임시 비활성화
-        {recentPosts.length > 0 && (
-          <SmartAdPlacement position={10} context="home" />
-        )}
-        */}
 
         <View style={styles.bottomSpace} />
       </ScrollView>

@@ -3,7 +3,9 @@ import {
   View,
   StyleSheet,
   Dimensions,
+  useColorScheme,
 } from 'react-native';
+import { useAppTheme } from '../hooks/useAppTheme';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -29,6 +31,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   borderRadius = 8,
 }) => {
   const shimmer = useSharedValue(0);
+  const { isDark, colors } = useAppTheme();
 
   useEffect(() => {
     shimmer.value = withRepeat(
@@ -49,26 +52,37 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
     };
   });
 
+  const skeletonStyles = [
+    styles.skeleton,
+    {
+      width: customWidth,
+      height,
+      borderRadius,
+      backgroundColor: isDark ? '#141414' : '#E5E5E5',
+    },
+    style,
+  ];
+
+  const shimmerStyles = [
+    styles.shimmer,
+    {
+      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.3)',
+    },
+    animatedStyle,
+  ];
+
   return (
-    <View
-      style={[
-        styles.skeleton,
-        {
-          width: customWidth,
-          height,
-          borderRadius,
-        },
-        style,
-      ]}
-    >
-      <Animated.View style={[styles.shimmer, animatedStyle]} />
+    <View style={skeletonStyles}>
+      <Animated.View style={shimmerStyles} />
     </View>
   );
 };
 
 export const ScreenSkeleton: React.FC = () => {
+  const { isDark, colors } = useAppTheme();
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header Skeleton */}
       <View style={styles.header}>
         <SkeletonLoader width={120} height={28} />
@@ -194,10 +208,15 @@ export const AIWritingSkeleton: React.FC = () => {
 
 // 트렌드 카테고리 탭 스켈레톤
 export const TrendCategorySkeleton: React.FC = () => {
+  const { isDark, colors } = useAppTheme();
+
   return (
     <View style={styles.categoryContainer}>
       {[1, 2, 3, 4].map((item, index) => (
-        <View key={index} style={styles.categoryButtonSkeleton}>
+        <View key={index} style={[
+          styles.categoryButtonSkeleton,
+          { backgroundColor: isDark ? colors.surface : '#E5E5E5' }
+        ]}>
           <SkeletonLoader width={16} height={16} borderRadius={8} />
           <SkeletonLoader width={50 + index * 10} height={14} style={{ marginLeft: 6 }} />
         </View>
@@ -208,8 +227,16 @@ export const TrendCategorySkeleton: React.FC = () => {
 
 // 트렌드 카드 스켈레톤
 export const TrendCardSkeleton: React.FC = () => {
+  const { isDark, colors } = useAppTheme();
+
   return (
-    <View style={styles.trendCardSkeleton}>
+    <View style={[
+      styles.trendCardSkeleton, 
+      {
+        backgroundColor: colors.surface,
+        borderColor: colors.border,
+      }
+    ]}>
       <View style={styles.trendHeaderSkeleton}>
         <SkeletonLoader width={32} height={32} borderRadius={16} />
         <View style={styles.trendContentSkeleton}>
@@ -235,8 +262,10 @@ export const TrendCardSkeleton: React.FC = () => {
 
 // 트렌드 페이지 전체 스켈레톤
 export const TrendPageSkeleton: React.FC = () => {
+  const { isDark, colors } = useAppTheme();
+
   return (
-    <View style={styles.trendPageContainer}>
+    <View style={[styles.trendPageContainer, { backgroundColor: colors.background }]}>
       {/* 헤더 스켈레톤 */}
       <View style={styles.trendHeaderContainer}>
         <View style={styles.trendHeaderTop}>
@@ -290,8 +319,15 @@ export const MyHashtagsSkeleton: React.FC = () => {
 
 const styles = StyleSheet.create({
   skeleton: {
-    backgroundColor: '#E5E5E5',
     overflow: 'hidden',
+  },
+  // 라이트모드 스켈레톤
+  skeletonLight: {
+    backgroundColor: '#E5E5E5',
+  },
+  // 다크모드 스켈레톤 - 더 어두운 색상
+  skeletonDark: {
+    backgroundColor: '#1A1A1A',
   },
   shimmer: {
     position: 'absolute',
@@ -299,12 +335,24 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
     transform: [{ skewX: '-20deg' }],
+  },
+  // 라이트모드 시머
+  shimmerLight: {
+    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  },
+  // 다크모드 시머 - 더 어두운 시머 효과
+  shimmerDark: {
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   container: {
     flex: 1,
+  },
+  containerLight: {
     backgroundColor: '#F8F9FA',
+  },
+  containerDark: {
+    backgroundColor: '#000000',
   },
   header: {
     padding: SPACING.lg,
@@ -387,7 +435,12 @@ const styles = StyleSheet.create({
   // 트렌드 스켈레톤 스타일들
   trendPageContainer: {
     flex: 1,
+  },
+  trendPageContainerLight: {
     backgroundColor: '#F8F9FA',
+  },
+  trendPageContainerDark: {
+    backgroundColor: '#000000',
   },
   trendHeaderContainer: {
     paddingHorizontal: SPACING.lg,
@@ -410,7 +463,6 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.md,
     borderRadius: 24,
-    backgroundColor: '#E5E5E5',
   },
   myTrendsSkeleton: {
     paddingHorizontal: SPACING.lg,
@@ -427,12 +479,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.lg,
   },
   trendCardSkeleton: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: SPACING.md,
     marginBottom: SPACING.sm,
     borderWidth: 1,
+  },
+  trendCardSkeletonLight: {
+    backgroundColor: '#FFFFFF',
     borderColor: '#E5E5E5',
+  },
+  trendCardSkeletonDark: {
+    backgroundColor: '#141414',
+    borderColor: '#3A3A3A',
   },
   trendHeaderSkeleton: {
     flexDirection: 'row',

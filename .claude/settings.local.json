@@ -57,7 +57,11 @@
       "Bash(sips:*)",
       "Bash(python3:*)",
       "Bash(git checkout:*)",
-      "mcp__sequential-thinking__sequentialthinking"
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(kill:*)",
+      "Bash(curl:*)",
+      "Bash(./emulator -list-avds)",
+      "Bash(./android/gradlew:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

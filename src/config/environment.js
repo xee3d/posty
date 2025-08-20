@@ -5,9 +5,9 @@
 
 export const FEATURES = {
   // 📱 외부 서비스 제어
-  USE_ADS: false,              // AdMob
-  USE_IAP: false,              // In-App Purchases
-  USE_ANALYTICS: false,        // Analytics
+  USE_ADS: true,               // AdMob - 피처드를 위해 활성화
+  USE_IAP: true,               // In-App Purchases - 수익화 모델
+  USE_ANALYTICS: true,         // Analytics - 사용자 분석
   
   // 🛠️ 개발 도구
   DEBUG_MODE: __DEV__,

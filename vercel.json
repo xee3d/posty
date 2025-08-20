@@ -1,5 +1,24 @@
 {
   "version": 2,
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 30
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/notifications/schedule?type=daily",
+      "schedule": "0 9,18 * * *"
+    },
+    {
+      "path": "/api/notifications/schedule?type=weekly", 
+      "schedule": "0 20 * * 0"
+    },
+    {
+      "path": "/api/notifications/schedule?type=smart",
+      "schedule": "0 12,15 * * *"
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/(.*)",

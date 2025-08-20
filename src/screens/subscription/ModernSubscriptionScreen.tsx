@@ -16,7 +16,7 @@ import missionService from '../../services/missionService';
 import TokenPurchaseView from '../../components/TokenPurchaseView';
 import EarnTokenModal from '../../components/EarnTokenModal';
 import PaymentSuccessModal from '../../components/PaymentSuccessModal';
-// import { AdaptiveNativeAd, SmartAdPlacement } from '../../components/ads'; // 앱스토어 스크린샷용 임시 비활성화
+import { AdaptiveNativeAd, SmartAdPlacement } from '../../components/ads';
 
 import { Alert } from '../../utils/customAlert';
 import { DeviceEventEmitter } from 'react-native';

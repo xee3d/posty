@@ -17,7 +17,7 @@ import { saveContent } from '../utils/storage';
 import { Alert } from '../utils/customAlert';
 import { useAppSelector } from '../hooks/redux';
 import { getUserPlan, MY_STYLE_ACCESS, PlanType } from '../config/adConfig';
-// import { CompactBanner, SmartAdPlacement } from '../components/ads'; // 앱스토어 스크린샷용 임시 비활성화
+import { CompactBanner, SmartAdPlacement } from '../components/ads';
 const { width } = Dimensions.get('window');
 
 interface MyStyleScreenProps {
@@ -1043,9 +1043,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         </View>
 
         {/* 광고 배너 */}
-        {/* 앱스토어 스크린샷용 임시 비활성화
         <SmartAdPlacement position={2} context="profile" />
-        */}
 
         {/* 탭 컨텐츠 */}
         <View style={styles.tabContent}>

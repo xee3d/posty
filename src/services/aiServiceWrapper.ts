@@ -97,13 +97,13 @@ class AIServiceWrapper {
         try {
           let platformPrompt = finalPrompt;
           
-          // 플랫폼별 특화 프롬프트 추가
+          // 플랫폼별 특화 프롬프트 추가 (사용자 관점으로)
           if (platformId === 'instagram') {
-            platformPrompt += '\n\n[Instagram 스타일로 작성: 감성적이고 시각적으로, 줄바꿈을 활용해서 스토리텔링하듯 작성해주세요. 해시태그 5-7개 포함]';
+            platformPrompt += '\n\n[Instagram 스타일로 작성: 내 개인적인 경험과 감정을 1인칭으로 감성적이고 시각적으로, 줄바꿈을 활용해서 스토리텔링하듯 작성해주세요. 사진은 내가 직접 찍은 것이라고 가정하고 작성해주세요. 해시태그 5-7개 포함]';
           } else if (platformId === 'facebook') {
-            platformPrompt += '\n\n[Facebook 스타일로 작성: 친근하고 대화형으로, 개인적인 경험을 공유하는 톤으로 한 문단으로 자연스럽게 작성해주세요]';
+            platformPrompt += '\n\n[Facebook 스타일로 작성: 내가 직접 경험한 것처럼 1인칭으로 친근하고 대화형으로, 개인적인 경험을 공유하는 톤으로 한 문단으로 자연스럽게 작성해주세요]';
           } else if (platformId === 'twitter') {
-            platformPrompt += '\n\n[Twitter 스타일로 작성: 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그 1-2개만]';
+            platformPrompt += '\n\n[Twitter 스타일로 작성: 내 경험을 1인칭으로 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그 1-2개만]';
           }
           
           const platformResponse = await serverAIService.generateContent({
@@ -194,13 +194,13 @@ class AIServiceWrapper {
         try {
           let platformPrompt = polishPrompt;
           
-          // 플랫폼별 특화 프롬프트 추가
+          // 플랫폼별 특화 프롬프트 추가 (사용자 관점으로)
           if (platformId === 'instagram') {
-            platformPrompt += '\n\n[Instagram 스타일로 최적화: 감성적이고 시각적으로, 줄바꿈을 활용해서 스토리텔링하듯 작성해주세요. 해시태그 5-7개 포함]';
+            platformPrompt += '\n\n[Instagram 스타일로 최적화: 내 개인적인 경험과 감정을 1인칭으로 감성적이고 시각적으로, 줄바꿈을 활용해서 스토리텔링하듯 작성해주세요. 내가 직접 경험한 것처럼 작성해주세요. 해시태그 5-7개 포함]';
           } else if (platformId === 'facebook') {
-            platformPrompt += '\n\n[Facebook 스타일로 최적화: 친근하고 대화형으로, 개인적인 경험을 공유하는 톤으로 한 문단으로 자연스럽게 작성해주세요]';
+            platformPrompt += '\n\n[Facebook 스타일로 최적화: 내가 직접 경험한 것처럼 1인칭으로 친근하고 대화형으로, 개인적인 경험을 공유하는 톤으로 한 문단으로 자연스럽게 작성해주세요]';
           } else if (platformId === 'twitter') {
-            platformPrompt += '\n\n[Twitter 스타일로 최적화: 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그 1-2개만]';
+            platformPrompt += '\n\n[Twitter 스타일로 최적화: 내 경험을 1인칭으로 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그 1-2개만]';
           }
           
           const platformResponse = await serverAIService.generateContent({
@@ -331,12 +331,12 @@ class AIServiceWrapper {
     const isWeekend = day === 0 || day === 6;
     
     const descriptions = [
-      `${timeOfDay}의 특별한 순간이 담긴 사진이네요! 어떤 이야기가 숨어있나요?`,
-      '일상 속에서 발견한 아름다운 장면이 인상적이에요.',
-      '사진 속 분위기가 참 좋네요. 이 순간의 느낌을 글로 표현해보세요.',
-      '멋진 구도와 색감이 돋보이는 사진이에요!',
-      '이 사진이 전하고 싶은 메시지가 무엇인가요?',
-      isWeekend ? '주말의 여유가 느껴지는 사진이네요!' : '일상의 소중한 순간을 포착하셨네요!',
+      `내가 포착한 ${timeOfDay}의 특별한 순간! 이 사진으로 어떤 이야기를 전하고 싶나요?`,
+      '내 일상 속에서 발견한 아름다운 장면을 담았네요.',
+      '내가 느낀 이 순간의 분위기를 글로 표현해보세요.',
+      '내가 찍은 멋진 구도와 색감이 돋보이는 사진이에요!',
+      '내가 이 사진으로 전하고 싶은 메시지는 무엇인가요?',
+      isWeekend ? '내 주말의 여유로운 순간을 담았네요!' : '내 일상의 소중한 순간을 기록했어요!',
     ];
     
     const randomDesc = customMessage || descriptions[Math.floor(Math.random() * descriptions.length)];
@@ -346,10 +346,10 @@ class AIServiceWrapper {
       objects: [],
       mood: 'positive',
       suggestedContent: [
-        `${timeOfDay}의 일상`,
-        isWeekend ? '주말 스냅' : '데일리 로그',
-        '오늘의 특별한 순간',
-        '일상 속 소확행',
+        `나의 ${timeOfDay} 일상`,
+        isWeekend ? '내 주말 스냅' : '내 데일리 로그',
+        '내가 만난 특별한 순간',
+        '내 일상 속 소확행',
         '나만의 이야기',
       ].slice(0, 3),
     };
@@ -360,26 +360,26 @@ class AIServiceWrapper {
     const suggestions = [];
     const lowerDesc = description.toLowerCase();
     
-    // 키워드 기반 제안
+    // 키워드 기반 제안 (사용자 관점으로)
     if (lowerDesc.includes('카페') || lowerDesc.includes('커피') || lowerDesc.includes('coffee')) {
-      suggestions.push('카페 일상', '오늘의 커피', '힐링 타임');
+      suggestions.push('내 카페 타임', '나의 커피 시간', '내 힐링 타임');
     }
     if (lowerDesc.includes('음식') || lowerDesc.includes('맛') || lowerDesc.includes('food')) {
-      suggestions.push('맛있는 한 끼', '오늘의 메뉴', '푸드 다이어리');
+      suggestions.push('내가 만든 한 끼', '나의 오늘 메뉴', '내 푸드 다이어리');
     }
     if (lowerDesc.includes('풍경') || lowerDesc.includes('자연') || lowerDesc.includes('nature')) {
-      suggestions.push('자연과 함께', '힐링 풍경', '여행의 순간');
+      suggestions.push('내가 본 자연', '내 힐링 풍경', '나의 여행 순간');
     }
     if (lowerDesc.includes('사람') || lowerDesc.includes('친구') || lowerDesc.includes('people')) {
-      suggestions.push('함께한 시간', '소중한 사람들', '우정 기록');
+      suggestions.push('내가 함께한 시간', '나의 소중한 사람들', '내 우정 기록');
     }
     if (lowerDesc.includes('밤') || lowerDesc.includes('야경') || lowerDesc.includes('night')) {
-      suggestions.push('도시의 밤', '야경 스냅', '밤의 정취');
+      suggestions.push('내가 본 도시의 밤', '나의 야경 스냅', '내가 느낀 밤의 정취');
     }
     
-    // 기본 제안 추가
+    // 기본 제안 추가 (사용자 관점으로)
     if (suggestions.length === 0) {
-      suggestions.push('일상 기록', '오늘의 이야기', '특별한 순간');
+      suggestions.push('내 일상 기록', '나의 오늘 이야기', '내가 포착한 특별한 순간');
     }
     
     return suggestions.slice(0, 3);
@@ -435,30 +435,30 @@ class AIServiceWrapper {
     
     const lengthGuide = length ? `\n길이: ${lengthInstructions[length]} 작성해주세요.` : '';
     
-    // 추가 지시사항: 전체 내용을 모두 포함하여 완성된 글로 작성
-    const completionInstruction = '\n\n중요: 반드시 전체 내용을 빠짐없이 포함하여 완성된 글로 작성해주세요. 중간에 끊기지 않도록 주의해주세요.';
+    // 추가 지시사항: 전체 내용을 모두 포함하여 완성된 글로 작성 (사용자 관점으로)
+    const completionInstruction = '\n\n중요: 반드시 전체 내용을 빠짐없이 포함하여 완성된 글로 작성해주세요. 내가 직접 경험한 것처럼 1인칭 관점으로 작성하고, 중간에 끊기지 않도록 주의해주세요.';
     
     switch (polishType) {
       case 'summarize':
-        return `다음 텍스트의 핵심 내용만 간단히 요약해주세요. SNS에 적합한 짧고 간결한 문장으로 작성해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+        return `다음 텍스트의 핵심 내용만 간단히 요약해주세요. 내가 직접 경험한 것처럼 1인칭으로 SNS에 적합한 짧고 간결한 문장으로 작성해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'simple':
-        return `다음 텍스트를 쉽고 친근하게 풀어서 다시 써주세요. 모든 내용을 빠짐없이 포함해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+        return `다음 텍스트를 쉽고 친근하게 풀어서 다시 써주세요. 내가 직접 경험한 것처럼 1인칭으로 모든 내용을 빠짐없이 포함해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'formal':
-        return `다음 텍스트를 격식있는 문체로 변환해주세요. 전체 내용을 빠짐없이 변환해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+        return `다음 텍스트를 격식있는 문체로 변환해주세요. 내가 직접 경험한 것처럼 1인칭으로 전체 내용을 빠짐없이 변환해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'emotion':
-        return `다음 텍스트에 감정 표현을 더 풍부하게 추가해주세요. 독자의 공감을 이끌어낼 수 있는 감성적인 표현으로 작성해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+        return `다음 텍스트에 감정 표현을 더 풍부하게 추가해주세요. 내가 직접 느낀 감정으로 1인칭으로 독자의 공감을 이끌어낼 수 있는 감성적인 표현으로 작성해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'storytelling':
-        return `다음 텍스트를 스토리텔링 형식으로 변환해주세요. 단순한 설명이 아닌 이야기로 만들어주세요: "${text}"${lengthGuide}${completionInstruction}`;
+        return `다음 텍스트를 스토리텔링 형식으로 변환해주세요. 내가 직접 경험한 이야기로 1인칭으로 단순한 설명이 아닌 개인적인 이야기로 만들어주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'engaging':
-        return `다음 텍스트를 더 재미있고 매력적으로 만들어주세요. 독자의 관심을 끌 수 있도록 작성해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+        return `다음 텍스트를 더 재미있고 매력적으로 만들어주세요. 내가 직접 경험한 것처럼 1인칭으로 독자의 관심을 끌 수 있도록 작성해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'hashtag':
-        return `다음 텍스트에서 주요 키워드를 추출하고 SNS에 적합한 해시태그를 생성해주세요. 원문 내용과 함께 해시태그를 추가해주세요: "${text}"\n\n형식: [원문 내용]\n\n#해시태그 #해시태그 #해시태그${completionInstruction}`;
+        return `다음 텍스트에서 주요 키워드를 추출하고 SNS에 적합한 해시태그를 생성해주세요. 내가 직접 경험한 것처럼 1인칭으로 원문 내용과 함께 해시태그를 추가해주세요: "${text}"\n\n형식: [원문 내용]\n\n#해시태그 #해시태그 #해시태그${completionInstruction}`;
       case 'emoji':
-        return `다음 텍스트에 적절한 이모지를 추가해주세요. 문장의 감정이나 내용에 맞는 이모지를 자연스럽게 삽입해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+        return `다음 텍스트에 적절한 이모지를 추가해주세요. 내가 직접 느낀 감정으로 1인칭으로 문장의 감정이나 내용에 맞는 이모지를 자연스럽게 삽입해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'question':
-        return `다음 텍스트를 질문형으로 변환해주세요. 평서문을 독자의 참여를 유도하는 질문형으로 바꿔주세요: "${text}"${lengthGuide}${completionInstruction}`;
+        return `다음 텍스트를 질문형으로 변환해주세요. 내가 직접 경험한 것처럼 1인칭으로 평서문을 독자의 참여를 유도하는 질문형으로 바꿔주세요: "${text}"${lengthGuide}${completionInstruction}`;
       default:
-        return `다음 텍스트를 개선해주세요: "${text}"${lengthGuide}${completionInstruction}`;
+        return `다음 텍스트를 개선해주세요. 내가 직접 경험한 것처럼 1인칭 관점으로 작성해주세요: "${text}"${lengthGuide}${completionInstruction}`;
     }
   }
 }
