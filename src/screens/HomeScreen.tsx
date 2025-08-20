@@ -526,7 +526,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 )}
               </View>
             </View>
-            </View>
           </View>
         </FadeInView>
 
