@@ -47,10 +47,10 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
   const loadBadgeCount = async () => {
     try {
       const count = badgeService.getBadgeCount();
-      const unreadNotifications = badgeService.getUnreadNotifications();
+      const allNotifications = badgeService.getAllNotifications();
       
       setBadgeCount(count);
-      setNotifications(unreadNotifications);
+      setNotifications(allNotifications); // 모든 알림 표시
     } catch (error) {
       console.error('📱 Load badge count failed:', error);
     }
@@ -66,14 +66,14 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
 
   const handleNotificationPress = async (notification: any) => {
     try {
-      // 알림을 읽음 처리
-      await badgeService.markNotificationAsRead(notification.id);
+      // 클릭하면 알림을 완전히 제거
+      await badgeService.removeNotification(notification.id);
       await loadBadgeCount();
 
       // 관련 화면으로 이동 (추후 네비게이션 연동)
       console.log(`📱 Navigate to ${notification.type} screen`);
       
-      setShowModal(false);
+      // 모달은 유지 - 알림만 제거됨
     } catch (error) {
       console.error('📱 Handle notification press failed:', error);
     }
@@ -210,9 +210,12 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
                       {formatTimestamp(notification.timestamp)}
                     </Text>
                   </View>
-                  {!notification.isRead && (
-                    <View style={styles.unreadDot} />
-                  )}
+                  <Icon 
+                    name="close-outline" 
+                    size={16} 
+                    color={colors.text.tertiary}
+                    style={{ marginLeft: 8 }}
+                  />
                 </TouchableOpacity>
               ))
             )}
@@ -340,13 +343,6 @@ const createStyles = (colors: any, isDark: boolean, sizeStyles: any) =>
     notificationTime: {
       fontSize: 12,
       color: colors.text.tertiary,
-    },
-    unreadDot: {
-      width: 8,
-      height: 8,
-      borderRadius: 4,
-      backgroundColor: colors.primary,
-      marginTop: 4,
     },
   });
 

@@ -37,14 +37,7 @@ const AnimatedSplashScreen: React.FC<AnimatedSplashScreenProps> = ({ onAnimation
       />
       <View style={styles.container}>
         <View style={styles.contentContainer}>
-          {/* 로고 이미지만 표시 */}
-          <View style={styles.logoContainer}>
-            <Image 
-              source={require('../assets/images/app_icon.png')}
-              style={styles.logoImage}
-              resizeMode="contain"
-            />
-          </View>
+          {/* 아이콘 제거 - 깔끔한 흰 배경만 표시 */}
         </View>
       </View>
     </>

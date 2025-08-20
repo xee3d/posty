@@ -95,23 +95,18 @@ export class BadgeService {
   }
 
   /**
-   * 배지 완전 초기화
+   * 배지 완전 초기화 (모든 알림 완전 삭제)
    */
   async clearBadge(): Promise<void> {
     try {
       this.badgeCount = 0;
-      
-      // 모든 알림을 읽음 처리
-      this.notifications = this.notifications.map(notification => ({
-        ...notification,
-        isRead: true
-      }));
+      this.notifications = []; // 모든 알림 완전 삭제
 
       await AsyncStorage.setItem(BADGE_COUNT_KEY, '0');
-      await AsyncStorage.setItem('badge_notifications', JSON.stringify(this.notifications));
+      await AsyncStorage.setItem('badge_notifications', JSON.stringify([]));
       await this.updateBadge(0);
       
-      console.log('📱 Badge cleared');
+      console.log('📱 Badge cleared - all notifications removed');
     } catch (error) {
       console.error('📱 Badge clear failed:', error);
     }
@@ -155,6 +150,31 @@ export class BadgeService {
   }
 
   /**
+   * 특정 알림 완전 제거
+   */
+  async removeNotification(notificationId: string): Promise<void> {
+    try {
+      const notificationIndex = this.notifications.findIndex(n => n.id === notificationId);
+      if (notificationIndex !== -1) {
+        const notification = this.notifications[notificationIndex];
+        
+        // 읽지 않은 알림이었다면 배지 카운트 감소
+        if (!notification.isRead) {
+          await this.decrementBadge(1);
+        }
+        
+        // 알림 목록에서 완전 제거
+        this.notifications.splice(notificationIndex, 1);
+        await AsyncStorage.setItem('badge_notifications', JSON.stringify(this.notifications));
+        
+        console.log(`📱 Notification ${notificationId} removed`);
+      }
+    } catch (error) {
+      console.error('📱 Remove notification failed:', error);
+    }
+  }
+
+  /**
    * 시스템 배지 업데이트 (플랫폼별 구현)
    */
   private async updateBadge(count: number): Promise<void> {
@@ -166,29 +186,27 @@ export class BadgeService {
           PushNotificationIOS.setApplicationIconBadgeNumber(count);
           console.log(`📱 iOS badge set to: ${count}`);
         } catch (error) {
-          // 대체 방법으로 react-native-push-notification 시도
+          // @react-native-community/push-notification-ios 대체 시도
           try {
-            const PushNotification = require('react-native-push-notification');
-            if (PushNotification && PushNotification.setApplicationIconBadgeNumber) {
-              PushNotification.setApplicationIconBadgeNumber(count);
-              console.log(`📱 iOS badge set to: ${count} (fallback)`);
-            }
-          } catch (fallbackError) {
+            const PushNotificationIOS = require('@react-native-community/push-notification-ios').default;
+            PushNotificationIOS.setApplicationIconBadgeNumber(count);
+            console.log(`📱 iOS badge set to: ${count} (PushNotificationIOS)`);
+          } catch (iosError) {
             console.log('📱 iOS badge not available - 실기기에서만 동작합니다');
           }
         }
       } else if (Platform.OS === 'android') {
-        // Android는 알림을 통한 배지 관리
+        // Android 배지 관리 (react-native-push-notification 재활성화)
         try {
           const PushNotification = require('react-native-push-notification');
-          // Android는 실제 알림이 있을 때만 배지 표시
-          if (count > 0) {
-            console.log(`📱 Android: ${count}개 알림이 시스템에서 배지로 표시됨`);
+          if (PushNotification && PushNotification.setApplicationIconBadgeNumber) {
+            PushNotification.setApplicationIconBadgeNumber(count);
+            console.log(`📱 Android badge set to: ${count}`);
           } else {
-            console.log('📱 Android: 배지 클리어됨');
+            console.log(`📱 Android: ${count}개 알림 (시스템 관리)`);
           }
         } catch (error) {
-          console.log('📱 Android badge managed by system');
+          console.log(`📱 Android: ${count}개 알림 (시스템 관리)`);
         }
       }
     } catch (error) {

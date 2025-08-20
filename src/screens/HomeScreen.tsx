@@ -673,12 +673,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
 
 
-        {/* 🧪 알림 테스트 버튼 (개발/테스트 전용) */}
-        {__DEV__ && (
-          <SlideInView delay={500} duration={300}>
-            <NotificationTestButtons />
-          </SlideInView>
-        )}
+        {/* 🧪 알림 테스트 버튼 (테스트 전용) */}
+        <SlideInView delay={500} duration={300}>
+          <NotificationTestButtons />
+        </SlideInView>
 
         {/* 작은 배너 광고 - 해시태그 아래 배치 */}
         {Date.now() % 2 === 0 && (
