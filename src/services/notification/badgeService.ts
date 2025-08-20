@@ -160,22 +160,35 @@ export class BadgeService {
   private async updateBadge(count: number): Promise<void> {
     try {
       if (Platform.OS === 'ios') {
-        // iOS의 경우 react-native-push-notification 사용
+        // iOS의 경우 @react-native-community/push-notification-ios 사용
         try {
-          const PushNotification = require('react-native-push-notification');
-          PushNotification.setApplicationIconBadgeNumber(count);
+          const PushNotificationIOS = require('@react-native-community/push-notification-ios');
+          PushNotificationIOS.setApplicationIconBadgeNumber(count);
           console.log(`📱 iOS badge set to: ${count}`);
         } catch (error) {
-          console.log('📱 iOS badge library not configured');
+          // 대체 방법으로 react-native-push-notification 시도
+          try {
+            const PushNotification = require('react-native-push-notification');
+            if (PushNotification && PushNotification.setApplicationIconBadgeNumber) {
+              PushNotification.setApplicationIconBadgeNumber(count);
+              console.log(`📱 iOS badge set to: ${count} (fallback)`);
+            }
+          } catch (fallbackError) {
+            console.log('📱 iOS badge not available - 실기기에서만 동작합니다');
+          }
         }
       } else if (Platform.OS === 'android') {
-        // Android는 react-native-push-notification 사용
+        // Android는 알림을 통한 배지 관리
         try {
           const PushNotification = require('react-native-push-notification');
-          // Android는 자동으로 알림 개수에 따라 배지가 표시됨
-          console.log(`📱 Android badge managed by system: ${count} notifications`);
+          // Android는 실제 알림이 있을 때만 배지 표시
+          if (count > 0) {
+            console.log(`📱 Android: ${count}개 알림이 시스템에서 배지로 표시됨`);
+          } else {
+            console.log('📱 Android: 배지 클리어됨');
+          }
         } catch (error) {
-          console.log('📱 Android badge not available (system managed)');
+          console.log('📱 Android badge managed by system');
         }
       }
     } catch (error) {

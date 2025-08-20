@@ -32,10 +32,11 @@ const NotificationTestButtons: React.FC = () => {
       };
 
       await badgeService.incrementBadge(testNotification);
+      const currentCount = badgeService.getBadgeCount();
       
       Alert.alert(
-        '✅ 테스트 성공',
-        `배지 카운트: ${badgeService.getBadgeCount()}\n앱 아이콘을 확인해보세요!`,
+        '✅ 배지 테스트 완료',
+        `앱 내 배지 카운트: ${currentCount}\n\n📱 실기기에서 확인사항:\n- 홈 상단 알림 아이콘의 빨간 배지 숫자\n- iOS: 앱 아이콘 우상단 빨간 배지\n- Android: 시스템별 배지 (런처에 따라 다름)\n\n⚠️ 시뮬레이터에서는 앱 아이콘 배지가 표시되지 않습니다.`,
         [{ text: '확인' }]
       );
     } catch (error) {
