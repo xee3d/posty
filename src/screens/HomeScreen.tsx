@@ -40,6 +40,7 @@ import { BannerCarousel, AdaptiveNativeAd, SmartAdPlacement } from '../component
 import AdIntegrationService from '../services/AdIntegrationService';
 import AppLogo from '../components/AppLogo';
 import NotificationBadge from '../components/NotificationBadge';
+import NotificationTestButtons from '../components/NotificationTestButtons';
 
 interface HomeScreenProps {
   onNavigate: (tab: string, content?: any) => void;
@@ -672,6 +673,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
 
 
+
+        {/* 🧪 알림 테스트 버튼 (개발/테스트 전용) */}
+        {__DEV__ && (
+          <SlideInView delay={500} duration={300}>
+            <NotificationTestButtons />
+          </SlideInView>
+        )}
 
         {/* 작은 배너 광고 - 해시태그 아래 배치 */}
         {Date.now() % 2 === 0 && (
