@@ -98,45 +98,65 @@ export class PushNotificationService {
    * 푸시 알림 설정 및 리스너 등록
    */
   private setupPushNotifications(): void {
-    // PushNotification 기본 설정
-    PushNotification.configure({
-      // 알림이 수신되었을 때 (포그라운드/백그라운드 모두)
-      onNotification: async (notification) => {
-        console.log('📱 Notification received:', notification);
+    try {
+      // PushNotification 기본 설정
+      PushNotification.configure({
+        // 알림이 수신되었을 때 (포그라운드/백그라운드 모두)
+        onNotification: async (notification) => {
+          console.log('📱 Notification received:', notification);
+          
+          const payload: NotificationPayload = {
+            title: notification.title || '',
+            body: notification.message || '',
+            data: notification.data || {}
+          };
+
+          // 배지 카운트 업데이트
+          if (!notification.userInteraction) {
+            // 사용자가 알림을 탭하지 않은 경우 (자동 수신)
+            await badgeService.handlePushNotification(notification);
+          } else {
+            // 사용자가 알림을 탭한 경우
+            await badgeService.handleAppActive();
+            this.handleNotificationPress(notification.data);
+          }
+
+          // 포그라운드에서 커스텀 알림 표시
+          if (notification.foreground && !notification.userInteraction) {
+            this.showCustomNotification(payload);
+          }
+        },
+
+        // 토큰이 등록되었을 때 (Android)
+        onRegister: async (token) => {
+          console.log('📱 Push notification token:', token);
+          this.deviceToken = token.token;
+          await AsyncStorage.setItem('device_token', token.token);
+          await this.sendTokenToServer(token.token);
+        },
+
+        // iOS에서만 권한 요청
+        requestPermissions: Platform.OS === 'ios',
         
-        const payload: NotificationPayload = {
-          title: notification.title || '',
-          body: notification.message || '',
-          data: notification.data || {}
-        };
+        // iOS 권한 설정
+        permissions: {
+          alert: true,
+          badge: true,
+          sound: true,
+        },
+        
+        // 앱이 활성화될 때 배지 자동 클리어 방지
+        popInitialNotification: true,
+        
+        // 권한이 없는 경우 조용히 실패
+        senderID: Platform.OS === 'android' ? '12345-sender-id' : undefined,
+      });
 
-        // 배지 카운트 업데이트
-        if (!notification.userInteraction) {
-          // 사용자가 알림을 탭하지 않은 경우 (자동 수신)
-          await badgeService.handlePushNotification(notification);
-        } else {
-          // 사용자가 알림을 탭한 경우
-          await badgeService.handleAppActive();
-          this.handleNotificationPress(notification.data);
-        }
-
-        // 포그라운드에서 커스텀 알림 표시
-        if (notification.foreground && !notification.userInteraction) {
-          this.showCustomNotification(payload);
-        }
-      },
-
-      // 토큰이 등록되었을 때 (Android)
-      onRegister: async (token) => {
-        console.log('📱 Push notification token:', token);
-        this.deviceToken = token.token;
-        await AsyncStorage.setItem('device_token', token.token);
-        await this.sendTokenToServer(token.token);
-      },
-
-      // 권한 요청
-      requestPermissions: Platform.OS === 'ios',
-    });
+      console.log('📱 Push notification configured successfully');
+    } catch (error) {
+      console.error('📱 Push notification configuration failed:', error);
+      // 실패해도 앱이 크래시되지 않도록 함
+    }
   }
 
   /**
