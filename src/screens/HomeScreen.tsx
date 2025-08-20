@@ -39,6 +39,7 @@ import { soundManager } from '../utils/soundManager';
 import { BannerCarousel, AdaptiveNativeAd, SmartAdPlacement } from '../components/ads';
 import AdIntegrationService from '../services/AdIntegrationService';
 import AppLogo from '../components/AppLogo';
+import NotificationBadge from '../components/NotificationBadge';
 
 interface HomeScreenProps {
   onNavigate: (tab: string, content?: any) => void;
@@ -495,8 +496,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 </View>
               </TouchableOpacity>
               
-              {/* 토큰 잔액 표시 - TokenBadge 컴포넌트 사용 */}
-              <View style={styles.tokenContainer}>
+              {/* 우측 헤더 컨트롤 */}
+              <View style={styles.headerControls}>
+                {/* 알림 배지 */}
+                <NotificationBadge size="medium" />
+                
+                {/* 토큰 잔액 표시 - TokenBadge 컴포넌트 사용 */}
                 <TokenBadge 
                   tokens={currentTokens}
                   variant="primary"
@@ -519,6 +524,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                   </TouchableOpacity>
                 )}
               </View>
+            </View>
             </View>
           </View>
         </FadeInView>
@@ -1040,6 +1046,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME, theme
     backgroundColor: 'rgba(255,255,255,0.25)',
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  headerControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   tokenContainer: {
     flexDirection: 'row',

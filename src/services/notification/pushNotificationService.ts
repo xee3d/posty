@@ -6,6 +6,7 @@
 import messaging from '@react-native-firebase/messaging';
 import { Platform, PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { badgeService } from './badgeService';
 
 export interface NotificationPayload {
   title: string;
@@ -49,6 +50,9 @@ export class PushNotificationService {
       
       // 백그라운드 메시지 핸들러 설정
       this.setupBackgroundMessageHandler();
+
+      // 배지 서비스 초기화
+      await badgeService.initialize();
 
       this.isInitialized = true;
       console.log('📱 Push notification service initialized');
@@ -124,6 +128,9 @@ export class PushNotificationService {
     messaging().onMessage(async remoteMessage => {
       console.log('📱 Foreground message:', remoteMessage);
       
+      // 배지 카운트 업데이트
+      await badgeService.handlePushNotification(remoteMessage);
+      
       // 커스텀 알림 표시
       this.showCustomNotification({
         title: remoteMessage.notification?.title || '',
@@ -133,17 +140,25 @@ export class PushNotificationService {
     });
 
     // 알림 클릭 처리 (앱이 백그라운드에서 열림)
-    messaging().onNotificationOpenedApp(remoteMessage => {
+    messaging().onNotificationOpenedApp(async remoteMessage => {
       console.log('📱 Notification opened from background:', remoteMessage);
+      
+      // 배지 카운트 감소 (사용자가 알림을 확인함)
+      await badgeService.handleAppActive();
+      
       this.handleNotificationPress(remoteMessage.data);
     });
 
     // 앱이 종료된 상태에서 알림으로 열림
     messaging()
       .getInitialNotification()
-      .then(remoteMessage => {
+      .then(async remoteMessage => {
         if (remoteMessage) {
           console.log('📱 App opened from terminated state:', remoteMessage);
+          
+          // 배지 카운트 감소
+          await badgeService.handleAppActive();
+          
           this.handleNotificationPress(remoteMessage.data);
         }
       });
