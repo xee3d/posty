@@ -3,10 +3,20 @@
  * react-native-push-notification을 활용한 스마트 알림 시스템
  */
 
-import PushNotification from 'react-native-push-notification';
 import { Platform, PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { badgeService } from './badgeService';
+
+// PushNotification import with error handling
+let PushNotification: any = null;
+try {
+  PushNotification = require('react-native-push-notification').default;
+  if (!PushNotification) {
+    PushNotification = require('react-native-push-notification');
+  }
+} catch (error) {
+  console.warn('📱 react-native-push-notification not available:', error.message);
+}
 
 export interface NotificationPayload {
   title: string;
@@ -35,6 +45,19 @@ export class PushNotificationService {
    */
   async initialize(): Promise<boolean> {
     try {
+      console.log('📱 Starting push notification service initialization...');
+      
+      if (!PushNotification) {
+        console.warn('📱 react-native-push-notification not available - running in limited mode');
+        
+        // 배지 서비스만 초기화
+        await badgeService.initialize();
+        
+        this.isInitialized = true;
+        console.log('📱 Push notification service initialized (limited mode)');
+        return true;
+      }
+
       // 푸시 알림 설정 및 리스너 등록
       this.setupPushNotifications();
 
@@ -45,12 +68,22 @@ export class PushNotificationService {
       await badgeService.initialize();
 
       this.isInitialized = true;
-      console.log('📱 Push notification service initialized');
+      console.log('✅ Push notification service initialized successfully');
       return true;
 
     } catch (error) {
-      console.error('📱 Push notification initialization failed:', error);
-      return false;
+      console.error('❌ Push notification initialization failed:', error);
+      
+      // 배지 서비스만이라도 초기화 시도
+      try {
+        await badgeService.initialize();
+        this.isInitialized = true;
+        console.log('📱 Push notification service initialized (badge only mode)');
+        return true;
+      } catch (badgeError) {
+        console.error('❌ Badge service initialization also failed:', badgeError);
+        return false;
+      }
     }
   }
 
@@ -59,6 +92,11 @@ export class PushNotificationService {
    */
   private async requestPermission(): Promise<boolean> {
     try {
+      if (!PushNotification) {
+        console.warn('📱 PushNotification not available, permission denied');
+        return false;
+      }
+      
       return new Promise((resolve) => {
         PushNotification.requestPermissions((permissions) => {
           console.log('📱 Push notification permissions:', permissions);
@@ -99,6 +137,11 @@ export class PushNotificationService {
    */
   private setupPushNotifications(): void {
     try {
+      if (!PushNotification) {
+        console.warn('📱 PushNotification not available, skipping setup');
+        return;
+      }
+      
       // PushNotification 기본 설정
       PushNotification.configure({
         // 알림이 수신되었을 때 (포그라운드/백그라운드 모두)
@@ -299,13 +342,15 @@ export class PushNotificationService {
         scheduledDate.setHours(20, 0, 0, 0);
       }
 
-      PushNotification.localNotificationSchedule({
-        title: payload.title,
-        message: payload.body,
-        date: scheduledDate,
-        repeatType: schedule === 'weekly' ? 'week' : 'day',
-        userInfo: payload.data,
-      });
+      if (PushNotification && PushNotification.localNotificationSchedule) {
+        PushNotification.localNotificationSchedule({
+          title: payload.title,
+          message: payload.body,
+          date: scheduledDate,
+          repeatType: schedule === 'weekly' ? 'week' : 'day',
+          userInfo: payload.data,
+        });
+      }
 
       console.log(`📱 Scheduled notification: ${payload.title} at ${scheduledDate}`);
     } catch (error) {
@@ -338,13 +383,15 @@ export class PushNotificationService {
     const notification = notifications[type];
     if (notification) {
       // 로컬 알림으로 즉시 표시
-      PushNotification.localNotification({
-        title: notification.title,
-        message: notification.body,
-        userInfo: notification.data,
-        playSound: true,
-        soundName: 'default',
-      });
+      if (PushNotification && PushNotification.localNotification) {
+        PushNotification.localNotification({
+          title: notification.title,
+          message: notification.body,
+          userInfo: notification.data,
+          playSound: true,
+          soundName: 'default',
+        });
+      }
 
       // 배지 카운트 업데이트
       const badgeNotification = {
