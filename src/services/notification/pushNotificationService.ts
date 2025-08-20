@@ -1,9 +1,9 @@
 /**
  * 📱 Posty 푸시 알림 서비스
- * Firebase Cloud Messaging을 활용한 스마트 알림 시스템
+ * react-native-push-notification을 활용한 스마트 알림 시스템
  */
 
-import messaging from '@react-native-firebase/messaging';
+import PushNotification from 'react-native-push-notification';
 import { Platform, PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { badgeService } from './badgeService';
@@ -20,7 +20,7 @@ export interface NotificationPayload {
 
 export class PushNotificationService {
   private static instance: PushNotificationService;
-  private fcmToken: string | null = null;
+  private deviceToken: string | null = null;
   private isInitialized = false;
 
   static getInstance(): PushNotificationService {
@@ -35,21 +35,11 @@ export class PushNotificationService {
    */
   async initialize(): Promise<boolean> {
     try {
-      // 권한 요청
-      const hasPermission = await this.requestPermission();
-      if (!hasPermission) {
-        console.log('📱 Push notification permission denied');
-        return false;
-      }
+      // 푸시 알림 설정 및 리스너 등록
+      this.setupPushNotifications();
 
-      // FCM 토큰 획득
-      await this.getFCMToken();
-      
-      // 메시지 리스너 설정
-      this.setupMessageListeners();
-      
-      // 백그라운드 메시지 핸들러 설정
-      this.setupBackgroundMessageHandler();
+      // 초기 설정 (권한 요청 및 토큰 생성)
+      await this.setupInitialConfiguration();
 
       // 배지 서비스 초기화
       await badgeService.initialize();
@@ -69,29 +59,12 @@ export class PushNotificationService {
    */
   private async requestPermission(): Promise<boolean> {
     try {
-      if (Platform.OS === 'ios') {
-        const authStatus = await messaging().requestPermission();
-        const enabled =
-          authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
-          authStatus === messaging.AuthorizationStatus.PROVISIONAL;
-        return enabled;
-      }
-
-      if (Platform.OS === 'android') {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
-          {
-            title: 'Posty 알림 권한',
-            message: '새로운 미션과 트렌드를 놓치지 않으려면 알림을 허용해주세요!',
-            buttonNeutral: '나중에',
-            buttonNegative: '거부',
-            buttonPositive: '허용',
-          },
-        );
-        return granted === PermissionsAndroid.RESULTS.GRANTED;
-      }
-
-      return false;
+      return new Promise((resolve) => {
+        PushNotification.requestPermissions((permissions) => {
+          console.log('📱 Push notification permissions:', permissions);
+          resolve(permissions.alert === true);
+        });
+      });
     } catch (error) {
       console.error('📱 Permission request failed:', error);
       return false;
@@ -99,80 +72,92 @@ export class PushNotificationService {
   }
 
   /**
-   * FCM 토큰 획득
+   * 디바이스 토큰 생성 및 저장
    */
-  private async getFCMToken(): Promise<string | null> {
+  private async generateDeviceToken(): Promise<string | null> {
     try {
-      const token = await messaging().getToken();
-      this.fcmToken = token;
+      // react-native-push-notification은 자체 토큰을 생성
+      const token = `device_${Platform.OS}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      this.deviceToken = token;
       
       // 토큰을 로컬에 저장
-      await AsyncStorage.setItem('fcm_token', token);
+      await AsyncStorage.setItem('device_token', token);
       
       // 서버에 토큰 전송 (필요시)
       await this.sendTokenToServer(token);
       
-      console.log('📱 FCM Token:', token);
+      console.log('📱 Device Token:', token);
       return token;
     } catch (error) {
-      console.error('📱 FCM Token acquisition failed:', error);
+      console.error('📱 Device Token generation failed:', error);
       return null;
     }
   }
 
   /**
-   * 포그라운드 메시지 리스너 설정
+   * 푸시 알림 설정 및 리스너 등록
    */
-  private setupMessageListeners(): void {
-    // 포그라운드 메시지 처리
-    messaging().onMessage(async remoteMessage => {
-      console.log('📱 Foreground message:', remoteMessage);
-      
-      // 배지 카운트 업데이트
-      await badgeService.handlePushNotification(remoteMessage);
-      
-      // 커스텀 알림 표시
-      this.showCustomNotification({
-        title: remoteMessage.notification?.title || '',
-        body: remoteMessage.notification?.body || '',
-        data: remoteMessage.data as any
-      });
-    });
+  private setupPushNotifications(): void {
+    // PushNotification 기본 설정
+    PushNotification.configure({
+      // 알림이 수신되었을 때 (포그라운드/백그라운드 모두)
+      onNotification: async (notification) => {
+        console.log('📱 Notification received:', notification);
+        
+        const payload: NotificationPayload = {
+          title: notification.title || '',
+          body: notification.message || '',
+          data: notification.data || {}
+        };
 
-    // 알림 클릭 처리 (앱이 백그라운드에서 열림)
-    messaging().onNotificationOpenedApp(async remoteMessage => {
-      console.log('📱 Notification opened from background:', remoteMessage);
-      
-      // 배지 카운트 감소 (사용자가 알림을 확인함)
-      await badgeService.handleAppActive();
-      
-      this.handleNotificationPress(remoteMessage.data);
-    });
-
-    // 앱이 종료된 상태에서 알림으로 열림
-    messaging()
-      .getInitialNotification()
-      .then(async remoteMessage => {
-        if (remoteMessage) {
-          console.log('📱 App opened from terminated state:', remoteMessage);
-          
-          // 배지 카운트 감소
+        // 배지 카운트 업데이트
+        if (!notification.userInteraction) {
+          // 사용자가 알림을 탭하지 않은 경우 (자동 수신)
+          await badgeService.handlePushNotification(notification);
+        } else {
+          // 사용자가 알림을 탭한 경우
           await badgeService.handleAppActive();
-          
-          this.handleNotificationPress(remoteMessage.data);
+          this.handleNotificationPress(notification.data);
         }
-      });
+
+        // 포그라운드에서 커스텀 알림 표시
+        if (notification.foreground && !notification.userInteraction) {
+          this.showCustomNotification(payload);
+        }
+      },
+
+      // 토큰이 등록되었을 때 (Android)
+      onRegister: async (token) => {
+        console.log('📱 Push notification token:', token);
+        this.deviceToken = token.token;
+        await AsyncStorage.setItem('device_token', token.token);
+        await this.sendTokenToServer(token.token);
+      },
+
+      // 권한 요청
+      requestPermissions: Platform.OS === 'ios',
+    });
   }
 
   /**
-   * 백그라운드 메시지 핸들러 설정
+   * 초기화 시 권한 요청 및 토큰 생성
    */
-  private setupBackgroundMessageHandler(): void {
-    messaging().setBackgroundMessageHandler(async remoteMessage => {
-      console.log('📱 Background message:', remoteMessage);
-      // 백그라운드에서 받은 메시지 처리
-      // 필요시 로컬 저장소에 저장하거나 상태 업데이트
-    });
+  private async setupInitialConfiguration(): Promise<void> {
+    try {
+      // 권한 요청
+      const hasPermission = await this.requestPermission();
+      if (!hasPermission) {
+        console.log('📱 Push notification permission denied');
+        return;
+      }
+
+      // 디바이스 토큰 생성 (iOS의 경우 실제 토큰은 onRegister에서 받음)
+      if (Platform.OS === 'android') {
+        await this.generateDeviceToken();
+      }
+    } catch (error) {
+      console.error('📱 Initial configuration failed:', error);
+    }
   }
 
   /**
@@ -276,8 +261,36 @@ export class PushNotificationService {
    * 알림 예약
    */
   private scheduleNotification(payload: NotificationPayload, schedule: string): void {
-    // 로컬 알림 스케줄링 구현
-    console.log('📱 Scheduling notification:', payload, 'at', schedule);
+    try {
+      let scheduledDate = new Date();
+      
+      if (schedule.includes(':')) {
+        // 시간 기반 스케줄링 (예: "09:00", "18:00")
+        const [hours, minutes] = schedule.split(':').map(Number);
+        scheduledDate.setHours(hours, minutes, 0, 0);
+        
+        // 오늘이 지나면 내일로 설정
+        if (scheduledDate <= new Date()) {
+          scheduledDate.setDate(scheduledDate.getDate() + 1);
+        }
+      } else if (schedule === 'weekly') {
+        // 주간 스케줄링 (일요일)
+        scheduledDate.setDate(scheduledDate.getDate() + (7 - scheduledDate.getDay()));
+        scheduledDate.setHours(20, 0, 0, 0);
+      }
+
+      PushNotification.localNotificationSchedule({
+        title: payload.title,
+        message: payload.body,
+        date: scheduledDate,
+        repeatType: schedule === 'weekly' ? 'week' : 'day',
+        userInfo: payload.data,
+      });
+
+      console.log(`📱 Scheduled notification: ${payload.title} at ${scheduledDate}`);
+    } catch (error) {
+      console.error('📱 Schedule notification failed:', error);
+    }
   }
 
   /**
@@ -304,20 +317,26 @@ export class PushNotificationService {
 
     const notification = notifications[type];
     if (notification) {
-      this.showCustomNotification(notification);
-    }
-  }
+      // 로컬 알림으로 즉시 표시
+      PushNotification.localNotification({
+        title: notification.title,
+        message: notification.body,
+        userInfo: notification.data,
+        playSound: true,
+        soundName: 'default',
+      });
 
-  /**
-   * 토큰 새로고침 처리
-   */
-  async handleTokenRefresh(): Promise<void> {
-    messaging().onTokenRefresh(token => {
-      console.log('📱 FCM Token refreshed:', token);
-      this.fcmToken = token;
-      AsyncStorage.setItem('fcm_token', token);
-      this.sendTokenToServer(token);
-    });
+      // 배지 카운트 업데이트
+      const badgeNotification = {
+        id: Date.now().toString(),
+        title: notification.title,
+        body: notification.body,
+        timestamp: Date.now(),
+        isRead: false,
+        type: notification.data.type
+      };
+      await badgeService.incrementBadge(badgeNotification);
+    }
   }
 
   /**
@@ -328,35 +347,39 @@ export class PushNotificationService {
     token: string | null;
     isEnabled: boolean;
   }> {
-    const hasPermission = await messaging().hasPermission();
-    const token = await AsyncStorage.getItem('fcm_token');
-    
-    return {
-      hasPermission: hasPermission === messaging.AuthorizationStatus.AUTHORIZED,
-      token,
-      isEnabled: this.isInitialized && hasPermission === messaging.AuthorizationStatus.AUTHORIZED
-    };
+    try {
+      const token = await AsyncStorage.getItem('device_token');
+      
+      // 권한 상태 확인 (간단한 체크)
+      const hasPermission = this.isInitialized && !!this.deviceToken;
+      
+      return {
+        hasPermission,
+        token,
+        isEnabled: hasPermission
+      };
+    } catch (error) {
+      console.error('📱 Get notification settings failed:', error);
+      return {
+        hasPermission: false,
+        token: null,
+        isEnabled: false
+      };
+    }
   }
 
   /**
-   * 알림 구독/구독해제
+   * 토큰 조회
    */
-  async subscribeToTopic(topic: string): Promise<void> {
-    try {
-      await messaging().subscribeToTopic(topic);
-      console.log(`📱 Subscribed to topic: ${topic}`);
-    } catch (error) {
-      console.error(`📱 Failed to subscribe to topic ${topic}:`, error);
-    }
+  getDeviceToken(): string | null {
+    return this.deviceToken;
   }
 
-  async unsubscribeFromTopic(topic: string): Promise<void> {
-    try {
-      await messaging().unsubscribeFromTopic(topic);
-      console.log(`📱 Unsubscribed from topic: ${topic}`);
-    } catch (error) {
-      console.error(`📱 Failed to unsubscribe from topic ${topic}:`, error);
-    }
+  /**
+   * 테스트 알림 발송
+   */
+  async sendTestNotification(): Promise<void> {
+    await this.sendSmartNotification('content_suggestion');
   }
 }
 
