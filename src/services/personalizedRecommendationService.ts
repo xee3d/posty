@@ -1,6 +1,7 @@
 // services/personalizedRecommendationService.ts
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SavedContent } from '../utils/storage';
+import { userBehaviorAnalytics } from './userBehaviorAnalytics';
 
 export interface RecommendationCard {
   id: string;
@@ -437,6 +438,57 @@ class PersonalizedRecommendationService {
         hour: [20, 21, 22, 23]
       }
     },
+
+    // 문장 정리 추천
+    {
+      id: 'polish-text',
+      type: 'completion',
+      icon: 'color-wand',
+      iconColor: '#9C27B0',
+      badge: '✨ 문장 정리',
+      badgeEmoji: '✨',
+      title: '어색한 문장 다듬기',
+      content: '써놓은 글이 어색해요?\nAI가 자연스럽게 다듬어드릴게요',
+      meta: {
+        icon: 'auto-fix-high',
+        text: 'AI 문장 교정'
+      },
+      actionText: '문장 다듬기',
+      actionPayload: {
+        mode: 'polish',
+        prompt: '',
+        category: 'polish'
+      },
+      priority: 8,
+      conditions: {
+        minPosts: 2
+      }
+    },
+    {
+      id: 'improve-writing',
+      type: 'completion',
+      icon: 'brush',
+      iconColor: '#FF6B6B',
+      badge: '🎨 글 완성도구',
+      badgeEmoji: '🎨',
+      title: '초안을 멋진 글로!',
+      content: '대충 쓴 메모도\n완성도 높은 포스팅으로 변신!',
+      meta: {
+        icon: 'trending-up',
+        text: '글 퀄리티 UP'
+      },
+      actionText: 'AI로 완성하기',
+      actionPayload: {
+        mode: 'polish',
+        prompt: '',
+        category: 'improve'
+      },
+      priority: 7,
+      conditions: {
+        hour: [9, 10, 11, 14, 15, 16, 17, 18, 19, 20]
+      }
+    },
+    
     {
       id: 'pet-photo',
       type: 'photo',
@@ -540,17 +592,48 @@ class PersonalizedRecommendationService {
     const recommendations: RecommendationCard[] = [];
     const now = new Date();
     
-    // 각 템플릿을 확인하여 조건에 맞는 것들 필터링
-    for (const template of this.recommendationTemplates) {
-      if (this.checkConditions(template, userContext, now)) {
-        // 동적 데이터로 템플릿 업데이트
-        const personalizedCard = await this.personalizeCard(template, userContext);
-        recommendations.push(personalizedCard);
+    try {
+      // 1. 개인화된 행동 기반 추천 가져오기 (우선순위 높음)
+      const behaviorRecommendations = await userBehaviorAnalytics.generatePersonalizedRecommendations();
+      
+      // PersonalizedRecommendation을 RecommendationCard로 변환
+      const convertedBehaviorRecs = behaviorRecommendations.map(rec => ({
+        ...rec,
+        type: 'completion' as const // 적절한 타입으로 설정
+      }));
+      
+      recommendations.push(...convertedBehaviorRecs);
+      
+      console.log(`🎯 Added ${behaviorRecommendations.length} behavior-based recommendations`);
+      
+    } catch (error) {
+      console.error('Failed to get behavior-based recommendations:', error);
+    }
+    
+    // 2. 기존 템플릿 기반 추천 (개인화 추천이 부족할 때 보완)
+    if (recommendations.length < 3) {
+      for (const template of this.recommendationTemplates) {
+        if (this.checkConditions(template, userContext, now)) {
+          // 동적 데이터로 템플릿 업데이트
+          const personalizedCard = await this.personalizeCard(template, userContext);
+          recommendations.push(personalizedCard);
+        }
       }
     }
 
     // 우선순위로 정렬하고 상위 3개 반환
-    recommendations.sort((a, b) => b.priority - a.priority);
+    recommendations.sort((a, b) => {
+      // 개인화 점수가 있으면 우선 고려
+      const aPersonality = (a as any).personalityScore || 0;
+      const bPersonality = (b as any).personalityScore || 0;
+      
+      if (aPersonality !== bPersonality) {
+        return bPersonality - aPersonality;
+      }
+      
+      return b.priority - a.priority;
+    });
+    
     return recommendations.slice(0, 3);
   }
 

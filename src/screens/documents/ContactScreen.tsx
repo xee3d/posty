@@ -28,48 +28,111 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ onBack, onNavigate }) => 
   ];
 
   const handleCopyEmail = () => {
-    Clipboard.setString('hello@getposty.ai');
-    Alert.alert('복사 완료', 'hello@getposty.ai가 클립보드에 복사되었어요!');
+    Clipboard.setString('getposty@gmail.com');
+    Alert.alert('복사 완료', 'getposty@gmail.com이 클립보드에 복사되었어요!');
   };
 
   const handleOpenEmail = async () => {
-    const email = 'hello@getposty.ai';
-    const categoryLabel = categories.find(c => c.id === selectedCategory)?.label || '문의';
-    const mailUrl = `mailto:${email}?subject=[${categoryLabel}] ${subject}&body=${message}`;
+    const email = 'getposty@gmail.com';
     
     try {
-      const canOpen = await Linking.canOpenURL(mailUrl);
-      if (canOpen) {
-        await Linking.openURL(mailUrl);
-      } else {
-        Alert.alert(
-          '이메일 앱이 없어요',
-          'hello@getposty.ai로 직접 메일을 보내주세요.',
-          [
-            { text: '취소', style: 'cancel' },
-            { text: '이메일 복사', onPress: handleCopyEmail }
-          ]
-        );
+      const simpleMailUrl = `mailto:${email}`;
+      console.log('Trying to open email with URL:', simpleMailUrl);
+      
+      // iOS/Android에서 더 직접적인 접근 시도
+      try {
+        await Linking.openURL(simpleMailUrl);
+        console.log('Email app opened successfully');
+        return; // 성공하면 바로 종료
+      } catch (openError) {
+        console.log('Direct open failed, checking canOpenURL:', openError);
+        
+        // 직접 열기가 실패하면 canOpenURL로 확인
+        const canOpen = await Linking.canOpenURL('mailto:');
+        console.log('Can open mailto scheme:', canOpen);
+        
+        if (canOpen) {
+          // 다시 한번 시도
+          await Linking.openURL(simpleMailUrl);
+          console.log('Email app opened on retry');
+        } else {
+          // 정말 이메일 앱이 없는 경우
+          throw new Error('No email app available');
+        }
       }
     } catch (error) {
-      console.error('Error opening email:', error);
+      console.error('All email opening methods failed:', error);
       Alert.alert(
-        '오류',
-        '이메일 앱을 열 수 없어요. 이메일 주소를 복사해서 사용해주세요.',
+        '이메일 앱을 열 수 없어요',
+        'getposty@gmail.com 주소를 복사해서 직접 이메일을 보내주세요.',
         [
-          { text: '확인', onPress: handleCopyEmail }
+          { text: '취소', style: 'cancel' },
+          { text: '이메일 복사', onPress: handleCopyEmail }
         ]
       );
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!subject.trim() || !message.trim() || !selectedCategory) {
       Alert.alert('알림', '모든 필드를 입력해주세요.');
       return;
     }
 
-    handleOpenEmail();
+    const email = 'getposty@gmail.com';
+    const categoryLabel = categories.find(c => c.id === selectedCategory)?.label || '문의';
+    
+    try {
+      const encodedSubject = encodeURIComponent(`[${categoryLabel}] ${subject}`);
+      const encodedBody = encodeURIComponent(message);
+      const fullMailUrl = `mailto:${email}?subject=${encodedSubject}&body=${encodedBody}`;
+      
+      console.log('Trying to open email with content:', fullMailUrl);
+      
+      // 직접 열기 시도
+      try {
+        await Linking.openURL(fullMailUrl);
+        console.log('Email app opened with content');
+        return;
+      } catch (openError) {
+        console.log('Full mailto URL failed, trying simple version:', openError);
+        
+        // 파라미터가 있는 URL이 실패하면 간단한 버전으로 시도
+        const simpleMailUrl = `mailto:${email}`;
+        await Linking.openURL(simpleMailUrl);
+        console.log('Email app opened with simple URL');
+        
+        // 사용자에게 수동으로 내용 입력하라고 알림
+        Alert.alert(
+          '이메일 앱이 열렸습니다',
+          `제목: [${categoryLabel}] ${subject}\n\n${message}\n\n위 내용을 복사해서 이메일에 붙여넣어 주세요.`,
+          [
+            { text: '내용 복사', onPress: () => {
+              const emailContent = `제목: [${categoryLabel}] ${subject}\n\n${message}`;
+              Clipboard.setString(emailContent);
+              Alert.alert('복사됨', '이메일 내용이 복사되었습니다.');
+            }},
+            { text: '확인' }
+          ]
+        );
+      }
+    } catch (error) {
+      console.error('All email methods failed:', error);
+      // 모든 방법이 실패하면 복사 옵션 제공
+      Alert.alert(
+        '이메일 앱을 열 수 없어요',
+        '이메일 주소와 내용을 복사해서 직접 보내주세요.',
+        [
+          { text: '취소', style: 'cancel' },
+          { text: '내용 복사', onPress: () => {
+            const categoryLabel = categories.find(c => c.id === selectedCategory)?.label || '문의';
+            const emailContent = `받는 사람: getposty@gmail.com\n제목: [${categoryLabel}] ${subject}\n\n${message}`;
+            Clipboard.setString(emailContent);
+            Alert.alert('복사됨', '이메일 정보가 모두 복사되었습니다.');
+          }}
+        ]
+      );
+    }
   };
 
   return (
@@ -99,7 +162,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ onBack, onNavigate }) => 
               <Icon name="mail" size={24} color={colors.primary} />
               <Text style={styles.emailTitle}>이메일로 문의하기</Text>
             </View>
-            <Text style={styles.emailAddress}>hello@getposty.ai</Text>
+            <Text style={styles.emailAddress}>getposty@gmail.com</Text>
             <View style={styles.emailActions}>
               <TouchableOpacity style={styles.emailButton} onPress={handleCopyEmail}>
                 <Icon name="copy-outline" size={18} color={colors.primary} />

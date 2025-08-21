@@ -140,7 +140,7 @@ const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({ onBack, onNav
           <Text style={styles.listItem}>• 처리정지 요구</Text>
           
           <Text style={styles.paragraph}>
-            권리 행사는 앱 내 설정 메뉴 또는 이메일(hello@getposty.ai)을 통해 하실 수 있습니다.
+            권리 행사는 앱 내 설정 메뉴 또는 이메일(getposty@gmail.com)을 통해 하실 수 있습니다.
           </Text>
         </View>
 

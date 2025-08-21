@@ -48,6 +48,7 @@ import { useAppTheme } from './src/hooks/useAppTheme';
 import adService from './src/services/adService';
 import { MemoryOptimizer, cleanupOnAppExit } from './src/utils/memoryOptimizer';
 import subscriptionService from './src/services/subscriptionService';
+import { AppInitializer } from './src/utils/appInitializer';
 import soundManager from './src/utils/soundManager';
 import vercelAuthService from './src/services/auth/vercelAuthService';
 import inAppPurchaseService from './src/services/subscription/inAppPurchaseService';
@@ -104,6 +105,9 @@ const App: React.FC = () => {
   // 앱 초기화
   useEffect(() => {
     console.log('[App] App initialization started');
+    
+    // 앱 초기화 (첫 설치 감지 및 데이터 정리)
+    AppInitializer.initialize();
     
     // 메모리 최적화 초기화
     MemoryOptimizer.checkMemoryUsage();
@@ -491,8 +495,8 @@ const App: React.FC = () => {
           <AIWriteScreen 
             key={screenKey}
             onNavigate={handleTabPress} 
-            initialMode={navigationData?.initialMode || (photoMode ? 'photo' : 'text')} 
-            initialText={navigationData?.initialText || navigationData?.content}
+            initialMode={navigationData?.initialMode || navigationData?.mode || (photoMode ? 'photo' : 'text')} 
+            initialText={navigationData?.initialText || navigationData?.content || navigationData?.prompt}
             initialHashtags={navigationData?.hashtags}
             initialTitle={navigationData?.title}
             initialTone={navigationData?.initialTone}

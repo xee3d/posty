@@ -64,18 +64,29 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
     }
   };
 
-  const handleNotificationPress = async (notification: any) => {
+  const handleNotificationRemove = async (notification: any) => {
     try {
-      // 클릭하면 알림을 완전히 제거
+      console.log(`📱 알림 클릭 - 제거: ${notification.id}`);
+      
+      // 즉시 UI 업데이트 - 해당 알림을 목록에서 제거
+      setNotifications(prev => {
+        const updated = prev.filter(n => n.id !== notification.id);
+        console.log(`📱 UI 업데이트: ${prev.length} → ${updated.length}`);
+        return updated;
+      });
+
+      // 배지 카운트도 즉시 업데이트
+      setBadgeCount(prev => {
+        const newCount = Math.max(0, prev - 1);
+        console.log(`📱 배지 업데이트: ${prev} → ${newCount}`);
+        return newCount;
+      });
+
+      // 백그라운드에서 실제 제거
       await badgeService.removeNotification(notification.id);
       await loadBadgeCount();
-
-      // 관련 화면으로 이동 (추후 네비게이션 연동)
-      console.log(`📱 Navigate to ${notification.type} screen`);
-      
-      // 모달은 유지 - 알림만 제거됨
     } catch (error) {
-      console.error('📱 Handle notification press failed:', error);
+      console.error('📱 Handle notification remove failed:', error);
     }
   };
 
@@ -189,8 +200,12 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
               notifications.map((notification, index) => (
                 <TouchableOpacity
                   key={notification.id}
-                  style={styles.notificationItem}
-                  onPress={() => handleNotificationPress(notification)}
+                  style={[
+                    styles.notificationItem,
+                    notification.isRead && styles.readNotificationItem
+                  ]}
+                  onPress={() => handleNotificationRemove(notification)}
+                  activeOpacity={0.7}
                 >
                   <View style={styles.notificationIcon}>
                     <Icon
@@ -210,12 +225,13 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
                       {formatTimestamp(notification.timestamp)}
                     </Text>
                   </View>
-                  <Icon 
-                    name="close-outline" 
-                    size={16} 
-                    color={colors.text.tertiary}
-                    style={{ marginLeft: 8 }}
-                  />
+                  <View style={styles.removeButtonArea}>
+                    <Icon 
+                      name="close-outline" 
+                      size={18} 
+                      color={colors.text.tertiary}
+                    />
+                  </View>
                 </TouchableOpacity>
               ))
             )}
@@ -310,7 +326,7 @@ const createStyles = (colors: any, isDark: boolean, sizeStyles: any) =>
     },
     notificationItem: {
       flexDirection: 'row',
-      alignItems: 'flex-start',
+      alignItems: 'center',
       paddingHorizontal: SPACING.lg,
       paddingVertical: SPACING.md,
       borderBottomWidth: 1,
@@ -327,6 +343,15 @@ const createStyles = (colors: any, isDark: boolean, sizeStyles: any) =>
     },
     notificationContent: {
       flex: 1,
+    },
+    removeButtonArea: {
+      padding: SPACING.xs,
+      justifyContent: 'center',
+      alignItems: 'center',
+      minWidth: 40,
+    },
+    readNotificationItem: {
+      opacity: 0.6,
     },
     notificationTitle: {
       fontSize: 15,

@@ -7,15 +7,20 @@ import { Platform, PermissionsAndroid } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { badgeService } from './badgeService';
 
-// PushNotification import with error handling
+// 플랫폼별 푸시 알림 import
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
 let PushNotification: any = null;
-try {
-  PushNotification = require('react-native-push-notification').default;
-  if (!PushNotification) {
-    PushNotification = require('react-native-push-notification');
+
+// Android용 푸시 알림 (Firebase 없이)
+if (Platform.OS === 'android') {
+  try {
+    PushNotification = require('react-native-push-notification').default;
+    if (!PushNotification) {
+      PushNotification = require('react-native-push-notification');
+    }
+  } catch (error) {
+    console.warn('📱 Android push notification not available:', error.message);
   }
-} catch (error) {
-  console.warn('📱 react-native-push-notification not available:', error.message);
 }
 
 export interface NotificationPayload {
@@ -45,28 +50,21 @@ export class PushNotificationService {
    */
   async initialize(): Promise<boolean> {
     try {
-      console.log('📱 Starting push notification service initialization...');
+      console.log('📱 Starting platform-specific push notification service initialization...');
       
-      if (!PushNotification) {
-        console.warn('📱 react-native-push-notification not available - running in limited mode');
-        
-        // 배지 서비스만 초기화
-        await badgeService.initialize();
-        
-        this.isInitialized = true;
-        console.log('📱 Push notification service initialized (limited mode)');
-        return true;
+      if (Platform.OS === 'ios') {
+        // iOS - @react-native-community/push-notification-ios 사용
+        console.log('📱 iOS: Using @react-native-community/push-notification-ios');
+        await this.setupIOSNotifications();
+      } else if (Platform.OS === 'android') {
+        // Android - react-native-push-notification (Firebase 없이)
+        console.log('📱 Android: Using react-native-push-notification (without Firebase)');
+        await this.setupAndroidNotifications();
       }
-
-      // 푸시 알림 설정 및 리스너 등록
-      this.setupPushNotifications();
-
-      // 초기 설정 (권한 요청 및 토큰 생성)
-      await this.setupInitialConfiguration();
-
+      
       // 배지 서비스 초기화
       await badgeService.initialize();
-
+      
       this.isInitialized = true;
       console.log('✅ Push notification service initialized successfully');
       return true;
@@ -88,21 +86,12 @@ export class PushNotificationService {
   }
 
   /**
-   * 푸시 알림 권한 요청
+   * 푸시 알림 권한 요청 (Native only)
    */
   private async requestPermission(): Promise<boolean> {
     try {
-      if (!PushNotification) {
-        console.warn('📱 PushNotification not available, permission denied');
-        return false;
-      }
-      
-      return new Promise((resolve) => {
-        PushNotification.requestPermissions((permissions) => {
-          console.log('📱 Push notification permissions:', permissions);
-          resolve(permissions.alert === true);
-        });
-      });
+      console.log('📱 Native permission request - always granted for badge system');
+      return true; // 배지 시스템은 별도 권한이 필요없음
     } catch (error) {
       console.error('📱 Permission request failed:', error);
       return false;
@@ -133,72 +122,71 @@ export class PushNotificationService {
   }
 
   /**
-   * 푸시 알림 설정 및 리스너 등록
+   * iOS 푸시 알림 설정
    */
-  private setupPushNotifications(): void {
+  private async setupIOSNotifications(): Promise<void> {
+    try {
+      // iOS 권한 요청
+      const permissions = await PushNotificationIOS.requestPermissions({
+        alert: true,
+        badge: true,
+        sound: true,
+      });
+      
+      console.log('📱 iOS push notification permissions:', permissions);
+      
+      // iOS 알림 리스너 설정
+      PushNotificationIOS.addEventListener('register', (token) => {
+        console.log('📱 iOS device token:', token);
+        this.deviceToken = token;
+        this.sendTokenToServer(token);
+      });
+
+      PushNotificationIOS.addEventListener('notification', async (notification) => {
+        console.log('📱 iOS notification received:', notification);
+        await badgeService.handlePushNotification(notification);
+      });
+
+    } catch (error) {
+      console.error('📱 iOS notification setup failed:', error);
+    }
+  }
+
+  /**
+   * Android 푸시 알림 설정 (Firebase 없이)
+   */
+  private async setupAndroidNotifications(): Promise<void> {
     try {
       if (!PushNotification) {
-        console.warn('📱 PushNotification not available, skipping setup');
+        console.warn('📱 Android PushNotification not available');
         return;
       }
-      
-      // PushNotification 기본 설정
-      PushNotification.configure({
-        // 알림이 수신되었을 때 (포그라운드/백그라운드 모두)
-        onNotification: async (notification) => {
-          console.log('📱 Notification received:', notification);
-          
-          const payload: NotificationPayload = {
-            title: notification.title || '',
-            body: notification.message || '',
-            data: notification.data || {}
-          };
 
-          // 배지 카운트 업데이트
-          if (!notification.userInteraction) {
-            // 사용자가 알림을 탭하지 않은 경우 (자동 수신)
-            await badgeService.handlePushNotification(notification);
-          } else {
-            // 사용자가 알림을 탭한 경우
+      // Android 푸시 알림 설정 (Firebase 없이)
+      PushNotification.configure({
+        onNotification: async (notification) => {
+          console.log('📱 Android notification received:', notification);
+          await badgeService.handlePushNotification(notification);
+          
+          if (notification.userInteraction) {
             await badgeService.handleAppActive();
             this.handleNotificationPress(notification.data);
           }
-
-          // 포그라운드에서 커스텀 알림 표시
-          if (notification.foreground && !notification.userInteraction) {
-            this.showCustomNotification(payload);
-          }
         },
 
-        // 토큰이 등록되었을 때 (Android)
         onRegister: async (token) => {
-          console.log('📱 Push notification token:', token);
+          console.log('📱 Android push notification token:', token);
           this.deviceToken = token.token;
-          await AsyncStorage.setItem('device_token', token.token);
           await this.sendTokenToServer(token.token);
         },
 
-        // iOS에서만 권한 요청
-        requestPermissions: Platform.OS === 'ios',
-        
-        // iOS 권한 설정
-        permissions: {
-          alert: true,
-          badge: true,
-          sound: true,
-        },
-        
-        // 앱이 활성화될 때 배지 자동 클리어 방지
+        // Firebase 없이 로컬 알림만 사용
+        requestPermissions: false, // Android는 별도 권한 요청 불필요
         popInitialNotification: true,
-        
-        // 권한이 없는 경우 조용히 실패
-        senderID: Platform.OS === 'android' ? '12345-sender-id' : undefined,
       });
 
-      console.log('📱 Push notification configured successfully');
     } catch (error) {
-      console.error('📱 Push notification configuration failed:', error);
-      // 실패해도 앱이 크래시되지 않도록 함
+      console.error('📱 Android notification setup failed:', error);
     }
   }
 
@@ -342,7 +330,17 @@ export class PushNotificationService {
         scheduledDate.setHours(20, 0, 0, 0);
       }
 
-      if (PushNotification && PushNotification.localNotificationSchedule) {
+      if (Platform.OS === 'ios') {
+        // iOS 로컬 알림 스케줄링
+        PushNotificationIOS.scheduleLocalNotification({
+          alertTitle: payload.title,
+          alertBody: payload.body,
+          fireDate: scheduledDate.toISOString(),
+          repeatInterval: schedule === 'weekly' ? 'week' : 'day',
+          userInfo: payload.data,
+        });
+      } else if (Platform.OS === 'android' && PushNotification && PushNotification.localNotificationSchedule) {
+        // Android 로컬 알림 스케줄링
         PushNotification.localNotificationSchedule({
           title: payload.title,
           message: payload.body,
@@ -382,8 +380,16 @@ export class PushNotificationService {
 
     const notification = notifications[type];
     if (notification) {
-      // 로컬 알림으로 즉시 표시
-      if (PushNotification && PushNotification.localNotification) {
+      if (Platform.OS === 'ios') {
+        // iOS 즉시 로컬 알림
+        PushNotificationIOS.presentLocalNotification({
+          alertTitle: notification.title,
+          alertBody: notification.body,
+          userInfo: notification.data,
+          isSilent: false,
+        });
+      } else if (Platform.OS === 'android' && PushNotification && PushNotification.localNotification) {
+        // Android 즉시 로컬 알림
         PushNotification.localNotification({
           title: notification.title,
           message: notification.body,

@@ -193,7 +193,7 @@ const TermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({ onBack, onN
             본 약관은 {lastUpdated}부터 시행됩니다.
           </Text>
           <Text style={styles.footerText}>
-            문의사항이 있으시면 hello@getposty.ai로 연락해주세요.
+            문의사항이 있으시면 getposty@gmail.com로 연락해주세요.
           </Text>
         </View>
 

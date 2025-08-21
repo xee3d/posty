@@ -37,7 +37,14 @@ const AnimatedSplashScreen: React.FC<AnimatedSplashScreenProps> = ({ onAnimation
       />
       <View style={styles.container}>
         <View style={styles.contentContainer}>
-          {/* 아이콘 제거 - 깔끔한 흰 배경만 표시 */}
+          {/* 화이트 로고 표시 */}
+          <View style={styles.logoContainer}>
+            <Image 
+              source={require('../assets/images/posty_logo_w.png')}
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+          </View>
         </View>
       </View>
     </>

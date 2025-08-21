@@ -28,6 +28,7 @@ import aiService from '../services/aiServiceWrapper';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { saveContent } from '../utils/storage';
 import contentSaveService from '../services/contentSaveService';
+import userBehaviorAnalytics from '../services/userBehaviorAnalytics';
 import { APP_TEXT, getText } from '../utils/textConstants';
 import { soundManager } from '../utils/soundManager';
 import trendService from '../services/trendService';
@@ -108,6 +109,17 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       setPrompt(initialText);
     }
   }, [initialText]);
+
+  // photo 모드로 시작할 때 자동으로 사진 선택 모달 열기
+  useEffect(() => {
+    if (initialMode === 'photo' && writeMode === 'photo' && !selectedImageUri) {
+      // 약간의 딜레이를 주어 화면이 렌더링된 후 모달이 열리도록 함
+      const timer = setTimeout(() => {
+        handleSelectImage();
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [initialMode]);
 
   // 프롬프트 변경 시 개인화된 해시태그 업데이트
   useEffect(() => {
@@ -686,13 +698,29 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
           console.log('Search query saved for personalization:', prompt.trim());
         }
         
+        // 플랫폼 결정 로직
+        const determinePlatform = () => {
+          // 사진 모드인 경우 instagram 우선
+          if (writeMode === 'photo') return 'instagram';
+          
+          // 톤에 따른 플랫폼 추론
+          if (selectedTone === 'casual' || selectedTone === 'friendly') return 'instagram';
+          if (selectedTone === 'professional' || selectedTone === 'formal') return 'linkedin';
+          if (selectedTone === 'concise') return 'twitter';
+          
+          // 기본값
+          return 'instagram';
+        };
+        
+        const platformToSave = determinePlatform();
+        
         // storage.ts의 saveContent 호출
         await saveContent({
           content: result,
           hashtags: hashtags,
           tone: selectedTone,
           length: selectedLength,
-          platform: 'general',
+          platform: platformToSave,
           prompt: writeMode === 'photo' ? '사진 글쓰기' : prompt,
         });
         
@@ -700,7 +728,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
         await simplePostService.savePost({
           content: result,
           hashtags: hashtags,
-          platform: 'general',
+          platform: platformToSave,
           category: getCategoryFromTone(selectedTone),
           tone: selectedTone,
         });
@@ -747,6 +775,14 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
       length: selectedLength,
       prompt: writeMode === 'photo' ? '사진 글쓰기' : prompt,
     });
+    
+    // 사용자 행동 패턴 업데이트 (개인화를 위해)
+    try {
+      await userBehaviorAnalytics.analyzeUserWritingPatterns();
+      console.log('📊 User behavior patterns updated after content save');
+    } catch (error) {
+      console.error('Failed to update behavior patterns:', error);
+    }
   };
   
   // promptUtils로 이동됨

@@ -61,7 +61,8 @@
       "Bash(kill:*)",
       "Bash(curl:*)",
       "Bash(./emulator -list-avds)",
-      "Bash(./android/gradlew:*)"
+      "Bash(./android/gradlew:*)",
+      "Bash(timeout:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

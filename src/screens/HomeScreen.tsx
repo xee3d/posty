@@ -23,6 +23,7 @@ import PostListScreen from './PostListScreen';
 import { APP_TEXT, getText } from '../utils/textConstants';
 import { enhancedTipsService, trendingHashtagService } from '../services/enhancedTipsService';
 import { personalizedRecommendationService, RecommendationCard } from '../services/personalizedRecommendationService';
+import userBehaviorAnalytics from '../services/userBehaviorAnalytics';
 import simplePostService from '../services/simplePostService';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { resetDailyTokens } from '../store/slices/userSlice';
@@ -673,10 +674,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
 
 
-        {/* 🧪 알림 테스트 버튼 (테스트 전용) */}
-        <SlideInView delay={500} duration={300}>
-          <NotificationTestButtons />
-        </SlideInView>
+        {/* 🧪 알림 테스트 버튼 (개발 모드 전용) */}
+        {__DEV__ && (
+          <SlideInView delay={500} duration={300}>
+            <NotificationTestButtons />
+          </SlideInView>
+        )}
 
         {/* 작은 배너 광고 - 해시태그 아래 배치 */}
         {Date.now() % 2 === 0 && (
@@ -781,7 +784,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                       </View>
                       <ScaleButton 
                         style={styles.writeButton}
-                        onPress={() => {
+                        onPress={async () => {
+                          // 추천 클릭 기록 (개인화를 위해)
+                          await userBehaviorAnalytics.recordRecommendationClick(card.id);
                           personalizedRecommendationService.saveRecommendationShown(card.id);
                           onNavigate('ai-write', card.actionPayload);
                         }}
