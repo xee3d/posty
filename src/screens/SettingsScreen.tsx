@@ -32,6 +32,7 @@ import MinimalWelcome from '../components/MinimalWelcome';
 import AppLogo from '../components/AppLogo';
 import ProfileDetailModal from '../components/ProfileDetailModal';
 import { getProfileGuideMessage } from '../types/userProfile';
+import ThemeDialog from '../components/ThemeDialog';
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
@@ -39,7 +40,8 @@ interface SettingsScreenProps {
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
-  const { themeMode, changeTheme, colors, cardTheme } = useAppTheme();
+  // useAppTheme으로 변경하여 기존 코드와의 호환성 확보
+  const { themeMode, colors, isDark, changeTheme, cardTheme } = useAppTheme();
   const dispatch = useAppDispatch();
   const timer = useTimer();
   const reduxUser = useAppSelector(state => state.user);
@@ -76,6 +78,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showNewUserWelcome, setShowNewUserWelcome] = useState(false);
   const [showProfileDetailModal, setShowProfileDetailModal] = useState(false);
+  const [showThemeDialog, setShowThemeDialog] = useState(false);
   
   // 프로필 완성도 관련
   const profileCompleteness = reduxUser.detailedProfile?.profileCompleteness || 0;
@@ -731,10 +734,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const getProviderColor = (provider: string | null | undefined) => {
     if (!provider) return colors.primary;
     switch (provider) {
-      case 'google': return '#4285F4';
-      case 'naver': return '#03C75A';
-      case 'kakao': return '#FEE500';
-      case 'facebook': return '#1877F2';
+      case 'google': return isDark ? '#5A9DF7' : '#4285F4';
+      case 'naver': return isDark ? '#4DD273' : '#03C75A';
+      case 'kakao': return isDark ? '#FFE733' : '#FEE500';
+      case 'facebook': return isDark ? '#4A90E2' : '#1877F2';
       case 'apple': return colors.text.primary;
       default: return colors.primary;
     }
@@ -743,22 +746,23 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const getSubscriptionBadge = () => {
     switch (subscriptionPlan) {
       case 'pro':
-        return { text: 'MAX', color: '#8B5CF6', icon: 'workspace-premium' };
+        return { text: 'MAX', color: colors.primary, icon: 'workspace-premium' };
       case 'premium':
-        return { text: 'PRO', color: '#F59E0B', icon: 'star' };
+        return { text: 'PRO', color: colors.warning, icon: 'star' };
       case 'starter':
-        return { text: 'STARTER', color: '#10B981', icon: 'flash' };
+        return { text: 'STARTER', color: colors.success, icon: 'flash' };
       default:
         return { text: 'FREE', color: colors.text.secondary, icon: 'person' };
     }
   };
+
 
   const platformsData = [
     {
       id: 'instagram',
       name: 'Instagram',
       username: connectedAccounts.instagram ? '@username' : '연결되지 않음',
-      color: '#E4405F',
+      color: isDark ? '#F56565' : '#E4405F',
       connected: connectedAccounts.instagram,
       status: connectedAccounts.instagram ? '연결됨' : '연결하기',
     },
@@ -766,7 +770,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
       id: 'facebook',
       name: 'Facebook',
       username: connectedAccounts.facebook ? '개인 계정' : '연결되지 않음',
-      color: '#1877F2',
+      color: isDark ? '#4A90E2' : '#1877F2',
       connected: connectedAccounts.facebook,
       status: connectedAccounts.facebook ? '연결됨' : '연결하기',
     },
@@ -774,7 +778,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
       id: 'twitter',
       name: 'X (Twitter)',
       username: '연결되지 않음',
-      color: '#000000',
+      color: isDark ? colors.text.primary : colors.text.secondary,
       connected: false,
       status: '연결하기',
     },
@@ -885,14 +889,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                 <View style={[
                   styles.profileAvatar,
                   userProfile?.selectedBadge && { 
-                    backgroundColor: userProfile.achievements.find(a => a.id === userProfile.selectedBadge)?.badgeColor || colors.primary 
+                    backgroundColor: userProfile.achievements?.find(a => a.id === userProfile.selectedBadge)?.badgeColor || colors.primary 
                   }
                 ]}>
                   {userProfile?.selectedBadge ? (
                     <Icon 
-                      name={userProfile.achievements.find(a => a.id === userProfile.selectedBadge)?.icon || 'person'}
+                      name={userProfile.achievements?.find(a => a.id === userProfile.selectedBadge)?.icon || 'person'}
                       size={32}
-                      color={userProfile.achievements.find(a => a.id === userProfile.selectedBadge)?.iconColor || colors.primary}
+                      color={userProfile.achievements?.find(a => a.id === userProfile.selectedBadge)?.iconColor || colors.primary}
                     />
                   ) : reduxUser.photoURL ? (
                     <Image source={{ uri: reduxUser.photoURL }} style={styles.profileAvatarImage} />
@@ -930,7 +934,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
             
             {/* 업적 보기 버튼 */}
             <TouchableOpacity 
-              style={[styles.editProfileButton, { backgroundColor: '#8B5CF6' + '10' }]}
+              style={[styles.editProfileButton, { backgroundColor: colors.primary + '15' }]}
               onPress={async () => {
                 if (onNavigate) {
                   onNavigate('profile');
@@ -946,28 +950,37 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                 }
               }}
             >
-              <Icon name="trophy" size={20} color="#8B5CF6" />
-              <Text style={[styles.editProfileButtonText, { color: '#8B5CF6' }]}>내 업적 보기</Text>
+              <Icon name="trophy" size={20} color={colors.primary} />
+              <Text style={[styles.editProfileButtonText, { color: colors.primary }]}>내 업적 보기</Text>
             </TouchableOpacity>
             
-            {/* 세부 프로필 설정 버튼 */}
+            {/* 세부 프로필 설정 */}
             <TouchableOpacity 
-              style={[styles.editProfileButton, { backgroundColor: '#FF6B6B' + '10', marginTop: SPACING.sm }]}
+              style={[styles.editProfileButton, { borderColor: colors.primary }]}
               onPress={() => setShowProfileDetailModal(true)}
             >
-              <Icon name="person-circle" size={20} color="#FF6B6B" />
-              <Text style={[styles.editProfileButtonText, { color: '#FF6B6B' }]}>세부 프로필 설정</Text>
+              <Icon name="person-circle" size={20} color={colors.primary} />
+              <Text style={[styles.editProfileButtonText, { color: colors.primary }]}>
+                세부 프로필 설정
+              </Text>
               {profileCompleteness < 100 && (
-                <View style={styles.profileBadge}>
+                <View style={[styles.profileBadge, { backgroundColor: colors.warning }]}>
                   <Text style={styles.profileBadgeText}>{profileCompleteness}%</Text>
                 </View>
               )}
             </TouchableOpacity>
             
-            {/* 프로필 가이드 메시지 */}
-            {profileGuideMessage && (
-              <View style={styles.profileGuide}>
-                <Text style={styles.profileGuideText}>{profileGuideMessage}</Text>
+            {profileCompleteness < 100 && (
+              <View style={[
+                styles.profileGuide, 
+                { 
+                  backgroundColor: isDark ? colors.surfaceVariant + '80' : colors.primary + '10',
+                  borderLeftColor: colors.primary 
+                }
+              ]}>
+                <Text style={[styles.profileGuideText, { color: colors.text.secondary }]}>
+                  {profileGuideMessage || '프로필을 완성해보세요'}
+                </Text>
               </View>
             )}
           </View>
@@ -1040,55 +1053,24 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
             />
           </View>
           
-
-          
-          <View style={styles.themeSection}>
-            <View style={styles.settingHeader}>
-              <Icon name="color-palette-outline" size={20} color={colors.text.secondary} />
-              <Text style={styles.settingLabel}>테마 설정</Text>
+          <TouchableOpacity 
+            style={styles.settingItem}
+            onPress={() => setShowThemeDialog(true)}
+          >
+            <View style={styles.settingInfo}>
+              <View style={styles.settingHeader}>
+                <Icon name="color-palette-outline" size={20} color={colors.text.secondary} />
+                <Text style={styles.settingLabel}>테마 및 색상</Text>
+              </View>
+              <Text style={styles.settingDescription}>
+                앱 테마와 액센트 색상을 설정하세요
+              </Text>
             </View>
-            <View style={styles.themeButtonGroup}>
-              <TouchableOpacity 
-                style={[
-                  styles.themeButton, 
-                  themeMode === 'light' && styles.themeButtonActive
-                ]} 
-                onPress={() => handleThemeChange('light')}
-              >
-                <Text style={styles.themeIcon}>☀️</Text>
-                <Text style={[
-                  styles.themeButtonText,
-                  themeMode === 'light' && styles.themeButtonTextActive
-                ]}>라이트</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[
-                  styles.themeButton, 
-                  themeMode === 'dark' && styles.themeButtonActive
-                ]} 
-                onPress={() => handleThemeChange('dark')}
-              >
-                <Text style={styles.themeIcon}>🌙</Text>
-                <Text style={[
-                  styles.themeButtonText,
-                  themeMode === 'dark' && styles.themeButtonTextActive
-                ]}>다크</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[
-                  styles.themeButton, 
-                  themeMode === 'system' && styles.themeButtonActive
-                ]} 
-                onPress={() => handleThemeChange('system')}
-              >
-                <Text style={styles.themeIcon}>🌓</Text>
-                <Text style={[
-                  styles.themeButtonText,
-                  themeMode === 'system' && styles.themeButtonTextActive
-                ]}>시스템</Text>
-              </TouchableOpacity>
+            <View style={styles.themePreview}>
+              <View style={[styles.themeColorPreview, { backgroundColor: colors.primary }]} />
+              <Icon name="chevron-forward" size={20} color={colors.text.tertiary} />
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
 
 
@@ -1120,7 +1102,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
         {/* 로그아웃 버튼 */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Icon name="log-out-outline" size={20} color="#EF4444" />
+          <Icon name="log-out-outline" size={20} color={colors.error} />
           <Text style={styles.logoutText}>로그아웃</Text>
         </TouchableOpacity>
 
@@ -1134,12 +1116,18 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
         showGuide={true}
       />
 
+      {/* 테마 설정 다이얼로그 */}
+      <ThemeDialog
+        visible={showThemeDialog}
+        onClose={() => setShowThemeDialog(false)}
+      />
+
     </SafeAreaView>
   );
 };
 
-const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
-  const isDark = colors.background === '#1A202C';
+const createStyles = (colors: any, cardTheme: any) => {
+  const isDark = colors.isDark;
   
   return StyleSheet.create({
   container: {
@@ -1167,7 +1155,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: SPACING.sm,
@@ -1180,7 +1168,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   headerTitle: {
     fontSize: 24,
     fontWeight: '700',
-    color: colors.text.primary,
+    color: colors.textPrimary,
     letterSpacing: -0.5,
   },
   section: {
@@ -1251,7 +1239,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   profileTitle: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#8B5CF6',
+    color: colors.primary,
     marginBottom: 2,
   },
   profileEmail: {
@@ -1332,7 +1320,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   tokenStatusCount: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#8B5CF6',
+    color: colors.primary,
   },
   tokenProgressBar: {
     height: 6,
@@ -1342,7 +1330,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   },
   tokenProgressFill: {
     height: '100%',
-    backgroundColor: '#8B5CF6',
+    backgroundColor: colors.primary,
     borderRadius: 3,
   },
   miniStats: {
@@ -1474,6 +1462,18 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     color: colors.text.tertiary,
     marginLeft: 28,
   },
+  themePreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: SPACING.sm,
+  },
+  themeColorPreview: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: colors.border,
+  },
   themeSection: {
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.md,
@@ -1558,14 +1558,14 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 12,
-    backgroundColor: isDark ? colors.error + '20' : '#FEF2F2',
+    backgroundColor: isDark ? colors.error + '20' : colors.error + '10',
     minWidth: 150,
     alignSelf: 'center',
   },
   logoutText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#EF4444',
+    color: colors.error,
     letterSpacing: -0.3,
     flexShrink: 0,
   },
@@ -1590,23 +1590,23 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   profileBadge: {
     position: 'absolute',
     right: 12,
-    backgroundColor: '#FF6B6B',
+    backgroundColor: colors.warning,
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 2,
   },
   profileBadgeText: {
-    color: '#fff',
+    color: colors.white,
     fontSize: 10,
     fontWeight: '600',
   },
   profileGuide: {
     marginTop: SPACING.sm,
     padding: SPACING.sm,
-    backgroundColor: colors.background === '#1A202C' ? '#2D3748' : '#F7FAFC',
+    backgroundColor: isDark ? '#2A1A1A' : colors.surfaceVariant || '#F7FAFC',
     borderRadius: 8,
     borderLeftWidth: 3,
-    borderLeftColor: '#FF6B6B',
+    borderLeftColor: colors.warning,
   },
   profileGuideText: {
     fontSize: FONT_SIZES.small,

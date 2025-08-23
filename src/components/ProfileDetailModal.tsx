@@ -19,6 +19,7 @@ import { updateDetailedProfile } from '../store/slices/userSlice';
 import { DetailedUserProfile, INTEREST_SUGGESTIONS, getProfileGuideMessage, calculateProfileCompleteness } from '../types/userProfile';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import LinearGradient from 'react-native-linear-gradient';
+import { useAppTheme } from '../hooks/useAppTheme';
 
 const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
@@ -31,12 +32,15 @@ interface ProfileDetailModalProps {
 const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({ visible, onClose, showGuide = false }) => {
   const dispatch = useDispatch();
   const { detailedProfile } = useSelector((state: RootState) => state.user);
+  const { colors, isDark } = useAppTheme();
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
   
   // 로컬 상태 관리
   const [localProfile, setLocalProfile] = useState<Partial<DetailedUserProfile>>(detailedProfile || {});
   const [selectedInterests, setSelectedInterests] = useState<string[]>(detailedProfile?.interests || []);
   const [customOccupation, setCustomOccupation] = useState(detailedProfile?.occupationDetail || '');
+  
+  const styles = createStyles(colors, isDark);
   
   // 모달 애니메이션
   useEffect(() => {
@@ -56,6 +60,19 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({ visible, onClos
     }
   }, [visible]);
   
+  // 실시간 프로필 업데이트
+  const updateProfileRealtime = (updates: Partial<DetailedUserProfile>) => {
+    const updatedProfile: Partial<DetailedUserProfile> = {
+      ...localProfile,
+      ...updates,
+      interests: selectedInterests,
+      occupationDetail: customOccupation,
+    };
+    
+    console.log('🔄 Real-time profile update:', updatedProfile);
+    dispatch(updateDetailedProfile(updatedProfile));
+  };
+
   // 프로필 저장
   const handleSave = () => {
     const updatedProfile: Partial<DetailedUserProfile> = {
@@ -80,11 +97,15 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({ visible, onClos
   
   // 관심사 토글
   const toggleInterest = (interest: string) => {
-    setSelectedInterests(prev => 
-      prev.includes(interest) 
+    setSelectedInterests(prev => {
+      const newInterests = prev.includes(interest) 
         ? prev.filter(i => i !== interest)
-        : [...prev, interest]
-    );
+        : [...prev, interest];
+      
+      // 실시간 업데이트
+      updateProfileRealtime({ interests: newInterests });
+      return newInterests;
+    });
   };
   
   // 선택 버튼 컴포넌트
@@ -129,7 +150,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({ visible, onClos
               <View style={styles.handleBar} />
               <Text style={styles.title}>나의 상세 프로필</Text>
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                <Icon name="close" size={24} color="#333" />
+                <Icon name="close" size={24} color={colors.text.primary} />
               </TouchableOpacity>
             </View>
             
@@ -138,7 +159,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({ visible, onClos
               <Text style={styles.completenessText}>프로필 완성도 {completeness}%</Text>
               <View style={styles.progressBar}>
                 <LinearGradient
-                  colors={['#FF6B6B', '#FF8E53']}
+                  colors={[colors.primary, colors.primary + '80']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={[styles.progressFill, { width: `${completeness}%` }]}
@@ -164,7 +185,10 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({ visible, onClos
                       key={age}
                       label={age === '60s+' ? '60대 이상' : age.replace('s', '대')}
                       selected={localProfile.ageGroup === age}
-                      onPress={() => setLocalProfile(prev => ({ ...prev, ageGroup: age as any }))}
+                      onPress={() => {
+                        setLocalProfile(prev => ({ ...prev, ageGroup: age as any }));
+                        updateProfileRealtime({ ageGroup: age as any });
+                      }}
                     />
                   ))}
                 </View>
@@ -177,22 +201,34 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({ visible, onClos
                   <SelectButton
                     label="남성"
                     selected={localProfile.gender === 'male'}
-                    onPress={() => setLocalProfile(prev => ({ ...prev, gender: 'male' }))}
+                    onPress={() => {
+                      setLocalProfile(prev => ({ ...prev, gender: 'male' }));
+                      updateProfileRealtime({ gender: 'male' });
+                    }}
                   />
                   <SelectButton
                     label="여성"
                     selected={localProfile.gender === 'female'}
-                    onPress={() => setLocalProfile(prev => ({ ...prev, gender: 'female' }))}
+                    onPress={() => {
+                      setLocalProfile(prev => ({ ...prev, gender: 'female' }));
+                      updateProfileRealtime({ gender: 'female' });
+                    }}
                   />
                   <SelectButton
                     label="기타"
                     selected={localProfile.gender === 'other'}
-                    onPress={() => setLocalProfile(prev => ({ ...prev, gender: 'other' }))}
+                    onPress={() => {
+                      setLocalProfile(prev => ({ ...prev, gender: 'other' }));
+                      updateProfileRealtime({ gender: 'other' });
+                    }}
                   />
                   <SelectButton
                     label="비공개"
                     selected={localProfile.gender === 'prefer_not_to_say'}
-                    onPress={() => setLocalProfile(prev => ({ ...prev, gender: 'prefer_not_to_say' }))}
+                    onPress={() => {
+                      setLocalProfile(prev => ({ ...prev, gender: 'prefer_not_to_say' }));
+                      updateProfileRealtime({ gender: 'prefer_not_to_say' });
+                    }}
                   />
                 </View>
               </View>
@@ -204,22 +240,34 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({ visible, onClos
                   <SelectButton
                     label="미혼"
                     selected={localProfile.familyRole === 'single'}
-                    onPress={() => setLocalProfile(prev => ({ ...prev, familyRole: 'single' }))}
+                    onPress={() => {
+                      setLocalProfile(prev => ({ ...prev, familyRole: 'single' }));
+                      updateProfileRealtime({ familyRole: 'single' });
+                    }}
                   />
                   <SelectButton
                     label="기혼"
                     selected={localProfile.familyRole === 'married'}
-                    onPress={() => setLocalProfile(prev => ({ ...prev, familyRole: 'married' }))}
+                    onPress={() => {
+                      setLocalProfile(prev => ({ ...prev, familyRole: 'married' }));
+                      updateProfileRealtime({ familyRole: 'married' });
+                    }}
                   />
                   <SelectButton
                     label="부모"
                     selected={localProfile.familyRole === 'parent'}
-                    onPress={() => setLocalProfile(prev => ({ ...prev, familyRole: 'parent' }))}
+                    onPress={() => {
+                      setLocalProfile(prev => ({ ...prev, familyRole: 'parent' }));
+                      updateProfileRealtime({ familyRole: 'parent' });
+                    }}
                   />
                   <SelectButton
                     label="조부모"
                     selected={localProfile.familyRole === 'grandparent'}
-                    onPress={() => setLocalProfile(prev => ({ ...prev, familyRole: 'grandparent' }))}
+                    onPress={() => {
+                      setLocalProfile(prev => ({ ...prev, familyRole: 'grandparent' }));
+                      updateProfileRealtime({ familyRole: 'grandparent' });
+                    }}
                   />
                 </View>
               </View>
@@ -295,7 +343,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({ visible, onClos
                     placeholder="구체적인 직업을 입력해주세요 (선택사항)"
                     value={customOccupation}
                     onChangeText={setCustomOccupation}
-                    placeholderTextColor="#999"
+                    placeholderTextColor={colors.text.tertiary}
                   />
                 )}
               </View>
@@ -416,7 +464,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({ visible, onClos
               {/* 저장 버튼 */}
               <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
                 <LinearGradient
-                  colors={['#FF6B6B', '#FF8E53']}
+                  colors={[colors.primary, colors.primary + '90']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.saveButtonGradient}
@@ -432,7 +480,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({ visible, onClos
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
@@ -445,7 +493,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,
     height: SCREEN_HEIGHT * 0.85, // 고정 높이로 변경 (85%)
@@ -458,19 +506,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: colors.border,
   },
   handleBar: {
     width: 40,
     height: 4,
-    backgroundColor: '#ddd',
+    backgroundColor: colors.border,
     borderRadius: 2,
     marginBottom: 10,
   },
   title: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#333',
+    color: colors.text.primary,
   },
   closeButton: {
     position: 'absolute',
@@ -480,16 +528,16 @@ const styles = StyleSheet.create({
   completenessSection: {
     paddingHorizontal: 20,
     paddingVertical: 15,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: isDark ? colors.surfaceVariant || colors.surface : colors.surfaceVariant || colors.lightGray,
   },
   completenessText: {
     fontSize: 14,
-    color: '#666',
+    color: colors.text.secondary,
     marginBottom: 8,
   },
   progressBar: {
     height: 8,
-    backgroundColor: '#e0e0e0',
+    backgroundColor: colors.border,
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -499,7 +547,7 @@ const styles = StyleSheet.create({
   },
   guideMessage: {
     fontSize: 13,
-    color: '#FF6B6B',
+    color: colors.warning,
     marginTop: 8,
     fontWeight: '500',
   },
@@ -517,13 +565,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.text.primary,
     marginBottom: 12,
   },
   subSectionTitle: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#666',
+    color: colors.text.secondary,
     marginTop: 15,
     marginBottom: 10,
   },
@@ -537,19 +585,19 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#fff',
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
   },
   selectButtonActive: {
-    backgroundColor: '#FF6B6B',
-    borderColor: '#FF6B6B',
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
   selectButtonText: {
     fontSize: 14,
-    color: '#666',
+    color: colors.text.secondary,
   },
   selectButtonTextActive: {
-    color: '#fff',
+    color: colors.white,
     fontWeight: '500',
   },
   interestGrid: {
@@ -561,17 +609,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingVertical: 8,
     borderRadius: 16,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors.border,
   },
   interestChipActive: {
-    backgroundColor: '#FFE5E5',
+    backgroundColor: colors.accentLight || colors.primary + '20',
   },
   interestChipText: {
     fontSize: 13,
-    color: '#666',
+    color: colors.text.secondary,
   },
   interestChipTextActive: {
-    color: '#FF6B6B',
+    color: colors.primary,
     fontWeight: '500',
   },
   textInput: {
@@ -579,10 +627,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: colors.border,
     borderRadius: 10,
     fontSize: 14,
-    color: '#333',
+    color: colors.text.primary,
+    backgroundColor: colors.surface,
   },
   saveButton: {
     marginTop: 30,
@@ -595,7 +644,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   saveButtonText: {
-    color: '#fff',
+    color: colors.white,
     fontSize: 16,
     fontWeight: '600',
   },

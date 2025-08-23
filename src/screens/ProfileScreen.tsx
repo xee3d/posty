@@ -62,6 +62,11 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
       profileGuideMessage: profileGuideMessage
     });
   }, [userInfo, profileCompleteness, profileGuideMessage]);
+
+  // 프로필 완성도 변경 감지
+  useEffect(() => {
+    console.log('🎯 Profile completeness changed:', profileCompleteness + '%');
+  }, [profileCompleteness]);
   
   // 소셜 로그인 정보
   const getProviderInfo = () => {
@@ -234,7 +239,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
                 activeOpacity={0.8}
               >
                 <LinearGradient
-                  colors={['#FFE5E5', '#FFF0F0']}
+                  colors={isDark ? [colors.surfaceVariant || '#2A1A1A', colors.surface || '#3A2A2A'] : [colors.primary + '10', colors.primary + '05']}
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.profileGuideGradient}
@@ -244,10 +249,20 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
                       <Text style={styles.profileGuideTitle}>프로필 {profileCompleteness}% 완성</Text>
                       <Text style={styles.profileGuideMessage}>{profileGuideMessage}</Text>
                     </View>
-                    <Icon name="chevron-forward" size={20} color="#FF6B6B" />
+                    <Icon name="chevron-forward" size={20} color={colors.primary} />
                   </View>
                   <View style={styles.profileProgressBar}>
-                    <View style={[styles.profileProgressFill, { width: `${profileCompleteness}%` }]} />
+                    <View style={[
+                      styles.profileProgressFill, 
+                      { 
+                        width: `${Math.max(profileCompleteness, 1)}%`,
+                        minWidth: 1
+                      }
+                    ]} />
+                    {/* 디버깅용: 진행바 너비 확인 */}
+                    <Text style={{ fontSize: 10, color: colors.text.tertiary, marginTop: 2 }}>
+                      진행률: {profileCompleteness}%
+                    </Text>
                   </View>
                 </LinearGradient>
               </TouchableOpacity>
@@ -514,7 +529,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
       {/* 프로필 세부 설정 모달 */}
       <ProfileDetailModal
         visible={showProfileDetailModal}
-        onClose={() => setShowProfileDetailModal(false)}
+        onClose={() => {
+          setShowProfileDetailModal(false);
+          // 모달이 닫힐 때 데이터 새로고침
+          setTimeout(() => {
+            loadData();
+          }, 500);
+        }}
         showGuide={true}
       />
     </SafeAreaView>
@@ -968,24 +989,24 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   profileGuideTitle: {
     fontSize: FONT_SIZES.small,
     fontWeight: '600',
-    color: '#FF6B6B',
+    color: colors.primary,
     marginBottom: 4,
   },
   profileGuideMessage: {
     fontSize: FONT_SIZES.small,
-    color: '#666',
+    color: colors.text.secondary,
     lineHeight: 18,
   },
   profileProgressBar: {
     height: 4,
-    backgroundColor: 'rgba(255, 107, 107, 0.2)',
+    backgroundColor: isDark ? colors.primary + '20' : colors.primary + '30',
     borderRadius: 2,
     marginTop: SPACING.sm,
     overflow: 'hidden',
   },
   profileProgressFill: {
     height: '100%',
-    backgroundColor: '#FF6B6B',
+    backgroundColor: colors.primary,
     borderRadius: 2,
   },
   // 임시 테스트 버튼 스타일
