@@ -13,6 +13,7 @@ import { extractHashtags } from '../utils/promptUtils';
 import { enhancePromptForPlatform, validateContentForPlatform } from '../utils/platformUtils';
 import { store } from '../store';
 import { selectSubscriptionPlan } from '../store/slices/userSlice';
+import { enhancedAI } from './ai/enhancedAIService';
 import { SUBSCRIPTION_PLANS } from '../utils/adConfig';
 import { imageAnalysisCache } from '../utils/imageAnalysisCache';
 
@@ -55,29 +56,68 @@ class AIServiceWrapper {
     }
     
     try {
-      // 플랫폼별로 프롬프트 강화
+      // 사용자 프로필 정보 가져오기
+      const state = store.getState();
+      const userProfile = state.user.detailedProfile;
+      
+      // platform 변수를 최상위에서 정의
       const platform = params.platform || 'instagram';
-      const enhancedPrompt = enhancePromptForPlatform(
-        params.prompt || '',
-        platform as any,
-        params.tone
-      );
+      let finalPrompt = '';
       
-      // 길이 옵션에 따른 추가 지시
-      let lengthInstruction = '';
-      switch (params.length) {
-        case 'short':
-          lengthInstruction = '\n[길이: 50자 이내로 짧고 간결하게 작성해주세요]';
-          break;
-        case 'medium':
-          lengthInstruction = '\n[길이: 100-150자 사이로 적당한 길이로 작성해주세요]';
-          break;
-        case 'long':
-          lengthInstruction = '\n[길이: 200-300자로 자세하고 풍부하게 작성해주세요]';
-          break;
+      // 개인화된 프롬프트 생성 (프로필 정보가 있는 경우)
+      if (userProfile && userProfile.profileCompleteness > 0) {
+        console.log('Using personalized AI prompt with profile completion:', userProfile.profileCompleteness + '%');
+        
+        // 이미지 컨텍스트 감지 시도
+        const imageContext = enhancedAI.detectImageContext(params.prompt || '');
+        
+        const personalizedConfig = {
+          userProfile: userProfile,
+          content: params.prompt || '',
+          platform: platform,
+          imageContext: imageContext,
+          occasion: 'general'
+        };
+        
+        finalPrompt = enhancedAI.generatePersonalizedPrompt(personalizedConfig);
+        
+        // 길이 조정 추가
+        switch (params.length) {
+          case 'short':
+            finalPrompt += '\n[길이: 50자 이내로 짧고 간결하게 작성해주세요]';
+            break;
+          case 'medium':
+            finalPrompt += '\n[길이: 100-150자 사이로 적당한 길이로 작성해주세요]';
+            break;
+          case 'long':
+            finalPrompt += '\n[길이: 200-300자로 자세하고 풍부하게 작성해주세요]';
+            break;
+        }
+      } else {
+        // 기존 방식 (프로필 정보가 없는 경우)
+        console.log('Using standard AI prompt (no profile data)');
+        const enhancedPrompt = enhancePromptForPlatform(
+          params.prompt || '',
+          platform as any,
+          params.tone
+        );
+        
+        // 길이 옵션에 따른 추가 지시
+        let lengthInstruction = '';
+        switch (params.length) {
+          case 'short':
+            lengthInstruction = '\n[길이: 50자 이내로 짧고 간결하게 작성해주세요]';
+            break;
+          case 'medium':
+            lengthInstruction = '\n[길이: 100-150자 사이로 적당한 길이로 작성해주세요]';
+            break;
+          case 'long':
+            lengthInstruction = '\n[길이: 200-300자로 자세하고 풍부하게 작성해주세요]';
+            break;
+        }
+        
+        finalPrompt = enhancedPrompt + lengthInstruction;
       }
-      
-      const finalPrompt = enhancedPrompt + lengthInstruction;
       
       console.log('Enhanced prompt for platform:', platform, finalPrompt);
       
@@ -99,11 +139,11 @@ class AIServiceWrapper {
           
           // 플랫폼별 특화 프롬프트 추가 (사용자 관점으로)
           if (platformId === 'instagram') {
-            platformPrompt += '\n\n[Instagram 스타일로 작성: 내 개인적인 경험과 감정을 1인칭으로 감성적이고 시각적으로, 줄바꿈을 활용해서 스토리텔링하듯 작성해주세요. 사진은 내가 직접 찍은 것이라고 가정하고 작성해주세요. 해시태그 5-7개 포함]';
+            platformPrompt += '\n\n[Instagram 스타일로 작성: 내 개인적인 경험과 감정을 1인칭으로 감성적이고 시각적으로, 줄바꿈을 활용해서 스토리텔링하듯 작성해주세요. 사진은 내가 직접 찍은 것이라고 가정하고 작성해주세요. 해시태그는 내용과 직접 관련된 키워드만 3-5개 선택해서 자연스럽게 포함해주세요]';
           } else if (platformId === 'facebook') {
             platformPrompt += '\n\n[Facebook 스타일로 작성: 내가 직접 경험한 것처럼 1인칭으로 친근하고 대화형으로, 개인적인 경험을 공유하는 톤으로 한 문단으로 자연스럽게 작성해주세요]';
           } else if (platformId === 'twitter') {
-            platformPrompt += '\n\n[Twitter 스타일로 작성: 내 경험을 1인칭으로 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그 1-2개만]';
+            platformPrompt += '\n\n[Twitter 스타일로 작성: 내 경험을 1인칭으로 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그는 핵심 키워드 1-2개만 포함해주세요]';
           }
           
           const platformResponse = await serverAIService.generateContent({
@@ -196,11 +236,11 @@ class AIServiceWrapper {
           
           // 플랫폼별 특화 프롬프트 추가 (사용자 관점으로)
           if (platformId === 'instagram') {
-            platformPrompt += '\n\n[Instagram 스타일로 최적화: 내 개인적인 경험과 감정을 1인칭으로 감성적이고 시각적으로, 줄바꿈을 활용해서 스토리텔링하듯 작성해주세요. 내가 직접 경험한 것처럼 작성해주세요. 해시태그 5-7개 포함]';
+            platformPrompt += '\n\n[Instagram 스타일로 최적화: 내 개인적인 경험과 감정을 1인칭으로 감성적이고 시각적으로, 줄바꿈을 활용해서 스토리텔링하듯 작성해주세요. 내가 직접 경험한 것처럼 작성해주세요. 해시태그는 내용의 핵심 키워드와 직접 관련된 것만 3-5개 선택해서 포함해주세요]';
           } else if (platformId === 'facebook') {
             platformPrompt += '\n\n[Facebook 스타일로 최적화: 내가 직접 경험한 것처럼 1인칭으로 친근하고 대화형으로, 개인적인 경험을 공유하는 톤으로 한 문단으로 자연스럽게 작성해주세요]';
           } else if (platformId === 'twitter') {
-            platformPrompt += '\n\n[Twitter 스타일로 최적화: 내 경험을 1인칭으로 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그 1-2개만]';
+            platformPrompt += '\n\n[Twitter 스타일로 최적화: 내 경험을 1인칭으로 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그는 핵심 키워드 1-2개만 포함해주세요]';
           }
           
           const platformResponse = await serverAIService.generateContent({
@@ -452,7 +492,7 @@ class AIServiceWrapper {
       case 'engaging':
         return `다음 텍스트를 더 재미있고 매력적으로 만들어주세요. 내가 직접 경험한 것처럼 1인칭으로 독자의 관심을 끌 수 있도록 작성해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'hashtag':
-        return `다음 텍스트에서 주요 키워드를 추출하고 SNS에 적합한 해시태그를 생성해주세요. 내가 직접 경험한 것처럼 1인칭으로 원문 내용과 함께 해시태그를 추가해주세요: "${text}"\n\n형식: [원문 내용]\n\n#해시태그 #해시태그 #해시태그${completionInstruction}`;
+        return `다음 텍스트의 핵심 내용과 직접 관련된 키워드만을 선별해서 자연스러운 해시태그를 생성해주세요. 내가 직접 경험한 것처럼 1인칭으로 원문 내용과 함께 내용과 밀접한 관련이 있는 해시태그만 3-5개 추가해주세요: "${text}"\n\n형식: [원문 내용]\n\n#관련키워드 #핵심내용 #구체적단어${completionInstruction}`;
       case 'emoji':
         return `다음 텍스트에 적절한 이모지를 추가해주세요. 내가 직접 느낀 감정으로 1인칭으로 문장의 감정이나 내용에 맞는 이모지를 자연스럽게 삽입해주세요: "${text}"${lengthGuide}${completionInstruction}`;
       case 'question':

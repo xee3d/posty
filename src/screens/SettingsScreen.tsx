@@ -30,6 +30,8 @@ import OnboardingScreen from './OnboardingScreen';
 import NewUserWelcome from '../components/NewUserWelcome';
 import MinimalWelcome from '../components/MinimalWelcome';
 import AppLogo from '../components/AppLogo';
+import ProfileDetailModal from '../components/ProfileDetailModal';
+import { getProfileGuideMessage } from '../types/userProfile';
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
@@ -73,6 +75,11 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const [userProfile, setUserProfile] = useState<UserProfile & { achievements?: Achievement[] } | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [showNewUserWelcome, setShowNewUserWelcome] = useState(false);
+  const [showProfileDetailModal, setShowProfileDetailModal] = useState(false);
+  
+  // 프로필 완성도 관련
+  const profileCompleteness = reduxUser.detailedProfile?.profileCompleteness || 0;
+  const profileGuideMessage = getProfileGuideMessage(profileCompleteness);
   
   // AI 토큰 및 통계
   const [stats, setStats] = useState({
@@ -942,6 +949,27 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               <Icon name="trophy" size={20} color="#8B5CF6" />
               <Text style={[styles.editProfileButtonText, { color: '#8B5CF6' }]}>내 업적 보기</Text>
             </TouchableOpacity>
+            
+            {/* 세부 프로필 설정 버튼 */}
+            <TouchableOpacity 
+              style={[styles.editProfileButton, { backgroundColor: '#FF6B6B' + '10', marginTop: SPACING.sm }]}
+              onPress={() => setShowProfileDetailModal(true)}
+            >
+              <Icon name="person-circle" size={20} color="#FF6B6B" />
+              <Text style={[styles.editProfileButtonText, { color: '#FF6B6B' }]}>세부 프로필 설정</Text>
+              {profileCompleteness < 100 && (
+                <View style={styles.profileBadge}>
+                  <Text style={styles.profileBadgeText}>{profileCompleteness}%</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+            
+            {/* 프로필 가이드 메시지 */}
+            {profileGuideMessage && (
+              <View style={styles.profileGuide}>
+                <Text style={styles.profileGuideText}>{profileGuideMessage}</Text>
+              </View>
+            )}
           </View>
         </View>
 
@@ -1099,8 +1127,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
         <View style={styles.bottomSpace} />
       </ScrollView>
 
-      {/* 프로필 편집 모달 제거 */}
-      
+      {/* 세부 프로필 설정 모달 */}
+      <ProfileDetailModal
+        visible={showProfileDetailModal}
+        onClose={() => setShowProfileDetailModal(false)}
+        showGuide={true}
+      />
 
     </SafeAreaView>
   );
@@ -1553,6 +1585,33 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => {
   testButtonText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  // 프로필 완성도 스타일
+  profileBadge: {
+    position: 'absolute',
+    right: 12,
+    backgroundColor: '#FF6B6B',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  profileBadgeText: {
+    color: '#fff',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  profileGuide: {
+    marginTop: SPACING.sm,
+    padding: SPACING.sm,
+    backgroundColor: colors.background === '#1A202C' ? '#2D3748' : '#F7FAFC',
+    borderRadius: 8,
+    borderLeftWidth: 3,
+    borderLeftColor: '#FF6B6B',
+  },
+  profileGuideText: {
+    fontSize: FONT_SIZES.small,
+    color: colors.text.secondary,
+    lineHeight: 16,
   },
   });
 };

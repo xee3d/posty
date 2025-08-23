@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#7C3AED</color>
+    <color name="primary_dark">#6D28D9</color>
+    <color name="accent">#A855F7</color>
+    <color name="white">#000000</color>
+    <color name="black">#FFFFFF</color>
+    <color name="launch_background">#000000</color>
+    <color name="system_background">@android:color/system_neutral1_900</color>
+</resources>

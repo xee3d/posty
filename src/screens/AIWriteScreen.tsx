@@ -598,6 +598,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
           prompt: enhancedPrompt,
           tone: selectedTone as any,
           length: selectedLength,
+          platform: 'instagram', // 기본 플랫폼 추가
           hashtags: selectedHashtags.length > 0 ? selectedHashtags : (initialHashtagsList.length > 0 ? initialHashtagsList : undefined),
           includeEmojis: true, // 기본값으로 이모지 포함하여 생성
           generatePlatformVersions: true,
@@ -661,6 +662,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({ onNavigate, initialMode =
           prompt: photoPrompt,
           tone: selectedTone as any,
           length: selectedLength,
+          platform: 'instagram', // 기본 플랫폼 추가
           hashtags: selectedHashtags.length > 0 ? selectedHashtags : 
                    (imageAnalysisResult?.suggestedContent || initialHashtagsList || undefined),
           includeEmojis: true, // 기본값으로 이모지 포함하여 생성

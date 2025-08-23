@@ -5,4 +5,6 @@
     <color name="accent">#A855F7</color>
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
+    <color name="launch_background">#FFFFFF</color>
+    <color name="system_background">@android:color/system_neutral1_0</color>
 </resources>

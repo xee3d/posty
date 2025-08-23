@@ -21,6 +21,9 @@ import { ScaleButton, FadeInView } from '../components/AnimationComponents';
 import { soundManager } from '../utils/soundManager';
 import { Alert } from '../utils/customAlert';
 import { useAppSelector } from '../hooks/redux';
+import ProfileDetailModal from '../components/ProfileDetailModal';
+import { getProfileGuideMessage } from '../types/userProfile';
+import LinearGradient from 'react-native-linear-gradient';
 
 const { width } = Dimensions.get('window');
 
@@ -39,8 +42,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [expProgress, setExpProgress] = useState({ current: 0, required: 100, percentage: 0 });
+  const [showProfileDetailModal, setShowProfileDetailModal] = useState(false);
   
   const progressAnim = useRef(new Animated.Value(0)).current;
+  
+  // 프로필 완성도 관련
+  const profileCompleteness = userInfo.detailedProfile?.profileCompleteness || 0;
+  const profileGuideMessage = getProfileGuideMessage(profileCompleteness);
   
   // 디버깅을 위해 userInfo 확인
   useEffect(() => {
@@ -48,9 +56,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
       displayName: userInfo.displayName,
       photoURL: userInfo.photoURL,
       provider: userInfo.provider,
-      email: userInfo.email
+      email: userInfo.email,
+      detailedProfile: userInfo.detailedProfile,
+      profileCompleteness: profileCompleteness,
+      profileGuideMessage: profileGuideMessage
     });
-  }, [userInfo]);
+  }, [userInfo, profileCompleteness, profileGuideMessage]);
   
   // 소셜 로그인 정보
   const getProviderInfo = () => {
@@ -215,6 +226,33 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
               </View>
             )}
             
+            {/* 프로필 완성도 섹션 추가 */}
+            {profileGuideMessage && (
+              <TouchableOpacity
+                style={styles.profileGuideSection}
+                onPress={() => setShowProfileDetailModal(true)}
+                activeOpacity={0.8}
+              >
+                <LinearGradient
+                  colors={['#FFE5E5', '#FFF0F0']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.profileGuideGradient}
+                >
+                  <View style={styles.profileGuideContent}>
+                    <View style={styles.profileGuideLeft}>
+                      <Text style={styles.profileGuideTitle}>프로필 {profileCompleteness}% 완성</Text>
+                      <Text style={styles.profileGuideMessage}>{profileGuideMessage}</Text>
+                    </View>
+                    <Icon name="chevron-forward" size={20} color="#FF6B6B" />
+                  </View>
+                  <View style={styles.profileProgressBar}>
+                    <View style={[styles.profileProgressFill, { width: `${profileCompleteness}%` }]} />
+                  </View>
+                </LinearGradient>
+              </TouchableOpacity>
+            )}
+            
             <View style={styles.statsContainer}>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{profile?.totalPosts || 0}</Text>
@@ -278,6 +316,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
             </Text>
           </View>
         </FadeInView>
+
 
         {/* 카테고리 탭 */}
         <FadeInView delay={300}>
@@ -471,6 +510,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
           </View>
         </View>
       </Modal>
+      
+      {/* 프로필 세부 설정 모달 */}
+      <ProfileDetailModal
+        visible={showProfileDetailModal}
+        onClose={() => setShowProfileDetailModal(false)}
+        showGuide={true}
+      />
     </SafeAreaView>
   );
 };
@@ -901,6 +947,68 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     fontSize: FONT_SIZES.medium,
     fontWeight: '600',
     color: colors.white,
+  },
+  // 프로필 완성도 가이드 스타일
+  profileGuideSection: {
+    marginTop: SPACING.lg,
+    marginHorizontal: SPACING.sm,
+  },
+  profileGuideGradient: {
+    borderRadius: 16,
+    padding: SPACING.md,
+  },
+  profileGuideContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  profileGuideLeft: {
+    flex: 1,
+  },
+  profileGuideTitle: {
+    fontSize: FONT_SIZES.small,
+    fontWeight: '600',
+    color: '#FF6B6B',
+    marginBottom: 4,
+  },
+  profileGuideMessage: {
+    fontSize: FONT_SIZES.small,
+    color: '#666',
+    lineHeight: 18,
+  },
+  profileProgressBar: {
+    height: 4,
+    backgroundColor: 'rgba(255, 107, 107, 0.2)',
+    borderRadius: 2,
+    marginTop: SPACING.sm,
+    overflow: 'hidden',
+  },
+  profileProgressFill: {
+    height: '100%',
+    backgroundColor: '#FF6B6B',
+    borderRadius: 2,
+  },
+  // 임시 테스트 버튼 스타일
+  testButton: {
+    marginHorizontal: SPACING.lg,
+    marginVertical: SPACING.md,
+    backgroundColor: '#FF6B6B',
+    paddingVertical: SPACING.md,
+    borderRadius: 12,
+    alignItems: 'center',
+    shadowColor: '#FF6B6B',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  testButtonText: {
+    color: '#fff',
+    fontSize: FONT_SIZES.medium,
+    fontWeight: '600',
   },
 });
 
