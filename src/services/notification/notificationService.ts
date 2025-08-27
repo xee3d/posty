@@ -3,7 +3,14 @@
  * react-native-push-notification 기반 Firebase 대체 시스템
  */
 
-import { pushNotificationService } from './pushNotificationService';
+// pushNotificationService import를 안전하게 처리
+let pushNotificationService: any = null;
+try {
+  const pushNotificationModule = require('./pushNotificationService');
+  pushNotificationService = pushNotificationModule.pushNotificationService || pushNotificationModule.default;
+} catch (error) {
+  console.warn('📱 Push notification service import failed:', error?.message || 'Unknown error');
+}
 import { badgeService } from './badgeService';
 
 class NotificationService {
@@ -11,6 +18,12 @@ class NotificationService {
   async initialize() {
     try {
       console.log('📱 Initializing push notification service...');
+      
+      // pushNotificationService가 available한지 확인
+      if (!pushNotificationService) {
+        console.warn('⚠️ Push notification service not available, running in fallback mode');
+        return true; // fallback 모드로 계속 진행
+      }
       
       // 푸시 알림 서비스 초기화
       const success = await pushNotificationService.initialize();
@@ -35,8 +48,12 @@ class NotificationService {
   // 스케줄된 알림 설정
   private async setupScheduledNotifications() {
     try {
-      await pushNotificationService.scheduleLocalNotifications();
-      console.log('📅 Scheduled notifications set up successfully');
+      if (pushNotificationService && pushNotificationService.scheduleLocalNotifications) {
+        await pushNotificationService.scheduleLocalNotifications();
+        console.log('📅 Scheduled notifications set up successfully');
+      } else {
+        console.log('📅 Scheduled notifications not available in fallback mode');
+      }
     } catch (error) {
       console.error('📅 Failed to setup scheduled notifications:', error);
     }
@@ -45,8 +62,13 @@ class NotificationService {
   // 권한 요청
   async requestPermission(): Promise<boolean> {
     try {
-      const settings = await pushNotificationService.getNotificationSettings();
-      return settings.hasPermission;
+      if (pushNotificationService && pushNotificationService.getNotificationSettings) {
+        const settings = await pushNotificationService.getNotificationSettings();
+        return settings.hasPermission;
+      } else {
+        console.log('📱 Permission request not available in fallback mode');
+        return false;
+      }
     } catch (error) {
       console.error('📱 Permission request failed:', error);
       return false;
@@ -55,7 +77,17 @@ class NotificationService {
 
   // 디바이스 토큰 가져오기
   async getDeviceToken(): Promise<string | null> {
-    return pushNotificationService.getDeviceToken();
+    try {
+      if (pushNotificationService && pushNotificationService.getDeviceToken) {
+        return pushNotificationService.getDeviceToken();
+      } else {
+        console.log('📱 Device token not available in fallback mode');
+        return null;
+      }
+    } catch (error) {
+      console.error('📱 Get device token failed:', error);
+      return null;
+    }
   }
 
   // 서버에 토큰 등록 (호환성을 위해 유지)
@@ -65,17 +97,54 @@ class NotificationService {
 
   // 알림 설정 상태 확인
   async getNotificationSettings() {
-    return await pushNotificationService.getNotificationSettings();
+    try {
+      if (pushNotificationService && pushNotificationService.getNotificationSettings) {
+        return await pushNotificationService.getNotificationSettings();
+      } else {
+        return {
+          hasPermission: false,
+          token: null,
+          isEnabled: false
+        };
+      }
+    } catch (error) {
+      console.error('📱 Get notification settings failed:', error);
+      return {
+        hasPermission: false,
+        token: null,
+        isEnabled: false
+      };
+    }
   }
 
   // 스마트 알림 발송
   async sendSmartNotification(type: 'inactive_user' | 'content_suggestion' | 'achievement_unlock') {
-    return await pushNotificationService.sendSmartNotification(type);
+    try {
+      if (pushNotificationService && pushNotificationService.sendSmartNotification) {
+        return await pushNotificationService.sendSmartNotification(type);
+      } else {
+        console.log(`📱 Smart notification (${type}) not available in fallback mode`);
+        return false;
+      }
+    } catch (error) {
+      console.error('📱 Send smart notification failed:', error);
+      return false;
+    }
   }
 
   // 테스트 알림 발송
   async sendTestNotification() {
-    return await pushNotificationService.sendTestNotification();
+    try {
+      if (pushNotificationService && pushNotificationService.sendTestNotification) {
+        return await pushNotificationService.sendTestNotification();
+      } else {
+        console.log('📱 Test notification not available in fallback mode');
+        return false;
+      }
+    } catch (error) {
+      console.error('📱 Send test notification failed:', error);
+      return false;
+    }
   }
 
   // 배지 관련 메서드들

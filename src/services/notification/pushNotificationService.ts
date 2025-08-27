@@ -9,17 +9,17 @@ import { badgeService } from './badgeService';
 
 // 플랫폼별 푸시 알림 import
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
+
 let PushNotification: any = null;
 
 // Android용 푸시 알림 (Firebase 없이)
 if (Platform.OS === 'android') {
   try {
-    PushNotification = require('react-native-push-notification').default;
-    if (!PushNotification) {
-      PushNotification = require('react-native-push-notification');
-    }
+    const PushNotificationModule = require('react-native-push-notification');
+    PushNotification = PushNotificationModule.default || PushNotificationModule;
   } catch (error) {
-    console.warn('📱 Android push notification not available:', error.message);
+    console.warn('📱 Android push notification not available:', error?.message || 'Unknown error');
+    PushNotification = null;
   }
 }
 
@@ -162,31 +162,45 @@ export class PushNotificationService {
         return;
       }
 
-      // Android 푸시 알림 설정 (Firebase 없이)
-      PushNotification.configure({
-        onNotification: async (notification) => {
-          console.log('📱 Android notification received:', notification);
-          await badgeService.handlePushNotification(notification);
-          
-          if (notification.userInteraction) {
-            await badgeService.handleAppActive();
-            this.handleNotificationPress(notification.data);
-          }
-        },
+      // NativeEventEmitter 문제를 방지하기 위해 조건부로 설정
+      if (PushNotification.configure && typeof PushNotification.configure === 'function') {
+        // Android 푸시 알림 설정 (Firebase 없이)
+        PushNotification.configure({
+          onNotification: async (notification) => {
+            console.log('📱 Android notification received:', notification);
+            await badgeService.handlePushNotification(notification);
+            
+            if (notification.userInteraction) {
+              await badgeService.handleAppActive();
+              this.handleNotificationPress(notification.data);
+            }
+          },
 
-        onRegister: async (token) => {
-          console.log('📱 Android push notification token:', token);
-          this.deviceToken = token.token;
-          await this.sendTokenToServer(token.token);
-        },
+          onRegister: async (token) => {
+            console.log('📱 Android push notification token:', token);
+            this.deviceToken = token.token;
+            await this.sendTokenToServer(token.token);
+          },
 
-        // Firebase 없이 로컬 알림만 사용
-        requestPermissions: false, // Android는 별도 권한 요청 불필요
-        popInitialNotification: true,
-      });
+          // Firebase 없이 로컬 알림만 사용
+          requestPermissions: false, // Android는 별도 권한 요청 불필요
+          popInitialNotification: true,
+        });
+      } else {
+        console.warn('📱 Android PushNotification.configure not available');
+        // Fallback: 토큰 생성만 진행
+        await this.generateDeviceToken();
+      }
 
     } catch (error) {
       console.error('📱 Android notification setup failed:', error);
+      // 오류 발생 시 fallback 토큰 생성
+      try {
+        await this.generateDeviceToken();
+        console.log('📱 Android notification fallback mode activated');
+      } catch (fallbackError) {
+        console.error('📱 Android notification fallback also failed:', fallbackError);
+      }
     }
   }
 
@@ -339,7 +353,8 @@ export class PushNotificationService {
           repeatInterval: schedule === 'weekly' ? 'week' : 'day',
           userInfo: payload.data,
         });
-      } else if (Platform.OS === 'android' && PushNotification && PushNotification.localNotificationSchedule) {
+      } else if (Platform.OS === 'android' && PushNotification && 
+                 typeof PushNotification.localNotificationSchedule === 'function') {
         // Android 로컬 알림 스케줄링
         PushNotification.localNotificationSchedule({
           title: payload.title,
@@ -388,7 +403,8 @@ export class PushNotificationService {
           userInfo: notification.data,
           isSilent: false,
         });
-      } else if (Platform.OS === 'android' && PushNotification && PushNotification.localNotification) {
+      } else if (Platform.OS === 'android' && PushNotification && 
+                 typeof PushNotification.localNotification === 'function') {
         // Android 즉시 로컬 알림
         PushNotification.localNotification({
           title: notification.title,
