@@ -25,6 +25,7 @@ import Animated, {
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from './src/store';
+import { ThemeProvider } from './src/contexts/ThemeContext';
 // Auth removed - using Vercel-based social login instead
 
 // Import screens
@@ -39,10 +40,11 @@ import { TermsOfServiceScreen, PrivacyPolicyScreen } from './src/screens/documen
 import TabNavigator from './src/components/TabNavigator';
 import ProfileScreen from './src/screens/ProfileScreen';
 import AchievementNotification from './src/components/AchievementNotification';
+import ThemeTestScreen from './src/screens/ThemeTestScreen';
 
 // Import constants and hooks
 import { COLORS } from './src/utils/constants';
-import { useAppTheme } from './src/hooks/useAppTheme';
+import { useTheme } from './src/contexts/ThemeContext';
 
 // Import services
 import adService from './src/services/adService';
@@ -83,8 +85,9 @@ const ANIMATION_CONFIG = {
   EASING: Easing.out(Easing.cubic),
 };
 
-const App: React.FC = () => {
-  const { colors, isDark } = useAppTheme();
+// Inner app component that uses the theme
+const AppContent: React.FC = () => {
+  const { colors, isDark } = useTheme(); // Use new theme system
   const [activeTab, setActiveTab] = useState('home');
   const [isAnimating, setIsAnimating] = useState(false);
   const [photoMode, setPhotoMode] = useState(false);
@@ -428,7 +431,14 @@ const App: React.FC = () => {
     });
   }, [activeTab, isAnimating, opacity, translateX, scale, onAnimationComplete]);
 
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  // Convert new theme colors to legacy format for createStyles
+  const legacyColors = {
+    ...COLORS,
+    primary: colors.accent,
+    background: colors.background,
+    surface: colors.surface,
+  };
+  const styles = useMemo(() => createStyles(legacyColors), [colors]);
 
   // renderScreen을 useMemo로 최적화
   const renderScreen = useMemo(() => {
@@ -521,11 +531,13 @@ const App: React.FC = () => {
           />
         );
       case 'terms':
-        return <TermsOfServiceScreen key="terms" onNavigate={handleTabPress} />;
+        return <TermsOfServiceScreen key="terms" onBack={() => handleTabPress('settings')} onNavigate={handleTabPress} />;
       case 'privacy':
-        return <PrivacyPolicyScreen key="privacy" onNavigate={handleTabPress} />;
+        return <PrivacyPolicyScreen key="privacy" onBack={() => handleTabPress('settings')} onNavigate={handleTabPress} />;
       case 'profile':
         return <ProfileScreen key="profile" navigation={{ goBack: () => handleTabPress('settings') }} />;
+      case 'theme-test':
+        return <ThemeTestScreen key="theme-test" onNavigate={handleTabPress} />;
       default:
         return <HomeScreen key="home" onNavigate={handleTabPress} />;
     }
@@ -549,48 +561,57 @@ const App: React.FC = () => {
   console.log('[App] Main render - showSplash:', showSplash, 'needsOnboarding:', needsOnboarding);
 
   return (
+    <AlertProvider ref={(ref) => {
+      alertRef.current = ref;
+      if (ref) {
+        AlertManager.setAlertRef(ref);
+      }
+    }}>
+      <View style={styles.container}>
+        <StatusBar 
+          backgroundColor={colors.surface} 
+          barStyle={isDark ? "light-content" : "dark-content"} 
+        />
+        <Animated.View style={[styles.content, animatedStyle]}>
+          {renderScreen}
+        </Animated.View>
+        {activeTab !== 'login' && !needsOnboarding && !showMinimalWelcome && (
+          <TabNavigator 
+            activeTab={activeTab} 
+            onTabPress={handleTabPress} 
+          />
+        )}
+        {activeTab !== 'login' && !needsOnboarding && !showMinimalWelcome && (
+          <AchievementNotification 
+            onNavigateToProfile={() => handleTabPress('profile')} 
+          />
+        )}
+      </View>
+    </AlertProvider>
+  );
+};
+
+// Main App component with providers
+const App: React.FC = () => {
+  return (
     <Provider store={store}>
       <PersistGate 
         loading={
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={colors.primary} />
+          <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <ActivityIndicator size="large" color="#7C65FF" />
           </View>
         } 
         persistor={persistor}
       >
-        <AlertProvider ref={(ref) => {
-          alertRef.current = ref;
-          if (ref) {
-            AlertManager.setAlertRef(ref);
-          }
-        }}>
-          <View style={styles.container}>
-            <StatusBar 
-              backgroundColor={colors.surface} 
-              barStyle={isDark ? "light-content" : "dark-content"} 
-            />
-            <Animated.View style={[styles.content, animatedStyle]}>
-              {renderScreen}
-            </Animated.View>
-            {activeTab !== 'login' && !needsOnboarding && !showMinimalWelcome && (
-              <TabNavigator 
-                activeTab={activeTab} 
-                onTabPress={handleTabPress} 
-              />
-            )}
-            {activeTab !== 'login' && !needsOnboarding && !showMinimalWelcome && (
-              <AchievementNotification 
-                onNavigateToProfile={() => handleTabPress('profile')} 
-              />
-            )}
-          </View>
-        </AlertProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
       </PersistGate>
     </Provider>
   );
 };
 
-const createStyles = (colors: typeof COLORS) => 
+const createStyles = (colors: any) => 
   StyleSheet.create({
     container: {
       flex: 1,

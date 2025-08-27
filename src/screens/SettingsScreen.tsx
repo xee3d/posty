@@ -5,6 +5,7 @@ import { COLORS, FONTS, SPACING, BORDER_RADIUS, PLATFORMS, BRAND, CARD_THEME, TY
 import Icon from 'react-native-vector-icons/Ionicons';
 import { APP_TEXT } from '../utils/textConstants';
 import { useAppTheme } from '../hooks/useAppTheme';
+import { useTheme } from '../contexts/ThemeContext';
 import { storage } from '../utils/storage';
 import socialMediaService from '../services/socialMediaService';
 // ProfileEditModal 제거
@@ -42,6 +43,7 @@ interface SettingsScreenProps {
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   // useAppTheme으로 변경하여 기존 코드와의 호환성 확보
   const { themeMode, colors, isDark, changeTheme, cardTheme } = useAppTheme();
+  const { resetThemeToDefault } = useTheme();
   const dispatch = useAppDispatch();
   const timer = useTimer();
   const reduxUser = useAppSelector(state => state.user);
@@ -524,6 +526,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               
               // Redux 상태 초기화
               dispatch(resetUser());
+              
+              // 테마 초기화
+              resetThemeToDefault();
               
               // 모든 로컬 데이터 초기화
               const authKeys = [

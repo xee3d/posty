@@ -207,9 +207,9 @@ const createStyles = (colors: typeof COLORS) =>
       paddingBottom: 20,
       paddingTop: 8,
       elevation: 8,
-      shadowColor: '#000',
+      shadowColor: colors.background === '#000000' ? '#FFFFFF' : '#000000',
       shadowOffset: { width: 0, height: -2 },
-      shadowOpacity: colors.background === '#000000' ? 0.3 : 0.1,
+      shadowOpacity: colors.background === '#000000' ? 0.15 : 0.1,
       shadowRadius: 4,
     },
     tab: {

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { LIGHT_COLORS, DARK_COLORS } from '../utils/constants';
 import { getUnifiedColors, getUnifiedShadows, getUnifiedCardTheme } from '../styles/themeStyles';
+import { useTheme } from '../contexts/ThemeContext';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
 
@@ -14,32 +15,57 @@ const notifyListeners = () => {
 };
 
 export const useAppTheme = () => {
-  const systemColorScheme = useColorScheme();
-  const [, forceUpdate] = useState({});
-  
-  // 컴포넌트가 마운트될 때 리스너 등록
-  useEffect(() => {
-    const listener = () => forceUpdate({});
-    globalListeners.push(listener);
-    
-    return () => {
-      globalListeners = globalListeners.filter(l => l !== listener);
-    };
-  }, []);
+  // 새로운 테마 시스템 사용
+  const { themeMode, setThemeMode, colors: newColors, isDark } = useTheme();
 
-  // 테마 변경
-  const changeTheme = (newTheme: ThemeMode) => {
-    globalThemeMode = newTheme;
-    notifyListeners();
+  // 기존 API와의 호환성을 위한 변환
+  const changeTheme = setThemeMode;
+
+  // 새로운 테마 색상을 완전히 우선시
+  const colors = {
+    // 새로운 테마 색상으로 먼저 구성
+    primary: newColors.accent,
+    background: newColors.background,
+    surface: newColors.surface,
+    cardBackground: newColors.cardBackground || newColors.surface,
+    border: newColors.border,
+    lightGray: newColors.lightGray || (isDark ? '#2A2A2A' : '#F5F5F5'),
+    white: newColors.white,
+    // 상태 색상들
+    success: newColors.success,
+    warning: newColors.warning,
+    error: newColors.error,
+    // 액센트 관련
+    accentLight: newColors.accentLight,
+    // 텍스트 색상 직접 매핑
+    text: {
+      primary: newColors.textPrimary,
+      secondary: newColors.textSecondary,
+      tertiary: newColors.textTertiary,
+    },
+    // 레거시 색상들은 fallback으로만 사용
+    ...(isDark ? DARK_COLORS : LIGHT_COLORS),
+    // 다시 새로운 테마 색상으로 덮어쓰기 (확실히 하기 위해)
+    primary: newColors.accent,
+    background: newColors.background,
+    surface: newColors.surface,
+    border: newColors.border,
+    text: {
+      primary: newColors.textPrimary,
+      secondary: newColors.textSecondary, 
+      tertiary: newColors.textTertiary,
+    },
   };
 
-  // 현재 다크모드 여부 계산
-  const isDark = globalThemeMode === 'system' 
-    ? systemColorScheme === 'dark'
-    : globalThemeMode === 'dark';
-
-  // 기존 색상 (하위 호환성을 위해 유지)
-  const colors = isDark ? DARK_COLORS : LIGHT_COLORS;
+  // 디버깅용 로그 (개발 환경에서만)
+  if (__DEV__ && isDark) {
+    console.log('[useAppTheme] Dark theme text colors:', {
+      primary: colors.text.primary,
+      secondary: colors.text.secondary,
+      tertiary: colors.text.tertiary,
+      newColorsPrimary: newColors.textPrimary,
+    });
+  }
   
   // 통합된 색상과 테마 가져오기
   const unifiedColors = getUnifiedColors(isDark);
@@ -49,14 +75,14 @@ export const useAppTheme = () => {
   // 기존 cardTheme (하위 호환성을 위해 유지)
   const cardTheme = {
     molly: {
-      background: isDark ? '#1A1A1A' : colors.accentLight,
+      background: isDark ? newColors.surface : colors.accentLight,
       iconBackground: colors.primary,
       iconColor: colors.white,
       titleColor: colors.text.primary,
       textColor: colors.text.secondary,
       button: {
         background: colors.primary,
-        text: isDark ? '#000000' : colors.white,
+        text: colors.white,
       },
     },
     default: {
@@ -69,7 +95,7 @@ export const useAppTheme = () => {
   };
 
   return {
-    themeMode: globalThemeMode,
+    themeMode,
     isDark,
     colors,
     cardTheme,
