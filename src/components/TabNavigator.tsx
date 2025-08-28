@@ -73,6 +73,7 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ activeTab, onTabPress }) =>
   });
 
   const handleTabPress = (tabKey: string) => {
+    console.log('[TabNavigator] Tab pressed:', tabKey);
     // 간단하고 부드러운 탭 애니메이션
     if (activeTab !== tabKey) {
       animatingTab.value = tabKey;

@@ -27,7 +27,7 @@ interface NewsItem {
 class TrendService {
   private readonly CACHE_KEY = 'TREND_CACHE';
   private readonly CACHE_VERSION_KEY = 'TREND_CACHE_VERSION';
-  private readonly CACHE_VERSION = '2.2'; // 뉴스/검색어 트렌드 개선 버전
+  private readonly CACHE_VERSION = '2.5'; // shuffleArray 수정 및 Google 트렌드 디버그 추가
   private readonly CACHE_DURATION = 1000 * 60 * 30; // 30분마다 업데이트 (더 자주 새로고침)
   
   // NewsAPI 키 (무료 플랜)
@@ -53,12 +53,24 @@ class TrendService {
       if (cached && !this.USE_REAL_API) {
         const cacheInfo = await this.getCacheAge();
         console.log(`[TrendService] Using cached trends (age: ${cacheInfo.ageInMinutes} minutes)`);
+        // 각 소스별 개수 확인
+        const sources = cached.reduce((acc, trend) => {
+          acc[trend.source] = (acc[trend.source] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
+        console.log('[TrendService] Cached trends by source:', sources);
         return cached;
       } else if (cached && this.USE_REAL_API) {
         const cacheInfo = await this.getCacheAge();
         // 실시간 API 사용 시 4시간 이상 된 캐시는 무시
         if (cacheInfo.ageInMinutes < 240) { // 4시간 = 240분
           console.log(`[TrendService] Using cached trends (age: ${cacheInfo.ageInMinutes} minutes)`);
+          // 각 소스별 개수 확인
+          const sources = cached.reduce((acc, trend) => {
+            acc[trend.source] = (acc[trend.source] || 0) + 1;
+            return acc;
+          }, {} as Record<string, number>);
+          console.log('[TrendService] Cached trends by source:', sources);
           return cached;
         }
         console.log(`[TrendService] Cache too old (${cacheInfo.ageInMinutes} minutes), fetching new data`);
@@ -115,6 +127,14 @@ class TrendService {
       
       // 캐시 저장
       await this.cacheTrends(allTrends);
+      
+      // 각 소스별 개수 확인
+      const sources = allTrends.reduce((acc, trend) => {
+        acc[trend.source] = (acc[trend.source] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      console.log(`[TrendService] Generated new trends: ${allTrends.length} items`);
+      console.log('[TrendService] New trends by source:', sources);
       
       return allTrends;
     } catch (error) {
@@ -612,8 +632,10 @@ class TrendService {
       
       // 모든 트렌드 합치고 중복 제거
       const allTrends = [...timeBasedTrends, ...seasonalTrends, ...realtimeTrends];
-      const uniqueTrends = allTrends.filter((trend, index, self) =>
-        index === self.findIndex((t) => t.title === trend.title)
+      // null/undefined 항목 제거 후 중복 제거 (같은 제목의 트렌드 제거)
+      const validTrends = allTrends.filter(trend => trend && trend.title);
+      const uniqueTrends = validTrends.filter((trend, index, self) =>
+        index === self.findIndex((t) => t && t.title === trend.title)
       );
       
       // 순서 섞기
@@ -647,11 +669,13 @@ class TrendService {
    * Google/Naver 검색어 트렌드 (언어별 검색어)
    */
   private getGoogleTrends(): TrendItem[] {
+    console.log('[TrendService] getGoogleTrends() called');
     const now = new Date();
     const hour = now.getHours();
     const month = now.getMonth() + 1;
     const randomSeed = Math.floor(now.getTime() / (1000 * 60 * 30)); // 30분마다 변경
     const isKoreanDevice = isKorean();
+    console.log('[TrendService] Google Trends - Is Korean Device:', isKoreanDevice);
     
     if (isKoreanDevice) {
       // 한국어 실시간 검색어 (네이버/구글 스타일)
@@ -706,16 +730,25 @@ class TrendService {
       const shuffled = this.shuffleArray(weightedTrends, randomSeed);
       const selectedTrends = shuffled.slice(0, count);
       
-      return selectedTrends.map((trend, index) => ({
-        id: `search-kr-${index}-${randomSeed}`,
-        title: trend.title,
-        category: trend.category,
-        source: 'google' as const,
-        timestamp: new Date().toISOString(),
-        hashtags: trend.hashtags,
-        volume: 1000 + Math.floor(Math.sin(randomSeed + index) * 5000) + 2000, // 1000-8000
-        change: Math.floor(Math.sin(randomSeed + index + 100) * 200) - 100, // -100 ~ +100
-      }));
+      const googleTrendsResult = selectedTrends.map((trend, index) => {
+        if (!trend || !trend.title) {
+          console.error('[TrendService] Google Trends - Invalid trend item:', trend);
+          return null;
+        }
+        return {
+          id: `search-kr-${index}-${randomSeed}`,
+          title: trend.title,
+          category: trend.category,
+          source: 'google' as const,
+          timestamp: new Date().toISOString(),
+          hashtags: trend.hashtags,
+          volume: 1000 + Math.floor(Math.sin(randomSeed + index) * 5000) + 2000, // 1000-8000
+          change: Math.floor(Math.sin(randomSeed + index + 100) * 200) - 100, // -100 ~ +100
+        };
+      }).filter(item => item !== null);
+      
+      console.log('[TrendService] Google Trends result count:', googleTrendsResult.length);
+      return googleTrendsResult;
     } else {
       // 영어권 Google 트렌드
       const googleTrends = [
@@ -729,15 +762,24 @@ class TrendService {
         { title: 'Weather forecast', category: 'life', hashtags: ['weather', 'forecast', 'climate'] },
       ];
       
-      return googleTrends.map((trend, index) => ({
-        id: `google-${index}`,
-        title: trend.title,
-        category: trend.category,
-        source: 'google' as const,
-        timestamp: new Date().toISOString(),
-        hashtags: trend.hashtags,
-        volume: Math.floor(Math.random() * 10000) + 1000,
-      }));
+      const englishTrendsResult = googleTrends.map((trend, index) => {
+        if (!trend || !trend.title) {
+          console.error('[TrendService] Google Trends (English) - Invalid trend item:', trend);
+          return null;
+        }
+        return {
+          id: `google-${index}`,
+          title: trend.title,
+          category: trend.category,
+          source: 'google' as const,
+          timestamp: new Date().toISOString(),
+          hashtags: trend.hashtags,
+          volume: Math.floor(Math.random() * 10000) + 1000,
+        };
+      }).filter(item => item !== null);
+      
+      console.log('[TrendService] Google Trends (English) result count:', englishTrendsResult.length);
+      return englishTrendsResult;
     }
   }
   
@@ -854,13 +896,24 @@ class TrendService {
    * 배열 섞기 (시드 기반)
    */
   private shuffleArray<T>(array: T[], seed: number): T[] {
+    if (!array || array.length === 0) {
+      console.error('[TrendService] shuffleArray - Invalid array:', array);
+      return [];
+    }
+    
     const arr = [...array];
     let currentIndex = arr.length;
     
     while (currentIndex !== 0) {
-      const randomIndex = Math.floor((Math.sin(seed++) * 10000 - Math.floor(Math.sin(seed) * 10000)) * currentIndex);
+      // 더 안전한 시드 기반 랜덤 인덱스 생성
+      const seedValue = (Math.sin(seed++) + 1) / 2; // 0~1 사이의 값
+      const randomIndex = Math.floor(seedValue * currentIndex);
       currentIndex--;
-      [arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
+      
+      // 유효한 인덱스인지 확인
+      if (randomIndex >= 0 && randomIndex < arr.length && currentIndex >= 0 && currentIndex < arr.length) {
+        [arr[currentIndex], arr[randomIndex]] = [arr[randomIndex], arr[currentIndex]];
+      }
     }
     
     return arr;

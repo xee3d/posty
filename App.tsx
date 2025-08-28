@@ -358,6 +358,7 @@ const AppContent: React.FC = () => {
 
   // 최적화된 handleTabPress - 깜빡거림 완전 방지
   const handleTabPress = useCallback((tab: string, data?: any) => {
+    console.log(`[App] Tab press requested: ${tab}, current: ${activeTab}, animating: ${isAnimating}`);
     if (isAnimating || (tab === activeTab && tab !== 'ai-write-photo')) return;
     
     // 전달받은 데이터 저장

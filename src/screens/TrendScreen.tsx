@@ -33,6 +33,7 @@ interface TrendScreenProps {
 }
 
 const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
+  console.log('[TrendScreen] ===== Component Mounted/Rendered =====');
   const { colors, isDark } = useAppTheme();
   
   // 구독 플랜 정보
