@@ -70,7 +70,6 @@ export const THEME_COLORS = [
 ];
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  console.log('🎨 ThemeProvider - Initializing...');
   const [themeMode, setThemeMode] = useState<ThemeMode>('system');
   const [themeColor, setThemeColor] = useState<string>('#7C65FF');
   const [systemColorScheme, setSystemColorScheme] = useState<ColorSchemeName>(
@@ -80,8 +79,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   
   // Redux에서 사용자 정보 가져오기
   const userId = useSelector((state: RootState) => state.user.userId || state.user.uid);
-  
-  console.log('🎨 ThemeProvider - Initial state:', { themeMode, themeColor, systemColorScheme, userId });
 
   // 저장된 테마 설정 로드
   useEffect(() => {
@@ -89,8 +86,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       try {
         // 사용자별 테마 저장 키 생성
         const userThemeKeys = getThemeStorageKeys(userId);
-        
-        console.log('🎨 Loading theme settings for user:', userId, 'with keys:', userThemeKeys);
         
         // 먼저 사용자별 테마 설정 확인
         let [savedMode, savedColor] = await Promise.all([
@@ -100,14 +95,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
         // 사용자별 설정이 없으면 레거시 설정 확인 및 마이그레이션
         if (!savedMode || !savedColor) {
-          console.log('🎨 No user-specific theme found, checking legacy settings...');
           const [legacyMode, legacyColor] = await Promise.all([
             AsyncStorage.getItem(THEME_STORAGE_KEYS.MODE),
             AsyncStorage.getItem(THEME_STORAGE_KEYS.COLOR),
           ]);
           
           if (legacyMode || legacyColor) {
-            console.log('🎨 Found legacy theme settings, migrating to user-specific...');
             savedMode = savedMode || legacyMode;
             savedColor = savedColor || legacyColor;
             
@@ -122,12 +115,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         }
 
         if (savedMode && ['light', 'dark', 'system'].includes(savedMode)) {
-          console.log('ThemeProvider - Loaded theme mode:', savedMode, 'for user:', userId);
           setThemeMode(savedMode as ThemeMode);
         }
 
         if (savedColor) {
-          console.log('ThemeProvider - Loaded theme color:', savedColor, 'for user:', userId);
           setThemeColor(savedColor);
         }
       } catch (error) {
@@ -143,7 +134,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // 사용자 변경 시 테마 초기화 (로그아웃 시)
   useEffect(() => {
     if (!userId) {
-      console.log('🎨 User logged out, resetting theme to default');
       resetThemeToDefault();
     }
   }, [userId]);
@@ -151,7 +141,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // 시스템 테마 변경 감지
   useEffect(() => {
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
-      console.log('System color scheme changed to:', colorScheme);
       setSystemColorScheme(colorScheme);
     });
 
@@ -214,11 +203,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // 테마 색상 반환 (memoized)
+  // 테마 색상 반환 (memoized) - 깜빡거림 방지를 위한 안정적인 의존성
   const colors = useMemo((): ThemeColors => {
-    console.log('ThemeProvider - getColors called, isDark:', isDark, 'themeMode:', themeMode);
     return createColors(isDark, themeColor);
-  }, [isDark, themeColor, themeMode]);
+  }, [isDark, themeColor]);
 
   // 로딩 중일 때 사용할 기본 색상
   const defaultColors = useMemo((): ThemeColors => {
@@ -227,26 +215,22 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [systemColorScheme]);
 
   const handleSetThemeMode = async (mode: ThemeMode) => {
-    console.log('ThemeProvider - Setting theme mode to:', mode, 'for user:', userId);
     setThemeMode(mode);
     
     try {
       const userThemeKeys = getThemeStorageKeys(userId);
       await AsyncStorage.setItem(userThemeKeys.MODE, mode);
-      console.log('ThemeProvider - Theme mode saved:', mode, 'for user:', userId);
     } catch (error) {
       console.error('테마 모드 저장 실패:', error);
     }
   };
 
   const handleSetThemeColor = async (color: string) => {
-    console.log('ThemeProvider - Setting theme color to:', color, 'for user:', userId);
     setThemeColor(color);
     
     try {
       const userThemeKeys = getThemeStorageKeys(userId);
       await AsyncStorage.setItem(userThemeKeys.COLOR, color);
-      console.log('ThemeProvider - Theme color saved:', color, 'for user:', userId);
     } catch (error) {
       console.error('테마 색상 저장 실패:', error);
     }
@@ -254,12 +238,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // 사용자 로그아웃 시 테마 초기화
   const resetThemeToDefault = () => {
-    console.log('🎨 Resetting theme to default for logout');
     setThemeMode('system');
     setThemeColor('#7C65FF');
   };
 
-  // Legacy card theme compatibility
+  // Legacy card theme compatibility (memoized)
   const cardTheme = useMemo(() => ({
     molly: {
       background: colors.accentLight,
@@ -280,65 +263,42 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     },
   }), [colors]);
 
-  // 로딩 중일 때는 기본 테마 사용
-  if (!isLoaded) {
-    return (
-      <ThemeContext.Provider
-        value={{
-          themeMode: 'system',
-          themeColor: '#7C65FF',
-          systemColorScheme,
-          isDark: systemColorScheme === 'dark',
-          colors: defaultColors,
-          setThemeMode: handleSetThemeMode,
-          setThemeColor: handleSetThemeColor,
-          resetThemeToDefault,
-          // Legacy compatibility
-          theme: 'system',
-          setTheme: handleSetThemeMode,
-          cardTheme: {
-            molly: {
-              background: defaultColors.accentLight,
-              iconBackground: defaultColors.primary,
-              iconColor: defaultColors.white,
-              titleColor: defaultColors.text,
-              textColor: defaultColors.textSecondary,
-              button: {
-                background: defaultColors.primary,
-                text: defaultColors.white,
-              },
-            },
-            default: {
-              background: defaultColors.surface,
-              titleColor: defaultColors.text,
-              textColor: defaultColors.textSecondary,
-              borderColor: defaultColors.border,
-            },
-          },
-        }}
-      >
-        {children}
-      </ThemeContext.Provider>
-    );
-  }
+  // Context 값을 안정적으로 memoized
+  const contextValue = useMemo(() => ({
+    themeMode,
+    themeColor,
+    systemColorScheme,
+    isDark,
+    colors: isLoaded ? colors : defaultColors,
+    setThemeMode: handleSetThemeMode,
+    setThemeColor: handleSetThemeColor,
+    resetThemeToDefault,
+    // Legacy compatibility
+    theme: themeMode,
+    setTheme: handleSetThemeMode,
+    cardTheme: isLoaded ? cardTheme : {
+      molly: {
+        background: defaultColors.accentLight,
+        iconBackground: defaultColors.primary,
+        iconColor: defaultColors.white,
+        titleColor: defaultColors.text,
+        textColor: defaultColors.textSecondary,
+        button: {
+          background: defaultColors.primary,
+          text: defaultColors.white,
+        },
+      },
+      default: {
+        background: defaultColors.surface,
+        titleColor: defaultColors.text,
+        textColor: defaultColors.textSecondary,
+        borderColor: defaultColors.border,
+      },
+    },
+  }), [themeMode, themeColor, systemColorScheme, isDark, colors, defaultColors, cardTheme, isLoaded, handleSetThemeMode, handleSetThemeColor, resetThemeToDefault]);
 
   return (
-    <ThemeContext.Provider
-      value={{
-        themeMode,
-        themeColor,
-        systemColorScheme,
-        isDark,
-        colors,
-        setThemeMode: handleSetThemeMode,
-        setThemeColor: handleSetThemeColor,
-        resetThemeToDefault,
-        // Legacy compatibility
-        theme: themeMode,
-        setTheme: handleSetThemeMode,
-        cardTheme,
-      }}
-    >
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );

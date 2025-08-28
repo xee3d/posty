@@ -49,49 +49,20 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ activeTab, onTabPress }) =>
   const indicatorPosition = useSharedValue(0);
   const indicatorWidth = useSharedValue(TAB_WIDTH);
   
-  // Shared values for each tab's bounce animation - 각 탭별로 개별 생성
-  const homeScaleX = useSharedValue(1);
-  const homeScaleY = useSharedValue(1);
-  const aiWriteScaleX = useSharedValue(1);
-  const aiWriteScaleY = useSharedValue(1);
-  const trendScaleX = useSharedValue(1);
-  const trendScaleY = useSharedValue(1);
-  const myStyleScaleX = useSharedValue(1);
-  const myStyleScaleY = useSharedValue(1);
-  const settingsScaleX = useSharedValue(1);
-  const settingsScaleY = useSharedValue(1);
-  
-  // 탭별 애니메이션 값 매핑
-  const tabScalesX = {
-    'home': homeScaleX,
-    'ai-write': aiWriteScaleX,
-    'trend': trendScaleX,
-    'my-style': myStyleScaleX,
-    'settings': settingsScaleX,
-  };
-  
-  const tabScalesY = {
-    'home': homeScaleY,
-    'ai-write': aiWriteScaleY,
-    'trend': trendScaleY,
-    'my-style': myStyleScaleY,
-    'settings': settingsScaleY,
-  };
+  // 단일 공유 값으로 탭 애니메이션 최적화
+  const tabScale = useSharedValue(1);
+  const animatingTab = useSharedValue('');
 
   // Update indicator position with smooth animation
   useEffect(() => {
     const tabIndex = tabs.findIndex(tab => tab.key === activeTab);
     
-    // 빠르고 부드러운 스프링 애니메이션
-    indicatorPosition.value = withSpring(tabIndex * TAB_WIDTH, {
-      damping: 20,
-      stiffness: 300,
-      mass: 0.8,
-      overshootClamping: true,
-      restDisplacementThreshold: 0.01,
-      restSpeedThreshold: 0.01,
+    // 최적화된 timing 애니메이션으로 깜빡거림 방지
+    indicatorPosition.value = withTiming(tabIndex * TAB_WIDTH, {
+      duration: 250,
+      easing: Easing.bezier(0.25, 0.46, 0.45, 0.94), // easeOutQuad
     });
-  }, [activeTab, tabs, indicatorPosition]);
+  }, [activeTab]);
 
   // Animated style for indicator
   const indicatorStyle = useAnimatedStyle(() => {
@@ -102,47 +73,19 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ activeTab, onTabPress }) =>
   });
 
   const handleTabPress = (tabKey: string) => {
-    // 쫀득한 X축 스케일 애니메이션 (좌우로 줄어들기)
-    tabScalesX[tabKey].value = withSpring(0.9, {
-      damping: 18,
-      stiffness: 350,
-      mass: 0.7,
-    }, () => {
-      tabScalesX[tabKey].value = withSpring(1, {
-        damping: 15,
-        stiffness: 200,
-        mass: 1,
-      });
-    });
-    
-    // 쫀득한 Y축 스케일 애니메이션 (위아래로 줄어들기)
-    tabScalesY[tabKey].value = withSpring(0.8, {
-      damping: 20,
-      stiffness: 400,
-      mass: 0.6,
-    }, () => {
-      tabScalesY[tabKey].value = withSpring(1.05, {
-        damping: 18,
-        stiffness: 250,
-        mass: 0.8,
+    // 간단하고 부드러운 탭 애니메이션
+    if (activeTab !== tabKey) {
+      animatingTab.value = tabKey;
+      tabScale.value = withTiming(0.95, {
+        duration: 100,
+        easing: Easing.out(Easing.quad),
       }, () => {
-        tabScalesY[tabKey].value = withSpring(1, {
-          damping: 12,
-          stiffness: 180,
-          mass: 1,
+        tabScale.value = withTiming(1, {
+          duration: 150,
+          easing: Easing.out(Easing.quad),
         });
       });
-    });
-    
-    if (activeTab === tabKey) return;
-    
-    // 인디케이터 너비 애니메이션 (선택적)
-    indicatorWidth.value = withTiming(TAB_WIDTH * 0.8, { duration: 100 }, () => {
-      indicatorWidth.value = withSpring(TAB_WIDTH, {
-        damping: 15,
-        stiffness: 200,
-      });
-    });
+    }
     
     onTabPress(tabKey);
   };
@@ -157,13 +100,13 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ activeTab, onTabPress }) =>
         const IconComponent = tab.isMaterial ? MaterialIcon : Icon;
         const iconName = isActive ? tab.activeIcon : tab.icon;
 
-        // 각 탭의 X축/Y축 스케일 애니메이션 스타일
-        const tabAnimatedStyle = useAnimatedStyle(() => ({
-          transform: [
-            { scaleX: tabScalesX[tab.key].value },
-            { scaleY: tabScalesY[tab.key].value }
-          ],
-        }));
+        // 최적화된 단일 스케일 애니메이션
+        const tabAnimatedStyle = useAnimatedStyle(() => {
+          const isAnimating = animatingTab.value === tab.key;
+          return {
+            transform: [{ scale: isAnimating ? tabScale.value : 1 }],
+          };
+        });
 
         return (
           <TouchableOpacity
@@ -172,7 +115,7 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({ activeTab, onTabPress }) =>
             onPress={() => handleTabPress(tab.key)}
             activeOpacity={0.8}
           >
-            <Animated.View style={[tabAnimatedStyle]}>
+            <Animated.View style={tabAnimatedStyle}>
               <View style={[styles.iconContainer, isActive && styles.iconContainerActive]}>
                 <IconComponent
                   name={iconName}

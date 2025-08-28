@@ -30,6 +30,7 @@ interface AnimatedWrapperProps {
   style?: ViewStyle;
 }
 
+// 화면 전환 깜빡거림 방지를 위해 애니메이션 비활성화
 const AnimatedWrapper: React.FC<AnimatedWrapperProps> = ({
   children,
   animation = 'fade',
@@ -37,50 +38,9 @@ const AnimatedWrapper: React.FC<AnimatedWrapperProps> = ({
   delay = 0,
   style,
 }) => {
-  const getAnimation = () => {
-    switch (animation) {
-      case 'fade':
-        return {
-          entering: FadeIn.duration(duration).delay(delay),
-          exiting: FadeOut.duration(duration),
-        };
-      case 'slide':
-        return {
-          entering: SlideInRight.duration(duration).delay(delay),
-          exiting: SlideOutLeft.duration(duration),
-        };
-      case 'slideVertical':
-        return {
-          entering: FadeInDown.duration(duration).delay(delay),
-          exiting: FadeOutUp.duration(duration),
-        };
-      case 'scale':
-        return {
-          entering: ZoomIn.duration(duration).delay(delay),
-          exiting: ZoomOut.duration(duration),
-        };
-      case 'bounce':
-        return {
-          entering: BounceIn.duration(duration).delay(delay),
-          exiting: BounceOut.duration(duration),
-        };
-      default:
-        return {
-          entering: FadeIn.duration(duration).delay(delay),
-          exiting: FadeOut.duration(duration),
-        };
-    }
-  };
-
-  const { entering, exiting } = getAnimation();
-
+  // 애니메이션 비활성화 - 깜빡거림 방지
   return (
-    <Animated.View
-      entering={entering}
-      exiting={exiting}
-      layout={Layout.springify()}
-      style={style}
-    >
+    <Animated.View style={style}>
       {children}
     </Animated.View>
   );

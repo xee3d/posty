@@ -27,14 +27,16 @@ interface NewsItem {
 class TrendService {
   private readonly CACHE_KEY = 'TREND_CACHE';
   private readonly CACHE_VERSION_KEY = 'TREND_CACHE_VERSION';
-  private readonly CACHE_VERSION = '2.0'; // 버전 변경 시 캐시 초기화
-  private readonly CACHE_DURATION = 1000 * 60 * 60 * 4; // 4시간마다 업데이트 (트렌드는 자주 변하지 않음)
+  private readonly CACHE_VERSION = '2.2'; // 뉴스/검색어 트렌드 개선 버전
+  private readonly CACHE_DURATION = 1000 * 60 * 30; // 30분마다 업데이트 (더 자주 새로고침)
   
   // NewsAPI 키 (무료 플랜)
   private readonly NEWS_API_KEY = NEWS_API_KEY || '';
   
-  // 실시간 API 설정
-  private USE_REAL_API = true; // 서버 API 활성화
+  // 실시간 API 설정 - 뉴스/검색어는 별도 처리
+  private USE_REAL_API = false; // 서버 API 비활성화 (소셜 트렌드만)
+  private USE_NEWS_API = true; // 뉴스 API 활성화
+  private USE_GOOGLE_TRENDS = true; // Google 트렌드 활성화
   private API_BASE_URL = 'https://posty-api.vercel.app/api'; // 새 API URL
   
   /**
@@ -68,7 +70,7 @@ class TrendService {
         // 실시간 API 사용
         allTrends = await this.fetchRealTimeTrends();
       } else {
-        // 기존 로직 사용
+        // 기존 로직 사용 - 모든 소스 포함
         // 병렬로 여러 소스에서 트렌드 가져오기 (타임아웃 적용)
         const promises = [
           Promise.race([
@@ -87,17 +89,25 @@ class TrendService {
         
         const [newsTraends, redditTrends, naverTrends] = await Promise.allSettled(promises);
         
-        // 네이버 트렌드 우선 (한국 콘텐츠)
+        // 네이버 트렌드 우선 (한국 검색어)
         if (naverTrends.status === 'fulfilled' && naverTrends.value) {
           allTrends.push(...naverTrends.value);
         }
         
+        // Google 트렌드 추가 (검색어)
+        if (this.USE_GOOGLE_TRENDS) {
+          console.log('[TrendService] Adding Google trends');
+          const googleTrends = this.getGoogleTrends();
+          allTrends.push(...googleTrends.slice(0, 8)); // 최대 8개
+        }
+        
         // 뉴스 트렌드 추가
         if (newsTraends.status === 'fulfilled' && newsTraends.value) {
+          console.log('[TrendService] Adding news trends:', newsTraends.value.length);
           allTrends.push(...newsTraends.value);
         }
         
-        // Reddit 트렌드 마지막에 추가
+        // Reddit 트렌드 마지막에 추가 (소셜)
         if (redditTrends.status === 'fulfilled' && redditTrends.value) {
           allTrends.push(...redditTrends.value.slice(0, 5)); // 최대 5개만
         }
@@ -120,8 +130,9 @@ class TrendService {
     const country = getNewsAPICountry();
     const isKoreanDevice = isKorean();
     
-    // NewsAPI 키가 없거나 테스트 키인 경우 샘플 데이터 반환
-    if (!this.NEWS_API_KEY || this.NEWS_API_KEY === 'test-news-api-key') {
+    // API 사용 설정 확인 (우선 샘플 데이터 제공 후 실제 API 연동)
+    if (!this.USE_NEWS_API || !this.NEWS_API_KEY || this.NEWS_API_KEY === 'test-news-api-key') {
+      console.log('[TrendService] Using sample news data (API disabled or no key)');
       return this.getSampleNewsTrends(isKoreanDevice);
     }
     
@@ -159,36 +170,64 @@ class TrendService {
   }
   
   /**
-   * 샘플 뉴스 트렌드 (언어별)
+   * 샘플 뉴스 트렌드 (언어별) - 시간대별 실시간 뉴스
    */
   private getSampleNewsTrends(isKorean: boolean): TrendItem[] {
     const now = new Date();
     const month = now.getMonth() + 1;
-    const randomSeed = Math.floor(now.getTime() / (1000 * 60 * 60)); // 시간마다 변경
+    const hour = now.getHours();
+    const randomSeed = Math.floor(now.getTime() / (1000 * 60 * 30)); // 30분마다 변경
+    
+    // 시간대별 random 시드 함수
+    const seededRandom = (seed: number, max: number) => {
+      const x = Math.sin(seed) * 10000;
+      return Math.floor((x - Math.floor(x)) * max);
+    };
     
     if (isKorean) {
-      // 한국어 샘플 뉴스 풀
-      const newsPool = [
+      // 시간대별 뉴스 풀 구성
+      const morningNewsPool = [
+        { title: '오늘 전국 날씨 예보 - 흐림', hashtags: ['날씨', '예보', '기상청'] },
+        { title: '아침 출근길 지하철 지연', hashtags: ['지하철', '출근', '교통'] },
+        { title: '코스피 장 시작 전 전망', hashtags: ['코스피', '주식', '경제'] },
+        { title: '오늘 환율 동향 분석', hashtags: ['환율', '달러', '금융'] },
+        { title: '정부 오전 브리핑 예정', hashtags: ['정부', '브리핑', '정책'] },
+        { title: '교육청 새 학기 준비 현황', hashtags: ['교육', '새학기', '학교'] },
+      ];
+      
+      const afternoonNewsPool = [
+        { title: '대기업 오늘 실적 발표', hashtags: ['대기업', '실적', '경제'] },
+        { title: 'IT 기업 신기술 공개', hashtags: ['IT', '신기술', '혁신'] },
+        { title: '부동산 시장 최신 동향', hashtags: ['부동산', '주택', '시장'] },
+        { title: '오후 증시 상승세 지속', hashtags: ['증시', '상승', '투자'] },
+        { title: '국회 오늘 주요 안건 논의', hashtags: ['국회', '정치', '안건'] },
+        { title: '의료진 코로나 대응 점검', hashtags: ['의료', '코로나', '방역'] },
+      ];
+      
+      const eveningNewsPool = [
+        { title: '오늘 하루 코로나 확진 현황', hashtags: ['코로나', '확진', '방역'] },
+        { title: '연예계 화제의 근황', hashtags: ['연예', '방송', '스타'] },
+        { title: '스포츠 경기 결과 속보', hashtags: ['스포츠', '경기', '결과'] },
+        { title: '내일 날씨 전망', hashtags: ['날씨', '예보', '기상'] },
+        { title: '해외 주요 뉴스 정리', hashtags: ['해외', '국제', '뉴스'] },
+        { title: '저녁 교통 상황 안내', hashtags: ['교통', '퇴근', '도로'] },
+      ];
+      
+      // 메인 뉴스 풀 (언제나 포함)
+      const mainNewsPool = [
         // 경제
-        { title: '삼성전자, 신규 반도체 공장 건설', hashtags: ['삼성전자', '반도체', '투자'] },
-        { title: 'SK하이닉스, 미국 공장 확대 발표', hashtags: ['SK', '반도체', '미국'] },
-        { title: 'LG에너지솔루션, 유럽 시장 진출', hashtags: ['LG', '배터리', '유럽'] },
-        { title: '현대차, 전기차 판매 호조', hashtags: ['현대차', '전기차', '자동차'] },
-        { title: '코스피 역대 최고치 경신', hashtags: ['코스피', '주식', '경제'] },
-        { title: '원/달러 환율 변동성 확대', hashtags: ['환율', '달러', '경제'] },
-        // 기술/IT
-        { title: '카카오, AI 서비스 대규모 투자', hashtags: ['카카오', 'AI', '투자'] },
-        { title: '네이버, 클라우드 사업 확대', hashtags: ['네이버', '클라우드', 'IT'] },
-        { title: '쿠팡, 로켓배송 서비스 확대', hashtags: ['쿠팡', '로켓배송', '이커머스'] },
-        { title: 'AI 반도체 개발 경쟁 본격화', hashtags: ['AI', '반도체', '기술'] },
-        // 사회
-        { title: '직장인 워라밸 중요성 증가', hashtags: ['워라밸', '직장', '트렌드'] },
-        { title: 'MZ세대 투자 트렌드 변화', hashtags: ['MZ', '투자', '트렌드'] },
-        { title: '친환경 소비 트렌드 확산', hashtags: ['친환경', '소비', '환경'] },
-        // 문화
-        { title: 'K-콘텐츠 글로벌 인기 지속', hashtags: ['K콘텐츠', '한류', '문화'] },
-        { title: '한국 영화 국제 영화제 수상', hashtags: ['영화', '한국영화', '수상'] },
-        { title: 'K-팝 세계 투어 성황리', hashtags: ['K팝', '투어', '음악'] },
+        { title: '삼성전자 신제품 출시 임박', hashtags: ['삼성', '스마트폰', '출시'] },
+        { title: 'SK그룹 친환경 사업 확대', hashtags: ['SK', '친환경', '투자'] },
+        { title: '현대차 해외 수출 증가', hashtags: ['현대차', '수출', '자동차'] },
+        { title: 'LG 디스플레이 기술 혁신', hashtags: ['LG', '디스플레이', '기술'] },
+        // 기술/IT  
+        { title: '네이버 AI 서비스 업그레이드', hashtags: ['네이버', 'AI', '서비스'] },
+        { title: '카카오 새로운 플랫폼 론칭', hashtags: ['카카오', '플랫폼', '출시'] },
+        { title: '5G 통신망 전국 확산', hashtags: ['5G', '통신', '네트워크'] },
+        // 사회/문화
+        { title: 'K-드라마 해외 인기 급상승', hashtags: ['K드라마', '한류', '해외'] },
+        { title: '한국 관광업 회복 신호', hashtags: ['관광', '회복', '여행'] },
+        { title: '전국 대학 입시 경쟁 치열', hashtags: ['입시', '대학', '교육'] },
       ];
       
       // 계절별 추가 뉴스
@@ -215,9 +254,28 @@ class TrendService {
         ],
       };
       
-      // 뉴스 선택 (랜덤)
+      // 시간대별 뉴스 선택
       const selectedNews = [];
-      const shuffledMain = this.shuffleArray([...newsPool], randomSeed);
+      
+      // 시간대별 뉴스 추가
+      let timeBasedNews = [];
+      if (hour >= 6 && hour < 12) {
+        // 아침 뉴스 (6-12시)
+        const shuffled = this.shuffleArray([...morningNewsPool], randomSeed);
+        timeBasedNews = shuffled.slice(0, 2);
+      } else if (hour >= 12 && hour < 18) {
+        // 오후 뉴스 (12-18시)
+        const shuffled = this.shuffleArray([...afternoonNewsPool], randomSeed + 1);
+        timeBasedNews = shuffled.slice(0, 2);
+      } else {
+        // 저녁 뉴스 (18-06시)
+        const shuffled = this.shuffleArray([...eveningNewsPool], randomSeed + 2);
+        timeBasedNews = shuffled.slice(0, 2);
+      }
+      selectedNews.push(...timeBasedNews);
+      
+      // 메인 뉴스에서 추가 선택
+      const shuffledMain = this.shuffleArray([...mainNewsPool], randomSeed + 3);
       selectedNews.push(...shuffledMain.slice(0, 3));
       
       // 계절별 뉴스 추가
@@ -229,7 +287,7 @@ class TrendService {
       
       if (seasonNews.length > 0) {
         const shuffledSeason = this.shuffleArray([...seasonNews], randomSeed + 100);
-        selectedNews.push(...shuffledSeason.slice(0, 2));
+        selectedNews.push(...shuffledSeason.slice(0, 1)); // 계절 뉴스는 1개만
       }
       
       return selectedNews.map((news, index) => ({
@@ -311,35 +369,38 @@ class TrendService {
   }
   
   /**
-   * 샘플 소셜 트렌드 (언어별)
+   * 샘플 소셜 트렌드 (언어별) - 최신화된 트렌드
    */
   private getSampleSocialTrends(isKorean: boolean): TrendItem[] {
     console.log('[TrendService] getSampleSocialTrends called with isKorean:', isKorean);
     const month = new Date().getMonth() + 1;
+    const now = new Date();
+    const randomSeed = Math.floor(now.getTime() / (1000 * 60 * 30)); // 30분마다 변경
     
     if (isKorean) {
       let sampleSocialTrends = [];
       
       if (month >= 7 && month <= 8) { // 여름
         sampleSocialTrends = [
-          { title: '해수욕장에서 만난 귀여운 강아지', hashtags: ['강아지', '해수욕장', '여름'], volume: 3456 },
-          { title: '빙수 맛집 추천', hashtags: ['빙수', '카페', '디저트'], volume: 2890 },
-          { title: '여름 휴가 패킹 리스트', hashtags: ['휴가', '패킹', '여행'], volume: 2345 },
-          { title: '시원한 계곡 추천', hashtags: ['계곡', '여름', '휴가'], volume: 1987 },
-          { title: '여름 다이어트 루틴', hashtags: ['다이어트', '운동', '여름'], volume: 1654 },
+          { title: '여름 휴가 베스트 스팟', hashtags: ['휴가', '여행', '여름'], volume: 4500 },
+          { title: '홈카페 아이스 음료 레시피', hashtags: ['홈카페', '음료', '레시피'], volume: 3800 },
+          { title: '워터파크 추천 리스트', hashtags: ['워터파크', '물놀이', '여름'], volume: 3200 },
+          { title: '여름 패션 코디 아이디어', hashtags: ['패션', '코디', '여름'], volume: 2900 },
+          { title: '에어컨 없이 시원하게', hashtags: ['여름', '시원함', '라이프팁'], volume: 2600 },
         ];
       } else if (month >= 11 || month <= 2) { // 겨울
         sampleSocialTrends = [
-          { title: '크리스마스 트리 꾸미기 팁', hashtags: ['크리스마스', '인테리어', 'DIY'], volume: 2345 },
-          { title: '따뜻한 카페에서 읽은 책', hashtags: ['카페', '독서', '겨울'], volume: 2890 },
-          { title: '겨울 코트 추천', hashtags: ['패션', '겨울', '코트'], volume: 1987 },
+          { title: '따뜻한 홈카페 음료 레시피', hashtags: ['홈카페', '따뜻한', '겨울'], volume: 3400 },
+          { title: '겨울 실내 운동 루틴', hashtags: ['운동', '홈트', '겨울'], volume: 2800 },
+          { title: '연말 파티 준비 아이디어', hashtags: ['파티', '연말', '준비'], volume: 2500 },
+          { title: '겨울 독서 추천도서', hashtags: ['독서', '책', '겨울'], volume: 2100 },
         ];
       } else { // 봄/가을 기본
         sampleSocialTrends = [
-          { title: '오늘 카페에서 만난 귀여운 강아지', hashtags: ['강아지', '카페', '일상'], volume: 3456 },
-          { title: '우리 동네 맛집 추천', hashtags: ['맛집', '동네', '먹스타그램'], volume: 2890 },
-          { title: '주말 나들이 장소 공유', hashtags: ['주말', '나들이', '여행'], volume: 1987 },
-          { title: '오늘 운동 루틴 공유', hashtags: ['운동', '헬스', '루틴'], volume: 1654 },
+          { title: '가을 감성 카페 투어', hashtags: ['카페', '가을', '투어'], volume: 4200 },
+          { title: '홈 인테리어 가을 버전', hashtags: ['인테리어', '가을', '홈데코'], volume: 3600 },
+          { title: '독서의 계절 추천도서', hashtags: ['독서', '책', '가을'], volume: 3100 },
+          { title: '가을 나들이 베스트 코스', hashtags: ['나들이', '가을', '여행'], volume: 2800 },
         ];
       }
       
@@ -425,7 +486,7 @@ class TrendService {
       const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
       const randomSeed = Math.floor(now.getTime() / (1000 * 60 * 30)); // 30분마다 변경
       
-      // 랜덤 함수 (시드 기반)
+      // 시드 기반 랜덤 함수
       const seededRandom = (seed: number, max: number) => {
         const x = Math.sin(seed) * 10000;
         return Math.floor((x - Math.floor(x)) * max);
@@ -583,29 +644,101 @@ class TrendService {
   }
   
   /**
-   * Google Trends (영어권 검색어)
+   * Google/Naver 검색어 트렌드 (언어별 검색어)
    */
   private getGoogleTrends(): TrendItem[] {
-    const googleTrends = [
-      { title: 'Christmas gifts 2024', category: 'shopping', hashtags: ['christmas', 'gifts', 'holiday'] },
-      { title: 'Winter travel destinations', category: 'travel', hashtags: ['winter', 'travel', 'vacation'] },
-      { title: 'New Year resolutions', category: 'life', hashtags: ['newyear', 'resolutions', 'goals'] },
-      { title: 'Holiday recipes', category: 'food', hashtags: ['holiday', 'recipes', 'cooking'] },
-      { title: 'Fitness trends 2025', category: 'health', hashtags: ['fitness', 'health', 'wellness'] },
-      { title: 'Tech gadgets 2024', category: 'tech', hashtags: ['tech', 'gadgets', 'electronics'] },
-      { title: 'Stock market today', category: 'finance', hashtags: ['stocks', 'market', 'investing'] },
-      { title: 'Weather forecast', category: 'life', hashtags: ['weather', 'forecast', 'climate'] },
-    ];
+    const now = new Date();
+    const hour = now.getHours();
+    const month = now.getMonth() + 1;
+    const randomSeed = Math.floor(now.getTime() / (1000 * 60 * 30)); // 30분마다 변경
+    const isKoreanDevice = isKorean();
     
-    return googleTrends.map((trend, index) => ({
-      id: `google-${index}`,
-      title: trend.title,
-      category: trend.category,
-      source: 'google' as const, // Google 트렌드
-      timestamp: new Date().toISOString(),
-      hashtags: trend.hashtags,
-      volume: Math.floor(Math.random() * 10000) + 1000,
-    }));
+    if (isKoreanDevice) {
+      // 한국어 실시간 검색어 (네이버/구글 스타일)
+      const trendingSearches = [
+        // 시간대별 인기 검색어
+        { title: '오늘 날씨', category: 'life', hashtags: ['날씨', '기상', '예보'] },
+        { title: '로또 당첨번호', category: 'entertainment', hashtags: ['로또', '당첨', '번호'] },
+        { title: '코스피 시세', category: 'finance', hashtags: ['코스피', '주식', '증시'] },
+        { title: '환율 정보', category: 'finance', hashtags: ['환율', '달러', '원화'] },
+        { title: '대학 입시 일정', category: 'education', hashtags: ['입시', '대학', '수능'] },
+        { title: '신상 카페', category: 'food', hashtags: ['카페', '신상', '맛집'] },
+        { title: '드라마 편성표', category: 'entertainment', hashtags: ['드라마', 'TV', '편성'] },
+        { title: '연예인 근황', category: 'entertainment', hashtags: ['연예인', '스타', '근황'] },
+        { title: '쇼핑 할인 정보', category: 'shopping', hashtags: ['쇼핑', '할인', '세일'] },
+        { title: '맛집 추천', category: 'food', hashtags: ['맛집', '맛스타그램', '추천'] },
+        { title: '여행 명소', category: 'travel', hashtags: ['여행', '명소', '관광'] },
+        { title: '운동 루틴', category: 'health', hashtags: ['운동', '헬스', '다이어트'] },
+        { title: '부동산 시세', category: 'finance', hashtags: ['부동산', '아파트', '시세'] },
+        { title: '취업 정보', category: 'career', hashtags: ['취업', '채용', '구인'] },
+        { title: '게임 공략', category: 'entertainment', hashtags: ['게임', '공략', '팁'] },
+        { title: '패션 트렌드', category: 'fashion', hashtags: ['패션', '스타일', '옷'] },
+        { title: '뷰티 제품', category: 'beauty', hashtags: ['뷰티', '화장품', '스킨케어'] },
+        { title: 'IT 신제품', category: 'tech', hashtags: ['IT', '스마트폰', '신제품'] },
+        { title: '영화 평점', category: 'entertainment', hashtags: ['영화', '평점', '리뷰'] },
+        { title: '책 추천', category: 'culture', hashtags: ['책', '도서', '독서'] }
+      ];
+      
+      // 시간대별 가중치 적용
+      let weightedTrends = [...trendingSearches];
+      if (hour >= 7 && hour <= 9) {
+        // 출근 시간대 - 날씨, 교통, 뉴스 관련 검색 증가
+        weightedTrends.unshift(
+          { title: '출근길 교통정보', category: 'life', hashtags: ['교통', '출근', '지하철'] },
+          { title: '아침 뉴스', category: 'news', hashtags: ['뉴스', '아침', '속보'] }
+        );
+      } else if (hour >= 12 && hour <= 14) {
+        // 점심 시간대 - 맛집, 배달 관련 검색 증가
+        weightedTrends.unshift(
+          { title: '점심 배달 맛집', category: 'food', hashtags: ['점심', '배달', '맛집'] },
+          { title: '근처 식당', category: 'food', hashtags: ['식당', '근처', '점심'] }
+        );
+      } else if (hour >= 18 && hour <= 22) {
+        // 저녁/밤 시간대 - 엔터테인먼트, 쇼핑 관련 검색 증가
+        weightedTrends.unshift(
+          { title: '저녁 드라마', category: 'entertainment', hashtags: ['드라마', 'TV', '저녁'] },
+          { title: '온라인 쇼핑', category: 'shopping', hashtags: ['쇼핑몰', '온라인', '할인'] }
+        );
+      }
+      
+      // 랜덤하게 10-12개 선택
+      const count = 10 + (randomSeed % 3);
+      const shuffled = this.shuffleArray(weightedTrends, randomSeed);
+      const selectedTrends = shuffled.slice(0, count);
+      
+      return selectedTrends.map((trend, index) => ({
+        id: `search-kr-${index}-${randomSeed}`,
+        title: trend.title,
+        category: trend.category,
+        source: 'google' as const,
+        timestamp: new Date().toISOString(),
+        hashtags: trend.hashtags,
+        volume: 1000 + Math.floor(Math.sin(randomSeed + index) * 5000) + 2000, // 1000-8000
+        change: Math.floor(Math.sin(randomSeed + index + 100) * 200) - 100, // -100 ~ +100
+      }));
+    } else {
+      // 영어권 Google 트렌드
+      const googleTrends = [
+        { title: 'Christmas gifts 2024', category: 'shopping', hashtags: ['christmas', 'gifts', 'holiday'] },
+        { title: 'Winter travel destinations', category: 'travel', hashtags: ['winter', 'travel', 'vacation'] },
+        { title: 'New Year resolutions', category: 'life', hashtags: ['newyear', 'resolutions', 'goals'] },
+        { title: 'Holiday recipes', category: 'food', hashtags: ['holiday', 'recipes', 'cooking'] },
+        { title: 'Fitness trends 2025', category: 'health', hashtags: ['fitness', 'health', 'wellness'] },
+        { title: 'Tech gadgets 2024', category: 'tech', hashtags: ['tech', 'gadgets', 'electronics'] },
+        { title: 'Stock market today', category: 'finance', hashtags: ['stocks', 'market', 'investing'] },
+        { title: 'Weather forecast', category: 'life', hashtags: ['weather', 'forecast', 'climate'] },
+      ];
+      
+      return googleTrends.map((trend, index) => ({
+        id: `google-${index}`,
+        title: trend.title,
+        category: trend.category,
+        source: 'google' as const,
+        timestamp: new Date().toISOString(),
+        hashtags: trend.hashtags,
+        volume: Math.floor(Math.random() * 10000) + 1000,
+      }));
+    }
   }
   
   /**

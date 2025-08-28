@@ -1,18 +1,9 @@
-import { useState, useEffect } from 'react';
-import { useColorScheme } from 'react-native';
+import { useMemo } from 'react';
 import { LIGHT_COLORS, DARK_COLORS } from '../utils/constants';
 import { getUnifiedColors, getUnifiedShadows, getUnifiedCardTheme } from '../styles/themeStyles';
 import { useTheme } from '../contexts/ThemeContext';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
-
-// 전역 상태 관리
-let globalThemeMode: ThemeMode = 'system';
-let globalListeners: Array<() => void> = [];
-
-const notifyListeners = () => {
-  globalListeners.forEach(listener => listener());
-};
 
 export const useAppTheme = () => {
   // 새로운 테마 시스템 사용
@@ -21,9 +12,9 @@ export const useAppTheme = () => {
   // 기존 API와의 호환성을 위한 변환
   const changeTheme = setThemeMode;
 
-  // 새로운 테마 색상을 완전히 우선시
-  const colors = {
-    // 새로운 테마 색상으로 먼저 구성
+  // 최적화된 색상 객체 (memoized)
+  const colors = useMemo(() => ({
+    // 새로운 테마 색상으로 구성
     primary: newColors.accent,
     background: newColors.background,
     surface: newColors.surface,
@@ -55,25 +46,15 @@ export const useAppTheme = () => {
       secondary: newColors.textSecondary, 
       tertiary: newColors.textTertiary,
     },
-  };
+  }), [newColors, isDark]);
 
-  // 디버깅용 로그 (개발 환경에서만)
-  if (__DEV__ && isDark) {
-    console.log('[useAppTheme] Dark theme text colors:', {
-      primary: colors.text.primary,
-      secondary: colors.text.secondary,
-      tertiary: colors.text.tertiary,
-      newColorsPrimary: newColors.textPrimary,
-    });
-  }
+  // 통합된 색상과 테마 가져오기 (memoized)
+  const unifiedColors = useMemo(() => getUnifiedColors(isDark), [isDark]);
+  const unifiedShadows = useMemo(() => getUnifiedShadows(isDark), [isDark]);
+  const unifiedCardTheme = useMemo(() => getUnifiedCardTheme(isDark), [isDark]);
   
-  // 통합된 색상과 테마 가져오기
-  const unifiedColors = getUnifiedColors(isDark);
-  const unifiedShadows = getUnifiedShadows(isDark);
-  const unifiedCardTheme = getUnifiedCardTheme(isDark);
-  
-  // 기존 cardTheme (하위 호환성을 위해 유지)
-  const cardTheme = {
+  // 기존 cardTheme (하위 호환성을 위해 유지, memoized)
+  const cardTheme = useMemo(() => ({
     molly: {
       background: isDark ? newColors.surface : colors.accentLight,
       iconBackground: colors.primary,
@@ -92,7 +73,7 @@ export const useAppTheme = () => {
       borderColor: colors.border,
       shadow: unifiedShadows.small,
     },
-  };
+  }), [isDark, newColors.surface, colors]);
 
   return {
     themeMode,

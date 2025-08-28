@@ -71,18 +71,11 @@ import { batteryOptimizer } from './src/utils/batteryOptimization';
 
 const { width } = Dimensions.get('window');
 
-// Reanimated 3 애니메이션 설정
+// 화면 전환 애니메이션 설정 - 깜빡거림 완전 방지
 const ANIMATION_CONFIG = {
-  FADE_DURATION: 80,
-  SLIDE_DURATION: 80,
-  FADE_IN_DURATION: 100,
-  SLIDE_DISTANCE: 15,
-  SPRING: {
-    damping: 15,
-    stiffness: 150,
-    mass: 1,
-  },
-  EASING: Easing.out(Easing.cubic),
+  DISABLE_ANIMATIONS: true, // 깜빡거림 방지를 위해 애니메이션 완전 비활성화
+  FADE_DURATION: 200, // 애니메이션 사용 시
+  EASING: Easing.bezier(0.25, 0.46, 0.45, 0.94), // easeOutQuad
 };
 
 // Inner app component that uses the theme
@@ -100,10 +93,8 @@ const AppContent: React.FC = () => {
   const [isCheckingOnboarding, setIsCheckingOnboarding] = useState(true);
   const [showMinimalWelcome, setShowMinimalWelcome] = useState(false);
   
-  // Reanimated shared values
+  // 단순화된 Reanimated shared value - opacity만 사용
   const opacity = useSharedValue(1);
-  const translateX = useSharedValue(0);
-  const scale = useSharedValue(1);
 
   // 앱 초기화
   useEffect(() => {
@@ -353,14 +344,10 @@ const AppContent: React.FC = () => {
     checkAuthStatus();
   }, [activeTab]);
 
-  // Reanimated animated style
+  // 단순화된 Reanimated animated style - opacity만 사용
   const animatedStyle = useAnimatedStyle(() => {
     return {
       opacity: opacity.value,
-      transform: [
-        { translateX: translateX.value },
-        { scale: scale.value },
-      ],
     };
   });
 
@@ -369,7 +356,7 @@ const AppContent: React.FC = () => {
     setIsAnimating(false);
   }, []);
 
-  // handleTabPress with Reanimated 3
+  // 최적화된 handleTabPress - 깜빡거림 완전 방지
   const handleTabPress = useCallback((tab: string, data?: any) => {
     if (isAnimating || (tab === activeTab && tab !== 'ai-write-photo')) return;
     
@@ -384,52 +371,35 @@ const AppContent: React.FC = () => {
       setPhotoMode(false);
     }
     
+    // 애니메이션 비활성화 옵션 적용
+    if (ANIMATION_CONFIG.DISABLE_ANIMATIONS) {
+      // 애니메이션 없이 즉시 화면 전환 - 깜빡거림 완전 방지
+      setActiveTab(tab);
+      return;
+    }
+    
     setIsAnimating(true);
     
-    const tabs = ['home', 'ai-write', 'trend', 'my-style', 'settings', 'profile'];
-    const currentIndex = tabs.indexOf(activeTab);
-    const nextIndex = tabs.indexOf(tab);
-    const direction = nextIndex > currentIndex ? 1 : -1;
-    
-    // Reanimated 3 애니메이션 시작
-    opacity.value = withTiming(0, {
-      duration: ANIMATION_CONFIG.FADE_DURATION,
+    // 단순 페이드 전환 - 깜빡거림 방지 (애니메이션 사용 시에만)
+    opacity.value = withTiming(0.3, {
+      duration: ANIMATION_CONFIG.FADE_DURATION / 2,
       easing: ANIMATION_CONFIG.EASING,
     }, (finished) => {
       if (finished) {
         runOnJS(setActiveTab)(tab);
         
-        // 새 화면 초기 위치 설정
-        translateX.value = direction * ANIMATION_CONFIG.SLIDE_DISTANCE;
-        
-        // 페이드 인 및 슬라이드 애니메이션
+        // 새 화면 페이드 인
         opacity.value = withTiming(1, {
-          duration: ANIMATION_CONFIG.FADE_IN_DURATION,
+          duration: ANIMATION_CONFIG.FADE_DURATION / 2,
           easing: ANIMATION_CONFIG.EASING,
-        });
-        
-        translateX.value = withSpring(0, ANIMATION_CONFIG.SPRING);
-        
-        // 스케일 애니메이션 추가 (미묘한 효과)
-        scale.value = withTiming(0.98, { duration: 50 }, () => {
-          scale.value = withSpring(1, {
-            damping: 20,
-            stiffness: 200,
-          }, (finished) => {
-            if (finished) {
-              runOnJS(onAnimationComplete)();
-            }
-          });
+        }, (finished) => {
+          if (finished) {
+            runOnJS(onAnimationComplete)();
+          }
         });
       }
     });
-    
-    // 슬라이드 아웃 애니메이션
-    translateX.value = withTiming(-direction * ANIMATION_CONFIG.SLIDE_DISTANCE, {
-      duration: ANIMATION_CONFIG.SLIDE_DURATION,
-      easing: ANIMATION_CONFIG.EASING,
-    });
-  }, [activeTab, isAnimating, opacity, translateX, scale, onAnimationComplete]);
+  }, [activeTab, isAnimating, opacity, onAnimationComplete]);
 
   // Convert new theme colors to legacy format for createStyles
   const legacyColors = {
