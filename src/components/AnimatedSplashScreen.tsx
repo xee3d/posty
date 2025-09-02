@@ -1,11 +1,5 @@
-import React, { useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-  Image,
-} from 'react-native';
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, StatusBar, Image } from "react-native";
 
 interface AnimatedSplashScreenProps {
   onAnimationComplete: () => void;
@@ -14,16 +8,18 @@ interface AnimatedSplashScreenProps {
 // Memoize dimensions to prevent unnecessary re-calculations
 const SCREEN_DIMENSIONS = {
   width: 120,
-  height: 120
+  height: 120,
 };
 
-const AnimatedSplashScreen: React.FC<AnimatedSplashScreenProps> = ({ onAnimationComplete }) => {
+const AnimatedSplashScreen: React.FC<AnimatedSplashScreenProps> = ({
+  onAnimationComplete,
+}) => {
   // 애니메이션 없이 1초 후 완료
   useEffect(() => {
     const timer = setTimeout(() => {
       onAnimationComplete();
     }, 1000); // 1초 동안 표시
-    
+
     return () => {
       clearTimeout(timer);
     };
@@ -31,16 +27,13 @@ const AnimatedSplashScreen: React.FC<AnimatedSplashScreenProps> = ({ onAnimation
 
   return (
     <>
-      <StatusBar 
-        backgroundColor="#FFFFFF" 
-        barStyle="dark-content" 
-      />
+      <StatusBar backgroundColor="#FFFFFF" barStyle="dark-content" />
       <View style={styles.container}>
         <View style={styles.contentContainer}>
           {/* 화이트 로고 표시 */}
           <View style={styles.logoContainer}>
-            <Image 
-              source={require('../assets/images/posty_logo_w.png')}
+            <Image
+              source={require("../assets/images/posty_logo_w.png")}
               style={styles.logoImage}
               resizeMode="contain"
             />
@@ -54,15 +47,15 @@ const AnimatedSplashScreen: React.FC<AnimatedSplashScreenProps> = ({ onAnimation
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
   },
   contentContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   logoContainer: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   logoImage: {
     width: SCREEN_DIMENSIONS.width,

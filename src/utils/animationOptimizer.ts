@@ -1,6 +1,6 @@
 // 애니메이션 배터리 최적화 유틸리티
-import { AppState } from 'react-native';
-import { BATTERY_OPTIMIZATION_TIPS } from './batteryOptimization';
+import { AppState } from "react-native";
+import { BATTERY_OPTIMIZATION_TIPS } from "./batteryOptimization";
 
 /**
  * 배터리 효율적인 애니메이션 매니저
@@ -18,8 +18,8 @@ class AnimationOptimizer {
   }
 
   private setupAppStateListener() {
-    AppState.addEventListener('change', (nextAppState) => {
-      this.isAppActive = nextAppState === 'active';
+    AppState.addEventListener("change", (nextAppState) => {
+      this.isAppActive = nextAppState === "active";
     });
   }
 
@@ -37,8 +37,10 @@ class AnimationOptimizer {
     useNativeDriver?: boolean;
     easing?: any;
   }) {
-    const duration = this.isAppActive 
-      ? (this.reducedMotion ? baseConfig.duration! * 0.5 : baseConfig.duration)
+    const duration = this.isAppActive
+      ? this.reducedMotion
+        ? baseConfig.duration! * 0.5
+        : baseConfig.duration
       : 0; // 백그라운드에서는 즉시 완료
 
     return {
@@ -58,10 +60,7 @@ class AnimationOptimizer {
   /**
    * 조건부 애니메이션 실행
    */
-  conditionalAnimate(
-    animationFn: () => void,
-    fallbackFn?: () => void
-  ) {
+  conditionalAnimate(animationFn: () => void, fallbackFn?: () => void) {
     if (this.shouldAnimate()) {
       animationFn();
     } else if (fallbackFn) {
@@ -100,9 +99,11 @@ export const animationOptimizer = new AnimationOptimizer();
  */
 export const useOptimizedAnimation = () => {
   return {
-    getConfig: animationOptimizer.getOptimizedAnimationConfig.bind(animationOptimizer),
+    getConfig:
+      animationOptimizer.getOptimizedAnimationConfig.bind(animationOptimizer),
     shouldAnimate: animationOptimizer.shouldAnimate.bind(animationOptimizer),
-    conditionalAnimate: animationOptimizer.conditionalAnimate.bind(animationOptimizer),
+    conditionalAnimate:
+      animationOptimizer.conditionalAnimate.bind(animationOptimizer),
     createLoop: animationOptimizer.createOptimizedLoop.bind(animationOptimizer),
   };
 };

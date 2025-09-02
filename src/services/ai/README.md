@@ -33,6 +33,7 @@ src/services/
 ## 🔑 주요 파일 설명
 
 ### aiServiceWrapper.ts
+
 - AI 기능의 메인 인터페이스
 - 서버 API 호출을 추상화
 - 메서드:
@@ -41,6 +42,7 @@ src/services/
   - `analyzeImage()`: 이미지 분석
 
 ### serverAIService.ts
+
 - Vercel 서버와의 실제 통신 담당
 - API 엔드포인트: `https://posty-server-p6qzkiq80-ethan-chois-projects.vercel.app`
 - 인증 토큰 관리
@@ -55,21 +57,21 @@ src/services/
 ## 🚀 사용 예시
 
 ```typescript
-import aiService from '../services/aiServiceWrapper';
+import aiService from "../services/aiServiceWrapper";
 
 // 콘텐츠 생성
 const result = await aiService.generateContent({
-  prompt: '오늘 카페에서',
-  tone: 'casual',
-  length: 'medium',
-  platform: 'instagram'
+  prompt: "오늘 카페에서",
+  tone: "casual",
+  length: "medium",
+  platform: "instagram",
 });
 
 // 문장 다듬기
 const polished = await aiService.polishContent({
-  text: '원본 텍스트',
-  polishType: 'refine',
-  tone: 'professional'
+  text: "원본 텍스트",
+  polishType: "refine",
+  tone: "professional",
 });
 ```
 

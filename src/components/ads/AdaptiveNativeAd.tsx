@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -7,14 +7,14 @@ import {
   StyleSheet,
   Dimensions,
   Platform,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import LinearGradient from 'react-native-linear-gradient';
-import { useAppTheme } from '../../hooks/useAppTheme';
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import LinearGradient from "react-native-linear-gradient";
+import { useAppTheme } from "../../hooks/useAppTheme";
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 
-export type AdLayoutType = 'feed' | 'card' | 'banner' | 'inline' | 'fullwidth';
+export type AdLayoutType = "feed" | "card" | "banner" | "inline" | "fullwidth";
 
 interface AdaptiveNativeAdProps {
   layout?: AdLayoutType;
@@ -23,31 +23,33 @@ interface AdaptiveNativeAdProps {
 }
 
 const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
-  layout = 'feed',
+  layout = "feed",
   onPress,
   showSponsoredLabel = true,
 }) => {
   const { colors, isDark } = useAppTheme();
   const [adData, setAdData] = useState<any>(null);
-  
+
   useEffect(() => {
     // 샘플 광고 데이터 (실제로는 AdMob에서 로드)
     setAdData({
-      headline: 'AI 콘텐츠 생성의 혁명',
-      body: '최신 AI 기술로 더 빠르고 정확한 콘텐츠를 만들어보세요. 지금 시작하면 첫 달 무료!',
-      advertiser: 'TechCorp',
-      callToAction: '무료 체험',
-      imageUrl: 'https://via.placeholder.com/300x200',
-      iconUrl: 'https://via.placeholder.com/48',
+      headline: "AI 콘텐츠 생성의 혁명",
+      body: "최신 AI 기술로 더 빠르고 정확한 콘텐츠를 만들어보세요. 지금 시작하면 첫 달 무료!",
+      advertiser: "TechCorp",
+      callToAction: "무료 체험",
+      imageUrl: "https://via.placeholder.com/300x200",
+      iconUrl: "https://via.placeholder.com/48",
       rating: 4.8,
-      price: '월 ₩9,900',
+      price: "월 ₩9,900",
     });
   }, []);
-  
-  if (!adData) return null;
-  
+
+  if (!adData) {
+    return null;
+  }
+
   const renderFeedLayout = () => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[styles.feedContainer, { backgroundColor: colors.cardBackground }]}
       onPress={onPress}
       activeOpacity={0.9}
@@ -57,7 +59,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
           <Text style={styles.sponsoredText}>Sponsored</Text>
         </View>
       )}
-      
+
       <View style={styles.feedHeader}>
         <Image source={{ uri: adData.iconUrl }} style={styles.feedIcon} />
         <View style={styles.feedHeaderText}>
@@ -70,7 +72,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
                 key={i}
                 name="star"
                 size={12}
-                color={i < Math.floor(adData.rating) ? '#FFD700' : '#E0E0E0'}
+                color={i < Math.floor(adData.rating) ? "#FFD700" : "#E0E0E0"}
               />
             ))}
             <Text style={[styles.ratingText, { color: colors.text.secondary }]}>
@@ -79,9 +81,9 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
           </View>
         </View>
       </View>
-      
+
       <Image source={{ uri: adData.imageUrl }} style={styles.feedImage} />
-      
+
       <View style={styles.feedContent}>
         <Text style={[styles.headline, { color: colors.text.primary }]}>
           {adData.headline}
@@ -89,9 +91,9 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
         <Text style={[styles.body, { color: colors.text.secondary }]}>
           {adData.body}
         </Text>
-        
+
         <LinearGradient
-          colors={['#6366F1', '#8B5CF6']}
+          colors={["#6366F1", "#8B5CF6"]}
           style={styles.ctaButton}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
@@ -102,15 +104,15 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
       </View>
     </TouchableOpacity>
   );
-  
+
   const renderCardLayout = () => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[styles.cardContainer, { backgroundColor: colors.cardBackground }]}
       onPress={onPress}
       activeOpacity={0.9}
     >
       <LinearGradient
-        colors={isDark ? ['#1F2937', '#111827'] : ['#F9FAFB', '#F3F4F6']}
+        colors={isDark ? ["#1F2937", "#111827"] : ["#F9FAFB", "#F3F4F6"]}
         style={styles.cardGradient}
       >
         {showSponsoredLabel && (
@@ -119,17 +121,23 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
             <Text style={styles.cardSponsoredText}>AD</Text>
           </View>
         )}
-        
+
         <Image source={{ uri: adData.imageUrl }} style={styles.cardImage} />
-        
+
         <View style={styles.cardContent}>
-          <Text style={[styles.cardHeadline, { color: colors.text }]} numberOfLines={2}>
+          <Text
+            style={[styles.cardHeadline, { color: colors.text }]}
+            numberOfLines={2}
+          >
             {adData.headline}
           </Text>
-          <Text style={[styles.cardBody, { color: colors.text.secondary }]} numberOfLines={3}>
+          <Text
+            style={[styles.cardBody, { color: colors.text.secondary }]}
+            numberOfLines={3}
+          >
             {adData.body}
           </Text>
-          
+
           <View style={styles.cardFooter}>
             <Text style={[styles.price, { color: colors.primary }]}>
               {adData.price}
@@ -142,15 +150,18 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
       </LinearGradient>
     </TouchableOpacity>
   );
-  
+
   const renderBannerLayout = () => (
-    <TouchableOpacity 
-      style={[styles.bannerContainer, { backgroundColor: colors.cardBackground }]}
+    <TouchableOpacity
+      style={[
+        styles.bannerContainer,
+        { backgroundColor: colors.cardBackground },
+      ]}
       onPress={onPress}
       activeOpacity={0.9}
     >
       <LinearGradient
-        colors={['#6366F1', '#8B5CF6']}
+        colors={["#6366F1", "#8B5CF6"]}
         style={styles.bannerGradient}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
@@ -164,19 +175,19 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
               {adData.body}
             </Text>
           </View>
-          
+
           <TouchableOpacity style={styles.bannerCtaButton}>
             <Text style={styles.bannerCtaText}>{adData.callToAction}</Text>
           </TouchableOpacity>
         </View>
-        
+
         {showSponsoredLabel && (
           <Text style={styles.bannerSponsoredText}>광고</Text>
         )}
       </LinearGradient>
     </TouchableOpacity>
   );
-  
+
   const renderInlineLayout = () => (
     <View style={[styles.inlineContainer, { backgroundColor: colors.surface }]}>
       {showSponsoredLabel && (
@@ -184,40 +195,46 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
           • 광고 •
         </Text>
       )}
-      
-      <TouchableOpacity 
+
+      <TouchableOpacity
         style={styles.inlineContent}
         onPress={onPress}
         activeOpacity={0.8}
       >
         <Image source={{ uri: adData.iconUrl }} style={styles.inlineIcon} />
-        
+
         <View style={styles.inlineTextContent}>
-          <Text style={[styles.inlineHeadline, { color: colors.text }]} numberOfLines={1}>
+          <Text
+            style={[styles.inlineHeadline, { color: colors.text }]}
+            numberOfLines={1}
+          >
             {adData.headline}
           </Text>
-          <Text style={[styles.inlineBody, { color: colors.text.secondary }]} numberOfLines={1}>
+          <Text
+            style={[styles.inlineBody, { color: colors.text.secondary }]}
+            numberOfLines={1}
+          >
             {adData.body}
           </Text>
         </View>
-        
+
         <TouchableOpacity style={styles.inlineCtaButton}>
           <Text style={styles.inlineCtaText}>{adData.callToAction}</Text>
         </TouchableOpacity>
       </TouchableOpacity>
     </View>
   );
-  
+
   const renderFullWidthLayout = () => (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={styles.fullWidthContainer}
       onPress={onPress}
       activeOpacity={0.95}
     >
       <Image source={{ uri: adData.imageUrl }} style={styles.fullWidthImage} />
-      
+
       <LinearGradient
-        colors={['transparent', 'rgba(0,0,0,0.8)']}
+        colors={["transparent", "rgba(0,0,0,0.8)"]}
         style={styles.fullWidthOverlay}
       >
         {showSponsoredLabel && (
@@ -225,13 +242,13 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
             <Text style={styles.fullWidthSponsoredText}>광고</Text>
           </View>
         )}
-        
+
         <View style={styles.fullWidthContent}>
           <Text style={styles.fullWidthHeadline}>{adData.headline}</Text>
           <Text style={styles.fullWidthBody} numberOfLines={2}>
             {adData.body}
           </Text>
-          
+
           <View style={styles.fullWidthCta}>
             <Text style={styles.fullWidthPrice}>{adData.price}</Text>
             <TouchableOpacity style={styles.fullWidthCtaButton}>
@@ -243,17 +260,17 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
       </LinearGradient>
     </TouchableOpacity>
   );
-  
+
   switch (layout) {
-    case 'card':
+    case "card":
       return renderCardLayout();
-    case 'banner':
+    case "banner":
       return renderBannerLayout();
-    case 'inline':
+    case "inline":
       return renderInlineLayout();
-    case 'fullwidth':
+    case "fullwidth":
       return renderFullWidthLayout();
-    case 'feed':
+    case "feed":
     default:
       return renderFeedLayout();
   }
@@ -265,10 +282,10 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     marginHorizontal: 16,
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     ...Platform.select({
       ios: {
-        shadowColor: '#000',
+        shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
@@ -279,10 +296,10 @@ const styles = StyleSheet.create({
     }),
   },
   sponsoredBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 12,
     right: 12,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 4,
@@ -290,13 +307,13 @@ const styles = StyleSheet.create({
   },
   sponsoredText: {
     fontSize: 10,
-    color: '#FFFFFF',
-    fontWeight: '600',
+    color: "#FFFFFF",
+    fontWeight: "600",
   },
   feedHeader: {
-    flexDirection: 'row',
+    flexDirection: "row",
     padding: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   feedIcon: {
     width: 40,
@@ -309,12 +326,12 @@ const styles = StyleSheet.create({
   },
   advertiser: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   ratingRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 2,
   },
   ratingText: {
@@ -322,7 +339,7 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   feedImage: {
-    width: '100%',
+    width: "100%",
     height: 200,
   },
   feedContent: {
@@ -330,7 +347,7 @@ const styles = StyleSheet.create({
   },
   headline: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 8,
   },
   body: {
@@ -339,36 +356,36 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   ctaButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 12,
     borderRadius: 12,
     gap: 8,
   },
   ctaText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
+    color: "#FFFFFF",
+    fontWeight: "700",
     fontSize: 15,
   },
-  
+
   // Card Layout Styles
   cardContainer: {
     width: (screenWidth - 48) / 2,
     marginHorizontal: 8,
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   cardGradient: {
     padding: 12,
   },
   cardSponsoredBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 8,
     right: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(99, 102, 241, 0.1)",
     paddingHorizontal: 6,
     paddingVertical: 3,
     borderRadius: 4,
@@ -377,11 +394,11 @@ const styles = StyleSheet.create({
   },
   cardSponsoredText: {
     fontSize: 10,
-    color: '#6366F1',
-    fontWeight: '700',
+    color: "#6366F1",
+    fontWeight: "700",
   },
   cardImage: {
-    width: '100%',
+    width: "100%",
     height: 120,
     borderRadius: 8,
     marginBottom: 12,
@@ -391,7 +408,7 @@ const styles = StyleSheet.create({
   },
   cardHeadline: {
     fontSize: 14,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 4,
   },
   cardBody: {
@@ -400,43 +417,43 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   cardFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   price: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   cardCtaButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: "#6366F1",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
   },
   cardCtaText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
-  
+
   // Banner Layout Styles
   bannerContainer: {
     marginHorizontal: 16,
     marginVertical: 8,
     borderRadius: 12,
-    overflow: 'hidden',
+    overflow: "hidden",
     height: 100,
   },
   bannerGradient: {
     flex: 1,
     padding: 16,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   bannerContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   bannerTextContent: {
     flex: 1,
@@ -444,47 +461,47 @@ const styles = StyleSheet.create({
   },
   bannerHeadline: {
     fontSize: 16,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontWeight: "700",
+    color: "#FFFFFF",
     marginBottom: 4,
   },
   bannerBody: {
     fontSize: 13,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: "rgba(255, 255, 255, 0.9)",
     lineHeight: 18,
   },
   bannerCtaButton: {
-    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
   },
   bannerCtaText: {
-    color: '#6366F1',
-    fontWeight: '700',
+    color: "#6366F1",
+    fontWeight: "700",
     fontSize: 13,
   },
   bannerSponsoredText: {
-    position: 'absolute',
+    position: "absolute",
     top: 8,
     right: 8,
     fontSize: 10,
-    color: 'rgba(255, 255, 255, 0.8)',
+    color: "rgba(255, 255, 255, 0.8)",
   },
-  
+
   // Inline Layout Styles
   inlineContainer: {
     marginVertical: 8,
     paddingVertical: 12,
   },
   inlineSponsored: {
-    textAlign: 'center',
+    textAlign: "center",
     fontSize: 11,
     marginBottom: 8,
   },
   inlineContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
   },
   inlineIcon: {
@@ -498,94 +515,94 @@ const styles = StyleSheet.create({
   },
   inlineHeadline: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 2,
   },
   inlineBody: {
     fontSize: 12,
   },
   inlineCtaButton: {
-    backgroundColor: '#6366F1',
+    backgroundColor: "#6366F1",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 6,
   },
   inlineCtaText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
-  
+
   // Full Width Layout Styles
   fullWidthContainer: {
     width: screenWidth,
     height: 250,
-    position: 'relative',
+    position: "relative",
   },
   fullWidthImage: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   fullWidthOverlay: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     left: 0,
     right: 0,
-    height: '60%',
-    justifyContent: 'flex-end',
+    height: "60%",
+    justifyContent: "flex-end",
     padding: 20,
   },
   fullWidthSponsoredBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: -80,
     right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 4,
   },
   fullWidthSponsoredText: {
     fontSize: 11,
-    color: '#FFFFFF',
-    fontWeight: '600',
+    color: "#FFFFFF",
+    fontWeight: "600",
   },
   fullWidthContent: {
     marginBottom: 10,
   },
   fullWidthHeadline: {
     fontSize: 22,
-    fontWeight: '800',
-    color: '#FFFFFF',
+    fontWeight: "800",
+    color: "#FFFFFF",
     marginBottom: 6,
   },
   fullWidthBody: {
     fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
+    color: "rgba(255, 255, 255, 0.9)",
     lineHeight: 20,
     marginBottom: 12,
   },
   fullWidthCta: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   fullWidthPrice: {
     fontSize: 18,
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontWeight: "700",
+    color: "#FFFFFF",
   },
   fullWidthCtaButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 25,
     gap: 6,
   },
   fullWidthCtaText: {
-    color: '#000',
-    fontWeight: '700',
+    color: "#000",
+    fontWeight: "700",
     fontSize: 14,
   },
 });

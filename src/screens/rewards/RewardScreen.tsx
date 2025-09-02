@@ -1,10 +1,18 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Animated,  } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { COLORS, SPACING } from '../../utils/constants';
-import { useAppTheme } from '../../hooks/useAppTheme';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Animated,
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import { COLORS, SPACING } from "../../utils/constants";
+import { useAppTheme } from "../../hooks/useAppTheme";
 
-import { Alert } from '../../utils/customAlert';
+import { Alert } from "../../utils/customAlert";
 interface RewardScreenProps {
   navigation: any;
 }
@@ -16,7 +24,7 @@ interface RewardTask {
   tokens: number;
   icon: string;
   completed: boolean;
-  type: 'daily' | 'achievement' | 'special';
+  type: "daily" | "achievement" | "special";
   progress?: {
     current: number;
     target: number;
@@ -31,74 +39,74 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
 
   const dailyTasks: RewardTask[] = [
     {
-      id: 'daily_login',
-      title: '매일 방문하기',
-      description: '7일 연속 로그인',
+      id: "daily_login",
+      title: "매일 방문하기",
+      description: "7일 연속 로그인",
       tokens: 10,
-      icon: 'today',
+      icon: "today",
       completed: false,
-      type: 'daily',
+      type: "daily",
       progress: {
         current: 3,
         target: 7,
       },
     },
     {
-      id: 'first_post',
-      title: '오늘의 첫 포스팅',
-      description: '하루 첫 콘텐츠 작성',
+      id: "first_post",
+      title: "오늘의 첫 포스팅",
+      description: "하루 첫 콘텐츠 작성",
       tokens: 5,
-      icon: 'edit',
+      icon: "edit",
       completed: false,
-      type: 'daily',
+      type: "daily",
     },
     {
-      id: 'share_content',
-      title: 'SNS 공유하기',
-      description: '작성한 콘텐츠 공유',
+      id: "share_content",
+      title: "SNS 공유하기",
+      description: "작성한 콘텐츠 공유",
       tokens: 3,
-      icon: 'share',
+      icon: "share",
       completed: true,
-      type: 'daily',
+      type: "daily",
     },
   ];
 
   const achievements: RewardTask[] = [
     {
-      id: 'first_content',
-      title: '첫 콘텐츠 작성',
-      description: '포스티와 함께 첫 글 작성',
+      id: "first_content",
+      title: "첫 콘텐츠 작성",
+      description: "포스티와 함께 첫 글 작성",
       tokens: 20,
-      icon: 'star',
+      icon: "star",
       completed: true,
-      type: 'achievement',
+      type: "achievement",
     },
     {
-      id: 'invite_friend',
-      title: '친구 초대하기',
-      description: '친구 1명 초대 완료',
+      id: "invite_friend",
+      title: "친구 초대하기",
+      description: "친구 1명 초대 완료",
       tokens: 20,
-      icon: 'person-add',
+      icon: "person-add",
       completed: false,
-      type: 'achievement',
+      type: "achievement",
     },
     {
-      id: 'review',
-      title: '리뷰 작성하기',
-      description: '앱스토어 리뷰 남기기',
+      id: "review",
+      title: "리뷰 작성하기",
+      description: "앱스토어 리뷰 남기기",
       tokens: 15,
-      icon: 'rate-review',
+      icon: "rate-review",
       completed: false,
-      type: 'achievement',
+      type: "achievement",
     },
     {
-      id: 'streak_30',
-      title: '30일 연속 사용',
-      description: '한 달 동안 매일 사용',
+      id: "streak_30",
+      title: "30일 연속 사용",
+      description: "한 달 동안 매일 사용",
       tokens: 50,
-      icon: 'local-fire-department',
+      icon: "local-fire-department",
       completed: false,
-      type: 'achievement',
+      type: "achievement",
       progress: {
         current: 12,
         target: 30,
@@ -108,13 +116,13 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
 
   const specialTasks: RewardTask[] = [
     {
-      id: 'weekend_bonus',
-      title: '주말 보너스',
-      description: '주말 동안 3개 이상 콘텐츠 작성',
+      id: "weekend_bonus",
+      title: "주말 보너스",
+      description: "주말 동안 3개 이상 콘텐츠 작성",
       tokens: 15,
-      icon: 'celebration',
+      icon: "celebration",
       completed: false,
-      type: 'special',
+      type: "special",
       progress: {
         current: 1,
         target: 3,
@@ -124,18 +132,14 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
 
   const handleClaimReward = (task: RewardTask) => {
     if (task.completed && !completedTasks.includes(task.id)) {
-      Alert.alert(
-        '🎉 보상 받기',
-        `${task.tokens} 토큰을 받았습니다!`,
-        [
-          {
-            text: '확인',
-            onPress: () => {
-              setCompletedTasks([...completedTasks, task.id]);
-            },
+      Alert.alert("🎉 보상 받기", `${task.tokens} 토큰을 받았습니다!`, [
+        {
+          text: "확인",
+          onPress: () => {
+            setCompletedTasks([...completedTasks, task.id]);
           },
-        ]
-      );
+        },
+      ]);
     }
   };
 
@@ -155,32 +159,40 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
         activeOpacity={canClaim ? 0.7 : 1}
       >
         <View style={styles.taskContent}>
-          <View style={[
-            styles.taskIcon,
-            { backgroundColor: task.completed ? '#10B981' : colors.lightGray }
-          ]}>
-            <Icon 
-              name={task.icon} 
-              size={24} 
-              color={task.completed ? '#FFFFFF' : colors.text.secondary} 
+          <View
+            style={[
+              styles.taskIcon,
+              {
+                backgroundColor: task.completed ? "#10B981" : colors.lightGray,
+              },
+            ]}
+          >
+            <Icon
+              name={task.icon}
+              size={24}
+              color={task.completed ? "#FFFFFF" : colors.text.secondary}
             />
           </View>
-          
+
           <View style={styles.taskInfo}>
             <Text style={styles.taskTitle}>{task.title}</Text>
             <Text style={styles.taskDescription}>{task.description}</Text>
-            
+
             {task.progress && (
               <View style={styles.progressContainer}>
                 <View style={styles.progressBar}>
-                  <View 
+                  <View
                     style={[
                       styles.progressFill,
-                      { 
-                        width: `${(task.progress.current / task.progress.target) * 100}%`,
-                        backgroundColor: task.completed ? '#10B981' : colors.primary,
-                      }
-                    ]} 
+                      {
+                        width: `${
+                          (task.progress.current / task.progress.target) * 100
+                        }%`,
+                        backgroundColor: task.completed
+                          ? "#10B981"
+                          : colors.primary,
+                      },
+                    ]}
                   />
                 </View>
                 <Text style={styles.progressText}>
@@ -189,30 +201,36 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
               </View>
             )}
           </View>
-          
+
           <View style={styles.taskReward}>
-            <View style={[
-              styles.tokenBadge,
-              canClaim && styles.claimableBadge,
-              isClaimed && styles.claimedBadge,
-            ]}>
+            <View
+              style={[
+                styles.tokenBadge,
+                canClaim && styles.claimableBadge,
+                isClaimed && styles.claimedBadge,
+              ]}
+            >
               {isClaimed ? (
                 <Icon name="check" size={16} color="#10B981" />
               ) : (
                 <>
-                  <Icon name="flash" size={16} color={canClaim ? '#FFFFFF' : colors.primary} />
-                  <Text style={[
-                    styles.tokenAmount,
-                    canClaim && styles.claimableText,
-                  ]}>
+                  <Icon
+                    name="flash"
+                    size={16}
+                    color={canClaim ? "#FFFFFF" : colors.primary}
+                  />
+                  <Text
+                    style={[
+                      styles.tokenAmount,
+                      canClaim && styles.claimableText,
+                    ]}
+                  >
                     {task.tokens}
                   </Text>
                 </>
               )}
             </View>
-            {canClaim && (
-              <Text style={styles.claimText}>받기</Text>
-            )}
+            {canClaim && <Text style={styles.claimText}>받기</Text>}
           </View>
         </View>
       </TouchableOpacity>
@@ -225,7 +243,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       {/* 헤더 */}
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
@@ -244,9 +262,9 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
             <Text style={styles.tokenStatNumber}>{availableTokens}</Text>
           </View>
         </View>
-        
+
         <View style={styles.tokenDivider} />
-        
+
         <View style={styles.tokenStat}>
           <Text style={styles.tokenStatLabel}>누적 획득</Text>
           <View style={styles.tokenStatValue}>
@@ -256,10 +274,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
         </View>
       </View>
 
-      <ScrollView 
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* 일일 미션 */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
@@ -291,10 +306,14 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
 
         {/* 토큰 사용 안내 */}
         <View style={styles.infoSection}>
-          <Icon name="information-circle-outline" size={20} color={colors.primary} />
+          <Icon
+            name="information-circle-outline"
+            size={20}
+            color={colors.primary}
+          />
           <Text style={styles.infoText}>
-            획득한 토큰은 AI 콘텐츠 생성에 사용할 수 있습니다.
-            토큰이 부족하다면 구매하거나 미션을 완료해보세요!
+            획득한 토큰은 AI 콘텐츠 생성에 사용할 수 있습니다. 토큰이 부족하다면
+            구매하거나 미션을 완료해보세요!
           </Text>
         </View>
 
@@ -311,9 +330,9 @@ const createStyles = (colors: any, isDark: boolean) =>
       backgroundColor: colors.background,
     },
     header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
       paddingHorizontal: SPACING.medium,
       paddingVertical: SPACING.medium,
       borderBottomWidth: 1,
@@ -322,31 +341,31 @@ const createStyles = (colors: any, isDark: boolean) =>
     backButton: {
       width: 40,
       height: 40,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
     },
     headerTitle: {
       fontSize: 18,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
     },
     tokenSummary: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-around',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-around",
       backgroundColor: colors.surface,
       marginHorizontal: SPACING.medium,
       marginTop: SPACING.medium,
       padding: SPACING.large,
       borderRadius: 16,
-      shadowColor: '#000',
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.05,
       shadowRadius: 8,
       elevation: 2,
     },
     tokenStat: {
-      alignItems: 'center',
+      alignItems: "center",
     },
     tokenStatLabel: {
       fontSize: 12,
@@ -354,13 +373,13 @@ const createStyles = (colors: any, isDark: boolean) =>
       marginBottom: 8,
     },
     tokenStatValue: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: 6,
     },
     tokenStatNumber: {
       fontSize: 24,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.text.primary,
     },
     tokenDivider: {
@@ -380,7 +399,7 @@ const createStyles = (colors: any, isDark: boolean) =>
     },
     sectionTitle: {
       fontSize: 18,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.text.primary,
       marginBottom: 4,
     },
@@ -397,21 +416,21 @@ const createStyles = (colors: any, isDark: boolean) =>
       borderColor: colors.border,
     },
     completedCard: {
-      borderColor: '#10B981',
+      borderColor: "#10B981",
     },
     claimedCard: {
       opacity: 0.6,
     },
     taskContent: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
     },
     taskIcon: {
       width: 48,
       height: 48,
       borderRadius: 24,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
       marginRight: SPACING.medium,
     },
     taskInfo: {
@@ -419,7 +438,7 @@ const createStyles = (colors: any, isDark: boolean) =>
     },
     taskTitle: {
       fontSize: 15,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
       marginBottom: 4,
     },
@@ -428,8 +447,8 @@ const createStyles = (colors: any, isDark: boolean) =>
       color: colors.text.secondary,
     },
     progressContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       marginTop: 8,
       gap: 8,
     },
@@ -438,10 +457,10 @@ const createStyles = (colors: any, isDark: boolean) =>
       height: 4,
       backgroundColor: colors.lightGray,
       borderRadius: 2,
-      overflow: 'hidden',
+      overflow: "hidden",
     },
     progressFill: {
-      height: '100%',
+      height: "100%",
       borderRadius: 2,
     },
     progressText: {
@@ -450,12 +469,12 @@ const createStyles = (colors: any, isDark: boolean) =>
       minWidth: 35,
     },
     taskReward: {
-      alignItems: 'center',
+      alignItems: "center",
       gap: 4,
     },
     tokenBadge: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       backgroundColor: colors.lightGray,
       paddingHorizontal: 12,
       paddingVertical: 6,
@@ -466,25 +485,25 @@ const createStyles = (colors: any, isDark: boolean) =>
       backgroundColor: colors.primary,
     },
     claimedBadge: {
-      backgroundColor: '#10B981' + '20',
+      backgroundColor: "#10B981" + "20",
     },
     tokenAmount: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.primary,
     },
     claimableText: {
-      color: '#FFFFFF',
+      color: "#FFFFFF",
     },
     claimText: {
       fontSize: 11,
       color: colors.primary,
-      fontWeight: '600',
+      fontWeight: "600",
     },
     infoSection: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.primary + '10',
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.primary + "10",
       marginHorizontal: SPACING.medium,
       marginTop: SPACING.xl,
       padding: SPACING.medium,

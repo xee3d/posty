@@ -7,30 +7,37 @@
 Vercel 대시보드에서 다음 환경변수들을 설정해야 합니다:
 
 #### 1. 앱 보안 키
+
 ```bash
 POSTY_APP_SECRET=your-secure-random-string-here
 ```
+
 - **용도**: API 인증, JWT 서명
 - **생성 방법**: `openssl rand -base64 32` 또는 강력한 랜덤 문자열
 - **보안**: 절대 소스코드에 포함하지 말 것
 
 #### 2. JWT 시크릿
+
 ```bash
 JWT_SECRET=another-secure-random-string-here
 ```
+
 - **용도**: 소셜 로그인 JWT 토큰 서명
 - **생성 방법**: `openssl rand -base64 64`
 - **중요**: POSTY_APP_SECRET과 다른 값 사용
 
 #### 3. NewsAPI 키 (선택사항)
+
 ```bash
 NEWS_API_KEY=your-newsapi-org-key
 ```
+
 - **용도**: 트렌드 데이터 수집
 - **발급**: [newsapi.org](https://newsapi.org)에서 무료 발급
 - **제한**: 무료 플랜은 일일 1000 요청
 
 ### 🤖 AI 서비스
+
 ```bash
 # OpenAI API (콘텐츠 생성 핵심 기능)
 OPENAI_API_KEY="sk-proj-your-openai-api-key"
@@ -40,11 +47,12 @@ HF_API_KEY="hf_your-huggingface-api-key"
 ```
 
 ### 🔗 소셜 로그인 OAuth
+
 ```bash
 # 구글 로그인
 GOOGLE_WEB_CLIENT_ID="your-google-client-id.apps.googleusercontent.com"
 
-# 네이버 로그인  
+# 네이버 로그인
 NAVER_CONSUMER_KEY="your-naver-consumer-key"
 NAVER_CONSUMER_SECRET="your-naver-consumer-secret"
 
@@ -58,6 +66,7 @@ FACEBOOK_CLIENT_TOKEN="your-facebook-client-token"
 ```
 
 ### 📱 푸시 알림
+
 ```bash
 # OneSignal 푸시 알림 서비스
 ONESIGNAL_APP_ID="your-onesignal-app-id"
@@ -68,6 +77,7 @@ CRON_SECRET="your-cron-job-secret"
 ```
 
 ### 🌐 서버 설정
+
 ```bash
 # 환경 구분
 NODE_ENV="production"
@@ -90,6 +100,7 @@ APP_VERSION="1.0.0"
 ## 🚀 Vercel 환경변수 설정 단계
 
 ### 1. Vercel 대시보드 접속
+
 ```bash
 # Vercel CLI 로그인 (필요시)
 npx vercel login
@@ -99,15 +110,18 @@ npx vercel --version
 ```
 
 ### 2. 환경변수 설정
+
 Vercel 대시보드 → 프로젝트 → Settings → Environment Variables
 
 **중요한 환경변수 우선순위**:
+
 1. `JWT_SECRET` (보안 핵심)
 2. `OPENAI_API_KEY` (AI 기능 핵심)
 3. `APP_SECRET` (API 보안)
 4. OAuth 키들 (소셜 로그인)
 
 ### 3. 환경변수 검증 스크립트
+
 ```bash
 # API 상태 확인
 curl https://posty-api.vercel.app/api/notifications/test
@@ -123,6 +137,7 @@ curl https://posty-api.vercel.app/api/generate -X POST \
 ## 📱 React Native 환경변수 설정
 
 ### 1. 로컬 개발 환경
+
 ```bash
 # .env 파일 생성 (이미 .gitignore에 포함됨)
 cp .env.example .env
@@ -134,6 +149,7 @@ nano .env
 ### 2. 프로덕션 빌드 설정
 
 **Android (android/gradle.properties)**:
+
 ```properties
 # 키스토어 정보는 CI/CD 환경변수로 설정
 # MYAPP_RELEASE_STORE_PASSWORD=환경변수로_설정
@@ -141,6 +157,7 @@ nano .env
 ```
 
 **iOS (환경변수 주입)**:
+
 ```bash
 # Xcode 빌드 시 환경변수 자동 주입
 # Info.plist에서 $(VARIABLE_NAME) 형태로 참조
@@ -151,12 +168,14 @@ nano .env
 ## ⚠️ 보안 주의사항
 
 ### 절대 하지 말 것
+
 - ❌ .env 파일을 Git에 커밋
 - ❌ 하드코딩된 시크릿을 소스코드에 포함
 - ❌ 약한 JWT 시크릿 사용
 - ❌ 프로덕션 키를 개발 환경에서 사용
 
 ### 권장사항
+
 - ✅ 환경별 다른 키 사용 (dev/staging/prod)
 - ✅ 정기적인 키 로테이션
 - ✅ 최소 권한 원칙 적용
@@ -167,18 +186,21 @@ nano .env
 ## 🔍 환경변수 검증 체크리스트
 
 ### Vercel 서버 검증
+
 - [ ] Vercel 대시보드에서 모든 필수 환경변수 설정 확인
 - [ ] API 엔드포인트 응답 테스트
 - [ ] 크론 작업 동작 확인
 - [ ] 로그에서 환경변수 로드 상태 확인
 
-### 모바일 앱 검증  
+### 모바일 앱 검증
+
 - [ ] .env 파일에 모든 키 설정
 - [ ] React Native 환경변수 로드 테스트
 - [ ] OAuth 로그인 기능 테스트
 - [ ] AI 콘텐츠 생성 기능 테스트
 
 ### 보안 검증
+
 - [ ] 하드코딩된 시크릿 완전 제거 확인
 - [ ] Git 히스토리에서 민감 정보 제거
 - [ ] 환경변수 권한 설정 확인
@@ -186,5 +208,5 @@ nano .env
 
 ---
 
-*📅 생성일: 2025-09-02*  
-*🔧 설정 도구: Claude Code 환경 설정*
+_📅 생성일: 2025-09-02_  
+_🔧 설정 도구: Claude Code 환경 설정_

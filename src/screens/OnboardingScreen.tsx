@@ -1,5 +1,5 @@
-import React from 'react';
-import ModernOnboardingScreen from './ModernOnboardingScreen';
+import React from "react";
+import ModernOnboardingScreen from "./ModernOnboardingScreen";
 
 interface OnboardingScreenProps {
   onComplete?: () => void;

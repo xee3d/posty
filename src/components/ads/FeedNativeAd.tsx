@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
@@ -7,12 +7,12 @@ import {
   Image,
   Dimensions,
   Platform,
-} from 'react-native';
-import { COLORS, SPACING } from '../../utils/constants';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { NativeAd } from '../../utils/adConfig';
+} from "react-native";
+import { COLORS, SPACING } from "../../utils/constants";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { NativeAd } from "../../utils/adConfig";
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 
 interface FeedNativeAdProps {
   ad: NativeAd;
@@ -25,12 +25,12 @@ export const FeedNativeAd: React.FC<FeedNativeAdProps> = ({ ad, onPress }) => {
       onPress();
     }
     // 광고 클릭 추적
-    console.log('Feed ad clicked:', ad.headline);
+    console.log("Feed ad clicked:", ad.headline);
   };
 
   return (
-    <TouchableOpacity 
-      style={styles.container} 
+    <TouchableOpacity
+      style={styles.container}
       onPress={handlePress}
       activeOpacity={0.9}
     >
@@ -51,8 +51,8 @@ export const FeedNativeAd: React.FC<FeedNativeAdProps> = ({ ad, onPress }) => {
       </View>
 
       {ad.images && ad.images[0] && (
-        <Image 
-          source={{ uri: ad.images[0] }} 
+        <Image
+          source={{ uri: ad.images[0] }}
           style={styles.mainImage}
           resizeMode="cover"
         />
@@ -75,12 +75,8 @@ export const FeedNativeAd: React.FC<FeedNativeAdProps> = ({ ad, onPress }) => {
                 <Text style={styles.ratingText}>{ad.starRating}</Text>
               </View>
             )}
-            {ad.price && (
-              <Text style={styles.price}>{ad.price}</Text>
-            )}
-            {ad.store && (
-              <Text style={styles.store}>· {ad.store}</Text>
-            )}
+            {ad.price && <Text style={styles.price}>{ad.price}</Text>}
+            {ad.store && <Text style={styles.store}>· {ad.store}</Text>}
           </View>
         )}
       </View>
@@ -97,8 +93,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: SPACING.medium,
   },
   profileImage: {
@@ -112,12 +108,12 @@ const styles = StyleSheet.create({
   },
   advertiserName: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
   },
   sponsoredRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginTop: 2,
   },
   sponsoredText: {
@@ -134,7 +130,7 @@ const styles = StyleSheet.create({
   adBadgeText: {
     fontSize: 11,
     color: COLORS.white,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   mainImage: {
     width: screenWidth,
@@ -146,7 +142,7 @@ const styles = StyleSheet.create({
   },
   headline: {
     fontSize: 18,
-    fontWeight: '700',
+    fontWeight: "700",
     color: COLORS.text,
     marginBottom: SPACING.small,
   },
@@ -158,9 +154,9 @@ const styles = StyleSheet.create({
   },
   ctaButton: {
     backgroundColor: COLORS.primary,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
     paddingVertical: 12,
     borderRadius: 8,
     marginBottom: SPACING.small,
@@ -168,16 +164,16 @@ const styles = StyleSheet.create({
   ctaText: {
     color: COLORS.white,
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     marginRight: 8,
   },
   footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   rating: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginRight: SPACING.small,
   },
   ratingText: {
@@ -187,7 +183,7 @@ const styles = StyleSheet.create({
   },
   price: {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginRight: SPACING.small,
   },

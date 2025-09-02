@@ -15,7 +15,7 @@ export interface SimplePost {
   id: string;
   content: string;
   hashtags: string[];
-  platform: 'instagram' | 'facebook' | 'twitter' | 'general';
+  platform: "instagram" | "facebook" | "twitter" | "general";
   category: string;
   tone: string;
   createdAt: string;

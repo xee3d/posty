@@ -1,12 +1,11 @@
-;
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { saveContent } from '../utils/storage';
-import simplePostService from './simplePostService';
-import { getCategoryFromTone, extractHashtags } from '../utils/promptUtils';
-import { generateHashtags } from '../utils/platformStyles';
-import analyticsService from './analytics/analyticsService';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { saveContent } from "../utils/storage";
+import simplePostService from "./simplePostService";
+import { getCategoryFromTone, extractHashtags } from "../utils/promptUtils";
+import { generateHashtags } from "../utils/platformStyles";
+import analyticsService from "./analytics/analyticsService";
 
-import { Alert } from '../utils/customAlert';
+import { Alert } from "../utils/customAlert";
 interface SaveContentParams {
   content: string;
   platform?: string;
@@ -20,10 +19,10 @@ interface SaveContentParams {
 class ContentSaveService {
   async saveGeneratedContent({
     content,
-    platform = 'instagram',
-    tone = 'casual',
-    length = 'medium',
-    prompt = '',
+    platform = "instagram",
+    tone = "casual",
+    length = "medium",
+    prompt = "",
     onSuccess,
     onError,
   }: SaveContentParams): Promise<boolean> {
@@ -31,7 +30,7 @@ class ContentSaveService {
       // 해시태그 추출 및 플랫폼별 조정
       const extractedHashtags = extractHashtags(content);
       const adjustedHashtags = generateHashtags(extractedHashtags, platform);
-      
+
       // 1. storage.ts를 통해 저장 (Firestore + 로컬 자동 처리)
       await saveContent({
         content,
@@ -41,44 +40,42 @@ class ContentSaveService {
         platform,
         prompt,
       });
-      
+
       // 2. simplePostService에 저장 (로컬 분석용)
       await simplePostService.savePost({
         content,
         hashtags: adjustedHashtags,
-        platform: platform as 'instagram' | 'facebook' | 'twitter' | 'general',
+        platform: platform as "instagram" | "facebook" | "twitter" | "general",
         category: getCategoryFromTone(tone),
         tone,
       });
-      
+
       // Analytics 이벤트 기록
       analyticsService.logContentSaved({
         platform,
         content_length: content.length,
         hashtag_count: adjustedHashtags.length,
       });
-      
+
       // 성공 알림
       Alert.alert(
-        '저장 완료! 💾', 
-        '콘텐츠가 저장되었어요.\n\n성과는 각 SNS 플랫폼에서 확인하세요!',
-        [{ 
-          text: '확인', 
-          style: 'default',
-          onPress: onSuccess,
-        }]
+        "저장 완료! 💾",
+        "콘텐츠가 저장되었어요.\n\n성과는 각 SNS 플랫폼에서 확인하세요!",
+        [
+          {
+            text: "확인",
+            style: "default",
+            onPress: onSuccess,
+          },
+        ]
       );
-      
+
       return true;
     } catch (error) {
-      console.error('Save error:', error);
-      
-      Alert.alert(
-        '오류', 
-        '저장 중 문제가 발생했어요.',
-        [{ text: '확인' }]
-      );
-      
+      console.error("Save error:", error);
+
+      Alert.alert("오류", "저장 중 문제가 발생했어요.", [{ text: "확인" }]);
+
       onError?.(error as Error);
       return false;
     }
@@ -94,17 +91,17 @@ class ContentSaveService {
         metadata,
         createdAt: new Date().toISOString(),
       };
-      
+
       drafts.unshift(newDraft);
       // 최대 10개까지만 저장
       if (drafts.length > 10) {
         drafts.pop();
       }
-      
-      await AsyncStorage.setItem('CONTENT_DRAFTS', JSON.stringify(drafts));
+
+      await AsyncStorage.setItem("CONTENT_DRAFTS", JSON.stringify(drafts));
       return true;
     } catch (error) {
-      console.error('Draft save error:', error);
+      console.error("Draft save error:", error);
       return false;
     }
   }
@@ -112,10 +109,10 @@ class ContentSaveService {
   // 임시 저장 목록 가져오기
   async getDrafts(): Promise<any[]> {
     try {
-      const draftsJson = await AsyncStorage.getItem('CONTENT_DRAFTS');
+      const draftsJson = await AsyncStorage.getItem("CONTENT_DRAFTS");
       return draftsJson ? JSON.parse(draftsJson) : [];
     } catch (error) {
-      console.error('Get drafts error:', error);
+      console.error("Get drafts error:", error);
       return [];
     }
   }
@@ -124,16 +121,17 @@ class ContentSaveService {
   async deleteDraft(draftId: string): Promise<boolean> {
     try {
       const drafts = await this.getDrafts();
-      const filteredDrafts = drafts.filter(draft => draft.id !== draftId);
-      await AsyncStorage.setItem('CONTENT_DRAFTS', JSON.stringify(filteredDrafts));
+      const filteredDrafts = drafts.filter((draft) => draft.id !== draftId);
+      await AsyncStorage.setItem(
+        "CONTENT_DRAFTS",
+        JSON.stringify(filteredDrafts)
+      );
       return true;
     } catch (error) {
-      console.error('Delete draft error:', error);
+      console.error("Delete draft error:", error);
       return false;
     }
   }
-
-
 }
 
 export default new ContentSaveService();

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   View,
   Text,
@@ -9,45 +9,64 @@ import {
   RefreshControl,
   ActivityIndicator,
   Image,
-} from 'react-native';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, BRAND } from '../utils/constants';
-import Icon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { useAppTheme } from '../hooks/useAppTheme';
+} from "react-native";
+import {
+  COLORS,
+  FONTS,
+  SPACING,
+  BORDER_RADIUS,
+  BRAND,
+} from "../utils/constants";
+import Icon from "react-native-vector-icons/Ionicons";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import { useAppTheme } from "../hooks/useAppTheme";
 // import { useFocusEffect } from '@react-navigation/native'; // NavigationContainer 밖에서 사용 불가
-import { soundManager } from '../utils/soundManager';
-import trendService from '../services/trendService';
-import { AnimatedCard, SlideInView, FadeInView } from '../components/AnimationComponents';
-import { useAppSelector } from '../hooks/redux';
-import { getUserPlan, TREND_ACCESS, PlanType } from '../config/adConfig';
-import { Alert } from '../utils/customAlert';
-import { TrendPageSkeleton, TrendCardSkeleton, MyHashtagsSkeleton } from '../components/SkeletonLoader';
-import { CompactBanner, SmartAdPlacement } from '../components/ads';
-import trendCache from '../utils/trendCache';
-import AppLogo from '../components/AppLogo';
+import { soundManager } from "../utils/soundManager";
+import trendService from "../services/trendService";
+import {
+  AnimatedCard,
+  SlideInView,
+  FadeInView,
+} from "../components/AnimationComponents";
+import { useAppSelector } from "../hooks/redux";
+import { getUserPlan, TREND_ACCESS, PlanType } from "../config/adConfig";
+import { Alert } from "../utils/customAlert";
+import {
+  TrendPageSkeleton,
+  TrendCardSkeleton,
+  MyHashtagsSkeleton,
+} from "../components/SkeletonLoader";
+import { CompactBanner, SmartAdPlacement } from "../components/ads";
+import trendCache from "../utils/trendCache";
+import AppLogo from "../components/AppLogo";
 
-type TrendCategory = 'all' | 'news' | 'social' | 'keywords';
+type TrendCategory = "all" | "news" | "social" | "keywords";
 
 interface TrendScreenProps {
   onNavigate?: (tab: string, data?: any) => void;
 }
 
 const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
-  console.log('[TrendScreen] ===== Component Mounted/Rendered =====');
+  console.log("[TrendScreen] ===== Component Mounted/Rendered =====");
   const { colors, isDark } = useAppTheme();
-  
+
   // 구독 플랜 정보
-  const subscription = useAppSelector(state => state.user.subscription);
-  const subscriptionPlan = useAppSelector(state => state.user.subscriptionPlan);
-  const userPlan = getUserPlan(subscriptionPlan || subscription?.plan || 'free');
+  const subscription = useAppSelector((state) => state.user.subscription);
+  const subscriptionPlan = useAppSelector(
+    (state) => state.user.subscriptionPlan
+  );
+  const userPlan = getUserPlan(
+    subscriptionPlan || subscription?.plan || "free"
+  );
   const trendAccess = TREND_ACCESS[userPlan] || TREND_ACCESS.free;
-  
-  console.log('[TrendScreen] subscription:', subscription);
-  console.log('[TrendScreen] subscriptionPlan:', subscriptionPlan);
-  console.log('[TrendScreen] userPlan:', userPlan);
-  console.log('[TrendScreen] trendAccess:', trendAccess);
-  console.log('[TrendScreen] TREND_ACCESS:', TREND_ACCESS);
-  const [selectedCategory, setSelectedCategory] = useState<TrendCategory>('all');
+
+  console.log("[TrendScreen] subscription:", subscription);
+  console.log("[TrendScreen] subscriptionPlan:", subscriptionPlan);
+  console.log("[TrendScreen] userPlan:", userPlan);
+  console.log("[TrendScreen] trendAccess:", trendAccess);
+  console.log("[TrendScreen] TREND_ACCESS:", TREND_ACCESS);
+  const [selectedCategory, setSelectedCategory] =
+    useState<TrendCategory>("all");
   const [refreshing, setRefreshing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
@@ -61,66 +80,69 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   const loadTrends = async (forceRefresh = false) => {
     const now = Date.now();
     const CACHE_DURATION = 4 * 60 * 60 * 1000; // 4시간
-    
+
     // 강제 새로고침이 아니고, 최근에 로드했고, 데이터가 있으면 스킵
-    if (!forceRefresh && trends.length > 0 && (now - lastLoadTime) < CACHE_DURATION) {
-      console.log('[TrendScreen] Using cached data, skipping API call');
+    if (
+      !forceRefresh &&
+      trends.length > 0 &&
+      now - lastLoadTime < CACHE_DURATION
+    ) {
+      console.log("[TrendScreen] Using cached data, skipping API call");
       setIsLoading(false);
       setIsInitialLoading(false);
       return;
     }
-    
+
     try {
       setError(null);
       if (!forceRefresh) {
         setIsLoading(true);
       }
-      
-      console.log('[TrendScreen] Loading trends from API...');
-      
+
+      console.log("[TrendScreen] Loading trends from API...");
+
       // 트렌드 데이터와 사용자 트렌드를 병렬로 로드
       const [trendData, userTrendData] = await Promise.allSettled([
         trendService.getAllTrends(),
         loadUserTrends(),
       ]);
-      
+
       // 트렌드 데이터 처리
-      if (trendData.status === 'fulfilled') {
+      if (trendData.status === "fulfilled") {
         setTrends(trendData.value);
         setLastLoadTime(now); // 로드 시간 업데이트
-        console.log('[TrendScreen] Trends loaded successfully');
-        
+        console.log("[TrendScreen] Trends loaded successfully");
+
         // 메모리 캐시에 저장
         trendCache.set({
           trends: trendData.value,
-          userTrends: userTrendData.status === 'fulfilled' ? userTrendData.value : null,
+          userTrends:
+            userTrendData.status === "fulfilled" ? userTrendData.value : null,
           lastLoadTime: now,
-          error: null
+          error: null,
         });
-        
       } else {
-        console.error('Failed to load trends:', trendData.reason);
-        const errorMsg = '트렌드를 불러오는 중 오류가 발생했습니다.';
+        console.error("Failed to load trends:", trendData.reason);
+        const errorMsg = "트렌드를 불러오는 중 오류가 발생했습니다.";
         setError(errorMsg);
         setTrends([]);
-        
+
         // 에러도 캐시에 저장
         trendCache.set({
           trends: [],
           userTrends: null,
           lastLoadTime: now,
-          error: errorMsg
+          error: errorMsg,
         });
       }
-      
+
       // 사용자 트렌드 데이터 처리
-      if (userTrendData.status === 'fulfilled') {
+      if (userTrendData.status === "fulfilled") {
         setUserTrends(userTrendData.value);
       }
-      
     } catch (error) {
-      console.error('Failed to load trends:', error);
-      setError('트렌드를 불러오는 중 오류가 발생했습니다.');
+      console.error("Failed to load trends:", error);
+      setError("트렌드를 불러오는 중 오류가 발생했습니다.");
       setTrends([]);
     } finally {
       setIsLoading(false);
@@ -132,11 +154,14 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   const loadUserTrends = async () => {
     try {
       setIsUserTrendsLoading(true);
-      const improvedUserTrendsService = require('../services/improvedUserTrendsService').default;
-      const userTrendData = await improvedUserTrendsService.analyzeTrends('week');
+      const improvedUserTrendsService =
+        require("../services/improvedUserTrendsService").default;
+      const userTrendData = await improvedUserTrendsService.analyzeTrends(
+        "week"
+      );
       return userTrendData;
     } catch (error) {
-      console.log('User trends not available');
+      console.log("User trends not available");
       return null;
     } finally {
       setIsUserTrendsLoading(false);
@@ -145,34 +170,35 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
 
   // 컴포넌트 마운트 시 한 번만 실행
   useEffect(() => {
-    console.log('[TrendScreen] Component mounted');
-    
+    console.log("[TrendScreen] Component mounted");
+
     // trendAccess가 존재하지 않으면 기본값 사용
     const hasAccess = trendAccess?.hasAccess ?? true;
-    
+
     // 플랜에 따라 접근 권한 확인
     if (!hasAccess) {
-      console.log('[TrendScreen] Access denied');
+      console.log("[TrendScreen] Access denied");
       setIsLoading(false);
       setIsInitialLoading(false);
       return;
     }
-    
+
     // 캐시된 데이터 먼저 로드 시도
     loadCachedDataFirst();
-    
   }, []); // 빈 의존성 배열로 한 번만 실행
-  
+
   // 캐시된 데이터 먼저 로드하는 함수
   const loadCachedDataFirst = useCallback(async () => {
     try {
-      console.log('[TrendScreen] Checking memory cache...');
-      
+      console.log("[TrendScreen] Checking memory cache...");
+
       // 메모리 캐시 확인
       const cached = trendCache.get();
-      
+
       if (cached) {
-        console.log(`[TrendScreen] Memory cache hit (age: ${trendCache.getAge()} minutes)`);
+        console.log(
+          `[TrendScreen] Memory cache hit (age: ${trendCache.getAge()} minutes)`
+        );
         setTrends(cached.trends);
         setUserTrends(cached.userTrends);
         setError(cached.error);
@@ -181,12 +207,11 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         setIsInitialLoading(false);
         return;
       }
-      
-      console.log('[TrendScreen] Memory cache miss - loading data');
+
+      console.log("[TrendScreen] Memory cache miss - loading data");
       await loadTrends();
-      
     } catch (error) {
-      console.error('[TrendScreen] Error loading cached data:', error);
+      console.error("[TrendScreen] Error loading cached data:", error);
       await loadTrends();
     }
   }, []);
@@ -194,16 +219,16 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   const onRefresh = async () => {
     soundManager.playRefresh();
     setRefreshing(true);
-    
+
     try {
       // 메모리 캐시와 서비스 캐시 모두 클리어
       trendCache.clear();
       await trendService.clearCache();
-      console.log('[TrendScreen] All caches cleared, fetching fresh data...');
+      console.log("[TrendScreen] All caches cleared, fetching fresh data...");
       await loadTrends(true); // forceRefresh = true
     } catch (error) {
-      console.error('[TrendScreen] Refresh error:', error);
-      setError('새로고침 중 오류가 발생했습니다.');
+      console.error("[TrendScreen] Refresh error:", error);
+      setError("새로고침 중 오류가 발생했습니다.");
     }
   };
 
@@ -212,27 +237,37 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
     setSelectedCategory(category);
   }, []);
 
-  const handleTrendPress = useCallback((trend: any) => {
-    soundManager.playTap();
-    if (onNavigate) {
-      const prompt = trend.title || trendService.generatePromptFromTrend(trend);
-      onNavigate('ai-write', {
-        initialText: prompt,
-        initialHashtags: trend.hashtags || [],
-      });
-    }
-  }, [onNavigate]);
+  const handleTrendPress = useCallback(
+    (trend: any) => {
+      soundManager.playTap();
+      if (onNavigate) {
+        const prompt =
+          trend.title || trendService.generatePromptFromTrend(trend);
+        onNavigate("ai-write", {
+          initialText: prompt,
+          initialHashtags: trend.hashtags || [],
+        });
+      }
+    },
+    [onNavigate]
+  );
 
   // 메모이제이션을 통한 필터링 최적화
   const filteredTrends = useMemo(() => {
-    if (selectedCategory === 'all') return trends;
-    
-    return trends.filter(trend => {
+    if (selectedCategory === "all") {
+      return trends;
+    }
+
+    return trends.filter((trend) => {
       switch (selectedCategory) {
-        case 'news': return trend.source === 'news';
-        case 'social': return trend.source === 'social';
-        case 'keywords': return trend.source === 'naver' || trend.source === 'google';
-        default: return true;
+        case "news":
+          return trend.source === "news";
+        case "social":
+          return trend.source === "social";
+        case "keywords":
+          return trend.source === "naver" || trend.source === "google";
+        default:
+          return true;
       }
     });
   }, [trends, selectedCategory]);
@@ -242,17 +277,21 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   // 초기 로딩 시 전체 스켈레톤 표시
   if (isInitialLoading) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
         <TrendPageSkeleton />
       </SafeAreaView>
     );
   }
-  
+
   // 접근 권한이 없을 때
   const hasAccess = trendAccess?.hasAccess ?? true;
   if (!hasAccess) {
     return (
-      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <SafeAreaView
+        style={[styles.container, { backgroundColor: colors.background }]}
+      >
         <View style={styles.header}>
           <View style={styles.headerTop}>
             <View style={styles.mollyBadge}>
@@ -262,7 +301,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
           </View>
           <Text style={styles.headerSubtitle}>{BRAND.slogans.creative}</Text>
         </View>
-        
+
         <View style={styles.accessDeniedContainer}>
           <View style={styles.accessDeniedIcon}>
             <Icon name="lock-closed" size={48} color={colors.text.tertiary} />
@@ -273,11 +312,11 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
           </Text>
           <TouchableOpacity
             style={styles.upgradeButton}
-            onPress={() => onNavigate?.('subscription')}
+            onPress={() => onNavigate?.("subscription")}
           >
             <Text style={styles.upgradeButtonText}>구독 플랜 보기</Text>
           </TouchableOpacity>
-          
+
           <View style={styles.trendPreview}>
             <Text style={styles.trendPreviewTitle}>트렌드 미리보기</Text>
             <Text style={styles.trendPreviewSubtitle}>
@@ -291,7 +330,9 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <SafeAreaView
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
       <ScrollView
         style={[styles.scrollView, { backgroundColor: colors.background }]}
         showsVerticalScrollIndicator={false}
@@ -317,35 +358,43 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
 
         {/* 카테고리 선택 */}
         <SlideInView direction="left" delay={100}>
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.categoryScroll}
           >
             <View style={styles.categoryContainer}>
               {[
-                { id: 'all', label: '전체', icon: 'globe' },
-                { id: 'news', label: '뉴스', icon: 'newspaper' },
-                { id: 'social', label: '소셜', icon: 'people' },
-                { id: 'keywords', label: '검색어', icon: 'search' },
+                { id: "all", label: "전체", icon: "globe" },
+                { id: "news", label: "뉴스", icon: "newspaper" },
+                { id: "social", label: "소셜", icon: "people" },
+                { id: "keywords", label: "검색어", icon: "search" },
               ].map((category) => (
                 <TouchableOpacity
                   key={category.id}
                   style={[
                     styles.categoryButton,
-                    selectedCategory === category.id && styles.categoryButtonActive,
+                    selectedCategory === category.id &&
+                      styles.categoryButtonActive,
                   ]}
-                  onPress={() => handleCategoryChange(category.id as TrendCategory)}
+                  onPress={() =>
+                    handleCategoryChange(category.id as TrendCategory)
+                  }
                 >
-                  <Icon 
-                    name={category.icon} 
-                    size={16} 
-                    color={selectedCategory === category.id ? colors.white : colors.text.secondary} 
+                  <Icon
+                    name={category.icon}
+                    size={16}
+                    color={
+                      selectedCategory === category.id
+                        ? colors.white
+                        : colors.text.secondary
+                    }
                   />
                   <Text
                     style={[
                       styles.categoryButtonText,
-                      selectedCategory === category.id && styles.categoryButtonTextActive,
+                      selectedCategory === category.id &&
+                        styles.categoryButtonTextActive,
                     ]}
                   >
                     {category.label}
@@ -360,7 +409,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         <SmartAdPlacement position={1} context="feed" />
 
         {/* 내 트렌드 요약 (있는 경우) */}
-        {userPlan === 'pro' && (
+        {userPlan === "pro" && (
           <>
             {isUserTrendsLoading ? (
               <MyHashtagsSkeleton />
@@ -369,20 +418,26 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
                 <View style={styles.myTrendsSection}>
                   <Text style={styles.sectionTitle}>내가 자주 쓴 태그</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                    {userTrends.hashtags.slice(0, 5).map((tag: any, index: number) => (
-                      <AnimatedCard
-                        key={tag.hashtag}
-                        delay={250 + index * 50}
-                        style={styles.myHashtagChip}
-                        onPress={() => handleTrendPress({ 
-                          title: `#${tag.hashtag}`, 
-                          hashtags: [tag.hashtag] 
-                        })}
-                      >
-                        <Text style={styles.myHashtagText}>#{tag.hashtag}</Text>
-                        <Text style={styles.myHashtagCount}>{tag.count}</Text>
-                      </AnimatedCard>
-                    ))}
+                    {userTrends.hashtags
+                      .slice(0, 5)
+                      .map((tag: any, index: number) => (
+                        <AnimatedCard
+                          key={tag.hashtag}
+                          delay={250 + index * 50}
+                          style={styles.myHashtagChip}
+                          onPress={() =>
+                            handleTrendPress({
+                              title: `#${tag.hashtag}`,
+                              hashtags: [tag.hashtag],
+                            })
+                          }
+                        >
+                          <Text style={styles.myHashtagText}>
+                            #{tag.hashtag}
+                          </Text>
+                          <Text style={styles.myHashtagCount}>{tag.count}</Text>
+                        </AnimatedCard>
+                      ))}
                   </ScrollView>
                 </View>
               </SlideInView>
@@ -393,17 +448,25 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         {/* 실시간 트렌드 리스트 */}
         <View style={styles.trendsSection}>
           <Text style={styles.sectionTitle}>
-            {selectedCategory === 'all' ? '전체 트렌드' :
-             selectedCategory === 'news' ? '뉴스' :
-             selectedCategory === 'social' ? '커뮤니티' : '인기 검색어'}
+            {selectedCategory === "all"
+              ? "전체 트렌드"
+              : selectedCategory === "news"
+              ? "뉴스"
+              : selectedCategory === "social"
+              ? "커뮤니티"
+              : "인기 검색어"}
           </Text>
 
           {/* 에러 상태 표시 */}
           {error && (
             <View style={styles.errorContainer}>
-              <Icon name="alert-circle-outline" size={48} color={colors.error} />
+              <Icon
+                name="alert-circle-outline"
+                size={48}
+                color={colors.error}
+              />
               <Text style={styles.errorText}>{error}</Text>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.retryButton}
                 onPress={() => loadTrends()}
               >
@@ -437,52 +500,78 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
                     </Text>
                     {trend.hashtags && trend.hashtags.length > 0 && (
                       <View style={styles.trendHashtags}>
-                        {trend.hashtags.slice(0, 3).map((tag: string, idx: number) => (
-                          <Text key={idx} style={styles.trendHashtag}>#{tag}</Text>
-                        ))}
+                        {trend.hashtags
+                          .slice(0, 3)
+                          .map((tag: string, idx: number) => (
+                            <Text key={idx} style={styles.trendHashtag}>
+                              #{tag}
+                            </Text>
+                          ))}
                       </View>
                     )}
                   </View>
                   {trend.volume && (
                     <View style={styles.trendStats}>
-                      <Icon name="eye-outline" size={14} color={colors.text.tertiary} />
+                      <Icon
+                        name="eye-outline"
+                        size={14}
+                        color={colors.text.tertiary}
+                      />
                       <Text style={styles.trendVolume}>{trend.volume}</Text>
                     </View>
                   )}
                 </View>
                 <View style={styles.trendFooter}>
                   <View style={styles.trendSource}>
-                    <Icon 
+                    <Icon
                       name={
-                        trend.source === 'news' ? 'newspaper-outline' :
-                        trend.source === 'social' ? 'people-outline' :
-                        'trending-up-outline'
-                      } 
-                      size={12} 
-                      color={colors.text.tertiary} 
+                        trend.source === "news"
+                          ? "newspaper-outline"
+                          : trend.source === "social"
+                          ? "people-outline"
+                          : "trending-up-outline"
+                      }
+                      size={12}
+                      color={colors.text.tertiary}
                     />
                     <Text style={styles.trendSourceText}>
-                      {trend.source === 'news' ? '뉴스' :
-                       trend.source === 'social' ? '커뮤니티' :
-                       trend.source === 'naver' ? '네이버' : '검색어'}
+                      {trend.source === "news"
+                        ? "뉴스"
+                        : trend.source === "social"
+                        ? "커뮤니티"
+                        : trend.source === "naver"
+                        ? "네이버"
+                        : "검색어"}
                     </Text>
                   </View>
-                  <TouchableOpacity 
+                  <TouchableOpacity
                     style={styles.writeButton}
                     onPress={() => handleTrendPress(trend)}
                   >
-                    <MaterialIcon name="edit" size={14} color={colors.primary} />
+                    <MaterialIcon
+                      name="edit"
+                      size={14}
+                      color={colors.primary}
+                    />
                     <Text style={styles.writeButtonText}>글쓰기</Text>
                   </TouchableOpacity>
                 </View>
               </AnimatedCard>
             ))
-          ) : !error && (
-            <View style={styles.emptyState}>
-              <Icon name="trending-up-outline" size={48} color={colors.text.tertiary} />
-              <Text style={styles.emptyText}>트렌드를 불러올 수 없어요</Text>
-              <Text style={styles.emptySubtext}>잠시 후 다시 시도해주세요</Text>
-            </View>
+          ) : (
+            !error && (
+              <View style={styles.emptyState}>
+                <Icon
+                  name="trending-up-outline"
+                  size={48}
+                  color={colors.text.tertiary}
+                />
+                <Text style={styles.emptyText}>트렌드를 불러올 수 없어요</Text>
+                <Text style={styles.emptySubtext}>
+                  잠시 후 다시 시도해주세요
+                </Text>
+              </View>
+            )
           )}
         </View>
 
@@ -490,19 +579,24 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         <FadeInView delay={500}>
           <View style={styles.tipCard}>
             <View style={styles.tipIcon}>
-              <MaterialIcon name="tips-and-updates" size={20} color={colors.primary} />
+              <MaterialIcon
+                name="tips-and-updates"
+                size={20}
+                color={colors.primary}
+              />
             </View>
             <View style={styles.tipContent}>
               <Text style={styles.tipTitle}>트렌드 활용 팁</Text>
               <Text style={styles.tipText}>
-                트렌드를 클릭하면 AI가 해당 주제로 글을 작성해드려요. 키워드를 바탕으로 나만의 스타일로 수정해보세요!
+                트렌드를 클릭하면 AI가 해당 주제로 글을 작성해드려요. 키워드를
+                바탕으로 나만의 스타일로 수정해보세요!
               </Text>
             </View>
           </View>
         </FadeInView>
-        
+
         {/* 업데이트 빈도 표시 */}
-        {trendAccess?.updateFrequency === 'daily' && userPlan !== 'pro' && (
+        {trendAccess?.updateFrequency === "daily" && userPlan !== "pro" && (
           <View style={styles.updateFrequencyBadge}>
             <Icon name="time-outline" size={16} color={colors.text.secondary} />
             <Text style={styles.updateFrequencyText}>
@@ -510,11 +604,13 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
             </Text>
           </View>
         )}
-        
-        {trendAccess?.updateFrequency === 'realtime' && (
+
+        {trendAccess?.updateFrequency === "realtime" && (
           <View style={styles.updateFrequencyBadge}>
             <Icon name="flash" size={16} color={colors.primary} />
-            <Text style={[styles.updateFrequencyText, { color: colors.primary }]}>
+            <Text
+              style={[styles.updateFrequencyText, { color: colors.primary }]}
+            >
               실시간 트렌드 업데이트
             </Text>
           </View>
@@ -526,7 +622,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   );
 };
 
-const createStyles = (colors: typeof COLORS, isDark: boolean) => 
+const createStyles = (colors: typeof COLORS, isDark: boolean) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -537,8 +633,8 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
     },
     loadingContainer: {
       flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
     },
     loadingText: {
       marginTop: SPACING.md,
@@ -551,8 +647,8 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       paddingBottom: SPACING.lg,
     },
     headerTop: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       marginBottom: SPACING.sm,
     },
     mollyBadge: {
@@ -560,18 +656,18 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       height: 36,
       borderRadius: 18,
       backgroundColor: colors.primary,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
       marginRight: SPACING.sm,
     },
     mollyBadgeText: {
       fontSize: 18,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.white,
     },
     headerTitle: {
       fontSize: 28,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.text.primary,
       letterSpacing: -0.5,
     },
@@ -584,13 +680,13 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       marginBottom: SPACING.lg,
     },
     categoryContainer: {
-      flexDirection: 'row',
+      flexDirection: "row",
       paddingHorizontal: SPACING.lg,
       gap: SPACING.sm,
     },
     categoryButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.xs,
       paddingVertical: SPACING.sm,
       paddingHorizontal: SPACING.md,
@@ -605,7 +701,7 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
     },
     categoryButtonText: {
       fontSize: 14,
-      fontWeight: '500',
+      fontWeight: "500",
       color: colors.text.secondary,
     },
     categoryButtonTextActive: {
@@ -616,26 +712,26 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
     },
     sectionTitle: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
       marginBottom: SPACING.md,
       paddingHorizontal: SPACING.lg,
     },
     myHashtagChip: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.xs,
-      backgroundColor: colors.primary + '15',
+      backgroundColor: colors.primary + "15",
       paddingVertical: SPACING.sm,
       paddingHorizontal: SPACING.md,
       borderRadius: 20,
       marginLeft: SPACING.sm,
       borderWidth: 1,
-      borderColor: colors.primary + '30',
+      borderColor: colors.primary + "30",
     },
     myHashtagText: {
       fontSize: 14,
-      fontWeight: '500',
+      fontWeight: "500",
       color: colors.primary,
     },
     myHashtagCount: {
@@ -656,22 +752,22 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       borderColor: colors.border,
     },
     trendHeader: {
-      flexDirection: 'row',
-      alignItems: 'flex-start',
+      flexDirection: "row",
+      alignItems: "flex-start",
       marginBottom: SPACING.sm,
     },
     trendRank: {
       width: 32,
       height: 32,
       borderRadius: 16,
-      backgroundColor: colors.primary + '10',
-      justifyContent: 'center',
-      alignItems: 'center',
+      backgroundColor: colors.primary + "10",
+      justifyContent: "center",
+      alignItems: "center",
       marginRight: SPACING.sm,
     },
     trendRankText: {
       fontSize: 14,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.primary,
     },
     trendContent: {
@@ -679,13 +775,13 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
     },
     trendTitle: {
       fontSize: 15,
-      fontWeight: '500',
+      fontWeight: "500",
       color: colors.text.primary,
       lineHeight: 22,
     },
     trendHashtags: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
+      flexDirection: "row",
+      flexWrap: "wrap",
       gap: SPACING.xs,
       marginTop: SPACING.xs,
     },
@@ -694,8 +790,8 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       color: colors.primary,
     },
     trendStats: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: 4,
       marginLeft: SPACING.sm,
     },
@@ -704,13 +800,13 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       color: colors.text.tertiary,
     },
     trendFooter: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
     },
     trendSource: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: 4,
     },
     trendSourceText: {
@@ -718,43 +814,43 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       color: colors.text.tertiary,
     },
     writeButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: 4,
-      backgroundColor: colors.primary + '10',
+      backgroundColor: colors.primary + "10",
       paddingVertical: 6,
       paddingHorizontal: 12,
       borderRadius: 16,
     },
     writeButtonText: {
       fontSize: 12,
-      fontWeight: '500',
+      fontWeight: "500",
       color: colors.primary,
     },
     tipCard: {
       marginHorizontal: SPACING.lg,
       marginBottom: SPACING.xl,
-      backgroundColor: colors.primary + '10',
+      backgroundColor: colors.primary + "10",
       borderRadius: 16,
       padding: SPACING.md,
-      flexDirection: 'row',
-      alignItems: 'flex-start',
+      flexDirection: "row",
+      alignItems: "flex-start",
       gap: SPACING.sm,
     },
     tipIcon: {
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: colors.primary + '20',
-      justifyContent: 'center',
-      alignItems: 'center',
+      backgroundColor: colors.primary + "20",
+      justifyContent: "center",
+      alignItems: "center",
     },
     tipContent: {
       flex: 1,
     },
     tipTitle: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.primary,
       marginBottom: 4,
     },
@@ -764,12 +860,12 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       lineHeight: 19,
     },
     emptyState: {
-      alignItems: 'center',
+      alignItems: "center",
       paddingVertical: SPACING.xxl * 2,
     },
     emptyText: {
       fontSize: 16,
-      fontWeight: '500',
+      fontWeight: "500",
       color: colors.text.secondary,
       marginTop: SPACING.md,
     },
@@ -783,29 +879,29 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
     },
     accessDeniedContainer: {
       flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
       paddingHorizontal: SPACING.xl,
     },
     accessDeniedIcon: {
       width: 80,
       height: 80,
       borderRadius: 40,
-      backgroundColor: isDark ? colors.surface : '#F3F4F6',
-      justifyContent: 'center',
-      alignItems: 'center',
+      backgroundColor: isDark ? colors.surface : "#F3F4F6",
+      justifyContent: "center",
+      alignItems: "center",
       marginBottom: SPACING.lg,
     },
     accessDeniedTitle: {
       fontSize: 20,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.text.primary,
       marginBottom: SPACING.sm,
     },
     accessDeniedSubtitle: {
       fontSize: 16,
       color: colors.text.secondary,
-      textAlign: 'center',
+      textAlign: "center",
       lineHeight: 24,
       marginBottom: SPACING.xl,
     },
@@ -822,32 +918,32 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
     },
     upgradeButtonText: {
       fontSize: 16,
-      fontWeight: '700',
-      color: '#FFFFFF',
+      fontWeight: "700",
+      color: "#FFFFFF",
     },
     trendPreview: {
       marginTop: SPACING.xxl,
       padding: SPACING.lg,
-      backgroundColor: colors.primary + '10',
+      backgroundColor: colors.primary + "10",
       borderRadius: 16,
-      width: '100%',
+      width: "100%",
     },
     trendPreviewTitle: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.primary,
       marginBottom: SPACING.sm,
-      textAlign: 'center',
+      textAlign: "center",
     },
     trendPreviewSubtitle: {
       fontSize: 14,
       color: colors.text.secondary,
-      textAlign: 'center',
+      textAlign: "center",
       lineHeight: 22,
     },
     updateFrequencyBadge: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.xs,
       marginHorizontal: SPACING.lg,
       marginBottom: SPACING.lg,
@@ -857,26 +953,26 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       borderRadius: 12,
       borderWidth: 1,
       borderColor: colors.border,
-      alignSelf: 'flex-start',
+      alignSelf: "flex-start",
     },
     updateFrequencyText: {
       fontSize: 13,
       color: colors.text.secondary,
-      fontWeight: '500',
+      fontWeight: "500",
     },
-    
+
     // 에러 상태 스타일
     errorContainer: {
-      alignItems: 'center',
+      alignItems: "center",
       paddingVertical: SPACING.xxl * 2,
     },
     errorText: {
       fontSize: 16,
-      fontWeight: '500',
+      fontWeight: "500",
       color: colors.error || colors.text.secondary,
       marginTop: SPACING.md,
       marginBottom: SPACING.lg,
-      textAlign: 'center',
+      textAlign: "center",
     },
     retryButton: {
       backgroundColor: colors.primary,
@@ -886,7 +982,7 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
     },
     retryButtonText: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.white,
     },
   });

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from "react";
 import {
   View,
   Text,
@@ -7,46 +7,48 @@ import {
   Dimensions,
   TouchableOpacity,
   AppState,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { SPACING, FONT_SIZES } from '../utils/constants';
-import { Achievement } from '../types/achievement';
-import achievementService from '../services/achievementService';
-import { soundManager } from '../utils/soundManager';
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import { useAppTheme } from "../hooks/useAppTheme";
+import { SPACING, FONT_SIZES } from "../utils/constants";
+import { Achievement } from "../types/achievement";
+import achievementService from "../services/achievementService";
+import { soundManager } from "../utils/soundManager";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 interface AchievementNotificationProps {
   onNavigateToProfile?: () => void;
 }
 
-const AchievementNotification: React.FC<AchievementNotificationProps> = ({ 
-  onNavigateToProfile 
+const AchievementNotification: React.FC<AchievementNotificationProps> = ({
+  onNavigateToProfile,
 }) => {
   const { colors } = useAppTheme();
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const animValue = useRef(new Animated.Value(0)).current;
   const fadeValue = useRef(new Animated.Value(0)).current;
-  
+
   useEffect(() => {
     checkNewAchievements();
-    
+
     // 앱이 포그라운드에 있을 때만 주기적으로 업적 체크 (30분마다로 배터리 최적화)
     let interval: NodeJS.Timeout | null = null;
-    
+
     const startInterval = () => {
-      if (interval) clearInterval(interval);
+      if (interval) {
+        clearInterval(interval);
+      }
       interval = setInterval(() => {
-        if (AppState.currentState === 'active') {
+        if (AppState.currentState === "active") {
           checkNewAchievements();
         }
       }, 30 * 60 * 1000); // 30분으로 변경
     };
 
     const handleAppStateChange = (nextAppState: string) => {
-      if (nextAppState === 'active') {
+      if (nextAppState === "active") {
         checkNewAchievements(); // 앱이 활성화될 때 즉시 체크
         startInterval();
       } else {
@@ -58,20 +60,25 @@ const AchievementNotification: React.FC<AchievementNotificationProps> = ({
     };
 
     startInterval();
-    const subscription = AppState.addEventListener('change', handleAppStateChange);
-    
+    const subscription = AppState.addEventListener(
+      "change",
+      handleAppStateChange
+    );
+
     return () => {
-      if (interval) clearInterval(interval);
+      if (interval) {
+        clearInterval(interval);
+      }
       subscription?.remove();
     };
   }, []);
-  
+
   useEffect(() => {
     if (achievements.length > 0 && currentIndex < achievements.length) {
       showNotification();
     }
   }, [achievements, currentIndex]);
-  
+
   const checkNewAchievements = async () => {
     try {
       const newAchievements = await achievementService.checkAchievements();
@@ -80,10 +87,10 @@ const AchievementNotification: React.FC<AchievementNotificationProps> = ({
         setCurrentIndex(0);
       }
     } catch (error) {
-      console.error('Failed to check achievements:', error);
+      console.error("Failed to check achievements:", error);
     }
   };
-  
+
   const showNotification = () => {
     // 애니메이션 시작
     Animated.sequence([
@@ -124,18 +131,18 @@ const AchievementNotification: React.FC<AchievementNotificationProps> = ({
         markAchievementsAsSeen();
       }
     });
-    
+
     // 사운드 재생
     soundManager.playSuccess();
   };
-  
+
   const markAchievementsAsSeen = async () => {
-    const achievementIds = achievements.map(a => a.id);
+    const achievementIds = achievements.map((a) => a.id);
     await achievementService.markAchievementsAsSeen(achievementIds);
     setAchievements([]);
     setCurrentIndex(0);
   };
-  
+
   const handlePress = () => {
     // 애니메이션 즉시 종료
     Animated.timing(animValue, {
@@ -149,19 +156,19 @@ const AchievementNotification: React.FC<AchievementNotificationProps> = ({
       markAchievementsAsSeen();
     });
   };
-  
+
   if (achievements.length === 0 || currentIndex >= achievements.length) {
     return null;
   }
-  
+
   const currentAchievement = achievements[currentIndex];
   const translateY = animValue.interpolate({
     inputRange: [0, 1],
     outputRange: [-100, 0],
   });
-  
+
   const styles = createStyles(colors);
-  
+
   return (
     <Animated.View
       style={[
@@ -178,17 +185,19 @@ const AchievementNotification: React.FC<AchievementNotificationProps> = ({
         activeOpacity={0.9}
       >
         <View style={styles.content}>
-          <View style={[
-            styles.iconContainer,
-            { backgroundColor: currentAchievement.badgeColor }
-          ]}>
+          <View
+            style={[
+              styles.iconContainer,
+              { backgroundColor: currentAchievement.badgeColor },
+            ]}
+          >
             <Icon
               name={currentAchievement.icon}
               size={32}
               color={currentAchievement.iconColor}
             />
           </View>
-          
+
           <View style={styles.textContainer}>
             <Text style={styles.title}>업적 달성! 🎉</Text>
             <Text style={styles.achievementName}>
@@ -199,86 +208,89 @@ const AchievementNotification: React.FC<AchievementNotificationProps> = ({
             </Text>
           </View>
         </View>
-        
+
         <View style={styles.footer}>
-          <Text style={styles.footerText}>
-            탭하여 프로필에서 확인하기
-          </Text>
-          <Icon name="chevron-forward" size={16} color={colors.text.secondary} />
+          <Text style={styles.footerText}>탭하여 프로필에서 확인하기</Text>
+          <Icon
+            name="chevron-forward"
+            size={16}
+            color={colors.text.secondary}
+          />
         </View>
       </TouchableOpacity>
     </Animated.View>
   );
 };
 
-const createStyles = (colors: any) => StyleSheet.create({
-  container: {
-    position: 'absolute',
-    top: 50,
-    left: 20,
-    right: 20,
-    zIndex: 1000,
-    elevation: 10,
-  },
-  notification: {
-    backgroundColor: colors.surface,
-    borderRadius: 16,
-    padding: SPACING.lg,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
+const createStyles = (colors: any) =>
+  StyleSheet.create({
+    container: {
+      position: "absolute",
+      top: 50,
+      left: 20,
+      right: 20,
+      zIndex: 1000,
+      elevation: 10,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 8,
-    borderWidth: 1,
-    borderColor: colors.primary + '20',
-  },
-  content: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: SPACING.md,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  title: {
-    fontSize: FONT_SIZES.small,
-    color: colors.text.secondary,
-    marginBottom: 2,
-  },
-  achievementName: {
-    fontSize: FONT_SIZES.large,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: 4,
-  },
-  description: {
-    fontSize: FONT_SIZES.small,
-    color: colors.text.secondary,
-    lineHeight: 18,
-  },
-  footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: SPACING.sm,
-    paddingTop: SPACING.sm,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  footerText: {
-    fontSize: FONT_SIZES.small,
-    color: colors.text.tertiary,
-  },
-});
+    notification: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: SPACING.lg,
+      shadowColor: "#000",
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.15,
+      shadowRadius: 8,
+      elevation: 8,
+      borderWidth: 1,
+      borderColor: colors.primary + "20",
+    },
+    content: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    iconContainer: {
+      width: 64,
+      height: 64,
+      borderRadius: 32,
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: SPACING.md,
+    },
+    textContainer: {
+      flex: 1,
+    },
+    title: {
+      fontSize: FONT_SIZES.small,
+      color: colors.text.secondary,
+      marginBottom: 2,
+    },
+    achievementName: {
+      fontSize: FONT_SIZES.large,
+      fontWeight: "700",
+      color: colors.text.primary,
+      marginBottom: 4,
+    },
+    description: {
+      fontSize: FONT_SIZES.small,
+      color: colors.text.secondary,
+      lineHeight: 18,
+    },
+    footer: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: SPACING.sm,
+      paddingTop: SPACING.sm,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
+    footerText: {
+      fontSize: FONT_SIZES.small,
+      color: colors.text.tertiary,
+    },
+  });
 
 export default AchievementNotification;

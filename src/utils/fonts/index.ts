@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
 // 플랫폼별 시스템 폰트 정의
 export const SYSTEM_FONTS = {
@@ -12,18 +12,21 @@ export const SYSTEM_FONTS = {
   },
   // Android 시스템 폰트
   android: {
-    regular: 'Roboto',
-    medium: 'Roboto-Medium',
-    bold: 'Roboto-Bold',
-    light: 'Roboto-Light',
-    thin: 'Roboto-Thin',
+    regular: "Roboto",
+    medium: "Roboto-Medium",
+    bold: "Roboto-Bold",
+    light: "Roboto-Light",
+    thin: "Roboto-Thin",
   },
   // 웹 폰트 (react-native-web 사용시)
   web: {
-    regular: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-    medium: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    regular:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    medium:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
     bold: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
-    light: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+    light:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
     thin: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
   },
 };
@@ -63,21 +66,21 @@ export const FONTS = {
 
 // 폰트 스타일 헬퍼
 export const getFontStyle = (
-  size: keyof typeof FONTS.sizes = 'md',
-  weight: 'regular' | 'medium' | 'bold' | 'light' | 'thin' = 'regular'
+  size: keyof typeof FONTS.sizes = "md",
+  weight: "regular" | "medium" | "bold" | "light" | "thin" = "regular"
 ) => {
   const fontFamily = FONTS[weight];
   const fontSize = FONTS.sizes[size];
   const lineHeight = FONTS.lineHeights[size];
 
   // iOS는 fontWeight로 처리, Android는 fontFamily로 처리
-  if (Platform.OS === 'ios') {
+  if (Platform.OS === "ios") {
     const weightMap = {
-      thin: '100',
-      light: '300',
-      regular: '400',
-      medium: '500',
-      bold: '700',
+      thin: "100",
+      light: "300",
+      regular: "400",
+      medium: "500",
+      bold: "700",
     };
 
     return {
@@ -98,31 +101,31 @@ export const getFontStyle = (
 // 자주 사용하는 텍스트 스타일
 export const TEXT_STYLES = {
   // 제목 스타일
-  h1: getFontStyle('xxxl', 'bold'),
-  h2: getFontStyle('xxl', 'bold'),
-  h3: getFontStyle('xl', 'bold'),
-  h4: getFontStyle('lg', 'medium'),
-  h5: getFontStyle('md', 'medium'),
-  h6: getFontStyle('sm', 'medium'),
-  
+  h1: getFontStyle("xxxl", "bold"),
+  h2: getFontStyle("xxl", "bold"),
+  h3: getFontStyle("xl", "bold"),
+  h4: getFontStyle("lg", "medium"),
+  h5: getFontStyle("md", "medium"),
+  h6: getFontStyle("sm", "medium"),
+
   // 본문 스타일
-  body: getFontStyle('md', 'regular'),
-  bodyLarge: getFontStyle('lg', 'regular'),
-  bodySmall: getFontStyle('sm', 'regular'),
-  
+  body: getFontStyle("md", "regular"),
+  bodyLarge: getFontStyle("lg", "regular"),
+  bodySmall: getFontStyle("sm", "regular"),
+
   // 캡션 스타일
-  caption: getFontStyle('xs', 'regular'),
-  captionBold: getFontStyle('xs', 'medium'),
-  
+  caption: getFontStyle("xs", "regular"),
+  captionBold: getFontStyle("xs", "medium"),
+
   // 버튼 스타일
-  button: getFontStyle('md', 'medium'),
-  buttonSmall: getFontStyle('sm', 'medium'),
-  buttonLarge: getFontStyle('lg', 'medium'),
-  
+  button: getFontStyle("md", "medium"),
+  buttonSmall: getFontStyle("sm", "medium"),
+  buttonLarge: getFontStyle("lg", "medium"),
+
   // 링크 스타일
   link: {
-    ...getFontStyle('md', 'regular'),
-    textDecorationLine: 'underline' as const,
+    ...getFontStyle("md", "regular"),
+    textDecorationLine: "underline" as const,
   },
 };
 

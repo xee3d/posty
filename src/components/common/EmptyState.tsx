@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { COLORS, SPACING } from '../../utils/constants';
-import { useAppTheme } from '../../hooks/useAppTheme';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import { COLORS, SPACING } from "../../utils/constants";
+import { useAppTheme } from "../../hooks/useAppTheme";
 
 interface EmptyStateProps {
   icon?: string;
@@ -13,15 +13,15 @@ interface EmptyStateProps {
 }
 
 export const EmptyState: React.FC<EmptyStateProps> = ({
-  icon = 'document-text-outline',
-  title = '아직 콘텐츠가 없어요',
-  subtitle = '새로운 콘텐츠를 만들어보세요!',
+  icon = "document-text-outline",
+  title = "아직 콘텐츠가 없어요",
+  subtitle = "새로운 콘텐츠를 만들어보세요!",
   iconSize = 64,
   style,
 }) => {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
-  
+
   return (
     <View style={[styles.container, style]}>
       <View style={styles.iconContainer}>
@@ -33,28 +33,29 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   );
 };
 
-const createStyles = (colors: typeof COLORS) => StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: SPACING.xxl * 2,
-    paddingHorizontal: SPACING.xl,
-  },
-  iconContainer: {
-    marginBottom: SPACING.lg,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: colors.text.primary,
-    textAlign: 'center',
-    marginBottom: SPACING.sm,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-});
+const createStyles = (colors: typeof COLORS) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: SPACING.xxl * 2,
+      paddingHorizontal: SPACING.xl,
+    },
+    iconContainer: {
+      marginBottom: SPACING.lg,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: colors.text.primary,
+      textAlign: "center",
+      marginBottom: SPACING.sm,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      textAlign: "center",
+      lineHeight: 20,
+    },
+  });

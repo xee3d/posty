@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
+import React from "react";
+import { View, StyleSheet, ViewStyle } from "react-native";
 
 interface ProgressBarProps {
   progress: number; // 0-100
@@ -12,8 +12,8 @@ interface ProgressBarProps {
 const ProgressBar: React.FC<ProgressBarProps> = ({
   progress,
   height = 6,
-  backgroundColor = '#E5E7EB',
-  progressColor = '#2196F3',
+  backgroundColor = "#E5E7EB",
+  progressColor = "#2196F3",
   style,
 }) => {
   // progress를 0-100 사이로 제한
@@ -36,12 +36,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: "100%",
     borderRadius: 3,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   progress: {
-    height: '100%',
+    height: "100%",
     borderRadius: 3,
   },
 });

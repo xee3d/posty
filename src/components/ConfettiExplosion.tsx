@@ -1,9 +1,5 @@
-import React, { useEffect, useRef } from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
+import React, { useEffect, useRef } from "react";
+import { View, StyleSheet, Dimensions } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -14,9 +10,9 @@ import Animated, {
   interpolate,
   Easing,
   runOnJS,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 interface Particle {
   id: number;
@@ -26,7 +22,7 @@ interface Particle {
   vy: number;
   color: string;
   size: number;
-  shape: 'circle' | 'star' | 'square';
+  shape: "circle" | "star" | "square";
 }
 
 interface ConfettiExplosionProps {
@@ -40,11 +36,19 @@ interface ConfettiExplosionProps {
 export const ConfettiExplosion: React.FC<ConfettiExplosionProps> = ({
   isVisible,
   onAnimationEnd,
-  colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F', '#BB8FCE'],
+  colors = [
+    "#FF6B6B",
+    "#4ECDC4",
+    "#45B7D1",
+    "#FFA07A",
+    "#98D8C8",
+    "#F7DC6F",
+    "#BB8FCE",
+  ],
   centerX: propCenterX,
   centerY: propCenterY,
 }) => {
-  console.log('[ConfettiExplosion] Rendering with isVisible:', isVisible);
+  console.log("[ConfettiExplosion] Rendering with isVisible:", isVisible);
   const particles = useRef<Particle[]>([]);
   const opacity = useSharedValue(0);
   const scale = useSharedValue(0);
@@ -59,7 +63,7 @@ export const ConfettiExplosion: React.FC<ConfettiExplosionProps> = ({
     for (let i = 0; i < particleCount; i++) {
       const angle = (Math.PI * 2 * i) / particleCount;
       const velocity = 8 + Math.random() * 15; // 속도 증가
-      
+
       newParticles.push({
         id: i,
         x: centerX,
@@ -68,25 +72,34 @@ export const ConfettiExplosion: React.FC<ConfettiExplosionProps> = ({
         vy: Math.sin(angle) * velocity - 5, // 중력 효과
         color: colors[Math.floor(Math.random() * colors.length)],
         size: 10 + Math.random() * 15, // 크기 증가
-        shape: ['circle', 'star', 'square'][Math.floor(Math.random() * 3)] as any,
+        shape: ["circle", "star", "square"][
+          Math.floor(Math.random() * 3)
+        ] as any,
       });
     }
-    
+
     particles.current = newParticles;
   };
 
   useEffect(() => {
-    console.log('[ConfettiExplosion] useEffect triggered, isVisible:', isVisible);
+    console.log(
+      "[ConfettiExplosion] useEffect triggered, isVisible:",
+      isVisible
+    );
     if (isVisible) {
       createParticles();
-      console.log('[ConfettiExplosion] Created', particles.current.length, 'particles');
-      
+      console.log(
+        "[ConfettiExplosion] Created",
+        particles.current.length,
+        "particles"
+      );
+
       // 애니메이션 시작
       opacity.value = withSequence(
         withTiming(1, { duration: 100 }),
         withDelay(1500, withTiming(0, { duration: 300 }))
       );
-      
+
       scale.value = withSequence(
         withSpring(1, { damping: 10, stiffness: 100 }),
         withDelay(1500, withTiming(0, { duration: 300 }))
@@ -107,12 +120,18 @@ export const ConfettiExplosion: React.FC<ConfettiExplosionProps> = ({
   }));
 
   if (!isVisible) {
-    console.log('[ConfettiExplosion] Not visible, returning null');
+    console.log("[ConfettiExplosion] Not visible, returning null");
     return null;
   }
 
   return (
-    <View style={[StyleSheet.absoluteFillObject, { zIndex: 9999, backgroundColor: 'transparent' }]} pointerEvents="none">
+    <View
+      style={[
+        StyleSheet.absoluteFillObject,
+        { zIndex: 9999, backgroundColor: "transparent" },
+      ]}
+      pointerEvents="none"
+    >
       <Animated.View style={[StyleSheet.absoluteFillObject, containerStyle]}>
         {particles.current.map((particle) => (
           <ParticleComponent key={particle.id} particle={particle} />
@@ -136,24 +155,24 @@ const ParticleComponent: React.FC<{ particle: Particle }> = ({ particle }) => {
       duration: 2000,
       easing: Easing.out(Easing.quad),
     });
-    
+
     translateY.value = withTiming(particle.y + particle.vy * 80 + 150, {
       duration: 2000,
       easing: Easing.out(Easing.quad),
     });
-    
+
     // 회전
     rotation.value = withTiming(360, {
       duration: 2000,
       easing: Easing.linear,
     });
-    
+
     // 크기 변화
     particleScale.value = withSequence(
       withTiming(1.2, { duration: 200 }),
       withTiming(0, { duration: 1800, easing: Easing.in(Easing.quad) })
     );
-    
+
     // 투명도
     opacity.value = withTiming(0, {
       duration: 2000,
@@ -162,7 +181,7 @@ const ParticleComponent: React.FC<{ particle: Particle }> = ({ particle }) => {
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
-    position: 'absolute',
+    position: "absolute",
     left: -particle.size / 2,
     top: -particle.size / 2,
     transform: [
@@ -175,31 +194,33 @@ const ParticleComponent: React.FC<{ particle: Particle }> = ({ particle }) => {
   }));
 
   // 모양에 따른 스타일
-  const shapeStyle = particle.shape === 'circle' 
-    ? { borderRadius: particle.size / 2 }
-    : particle.shape === 'star'
-    ? { 
-        width: 0,
-        height: 0,
-        borderStyle: 'solid',
-        borderLeftWidth: particle.size / 2,
-        borderRightWidth: particle.size / 2,
-        borderBottomWidth: particle.size,
-        borderLeftColor: 'transparent',
-        borderRightColor: 'transparent',
-        borderBottomColor: particle.color,
-        backgroundColor: 'transparent',
-      }
-    : {}; // square는 기본 사각형
+  const shapeStyle =
+    particle.shape === "circle"
+      ? { borderRadius: particle.size / 2 }
+      : particle.shape === "star"
+      ? {
+          width: 0,
+          height: 0,
+          borderStyle: "solid",
+          borderLeftWidth: particle.size / 2,
+          borderRightWidth: particle.size / 2,
+          borderBottomWidth: particle.size,
+          borderLeftColor: "transparent",
+          borderRightColor: "transparent",
+          borderBottomColor: particle.color,
+          backgroundColor: "transparent",
+        }
+      : {}; // square는 기본 사각형
 
   return (
     <Animated.View
       style={[
         animatedStyle,
         {
-          width: particle.shape === 'star' ? 0 : particle.size,
-          height: particle.shape === 'star' ? 0 : particle.size,
-          backgroundColor: particle.shape === 'star' ? 'transparent' : particle.color,
+          width: particle.shape === "star" ? 0 : particle.size,
+          height: particle.shape === "star" ? 0 : particle.size,
+          backgroundColor:
+            particle.shape === "star" ? "transparent" : particle.color,
         },
         shapeStyle,
       ]}

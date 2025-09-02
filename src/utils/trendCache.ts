@@ -18,35 +18,35 @@ class TrendCache {
   set(data: TrendCacheData): void {
     this.cache = {
       ...data,
-      lastLoadTime: Date.now()
+      lastLoadTime: Date.now(),
     };
-    console.log('[TrendCache] Data cached successfully');
+    console.log("[TrendCache] Data cached successfully");
   }
 
   // 캐시 조회
   get(): TrendCacheData | null {
     if (!this.cache) {
-      console.log('[TrendCache] No cache found');
+      console.log("[TrendCache] No cache found");
       return null;
     }
 
     const now = Date.now();
-    const isExpired = (now - this.cache.lastLoadTime) > this.CACHE_DURATION;
+    const isExpired = now - this.cache.lastLoadTime > this.CACHE_DURATION;
 
     if (isExpired) {
-      console.log('[TrendCache] Cache expired, clearing');
+      console.log("[TrendCache] Cache expired, clearing");
       this.cache = null;
       return null;
     }
 
-    console.log('[TrendCache] Cache hit - returning cached data');
+    console.log("[TrendCache] Cache hit - returning cached data");
     return this.cache;
   }
 
   // 캐시 삭제
   clear(): void {
     this.cache = null;
-    console.log('[TrendCache] Cache cleared');
+    console.log("[TrendCache] Cache cleared");
   }
 
   // 캐시 존재 여부
@@ -57,7 +57,9 @@ class TrendCache {
 
   // 캐시 나이 (분)
   getAge(): number {
-    if (!this.cache) return Infinity;
+    if (!this.cache) {
+      return Infinity;
+    }
     return Math.floor((Date.now() - this.cache.lastLoadTime) / (1000 * 60));
   }
 }

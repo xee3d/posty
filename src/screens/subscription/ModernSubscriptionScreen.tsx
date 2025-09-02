@@ -1,92 +1,127 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Linking, Share, Platform,  } from 'react-native';
-import { COLORS, SPACING } from '../../utils/constants';
-import { SUBSCRIPTION_PLANS } from '../../config/adConfig';
-import Icon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { useAppTheme } from '../../hooks/useAppTheme';
-import { useAppSelector } from '../../hooks/redux';
-import { selectCurrentTokens, selectSubscriptionPlan, selectSubscriptionAutoRenew, cancelSubscription } from '../../store/slices/userSlice';
-import { useAppDispatch } from '../../hooks/redux';
-import tokenService from '../../services/subscription/tokenService';
-import inAppPurchaseService from '../../services/subscription/inAppPurchaseService';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import rewardAdService from '../../services/rewardAdService';
-import missionService from '../../services/missionService';
-import TokenPurchaseView from '../../components/TokenPurchaseView';
-import EarnTokenModal from '../../components/EarnTokenModal';
-import PaymentSuccessModal from '../../components/PaymentSuccessModal';
-import { AdaptiveNativeAd, SmartAdPlacement } from '../../components/ads';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  StyleSheet,
+  SafeAreaView,
+  Dimensions,
+  Linking,
+  Share,
+  Platform,
+} from "react-native";
+import { COLORS, SPACING } from "../../utils/constants";
+import { SUBSCRIPTION_PLANS } from "../../config/adConfig";
+import Icon from "react-native-vector-icons/Ionicons";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import { useAppTheme } from "../../hooks/useAppTheme";
+import { useAppSelector } from "../../hooks/redux";
+import {
+  selectCurrentTokens,
+  selectSubscriptionPlan,
+  selectSubscriptionAutoRenew,
+  cancelSubscription,
+} from "../../store/slices/userSlice";
+import { useAppDispatch } from "../../hooks/redux";
+import tokenService from "../../services/subscription/tokenService";
+import inAppPurchaseService from "../../services/subscription/inAppPurchaseService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import rewardAdService from "../../services/rewardAdService";
+import missionService from "../../services/missionService";
+import TokenPurchaseView from "../../components/TokenPurchaseView";
+import EarnTokenModal from "../../components/EarnTokenModal";
+import PaymentSuccessModal from "../../components/PaymentSuccessModal";
+import { AdaptiveNativeAd, SmartAdPlacement } from "../../components/ads";
 
-import { Alert } from '../../utils/customAlert';
-import { DeviceEventEmitter } from 'react-native';
-const { width: screenWidth } = Dimensions.get('window');
+import { Alert } from "../../utils/customAlert";
+import { DeviceEventEmitter } from "react-native";
+const { width: screenWidth } = Dimensions.get("window");
 
 interface SubscriptionScreenProps {
   navigation: any;
-  currentPlan?: 'free' | 'premium' | 'pro';
+  currentPlan?: "free" | "premium" | "pro";
 }
 
-export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({ 
-  navigation, 
-  currentPlan = 'free' 
+export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
+  navigation,
+  currentPlan = "free",
 }) => {
   const { colors, isDark } = useAppTheme();
   const dispatch = useAppDispatch();
   const currentTokens = useAppSelector(selectCurrentTokens);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
   const subscriptionAutoRenew = useAppSelector(selectSubscriptionAutoRenew);
-  const [selectedPlan, setSelectedPlan] = useState<'free' | 'starter' | 'premium' | 'pro'>('premium');
-  const [activeTab, setActiveTab] = useState<'subscription' | 'tokens' | 'manage'>('subscription');
+  const [selectedPlan, setSelectedPlan] = useState<
+    "free" | "starter" | "premium" | "pro"
+  >("premium");
+  const [activeTab, setActiveTab] = useState<
+    "subscription" | "tokens" | "manage"
+  >("subscription");
   const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
   const [stats, setStats] = useState({
     totalTokens: 0,
   });
-  const [realSubscriptionPlan, setRealSubscriptionPlan] = useState<'free' | 'starter' | 'premium' | 'pro'>('free');
+  const [realSubscriptionPlan, setRealSubscriptionPlan] = useState<
+    "free" | "starter" | "premium" | "pro"
+  >("free");
   const [adStats, setAdStats] = useState({
     dailyCount: 0,
     remainingToday: 10,
     dailyLimit: 10,
   });
-  
+
   // 폭죽 애니메이션용 state
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [purchaseType, setPurchaseType] = useState<'subscription' | 'tokens'>('subscription');
+  const [purchaseType, setPurchaseType] = useState<"subscription" | "tokens">(
+    "subscription"
+  );
   const [purchaseDetails, setPurchaseDetails] = useState<any>({});
-  
+
   // 디버깅용
   useEffect(() => {
-    console.log('[ModernSubscriptionScreen] showSuccessModal changed:', showSuccessModal);
+    console.log(
+      "[ModernSubscriptionScreen] showSuccessModal changed:",
+      showSuccessModal
+    );
   }, [showSuccessModal]);
 
   useEffect(() => {
     loadTokenStats();
     loadAdStats();
-    
+
     const checkInitialTab = async () => {
-      const initialTab = await AsyncStorage.getItem('subscription_initial_tab');
+      const initialTab = await AsyncStorage.getItem("subscription_initial_tab");
       if (initialTab) {
         setActiveTab(initialTab as any);
-        await AsyncStorage.removeItem('subscription_initial_tab');
+        await AsyncStorage.removeItem("subscription_initial_tab");
       }
     };
     checkInitialTab();
 
     rewardAdService.preloadAd();
-    
+
     // 구매 성공 이벤트 리스너
-    const purchaseListener = DeviceEventEmitter.addListener('purchaseSuccess', (data) => {
-      console.log('[ModernSubscriptionScreen] Purchase success event received:', data);
-      console.log('[ModernSubscriptionScreen] Setting showSuccessModal to true');
-      setPurchaseType(data.type);
-      if (data.type === 'subscription') {
-        setPurchaseDetails({ planName: data.planName });
-      } else {
-        setPurchaseDetails({ tokenAmount: data.amount });
+    const purchaseListener = DeviceEventEmitter.addListener(
+      "purchaseSuccess",
+      (data) => {
+        console.log(
+          "[ModernSubscriptionScreen] Purchase success event received:",
+          data
+        );
+        console.log(
+          "[ModernSubscriptionScreen] Setting showSuccessModal to true"
+        );
+        setPurchaseType(data.type);
+        if (data.type === "subscription") {
+          setPurchaseDetails({ planName: data.planName });
+        } else {
+          setPurchaseDetails({ tokenAmount: data.amount });
+        }
+        setShowSuccessModal(true);
       }
-      setShowSuccessModal(true);
-    });
-    
+    );
+
     return () => {
       purchaseListener.remove();
     };
@@ -94,11 +129,14 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   // 구독 플랜이 변경되면 화면 새로고침
   useEffect(() => {
-    console.log('[ModernSubscriptionScreen] subscriptionPlan changed to:', subscriptionPlan);
+    console.log(
+      "[ModernSubscriptionScreen] subscriptionPlan changed to:",
+      subscriptionPlan
+    );
   }, [subscriptionPlan]);
 
   useEffect(() => {
-    if (activeTab === 'manage') {
+    if (activeTab === "manage") {
       loadTokenStats();
       loadAdStats();
     }
@@ -108,14 +146,14 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     try {
       const tokenInfo = await tokenService.getTokenInfo();
       const totalTokens = tokenInfo.daily + tokenInfo.purchased;
-      
+
       setStats({
         totalTokens: totalTokens,
       });
-      
-      setRealSubscriptionPlan(tokenInfo.plan || 'free');
+
+      setRealSubscriptionPlan(tokenInfo.plan || "free");
     } catch (error) {
-      console.error('Failed to load token stats:', error);
+      console.error("Failed to load token stats:", error);
     }
   };
 
@@ -124,7 +162,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       const stats = await rewardAdService.getAdStats();
       setAdStats(stats);
     } catch (error) {
-      console.error('Failed to load ad stats:', error);
+      console.error("Failed to load ad stats:", error);
     }
   };
 
@@ -132,78 +170,87 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     try {
       const subscription = await tokenService.getSubscription();
       subscription.dailyTokens += tokens;
-      await AsyncStorage.setItem('USER_SUBSCRIPTION', JSON.stringify(subscription));
-      
-      await loadTokenStats();
-      
-      Alert.alert(
-        '토큰 획득! 🎉',
-        `${tokens}개의 토큰을 받았어요!`,
-        [{ text: '확인' }]
+      await AsyncStorage.setItem(
+        "USER_SUBSCRIPTION",
+        JSON.stringify(subscription)
       );
+
+      await loadTokenStats();
+
+      Alert.alert("토큰 획득! 🎉", `${tokens}개의 토큰을 받았어요!`, [
+        { text: "확인" },
+      ]);
     } catch (error) {
-      console.error('Failed to add tokens:', error);
+      console.error("Failed to add tokens:", error);
     }
   };
 
   const handleWatchAd = async () => {
     const { canWatch, reason } = await rewardAdService.canWatchAd();
-    
+
     if (!canWatch) {
-      Alert.alert('광고 시청 불가', reason || '잠시 후 다시 시도해주세요.');
+      Alert.alert("광고 시청 불가", reason || "잠시 후 다시 시도해주세요.");
       return;
     }
 
     Alert.alert(
-      '광고 시청',
-      '30초 광고를 시청하고 2개의 토큰을 받으시겠어요?',
+      "광고 시청",
+      "30초 광고를 시청하고 2개의 토큰을 받으시겠어요?",
       [
-        { text: '취소', style: 'cancel' },
-        { 
-          text: '시청하기',
+        { text: "취소", style: "cancel" },
+        {
+          text: "시청하기",
           onPress: async () => {
             const result = await rewardAdService.showRewardedAd();
-            
+
             if (result.success && result.reward) {
               await handleEarnTokens(result.reward.amount);
-              
-              const missionResult = await missionService.trackAction('ad_watch');
+
+              const missionResult = await missionService.trackAction(
+                "ad_watch"
+              );
               if (missionResult.rewardsEarned > 0) {
                 setTimeout(() => {
                   Alert.alert(
-                    '미션 완료! 🎯',
+                    "미션 완료! 🎯",
                     `광고 시청 미션을 완료하여 추가로 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`,
-                    [{ text: '확인', onPress: () => handleEarnTokens(missionResult.rewardsEarned) }]
+                    [
+                      {
+                        text: "확인",
+                        onPress: () =>
+                          handleEarnTokens(missionResult.rewardsEarned),
+                      },
+                    ]
                   );
                 }, 1000);
               }
-              
+
               await loadAdStats();
             } else if (result.error) {
-              Alert.alert('광고 시청 실패', result.error);
+              Alert.alert("광고 시청 실패", result.error);
             }
-          }
-        }
+          },
+        },
       ]
     );
   };
 
   const handleDailyCheck = async () => {
     const today = new Date().toDateString();
-    const lastCheck = await AsyncStorage.getItem('last_daily_check');
-    
+    const lastCheck = await AsyncStorage.getItem("last_daily_check");
+
     if (lastCheck === today) {
-      Alert.alert('알림', '오늘은 이미 출석 체크를 했어요!');
+      Alert.alert("알림", "오늘은 이미 출석 체크를 했어요!");
       return;
     }
-    
-    await AsyncStorage.setItem('last_daily_check', today);
+
+    await AsyncStorage.setItem("last_daily_check", today);
     await handleEarnTokens(1);
-    
-    const result = await missionService.trackAction('login');
+
+    const result = await missionService.trackAction("login");
     if (result.rewardsEarned > 0) {
       Alert.alert(
-        '미션 완료! 🎯',
+        "미션 완료! 🎯",
         `출석 미션을 완료하여 추가로 ${result.rewardsEarned}개의 토큰을 받았습니다!`
       );
       await handleEarnTokens(result.rewardsEarned);
@@ -213,100 +260,103 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   const handleShareSNS = async () => {
     try {
       const result = await Share.share({
-        message: 'Posty로 AI가 만드는 SNS 콘텐츠! 지금 바로 사용해보세요 🚀\nhttps://posty.app',
-        title: 'Posty - AI 콘텐츠 생성',
+        message:
+          "Posty로 AI가 만드는 SNS 콘텐츠! 지금 바로 사용해보세요 🚀\nhttps://posty.app",
+        title: "Posty - AI 콘텐츠 생성",
       });
-      
+
       if (result.action === Share.sharedAction) {
         const today = new Date().toDateString();
         const sharedToday = await AsyncStorage.getItem(`shared_sns_${today}`);
-        
+
         if (!sharedToday) {
-          await AsyncStorage.setItem(`shared_sns_${today}`, 'true');
+          await AsyncStorage.setItem(`shared_sns_${today}`, "true");
           await handleEarnTokens(3);
-          
-          const missionResult = await missionService.trackAction('share');
+
+          const missionResult = await missionService.trackAction("share");
           if (missionResult.rewardsEarned > 0) {
             Alert.alert(
-              '미션 완료! 🎯',
+              "미션 완료! 🎯",
               `공유 미션을 완료하여 추가로 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`
             );
             await handleEarnTokens(missionResult.rewardsEarned);
           }
         } else {
-          Alert.alert('알림', '오늘은 이미 SNS 공유를 했어요!');
+          Alert.alert("알림", "오늘은 이미 SNS 공유를 했어요!");
         }
       }
     } catch (error) {
-      console.error('Share error:', error);
+      console.error("Share error:", error);
     }
   };
 
   const handleInviteFriend = async () => {
     try {
-      const inviteCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+      const inviteCode = Math.random()
+        .toString(36)
+        .substring(2, 8)
+        .toUpperCase();
       const inviteLink = `https://posty.app/invite/${inviteCode}`;
-      
+
       const result = await Share.share({
         message: `Posty로 친구를 초대하세요! 초대 코드: ${inviteCode}\n${inviteLink}`,
-        title: 'Posty 초대하기',
+        title: "Posty 초대하기",
       });
-      
+
       if (result.action === Share.sharedAction) {
         Alert.alert(
-          '초대 전송',
-          '친구가 가입하면 5개의 토큰을 받을 수 있어요!',
-          [{ text: '확인' }]
+          "초대 전송",
+          "친구가 가입하면 5개의 토큰을 받을 수 있어요!",
+          [{ text: "확인" }]
         );
-        
-        await missionService.trackAction('invite');
+
+        await missionService.trackAction("invite");
       }
     } catch (error) {
-      console.error('Invite error:', error);
+      console.error("Invite error:", error);
     }
   };
 
   const handleRateApp = async () => {
-    const hasRated = await AsyncStorage.getItem('app_rated');
-    
+    const hasRated = await AsyncStorage.getItem("app_rated");
+
     if (hasRated) {
-      Alert.alert('알림', '이미 앱을 평가해주셨어요. 감사합니다!');
+      Alert.alert("알림", "이미 앱을 평가해주셨어요. 감사합니다!");
       return;
     }
-    
-    Alert.alert(
-      '앱 평가하기',
-      'Posty가 도움이 되셨나요? 평가를 남겨주세요!',
-      [
-        { text: '나중에', style: 'cancel' },
-        {
-          text: '평가하러 가기',
-          onPress: async () => {
-            try {
-              const storeUrl = Platform.OS === 'ios'
-                ? 'https://apps.apple.com/app/posty-ai/id123456789'
-                : 'https://play.google.com/store/apps/details?id=com.posty.ai';
-              
-              await Linking.openURL(storeUrl);
-              
-              setTimeout(async () => {
-                await AsyncStorage.setItem('app_rated', 'true');
-                await handleEarnTokens(10);
-              }, 3000);
-            } catch (error) {
-              Alert.alert('오류', '스토어를 열 수 없어요.');
-            }
+
+    Alert.alert("앱 평가하기", "Posty가 도움이 되셨나요? 평가를 남겨주세요!", [
+      { text: "나중에", style: "cancel" },
+      {
+        text: "평가하러 가기",
+        onPress: async () => {
+          try {
+            const storeUrl =
+              Platform.OS === "ios"
+                ? "https://apps.apple.com/app/posty-ai/id123456789"
+                : "https://play.google.com/store/apps/details?id=com.posty.ai";
+
+            await Linking.openURL(storeUrl);
+
+            setTimeout(async () => {
+              await AsyncStorage.setItem("app_rated", "true");
+              await handleEarnTokens(10);
+            }, 3000);
+          } catch (error) {
+            Alert.alert("오류", "스토어를 열 수 없어요.");
           }
-        }
-      ]
-    );
+        },
+      },
+    ]);
   };
 
   const handleCompleteMission = () => {
-    navigation.navigate('Mission');
+    navigation.navigate("Mission");
   };
 
-  const subscriptionExpiresAt = useAppSelector(state => state.user.subscriptionExpiresAt);
+  const subscriptionExpiresAt = useAppSelector(
+    (state) => state.user.subscriptionExpiresAt
+  );
 
   // 구독 만료일 계산
   const getSubscriptionExpiryDate = () => {
@@ -335,163 +385,170 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   const handleCancelSubscription = () => {
     Alert.alert(
-      '구독 취소',
+      "구독 취소",
       `${SUBSCRIPTION_PLANS[subscriptionPlan].name} 플랜 구독을 취소하시겠습니까?\n\n취소해도 다음 결제일까지 현재 플랜을 이용할 수 있습니다.`,
       [
-        { text: '취소', style: 'cancel' },
-        { 
-          text: '구독 취소', 
-          style: 'destructive',
+        { text: "취소", style: "cancel" },
+        {
+          text: "구독 취소",
+          style: "destructive",
           onPress: async () => {
             try {
               // Redux에서 구독 취소 상태 업데이트
               dispatch(cancelSubscription());
-              
+
               // TODO: 실제 구독 취소 API 호출
               // await inAppPurchaseService.cancelSubscription();
-              
+
               Alert.alert(
-                '구독 취소 완료',
-                '구독이 취소되었습니다. 다음 결제일까지 현재 플랜을 계속 이용할 수 있습니다.',
-                [{ text: '확인' }]
+                "구독 취소 완료",
+                "구독이 취소되었습니다. 다음 결제일까지 현재 플랜을 계속 이용할 수 있습니다.",
+                [{ text: "확인" }]
               );
             } catch (error) {
               Alert.alert(
-                '구독 취소 실패',
-                '구독 취소 중 문제가 발생했습니다. 다시 시도해주세요.',
-                [{ text: '확인' }]
+                "구독 취소 실패",
+                "구독 취소 중 문제가 발생했습니다. 다시 시도해주세요.",
+                [{ text: "확인" }]
               );
             }
-          }
+          },
         },
       ]
     );
   };
 
-  const calculateTokenChange = (newPlan: 'starter' | 'premium' | 'pro') => {
+  const calculateTokenChange = (newPlan: "starter" | "premium" | "pro") => {
     let tokenChange = 0;
-    let description = '';
-    
-    if (subscriptionPlan === 'free') {
-      if (newPlan === 'starter') {
+    let description = "";
+
+    if (subscriptionPlan === "free") {
+      if (newPlan === "starter") {
         tokenChange = 300;
-        description = '가입 즉시 300개 토큰을 받게 됩니다';
-      } else if (newPlan === 'premium') {
+        description = "가입 즉시 300개 토큰을 받게 됩니다";
+      } else if (newPlan === "premium") {
         tokenChange = 500;
-        description = '가입 즉시 500개 토큰을 받게 됩니다';
-      } else if (newPlan === 'pro') {
+        description = "가입 즉시 500개 토큰을 받게 됩니다";
+      } else if (newPlan === "pro") {
         tokenChange = 9999;
-        description = '무제한 토큰을 사용할 수 있습니다';
+        description = "무제한 토큰을 사용할 수 있습니다";
       }
-    } else if (subscriptionPlan === 'starter') {
-      if (newPlan === 'premium') {
+    } else if (subscriptionPlan === "starter") {
+      if (newPlan === "premium") {
         tokenChange = 500;
-        description = '전액 500개 토큰을 추가로 받게 됩니다';
-      } else if (newPlan === 'pro') {
+        description = "전액 500개 토큰을 추가로 받게 됩니다";
+      } else if (newPlan === "pro") {
         tokenChange = 9999;
-        description = '무제한 토큰을 사용할 수 있습니다';
+        description = "무제한 토큰을 사용할 수 있습니다";
       }
-    } else if (subscriptionPlan === 'premium') {
-      if (newPlan === 'pro') {
+    } else if (subscriptionPlan === "premium") {
+      if (newPlan === "pro") {
         tokenChange = 9999;
-        description = '무제한 토큰을 사용할 수 있습니다';
-      } else if (newPlan === 'starter') {
+        description = "무제한 토큰을 사용할 수 있습니다";
+      } else if (newPlan === "starter") {
         tokenChange = 0;
-        description = '경고: 무료 토큰이 300개로 제한됩니다';
+        description = "경고: 무료 토큰이 300개로 제한됩니다";
       }
     }
-    
+
     return { tokenChange, description };
   };
 
-  const handleSubscribe = async (planKey?: 'free' | 'starter' | 'premium' | 'pro') => {
+  const handleSubscribe = async (
+    planKey?: "free" | "starter" | "premium" | "pro"
+  ) => {
     const targetPlan = planKey || selectedPlan;
-    
-    if (targetPlan === 'free') {
+
+    if (targetPlan === "free") {
       navigation.goBack();
       return;
     }
-    
+
     // 다운그레이드 체크
-    const isDowngrade = (
-      (subscriptionPlan === 'pro' && targetPlan !== 'pro') ||
-      (subscriptionPlan === 'premium' && (targetPlan === 'starter' || targetPlan === 'free')) ||
-      (subscriptionPlan === 'starter' && targetPlan === 'free')
-    );
-    
+    const isDowngrade =
+      (subscriptionPlan === "pro" && targetPlan !== "pro") ||
+      (subscriptionPlan === "premium" &&
+        (targetPlan === "starter" || targetPlan === "free")) ||
+      (subscriptionPlan === "starter" && targetPlan === "free");
+
     if (isDowngrade) {
       Alert.alert(
-        '다운그레이드 불가',
-        '하위 플랜으로 변경할 수 없습니다.\n\n현재 구독을 취소하고 만료 후 새로 가입해주세요.',
-        [{ text: '확인' }]
+        "다운그레이드 불가",
+        "하위 플랜으로 변경할 수 없습니다.\n\n현재 구독을 취소하고 만료 후 새로 가입해주세요.",
+        [{ text: "확인" }]
       );
       return;
     }
-    
-    const { tokenChange, description } = calculateTokenChange(targetPlan);
-    const afterTokens = targetPlan === 'pro' ? '무제한' : 
-                       targetPlan === 'starter' && subscriptionPlan === 'free' ? currentTokens + 300 :
-                       targetPlan === 'premium' && subscriptionPlan === 'free' ? currentTokens + 500 :
-                       targetPlan === 'premium' && subscriptionPlan === 'starter' ? currentTokens + 500 :
-                       currentTokens;
-    
-    const message = `${SUBSCRIPTION_PLANS[targetPlan].name} 플랜을 구독하시겠습니까?\n\n${description}\n현재 토큰: ${currentTokens}개\n변경 후: ${targetPlan === 'pro' ? '무제한' : afterTokens + '개'}`;
 
-    Alert.alert(
-      '구독 확인',
-      message,
-      [
-        { text: '취소', style: 'cancel' },
-        { 
-          text: '구독하기', 
-          onPress: async () => {
-            try {
-              await inAppPurchaseService.purchaseSubscription(targetPlan, false);
-              // 구독 완료 후 상태 새로고침
-              setTimeout(() => {
-                loadTokenStats();
-              }, 1000);
-            } catch (error) {
-              console.error('Subscription error:', error);
-              Alert.alert(
-                '구독 실패',
-                '구독 처리 중 문제가 발생했습니다. 다시 시도해주세요.',
-                [{ text: '확인' }]
-              );
-            }
+    const { tokenChange, description } = calculateTokenChange(targetPlan);
+    const afterTokens =
+      targetPlan === "pro"
+        ? "무제한"
+        : targetPlan === "starter" && subscriptionPlan === "free"
+        ? currentTokens + 300
+        : targetPlan === "premium" && subscriptionPlan === "free"
+        ? currentTokens + 500
+        : targetPlan === "premium" && subscriptionPlan === "starter"
+        ? currentTokens + 500
+        : currentTokens;
+
+    const message = `${
+      SUBSCRIPTION_PLANS[targetPlan].name
+    } 플랜을 구독하시겠습니까?\n\n${description}\n현재 토큰: ${currentTokens}개\n변경 후: ${
+      targetPlan === "pro" ? "무제한" : afterTokens + "개"
+    }`;
+
+    Alert.alert("구독 확인", message, [
+      { text: "취소", style: "cancel" },
+      {
+        text: "구독하기",
+        onPress: async () => {
+          try {
+            await inAppPurchaseService.purchaseSubscription(targetPlan, false);
+            // 구독 완료 후 상태 새로고침
+            setTimeout(() => {
+              loadTokenStats();
+            }, 1000);
+          } catch (error) {
+            console.error("Subscription error:", error);
+            Alert.alert(
+              "구독 실패",
+              "구독 처리 중 문제가 발생했습니다. 다시 시도해주세요.",
+              [{ text: "확인" }]
+            );
           }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const planColors = {
-    free: '#6B7280',
-    starter: '#10B981',  // STARTER - 그린 색상
-    premium: '#F59E0B',  // PRO - 골드 색상
-    pro: '#8B5CF6',      // MAX - 보라 색상
+    free: "#6B7280",
+    starter: "#10B981", // STARTER - 그린 색상
+    premium: "#F59E0B", // PRO - 골드 색상
+    pro: "#8B5CF6", // MAX - 보라 색상
   };
 
   const planIcons = {
-    free: 'account-circle',
-    starter: 'flight-takeoff',
-    premium: 'star',
-    pro: 'workspace-premium',
+    free: "account-circle",
+    starter: "flight-takeoff",
+    premium: "star",
+    pro: "workspace-premium",
   };
 
-  const renderPlanCard = (planKey: 'free' | 'starter' | 'premium' | 'pro') => {
+  const renderPlanCard = (planKey: "free" | "starter" | "premium" | "pro") => {
     const plan = SUBSCRIPTION_PLANS[planKey];
     const isSelected = selectedPlan === planKey;
     const isCurrent = subscriptionPlan === planKey;
-    const isPopular = planKey === 'premium';
+    const isPopular = planKey === "premium";
     const planColor = planColors[planKey];
-    
+
     // 다운그레이드 체크
-    const isDowngrade = (
-      (subscriptionPlan === 'pro' && planKey !== 'pro') ||
-      (subscriptionPlan === 'premium' && (planKey === 'starter' || planKey === 'free')) ||
-      (subscriptionPlan === 'starter' && planKey === 'free')
-    );
+    const isDowngrade =
+      (subscriptionPlan === "pro" && planKey !== "pro") ||
+      (subscriptionPlan === "premium" &&
+        (planKey === "starter" || planKey === "free")) ||
+      (subscriptionPlan === "starter" && planKey === "free");
 
     return (
       <TouchableOpacity
@@ -500,7 +557,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           styles.planCard,
           isSelected && styles.selectedPlanCard,
           isSelected && { borderColor: planColor },
-          isDowngrade && styles.downgradePlanCard
+          isDowngrade && styles.downgradePlanCard,
         ]}
         onPress={() => !isDowngrade && setSelectedPlan(planKey)}
         activeOpacity={isDowngrade ? 1 : 0.9}
@@ -514,13 +571,18 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
         <View style={styles.planHeader}>
           <View style={styles.planTitleRow}>
-            <MaterialIcon 
-              name={planIcons[planKey]} 
-              size={24} 
-              color={isSelected ? planColor : colors.text.secondary} 
+            <MaterialIcon
+              name={planIcons[planKey]}
+              size={24}
+              color={isSelected ? planColor : colors.text.secondary}
               style={{ marginRight: 8 }}
             />
-            <Text style={[styles.planName, { color: isSelected ? planColor : colors.text.primary }]}>
+            <Text
+              style={[
+                styles.planName,
+                { color: isSelected ? planColor : colors.text.primary },
+              ]}
+            >
               {plan.name}
             </Text>
             {isCurrent && (
@@ -530,7 +592,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             )}
           </View>
           {isSelected && (
-            <View style={[styles.selectedCheckmark, { backgroundColor: planColor }]}>
+            <View
+              style={[styles.selectedCheckmark, { backgroundColor: planColor }]}
+            >
               <Icon name="checkmark" size={16} color="#FFFFFF" />
             </View>
           )}
@@ -538,50 +602,93 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
         <View style={styles.priceContainer}>
           <Text style={[styles.price, isSelected && { color: planColor }]}>
-            {plan.price === 0 ? '무료' : `₩${plan.price.toLocaleString()}`}
+            {plan.price === 0 ? "무료" : `₩${plan.price.toLocaleString()}`}
           </Text>
           <Text style={styles.priceUnit}>/월</Text>
         </View>
 
-        <View style={[styles.tokenInfo, { backgroundColor: isDowngrade ? colors.lightGray + '50' : planColor + '15' }]}>
-          <Icon name="flash" size={18} color={isDowngrade ? colors.text.secondary : planColor} />
-          <Text style={[styles.tokenText, { color: isDowngrade ? colors.text.secondary : planColor }]}>
-          {isDowngrade ? '하위 플랜으로 변경 불가' :
-           planKey === 'free' ? '매일 10개 무료 충전' : 
-           planKey === 'starter' ? '가입 시 300개 + 매일 10개' :
-           planKey === 'premium' ? '가입 시 500개 + 매일 20개' :
-           '무제한 토큰'}
+        <View
+          style={[
+            styles.tokenInfo,
+            {
+              backgroundColor: isDowngrade
+                ? colors.lightGray + "50"
+                : planColor + "15",
+            },
+          ]}
+        >
+          <Icon
+            name="flash"
+            size={18}
+            color={isDowngrade ? colors.text.secondary : planColor}
+          />
+          <Text
+            style={[
+              styles.tokenText,
+              { color: isDowngrade ? colors.text.secondary : planColor },
+            ]}
+          >
+            {isDowngrade
+              ? "하위 플랜으로 변경 불가"
+              : planKey === "free"
+              ? "매일 10개 무료 충전"
+              : planKey === "starter"
+              ? "가입 시 300개 + 매일 10개"
+              : planKey === "premium"
+              ? "가입 시 500개 + 매일 20개"
+              : "무제한 토큰"}
           </Text>
         </View>
 
         <View style={styles.features}>
           {plan.features?.slice(0, 3).map((feature, index) => (
             <View key={index} style={styles.featureItem}>
-              <Icon name="checkmark" size={16} color={isSelected ? planColor : '#10B981'} />
+              <Icon
+                name="checkmark"
+                size={16}
+                color={isSelected ? planColor : "#10B981"}
+              />
               <Text style={styles.featureText}>{feature}</Text>
             </View>
           ))}
         </View>
 
         {/* 각 카드 내 구매 버튼 */}
-        {planKey !== 'free' && (
+        {planKey !== "free" && (
           <TouchableOpacity
             style={[
               styles.cardPurchaseButton,
-              { backgroundColor: isCurrent ? colors.lightGray : isDowngrade ? colors.lightGray : planColor },
-              (isCurrent || isDowngrade) && styles.cardPurchaseButtonDisabled
+              {
+                backgroundColor: isCurrent
+                  ? colors.lightGray
+                  : isDowngrade
+                  ? colors.lightGray
+                  : planColor,
+              },
+              (isCurrent || isDowngrade) && styles.cardPurchaseButtonDisabled,
             ]}
-            onPress={() => !isCurrent && !isDowngrade && handleSubscribe(planKey)}
+            onPress={() =>
+              !isCurrent && !isDowngrade && handleSubscribe(planKey)
+            }
             activeOpacity={isCurrent || isDowngrade ? 1 : 0.8}
             disabled={isCurrent || isDowngrade}
           >
-            <Text style={[
-              styles.cardPurchaseButtonText,
-              (isCurrent || isDowngrade) && styles.cardPurchaseButtonTextDisabled
-            ]}>
-              {isCurrent ? '현재 이용중' : isDowngrade ? '구매 불가' : '구독하기'}
+            <Text
+              style={[
+                styles.cardPurchaseButtonText,
+                (isCurrent || isDowngrade) &&
+                  styles.cardPurchaseButtonTextDisabled,
+              ]}
+            >
+              {isCurrent
+                ? "현재 이용중"
+                : isDowngrade
+                ? "구매 불가"
+                : "구독하기"}
             </Text>
-            {!isCurrent && !isDowngrade && <Icon name="arrow-forward-outline" size={18} color="#FFFFFF" />}
+            {!isCurrent && !isDowngrade && (
+              <Icon name="arrow-forward-outline" size={18} color="#FFFFFF" />
+            )}
           </TouchableOpacity>
         )}
       </TouchableOpacity>
@@ -593,21 +700,31 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Icon name="arrow-back-outline" size={24} color={colors.text.primary} />
+          <Icon
+            name="arrow-back-outline"
+            size={24}
+            color={colors.text.primary}
+          />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {activeTab === 'subscription' ? '구독 플랜' : activeTab === 'tokens' ? '토큰 구매' : '무료 토큰'}
+          {activeTab === "subscription"
+            ? "구독 플랜"
+            : activeTab === "tokens"
+            ? "토큰 구매"
+            : "무료 토큰"}
         </Text>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.headerButton}
           onPress={() => setShowEarnTokenModal(true)}
         >
           <Icon name="flash" size={20} color={colors.primary} />
-          <Text style={styles.currentTokens}>{subscriptionPlan === 'pro' ? '무제한' : currentTokens}</Text>
+          <Text style={styles.currentTokens}>
+            {subscriptionPlan === "pro" ? "무제한" : currentTokens}
+          </Text>
         </TouchableOpacity>
       </View>
 
@@ -615,73 +732,78 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         <TouchableOpacity
           style={[
             styles.tabButton,
-            activeTab === 'subscription' && styles.activeTab,
+            activeTab === "subscription" && styles.activeTab,
           ]}
-          onPress={() => setActiveTab('subscription')}
+          onPress={() => setActiveTab("subscription")}
         >
-          <MaterialIcon 
-            name="workspace-premium" 
-            size={20} 
-            color={activeTab === 'subscription' ? colors.primary : colors.text.secondary} 
+          <MaterialIcon
+            name="workspace-premium"
+            size={20}
+            color={
+              activeTab === "subscription"
+                ? colors.primary
+                : colors.text.secondary
+            }
           />
-          <Text style={[
-            styles.tabText,
-            activeTab === 'subscription' && styles.activeTabText
-          ]}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "subscription" && styles.activeTabText,
+            ]}
+          >
             구독 플랜
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
-          style={[
-            styles.tabButton,
-            activeTab === 'tokens' && styles.activeTab,
-          ]}
-          onPress={() => setActiveTab('tokens')}
+          style={[styles.tabButton, activeTab === "tokens" && styles.activeTab]}
+          onPress={() => setActiveTab("tokens")}
         >
-          <Icon 
-            name="flash" 
-            size={20} 
-            color={activeTab === 'tokens' ? colors.primary : colors.text.secondary} 
+          <Icon
+            name="flash"
+            size={20}
+            color={
+              activeTab === "tokens" ? colors.primary : colors.text.secondary
+            }
           />
-          <Text style={[
-            styles.tabText,
-            activeTab === 'tokens' && styles.activeTabText
-          ]}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "tokens" && styles.activeTabText,
+            ]}
+          >
             토큰 구매
           </Text>
         </TouchableOpacity>
-        
+
         <TouchableOpacity
-          style={[
-            styles.tabButton,
-            activeTab === 'manage' && styles.activeTab,
-          ]}
-          onPress={() => setActiveTab('manage')}
+          style={[styles.tabButton, activeTab === "manage" && styles.activeTab]}
+          onPress={() => setActiveTab("manage")}
         >
-          <MaterialIcon 
-            name="account-balance-wallet" 
-            size={20} 
-            color={activeTab === 'manage' ? colors.primary : colors.text.secondary} 
+          <MaterialIcon
+            name="account-balance-wallet"
+            size={20}
+            color={
+              activeTab === "manage" ? colors.primary : colors.text.secondary
+            }
           />
-          <Text style={[
-            styles.tabText,
-            activeTab === 'manage' && styles.activeTabText
-          ]}>
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === "manage" && styles.activeTabText,
+            ]}
+          >
             무료 토큰
           </Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
-        style={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
-        {activeTab === 'subscription' ? (
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {activeTab === "subscription" ? (
           <>
             <View style={styles.heroSection}>
               <Text style={styles.heroTitle}>
-                포스티와 함께{'\n'}더 많은 콘텐츠를 만들어보세요
+                포스티와 함께{"\n"}더 많은 콘텐츠를 만들어보세요
               </Text>
               <Text style={styles.heroSubtitle}>
                 AI가 당신의 크리에이티브 파트너가 되어드립니다
@@ -689,29 +811,41 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             </View>
 
             <View style={styles.plansContainer}>
-              {renderPlanCard('free')}
-              {renderPlanCard('starter')}
-              {renderPlanCard('premium')}
-              {renderPlanCard('pro')}
+              {renderPlanCard("free")}
+              {renderPlanCard("starter")}
+              {renderPlanCard("premium")}
+              {renderPlanCard("pro")}
             </View>
 
             <View style={styles.benefitsSection}>
               <Text style={styles.sectionTitle}>프리미엄 혜택</Text>
-              
+
               <View style={styles.benefitCard}>
-                <View style={[styles.benefitIcon, { backgroundColor: '#8B5CF6' + '20' }]}>
+                <View
+                  style={[
+                    styles.benefitIcon,
+                    { backgroundColor: "#8B5CF6" + "20" },
+                  ]}
+                >
                   <Icon name="flash" size={24} color="#8B5CF6" />
                 </View>
                 <View style={styles.benefitContent}>
                   <Text style={styles.benefitTitle}>더 많은 토큰</Text>
                   <Text style={styles.benefitDesc}>
-                  STARTER는 총 600개(초기 300 + 일일 10x30), PRO는 총 1,100개(초기 500 + 일일 20x30), MAX는 무제한 토큰을 제공합니다
+                    STARTER는 총 600개(초기 300 + 일일 10x30), PRO는 총
+                    1,100개(초기 500 + 일일 20x30), MAX는 무제한 토큰을
+                    제공합니다
                   </Text>
                 </View>
               </View>
 
               <View style={styles.benefitCard}>
-                <View style={[styles.benefitIcon, { backgroundColor: '#EC4899' + '20' }]}>
+                <View
+                  style={[
+                    styles.benefitIcon,
+                    { backgroundColor: "#EC4899" + "20" },
+                  ]}
+                >
                   <MaterialIcon name="auto-awesome" size={24} color="#EC4899" />
                 </View>
                 <View style={styles.benefitContent}>
@@ -723,7 +857,12 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               </View>
 
               <View style={styles.benefitCard}>
-                <View style={[styles.benefitIcon, { backgroundColor: '#10B981' + '20' }]}>
+                <View
+                  style={[
+                    styles.benefitIcon,
+                    { backgroundColor: "#10B981" + "20" },
+                  ]}
+                >
                   <MaterialIcon name="block" size={24} color="#10B981" />
                 </View>
                 <View style={styles.benefitContent}>
@@ -736,10 +875,10 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             </View>
 
             {/* 구독 관리 섹션 */}
-            {subscriptionPlan !== 'free' && (
+            {subscriptionPlan !== "free" && (
               <View style={styles.subscriptionManagement}>
                 <Text style={styles.sectionTitle}>구독 관리</Text>
-                
+
                 <View style={styles.subscriptionInfoCard}>
                   <View style={styles.planInfoRow}>
                     <View style={styles.planInfoItem}>
@@ -756,72 +895,103 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                       </Text>
                     </View>
                   </View>
-                  
+
                   <View style={styles.expiryInfoContainer}>
-                    <MaterialIcon name="calendar-today" size={20} color={colors.primary} />
+                    <MaterialIcon
+                      name="calendar-today"
+                      size={20}
+                      color={colors.primary}
+                    />
                     <View style={styles.expiryTextContainer}>
                       <Text style={styles.expiryLabel}>다음 결제일</Text>
                       <Text style={styles.expiryDate}>
                         {formatExpiryDate(getSubscriptionExpiryDate())}
                       </Text>
                       <Text style={styles.daysRemaining}>
-                        {calculateDaysRemaining(getSubscriptionExpiryDate())}일 남음
+                        {calculateDaysRemaining(getSubscriptionExpiryDate())}일
+                        남음
                       </Text>
                     </View>
                   </View>
-                  
+
                   <View style={styles.autoRenewInfo}>
-                    <MaterialIcon name="autorenew" size={16} color={subscriptionAutoRenew ? colors.text.secondary : colors.error || '#FF3B30'} />
-                    <Text style={[styles.autoRenewText, !subscriptionAutoRenew && { color: colors.error || '#FF3B30' }]}>
-                      {subscriptionAutoRenew ? '자동 갱신 활성화됨' : '자동 갱신 취소됨'}
+                    <MaterialIcon
+                      name="autorenew"
+                      size={16}
+                      color={
+                        subscriptionAutoRenew
+                          ? colors.text.secondary
+                          : colors.error || "#FF3B30"
+                      }
+                    />
+                    <Text
+                      style={[
+                        styles.autoRenewText,
+                        !subscriptionAutoRenew && {
+                          color: colors.error || "#FF3B30",
+                        },
+                      ]}
+                    >
+                      {subscriptionAutoRenew
+                        ? "자동 갱신 활성화됨"
+                        : "자동 갱신 취소됨"}
                     </Text>
                   </View>
                 </View>
-                
+
                 {subscriptionAutoRenew && (
                   <TouchableOpacity
                     style={styles.cancelButton}
                     onPress={() => handleCancelSubscription()}
                   >
-                    <MaterialIcon name="cancel" size={20} color={colors.error || '#FF3B30'} />
+                    <MaterialIcon
+                      name="cancel"
+                      size={20}
+                      color={colors.error || "#FF3B30"}
+                    />
                     <Text style={styles.cancelButtonText}>구독 취소</Text>
                   </TouchableOpacity>
                 )}
-                
+
                 <Text style={styles.cancelInfo}>
-                  {subscriptionAutoRenew 
-                    ? `구독을 취소해도 ${formatExpiryDate(getSubscriptionExpiryDate())}까지 현재 플랜을 계속 이용할 수 있습니다.`
-                    : `구독이 취소되었으며, ${formatExpiryDate(getSubscriptionExpiryDate())}에 만료됩니다.`
-                  }
+                  {subscriptionAutoRenew
+                    ? `구독을 취소해도 ${formatExpiryDate(
+                        getSubscriptionExpiryDate()
+                      )}까지 현재 플랜을 계속 이용할 수 있습니다.`
+                    : `구독이 취소되었으며, ${formatExpiryDate(
+                        getSubscriptionExpiryDate()
+                      )}에 만료됩니다.`}
                 </Text>
               </View>
             )}
           </>
-        ) : activeTab === 'tokens' ? (
-          <TokenPurchaseView 
+        ) : activeTab === "tokens" ? (
+          <TokenPurchaseView
             onPurchase={async (tokenAmount) => {
               try {
                 await inAppPurchaseService.purchaseTokens(tokenAmount);
               } catch (error) {
-                console.error('Token purchase error:', error);
+                console.error("Token purchase error:", error);
               }
             }}
             colors={colors}
             isDark={isDark}
           />
-        ) : activeTab === 'manage' ? (
+        ) : activeTab === "manage" ? (
           <>
             <View style={styles.heroSection}>
-              <Text style={styles.heroTitle}>
-                무료 토큰 받기
-              </Text>
+              <Text style={styles.heroTitle}>무료 토큰 받기</Text>
               <Text style={styles.heroSubtitle}>
                 다양한 활동으로 무료 토큰을 획득하세요
               </Text>
             </View>
 
             <View style={styles.tokenInfoBanner}>
-              <Icon name="information-circle-outline" size={16} color={colors.text.secondary} />
+              <Icon
+                name="information-circle-outline"
+                size={16}
+                color={colors.text.secondary}
+              />
               <Text style={styles.tokenInfoText}>
                 현재 {stats.totalTokens}개의 토큰을 보유하고 있습니다
               </Text>
@@ -829,88 +999,163 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
             <View style={styles.earnTokensSection}>
               <View style={styles.earnTokensList}>
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.earnTokenItem}
                   onPress={() => handleWatchAd()}
                 >
-                  <View style={[styles.earnTokenIcon, { backgroundColor: '#8B5CF6' + '20' }]}>
-                    <MaterialIcon name="play-circle" size={24} color="#8B5CF6" />
+                  <View
+                    style={[
+                      styles.earnTokenIcon,
+                      { backgroundColor: "#8B5CF6" + "20" },
+                    ]}
+                  >
+                    <MaterialIcon
+                      name="play-circle"
+                      size={24}
+                      color="#8B5CF6"
+                    />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>광고 보기</Text>
-                    <Text style={styles.earnTokenDesc}>+2 토큰 ({adStats.remainingToday}/{adStats.dailyLimit || 10}회 남음)</Text>
+                    <Text style={styles.earnTokenDesc}>
+                      +2 토큰 ({adStats.remainingToday}/
+                      {adStats.dailyLimit || 10}회 남음)
+                    </Text>
                   </View>
-                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
+                  <Icon
+                    name="chevron-forward-outline"
+                    size={20}
+                    color={colors.text.tertiary}
+                  />
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.earnTokenItem}
                   onPress={() => handleDailyCheck()}
                 >
-                  <View style={[styles.earnTokenIcon, { backgroundColor: '#10B981' + '20' }]}>
-                    <MaterialIcon name="event-available" size={24} color="#10B981" />
+                  <View
+                    style={[
+                      styles.earnTokenIcon,
+                      { backgroundColor: "#10B981" + "20" },
+                    ]}
+                  >
+                    <MaterialIcon
+                      name="event-available"
+                      size={24}
+                      color="#10B981"
+                    />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>일일 출석</Text>
-                    <Text style={styles.earnTokenDesc}>+1 토큰 (오늘 가능)</Text>
+                    <Text style={styles.earnTokenDesc}>
+                      +1 토큰 (오늘 가능)
+                    </Text>
                   </View>
-                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
+                  <Icon
+                    name="chevron-forward-outline"
+                    size={20}
+                    color={colors.text.tertiary}
+                  />
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.earnTokenItem}
                   onPress={() => handleShareSNS()}
                 >
-                  <View style={[styles.earnTokenIcon, { backgroundColor: '#EC4899' + '20' }]}>
-                    <Icon name="share-social-outline" size={24} color="#EC4899" />
+                  <View
+                    style={[
+                      styles.earnTokenIcon,
+                      { backgroundColor: "#EC4899" + "20" },
+                    ]}
+                  >
+                    <Icon
+                      name="share-social-outline"
+                      size={24}
+                      color="#EC4899"
+                    />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>SNS 공유</Text>
-                    <Text style={styles.earnTokenDesc}>+3 토큰 (1/1회 남음)</Text>
+                    <Text style={styles.earnTokenDesc}>
+                      +3 토큰 (1/1회 남음)
+                    </Text>
                   </View>
-                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
+                  <Icon
+                    name="chevron-forward-outline"
+                    size={20}
+                    color={colors.text.tertiary}
+                  />
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.earnTokenItem}
                   onPress={() => handleInviteFriend()}
                 >
-                  <View style={[styles.earnTokenIcon, { backgroundColor: '#F59E0B' + '20' }]}>
+                  <View
+                    style={[
+                      styles.earnTokenIcon,
+                      { backgroundColor: "#F59E0B" + "20" },
+                    ]}
+                  >
                     <Icon name="person-add-outline" size={24} color="#F59E0B" />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>친구 초대</Text>
                     <Text style={styles.earnTokenDesc}>+5 토큰 (친구당)</Text>
                   </View>
-                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
+                  <Icon
+                    name="chevron-forward-outline"
+                    size={20}
+                    color={colors.text.tertiary}
+                  />
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.earnTokenItem}
                   onPress={() => handleRateApp()}
                 >
-                  <View style={[styles.earnTokenIcon, { backgroundColor: '#6366F1' + '20' }]}>
+                  <View
+                    style={[
+                      styles.earnTokenIcon,
+                      { backgroundColor: "#6366F1" + "20" },
+                    ]}
+                  >
                     <Icon name="star-outline" size={24} color="#6366F1" />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>앱 평가하기</Text>
                     <Text style={styles.earnTokenDesc}>+10 토큰 (1회)</Text>
                   </View>
-                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
+                  <Icon
+                    name="chevron-forward-outline"
+                    size={20}
+                    color={colors.text.tertiary}
+                  />
                 </TouchableOpacity>
 
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.earnTokenItem}
                   onPress={() => handleCompleteMission()}
                 >
-                  <View style={[styles.earnTokenIcon, { backgroundColor: '#14B8A6' + '20' }]}>
+                  <View
+                    style={[
+                      styles.earnTokenIcon,
+                      { backgroundColor: "#14B8A6" + "20" },
+                    ]}
+                  >
                     <MaterialIcon name="task-alt" size={24} color="#14B8A6" />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>미션 완료</Text>
-                    <Text style={styles.earnTokenDesc}>+3 토큰 (일일 미션)</Text>
+                    <Text style={styles.earnTokenDesc}>
+                      +3 토큰 (일일 미션)
+                    </Text>
                   </View>
-                  <Icon name="chevron-forward-outline" size={20} color={colors.text.tertiary} />
+                  <Icon
+                    name="chevron-forward-outline"
+                    size={20}
+                    color={colors.text.tertiary}
+                  />
                 </TouchableOpacity>
               </View>
 
@@ -922,12 +1167,19 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               </View>
 
               <View style={styles.premiumNotice}>
-                <MaterialIcon name="workspace-premium" size={20} color={colors.primary} />
+                <MaterialIcon
+                  name="workspace-premium"
+                  size={20}
+                  color={colors.primary}
+                />
                 <Text style={styles.premiumNoticeText}>
-                  {realSubscriptionPlan === 'free' ? '무료 회원은 매일 10개의 토큰이 자동 충전됩니다' : 
-                   realSubscriptionPlan === 'starter' ? 'STARTER 회원은 가입 시 300개 + 매일 10개씩 추가 토큰을 받습니다' : 
-                   realSubscriptionPlan === 'premium' ? 'PRO 회원은 가입 시 500개 + 매일 20개씩 추가 토큰을 받습니다' : 
-                   'MAX 회원은 무제한 토큰을 사용할 수 있습니다'}
+                  {realSubscriptionPlan === "free"
+                    ? "무료 회원은 매일 10개의 토큰이 자동 충전됩니다"
+                    : realSubscriptionPlan === "starter"
+                    ? "STARTER 회원은 가입 시 300개 + 매일 10개씩 추가 토큰을 받습니다"
+                    : realSubscriptionPlan === "premium"
+                    ? "PRO 회원은 가입 시 500개 + 매일 20개씩 추가 토큰을 받습니다"
+                    : "MAX 회원은 무제한 토큰을 사용할 수 있습니다"}
                 </Text>
               </View>
             </View>
@@ -938,7 +1190,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       </ScrollView>
 
       {/* 하단 버튼 제거 - 각 카드에 버튼 추가됨 */}
-      
+
       <EarnTokenModal
         visible={showEarnTokenModal}
         onClose={() => {
@@ -947,7 +1199,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         }}
         onTokensEarned={handleEarnTokens}
       />
-      
+
       {/* 결제 성공 모달 */}
       <PaymentSuccessModal
         visible={showSuccessModal}
@@ -961,19 +1213,21 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 };
 
 const createStyles = (colors: any, isDark: boolean) => {
-  const cardShadow = isDark ? {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  } : {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  };
+  const cardShadow = isDark
+    ? {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+      }
+    : {
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.08,
+        shadowRadius: 12,
+        elevation: 4,
+      };
 
   return StyleSheet.create({
     container: {
@@ -981,9 +1235,9 @@ const createStyles = (colors: any, isDark: boolean) => {
       backgroundColor: colors.background,
     },
     header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
       paddingHorizontal: SPACING.medium,
       paddingVertical: SPACING.medium,
       borderBottomWidth: 1,
@@ -992,21 +1246,21 @@ const createStyles = (colors: any, isDark: boolean) => {
     backButton: {
       width: 40,
       height: 40,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
     },
     headerTitle: {
       fontSize: 18,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
     },
     content: {
       flex: 1,
     },
     headerButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.primary + '20',
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.primary + "20",
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 16,
@@ -1014,13 +1268,13 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     currentTokens: {
       fontSize: 14,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.primary,
     },
     tokenInfoBanner: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.primary + '10',
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.primary + "10",
       marginHorizontal: SPACING.large,
       marginBottom: SPACING.large,
       padding: SPACING.medium,
@@ -1040,8 +1294,8 @@ const createStyles = (colors: any, isDark: boolean) => {
       gap: SPACING.small,
     },
     earnTokenItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       backgroundColor: colors.surface,
       padding: SPACING.medium,
       borderRadius: 12,
@@ -1053,15 +1307,15 @@ const createStyles = (colors: any, isDark: boolean) => {
       width: 44,
       height: 44,
       borderRadius: 22,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
     },
     earnTokenInfo: {
       flex: 1,
     },
     earnTokenTitle: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
       marginBottom: 2,
     },
@@ -1070,8 +1324,8 @@ const createStyles = (colors: any, isDark: boolean) => {
       color: colors.text.secondary,
     },
     earnTokenTip: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       backgroundColor: colors.surface,
       marginTop: SPACING.large,
       padding: SPACING.medium,
@@ -1087,9 +1341,9 @@ const createStyles = (colors: any, isDark: boolean) => {
       lineHeight: 18,
     },
     premiumNotice: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.primary + '10',
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.primary + "10",
       marginTop: SPACING.medium,
       padding: SPACING.medium,
       borderRadius: 12,
@@ -1100,7 +1354,7 @@ const createStyles = (colors: any, isDark: boolean) => {
       color: colors.primary,
       flex: 1,
       lineHeight: 18,
-      fontWeight: '500',
+      fontWeight: "500",
     },
     heroSection: {
       paddingHorizontal: SPACING.large,
@@ -1109,7 +1363,7 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     heroTitle: {
       fontSize: 28,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.text.primary,
       lineHeight: 36,
       marginBottom: SPACING.small,
@@ -1130,10 +1384,10 @@ const createStyles = (colors: any, isDark: boolean) => {
       marginBottom: SPACING.medium,
       borderWidth: 2,
       borderColor: colors.border,
-      position: 'relative',
+      position: "relative",
     },
     selectedPlanCard: {
-      shadowColor: '#000',
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.15,
       shadowRadius: 12,
@@ -1144,7 +1398,7 @@ const createStyles = (colors: any, isDark: boolean) => {
       borderColor: colors.border,
     },
     popularBadge: {
-      position: 'absolute',
+      position: "absolute",
       top: -10,
       right: 20,
       paddingHorizontal: 12,
@@ -1152,24 +1406,24 @@ const createStyles = (colors: any, isDark: boolean) => {
       borderRadius: 12,
     },
     popularBadgeText: {
-      color: '#FFFFFF',
+      color: "#FFFFFF",
       fontSize: 12,
-      fontWeight: '600',
+      fontWeight: "600",
     },
     planHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
       marginBottom: SPACING.small,
     },
     planTitleRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.small,
     },
     planName: {
       fontSize: 20,
-      fontWeight: '700',
+      fontWeight: "700",
     },
     currentBadge: {
       backgroundColor: colors.lightGray,
@@ -1180,23 +1434,23 @@ const createStyles = (colors: any, isDark: boolean) => {
     currentBadgeText: {
       fontSize: 11,
       color: colors.text.secondary,
-      fontWeight: '500',
+      fontWeight: "500",
     },
     selectedCheckmark: {
       width: 24,
       height: 24,
       borderRadius: 12,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
     },
     priceContainer: {
-      flexDirection: 'row',
-      alignItems: 'baseline',
+      flexDirection: "row",
+      alignItems: "baseline",
       marginBottom: SPACING.medium,
     },
     price: {
       fontSize: 32,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.text.primary,
     },
     priceUnit: {
@@ -1205,8 +1459,8 @@ const createStyles = (colors: any, isDark: boolean) => {
       marginLeft: 4,
     },
     tokenInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       paddingHorizontal: 12,
       paddingVertical: 8,
       borderRadius: 8,
@@ -1215,14 +1469,14 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     tokenText: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
     },
     features: {
       gap: SPACING.small,
     },
     featureItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.small,
     },
     featureText: {
@@ -1236,13 +1490,13 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     sectionTitle: {
       fontSize: 20,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.text.primary,
       marginBottom: SPACING.xs,
     },
     benefitCard: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       backgroundColor: colors.surface,
       padding: SPACING.medium,
       borderRadius: 12,
@@ -1253,15 +1507,15 @@ const createStyles = (colors: any, isDark: boolean) => {
       width: 48,
       height: 48,
       borderRadius: 12,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
     },
     benefitContent: {
       flex: 1,
     },
     benefitTitle: {
       fontSize: 15,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
       marginBottom: 4,
     },
@@ -1291,13 +1545,13 @@ const createStyles = (colors: any, isDark: boolean) => {
       borderColor: colors.border,
     },
     planInfoRow: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       marginBottom: SPACING.medium,
     },
     planInfoItem: {
       flex: 1,
-      alignItems: 'center',
+      alignItems: "center",
     },
     planInfoLabel: {
       fontSize: 13,
@@ -1306,7 +1560,7 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     planInfoValue: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
     },
     planInfoDivider: {
@@ -1316,9 +1570,9 @@ const createStyles = (colors: any, isDark: boolean) => {
       marginHorizontal: SPACING.medium,
     },
     expiryInfoContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: colors.primary + '10',
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.primary + "10",
       padding: SPACING.medium,
       borderRadius: 8,
       gap: SPACING.small,
@@ -1333,7 +1587,7 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     expiryDate: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.primary,
       marginBottom: 2,
     },
@@ -1343,8 +1597,8 @@ const createStyles = (colors: any, isDark: boolean) => {
       opacity: 0.8,
     },
     autoRenewInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: 6,
       marginTop: SPACING.small,
       paddingTop: SPACING.small,
@@ -1356,8 +1610,8 @@ const createStyles = (colors: any, isDark: boolean) => {
       color: colors.text.secondary,
     },
     currentPlanInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.small,
       marginBottom: SPACING.large,
     },
@@ -1367,60 +1621,62 @@ const createStyles = (colors: any, isDark: boolean) => {
       flex: 1,
     },
     cancelButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
       gap: SPACING.small,
-      backgroundColor: colors.error ? colors.error + '10' : '#FF3B3010',
+      backgroundColor: colors.error ? colors.error + "10" : "#FF3B3010",
       paddingVertical: 14,
       paddingHorizontal: 24,
       borderRadius: 12,
       borderWidth: 1,
-      borderColor: colors.error || '#FF3B30',
+      borderColor: colors.error || "#FF3B30",
       marginBottom: SPACING.medium,
     },
     cancelButtonText: {
       fontSize: 16,
-      fontWeight: '600',
-      color: colors.error || '#FF3B30',
+      fontWeight: "600",
+      color: colors.error || "#FF3B30",
     },
     cancelInfo: {
       fontSize: 13,
       color: colors.text.secondary,
-      textAlign: 'center',
+      textAlign: "center",
       lineHeight: 18,
     },
     cardPurchaseButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
       paddingVertical: 14,
       borderRadius: 10,
       marginTop: SPACING.medium,
       gap: 8,
       // 다크테마에서 버튼이 더 잘 보이도록 개선
-      ...(isDark ? {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.3,
-        shadowRadius: 4,
-        elevation: 4,
-      } : {}),
+      ...(isDark
+        ? {
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.3,
+            shadowRadius: 4,
+            elevation: 4,
+          }
+        : {}),
     },
     cardPurchaseButtonDisabled: {
       borderWidth: 1,
       borderColor: colors.border,
     },
     cardPurchaseButtonText: {
-      color: '#FFFFFF',
+      color: "#FFFFFF",
       fontSize: 15,
-      fontWeight: '600',
+      fontWeight: "600",
     },
     cardPurchaseButtonTextDisabled: {
       color: colors.text.secondary,
     },
     bottomCTA: {
-      position: 'absolute',
+      position: "absolute",
       bottom: 0,
       left: 0,
       right: 0,
@@ -1434,30 +1690,30 @@ const createStyles = (colors: any, isDark: boolean) => {
     subscribeButton: {
       paddingVertical: 16,
       borderRadius: 12,
-      alignItems: 'center',
+      alignItems: "center",
       marginBottom: SPACING.small,
     },
     subscribeButtonContent: {
-      alignItems: 'center',
+      alignItems: "center",
     },
     subscribeButtonText: {
-      color: '#FFFFFF',
+      color: "#FFFFFF",
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: "600",
       marginBottom: 2,
     },
     subscribeButtonPrice: {
-      color: 'rgba(255, 255, 255, 0.9)',
+      color: "rgba(255, 255, 255, 0.9)",
       fontSize: 14,
-      fontWeight: '500',
+      fontWeight: "500",
     },
     legalText: {
       fontSize: 12,
       color: colors.text.tertiary,
-      textAlign: 'center',
+      textAlign: "center",
     },
     tabContainer: {
-      flexDirection: 'row',
+      flexDirection: "row",
       paddingHorizontal: SPACING.medium,
       paddingVertical: SPACING.small,
       gap: SPACING.small,
@@ -1466,24 +1722,24 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     tabButton: {
       flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
       paddingVertical: SPACING.small,
       borderRadius: 8,
       gap: 6,
     },
     activeTab: {
-      backgroundColor: colors.primary + '15',
+      backgroundColor: colors.primary + "15",
     },
     tabText: {
       fontSize: 14,
-      fontWeight: '500',
+      fontWeight: "500",
       color: colors.text.secondary,
     },
     activeTabText: {
       color: colors.primary,
-      fontWeight: '600',
+      fontWeight: "600",
     },
   });
 };

@@ -10,18 +10,21 @@
 ## 🚀 주요 개선사항
 
 ### **성능 향상**
+
 - **앱 시작 시간**: 15% 향상
 - **메모리 사용량**: 8% 감소 (PropTypes 제거)
 - **번들 크기**: 26.4KB 감소 + 13% 전체 크기 감소
 - **빌드 속도**: 30% 향상 (Flipper 제거)
 
 ### **새로운 기능**
+
 - **Yoga 3.0**: 레이아웃 엔진 개선으로 웹 호환성 향상
 - **Bridgeless Mode**: New Architecture에서 기본 활성화
 - **Yarn 3.0**: 기본 패키지 매니저로 변경
 - **TypeScript 5.0.4**: 최신 TypeScript 지원
 
 ### **아키텍처 개선**
+
 - **PropTypes 완전 제거**: TypeScript 강제 사용으로 타입 안전성 확보
 - **Flipper 제거**: 네이티브 디버깅 도구 사용 권장
 - **Android minSdkVersion 23**: Android 6.0 이상 필수
@@ -29,6 +32,7 @@
 ## 📦 의존성 업데이트
 
 ### **React Native 핵심**
+
 ```json
 {
   "react": "18.2.0",
@@ -37,6 +41,7 @@
 ```
 
 ### **새로 추가된 라이브러리**
+
 ```json
 {
   "@react-navigation/native": "6.1.18",
@@ -55,6 +60,7 @@
 ```
 
 ### **업데이트된 기존 라이브러리**
+
 ```json
 {
   "react-native-device-info": "10.13.2",
@@ -68,6 +74,7 @@
 ## 🔧 설정 변경사항
 
 ### **Android 설정**
+
 - **Gradle**: 8.0.1 → 8.3
 - **Kotlin**: 1.8.0 → 1.9.0
 - **NDK**: 23.1.7779620 → 25.1.8937393
@@ -75,6 +82,7 @@
 - **Google Services**: 4.4.2 추가
 
 ### **개발 도구**
+
 - **TypeScript**: 4.8.4 → 5.0.4
 - **ESLint**: React Native 0.74.5 호환 버전
 - **Metro**: 0.74.87 버전
@@ -82,11 +90,13 @@
 ## ⚠️ 중요 변경사항
 
 ### **Breaking Changes 대응**
+
 1. **PropTypes 제거**: 모든 컴포넌트를 TypeScript로 마이그레이션
 2. **Flipper 제거**: Android Studio/Xcode 네이티브 디버깅 사용
 3. **index.js 수정**: react-native-gesture-handler 임포트 추가
 
 ### **Firebase 호환성**
+
 - React Native Firebase v20.4.0으로 완전 호환
 - 기존 0.72.x 버전에서 발생하던 빌드 오류 해결
 - Android minSdkVersion 23 요구사항 충족
@@ -94,12 +104,14 @@
 ## 🧪 테스트 결과
 
 ### **빌드 테스트**
+
 - [ ] Android Debug 빌드 성공
 - [ ] Android Release 빌드 성공
 - [ ] iOS Debug 빌드 성공 (Mac 환경 시)
 - [ ] iOS Release 빌드 성공 (Mac 환경 시)
 
 ### **기능 테스트**
+
 - [ ] 앱 시작 및 초기화
 - [ ] Navigation 동작 확인
 - [ ] Firebase 연결 테스트
@@ -122,16 +134,19 @@ xcopy ..\Posty_backup\* . /E /Y
 ## 📈 향후 계획
 
 ### **단기 계획 (1-2주)**
+
 - [ ] 모든 기존 기능 마이그레이션 완료
 - [ ] Firebase 통합 테스트
 - [ ] 성능 최적화 적용
 
 ### **중기 계획 (1-2개월)**
+
 - [ ] New Architecture 활성화 검토
 - [ ] React Navigation 고급 기능 활용
 - [ ] TypeScript 엄격 모드 적용
 
 ### **장기 계획 (3-6개월)**
+
 - [ ] React Native 0.76+ 업그레이드 준비
 - [ ] 최신 Firebase 기능 활용
 - [ ] 성능 모니터링 강화

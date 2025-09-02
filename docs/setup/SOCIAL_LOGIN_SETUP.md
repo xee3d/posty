@@ -33,6 +33,7 @@ API_URL=https://your-server-url.com
 ### 1. Google Sign-In
 
 **android/app/build.gradle:**
+
 ```gradle
 dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.7.0'
@@ -42,6 +43,7 @@ dependencies {
 ### 2. Naver Login
 
 **android/app/src/main/AndroidManifest.xml:**
+
 ```xml
 <uses-permission android:name="android.permission.INTERNET" />
 
@@ -57,6 +59,7 @@ dependencies {
 ### 3. Kakao Login
 
 **android/app/src/main/AndroidManifest.xml:**
+
 ```xml
 <application>
     <!-- Kakao Login -->
@@ -74,6 +77,7 @@ dependencies {
 ```
 
 **android/app/build.gradle:**
+
 ```gradle
 android {
     defaultConfig {
@@ -89,6 +93,7 @@ android {
 ### 1. Google Sign-In
 
 **ios/Posty/Info.plist:**
+
 ```xml
 <key>CFBundleURLTypes</key>
 <array>
@@ -104,6 +109,7 @@ android {
 ### 2. Naver Login
 
 **ios/Posty/Info.plist:**
+
 ```xml
 <key>CFBundleURLTypes</key>
 <array>
@@ -125,6 +131,7 @@ android {
 ### 3. Kakao Login
 
 **ios/Posty/Info.plist:**
+
 ```xml
 <key>CFBundleURLTypes</key>
 <array>
@@ -160,50 +167,54 @@ android {
 네이버와 카카오 로그인을 위해서는 서버에서 Firebase Custom Token을 생성해야 합니다.
 
 **서버 예제 (Node.js):**
+
 ```javascript
-const admin = require('firebase-admin');
+const admin = require("firebase-admin");
 
 // Firebase Admin SDK 초기화
 admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+  credential: admin.credential.cert(serviceAccount),
 });
 
-app.post('/auth/custom-token', async (req, res) => {
+app.post("/auth/custom-token", async (req, res) => {
   const { provider, profile } = req.body;
-  
+
   try {
     let uid, email, displayName, photoURL;
-    
-    if (provider === 'naver') {
+
+    if (provider === "naver") {
       uid = `naver:${profile.id}`;
       email = profile.email;
       displayName = profile.name;
       photoURL = profile.profile_image;
-    } else if (provider === 'kakao') {
+    } else if (provider === "kakao") {
       uid = `kakao:${profile.id}`;
       email = profile.kakao_account?.email;
       displayName = profile.properties?.nickname;
       photoURL = profile.properties?.profile_image;
     }
-    
+
     // Firebase Custom Token 생성
     const customToken = await admin.auth().createCustomToken(uid);
-    
+
     // 사용자 정보 업데이트
-    await admin.auth().updateUser(uid, {
-      email,
-      displayName,
-      photoURL,
-    }).catch(() => {
-      // 사용자가 없으면 생성
-      return admin.auth().createUser({
-        uid,
+    await admin
+      .auth()
+      .updateUser(uid, {
         email,
         displayName,
         photoURL,
+      })
+      .catch(() => {
+        // 사용자가 없으면 생성
+        return admin.auth().createUser({
+          uid,
+          email,
+          displayName,
+          photoURL,
+        });
       });
-    });
-    
+
     res.json({ customToken });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -214,17 +225,20 @@ app.post('/auth/custom-token', async (req, res) => {
 ## 🚀 실행
 
 1. 패키지 설치:
+
 ```bash
 cd C:\Users\xee3d\Documents\Posty_V74
 npm install @react-native-google-signin/google-signin @react-native-seoul/naver-login @react-native-seoul/kakao-login
 ```
 
 2. iOS 설정 (Mac에서만):
+
 ```bash
 cd ios && pod install && cd ..
 ```
 
 3. 앱 실행:
+
 ```bash
 npx react-native run-android
 # 또는

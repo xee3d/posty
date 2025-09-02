@@ -3,22 +3,25 @@
  * react-native-push-notification을 활용한 스마트 알림 시스템
  */
 
-import { Platform, PermissionsAndroid } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { badgeService } from './badgeService';
+import { Platform, PermissionsAndroid } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { badgeService } from "./badgeService";
 
 // 플랫폼별 푸시 알림 import
-import PushNotificationIOS from '@react-native-community/push-notification-ios';
+import PushNotificationIOS from "@react-native-community/push-notification-ios";
 
 let PushNotification: any = null;
 
 // Android용 푸시 알림 (Firebase 없이)
-if (Platform.OS === 'android') {
+if (Platform.OS === "android") {
   try {
-    const PushNotificationModule = require('react-native-push-notification');
+    const PushNotificationModule = require("react-native-push-notification");
     PushNotification = PushNotificationModule.default || PushNotificationModule;
   } catch (error) {
-    console.warn('📱 Android push notification not available:', error?.message || 'Unknown error');
+    console.warn(
+      "📱 Android push notification not available:",
+      error?.message || "Unknown error"
+    );
     PushNotification = null;
   }
 }
@@ -27,7 +30,7 @@ export interface NotificationPayload {
   title: string;
   body: string;
   data?: {
-    type: 'mission' | 'trend' | 'token' | 'achievement' | 'tip';
+    type: "mission" | "trend" | "token" | "achievement" | "tip";
     action?: string;
     url?: string;
   };
@@ -50,36 +53,46 @@ export class PushNotificationService {
    */
   async initialize(): Promise<boolean> {
     try {
-      console.log('📱 Starting platform-specific push notification service initialization...');
-      
-      if (Platform.OS === 'ios') {
+      console.log(
+        "📱 Starting platform-specific push notification service initialization..."
+      );
+
+      if (Platform.OS === "ios") {
         // iOS - @react-native-community/push-notification-ios 사용
-        console.log('📱 iOS: Using @react-native-community/push-notification-ios');
+        console.log(
+          "📱 iOS: Using @react-native-community/push-notification-ios"
+        );
         await this.setupIOSNotifications();
-      } else if (Platform.OS === 'android') {
+      } else if (Platform.OS === "android") {
         // Android - react-native-push-notification (Firebase 없이)
-        console.log('📱 Android: Using react-native-push-notification (without Firebase)');
+        console.log(
+          "📱 Android: Using react-native-push-notification (without Firebase)"
+        );
         await this.setupAndroidNotifications();
       }
-      
+
       // 배지 서비스 초기화
       await badgeService.initialize();
-      
-      this.isInitialized = true;
-      console.log('✅ Push notification service initialized successfully');
-      return true;
 
+      this.isInitialized = true;
+      console.log("✅ Push notification service initialized successfully");
+      return true;
     } catch (error) {
-      console.error('❌ Push notification initialization failed:', error);
-      
+      console.error("❌ Push notification initialization failed:", error);
+
       // 배지 서비스만이라도 초기화 시도
       try {
         await badgeService.initialize();
         this.isInitialized = true;
-        console.log('📱 Push notification service initialized (badge only mode)');
+        console.log(
+          "📱 Push notification service initialized (badge only mode)"
+        );
         return true;
       } catch (badgeError) {
-        console.error('❌ Badge service initialization also failed:', badgeError);
+        console.error(
+          "❌ Badge service initialization also failed:",
+          badgeError
+        );
         return false;
       }
     }
@@ -90,10 +103,12 @@ export class PushNotificationService {
    */
   private async requestPermission(): Promise<boolean> {
     try {
-      console.log('📱 Native permission request - always granted for badge system');
+      console.log(
+        "📱 Native permission request - always granted for badge system"
+      );
       return true; // 배지 시스템은 별도 권한이 필요없음
     } catch (error) {
-      console.error('📱 Permission request failed:', error);
+      console.error("📱 Permission request failed:", error);
       return false;
     }
   }
@@ -104,19 +119,21 @@ export class PushNotificationService {
   private async generateDeviceToken(): Promise<string | null> {
     try {
       // react-native-push-notification은 자체 토큰을 생성
-      const token = `device_${Platform.OS}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const token = `device_${Platform.OS}_${Date.now()}_${Math.random()
+        .toString(36)
+        .substr(2, 9)}`;
       this.deviceToken = token;
-      
+
       // 토큰을 로컬에 저장
-      await AsyncStorage.setItem('device_token', token);
-      
+      await AsyncStorage.setItem("device_token", token);
+
       // 서버에 토큰 전송 (필요시)
       await this.sendTokenToServer(token);
-      
-      console.log('📱 Device Token:', token);
+
+      console.log("📱 Device Token:", token);
       return token;
     } catch (error) {
-      console.error('📱 Device Token generation failed:', error);
+      console.error("📱 Device Token generation failed:", error);
       return null;
     }
   }
@@ -132,23 +149,25 @@ export class PushNotificationService {
         badge: true,
         sound: true,
       });
-      
-      console.log('📱 iOS push notification permissions:', permissions);
-      
+
+      console.log("📱 iOS push notification permissions:", permissions);
+
       // iOS 알림 리스너 설정
-      PushNotificationIOS.addEventListener('register', (token) => {
-        console.log('📱 iOS device token:', token);
+      PushNotificationIOS.addEventListener("register", (token) => {
+        console.log("📱 iOS device token:", token);
         this.deviceToken = token;
         this.sendTokenToServer(token);
       });
 
-      PushNotificationIOS.addEventListener('notification', async (notification) => {
-        console.log('📱 iOS notification received:', notification);
-        await badgeService.handlePushNotification(notification);
-      });
-
+      PushNotificationIOS.addEventListener(
+        "notification",
+        async (notification) => {
+          console.log("📱 iOS notification received:", notification);
+          await badgeService.handlePushNotification(notification);
+        }
+      );
     } catch (error) {
-      console.error('📱 iOS notification setup failed:', error);
+      console.error("📱 iOS notification setup failed:", error);
     }
   }
 
@@ -158,18 +177,21 @@ export class PushNotificationService {
   private async setupAndroidNotifications(): Promise<void> {
     try {
       if (!PushNotification) {
-        console.warn('📱 Android PushNotification not available');
+        console.warn("📱 Android PushNotification not available");
         return;
       }
 
       // NativeEventEmitter 문제를 방지하기 위해 조건부로 설정
-      if (PushNotification.configure && typeof PushNotification.configure === 'function') {
+      if (
+        PushNotification.configure &&
+        typeof PushNotification.configure === "function"
+      ) {
         // Android 푸시 알림 설정 (Firebase 없이)
         PushNotification.configure({
           onNotification: async (notification) => {
-            console.log('📱 Android notification received:', notification);
+            console.log("📱 Android notification received:", notification);
             await badgeService.handlePushNotification(notification);
-            
+
             if (notification.userInteraction) {
               await badgeService.handleAppActive();
               this.handleNotificationPress(notification.data);
@@ -177,7 +199,7 @@ export class PushNotificationService {
           },
 
           onRegister: async (token) => {
-            console.log('📱 Android push notification token:', token);
+            console.log("📱 Android push notification token:", token);
             this.deviceToken = token.token;
             await this.sendTokenToServer(token.token);
           },
@@ -187,19 +209,21 @@ export class PushNotificationService {
           popInitialNotification: true,
         });
       } else {
-        console.warn('📱 Android PushNotification.configure not available');
+        console.warn("📱 Android PushNotification.configure not available");
         // Fallback: 토큰 생성만 진행
         await this.generateDeviceToken();
       }
-
     } catch (error) {
-      console.error('📱 Android notification setup failed:', error);
+      console.error("📱 Android notification setup failed:", error);
       // 오류 발생 시 fallback 토큰 생성
       try {
         await this.generateDeviceToken();
-        console.log('📱 Android notification fallback mode activated');
+        console.log("📱 Android notification fallback mode activated");
       } catch (fallbackError) {
-        console.error('📱 Android notification fallback also failed:', fallbackError);
+        console.error(
+          "📱 Android notification fallback also failed:",
+          fallbackError
+        );
       }
     }
   }
@@ -212,16 +236,16 @@ export class PushNotificationService {
       // 권한 요청
       const hasPermission = await this.requestPermission();
       if (!hasPermission) {
-        console.log('📱 Push notification permission denied');
+        console.log("📱 Push notification permission denied");
         return;
       }
 
       // 디바이스 토큰 생성 (iOS의 경우 실제 토큰은 onRegister에서 받음)
-      if (Platform.OS === 'android') {
+      if (Platform.OS === "android") {
         await this.generateDeviceToken();
       }
     } catch (error) {
-      console.error('📱 Initial configuration failed:', error);
+      console.error("📱 Initial configuration failed:", error);
     }
   }
 
@@ -231,35 +255,37 @@ export class PushNotificationService {
   private showCustomNotification(payload: NotificationPayload): void {
     // 앱 내 커스텀 알림 표시 (토스트, 모달 등)
     // AlertProvider를 통해 표시하거나 별도의 알림 컴포넌트 사용
-    console.log('📱 Showing custom notification:', payload);
+    console.log("📱 Showing custom notification:", payload);
   }
 
   /**
    * 알림 클릭 처리
    */
   private handleNotificationPress(data: any): void {
-    if (!data) return;
+    if (!data) {
+      return;
+    }
 
     switch (data.type) {
-      case 'mission':
+      case "mission":
         // 미션 화면으로 이동
-        console.log('📱 Navigate to mission screen');
+        console.log("📱 Navigate to mission screen");
         break;
-      case 'trend':
+      case "trend":
         // 트렌드 화면으로 이동
-        console.log('📱 Navigate to trend screen');
+        console.log("📱 Navigate to trend screen");
         break;
-      case 'token':
+      case "token":
         // 토큰 관련 화면으로 이동
-        console.log('📱 Navigate to token screen');
+        console.log("📱 Navigate to token screen");
         break;
-      case 'achievement':
+      case "achievement":
         // 업적 화면으로 이동
-        console.log('📱 Navigate to achievement screen');
+        console.log("📱 Navigate to achievement screen");
         break;
       default:
         // 홈 화면으로 이동
-        console.log('📱 Navigate to home screen');
+        console.log("📱 Navigate to home screen");
     }
   }
 
@@ -268,31 +294,37 @@ export class PushNotificationService {
    */
   private async sendTokenToServer(token: string): Promise<void> {
     try {
-      const response = await fetch('https://posty-ai-new.vercel.app/api/notifications/register-token', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          token,
-          userId: null, // 추후 사용자 ID 연동
-          deviceInfo: {
-            platform: Platform.OS,
-            version: Platform.Version,
-            timestamp: new Date().toISOString(),
+      const response = await fetch(
+        "https://posty-ai-new.vercel.app/api/notifications/register-token",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        }),
-      });
+          body: JSON.stringify({
+            token,
+            userId: null, // 추후 사용자 ID 연동
+            deviceInfo: {
+              platform: Platform.OS,
+              version: Platform.Version,
+              timestamp: new Date().toISOString(),
+            },
+          }),
+        }
+      );
 
       const result = await response.json();
-      
+
       if (result.success) {
-        console.log('📱 Token sent to server successfully:', token.substring(0, 20) + '...');
+        console.log(
+          "📱 Token sent to server successfully:",
+          token.substring(0, 20) + "..."
+        );
       } else {
-        throw new Error(result.error || 'Unknown server error');
+        throw new Error(result.error || "Unknown server error");
       }
     } catch (error) {
-      console.error('📱 Failed to send token to server:', error);
+      console.error("📱 Failed to send token to server:", error);
     }
   }
 
@@ -301,101 +333,122 @@ export class PushNotificationService {
    */
   async scheduleLocalNotifications(): Promise<void> {
     // 일일 미션 알림 (매일 오전 9시)
-    this.scheduleNotification({
-      title: '🌟 새로운 미션이 도착했어요!',
-      body: '포스티와 함께 오늘의 창의적인 콘텐츠를 만들어보세요.',
-      data: { type: 'mission' }
-    }, '09:00');
+    this.scheduleNotification(
+      {
+        title: "🌟 새로운 미션이 도착했어요!",
+        body: "포스티와 함께 오늘의 창의적인 콘텐츠를 만들어보세요.",
+        data: { type: "mission" },
+      },
+      "09:00"
+    );
 
     // 트렌드 업데이트 알림 (매일 오후 6시)
-    this.scheduleNotification({
-      title: '📈 실시간 트렌드 업데이트',
-      body: '지금 뜨고 있는 키워드로 콘텐츠를 만들어보세요!',
-      data: { type: 'trend' }
-    }, '18:00');
+    this.scheduleNotification(
+      {
+        title: "📈 실시간 트렌드 업데이트",
+        body: "지금 뜨고 있는 키워드로 콘텐츠를 만들어보세요!",
+        data: { type: "trend" },
+      },
+      "18:00"
+    );
 
     // 주간 사용 통계 알림 (일요일 오후 8시)
-    this.scheduleNotification({
-      title: '📊 이번 주 활동 요약',
-      body: '이번 주 얼마나 많은 창작물을 만드셨는지 확인해보세요!',
-      data: { type: 'achievement' }
-    }, 'weekly');
+    this.scheduleNotification(
+      {
+        title: "📊 이번 주 활동 요약",
+        body: "이번 주 얼마나 많은 창작물을 만드셨는지 확인해보세요!",
+        data: { type: "achievement" },
+      },
+      "weekly"
+    );
   }
 
   /**
    * 알림 예약
    */
-  private scheduleNotification(payload: NotificationPayload, schedule: string): void {
+  private scheduleNotification(
+    payload: NotificationPayload,
+    schedule: string
+  ): void {
     try {
       let scheduledDate = new Date();
-      
-      if (schedule.includes(':')) {
+
+      if (schedule.includes(":")) {
         // 시간 기반 스케줄링 (예: "09:00", "18:00")
-        const [hours, minutes] = schedule.split(':').map(Number);
+        const [hours, minutes] = schedule.split(":").map(Number);
         scheduledDate.setHours(hours, minutes, 0, 0);
-        
+
         // 오늘이 지나면 내일로 설정
         if (scheduledDate <= new Date()) {
           scheduledDate.setDate(scheduledDate.getDate() + 1);
         }
-      } else if (schedule === 'weekly') {
+      } else if (schedule === "weekly") {
         // 주간 스케줄링 (일요일)
-        scheduledDate.setDate(scheduledDate.getDate() + (7 - scheduledDate.getDay()));
+        scheduledDate.setDate(
+          scheduledDate.getDate() + (7 - scheduledDate.getDay())
+        );
         scheduledDate.setHours(20, 0, 0, 0);
       }
 
-      if (Platform.OS === 'ios') {
+      if (Platform.OS === "ios") {
         // iOS 로컬 알림 스케줄링
         PushNotificationIOS.scheduleLocalNotification({
           alertTitle: payload.title,
           alertBody: payload.body,
           fireDate: scheduledDate.toISOString(),
-          repeatInterval: schedule === 'weekly' ? 'week' : 'day',
+          repeatInterval: schedule === "weekly" ? "week" : "day",
           userInfo: payload.data,
         });
-      } else if (Platform.OS === 'android' && PushNotification && 
-                 typeof PushNotification.localNotificationSchedule === 'function') {
+      } else if (
+        Platform.OS === "android" &&
+        PushNotification &&
+        typeof PushNotification.localNotificationSchedule === "function"
+      ) {
         // Android 로컬 알림 스케줄링
         PushNotification.localNotificationSchedule({
           title: payload.title,
           message: payload.body,
           date: scheduledDate,
-          repeatType: schedule === 'weekly' ? 'week' : 'day',
+          repeatType: schedule === "weekly" ? "week" : "day",
           userInfo: payload.data,
         });
       }
 
-      console.log(`📱 Scheduled notification: ${payload.title} at ${scheduledDate}`);
+      console.log(
+        `📱 Scheduled notification: ${payload.title} at ${scheduledDate}`
+      );
     } catch (error) {
-      console.error('📱 Schedule notification failed:', error);
+      console.error("📱 Schedule notification failed:", error);
     }
   }
 
   /**
    * 스마트 알림 (사용자 행동 기반)
    */
-  async sendSmartNotification(type: 'inactive_user' | 'content_suggestion' | 'achievement_unlock'): Promise<void> {
+  async sendSmartNotification(
+    type: "inactive_user" | "content_suggestion" | "achievement_unlock"
+  ): Promise<void> {
     const notifications = {
       inactive_user: {
-        title: '💡 포스티가 기다리고 있어요!',
-        body: '오늘 하루 어떤 이야기를 들려주실까요?',
-        data: { type: 'mission' }
+        title: "💡 포스티가 기다리고 있어요!",
+        body: "오늘 하루 어떤 이야기를 들려주실까요?",
+        data: { type: "mission" },
       },
       content_suggestion: {
-        title: '🎯 포스티의 맞춤 아이디어',
-        body: '당신의 스타일에 맞는 새로운 콘텐츠 아이디어가 준비되었어요!',
-        data: { type: 'tip' }
+        title: "🎯 포스티의 맞춤 아이디어",
+        body: "당신의 스타일에 맞는 새로운 콘텐츠 아이디어가 준비되었어요!",
+        data: { type: "tip" },
       },
       achievement_unlock: {
-        title: '🏆 새로운 업적 달성!',
-        body: '축하합니다! 포스티가 새로운 뱃지를 준비했어요.',
-        data: { type: 'achievement' }
-      }
+        title: "🏆 새로운 업적 달성!",
+        body: "축하합니다! 포스티가 새로운 뱃지를 준비했어요.",
+        data: { type: "achievement" },
+      },
     };
 
     const notification = notifications[type];
     if (notification) {
-      if (Platform.OS === 'ios') {
+      if (Platform.OS === "ios") {
         // iOS 즉시 로컬 알림
         PushNotificationIOS.presentLocalNotification({
           alertTitle: notification.title,
@@ -403,15 +456,18 @@ export class PushNotificationService {
           userInfo: notification.data,
           isSilent: false,
         });
-      } else if (Platform.OS === 'android' && PushNotification && 
-                 typeof PushNotification.localNotification === 'function') {
+      } else if (
+        Platform.OS === "android" &&
+        PushNotification &&
+        typeof PushNotification.localNotification === "function"
+      ) {
         // Android 즉시 로컬 알림
         PushNotification.localNotification({
           title: notification.title,
           message: notification.body,
           userInfo: notification.data,
           playSound: true,
-          soundName: 'default',
+          soundName: "default",
         });
       }
 
@@ -422,7 +478,7 @@ export class PushNotificationService {
         body: notification.body,
         timestamp: Date.now(),
         isRead: false,
-        type: notification.data.type
+        type: notification.data.type,
       };
       await badgeService.incrementBadge(badgeNotification);
     }
@@ -437,22 +493,22 @@ export class PushNotificationService {
     isEnabled: boolean;
   }> {
     try {
-      const token = await AsyncStorage.getItem('device_token');
-      
+      const token = await AsyncStorage.getItem("device_token");
+
       // 권한 상태 확인 (간단한 체크)
       const hasPermission = this.isInitialized && !!this.deviceToken;
-      
+
       return {
         hasPermission,
         token,
-        isEnabled: hasPermission
+        isEnabled: hasPermission,
       };
     } catch (error) {
-      console.error('📱 Get notification settings failed:', error);
+      console.error("📱 Get notification settings failed:", error);
       return {
         hasPermission: false,
         token: null,
-        isEnabled: false
+        isEnabled: false,
       };
     }
   }
@@ -468,7 +524,7 @@ export class PushNotificationService {
    * 테스트 알림 발송
    */
   async sendTestNotification(): Promise<void> {
-    await this.sendSmartNotification('content_suggestion');
+    await this.sendSmartNotification("content_suggestion");
   }
 }
 

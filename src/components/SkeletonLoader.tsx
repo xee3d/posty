@@ -1,21 +1,16 @@
-import React, { useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  useColorScheme,
-} from 'react-native';
-import { useAppTheme } from '../hooks/useAppTheme';
+import React, { useEffect } from "react";
+import { View, StyleSheet, Dimensions, useColorScheme } from "react-native";
+import { useAppTheme } from "../hooks/useAppTheme";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
   withTiming,
   interpolate,
-} from 'react-native-reanimated';
-import { COLORS, SPACING } from '../utils/constants';
+} from "react-native-reanimated";
+import { COLORS, SPACING } from "../utils/constants";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 interface SkeletonLoaderProps {
   style?: any;
@@ -26,7 +21,7 @@ interface SkeletonLoaderProps {
 
 export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   style,
-  width: customWidth = '100%',
+  width: customWidth = "100%",
   height = 20,
   borderRadius = 8,
 }) => {
@@ -34,19 +29,11 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   const { isDark, colors } = useAppTheme();
 
   useEffect(() => {
-    shimmer.value = withRepeat(
-      withTiming(1, { duration: 1000 }),
-      -1,
-      false
-    );
+    shimmer.value = withRepeat(withTiming(1, { duration: 1000 }), -1, false);
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const translateX = interpolate(
-      shimmer.value,
-      [0, 1],
-      [-width, width]
-    );
+    const translateX = interpolate(shimmer.value, [0, 1], [-width, width]);
     return {
       transform: [{ translateX }],
     };
@@ -58,7 +45,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
       width: customWidth,
       height,
       borderRadius,
-      backgroundColor: isDark ? '#141414' : '#E5E5E5',
+      backgroundColor: isDark ? "#141414" : "#E5E5E5",
     },
     style,
   ];
@@ -66,7 +53,9 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
   const shimmerStyles = [
     styles.shimmer,
     {
-      backgroundColor: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(255, 255, 255, 0.3)',
+      backgroundColor: isDark
+        ? "rgba(255, 255, 255, 0.03)"
+        : "rgba(255, 255, 255, 0.3)",
     },
     animatedStyle,
   ];
@@ -120,18 +109,13 @@ export const TextSkeleton: React.FC<{
   lineHeight?: number;
   lastLineWidth?: string;
   style?: any;
-}> = ({ 
-  lines = 3, 
-  lineHeight = 16, 
-  lastLineWidth = '70%',
-  style 
-}) => {
+}> = ({ lines = 3, lineHeight = 16, lastLineWidth = "70%", style }) => {
   return (
     <View style={[styles.textContainer, style]}>
       {Array.from({ length: lines }).map((_, index) => (
         <SkeletonLoader
           key={index}
-          width={index === lines - 1 ? lastLineWidth : '100%'}
+          width={index === lines - 1 ? lastLineWidth : "100%"}
           height={lineHeight}
           style={{ marginBottom: index < lines - 1 ? 8 : 0 }}
         />
@@ -152,17 +136,17 @@ export const PostSkeleton: React.FC = () => {
           <SkeletonLoader width={80} height={12} style={{ marginTop: 4 }} />
         </View>
       </View>
-      
+
       {/* 본문 텍스트 */}
       <TextSkeleton lines={3} lineHeight={16} lastLineWidth="60%" />
-      
+
       {/* 이미지 영역 (옵션) */}
-      <SkeletonLoader 
-        width="100%" 
-        height={200} 
-        style={{ marginTop: 12, marginBottom: 12 }} 
+      <SkeletonLoader
+        width="100%"
+        height={200}
+        style={{ marginTop: 12, marginBottom: 12 }}
       />
-      
+
       {/* 액션 버튼들 */}
       <View style={styles.postActions}>
         <SkeletonLoader width={60} height={32} borderRadius={16} />
@@ -192,10 +176,10 @@ export const AIWritingSkeleton: React.FC = () => {
         <SkeletonLoader width={24} height={24} borderRadius={12} />
         <SkeletonLoader width={100} height={16} style={{ marginLeft: 8 }} />
       </View>
-      
+
       <View style={styles.aiContent}>
         <TextSkeleton lines={4} lineHeight={18} lastLineWidth="45%" />
-        
+
         {/* 점점 추가되는 효과를 위한 추가 라인들 */}
         <View style={styles.progressLines}>
           <SkeletonLoader width="30%" height={18} style={{ marginTop: 8 }} />
@@ -213,12 +197,19 @@ export const TrendCategorySkeleton: React.FC = () => {
   return (
     <View style={styles.categoryContainer}>
       {[1, 2, 3, 4].map((item, index) => (
-        <View key={index} style={[
-          styles.categoryButtonSkeleton,
-          { backgroundColor: isDark ? colors.surface : '#E5E5E5' }
-        ]}>
+        <View
+          key={index}
+          style={[
+            styles.categoryButtonSkeleton,
+            { backgroundColor: isDark ? colors.surface : "#E5E5E5" },
+          ]}
+        >
           <SkeletonLoader width={16} height={16} borderRadius={8} />
-          <SkeletonLoader width={50 + index * 10} height={14} style={{ marginLeft: 6 }} />
+          <SkeletonLoader
+            width={50 + index * 10}
+            height={14}
+            style={{ marginLeft: 6 }}
+          />
         </View>
       ))}
     </View>
@@ -230,13 +221,15 @@ export const TrendCardSkeleton: React.FC = () => {
   const { isDark, colors } = useAppTheme();
 
   return (
-    <View style={[
-      styles.trendCardSkeleton, 
-      {
-        backgroundColor: colors.surface,
-        borderColor: colors.border,
-      }
-    ]}>
+    <View
+      style={[
+        styles.trendCardSkeleton,
+        {
+          backgroundColor: colors.surface,
+          borderColor: colors.border,
+        },
+      ]}
+    >
       <View style={styles.trendHeaderSkeleton}>
         <SkeletonLoader width={32} height={32} borderRadius={16} />
         <View style={styles.trendContentSkeleton}>
@@ -265,7 +258,12 @@ export const TrendPageSkeleton: React.FC = () => {
   const { isDark, colors } = useAppTheme();
 
   return (
-    <View style={[styles.trendPageContainer, { backgroundColor: colors.background }]}>
+    <View
+      style={[
+        styles.trendPageContainer,
+        { backgroundColor: colors.background },
+      ]}
+    >
       {/* 헤더 스켈레톤 */}
       <View style={styles.trendHeaderContainer}>
         <View style={styles.trendHeaderTop}>
@@ -284,7 +282,11 @@ export const TrendPageSkeleton: React.FC = () => {
         <View style={styles.myHashtagsSkeleton}>
           {[1, 2, 3, 4, 5].map((_, index) => (
             <View key={index} style={styles.myHashtagChipSkeleton}>
-              <SkeletonLoader width={60 + index * 10} height={32} borderRadius={16} />
+              <SkeletonLoader
+                width={60 + index * 10}
+                height={32}
+                borderRadius={16}
+              />
             </View>
           ))}
         </View>
@@ -309,7 +311,11 @@ export const MyHashtagsSkeleton: React.FC = () => {
       <View style={styles.myHashtagsSkeleton}>
         {[1, 2, 3, 4, 5].map((_, index) => (
           <View key={index} style={styles.myHashtagChipSkeleton}>
-            <SkeletonLoader width={60 + index * 10} height={32} borderRadius={16} />
+            <SkeletonLoader
+              width={60 + index * 10}
+              height={32}
+              borderRadius={16}
+            />
           </View>
         ))}
       </View>
@@ -319,48 +325,48 @@ export const MyHashtagsSkeleton: React.FC = () => {
 
 const styles = StyleSheet.create({
   skeleton: {
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   // 라이트모드 스켈레톤
   skeletonLight: {
-    backgroundColor: '#E5E5E5',
+    backgroundColor: "#E5E5E5",
   },
   // 다크모드 스켈레톤 - 더 어두운 색상
   skeletonDark: {
-    backgroundColor: '#1A1A1A',
+    backgroundColor: "#1A1A1A",
   },
   shimmer: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    transform: [{ skewX: '-20deg' }],
+    transform: [{ skewX: "-20deg" }],
   },
   // 라이트모드 시머
   shimmerLight: {
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+    backgroundColor: "rgba(255, 255, 255, 0.3)",
   },
   // 다크모드 시머 - 더 어두운 시머 효과
   shimmerDark: {
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: "rgba(255, 255, 255, 0.05)",
   },
   container: {
     flex: 1,
   },
   containerLight: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: "#F8F9FA",
   },
   containerDark: {
-    backgroundColor: '#000000',
+    backgroundColor: "#000000",
   },
   header: {
     padding: SPACING.lg,
     paddingTop: SPACING.xl,
   },
   banner: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: SPACING.lg,
     marginBottom: SPACING.xl,
   },
@@ -369,8 +375,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   cards: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingHorizontal: SPACING.lg,
     marginBottom: SPACING.xl,
     gap: 8,
@@ -378,25 +384,25 @@ const styles = StyleSheet.create({
   actionCards: {
     paddingHorizontal: SPACING.lg,
   },
-  
+
   // 새로운 스타일들
   textContainer: {
-    width: '100%',
+    width: "100%",
   },
   postSkeleton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     padding: 16,
     marginBottom: 12,
     borderRadius: 12,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
   },
   postHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
   },
   postHeaderText: {
@@ -404,25 +410,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   postActions: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    borderTopColor: "#F0F0F0",
   },
   feedContainer: {
     padding: 16,
   },
   aiWritingContainer: {
-    backgroundColor: '#F8F9FF',
+    backgroundColor: "#F8F9FF",
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E8E8FF',
+    borderColor: "#E8E8FF",
   },
   aiHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 12,
   },
   aiContent: {
@@ -431,16 +437,16 @@ const styles = StyleSheet.create({
   progressLines: {
     opacity: 0.6,
   },
-  
+
   // 트렌드 스켈레톤 스타일들
   trendPageContainer: {
     flex: 1,
   },
   trendPageContainerLight: {
-    backgroundColor: '#F8F9FA',
+    backgroundColor: "#F8F9FA",
   },
   trendPageContainerDark: {
-    backgroundColor: '#000000',
+    backgroundColor: "#000000",
   },
   trendHeaderContainer: {
     paddingHorizontal: SPACING.lg,
@@ -448,18 +454,18 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING.lg,
   },
   trendHeaderTop: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   categoryContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     paddingHorizontal: SPACING.lg,
     marginBottom: SPACING.lg,
     gap: SPACING.sm,
   },
   categoryButtonSkeleton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: SPACING.sm,
     paddingHorizontal: SPACING.md,
     borderRadius: 24,
@@ -469,7 +475,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xl,
   },
   myHashtagsSkeleton: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: SPACING.sm,
   },
   myHashtagChipSkeleton: {
@@ -485,16 +491,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   trendCardSkeletonLight: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E5E5E5',
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E5E5E5",
   },
   trendCardSkeletonDark: {
-    backgroundColor: '#141414',
-    borderColor: '#3A3A3A',
+    backgroundColor: "#141414",
+    borderColor: "#3A3A3A",
   },
   trendHeaderSkeleton: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+    flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: SPACING.sm,
   },
   trendContentSkeleton: {
@@ -502,19 +508,19 @@ const styles = StyleSheet.create({
     marginLeft: SPACING.sm,
   },
   trendHashtagsSkeleton: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: SPACING.xs,
     marginTop: SPACING.xs,
   },
   trendFooterSkeleton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginTop: SPACING.sm,
   },
   trendSourceSkeleton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
 });

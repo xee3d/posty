@@ -1,25 +1,25 @@
 // AI 글쓰기 로딩 상태 개선을 위한 컴포넌트 - 타이핑 애니메이션 추가
 
-import React from 'react';
+import React from "react";
 import {
   View,
   Text,
   ActivityIndicator,
   StyleSheet,
   Animated,
-} from 'react-native';
-import { COLORS, SPACING, FONTS, BRAND } from '../utils/constants';
-import Icon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+} from "react-native";
+import { COLORS, SPACING, FONTS, BRAND } from "../utils/constants";
+import Icon from "react-native-vector-icons/Ionicons";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 
 interface GeneratingIndicatorProps {
   visible: boolean;
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   message?: string;
 }
 
 // 타이핑 애니메이션 컴포넌트
-const TypingAnimation: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
+const TypingAnimation: React.FC<{ theme: "light" | "dark" }> = ({ theme }) => {
   const dot1 = React.useRef(new Animated.Value(0)).current;
   const dot2 = React.useRef(new Animated.Value(0)).current;
   const dot3 = React.useRef(new Animated.Value(0)).current;
@@ -52,21 +52,41 @@ const TypingAnimation: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
 
   const dotStyle = (animatedValue: Animated.Value) => ({
     opacity: animatedValue,
-    transform: [{
-      scale: animatedValue.interpolate({
-        inputRange: [0, 1],
-        outputRange: [0.8, 1.2],
-      })
-    }]
+    transform: [
+      {
+        scale: animatedValue.interpolate({
+          inputRange: [0, 1],
+          outputRange: [0.8, 1.2],
+        }),
+      },
+    ],
   });
 
-  const colors = theme === 'dark' ? darkColors : lightColors;
+  const colors = theme === "dark" ? darkColors : lightColors;
 
   return (
     <View style={styles.typingContainer}>
-      <Animated.View style={[styles.dot, { backgroundColor: colors.primary }, dotStyle(dot1)]} />
-      <Animated.View style={[styles.dot, { backgroundColor: colors.primary }, dotStyle(dot2)]} />
-      <Animated.View style={[styles.dot, { backgroundColor: colors.primary }, dotStyle(dot3)]} />
+      <Animated.View
+        style={[
+          styles.dot,
+          { backgroundColor: colors.primary },
+          dotStyle(dot1),
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.dot,
+          { backgroundColor: colors.primary },
+          dotStyle(dot2),
+        ]}
+      />
+      <Animated.View
+        style={[
+          styles.dot,
+          { backgroundColor: colors.primary },
+          dotStyle(dot3),
+        ]}
+      />
     </View>
   );
 };
@@ -75,17 +95,17 @@ const TypingAnimation: React.FC<{ theme: 'light' | 'dark' }> = ({ theme }) => {
 export const GeneratingIndicator: React.FC<GeneratingIndicatorProps> = ({
   visible,
   theme,
-  message = '포스티가 글을 작성 중입니다'
+  message = "포스티가 글을 작성 중입니다",
 }) => {
   const animatedValue = React.useRef(new Animated.Value(0)).current;
   const [currentTip, setCurrentTip] = React.useState(0);
-  
+
   const tips = [
-    '💡 톤을 바꾸면 완전히 다른 느낌의 글이 나와요!',
-    '✨ 길이를 조절해서 플랫폼에 맞는 글을 만들어보세요',
-    '🎯 구체적인 주제일수록 더 좋은 결과가 나와요',
-    '📱 각 플랫폼마다 최적화된 스타일로 작성됩니다',
-    '🔥 GenZ 톤으로 MZ세대 감성을 담아보세요'
+    "💡 톤을 바꾸면 완전히 다른 느낌의 글이 나와요!",
+    "✨ 길이를 조절해서 플랫폼에 맞는 글을 만들어보세요",
+    "🎯 구체적인 주제일수록 더 좋은 결과가 나와요",
+    "📱 각 플랫폼마다 최적화된 스타일로 작성됩니다",
+    "🔥 GenZ 톤으로 MZ세대 감성을 담아보세요",
   ];
 
   React.useEffect(() => {
@@ -94,7 +114,7 @@ export const GeneratingIndicator: React.FC<GeneratingIndicatorProps> = ({
     if (visible) {
       // 팁 로테이션 (배터리 최적화: 빈도 줄임)
       tipInterval = setInterval(() => {
-        setCurrentTip(prev => (prev + 1) % tips.length);
+        setCurrentTip((prev) => (prev + 1) % tips.length);
       }, 5000); // 3초에서 5초로 변경
 
       // 페이드인 애니메이션
@@ -119,70 +139,76 @@ export const GeneratingIndicator: React.FC<GeneratingIndicatorProps> = ({
     };
   }, [visible]);
 
-  if (!visible) return null;
+  if (!visible) {
+    return null;
+  }
 
-  const colors = theme === 'dark' ? darkColors : lightColors;
+  const colors = theme === "dark" ? darkColors : lightColors;
 
   return (
-    <Animated.View 
+    <Animated.View
       style={[
         styles.container,
-        { 
+        {
           backgroundColor: colors.overlay,
           opacity: animatedValue,
-        }
+        },
       ]}
     >
-      <Animated.View 
+      <Animated.View
         style={[
           styles.content,
-          { 
+          {
             backgroundColor: colors.background,
-            transform: [{
-              scale: animatedValue.interpolate({
-                inputRange: [0, 1],
-                outputRange: [0.9, 1],
-              })
-            }]
-          }
+            transform: [
+              {
+                scale: animatedValue.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [0.9, 1],
+                }),
+              },
+            ],
+          },
         ]}
       >
         {/* 포스티 아이콘 */}
-        <View style={[styles.mascotContainer, { backgroundColor: colors.mascotBg }]}>
+        <View
+          style={[styles.mascotContainer, { backgroundColor: colors.mascotBg }]}
+        >
           <Text style={styles.mascotEmoji}>{BRAND.mascot}</Text>
           <View style={styles.typingIndicator}>
             <TypingAnimation theme={theme} />
           </View>
         </View>
-        
+
         {/* 메시지 */}
-        <Text style={[styles.message, { color: colors.text }]}>
-          {message}
-        </Text>
-        
+        <Text style={[styles.message, { color: colors.text }]}>{message}</Text>
+
         {/* 프로그레스 바 */}
-        <View style={[styles.progressBar, { backgroundColor: colors.progressBg }]}>
-          <Animated.View 
+        <View
+          style={[styles.progressBar, { backgroundColor: colors.progressBg }]}
+        >
+          <Animated.View
             style={[
               styles.progressFill,
-              { 
+              {
                 backgroundColor: colors.primary,
                 width: animatedValue.interpolate({
                   inputRange: [0, 1],
-                  outputRange: ['0%', '80%'],
-                })
-              }
+                  outputRange: ["0%", "80%"],
+                }),
+              },
             ]}
           />
         </View>
-        
+
         {/* 회전하는 팁 */}
-        <Animated.View 
+        <Animated.View
           style={{
             opacity: animatedValue.interpolate({
               inputRange: [0, 0.5, 1],
               outputRange: [0, 0, 1],
-            })
+            }),
           }}
         >
           <Text style={[styles.tipText, { color: colors.subtext }]}>
@@ -195,8 +221,8 @@ export const GeneratingIndicator: React.FC<GeneratingIndicatorProps> = ({
 };
 
 // 버튼 내부 로딩 상태
-export const ButtonLoadingIndicator: React.FC<{ color?: string }> = ({ 
-  color = COLORS.white 
+export const ButtonLoadingIndicator: React.FC<{ color?: string }> = ({
+  color = COLORS.white,
 }) => {
   const rotateValue = React.useRef(new Animated.Value(0)).current;
 
@@ -212,7 +238,7 @@ export const ButtonLoadingIndicator: React.FC<{ color?: string }> = ({
 
   const rotate = rotateValue.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
+    outputRange: ["0deg", "360deg"],
   });
 
   return (
@@ -220,9 +246,7 @@ export const ButtonLoadingIndicator: React.FC<{ color?: string }> = ({
       <Animated.View style={{ transform: [{ rotate }] }}>
         <Icon name="sync-outline" size={20} color={color} />
       </Animated.View>
-      <Text style={[styles.buttonLoadingText, { color }]}>
-        생성 중
-      </Text>
+      <Text style={[styles.buttonLoadingText, { color }]}>생성 중</Text>
       <View style={styles.miniTyping}>
         <View style={[styles.miniDot, { backgroundColor: color }]} />
         <View style={[styles.miniDot, { backgroundColor: color }]} />
@@ -233,78 +257,78 @@ export const ButtonLoadingIndicator: React.FC<{ color?: string }> = ({
 };
 
 const lightColors = {
-  background: 'rgba(255, 255, 255, 0.98)',
-  overlay: 'rgba(0, 0, 0, 0.5)',
+  background: "rgba(255, 255, 255, 0.98)",
+  overlay: "rgba(0, 0, 0, 0.5)",
   primary: COLORS.primary,
   text: COLORS.text.primary,
   subtext: COLORS.text.secondary,
-  mascotBg: 'rgba(255, 111, 97, 0.1)',
-  progressBg: '#F0F0F0',
+  mascotBg: "rgba(255, 111, 97, 0.1)",
+  progressBg: "#F0F0F0",
 };
 
 const darkColors = {
-  background: 'rgba(30, 30, 30, 0.98)',
-  overlay: 'rgba(0, 0, 0, 0.8)',
+  background: "rgba(30, 30, 30, 0.98)",
+  overlay: "rgba(0, 0, 0, 0.8)",
   primary: COLORS.primary,
-  text: '#FFFFFF',
-  subtext: '#AAAAAA',
-  mascotBg: 'rgba(255, 111, 97, 0.2)',
-  progressBg: '#404040',
+  text: "#FFFFFF",
+  subtext: "#AAAAAA",
+  mascotBg: "rgba(255, 111, 97, 0.2)",
+  progressBg: "#404040",
 };
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     zIndex: 1000,
     elevation: 10,
   },
   content: {
-    width: '85%',
+    width: "85%",
     maxWidth: 320,
     padding: SPACING.xl,
     borderRadius: 20,
-    backgroundColor: '#FFFFFF', // 기본 배경색 추가
-    shadowColor: '#000',
+    backgroundColor: "#FFFFFF", // 기본 배경색 추가
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
     shadowRadius: 12,
     elevation: 8,
-    alignItems: 'center',
+    alignItems: "center",
   },
   mascotContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: SPACING.md,
-    position: 'relative',
+    position: "relative",
   },
   mascotEmoji: {
     fontSize: 40,
   },
   typingIndicator: {
-    position: 'absolute',
+    position: "absolute",
     bottom: -5,
     right: -5,
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderRadius: 12,
     padding: 4,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
   typingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 3,
   },
   dot: {
@@ -314,38 +338,38 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 18,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
     marginBottom: SPACING.md,
   },
   progressBar: {
-    width: '100%',
+    width: "100%",
     height: 4,
     borderRadius: 2,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginBottom: SPACING.md,
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
     borderRadius: 2,
   },
   tipText: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 20,
   },
   buttonLoading: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   buttonLoadingText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   miniTyping: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 2,
     marginLeft: 4,
   },

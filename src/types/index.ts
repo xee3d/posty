@@ -11,12 +11,12 @@ export interface UserPreferences {
   defaultPlatform: Platform;
   autoSchedule: boolean;
   notificationsEnabled: boolean;
-  aiRecommendationFrequency: 'low' | 'medium' | 'high';
+  aiRecommendationFrequency: "low" | "medium" | "high";
   preferredPostingTimes: string[];
 }
 
 // 플랫폼
-export type Platform = 'instagram' | 'facebook' | 'twitter' | 'linkedin';
+export type Platform = "instagram" | "facebook" | "twitter" | "linkedin";
 
 // 게시물
 export interface Post {
@@ -24,7 +24,7 @@ export interface Post {
   title: string;
   content: string;
   platform: Platform;
-  status: 'draft' | 'scheduled' | 'published';
+  status: "draft" | "scheduled" | "published";
   createdAt: Date;
   updatedAt: Date;
   scheduledAt?: Date;
@@ -58,8 +58,13 @@ export interface StylePreset {
   id: string;
   name: string;
   description: string;
-  tone: 'professional' | 'casual' | 'humorous' | 'inspirational' | 'informative';
-  length: 'short' | 'medium' | 'long';
+  tone:
+    | "professional"
+    | "casual"
+    | "humorous"
+    | "inspirational"
+    | "informative";
+  length: "short" | "medium" | "long";
   includeEmojis: boolean;
   includeHashtags: boolean;
   customPrompt?: string;
@@ -104,14 +109,14 @@ export interface Schedule {
   postId: string;
   scheduledAt: Date;
   platform: Platform;
-  status: 'pending' | 'posted' | 'failed';
+  status: "pending" | "posted" | "failed";
   error?: string;
 }
 
 // 알림
 export interface Notification {
   id: string;
-  type: 'info' | 'success' | 'warning' | 'error';
+  type: "info" | "success" | "warning" | "error";
   title: string;
   message: string;
   read: boolean;

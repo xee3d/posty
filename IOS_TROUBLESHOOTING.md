@@ -3,6 +3,7 @@
 ## 🔍 설정 완료 후 체크리스트
 
 ### 1. 필수 파일 확인
+
 - [ ] `ios/` 폴더 존재
 - [ ] `ios/Posty.xcworkspace` 또는 `ios/Posty.xcodeproj` 존재
 - [ ] `ios/Podfile` 존재하고 올바른 내용 포함
@@ -10,12 +11,14 @@
 - [ ] `ios/Posty/GoogleService-Info.plist` 존재 (Firebase 사용시)
 
 ### 2. 환경 설정 확인
+
 - [ ] `.env` 파일에 필요한 키값들 설정
 - [ ] Node.js 18+ 버전 사용
 - [ ] CocoaPods 설치됨 (`pod --version` 확인)
 - [ ] Xcode 14+ 설치됨
 
 ### 3. 프로젝트 설정 확인 (Xcode에서)
+
 - [ ] Bundle Identifier: `com.posty.app`
 - [ ] Deployment Target: iOS 11.0+
 - [ ] Signing & Capabilities 설정
@@ -23,8 +26,9 @@
 - [ ] GoogleService-Info.plist가 프로젝트에 추가됨
 
 ### 4. Info.plist 권한 확인
+
 - [ ] NSCameraUsageDescription
-- [ ] NSPhotoLibraryUsageDescription  
+- [ ] NSPhotoLibraryUsageDescription
 - [ ] NSMicrophoneUsageDescription
 - [ ] NSLocationWhenInUseUsageDescription
 - [ ] NSUserTrackingUsageDescription
@@ -34,6 +38,7 @@
 - [ ] UIAppFonts (MaterialIcons.ttf, Ionicons.ttf)
 
 ### 5. 빌드 테스트
+
 - [ ] `cd ios && pod install` 성공
 - [ ] `npm start` Metro 서버 시작 성공
 - [ ] `npm run ios` 시뮬레이터 빌드 성공
@@ -42,6 +47,7 @@
 ## 🚨 자주 발생하는 문제들과 해결법
 
 ### 1. "No bundle URL present" 오류
+
 ```bash
 # 해결법 1: Metro 서버 먼저 시작
 npm start --reset-cache
@@ -54,6 +60,7 @@ xcrun simctl erase all
 ```
 
 ### 2. CocoaPods 관련 오류
+
 ```bash
 # 해결법 1: 캐시 클리어 후 재설치
 cd ios
@@ -67,6 +74,7 @@ arch -x86_64 pod install
 ```
 
 ### 3. Firebase 설정 오류
+
 - GoogleService-Info.plist가 올바른 위치(`ios/Posty/`)에 있는지 확인
 - Bundle Identifier가 Firebase 프로젝트와 정확히 일치하는지 확인
 - Xcode에서 파일이 프로젝트에 추가되고 Target이 선택되었는지 확인
@@ -74,6 +82,7 @@ arch -x86_64 pod install
 ### 4. 소셜 로그인 오류
 
 #### Google Sign In
+
 ```bash
 # .env 파일 확인
 GOOGLE_SERVICES_IOS_CLIENT_ID=your_ios_client_id
@@ -83,8 +92,9 @@ GOOGLE_SERVICES_IOS_CLIENT_ID=your_ios_client_id
 ```
 
 #### Kakao Login
+
 ```bash
-# .env 파일 확인  
+# .env 파일 확인
 KAKAO_APP_KEY=your_kakao_app_key
 
 # Info.plist에 URL scheme 추가 확인
@@ -92,6 +102,7 @@ KAKAO_APP_KEY=your_kakao_app_key
 ```
 
 ### 5. Vector Icons 표시 안됨
+
 ```bash
 # 폰트 파일 복사 확인
 cp node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf ios/Posty/
@@ -101,6 +112,7 @@ cp node_modules/react-native-vector-icons/Fonts/Ionicons.ttf ios/Posty/
 ```
 
 ### 6. "React/RCTBridgeModule.h file not found" 오류
+
 ```bash
 # 해결법: React Native 경로 문제
 cd ios
@@ -115,12 +127,14 @@ pod install
 ```
 
 ### 7. "Multiple commands produce" 오류
+
 ```bash
 # 해결법: Xcode에서 Build Phases 확인
 # 중복된 파일이나 스크립트가 있는지 확인하고 제거
 ```
 
 ### 8. 시뮬레이터에서 앱이 크래시
+
 ```bash
 # Metro 로그 확인
 npm start
@@ -132,6 +146,7 @@ npm start
 ## 🔧 고급 문제 해결
 
 ### 1. 완전한 클린 빌드
+
 ```bash
 # 1. 모든 캐시 제거
 npm start -- --reset-cache
@@ -151,6 +166,7 @@ xcodebuild clean -workspace Posty.xcworkspace -scheme Posty
 ```
 
 ### 2. React Native 버전 호환성 문제
+
 ```bash
 # 현재 버전 확인
 react-native --version
@@ -163,6 +179,7 @@ npm install react-native-library@specific-version
 ```
 
 ### 3. Apple Silicon Mac 관련 문제
+
 ```bash
 # Ruby 환경 확인
 which ruby
@@ -180,6 +197,7 @@ arch -x86_64 pod install
 ```
 
 ### 4. 메모리 부족 오류
+
 ```bash
 # Node.js 메모리 제한 늘리기
 export NODE_OPTIONS="--max-old-space-size=8192"
@@ -190,6 +208,7 @@ npm start
 ```
 
 ### 5. Firebase 연동 후 빌드 오류
+
 ```bash
 # Firebase SDK 버전 확인
 npm list | grep firebase
@@ -207,6 +226,7 @@ pod install --repo-update
 ## 📱 Posty 앱 특화 설정
 
 ### 1. 필수 라이브러리 설정 확인
+
 ```bash
 # 설치된 패키지 목록 확인
 npm list --depth=0
@@ -223,6 +243,7 @@ npm list --depth=0
 ```
 
 ### 2. 구독 결제 시스템 설정
+
 ```bash
 # App Store Connect 설정 필요
 1. App Store Connect에 앱 등록
@@ -236,6 +257,7 @@ npm list --depth=0
 ```
 
 ### 3. 푸시 알림 설정 (선택사항)
+
 ```bash
 # Capabilities에서 Push Notifications 추가
 # APNs 인증서 또는 키 생성
@@ -243,6 +265,7 @@ npm list --depth=0
 ```
 
 ### 4. 앱 아이콘 및 LaunchScreen 설정
+
 ```bash
 # 앱 아이콘 추가
 1. ios/Posty/Images.xcassets/AppIcon.appiconset/
@@ -257,6 +280,7 @@ npm list --depth=0
 ## 🚀 배포 준비
 
 ### 1. Archive 빌드 설정
+
 ```bash
 # Release 모드로 빌드
 npx react-native run-ios --configuration Release
@@ -266,6 +290,7 @@ npx react-native run-ios --configuration Release
 ```
 
 ### 2. App Store 배포 체크리스트
+
 - [ ] Bundle Identifier 확정
 - [ ] 앱 버전 및 빌드 번호 설정
 - [ ] App Store Connect에 앱 정보 입력
@@ -274,6 +299,7 @@ npx react-native run-ios --configuration Release
 - [ ] 테스트 완료 (TestFlight)
 
 ### 3. 성능 최적화
+
 ```bash
 # Bundle 크기 분석
 npx react-native bundle --platform ios --dev false --entry-file index.js --bundle-output ios-bundle.js --assets-dest ios-assets
@@ -296,6 +322,7 @@ npx react-native bundle --platform ios --dev false --entry-file index.js --bundl
 ## 🔄 정기 유지보수
 
 ### 월간 작업
+
 ```bash
 # 1. 의존성 업데이트 확인
 npm outdated
@@ -309,6 +336,7 @@ pod update
 ```
 
 ### 분기별 작업
+
 ```bash
 # 1. React Native 버전 업그레이드 검토
 # 2. 주요 라이브러리 메이저 버전 업데이트 검토

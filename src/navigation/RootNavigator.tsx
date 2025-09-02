@@ -1,20 +1,20 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 
 // Import screens
-import HomeScreen from '../screens/HomeScreen';
-import AIWriteScreen from '../screens/AIWriteScreen';
-import TrendScreen from '../screens/TrendScreen';
-import MyStyleScreen from '../screens/MyStyleScreen';
-import SettingsScreen from '../screens/SettingsScreen';
+import HomeScreen from "../screens/HomeScreen";
+import AIWriteScreen from "../screens/AIWriteScreen";
+import TrendScreen from "../screens/TrendScreen";
+import MyStyleScreen from "../screens/MyStyleScreen";
+import SettingsScreen from "../screens/SettingsScreen";
 
 // Import constants
-import { COLORS, FONTS, SPACING, BRAND } from '../utils/constants';
+import { COLORS, FONTS, SPACING, BRAND } from "../utils/constants";
 
 // Type definitions
 export type RootStackParamList = {
@@ -43,7 +43,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
 
         const onPress = () => {
           const event = navigation.emit({
-            type: 'tabPress',
+            type: "tabPress",
             target: route.key,
             canPreventDefault: true,
           });
@@ -55,33 +55,57 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
 
         const getTabIcon = (routeName: string) => {
           switch (routeName) {
-            case 'Home':
-              return { icon: 'home-outline', activeIcon: 'home', isMaterial: false };
-            case 'AIWrite':
-              return { icon: 'create-outline', activeIcon: 'create', isMaterial: false };
-            case 'Trend':
-              return { icon: 'trending-up', activeIcon: 'trending-up', isMaterial: false };
-            case 'MyStyle':
-              return { icon: 'palette', activeIcon: 'palette', isMaterial: true };
-            case 'Settings':
-              return { icon: 'settings-outline', activeIcon: 'settings', isMaterial: false };
+            case "Home":
+              return {
+                icon: "home-outline",
+                activeIcon: "home",
+                isMaterial: false,
+              };
+            case "AIWrite":
+              return {
+                icon: "create-outline",
+                activeIcon: "create",
+                isMaterial: false,
+              };
+            case "Trend":
+              return {
+                icon: "trending-up",
+                activeIcon: "trending-up",
+                isMaterial: false,
+              };
+            case "MyStyle":
+              return {
+                icon: "palette",
+                activeIcon: "palette",
+                isMaterial: true,
+              };
+            case "Settings":
+              return {
+                icon: "settings-outline",
+                activeIcon: "settings",
+                isMaterial: false,
+              };
             default:
-              return { icon: 'home-outline', activeIcon: 'home', isMaterial: false };
+              return {
+                icon: "home-outline",
+                activeIcon: "home",
+                isMaterial: false,
+              };
           }
         };
 
         const getTabLabel = (routeName: string) => {
           switch (routeName) {
-            case 'Home':
-              return '홈';
-            case 'AIWrite':
-              return '글쓰기';
-            case 'Trend':
-              return '트렌드';
-            case 'MyStyle':
-              return '내 스타일';
-            case 'Settings':
-              return '설정';
+            case "Home":
+              return "홈";
+            case "AIWrite":
+              return "글쓰기";
+            case "Trend":
+              return "트렌드";
+            case "MyStyle":
+              return "내 스타일";
+            case "Settings":
+              return "설정";
             default:
               return routeName;
           }
@@ -97,7 +121,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
             onPress={onPress}
             style={styles.tab}
           >
-            {route.name === 'AIWrite' && isFocused ? (
+            {route.name === "AIWrite" && isFocused ? (
               <View style={styles.aiWriteActiveIcon}>
                 <Icon name="create" size={24} color="#FFFFFF" />
               </View>
@@ -108,10 +132,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
                 color={isFocused ? COLORS.primary : COLORS.text.tertiary}
               />
             )}
-            <Text style={[
-              styles.tabLabel,
-              isFocused && styles.tabLabelActive
-            ]}>
+            <Text style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>
               {getTabLabel(route.name)}
             </Text>
           </TouchableOpacity>
@@ -140,44 +161,48 @@ function MainTabs() {
         },
       }}
     >
-      <Tab.Screen 
-        name="Home" 
+      <Tab.Screen
+        name="Home"
         component={HomeScreen}
         options={{
           headerTitle: BRAND.koreanName,
           headerRight: () => (
             <TouchableOpacity style={{ marginRight: SPACING.md }}>
-              <Icon name="notifications-outline" size={24} color={COLORS.text.primary} />
+              <Icon
+                name="notifications-outline"
+                size={24}
+                color={COLORS.text.primary}
+              />
             </TouchableOpacity>
           ),
         }}
       />
-      <Tab.Screen 
-        name="AIWrite" 
+      <Tab.Screen
+        name="AIWrite"
         component={AIWriteScreen}
         options={{
-          headerTitle: 'AI 글쓰기',
+          headerTitle: "AI 글쓰기",
         }}
       />
-      <Tab.Screen 
-        name="Trend" 
+      <Tab.Screen
+        name="Trend"
         component={TrendScreen}
         options={{
-          headerTitle: '트렌드',
+          headerTitle: "트렌드",
         }}
       />
-      <Tab.Screen 
-        name="MyStyle" 
+      <Tab.Screen
+        name="MyStyle"
         component={MyStyleScreen}
         options={{
-          headerTitle: '내 스타일',
+          headerTitle: "내 스타일",
         }}
       />
-      <Tab.Screen 
-        name="Settings" 
+      <Tab.Screen
+        name="Settings"
         component={SettingsScreen}
         options={{
-          headerTitle: '설정',
+          headerTitle: "설정",
         }}
       />
     </Tab.Navigator>
@@ -189,10 +214,7 @@ export default function RootNavigator() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        <Stack.Screen 
-          name="MainTabs" 
-          component={MainTabs}
-        />
+        <Stack.Screen name="MainTabs" component={MainTabs} />
         {/* Add modal screens here later */}
       </Stack.Navigator>
     </NavigationContainer>
@@ -201,16 +223,16 @@ export default function RootNavigator() {
 
 const styles = StyleSheet.create({
   tabBarContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     backgroundColor: COLORS.surface,
     borderTopWidth: 1,
-    borderTopColor: '#F3F4F6',
+    borderTopColor: "#F3F4F6",
     paddingBottom: 20,
     paddingTop: 8,
   },
   tab: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     paddingVertical: SPACING.sm,
   },
   aiWriteActiveIcon: {
@@ -218,10 +240,10 @@ const styles = StyleSheet.create({
     height: 48,
     borderRadius: 24,
     backgroundColor: COLORS.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginTop: -20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
@@ -234,6 +256,6 @@ const styles = StyleSheet.create({
   },
   tabLabelActive: {
     color: COLORS.primary,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

@@ -3,8 +3,9 @@
 ## 🎯 테스트된 환경 (중요!)
 
 이 프로젝트는 다음 버전에서 테스트되었습니다:
+
 - **Node.js**: 18.20.4
-- **npm**: 10.7.0  
+- **npm**: 10.7.0
 - **React Native CLI**: 0.73.10 (중요: 이 버전 사용 권장)
 - **React Native**: 0.74.5
 - **TypeScript**: 5.0.4
@@ -23,7 +24,7 @@ npx react-native@0.73.10 --version
 `src/services/openaiService.ts` 파일에서:
 
 ```typescript
-const OPENAI_API_KEY = 'sk-your-actual-api-key-here';
+const OPENAI_API_KEY = "sk-your-actual-api-key-here";
 ```
 
 ⚠️ **주의**: GitHub에 커밋하지 마세요!
@@ -42,15 +43,18 @@ yarn add react-native-dotenv
 
 ```javascript
 module.exports = {
-  presets: ['module:metro-react-native-babel-preset'],
+  presets: ["module:metro-react-native-babel-preset"],
   plugins: [
-    ['module:react-native-dotenv', {
-      moduleName: '@env',
-      path: '.env',
-      safe: false,
-      allowUndefined: true,
-    }]
-  ]
+    [
+      "module:react-native-dotenv",
+      {
+        moduleName: "@env",
+        path: ".env",
+        safe: false,
+        allowUndefined: true,
+      },
+    ],
+  ],
 };
 ```
 
@@ -59,7 +63,7 @@ module.exports = {
 `src/types/env.d.ts` 파일 생성:
 
 ```typescript
-declare module '@env' {
+declare module "@env" {
   export const OPENAI_API_KEY: string;
 }
 ```
@@ -82,7 +86,7 @@ OPENAI_API_KEY=sk-your-actual-api-key-here
 ### 6. openaiService.ts 수정
 
 ```typescript
-import { OPENAI_API_KEY } from '@env';
+import { OPENAI_API_KEY } from "@env";
 
 // const OPENAI_API_KEY = 'YOUR_OPENAI_API_KEY_HERE'; // 제거
 ```
@@ -104,6 +108,7 @@ npx react-native run-android
 ## 문제 해결
 
 ### Metro 캐시 문제
+
 ```bash
 rm -rf node_modules/.cache
 rm -rf $TMPDIR/metro-*
@@ -111,6 +116,7 @@ npx react-native start --reset-cache
 ```
 
 ### 환경변수가 로드되지 않을 때
+
 1. 앱 완전 종료
 2. Metro 서버 재시작
 3. 앱 재빌드
@@ -120,7 +126,6 @@ npx react-native start --reset-cache
 1. **절대 하지 말아야 할 것**:
    - API 키를 코드에 하드코딩
    - .env 파일을 Git에 커밋
-   
 2. **프로덕션 배포 시**:
    - 서버 사이드 프록시 사용 권장
    - 환경별 다른 키 사용

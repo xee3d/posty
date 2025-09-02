@@ -68,8 +68,6 @@
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
-    "additionalDirectories": [
-      "/Users/ethanchoi"
-    ]
+    "additionalDirectories": ["/Users/ethanchoi"]
   }
 }

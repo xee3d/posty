@@ -1,7 +1,7 @@
-import I18n from 'i18n-js';
-import * as RNLocalize from 'react-native-localize';
-import en from './en';
-import ko from './ko';
+import I18n from "i18n-js";
+import * as RNLocalize from "react-native-localize";
+import en from "./en";
+import ko from "./ko";
 
 // 번역 파일 등록
 I18n.translations = {
@@ -11,23 +11,23 @@ I18n.translations = {
 
 // 폴백 언어 설정
 I18n.fallbacks = true;
-I18n.defaultLocale = 'ko';
+I18n.defaultLocale = "ko";
 
 // 시스템 언어 감지 및 설정
 const setI18nConfig = () => {
   const locales = RNLocalize.getLocales();
-  
+
   if (Array.isArray(locales)) {
     // 시스템 언어 우선 사용
     const systemLanguage = locales[0].languageCode;
-    
+
     // 지원하는 언어인지 확인
-    const supportedLanguages = ['ko', 'en'];
+    const supportedLanguages = ["ko", "en"];
     if (supportedLanguages.includes(systemLanguage)) {
       I18n.locale = systemLanguage;
     } else {
       // 지원하지 않는 언어면 기본값 사용
-      I18n.locale = 'ko';
+      I18n.locale = "ko";
     }
   }
 };
@@ -36,7 +36,7 @@ const setI18nConfig = () => {
 setI18nConfig();
 
 // 언어 변경 감지
-RNLocalize.addEventListener('change', setI18nConfig);
+RNLocalize.addEventListener("change", setI18nConfig);
 
 // 번역 함수
 export const t = (key: string, options?: any) => I18n.t(key, options);

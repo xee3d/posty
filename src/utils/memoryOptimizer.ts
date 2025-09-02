@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform } from "react-native";
 
 export class MemoryOptimizer {
   private static timers: Set<NodeJS.Timeout> = new Set();
@@ -10,7 +10,7 @@ export class MemoryOptimizer {
       this.timers.delete(timer);
       callback();
     }, delay);
-    
+
     this.timers.add(timer);
     return timer;
   }
@@ -36,20 +36,22 @@ export class MemoryOptimizer {
 
   // 모든 타이머 정리
   static clearAllTimers(): void {
-    console.log(`정리 중인 타이머: ${this.timers.size}개, 인터벌: ${this.intervals.size}개`);
-    
-    this.timers.forEach(timer => clearTimeout(timer));
-    this.intervals.forEach(interval => clearInterval(interval));
-    
+    console.log(
+      `정리 중인 타이머: ${this.timers.size}개, 인터벌: ${this.intervals.size}개`
+    );
+
+    this.timers.forEach((timer) => clearTimeout(timer));
+    this.intervals.forEach((interval) => clearInterval(interval));
+
     this.timers.clear();
     this.intervals.clear();
   }
 
   // 메모리 사용량 체크 (iOS만)
   static checkMemoryUsage(): void {
-    if (__DEV__ && Platform.OS === 'ios') {
+    if (__DEV__ && Platform.OS === "ios") {
       // React Native의 메모리 사용량을 체크하는 방법은 제한적
-      console.log('메모리 최적화 체크 완료');
+      console.log("메모리 최적화 체크 완료");
     }
   }
 
@@ -57,7 +59,7 @@ export class MemoryOptimizer {
   static forceGarbageCollection(): void {
     if (__DEV__ && global.gc) {
       global.gc();
-      console.log('가비지 컬렉션 강제 실행됨');
+      console.log("가비지 컬렉션 강제 실행됨");
     }
   }
 }

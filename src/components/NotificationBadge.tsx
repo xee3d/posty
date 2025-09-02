@@ -3,7 +3,7 @@
  * 앱 내에서 읽지 않은 알림 개수 표시
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -12,20 +12,20 @@ import {
   Modal,
   ScrollView,
   SafeAreaView,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { badgeService } from '../services/notification/badgeService';
-import { COLORS, SPACING, FONTS } from '../utils/constants';
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import { useAppTheme } from "../hooks/useAppTheme";
+import { badgeService } from "../services/notification/badgeService";
+import { COLORS, SPACING, FONTS } from "../utils/constants";
 
 interface NotificationBadgeProps {
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
   showCount?: boolean;
   onPress?: () => void;
 }
 
 const NotificationBadge: React.FC<NotificationBadgeProps> = ({
-  size = 'medium',
+  size = "medium",
   showCount = true,
   onPress,
 }) => {
@@ -48,11 +48,11 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
     try {
       const count = badgeService.getBadgeCount();
       const allNotifications = badgeService.getAllNotifications();
-      
+
       setBadgeCount(count);
       setNotifications(allNotifications); // 모든 알림 표시
     } catch (error) {
-      console.error('📱 Load badge count failed:', error);
+      console.error("📱 Load badge count failed:", error);
     }
   };
 
@@ -67,16 +67,16 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
   const handleNotificationRemove = async (notification: any) => {
     try {
       console.log(`📱 알림 클릭 - 제거: ${notification.id}`);
-      
+
       // 즉시 UI 업데이트 - 해당 알림을 목록에서 제거
-      setNotifications(prev => {
-        const updated = prev.filter(n => n.id !== notification.id);
+      setNotifications((prev) => {
+        const updated = prev.filter((n) => n.id !== notification.id);
         console.log(`📱 UI 업데이트: ${prev.length} → ${updated.length}`);
         return updated;
       });
 
       // 배지 카운트도 즉시 업데이트
-      setBadgeCount(prev => {
+      setBadgeCount((prev) => {
         const newCount = Math.max(0, prev - 1);
         console.log(`📱 배지 업데이트: ${prev} → ${newCount}`);
         return newCount;
@@ -86,7 +86,7 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
       await badgeService.removeNotification(notification.id);
       await loadBadgeCount();
     } catch (error) {
-      console.error('📱 Handle notification remove failed:', error);
+      console.error("📱 Handle notification remove failed:", error);
     }
   };
 
@@ -96,7 +96,7 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
       await loadBadgeCount();
       setShowModal(false);
     } catch (error) {
-      console.error('📱 Clear all notifications failed:', error);
+      console.error("📱 Clear all notifications failed:", error);
     }
   };
 
@@ -108,28 +108,41 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
     const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-    if (diffMins < 1) return '방금 전';
-    if (diffMins < 60) return `${diffMins}분 전`;
-    if (diffHours < 24) return `${diffHours}시간 전`;
-    if (diffDays < 7) return `${diffDays}일 전`;
-    return date.toLocaleDateString('ko-KR');
+    if (diffMins < 1) {
+      return "방금 전";
+    }
+    if (diffMins < 60) {
+      return `${diffMins}분 전`;
+    }
+    if (diffHours < 24) {
+      return `${diffHours}시간 전`;
+    }
+    if (diffDays < 7) {
+      return `${diffDays}일 전`;
+    }
+    return date.toLocaleDateString("ko-KR");
   };
 
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'mission': return 'rocket-outline';
-      case 'trend': return 'trending-up-outline';
-      case 'achievement': return 'trophy-outline';
-      case 'tip': return 'bulb-outline';
-      default: return 'notifications-outline';
+      case "mission":
+        return "rocket-outline";
+      case "trend":
+        return "trending-up-outline";
+      case "achievement":
+        return "trophy-outline";
+      case "tip":
+        return "bulb-outline";
+      default:
+        return "notifications-outline";
     }
   };
 
   const getSizeStyles = () => {
     switch (size) {
-      case 'small':
+      case "small":
         return { iconSize: 18, badgeSize: 16, fontSize: 10 };
-      case 'large':
+      case "large":
         return { iconSize: 28, badgeSize: 22, fontSize: 14 };
       default:
         return { iconSize: 24, badgeSize: 20, fontSize: 12 };
@@ -142,15 +155,15 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
   return (
     <>
       <TouchableOpacity style={styles.container} onPress={handlePress}>
-        <Icon 
-          name="notifications-outline" 
-          size={sizeStyles.iconSize} 
-          color={colors.text.primary} 
+        <Icon
+          name="notifications-outline"
+          size={sizeStyles.iconSize}
+          color={colors.text.primary}
         />
         {badgeCount > 0 && showCount && (
           <View style={styles.badge}>
             <Text style={styles.badgeText}>
-              {badgeCount > 99 ? '99+' : badgeCount.toString()}
+              {badgeCount > 99 ? "99+" : badgeCount.toString()}
             </Text>
           </View>
         )}
@@ -186,10 +199,10 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
           <ScrollView style={styles.notificationList}>
             {notifications.length === 0 ? (
               <View style={styles.emptyState}>
-                <Icon 
-                  name="notifications-off-outline" 
-                  size={48} 
-                  color={colors.text.tertiary} 
+                <Icon
+                  name="notifications-off-outline"
+                  size={48}
+                  color={colors.text.tertiary}
                 />
                 <Text style={styles.emptyText}>새로운 알림이 없습니다</Text>
                 <Text style={styles.emptySubtext}>
@@ -202,7 +215,7 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
                   key={notification.id}
                   style={[
                     styles.notificationItem,
-                    notification.isRead && styles.readNotificationItem
+                    notification.isRead && styles.readNotificationItem,
                   ]}
                   onPress={() => handleNotificationRemove(notification)}
                   activeOpacity={0.7}
@@ -226,9 +239,9 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
                     </Text>
                   </View>
                   <View style={styles.removeButtonArea}>
-                    <Icon 
-                      name="close-outline" 
-                      size={18} 
+                    <Icon
+                      name="close-outline"
+                      size={18}
                       color={colors.text.tertiary}
                     />
                   </View>
@@ -245,35 +258,35 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
 const createStyles = (colors: any, isDark: boolean, sizeStyles: any) =>
   StyleSheet.create({
     container: {
-      position: 'relative',
+      position: "relative",
       padding: SPACING.xs,
     },
     badge: {
-      position: 'absolute',
+      position: "absolute",
       top: -2,
       right: -2,
-      backgroundColor: colors.error || '#FF3B30',
+      backgroundColor: colors.error || "#FF3B30",
       width: sizeStyles.badgeSize,
       height: sizeStyles.badgeSize,
       borderRadius: sizeStyles.badgeSize / 2,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
       minWidth: sizeStyles.badgeSize,
     },
     badgeText: {
-      color: '#FFFFFF',
+      color: "#FFFFFF",
       fontSize: sizeStyles.fontSize,
-      fontWeight: '700',
-      textAlign: 'center',
+      fontWeight: "700",
+      textAlign: "center",
     },
     modalContainer: {
       flex: 1,
       backgroundColor: colors.background,
     },
     modalHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
       paddingHorizontal: SPACING.lg,
       paddingVertical: SPACING.md,
       borderBottomWidth: 1,
@@ -281,12 +294,12 @@ const createStyles = (colors: any, isDark: boolean, sizeStyles: any) =>
     },
     modalTitle: {
       fontSize: 18,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.text.primary,
     },
     modalHeaderButtons: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.md,
     },
     clearButton: {
@@ -296,7 +309,7 @@ const createStyles = (colors: any, isDark: boolean, sizeStyles: any) =>
     clearButtonText: {
       color: colors.primary,
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
     },
     closeButton: {
       padding: SPACING.xs,
@@ -306,27 +319,27 @@ const createStyles = (colors: any, isDark: boolean, sizeStyles: any) =>
     },
     emptyState: {
       flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
       paddingHorizontal: SPACING.xl,
       paddingVertical: SPACING.xxl * 2,
     },
     emptyText: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.secondary,
       marginTop: SPACING.md,
-      textAlign: 'center',
+      textAlign: "center",
     },
     emptySubtext: {
       fontSize: 14,
       color: colors.text.tertiary,
       marginTop: SPACING.xs,
-      textAlign: 'center',
+      textAlign: "center",
     },
     notificationItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       paddingHorizontal: SPACING.lg,
       paddingVertical: SPACING.md,
       borderBottomWidth: 1,
@@ -336,9 +349,9 @@ const createStyles = (colors: any, isDark: boolean, sizeStyles: any) =>
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: colors.primary + '15',
-      justifyContent: 'center',
-      alignItems: 'center',
+      backgroundColor: colors.primary + "15",
+      justifyContent: "center",
+      alignItems: "center",
       marginRight: SPACING.md,
     },
     notificationContent: {
@@ -346,8 +359,8 @@ const createStyles = (colors: any, isDark: boolean, sizeStyles: any) =>
     },
     removeButtonArea: {
       padding: SPACING.xs,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
       minWidth: 40,
     },
     readNotificationItem: {
@@ -355,7 +368,7 @@ const createStyles = (colors: any, isDark: boolean, sizeStyles: any) =>
     },
     notificationTitle: {
       fontSize: 15,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
       marginBottom: 4,
     },

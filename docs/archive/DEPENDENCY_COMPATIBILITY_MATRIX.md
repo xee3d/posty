@@ -7,6 +7,7 @@
 ## 🎯 핵심 의존성 (절대 변경 금지)
 
 ### **React Native 핵심**
+
 ```json
 {
   "react": "18.2.0",
@@ -15,6 +16,7 @@
 ```
 
 ### **Navigation 완벽 세트**
+
 ```json
 {
   "@react-navigation/native": "6.1.18",
@@ -28,6 +30,7 @@
 ```
 
 ### **Firebase 완벽 세트**
+
 ```json
 {
   "@react-native-firebase/app": "20.4.0",
@@ -43,6 +46,7 @@
 ## 🔧 개발 도구
 
 ### **TypeScript & ESLint**
+
 ```json
 {
   "@react-native/babel-preset": "0.74.87",
@@ -56,6 +60,7 @@
 ```
 
 ### **빌드 도구**
+
 ```json
 {
   "@react-native-community/cli": "13.6.9",
@@ -68,6 +73,7 @@
 ## 🎨 UI & 애니메이션
 
 ### **애니메이션 라이브러리**
+
 ```json
 {
   "react-native-reanimated": "3.15.0",
@@ -77,6 +83,7 @@
 ```
 
 ### **UI 컴포넌트**
+
 ```json
 {
   "react-native-vector-icons": "10.2.0",
@@ -87,6 +94,7 @@
 ## 🏪 상태 관리
 
 ### **Redux 생태계**
+
 ```json
 {
   "@reduxjs/toolkit": "2.2.7",
@@ -95,6 +103,7 @@
 ```
 
 ### **대안 상태 관리**
+
 ```json
 {
   "zustand": "4.5.5"
@@ -104,6 +113,7 @@
 ## 🛠️ 유틸리티
 
 ### **스토리지 & 네트워킹**
+
 ```json
 {
   "@react-native-async-storage/async-storage": "1.24.0",
@@ -112,6 +122,7 @@
 ```
 
 ### **디바이스 & 미디어**
+
 ```json
 {
   "react-native-device-info": "10.13.2",
@@ -121,6 +132,7 @@
 ```
 
 ### **기타 유틸리티**
+
 ```json
 {
   "@react-native-clipboard/clipboard": "1.16.3",
@@ -132,6 +144,7 @@
 ## 📱 광고 & 수익화
 
 ### **Google AdMob**
+
 ```json
 {
   "react-native-google-mobile-ads": "14.2.0"
@@ -141,6 +154,7 @@
 ## 🔊 미디어
 
 ### **오디오**
+
 ```json
 {
   "react-native-sound": "0.11.2"
@@ -150,6 +164,7 @@
 ## ⚠️ 중요 호환성 규칙
 
 ### **절대 사용하면 안 되는 버전들**
+
 ```json
 {
   "react-native-reanimated": "< 3.10.0",
@@ -161,6 +176,7 @@
 ```
 
 ### **Android 설정 필수사항**
+
 ```gradle
 // android/build.gradle
 buildscript {
@@ -183,6 +199,7 @@ dependencies {
 ```
 
 ### **Gradle 설정**
+
 ```properties
 # android/gradle/wrapper/gradle-wrapper.properties
 distributionUrl=https\://services.gradle.org/distributions/gradle-8.3-all.zip
@@ -200,6 +217,7 @@ distributionUrl=https\://services.gradle.org/distributions/gradle-8.3-all.zip
 ## 📋 빠른 설치 명령어
 
 ### **전체 의존성 일괄 설치**
+
 ```bash
 # 핵심 Navigation
 npm install @react-navigation/native@6.1.18 @react-navigation/native-stack@6.11.0 @react-navigation/bottom-tabs@6.6.1 react-native-screens@3.34.0 react-native-safe-area-context@4.11.0 react-native-gesture-handler@2.18.1

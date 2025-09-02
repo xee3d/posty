@@ -1,30 +1,30 @@
 // components/gradient/OptimizedGradientButton.tsx
-import React from 'react';
-import { 
-  TouchableOpacity, 
-  Text, 
-  StyleSheet, 
-  ViewStyle, 
-  TextStyle, 
+import React from "react";
+import {
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  ViewStyle,
+  TextStyle,
   ActivityIndicator,
-  Animated 
-} from 'react-native';
-import LinearGradient from 'react-native-linear-gradient';
-import { useOptimizedTheme } from '../../hooks/useOptimizedTheme';
-import { SPACING, BORDER_RADIUS } from '../../utils/constants';
+  Animated,
+} from "react-native";
+import LinearGradient from "react-native-linear-gradient";
+import { useOptimizedTheme } from "../../hooks/useOptimizedTheme";
+import { SPACING, BORDER_RADIUS } from "../../utils/constants";
 
 interface GradientButtonProps {
   onPress: () => void;
   children: React.ReactNode | string;
   style?: ViewStyle;
   textStyle?: TextStyle;
-  variant?: 'primary' | 'secondary' | 'subtle' | 'outline' | 'ghost';
-  size?: 'small' | 'medium' | 'large';
+  variant?: "primary" | "secondary" | "subtle" | "outline" | "ghost";
+  size?: "small" | "medium" | "large";
   disabled?: boolean;
   loading?: boolean;
   fullWidth?: boolean;
   icon?: React.ReactNode;
-  iconPosition?: 'left' | 'right';
+  iconPosition?: "left" | "right";
 }
 
 export const OptimizedGradientButton: React.FC<GradientButtonProps> = ({
@@ -32,30 +32,30 @@ export const OptimizedGradientButton: React.FC<GradientButtonProps> = ({
   children,
   style,
   textStyle,
-  variant = 'primary',
-  size = 'medium',
+  variant = "primary",
+  size = "medium",
   disabled = false,
   loading = false,
   fullWidth = false,
   icon,
-  iconPosition = 'left',
+  iconPosition = "left",
 }) => {
   const { colors, isDark, gradients, shadows } = useOptimizedTheme();
   const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
   // 버튼별 그라데이션 설정 (다크모드 최적화)
   const buttonGradients = {
-    primary: isDark ? gradients.button : ['#8B5CF6', '#7C3AED', '#6D28D9'],
-    secondary: isDark 
-      ? ['rgba(183, 148, 244, 0.2)', 'rgba(159, 122, 234, 0.2)']
-      : ['#E9D5FF', '#DFC3FF', '#D8B4FE'],
-    subtle: isDark 
-      ? ['rgba(159, 122, 234, 0.1)', 'rgba(159, 122, 234, 0.05)']
-      : ['#FAF5FF', '#F3E8FF'],
-    outline: ['transparent', 'transparent'],
-    ghost: isDark 
-      ? ['rgba(159, 122, 234, 0.05)', 'rgba(159, 122, 234, 0.05)']
-      : ['rgba(139, 92, 246, 0.05)', 'rgba(139, 92, 246, 0.05)'],
+    primary: isDark ? gradients.button : ["#8B5CF6", "#7C3AED", "#6D28D9"],
+    secondary: isDark
+      ? ["rgba(183, 148, 244, 0.2)", "rgba(159, 122, 234, 0.2)"]
+      : ["#E9D5FF", "#DFC3FF", "#D8B4FE"],
+    subtle: isDark
+      ? ["rgba(159, 122, 234, 0.1)", "rgba(159, 122, 234, 0.05)"]
+      : ["#FAF5FF", "#F3E8FF"],
+    outline: ["transparent", "transparent"],
+    ghost: isDark
+      ? ["rgba(159, 122, 234, 0.05)", "rgba(159, 122, 234, 0.05)"]
+      : ["rgba(139, 92, 246, 0.05)", "rgba(139, 92, 246, 0.05)"],
   };
 
   const sizes = {
@@ -80,21 +80,23 @@ export const OptimizedGradientButton: React.FC<GradientButtonProps> = ({
   };
 
   const buttonSize = sizes[size];
-  const isOutline = variant === 'outline';
+  const isOutline = variant === "outline";
 
   // 텍스트 색상 결정 (다크모드 최적화)
   const getTextColor = () => {
-    if (disabled) return colors.text.tertiary;
-    
+    if (disabled) {
+      return colors.text.tertiary;
+    }
+
     switch (variant) {
-      case 'primary':
-        return isDark ? '#0F1419' : '#FFFFFF';
-      case 'secondary':
-        return isDark ? colors.primary : '#7C3AED';
-      case 'subtle':
-      case 'ghost':
+      case "primary":
+        return isDark ? "#0F1419" : "#FFFFFF";
+      case "secondary":
+        return isDark ? colors.primary : "#7C3AED";
+      case "subtle":
+      case "ghost":
         return colors.primary;
-      case 'outline':
+      case "outline":
         return colors.primary;
       default:
         return colors.text.primary;
@@ -120,8 +122,12 @@ export const OptimizedGradientButton: React.FC<GradientButtonProps> = ({
 
   // 그림자 스타일 (다크모드 최적화)
   const getShadowStyle = () => {
-    if (disabled || variant === 'outline' || variant === 'ghost') return {};
-    if (variant === 'primary') return isDark ? shadows.glow : shadows.medium;
+    if (disabled || variant === "outline" || variant === "ghost") {
+      return {};
+    }
+    if (variant === "primary") {
+      return isDark ? shadows.glow : shadows.medium;
+    }
     return shadows.small;
   };
 
@@ -141,7 +147,7 @@ export const OptimizedGradientButton: React.FC<GradientButtonProps> = ({
         activeOpacity={0.8}
         style={[
           isOutline && styles.outlineContainer,
-          isOutline && { 
+          isOutline && {
             borderColor: disabled ? colors.border : colors.primary,
             backgroundColor: colors.surface,
           },
@@ -149,9 +155,10 @@ export const OptimizedGradientButton: React.FC<GradientButtonProps> = ({
         ]}
       >
         <LinearGradient
-          colors={disabled 
-            ? [colors.lightGray, colors.lightGray] 
-            : buttonGradients[variant]
+          colors={
+            disabled
+              ? [colors.lightGray, colors.lightGray]
+              : buttonGradients[variant]
           }
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
@@ -169,30 +176,33 @@ export const OptimizedGradientButton: React.FC<GradientButtonProps> = ({
             <ActivityIndicator size="small" color={getTextColor()} />
           ) : (
             <>
-              {icon && iconPosition === 'left' && (
+              {icon && iconPosition === "left" && (
                 <React.Fragment>
                   {icon}
                   {children && <Text style={{ width: 8 }} />}
                 </React.Fragment>
               )}
-              
-              {typeof children === 'string' ? (
-                <Text style={[
-                  styles.text,
-                  { 
-                    fontSize: buttonSize.fontSize, 
-                    color: getTextColor(),
-                    fontWeight: isDark && variant === 'primary' ? '700' : '600',
-                  },
-                  textStyle,
-                ]}>
+
+              {typeof children === "string" ? (
+                <Text
+                  style={[
+                    styles.text,
+                    {
+                      fontSize: buttonSize.fontSize,
+                      color: getTextColor(),
+                      fontWeight:
+                        isDark && variant === "primary" ? "700" : "600",
+                    },
+                    textStyle,
+                  ]}
+                >
                   {children}
                 </Text>
               ) : (
                 children
               )}
-              
-              {icon && iconPosition === 'right' && (
+
+              {icon && iconPosition === "right" && (
                 <React.Fragment>
                   {children && <Text style={{ width: 8 }} />}
                   {icon}
@@ -209,13 +219,13 @@ export const OptimizedGradientButton: React.FC<GradientButtonProps> = ({
 const styles = StyleSheet.create({
   gradient: {
     borderRadius: BORDER_RADIUS.large,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
+    alignItems: "center",
+    justifyContent: "center",
+    flexDirection: "row",
   },
   text: {
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
     letterSpacing: -0.2,
   },
   outlineContainer: {
@@ -226,6 +236,6 @@ const styles = StyleSheet.create({
     margin: -2,
   },
   fullWidth: {
-    width: '100%',
+    width: "100%",
   },
 });

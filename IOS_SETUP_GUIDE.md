@@ -1,6 +1,7 @@
 # Posty iOS 설정 완전 가이드
 
 ## ⚠️ 문제 상황
+
 Windows에서 개발된 Posty 프로젝트를 Mac으로 이전하면서 iOS 폴더 세팅이 누락되어 많은 버그가 발생했습니다.
 
 ## 🛠️ 해결 방법
@@ -8,6 +9,7 @@ Windows에서 개발된 Posty 프로젝트를 Mac으로 이전하면서 iOS 폴�
 ### 1. iOS 폴더 재생성
 
 #### 방법 A: React Native CLI 사용 (권장)
+
 ```bash
 # 기존 iOS 폴더 백업 (있는 경우)
 mv ios ios_backup_$(date +%Y%m%d_%H%M%S)
@@ -22,6 +24,7 @@ cd ..
 ```
 
 #### 방법 B: 템플릿에서 복사
+
 ```bash
 # 임시 프로젝트 생성
 npx @react-native-community/cli init TempProject --template react-native-template-typescript
@@ -161,6 +164,7 @@ end
 ### 4. Firebase 설정
 
 1. **GoogleService-Info.plist 추가**
+
    - Firebase 콘솔에서 iOS 앱용 GoogleService-Info.plist 다운로드
    - Xcode에서 `ios/Posty/` 폴더에 드래그앤드롭으로 추가
    - "Copy items if needed" 체크
@@ -173,6 +177,7 @@ end
 ### 5. Apple Developer 설정
 
 1. **Signing & Capabilities**
+
    - Xcode에서 Signing & Capabilities 탭 열기
    - Team 선택
    - Bundle Identifier 확인
@@ -184,6 +189,7 @@ end
 ### 6. 빌드 설정 확인
 
 #### Build Phases 설정
+
 ```bash
 # Bundle React Native code and images
 export NODE_BINARY=node
@@ -191,6 +197,7 @@ export NODE_BINARY=node
 ```
 
 #### Build Settings
+
 - **iOS Deployment Target**: 11.0 이상
 - **Architectures**: arm64, x86_64
 - **Enable Bitcode**: NO (React Native 0.60+)
@@ -198,20 +205,24 @@ export NODE_BINARY=node
 ### 7. 라이브러리별 추가 설정
 
 #### React Native Sound
+
 ```ruby
 # Podfile에 추가
 pod 'react-native-sound', :path => '../node_modules/react-native-sound'
 ```
 
 #### React Native Image Picker
+
 ```ruby
 # Podfile에 추가
 pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
 ```
 
 #### React Native Vector Icons
+
 1. 폰트 파일들을 `ios/Posty/` 폴더에 복사
 2. Info.plist에 폰트 등록:
+
 ```xml
 <key>UIAppFonts</key>
 <array>
@@ -243,6 +254,7 @@ npm run ios -- --device
 #### 자주 발생하는 오류들
 
 1. **"No bundle URL present" 오류**
+
    ```bash
    # Metro 서버를 먼저 시작
    npm start --reset-cache
@@ -251,6 +263,7 @@ npm run ios -- --device
    ```
 
 2. **CocoaPods 오류**
+
    ```bash
    cd ios
    pod cache clean --all
@@ -259,6 +272,7 @@ npm run ios -- --device
    ```
 
 3. **Xcode 빌드 오류**
+
    ```bash
    # Clean build folder
    # Xcode -> Product -> Clean Build Folder
@@ -273,6 +287,7 @@ npm run ios -- --device
 ### 10. 환경 변수 설정
 
 `.env` 파일의 iOS 관련 설정들:
+
 ```env
 # iOS Bundle Identifier
 IOS_BUNDLE_ID=com.posty.app
@@ -316,13 +331,16 @@ chmod +x setup-ios.sh
 ### 소셜 로그인 추가 설정
 
 #### 카카오 로그인
+
 1. **Info.plist 추가 설정**:
+
 ```xml
 <key>KAKAO_APP_KEY</key>
 <string>YOUR_KAKAO_APP_KEY</string>
 ```
 
 2. **AppDelegate.m/mm 수정**:
+
 ```objc
 #import <RNKakaoLogins/RNKakaoLogins.h>
 
@@ -335,7 +353,9 @@ chmod +x setup-ios.sh
 ```
 
 #### 네이버 로그인
+
 1. **Info.plist에 URL Scheme 추가**:
+
 ```xml
 <key>CFBundleURLTypes</key>
 <array>
@@ -351,13 +371,16 @@ chmod +x setup-ios.sh
 ```
 
 ### Firebase Analytics 설정
+
 1. **앱 추가 권한**:
+
 ```xml
 <key>NSUserTrackingUsageDescription</key>
 <string>맞춤형 광고 및 서비스 개선을 위해 추적 권한이 필요합니다.</string>
 ```
 
 ### 구독 결제 (In-App Purchase) 설정
+
 1. **StoreKit 프레임워크 추가**
 2. **App Store Connect에서 구독 상품 설정**
 3. **테스트 계정 설정**
@@ -365,10 +388,12 @@ chmod +x setup-ios.sh
 ## 🚨 주의사항
 
 1. **React Native 0.74.5 호환성**
+
    - 일부 라이브러리가 최신 버전과 호환되지 않을 수 있음
    - 필요시 라이브러리 버전 다운그레이드 고려
 
 2. **M1/M2 Mac 사용시**
+
    ```bash
    # Rosetta 환경에서 CocoaPods 설치
    sudo arch -x86_64 gem install cocoapods
@@ -382,6 +407,7 @@ chmod +x setup-ios.sh
 ## 🔄 지속적인 관리
 
 ### 정기적으로 수행할 작업들
+
 ```bash
 # 1. 주간 의존성 업데이트
 cd ios

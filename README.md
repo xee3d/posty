@@ -14,7 +14,7 @@
 
 ## 📱 개요
 
-Posty는 AI(GPT-4o-mini)를 활용하여 매력적인 SNS 콘텐츠를 생성하는 모바일 애플리케이션입니다. 
+Posty는 AI(GPT-4o-mini)를 활용하여 매력적인 SNS 콘텐츠를 생성하는 모바일 애플리케이션입니다.
 트렌드를 반영한 창의적인 콘텐츠를 쉽고 빠르게 만들어 Instagram, Facebook, X(Twitter) 등에 공유할 수 있습니다.
 
 **📅 개발 기간**: 2025년 7월 4일 ~ 현재 (약 1개월)  
@@ -23,6 +23,7 @@ Posty는 AI(GPT-4o-mini)를 활용하여 매력적인 SNS 콘텐츠를 생성하
 ## ✨ 주요 기능
 
 ### 🤖 AI 콘텐츠 생성
+
 - **텍스트 생성**: 주제만 입력하면 AI가 창의적인 콘텐츠 작성
 - **이미지 분석**: 사진을 업로드하면 AI가 분석하여 관련 텍스트 생성
 - **문장 다듬기**: 기존 텍스트를 더 매력적으로 개선
@@ -30,24 +31,27 @@ Posty는 AI(GPT-4o-mini)를 활용하여 매력적인 SNS 콘텐츠를 생성하
 - **3가지 길이**: 짧게(50자), 보통(100자), 길게(200자)
 
 ### 📱 플랫폼 최적화
+
 - **Instagram**: 해시태그 자동 생성, 감성적인 톤
 - **Facebook**: 스토리텔링에 최적화된 긴 텍스트
 - **X(Twitter)**: 280자 제한에 맞춘 간결한 메시지
 
 ### 🚀 사운드 & 진동 피드백
+
 - 버튼 터치, 생성 완료, 복사 등 주요 액션에 사운드 효과
 - 햅틱 피드백으로 더 나은 사용자 경험
 
 ### 💎 구독 시스템 (2025년 7월 업데이트)
 
-| 플랜 | 가격 | 초기 토큰 | 일일 보너스 | 월 총 토큰 | 광고 |
-|------|------|-----------|-------------|------------|------|
-| **FREE** | 무료 | - | 10개 | 300개 | 있음 |
-| **STARTER** | ₩1,900/월 | 300개 | +10개 | 600개 | 없음 |
-| **PREMIUM** | ₩4,900/월 | 500개 | +20개 | 1,100개 | 없음 |
-| **PRO** | ₩14,900/월 | 무제한 | - | 무제한 | 없음 |
+| 플랜        | 가격       | 초기 토큰 | 일일 보너스 | 월 총 토큰 | 광고 |
+| ----------- | ---------- | --------- | ----------- | ---------- | ---- |
+| **FREE**    | 무료       | -         | 10개        | 300개      | 있음 |
+| **STARTER** | ₩1,900/월  | 300개     | +10개       | 600개      | 없음 |
+| **PREMIUM** | ₩4,900/월  | 500개     | +20개       | 1,100개    | 없음 |
+| **PRO**     | ₩14,900/월 | 무제한    | -           | 무제한     | 없음 |
 
 ### 📈 실시간 트렌드
+
 - 네이버 실시간 검색어
 - 구글 트렌드
 - 뉴스 키워드
@@ -56,6 +60,7 @@ Posty는 AI(GPT-4o-mini)를 활용하여 매력적인 SNS 콘텐츠를 생성하
 ## 🛠 기술 스택
 
 ### Frontend
+
 - **Framework**: React Native 0.74.5
 - **Language**: TypeScript 5.0.4
 - **State**: Redux Toolkit + React Redux
@@ -64,6 +69,7 @@ Posty는 AI(GPT-4o-mini)를 활용하여 매력적인 SNS 콘텐츠를 생성하
 - **UI**: Custom Theme System (Light/Dark)
 
 ### Backend & Services
+
 - **AI Server**: https://posty-ai.vercel.app (OpenAI GPT-4o-mini)
 - **API Server**: https://posty-api.vercel.app (트렌드, 인증)
 - **Database**: Firebase Firestore
@@ -74,6 +80,7 @@ Posty는 AI(GPT-4o-mini)를 활용하여 매력적인 SNS 콘텐츠를 생성하
 ## 🚀 시작하기
 
 ### 필수 요구사항
+
 - Node.js 18+ (권장: 18.20.4)
 - npm 8.0.0+ (권장: 10.7.0)
 - **React Native CLI 0.73.10** (중요: 이 버전으로 테스트됨)
@@ -116,6 +123,7 @@ npm run ios
 ### 환경 변수 설정
 
 `.env` 파일 생성:
+
 ```env
 # OpenAI
 OPENAI_API_KEY=your_openai_api_key
@@ -158,7 +166,9 @@ Posty/
 ## 🚢 배포
 
 ### 자동 배포 (권장)
+
 Git push 시 Vercel에 자동 배포:
+
 ```bash
 git add .
 git commit -m "feat: 새로운 기능"
@@ -168,6 +178,7 @@ git push
 ### 프로덕션 빌드
 
 #### Android
+
 ```bash
 cd android
 ./gradlew bundleRelease
@@ -175,6 +186,7 @@ cd android
 ```
 
 #### iOS
+
 ```bash
 cd ios
 xcodebuild -workspace Posty.xcworkspace -scheme Posty -configuration Release
@@ -183,22 +195,26 @@ xcodebuild -workspace Posty.xcworkspace -scheme Posty -configuration Release
 ## 📱 유틸리티 스크립트
 
 ### 개발 실행 (검증된 CLI 버전)
+
 - `npx react-native@0.73.10 start --reset-cache` - Metro 캐시 클리어 후 시작
 - `npx react-native@0.73.10 run-ios` - iOS 실행
 - `npx react-native@0.73.10 run-android` - Android 실행
 
 ### 배포 스크립트
+
 - `deploy-all.bat` - 모든 서버 배포
 - `verify-deployment.bat` - 배포 상태 확인
 - `fresh-deploy.bat` - 클린 빌드 및 실행
 
 ### 버전 관리
+
 - `npx react-native --version` - CLI 버전 확인
 - `npx clear-npx-cache` - NPX 캐시 클리어
 
 ## 📈 최근 업데이트
 
 ### 2025년 8월
+
 - ✅ Firebase Auth 전용 구성 완료 (8월 5일)
 - ✅ React Native CLI 0.73.10 버전 고정 및 문서화
 - ✅ iOS 빌드 환경 최적화 (C++20, GNU C 확장)
@@ -206,6 +222,7 @@ xcodebuild -workspace Posty.xcworkspace -scheme Posty -configuration Release
 - ✅ 버전 호환성 가이드 신규 추가
 
 ### 2025년 7월
+
 - ✅ 프로젝트 개발 시작 (7월 4일)
 - ✅ React Native 0.74.5 업그레이드
 - ✅ 구독 시스템 개편 (하이브리드 토큰 모델)

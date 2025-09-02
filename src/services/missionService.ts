@@ -1,8 +1,8 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface Mission {
   id: string;
-  type: 'daily' | 'weekly' | 'achievement';
+  type: "daily" | "weekly" | "achievement";
   title: string;
   description: string;
   target: number;
@@ -14,9 +14,9 @@ export interface Mission {
 }
 
 const STORAGE_KEYS = {
-  MISSIONS: 'missions_data',
-  LAST_RESET: 'missions_last_reset',
-  COMPLETED_ACHIEVEMENTS: 'completed_achievements',
+  MISSIONS: "missions_data",
+  LAST_RESET: "missions_last_reset",
+  COMPLETED_ACHIEVEMENTS: "completed_achievements",
 };
 
 class MissionService {
@@ -27,7 +27,7 @@ class MissionService {
 
   private constructor() {
     // 미션 시스템 비활성화 - 초기화하지 않음
-    console.log('Mission system is disabled');
+    console.log("Mission system is disabled");
   }
 
   static getInstance(): MissionService {
@@ -50,7 +50,9 @@ class MissionService {
   }
 
   private async initializeService() {
-    if (!this.isEnabled) return;
+    if (!this.isEnabled) {
+      return;
+    }
     // 기존 초기화 코드...
   }
 
@@ -70,7 +72,9 @@ class MissionService {
   }
 
   // 미션 타입별 액션 추적 - 비활성화 시 아무것도 하지 않음
-  async trackAction(actionType: 'create' | 'share' | 'ad_watch' | 'login' | 'invite') {
+  async trackAction(
+    actionType: "create" | "share" | "ad_watch" | "login" | "invite"
+  ) {
     if (!this.isEnabled) {
       return { rewardsEarned: 0, completedMissions: [] };
     }
@@ -80,26 +84,34 @@ class MissionService {
 
   // 활성 미션 가져오기
   getActiveMissions(): Mission[] {
-    if (!this.isEnabled) return [];
-    return this.missions.filter(mission => !mission.completed);
+    if (!this.isEnabled) {
+      return [];
+    }
+    return this.missions.filter((mission) => !mission.completed);
   }
 
   // 완료된 미션 가져오기
   getCompletedMissions(): Mission[] {
-    if (!this.isEnabled) return [];
-    return this.missions.filter(mission => mission.completed);
+    if (!this.isEnabled) {
+      return [];
+    }
+    return this.missions.filter((mission) => mission.completed);
   }
 
   // 미션 타입별로 가져오기
-  getMissionsByType(type: 'daily' | 'weekly' | 'achievement'): Mission[] {
-    if (!this.isEnabled) return [];
-    return this.missions.filter(mission => mission.type === type);
+  getMissionsByType(type: "daily" | "weekly" | "achievement"): Mission[] {
+    if (!this.isEnabled) {
+      return [];
+    }
+    return this.missions.filter((mission) => mission.type === type);
   }
 
   // 특정 미션 가져오기
   getMissionById(id: string): Mission | undefined {
-    if (!this.isEnabled) return undefined;
-    return this.missions.find(mission => mission.id === id);
+    if (!this.isEnabled) {
+      return undefined;
+    }
+    return this.missions.find((mission) => mission.id === id);
   }
 
   // 미션 통계
@@ -114,12 +126,18 @@ class MissionService {
         achievementsCompleted: 0,
       };
     }
-    
+
     const total = this.missions.length;
-    const completed = this.missions.filter(m => m.completed).length;
-    const dailyCompleted = this.missions.filter(m => m.type === 'daily' && m.completed).length;
-    const weeklyCompleted = this.missions.filter(m => m.type === 'weekly' && m.completed).length;
-    const achievementsCompleted = this.missions.filter(m => m.type === 'achievement' && m.completed).length;
+    const completed = this.missions.filter((m) => m.completed).length;
+    const dailyCompleted = this.missions.filter(
+      (m) => m.type === "daily" && m.completed
+    ).length;
+    const weeklyCompleted = this.missions.filter(
+      (m) => m.type === "weekly" && m.completed
+    ).length;
+    const achievementsCompleted = this.missions.filter(
+      (m) => m.type === "achievement" && m.completed
+    ).length;
 
     return {
       total,

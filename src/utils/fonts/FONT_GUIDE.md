@@ -9,16 +9,16 @@ React Native에서 `fontFamily: 'System'`은 지원되지 않습니다. 이 프�
 ### 1. getFontStyle 함수 사용 (권장)
 
 ```typescript
-import { getFontStyle } from '@/utils/fonts';
+import { getFontStyle } from "@/utils/fonts";
 
 // 기본 사용
 const styles = StyleSheet.create({
   text: {
-    ...getFontStyle('md', 'regular'),
+    ...getFontStyle("md", "regular"),
     color: colors.text.primary,
   },
   title: {
-    ...getFontStyle('xl', 'bold'),
+    ...getFontStyle("xl", "bold"),
     color: colors.text.primary,
   },
 });
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
 ### 2. 사전 정의된 텍스트 스타일 사용
 
 ```typescript
-import { TEXT_STYLES } from '@/utils/fonts';
+import { TEXT_STYLES } from "@/utils/fonts";
 
 const styles = StyleSheet.create({
   heading: {
@@ -48,20 +48,25 @@ const styles = StyleSheet.create({
 ### 3. Text 컴포넌트에서 직접 사용
 
 ```tsx
-import { getFontStyle, getFontOptimization } from '@/utils/fonts';
+import { getFontStyle, getFontOptimization } from "@/utils/fonts";
 
-<Text style={[getFontStyle('lg', 'medium'), { color: colors.primary }]} {...getFontOptimization()}>
+<Text
+  style={[getFontStyle("lg", "medium"), { color: colors.primary }]}
+  {...getFontOptimization()}
+>
   안녕하세요!
-</Text>
+</Text>;
 ```
 
 ## 플랫폼별 동작
 
 ### iOS
+
 - `fontWeight`를 사용하여 시스템 폰트의 굵기를 조정합니다
 - San Francisco 폰트가 자동으로 사용됩니다
 
 ### Android
+
 - Roboto 폰트 패밀리를 명시적으로 지정합니다
 - `includeFontPadding: false`로 불필요한 패딩을 제거합니다
 
@@ -86,23 +91,25 @@ import { getFontStyle, getFontOptimization } from '@/utils/fonts';
 ## 마이그레이션 가이드
 
 ### 이전 코드
+
 ```typescript
 const styles = StyleSheet.create({
   text: {
-    fontFamily: 'System',
+    fontFamily: "System",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 ```
 
 ### 새로운 코드
+
 ```typescript
-import { getFontStyle } from '@/utils/fonts';
+import { getFontStyle } from "@/utils/fonts";
 
 const styles = StyleSheet.create({
   text: {
-    ...getFontStyle('md', 'bold'),
+    ...getFontStyle("md", "bold"),
   },
 });
 ```
@@ -117,15 +124,18 @@ const styles = StyleSheet.create({
 ## 예제
 
 ### 제목과 본문이 있는 카드
+
 ```tsx
-import { TEXT_STYLES } from '@/utils/fonts';
+import { TEXT_STYLES } from "@/utils/fonts";
 
 const Card = () => (
   <View style={styles.card}>
     <Text style={[TEXT_STYLES.h3, { color: colors.text.primary }]}>
       카드 제목
     </Text>
-    <Text style={[TEXT_STYLES.body, { color: colors.text.secondary, marginTop: 8 }]}>
+    <Text
+      style={[TEXT_STYLES.body, { color: colors.text.secondary, marginTop: 8 }]}
+    >
       카드 본문 내용입니다. 시스템 폰트가 자동으로 적용됩니다.
     </Text>
   </View>
@@ -133,12 +143,13 @@ const Card = () => (
 ```
 
 ### 버튼 텍스트
+
 ```tsx
-import { getFontStyle } from '@/utils/fonts';
+import { getFontStyle } from "@/utils/fonts";
 
 const Button = ({ title }) => (
   <TouchableOpacity style={styles.button}>
-    <Text style={[getFontStyle('md', 'medium'), { color: 'white' }]}>
+    <Text style={[getFontStyle("md", "medium"), { color: "white" }]}>
       {title}
     </Text>
   </TouchableOpacity>

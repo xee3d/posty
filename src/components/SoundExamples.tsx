@@ -1,9 +1,9 @@
 // 사운드 매니저 사용 예시
 
-import React from 'react';
-import { TouchableOpacity, Text, View, StyleSheet, Switch } from 'react-native';
-import { soundManager } from '../utils/soundManager';
-import Clipboard from '@react-native-clipboard/clipboard';
+import React from "react";
+import { TouchableOpacity, Text, View, StyleSheet, Switch } from "react-native";
+import { soundManager } from "../utils/soundManager";
+import Clipboard from "@react-native-clipboard/clipboard";
 
 // 1. 버튼 컴포넌트에서 사용
 export const SoundButton: React.FC<{
@@ -27,11 +27,11 @@ export const SoundButton: React.FC<{
 export const AIGenerateExample = () => {
   const handleGenerate = async () => {
     soundManager.playGenerate(); // 생성 시작 사운드
-    
+
     try {
       // AI 생성 로직...
       // const result = await generateContent();
-      
+
       soundManager.playSuccess(); // 성공 사운드
     } catch (error) {
       soundManager.playError(); // 에러 사운드
@@ -51,7 +51,7 @@ export const CopyExample = () => {
     // 클립보드 복사 로직...
     const content = "복사할 텍스트";
     Clipboard.setString(content);
-    
+
     soundManager.playCopy(); // 복사 사운드 + 가벼운 햅틱
   };
 
@@ -70,7 +70,7 @@ export const SoundSettings = () => {
   const toggleSound = (value: boolean) => {
     setSoundEnabled(value);
     soundManager.setSoundEnabled(value);
-    
+
     // 설정 변경 시 피드백
     if (value) {
       soundManager.playTap();
@@ -80,10 +80,10 @@ export const SoundSettings = () => {
   const toggleVibration = (value: boolean) => {
     setVibrationEnabled(value);
     soundManager.setVibrationEnabled(value);
-    
+
     // 설정 변경 시 피드백
     if (value) {
-      soundManager.haptic('light');
+      soundManager.haptic("light");
     }
   };
 
@@ -93,7 +93,7 @@ export const SoundSettings = () => {
         <Text>사운드 효과</Text>
         <Switch value={soundEnabled} onValueChange={toggleSound} />
       </View>
-      
+
       <View style={styles.settingItem}>
         <Text>진동</Text>
         <Switch value={vibrationEnabled} onValueChange={toggleVibration} />
@@ -105,13 +105,13 @@ export const SoundSettings = () => {
 const styles = StyleSheet.create({
   button: {
     padding: 16,
-    backgroundColor: '#007AFF',
+    backgroundColor: "#007AFF",
     borderRadius: 8,
   },
   settingItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     padding: 16,
   },
 });

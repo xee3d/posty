@@ -1,5 +1,5 @@
 // src/components/common/OptimizedImage.tsx
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo } from "react";
 import {
   Image,
   ImageProps,
@@ -10,24 +10,24 @@ import {
   Animated,
   Platform,
   StyleSheet,
-} from 'react-native';
-import { useAnimatedValue } from '../../hooks/useAnimations';
-import { useOptimizedAnimation } from '../../utils/animationOptimizer';
+} from "react-native";
+import { useAnimatedValue } from "../../hooks/useAnimations";
+import { useOptimizedAnimation } from "../../utils/animationOptimizer";
 
-interface OptimizedImageProps extends Omit<ImageProps, 'source'> {
-  source: ImageProps['source'];
+interface OptimizedImageProps extends Omit<ImageProps, "source"> {
+  source: ImageProps["source"];
   style?: StyleProp<ImageStyle>;
   placeholderColor?: string;
   showLoading?: boolean;
   fadeInDuration?: number;
   // 캐시 옵션
-  cachePolicy?: 'memory' | 'disk' | 'memory-disk';
+  cachePolicy?: "memory" | "disk" | "memory-disk";
   // 이미지 최적화 옵션
-  resizeMode?: 'cover' | 'contain' | 'stretch' | 'center';
+  resizeMode?: "cover" | "contain" | "stretch" | "center";
   // 썸네일 지원
-  thumbnailSource?: ImageProps['source'];
+  thumbnailSource?: ImageProps["source"];
   // 오류 시 대체 이미지
-  fallbackSource?: ImageProps['source'];
+  fallbackSource?: ImageProps["source"];
 }
 
 /**
@@ -41,11 +41,11 @@ interface OptimizedImageProps extends Omit<ImageProps, 'source'> {
 const OptimizedImage: React.FC<OptimizedImageProps> = ({
   source,
   style,
-  placeholderColor = '#f0f0f0',
+  placeholderColor = "#f0f0f0",
   showLoading = true,
   fadeInDuration = 300,
-  cachePolicy = 'memory-disk',
-  resizeMode = 'cover',
+  cachePolicy = "memory-disk",
+  resizeMode = "cover",
   thumbnailSource,
   fallbackSource,
   onLoad,
@@ -68,15 +68,15 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     return [
       imageStyle,
       {
-        backgroundColor: loading ? placeholderColor : 'transparent',
-        overflow: 'hidden',
+        backgroundColor: loading ? placeholderColor : "transparent",
+        overflow: "hidden",
       },
     ];
   }, [imageStyle, loading, placeholderColor]);
 
   // 캐시 설정이 적용된 source
   const optimizedSource = useMemo(() => {
-    if (!source || typeof source !== 'object' || !('uri' in source)) {
+    if (!source || typeof source !== "object" || !("uri" in source)) {
       return source;
     }
 
@@ -85,17 +85,17 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     };
 
     // Android에서 캐시 정책 적용
-    if (Platform.OS === 'android') {
+    if (Platform.OS === "android") {
       switch (cachePolicy) {
-        case 'memory':
-          headers['Cache-Control'] = 'max-age=3600'; // 1시간
+        case "memory":
+          headers["Cache-Control"] = "max-age=3600"; // 1시간
           break;
-        case 'disk':
-          headers['Cache-Control'] = 'max-age=86400'; // 24시간
+        case "disk":
+          headers["Cache-Control"] = "max-age=86400"; // 24시간
           break;
-        case 'memory-disk':
+        case "memory-disk":
         default:
-          headers['Cache-Control'] = 'max-age=604800'; // 7일
+          headers["Cache-Control"] = "max-age=604800"; // 7일
           break;
       }
     }
@@ -103,62 +103,84 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     return {
       ...source,
       headers,
-      cache: cachePolicy === 'memory' ? 'reload' : 'default',
+      cache: cachePolicy === "memory" ? "reload" : "default",
     };
   }, [source, cachePolicy]);
 
   // 이미지 로드 완료 처리
-  const handleLoad = useCallback((event: any) => {
-    setLoading(false);
-    setError(false);
+  const handleLoad = useCallback(
+    (event: any) => {
+      setLoading(false);
+      setError(false);
 
-    // 배터리 효율적인 페이드인 애니메이션
-    if (shouldAnimate()) {
-      Animated.timing(opacity, getConfig({
-        toValue: 1,
-        duration: fadeInDuration,
-        useNativeDriver: true,
-      })).start();
+      // 배터리 효율적인 페이드인 애니메이션
+      if (shouldAnimate()) {
+        Animated.timing(
+          opacity,
+          getConfig({
+            toValue: 1,
+            duration: fadeInDuration,
+            useNativeDriver: true,
+          })
+        ).start();
 
-      // 썸네일 페이드아웃
-      if (thumbnailSource && thumbnailLoaded) {
-        Animated.timing(thumbnailOpacity, getConfig({
-          toValue: 0,
-          duration: fadeInDuration,
-          useNativeDriver: true,
-        })).start();
+        // 썸네일 페이드아웃
+        if (thumbnailSource && thumbnailLoaded) {
+          Animated.timing(
+            thumbnailOpacity,
+            getConfig({
+              toValue: 0,
+              duration: fadeInDuration,
+              useNativeDriver: true,
+            })
+          ).start();
+        }
+      } else {
+        // 애니메이션 없이 즉시 변경
+        opacity.setValue(1);
+        if (thumbnailSource && thumbnailLoaded) {
+          thumbnailOpacity.setValue(0);
+        }
       }
-    } else {
-      // 애니메이션 없이 즉시 변경
-      opacity.setValue(1);
-      if (thumbnailSource && thumbnailLoaded) {
-        thumbnailOpacity.setValue(0);
-      }
-    }
 
-    onLoad?.(event);
-  }, [fadeInDuration, onLoad, opacity, thumbnailLoaded, thumbnailOpacity, thumbnailSource]);
+      onLoad?.(event);
+    },
+    [
+      fadeInDuration,
+      onLoad,
+      opacity,
+      thumbnailLoaded,
+      thumbnailOpacity,
+      thumbnailSource,
+    ]
+  );
 
   // 썸네일 로드 완료 처리
   const handleThumbnailLoad = useCallback(() => {
     setThumbnailLoaded(true);
     if (shouldAnimate()) {
-      Animated.timing(thumbnailOpacity, getConfig({
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      })).start();
+      Animated.timing(
+        thumbnailOpacity,
+        getConfig({
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true,
+        })
+      ).start();
     } else {
       thumbnailOpacity.setValue(1);
     }
   }, [thumbnailOpacity, getConfig, shouldAnimate]);
 
   // 오류 처리
-  const handleError = useCallback((error: any) => {
-    setLoading(false);
-    setError(true);
-    onError?.(error);
-  }, [onError]);
+  const handleError = useCallback(
+    (error: any) => {
+      setLoading(false);
+      setError(true);
+      onError?.(error);
+    },
+    [onError]
+  );
 
   return (
     <View style={containerStyle}>
@@ -182,11 +204,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
         <Animated.Image
           {...props}
           source={optimizedSource}
-          style={[
-            StyleSheet.absoluteFillObject,
-            { opacity },
-            imageStyle,
-          ]}
+          style={[StyleSheet.absoluteFillObject, { opacity }, imageStyle]}
           resizeMode={resizeMode}
           onLoad={handleLoad}
           onError={handleError}
@@ -216,8 +234,8 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
 const styles = StyleSheet.create({
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });
 

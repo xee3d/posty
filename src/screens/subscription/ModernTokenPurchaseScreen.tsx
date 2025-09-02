@@ -1,8 +1,8 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import TokenPurchaseView from '../../components/TokenPurchaseView';
-import inAppPurchaseService from '../../services/subscription/inAppPurchaseService';
-import { useAppTheme } from '../../hooks/useAppTheme';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
+import TokenPurchaseView from "../../components/TokenPurchaseView";
+import inAppPurchaseService from "../../services/subscription/inAppPurchaseService";
+import { useAppTheme } from "../../hooks/useAppTheme";
 
 export const ModernTokenPurchaseScreen = () => {
   const { colors, isDark } = useAppTheme();
@@ -11,12 +11,12 @@ export const ModernTokenPurchaseScreen = () => {
     try {
       await inAppPurchaseService.purchaseTokens(packageId);
     } catch (error) {
-      console.error('Token purchase error:', error);
+      console.error("Token purchase error:", error);
     }
   };
 
   return (
-    <TokenPurchaseView 
+    <TokenPurchaseView
       onPurchase={handlePurchase}
       colors={colors}
       isDark={isDark}

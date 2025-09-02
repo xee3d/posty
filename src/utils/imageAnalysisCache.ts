@@ -13,7 +13,7 @@ class ImageAnalysisCache {
   // 이미지 해시 생성 (간단한 방식)
   private getImageHash(imageData: string): string {
     // base64의 일부를 해시로 사용 (실제로는 더 정교한 해싱 필요)
-    const cleanData = imageData.replace(/^data:image\/\w+;base64,/, '');
+    const cleanData = imageData.replace(/^data:image\/\w+;base64,/, "");
     return cleanData.substring(0, 100); // 첫 100자를 키로 사용
   }
 
@@ -32,7 +32,7 @@ class ImageAnalysisCache {
       return null;
     }
 
-    console.log('Image analysis cache hit');
+    console.log("Image analysis cache hit");
     return cached.analysis;
   }
 
@@ -43,18 +43,19 @@ class ImageAnalysisCache {
     // 크기 제한 체크
     if (this.cache.size >= this.maxSize) {
       // 가장 오래된 항목 제거
-      const oldestKey = Array.from(this.cache.entries())
-        .sort((a, b) => a[1].timestamp - b[1].timestamp)[0][0];
+      const oldestKey = Array.from(this.cache.entries()).sort(
+        (a, b) => a[1].timestamp - b[1].timestamp
+      )[0][0];
       this.cache.delete(oldestKey);
     }
 
     this.cache.set(hash, {
       description: analysis.description,
       analysis,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
 
-    console.log('Image analysis cached');
+    console.log("Image analysis cached");
   }
 
   // 캐시 초기화

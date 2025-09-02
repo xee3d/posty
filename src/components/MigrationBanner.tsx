@@ -1,22 +1,25 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   StyleSheet,
   TouchableOpacity,
   Animated,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { SPACING } from '../utils/constants';
+} from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useAppTheme } from "../hooks/useAppTheme";
+import { SPACING } from "../utils/constants";
 
 interface MigrationBannerProps {
   onMigratePress: () => void;
   onDismiss: () => void;
 }
 
-const MigrationBanner: React.FC<MigrationBannerProps> = ({ onMigratePress, onDismiss }) => {
+const MigrationBanner: React.FC<MigrationBannerProps> = ({
+  onMigratePress,
+  onDismiss,
+}) => {
   const { colors } = useAppTheme();
   const [visible, setVisible] = useState(false);
   const fadeAnim = new Animated.Value(0);
@@ -28,16 +31,26 @@ const MigrationBanner: React.FC<MigrationBannerProps> = ({ onMigratePress, onDis
   const checkAndShowBanner = async () => {
     try {
       // 배너를 이미 닫았는지 확인
-      const dismissed = await AsyncStorage.getItem('MIGRATION_BANNER_DISMISSED');
-      if (dismissed === 'true') return;
+      const dismissed = await AsyncStorage.getItem(
+        "MIGRATION_BANNER_DISMISSED"
+      );
+      if (dismissed === "true") {
+        return;
+      }
 
       // 마이그레이션이 필요한지 확인
-      const migrationStatus = await AsyncStorage.getItem('MIGRATION_COMPLETED_CONTENTS');
-      if (migrationStatus === 'true') return;
+      const migrationStatus = await AsyncStorage.getItem(
+        "MIGRATION_COMPLETED_CONTENTS"
+      );
+      if (migrationStatus === "true") {
+        return;
+      }
 
       // 로컬 데이터가 있는지 확인
-      const savedContents = await AsyncStorage.getItem('GENERATED_CONTENTS');
-      if (!savedContents || JSON.parse(savedContents).length === 0) return;
+      const savedContents = await AsyncStorage.getItem("GENERATED_CONTENTS");
+      if (!savedContents || JSON.parse(savedContents).length === 0) {
+        return;
+      }
 
       // 배너 표시
       setVisible(true);
@@ -47,12 +60,12 @@ const MigrationBanner: React.FC<MigrationBannerProps> = ({ onMigratePress, onDis
         useNativeDriver: true,
       }).start();
     } catch (error) {
-      console.error('Error checking migration banner:', error);
+      console.error("Error checking migration banner:", error);
     }
   };
 
   const handleDismiss = async () => {
-    await AsyncStorage.setItem('MIGRATION_BANNER_DISMISSED', 'true');
+    await AsyncStorage.setItem("MIGRATION_BANNER_DISMISSED", "true");
     Animated.timing(fadeAnim, {
       toValue: 0,
       duration: 300,
@@ -65,7 +78,9 @@ const MigrationBanner: React.FC<MigrationBannerProps> = ({ onMigratePress, onDis
 
   const styles = createStyles(colors);
 
-  if (!visible) return null;
+  if (!visible) {
+    return null;
+  }
 
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
@@ -78,10 +93,16 @@ const MigrationBanner: React.FC<MigrationBannerProps> = ({ onMigratePress, onDis
           </Text>
         </View>
         <View style={styles.actions}>
-          <TouchableOpacity onPress={handleDismiss} style={styles.dismissButton}>
+          <TouchableOpacity
+            onPress={handleDismiss}
+            style={styles.dismissButton}
+          >
             <Text style={styles.dismissText}>나중에</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={onMigratePress} style={styles.migrateButton}>
+          <TouchableOpacity
+            onPress={onMigratePress}
+            style={styles.migrateButton}
+          >
             <Text style={styles.migrateText}>백업하기</Text>
           </TouchableOpacity>
         </View>
@@ -93,14 +114,14 @@ const MigrationBanner: React.FC<MigrationBannerProps> = ({ onMigratePress, onDis
 const createStyles = (colors: any) =>
   StyleSheet.create({
     container: {
-      position: 'absolute',
+      position: "absolute",
       top: 0,
       left: 0,
       right: 0,
       backgroundColor: colors.surface,
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
-      shadowColor: '#000',
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
@@ -108,8 +129,8 @@ const createStyles = (colors: any) =>
       zIndex: 1000,
     },
     content: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       padding: SPACING.md,
       paddingTop: SPACING.xl, // StatusBar 공간
     },
@@ -119,7 +140,7 @@ const createStyles = (colors: any) =>
     },
     title: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
     },
     description: {
@@ -128,8 +149,8 @@ const createStyles = (colors: any) =>
       marginTop: 2,
     },
     actions: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.sm,
     },
     dismissButton: {
@@ -148,7 +169,7 @@ const createStyles = (colors: any) =>
     },
     migrateText: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.white,
     },
   });

@@ -74,16 +74,17 @@ Google Auth → Redux Store ↔️ Firestore
 
 ### 2.3 토큰 시스템
 
-| 플랜 | 아이콘 | 토큰 제한 |
-|------|--------|-----------|
-| FREE | 🆓 | 10개/일 |
-| STARTER | ⭐ | 200개/월 |
-| PREMIUM | 💎 | 500개/월 |
-| PRO | 👑 | 무제한 |
+| 플랜    | 아이콘 | 토큰 제한 |
+| ------- | ------ | --------- |
+| FREE    | 🆓     | 10개/일   |
+| STARTER | ⭐     | 200개/월  |
+| PREMIUM | 💎     | 500개/월  |
+| PRO     | 👑     | 무제한    |
 
 ## 3. 기술 스택 (Tech Stack)
 
 ### Frontend
+
 - ⚛️ React Native 0.74
 - 🗃️ Redux Toolkit
 - 🔥 Firebase SDK
@@ -91,6 +92,7 @@ Google Auth → Redux Store ↔️ Firestore
 - 🎨 React Native Vector Icons
 
 ### Backend
+
 - ▲ Vercel Functions
 - 🟢 Node.js
 - 🔒 Environment Variables
@@ -98,6 +100,7 @@ Google Auth → Redux Store ↔️ Firestore
 - 🌐 CORS Headers
 
 ### Services
+
 - 🤖 OpenAI API (GPT-4o-mini)
 - 🔥 Firebase Authentication
 - ☁️ Firestore Database
@@ -107,21 +110,25 @@ Google Auth → Redux Store ↔️ Firestore
 ## 4. 주요 특징
 
 ### 보안
+
 - API 키는 서버에서만 관리
 - 클라이언트는 서버를 통해서만 OpenAI API 접근
 - Firebase Auth로 사용자 인증
 
 ### 확장성
+
 - 마이크로서비스 아키텍처
 - AI 서버와 트렌드 서버 분리
 - Serverless 환경으로 자동 스케일링
 
 ### 실시간 동기화
+
 - Firestore를 통한 실시간 데이터 동기화
 - Redux 미들웨어로 자동 상태 관리
 - 오프라인 지원
 
 ### 성능 최적화
+
 - 토큰 사용량 실시간 추적
 - 캐싱을 통한 API 호출 최소화
 - 플랫폼별 콘텐츠 최적화
@@ -129,17 +136,20 @@ Google Auth → Redux Store ↔️ Firestore
 ## 5. API 엔드포인트
 
 ### AI Content Server
+
 - `POST /api/generate` - AI 콘텐츠 생성
 - `GET /api/health` - 서버 상태 확인
 - `GET /api/generate-test` - API 테스트
 
 ### Trend Data Server
+
 - `GET /api/trends` - 실시간 트렌드 데이터
 - `GET /api/health` - 서버 상태 확인
 
 ## 6. 환경 변수
 
 ### 클라이언트 (.env)
+
 ```
 # Firebase 설정
 FIREBASE_API_KEY=
@@ -151,6 +161,7 @@ APP_SECRET=posty-secret-key-change-this-in-production
 ```
 
 ### 서버 (Vercel Environment Variables)
+
 ```
 OPENAI_API_KEY=your_openai_api_key
 APP_SECRET=posty-secret-key-change-this-in-production
@@ -158,4 +169,4 @@ APP_SECRET=posty-secret-key-change-this-in-production
 
 ---
 
-*최종 업데이트: 2025년 1월 20일*
+_최종 업데이트: 2025년 1월 20일_

@@ -1,35 +1,31 @@
-import React from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-} from 'react-native';
+import React from "react";
+import { View, StyleSheet, Dimensions } from "react-native";
 import {
   BannerAd,
   BannerAdSize,
   TestIds,
-} from 'react-native-google-mobile-ads';
+} from "react-native-google-mobile-ads";
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 
 interface CompactBannerProps {
-  size?: 'standard' | 'large' | 'smart';
+  size?: "standard" | "large" | "smart";
   style?: any;
 }
 
 const CompactBanner: React.FC<CompactBannerProps> = ({
-  size = 'standard',
+  size = "standard",
   style,
 }) => {
-  const adUnitId = __DEV__ 
+  const adUnitId = __DEV__
     ? TestIds.BANNER
-    : 'ca-app-pub-xxxxxxxxxxxxx/banner-compact';
+    : "ca-app-pub-xxxxxxxxxxxxx/banner-compact";
 
   const getBannerSize = () => {
     switch (size) {
-      case 'large':
+      case "large":
         return BannerAdSize.LARGE_BANNER; // 320x100
-      case 'smart':
+      case "smart":
         return BannerAdSize.SMART_BANNER; // 스크린에 맞춤
       default:
         return BannerAdSize.BANNER; // 320x50
@@ -51,10 +47,10 @@ const CompactBanner: React.FC<CompactBannerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginVertical: 8,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
 });
 

@@ -9,6 +9,7 @@ React Native iOS 개발에서 자주 발생하는 Swift 및 의존성 관련 문
 ### 1. CocoaPods 의존성 충돌
 
 #### 문제 증상
+
 ```
 [!] CocoaPods could not find compatible versions for pod "Firebase/Core"
 [!] Unable to satisfy the following requirements:
@@ -17,6 +18,7 @@ React Native iOS 개발에서 자주 발생하는 Swift 및 의존성 관련 문
 ```
 
 #### 해결 방법
+
 ```bash
 # 1. Podfile.lock 삭제 및 캐시 정리
 cd ios
@@ -36,11 +38,13 @@ pod install --repo-update
 ### 2. Swift 버전 호환성 문제
 
 #### 문제 증상
+
 ```
 Module compiled with Swift 5.7 cannot be imported by the Swift 5.9 compiler
 ```
 
 #### 해결 방법
+
 ```bash
 # Xcode에서 Build Settings 확인:
 # Swift Language Version을 통일 (Swift 5.9 권장)
@@ -58,12 +62,14 @@ end
 ### 3. React Native Firebase 호환성
 
 #### 문제 증상
+
 ```
 RNFBApp/RNFBApp.h file not found
 No such module 'Firebase'
 ```
 
 #### 해결 방법
+
 ```bash
 # 1. React Native Firebase 버전 확인
 npm list @react-native-firebase/app
@@ -81,12 +87,14 @@ pod install --repo-update
 ### 4. Google Sign In 의존성 문제
 
 #### 문제 증상
+
 ```
 'GoogleSignIn/GoogleSignIn.h' file not found
 Undefined symbol: _OBJC_CLASS_$_GIDSignIn
 ```
 
 #### 해결 방법
+
 ```bash
 # Podfile에 명시적으로 추가
 pod 'GoogleSignIn', '~> 7.0'
@@ -104,11 +112,13 @@ pod 'GoogleSignIn', '~> 7.0'
 ### 5. Kakao Login SDK 문제
 
 #### 문제 증상
+
 ```
 'KakaoSDK/KakaoSDK.h' file not found
 ```
 
 #### 해결 방법
+
 ```bash
 # 1. Podfile에 수동 추가
 pod 'KakaoSDK'
@@ -124,11 +134,13 @@ pod install --repo-update
 ### 6. Vector Icons 폰트 문제
 
 #### 문제 증상
+
 ```
 Unrecognized font family 'MaterialIcons'
 ```
 
 #### 해결 방법
+
 ```bash
 # 1. 폰트 파일 수동 복사
 cp node_modules/react-native-vector-icons/Fonts/*.ttf ios/Posty/
@@ -150,11 +162,13 @@ cp node_modules/react-native-vector-icons/Fonts/*.ttf ios/Posty/
 ### 7. React Native Sound 의존성
 
 #### 문제 증상
+
 ```
 'React/RCTBridgeModule.h' file not found in RNSound
 ```
 
 #### 해결 방법
+
 ```bash
 # 1. Podfile에 수동 추가
 pod 'react-native-sound', :path => '../node_modules/react-native-sound'
@@ -167,12 +181,14 @@ pod 'react-native-sound', :path => '../node_modules/react-native-sound'
 ### 8. Apple Silicon Mac (M1/M2) 특별 문제
 
 #### 문제 증상
+
 ```
 arm64 architecture not supported
 ffi extension failed to load
 ```
 
 #### 해결 방법
+
 ```bash
 # 1. Rosetta로 CocoaPods 설치
 sudo arch -x86_64 gem install cocoapods
@@ -193,6 +209,7 @@ rbenv global 3.1.0
 ## 🔧 Posty 특화 의존성 설정
 
 ### 필요한 Podfile 설정
+
 ```ruby
 require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
@@ -232,12 +249,12 @@ target 'Posty' do
 
   # Social Login
   pod 'KakaoSDK'
-  
+
   # Other dependencies
   pod 'react-native-sound', :path => '../node_modules/react-native-sound'
   pod 'react-native-image-picker', :path => '../node_modules/react-native-image-picker'
   pod 'react-native-image-resizer', :path => '../node_modules/react-native-image-resizer'
-  
+
   # In-App Purchase
   pod 'react-native-iap', :path => '../node_modules/react-native-iap'
 
@@ -252,7 +269,7 @@ target 'Posty' do
       config[:reactNativePath],
       :mac_catalyst_enabled => false
     )
-    
+
     # Swift 버전 통일
     installer.pods_project.targets.each do |target|
       target.build_configurations.each do |config|
@@ -265,10 +282,11 @@ end
 ```
 
 ### 호환되는 패키지 버전들
+
 ```json
 {
   "@react-native-firebase/app": "^18.6.1",
-  "@react-native-firebase/auth": "^18.6.1", 
+  "@react-native-firebase/auth": "^18.6.1",
   "@react-native-firebase/firestore": "^18.6.1",
   "@react-native-firebase/analytics": "^18.6.1",
   "@react-native-google-signin/google-signin": "^10.1.0",
@@ -282,6 +300,7 @@ end
 ## 🚨 긴급 문제 해결 방법
 
 ### 모든 의존성 초기화
+
 ```bash
 # 1. 완전 정리
 cd ios
@@ -303,6 +322,7 @@ rm -rf ~/Library/Developer/Xcode/DerivedData
 ```
 
 ### Build Settings 초기화
+
 ```bash
 # Xcode에서:
 # 1. Product > Clean Build Folder
@@ -315,6 +335,7 @@ rm -rf ~/Library/Developer/Xcode/DerivedData
 ## 🎯 Mac에서 수행할 의존성 체크리스트
 
 ### 환경 확인
+
 - [ ] Xcode 14+ 설치
 - [ ] Command Line Tools 설치: `xcode-select --install`
 - [ ] CocoaPods 설치: `sudo gem install cocoapods`
@@ -322,6 +343,7 @@ rm -rf ~/Library/Developer/Xcode/DerivedData
 - [ ] iOS 시뮬레이터 설치
 
 ### 프로젝트 설정
+
 - [ ] Bundle Identifier: `com.posty`
 - [ ] iOS Deployment Target: 11.0+
 - [ ] Swift Language Version: 5.9
@@ -329,11 +351,13 @@ rm -rf ~/Library/Developer/Xcode/DerivedData
 - [ ] GoogleService-Info.plist 추가
 
 ### 의존성 설치
+
 - [ ] `npm install` 성공
 - [ ] `cd ios && pod install` 성공
 - [ ] 모든 네이티브 모듈 링킹 확인
 
 ### 빌드 테스트
+
 - [ ] `npm run ios` 성공
 - [ ] 시뮬레이터에서 앱 실행
 - [ ] Firebase 연결 확인

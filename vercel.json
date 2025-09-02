@@ -11,7 +11,7 @@
       "schedule": "0 9,18 * * *"
     },
     {
-      "path": "/api/notifications/schedule?type=weekly", 
+      "path": "/api/notifications/schedule?type=weekly",
       "schedule": "0 20 * * 0"
     },
     {
@@ -30,8 +30,14 @@
       "source": "/api/(.*)",
       "headers": [
         { "key": "Access-Control-Allow-Origin", "value": "*" },
-        { "key": "Access-Control-Allow-Methods", "value": "GET, POST, PUT, DELETE, OPTIONS" },
-        { "key": "Access-Control-Allow-Headers", "value": "X-Requested-With, Content-Type, Authorization" }
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-Requested-With, Content-Type, Authorization"
+        }
       ]
     }
   ]

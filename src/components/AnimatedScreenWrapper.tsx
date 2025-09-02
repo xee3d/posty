@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import Animated, {
   Layout,
   FadeIn,
@@ -11,10 +11,15 @@ import Animated, {
   FadeOutUp,
   BounceIn,
   BounceOut,
-} from 'react-native-reanimated';
-import { StyleSheet, ViewStyle } from 'react-native';
+} from "react-native-reanimated";
+import { StyleSheet, ViewStyle } from "react-native";
 
-export type ScreenAnimation = 'fade' | 'slide' | 'scale' | 'slideVertical' | 'bounce';
+export type ScreenAnimation =
+  | "fade"
+  | "slide"
+  | "scale"
+  | "slideVertical"
+  | "bounce";
 
 interface AnimatedScreenWrapperProps {
   children: React.ReactNode;
@@ -27,16 +32,14 @@ interface AnimatedScreenWrapperProps {
 // 화면 전환 깜빡거림 방지를 위해 애니메이션 비활성화
 const AnimatedScreenWrapper: React.FC<AnimatedScreenWrapperProps> = ({
   children,
-  animation = 'fade',
+  animation = "fade",
   duration = 300,
   delay = 0,
   style,
 }) => {
   // 애니메이션 비활성화 - 깜빡거림 방지
   return (
-    <Animated.View style={[styles.container, style]}>
-      {children}
-    </Animated.View>
+    <Animated.View style={[styles.container, style]}>{children}</Animated.View>
   );
 };
 

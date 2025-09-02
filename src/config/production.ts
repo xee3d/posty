@@ -4,7 +4,7 @@ export const PRODUCTION_CONFIG = {
   LOGGING: {
     ENABLE_CONSOLE_LOGS: false, // 프로덕션에서는 console.log 비활성화
     ENABLE_ERROR_REPORTING: true, // 에러 리포팅은 활성화
-    SENTRY_DSN: '', // Sentry 설정 (필요시)
+    SENTRY_DSN: "", // Sentry 설정 (필요시)
   },
 
   // 인증 설정
@@ -45,7 +45,7 @@ export const getConfig = () => {
   if (isProduction) {
     return PRODUCTION_CONFIG;
   }
-  
+
   // 개발 환경 설정
   return {
     ...PRODUCTION_CONFIG,

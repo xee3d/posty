@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -7,15 +7,15 @@ import {
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '../utils/constants';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { ScaleButton, FadeInView } from '../components/AnimationComponents';
-import localAnalyticsService from '../services/analytics/localAnalyticsService';
-import { soundManager } from '../utils/soundManager';
-import { Alert } from '../utils/customAlert';
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import { COLORS, FONTS, SPACING, BORDER_RADIUS } from "../utils/constants";
+import { useAppTheme } from "../hooks/useAppTheme";
+import { ScaleButton, FadeInView } from "../components/AnimationComponents";
+import localAnalyticsService from "../services/analytics/localAnalyticsService";
+import { soundManager } from "../utils/soundManager";
+import { Alert } from "../utils/customAlert";
 
 interface PostInputScreenProps {
   onClose: () => void;
@@ -24,35 +24,56 @@ interface PostInputScreenProps {
   initialHashtags?: string[];
 }
 
-const PostInputScreen: React.FC<PostInputScreenProps> = ({ 
-  onClose, 
+const PostInputScreen: React.FC<PostInputScreenProps> = ({
+  onClose,
   onSave,
-  initialContent = '',
-  initialHashtags = []
+  initialContent = "",
+  initialHashtags = [],
 }) => {
   const { colors, cardTheme } = useAppTheme();
   const [content, setContent] = useState(initialContent);
-  const [hashtags, setHashtags] = useState(initialHashtags.join(' '));
-  const [platform, setPlatform] = useState<'instagram' | 'facebook' | 'twitter'>('instagram');
-  const [category, setCategory] = useState<string>('일상');
+  const [hashtags, setHashtags] = useState(initialHashtags.join(" "));
+  const [platform, setPlatform] = useState<
+    "instagram" | "facebook" | "twitter"
+  >("instagram");
+  const [category, setCategory] = useState<string>("일상");
   const [metrics, setMetrics] = useState({
-    likes: '',
-    comments: '',
-    shares: '',
-    reach: '',
+    likes: "",
+    comments: "",
+    shares: "",
+    reach: "",
   });
   const [isSaving, setIsSaving] = useState(false);
 
-  const categories = ['카페', '맛집', '일상', '운동', '여행', '패션', '뷰티', '기타'];
+  const categories = [
+    "카페",
+    "맛집",
+    "일상",
+    "운동",
+    "여행",
+    "패션",
+    "뷰티",
+    "기타",
+  ];
   const platforms = [
-    { id: 'instagram', name: 'Instagram', icon: 'logo-instagram', color: '#E4405F' },
-    { id: 'facebook', name: 'Facebook', icon: 'logo-facebook', color: '#1877F2' },
-    { id: 'twitter', name: 'X', icon: 'logo-twitter', color: '#000000' },
+    {
+      id: "instagram",
+      name: "Instagram",
+      icon: "logo-instagram",
+      color: "#E4405F",
+    },
+    {
+      id: "facebook",
+      name: "Facebook",
+      icon: "logo-facebook",
+      color: "#1877F2",
+    },
+    { id: "twitter", name: "X", icon: "logo-twitter", color: "#000000" },
   ];
 
   const handleSave = async () => {
     if (!content.trim()) {
-      Alert.alert('알림', '게시물 내용을 입력해주세요.');
+      Alert.alert("알림", "게시물 내용을 입력해주세요.");
       return;
     }
 
@@ -61,8 +82,8 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
       // 해시태그 파싱
       const hashtagList = hashtags
         .split(/[\s,]+/)
-        .filter(tag => tag.length > 0)
-        .map(tag => tag.startsWith('#') ? tag.substring(1) : tag);
+        .filter((tag) => tag.length > 0)
+        .map((tag) => (tag.startsWith("#") ? tag.substring(1) : tag));
 
       // 게시물 저장
       await localAnalyticsService.savePost({
@@ -70,7 +91,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
         hashtags: hashtagList,
         platform,
         category,
-        tone: 'casual', // 기본값
+        tone: "casual", // 기본값
         metrics: {
           likes: parseInt(metrics.likes) || 0,
           comments: parseInt(metrics.comments) || 0,
@@ -79,15 +100,18 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
         },
       });
 
-      Alert.alert('성공', '게시물이 저장되었습니다!', [
-        { text: '확인', onPress: () => {
-          onSave();
-          onClose();
-        }}
+      Alert.alert("성공", "게시물이 저장되었습니다!", [
+        {
+          text: "확인",
+          onPress: () => {
+            onSave();
+            onClose();
+          },
+        },
       ]);
     } catch (error) {
-      console.error('Failed to save post:', error);
-      Alert.alert('오류', '게시물 저장 중 문제가 발생했습니다.');
+      console.error("Failed to save post:", error);
+      Alert.alert("오류", "게시물 저장 중 문제가 발생했습니다.");
     } finally {
       setIsSaving(false);
     }
@@ -102,13 +126,13 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
           <Icon name="close" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>게시물 기록하기</Text>
-        <ScaleButton 
+        <ScaleButton
           style={styles.saveButton}
           onPress={handleSave}
           disabled={isSaving}
         >
           <Text style={styles.saveButtonText}>
-            {isSaving ? '저장 중...' : '저장'}
+            {isSaving ? "저장 중..." : "저장"}
           </Text>
         </ScaleButton>
       </View>
@@ -152,19 +176,21 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
                   style={[
                     styles.platformButton,
                     platform === p.id && styles.platformButtonActive,
-                    platform === p.id && { borderColor: p.color }
+                    platform === p.id && { borderColor: p.color },
                   ]}
                   onPress={() => setPlatform(p.id as any)}
                 >
-                  <Icon 
-                    name={p.icon} 
-                    size={20} 
-                    color={platform === p.id ? p.color : colors.text.tertiary} 
+                  <Icon
+                    name={p.icon}
+                    size={20}
+                    color={platform === p.id ? p.color : colors.text.tertiary}
                   />
-                  <Text style={[
-                    styles.platformButtonText,
-                    platform === p.id && { color: p.color }
-                  ]}>
+                  <Text
+                    style={[
+                      styles.platformButtonText,
+                      platform === p.id && { color: p.color },
+                    ]}
+                  >
                     {p.name}
                   </Text>
                 </TouchableOpacity>
@@ -182,14 +208,16 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
                   key={cat}
                   style={[
                     styles.categoryButton,
-                    category === cat && styles.categoryButtonActive
+                    category === cat && styles.categoryButtonActive,
                   ]}
                   onPress={() => setCategory(cat)}
                 >
-                  <Text style={[
-                    styles.categoryButtonText,
-                    category === cat && styles.categoryButtonTextActive
-                  ]}>
+                  <Text
+                    style={[
+                      styles.categoryButtonText,
+                      category === cat && styles.categoryButtonTextActive,
+                    ]}
+                  >
                     {cat}
                   </Text>
                 </TouchableOpacity>
@@ -201,7 +229,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
         <FadeInView delay={400}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
-              성과 지표 
+              성과 지표
               <Text style={styles.sectionSubtitle}> (선택사항)</Text>
             </Text>
             <View style={styles.metricsGrid}>
@@ -215,7 +243,9 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
                   placeholder="0"
                   placeholderTextColor={colors.text.tertiary}
                   value={metrics.likes}
-                  onChangeText={(text) => setMetrics({...metrics, likes: text})}
+                  onChangeText={(text) =>
+                    setMetrics({ ...metrics, likes: text })
+                  }
                   keyboardType="number-pad"
                 />
               </View>
@@ -230,7 +260,9 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
                   placeholder="0"
                   placeholderTextColor={colors.text.tertiary}
                   value={metrics.comments}
-                  onChangeText={(text) => setMetrics({...metrics, comments: text})}
+                  onChangeText={(text) =>
+                    setMetrics({ ...metrics, comments: text })
+                  }
                   keyboardType="number-pad"
                 />
               </View>
@@ -245,7 +277,9 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
                   placeholder="0"
                   placeholderTextColor={colors.text.tertiary}
                   value={metrics.shares}
-                  onChangeText={(text) => setMetrics({...metrics, shares: text})}
+                  onChangeText={(text) =>
+                    setMetrics({ ...metrics, shares: text })
+                  }
                   keyboardType="number-pad"
                 />
               </View>
@@ -260,7 +294,9 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
                   placeholder="0"
                   placeholderTextColor={colors.text.tertiary}
                   value={metrics.reach}
-                  onChangeText={(text) => setMetrics({...metrics, reach: text})}
+                  onChangeText={(text) =>
+                    setMetrics({ ...metrics, reach: text })
+                  }
                   keyboardType="number-pad"
                 />
               </View>
@@ -274,16 +310,16 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
   );
 };
 
-const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) => 
+const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
   StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.background,
     },
     header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
       paddingHorizontal: SPACING.lg,
       paddingVertical: SPACING.md,
       borderBottomWidth: 1,
@@ -294,7 +330,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     headerTitle: {
       fontSize: 18,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
     },
     saveButton: {
@@ -306,7 +342,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     saveButtonText: {
       color: colors.white,
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
     },
     content: {
       flex: 1,
@@ -317,13 +353,13 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     sectionTitle: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
       marginBottom: SPACING.sm,
     },
     sectionSubtitle: {
       fontSize: 14,
-      fontWeight: '400',
+      fontWeight: "400",
       color: colors.text.tertiary,
     },
     contentInput: {
@@ -333,7 +369,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       fontSize: 15,
       color: colors.text.primary,
       minHeight: 100,
-      textAlignVertical: 'top',
+      textAlignVertical: "top",
       borderWidth: 1,
       borderColor: colors.border,
     },
@@ -347,14 +383,14 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       borderColor: colors.border,
     },
     platformSelector: {
-      flexDirection: 'row',
+      flexDirection: "row",
       gap: SPACING.sm,
     },
     platformButton: {
       flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
       gap: SPACING.xs,
       backgroundColor: colors.surface,
       paddingVertical: SPACING.sm,
@@ -367,12 +403,12 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     platformButtonText: {
       fontSize: 14,
-      fontWeight: '500',
+      fontWeight: "500",
       color: colors.text.tertiary,
     },
     categoryGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
+      flexDirection: "row",
+      flexWrap: "wrap",
       gap: SPACING.sm,
     },
     categoryButton: {
@@ -389,20 +425,20 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     categoryButtonText: {
       fontSize: 14,
-      fontWeight: '500',
+      fontWeight: "500",
       color: colors.text.secondary,
     },
     categoryButtonTextActive: {
       color: colors.white,
     },
     metricsGrid: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
+      flexDirection: "row",
+      flexWrap: "wrap",
       gap: SPACING.sm,
     },
     metricItem: {
       flex: 1,
-      minWidth: '45%',
+      minWidth: "45%",
       backgroundColor: colors.surface,
       borderRadius: 12,
       padding: SPACING.md,
@@ -410,8 +446,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       borderColor: colors.border,
     },
     metricHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.xs,
       marginBottom: SPACING.xs,
     },
@@ -421,7 +457,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     metricInput: {
       fontSize: 20,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
       padding: 0,
     },

@@ -1,5 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import trendService from '../../services/trendService';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import trendService from "../../services/trendService";
 
 /**
  * 디버깅용 유틸리티 함수들
@@ -11,10 +11,10 @@ export const debugUtils = {
   async clearTrendCache() {
     try {
       await trendService.clearCache();
-      console.log('[DebugUtils] Trend cache cleared successfully');
+      console.log("[DebugUtils] Trend cache cleared successfully");
       return true;
     } catch (error) {
-      console.error('[DebugUtils] Failed to clear trend cache:', error);
+      console.error("[DebugUtils] Failed to clear trend cache:", error);
       return false;
     }
   },
@@ -26,10 +26,10 @@ export const debugUtils = {
     try {
       const keys = await AsyncStorage.getAllKeys();
       await AsyncStorage.multiRemove(keys);
-      console.log('[DebugUtils] All cache cleared successfully');
+      console.log("[DebugUtils] All cache cleared successfully");
       return true;
     } catch (error) {
-      console.error('[DebugUtils] Failed to clear all cache:', error);
+      console.error("[DebugUtils] Failed to clear all cache:", error);
       return false;
     }
   },
@@ -43,23 +43,23 @@ export const debugUtils = {
       const analysis = {
         total: trends.length,
         bySouce: {
-          news: trends.filter(t => t.source === 'news').length,
-          social: trends.filter(t => t.source === 'social').length,
-          naver: trends.filter(t => t.source === 'naver').length,
-          google: trends.filter(t => t.source === 'google').length,
+          news: trends.filter((t) => t.source === "news").length,
+          social: trends.filter((t) => t.source === "social").length,
+          naver: trends.filter((t) => t.source === "naver").length,
+          google: trends.filter((t) => t.source === "google").length,
         },
         samples: {
-          news: trends.find(t => t.source === 'news'),
-          social: trends.find(t => t.source === 'social'),
-          naver: trends.find(t => t.source === 'naver'),
-          google: trends.find(t => t.source === 'google'),
-        }
+          news: trends.find((t) => t.source === "news"),
+          social: trends.find((t) => t.source === "social"),
+          naver: trends.find((t) => t.source === "naver"),
+          google: trends.find((t) => t.source === "google"),
+        },
       };
-      
-      console.log('[DebugUtils] Trend Analysis:', analysis);
+
+      console.log("[DebugUtils] Trend Analysis:", analysis);
       return analysis;
     } catch (error) {
-      console.error('[DebugUtils] Failed to analyze trends:', error);
+      console.error("[DebugUtils] Failed to analyze trends:", error);
       return null;
     }
   },
@@ -70,13 +70,16 @@ export const debugUtils = {
   async checkRealApiMode() {
     try {
       const isEnabled = await trendService.isRealApiEnabled();
-      console.log('[DebugUtils] Real API mode:', isEnabled ? 'ENABLED' : 'DISABLED');
+      console.log(
+        "[DebugUtils] Real API mode:",
+        isEnabled ? "ENABLED" : "DISABLED"
+      );
       return isEnabled;
     } catch (error) {
-      console.error('[DebugUtils] Failed to check API mode:', error);
+      console.error("[DebugUtils] Failed to check API mode:", error);
       return false;
     }
-  }
+  },
 };
 
 export default debugUtils;

@@ -3,6 +3,7 @@
 ## 📱 필요한 아이콘 크기
 
 ### Android (mipmap 폴더)
+
 - `mipmap-mdpi`: 48x48 px
 - `mipmap-hdpi`: 72x72 px
 - `mipmap-xhdpi`: 96x96 px
@@ -10,6 +11,7 @@
 - `mipmap-xxxhdpi`: 192x192 px
 
 ### iOS (Xcode Assets)
+
 - 20pt: 20x20, 40x40, 60x60
 - 29pt: 29x29, 58x58, 87x87
 - 40pt: 40x40, 80x80, 120x120
@@ -21,16 +23,19 @@
 ### 방법 1: 온라인 도구 사용 (추천)
 
 #### 1. App Icon Generator
+
 - URL: https://www.appicon.co/
 - SVG 또는 고해상도 PNG 업로드
 - Android + iOS 아이콘 한번에 생성
 
 #### 2. Icon Kitchen (Android 전용)
+
 - URL: https://icon.kitchen/
 - Material Design 스타일 아이콘 생성
 - Adaptive Icon 지원
 
 #### 3. Makeappicon
+
 - URL: https://makeappicon.com/
 - 1024x1024 이미지 업로드
 - 모든 크기 자동 생성
@@ -38,11 +43,13 @@
 ### 방법 2: 디자인 도구 사용
 
 #### Figma (무료)
+
 1. 512x512 캔버스 생성
 2. 아이콘 디자인
 3. 각 크기별로 Export
 
 #### Canva (무료)
+
 1. "앱 아이콘" 템플릿 선택
 2. 디자인 커스터마이징
 3. PNG로 다운로드
@@ -50,6 +57,7 @@
 ## 🎨 Posty 아이콘 디자인 컨셉
 
 ### 메인 요소
+
 - **색상**: #FF4757 (Posty 레드)
 - **모양**: 둥근 사각형 (반경 25%)
 - **심볼**: 'P' + 메시지 버블
@@ -58,6 +66,7 @@
 ### 디자인 옵션
 
 #### 옵션 1: 메시지 버블 + P
+
 ```
 ┌─────────────────┐
 │    ╭─────╮      │
@@ -67,6 +76,7 @@
 ```
 
 #### 옵션 2: AI 스파크 + P
+
 ```
 ┌─────────────────┐
 │      ✨         │
@@ -76,6 +86,7 @@
 ```
 
 #### 옵션 3: 그라데이션 P
+
 ```
 ┌─────────────────┐
 │                 │
@@ -89,6 +100,7 @@
 ### Android
 
 1. 생성된 아이콘을 각 mipmap 폴더에 복사:
+
 ```
 android/app/src/main/res/
 ├── mipmap-mdpi/
@@ -109,6 +121,7 @@ android/app/src/main/res/
 ```
 
 2. 앱 재빌드:
+
 ```bash
 cd android
 ./gradlew clean
@@ -126,20 +139,25 @@ npx react-native run-android
 ## 🎯 빠른 시작
 
 ### 1단계: 기본 아이콘 다운로드
+
 위의 SVG를 사용하거나 직접 디자인
 
 ### 2단계: 크기 변환
+
 https://www.appicon.co/ 에서 변환
 
 ### 3단계: 파일 복사
+
 생성된 파일을 각 폴더에 복사
 
 ### 4단계: 테스트
+
 앱 설치 후 홈 화면에서 확인
 
 ## 🔧 Adaptive Icon (Android 8+)
 
 ### ic_launcher_foreground.xml
+
 ```xml
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -151,6 +169,7 @@ https://www.appicon.co/ 에서 변환
 ```
 
 ### ic_launcher_background.xml
+
 ```xml
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="108dp"
@@ -181,6 +200,7 @@ https://www.appicon.co/ 에서 변환
 ## 📱 미리보기 테스트
 
 아이콘 적용 전 미리보기:
+
 1. 홈 화면 스크린샷 촬영
 2. 포토샵/GIMP에서 아이콘 합성
 3. 다양한 배경에서 확인

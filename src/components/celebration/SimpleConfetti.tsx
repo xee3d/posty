@@ -1,10 +1,5 @@
-import React, { useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  Dimensions,
-  Platform,
-} from 'react-native';
+import React, { useEffect } from "react";
+import { View, StyleSheet, Dimensions, Platform } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -14,9 +9,9 @@ import Animated, {
   withSequence,
   Easing,
   interpolate,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface SimpleConfettiProps {
   isVisible: boolean;
@@ -111,43 +106,45 @@ const ConfettiPiece: React.FC<{
       ]}
     >
       {/* 다양한 모양 렌더링 */}
-      <View 
+      <View
         style={[
           {
-            width: '100%',
-            height: '100%',
+            width: "100%",
+            height: "100%",
             backgroundColor: color,
             borderRadius: Math.random() > 0.5 ? size / 2 : 2, // 원형 또는 사각형
-            transform: [
-              { rotate: `${Math.random() * 45}deg` }
-            ]
-          }
-        ]} 
+            transform: [{ rotate: `${Math.random() * 45}deg` }],
+          },
+        ]}
       />
     </Animated.View>
   );
 };
 
-export const SimpleConfetti: React.FC<SimpleConfettiProps> = ({ isVisible }) => {
-  if (!isVisible) return null;
+export const SimpleConfetti: React.FC<SimpleConfettiProps> = ({
+  isVisible,
+}) => {
+  if (!isVisible) {
+    return null;
+  }
 
   // 더 선명하고 축제 분위기에 맞는 색상들
   const colors = [
-    '#FF1744', // 빨강
-    '#00E676', // 초록
-    '#FFD700', // 금색
-    '#2196F3', // 파랑
-    '#E91E63', // 핑크
-    '#9C27B0', // 보라
-    '#FF9800', // 주황
-    '#00BCD4', // 청록
-    '#FFC107', // 황금색
-    '#4CAF50', // 녹색
+    "#FF1744", // 빨강
+    "#00E676", // 초록
+    "#FFD700", // 금색
+    "#2196F3", // 파랑
+    "#E91E63", // 핑크
+    "#9C27B0", // 보라
+    "#FF9800", // 주황
+    "#00BCD4", // 청록
+    "#FFC107", // 황금색
+    "#4CAF50", // 녹색
   ];
-  
+
   // 세 그룹으로 나누어 단계적으로 폭발
   const pieces = [];
-  
+
   // 첫 번째 그룹 (즉시 폭발)
   for (let i = 0; i < 15; i++) {
     const angle = (Math.PI * 2 * i) / 15;
@@ -162,7 +159,7 @@ export const SimpleConfetti: React.FC<SimpleConfettiProps> = ({ isVisible }) => 
       size: 12 + Math.random() * 8,
     });
   }
-  
+
   // 두 번째 그룹 (약간 늦게)
   for (let i = 0; i < 15; i++) {
     const angle = (Math.PI * 2 * i) / 15 + Math.PI / 15;
@@ -177,7 +174,7 @@ export const SimpleConfetti: React.FC<SimpleConfettiProps> = ({ isVisible }) => 
       size: 10 + Math.random() * 10,
     });
   }
-  
+
   // 세 번째 그룹 (더 늦게)
   for (let i = 0; i < 10; i++) {
     const angle = Math.random() * Math.PI * 2;
@@ -194,14 +191,14 @@ export const SimpleConfetti: React.FC<SimpleConfettiProps> = ({ isVisible }) => 
   }
 
   return (
-    <View 
+    <View
       style={[
-        StyleSheet.absoluteFillObject, 
-        { 
-          zIndex: Platform.OS === 'ios' ? 999 : undefined,
-          elevation: Platform.OS === 'android' ? 999 : undefined,
-        }
-      ]} 
+        StyleSheet.absoluteFillObject,
+        {
+          zIndex: Platform.OS === "ios" ? 999 : undefined,
+          elevation: Platform.OS === "android" ? 999 : undefined,
+        },
+      ]}
       pointerEvents="none"
     >
       {pieces.map((piece) => (
@@ -221,16 +218,18 @@ export const SimpleConfetti: React.FC<SimpleConfettiProps> = ({ isVisible }) => 
 
 const styles = StyleSheet.create({
   confettiPiece: {
-    position: 'absolute',
+    position: "absolute",
     // 그림자 효과로 더 입체감 있게
-    ...(Platform.OS === 'ios' ? {
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.15,
-      shadowRadius: 2,
-    } : {
-      elevation: 2,
-    }),
+    ...(Platform.OS === "ios"
+      ? {
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.15,
+          shadowRadius: 2,
+        }
+      : {
+          elevation: 2,
+        }),
   },
 });
 

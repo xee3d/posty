@@ -1,47 +1,48 @@
 // components/ThemeToggle.tsx
-import React from 'react';
+import React from "react";
 import {
   TouchableOpacity,
   View,
   Text,
   StyleSheet,
   Animated,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useOptimizedTheme } from '../hooks/useOptimizedTheme';
-import { SPACING, BORDER_RADIUS } from '../utils/constants';
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import { useOptimizedTheme } from "../hooks/useOptimizedTheme";
+import { SPACING, BORDER_RADIUS } from "../utils/constants";
 
 interface ThemeToggleProps {
   style?: any;
   showLabel?: boolean;
 }
 
-export const ThemeToggle: React.FC<ThemeToggleProps> = ({ 
-  style, 
-  showLabel = false 
+export const ThemeToggle: React.FC<ThemeToggleProps> = ({
+  style,
+  showLabel = false,
 }) => {
-  const { themeMode, isDark, colors, changeTheme, componentStyles } = useOptimizedTheme();
+  const { themeMode, isDark, colors, changeTheme, componentStyles } =
+    useOptimizedTheme();
   const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
   const getIcon = () => {
     switch (themeMode) {
-      case 'light':
-        return 'sunny';
-      case 'dark':
-        return 'moon';
-      case 'system':
-        return 'phone-portrait-outline';
+      case "light":
+        return "sunny";
+      case "dark":
+        return "moon";
+      case "system":
+        return "phone-portrait-outline";
     }
   };
 
   const getLabel = () => {
     switch (themeMode) {
-      case 'light':
-        return '라이트';
-      case 'dark':
-        return '다크';
-      case 'system':
-        return '시스템';
+      case "light":
+        return "라이트";
+      case "dark":
+        return "다크";
+      case "system":
+        return "시스템";
     }
   };
 
@@ -61,15 +62,15 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
     ]).start();
 
     // 테마 순환: light -> dark -> system -> light
-    let newTheme: 'light' | 'dark' | 'system';
-    if (themeMode === 'light') {
-      newTheme = 'dark';
-    } else if (themeMode === 'dark') {
-      newTheme = 'system';
+    let newTheme: "light" | "dark" | "system";
+    if (themeMode === "light") {
+      newTheme = "dark";
+    } else if (themeMode === "dark") {
+      newTheme = "system";
     } else {
-      newTheme = 'light';
+      newTheme = "light";
     }
-    
+
     changeTheme(newTheme);
   };
 
@@ -81,21 +82,12 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
       onPress={handlePress}
       activeOpacity={0.7}
     >
-      <Animated.View 
-        style={[
-          styles.iconContainer,
-          { transform: [{ scale: scaleAnim }] }
-        ]}
+      <Animated.View
+        style={[styles.iconContainer, { transform: [{ scale: scaleAnim }] }]}
       >
-        <Icon 
-          name={getIcon()} 
-          size={24} 
-          color={colors.text.primary} 
-        />
+        <Icon name={getIcon()} size={24} color={colors.text.primary} />
       </Animated.View>
-      {showLabel && (
-        <Text style={styles.label}>{getLabel()}</Text>
-      )}
+      {showLabel && <Text style={styles.label}>{getLabel()}</Text>}
     </TouchableOpacity>
   );
 };
@@ -115,21 +107,21 @@ export const ThemeToggleCompact: React.FC<{ style?: any }> = ({ style }) => {
       rotateAnim.setValue(0);
     });
 
-    let newTheme: 'light' | 'dark' | 'system';
-    if (themeMode === 'light') {
-      newTheme = 'dark';
-    } else if (themeMode === 'dark') {
-      newTheme = 'system';
+    let newTheme: "light" | "dark" | "system";
+    if (themeMode === "light") {
+      newTheme = "dark";
+    } else if (themeMode === "dark") {
+      newTheme = "system";
     } else {
-      newTheme = 'light';
+      newTheme = "light";
     }
-    
+
     changeTheme(newTheme);
   };
 
   const spin = rotateAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg'],
+    outputRange: ["0deg", "360deg"],
   });
 
   return (
@@ -139,60 +131,63 @@ export const ThemeToggleCompact: React.FC<{ style?: any }> = ({ style }) => {
       activeOpacity={0.7}
     >
       <Animated.View style={{ transform: [{ rotate: spin }] }}>
-        <Icon 
+        <Icon
           name={
-            themeMode === 'light' ? 'sunny' : 
-            themeMode === 'dark' ? 'moon' : 
-            'contrast'
-          } 
-          size={20} 
-          color={colors.text.primary} 
+            themeMode === "light"
+              ? "sunny"
+              : themeMode === "dark"
+              ? "moon"
+              : "contrast"
+          }
+          size={20}
+          color={colors.text.primary}
         />
       </Animated.View>
     </TouchableOpacity>
   );
 };
 
-const createStyles = (colors: any, isDark: boolean, componentStyles: any) => StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    backgroundColor: colors.surface,
-    borderRadius: BORDER_RADIUS.large,
-    borderWidth: 1,
-    borderColor: colors.border,
-    ...componentStyles.button.ghost,
-  },
-  iconContainer: {
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  label: {
-    marginLeft: SPACING.sm,
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.text.primary,
-  },
-  compactContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: isDark ? colors.elevated : colors.lightGray,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+const createStyles = (colors: any, isDark: boolean, componentStyles: any) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.sm,
+      backgroundColor: colors.surface,
+      borderRadius: BORDER_RADIUS.large,
+      borderWidth: 1,
+      borderColor: colors.border,
+      ...componentStyles.button.ghost,
+    },
+    iconContainer: {
+      width: 32,
+      height: 32,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    label: {
+      marginLeft: SPACING.sm,
+      fontSize: 14,
+      fontWeight: "500",
+      color: colors.text.primary,
+    },
+    compactContainer: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: isDark ? colors.elevated : colors.lightGray,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+  });
 
 const styles = StyleSheet.create({
   compactContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
 });

@@ -1,7 +1,7 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { COLORS, SPACING } from '../../utils/constants';
-import { useAppTheme } from '../../hooks/useAppTheme';
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { COLORS, SPACING } from "../../utils/constants";
+import { useAppTheme } from "../../hooks/useAppTheme";
 
 interface SectionHeaderProps {
   title: string;
@@ -20,7 +20,7 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
 }) => {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
-  
+
   return (
     <View style={[styles.container, style]}>
       <View style={styles.textContainer}>
@@ -36,31 +36,32 @@ export const SectionHeader: React.FC<SectionHeaderProps> = ({
   );
 };
 
-const createStyles = (colors: typeof COLORS) => StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: SPACING.md,
-  },
-  textContainer: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.text.primary,
-    letterSpacing: -0.3,
-  },
-  subtitle: {
-    fontSize: 14,
-    color: colors.text.secondary,
-    marginTop: 4,
-    lineHeight: 20,
-  },
-  actionText: {
-    fontSize: 14,
-    color: colors.primary,
-    fontWeight: '500',
-  },
-});
+const createStyles = (colors: typeof COLORS) =>
+  StyleSheet.create({
+    container: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "flex-start",
+      marginBottom: SPACING.md,
+    },
+    textContainer: {
+      flex: 1,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.text.primary,
+      letterSpacing: -0.3,
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginTop: 4,
+      lineHeight: 20,
+    },
+    actionText: {
+      fontSize: 14,
+      color: colors.primary,
+      fontWeight: "500",
+    },
+  });

@@ -1,26 +1,44 @@
 // AI 서비스 타입 정의
-export type ToneType = 
-  | 'casual' 
-  | 'professional' 
-  | 'humorous' 
-  | 'emotional' 
-  | 'genz' 
-  | 'millennial' 
-  | 'minimalist' 
-  | 'storytelling' 
-  | 'motivational';
+export type ToneType =
+  | "casual"
+  | "professional"
+  | "humorous"
+  | "emotional"
+  | "genz"
+  | "millennial"
+  | "minimalist"
+  | "storytelling"
+  | "motivational";
 
-export type LengthType = 'short' | 'medium' | 'long';
+export type LengthType = "short" | "medium" | "long";
 
-export type PlatformType = 'instagram' | 'facebook' | 'twitter' | 'linkedin' | 'blog';
+export type PlatformType =
+  | "instagram"
+  | "facebook"
+  | "twitter"
+  | "linkedin"
+  | "blog";
 
-export type PolishType = 'summarize' | 'simple' | 'formal' | 'emotion' | 'storytelling' | 'engaging' | 'hashtag' | 'emoji' | 'question';
+export type PolishType =
+  | "summarize"
+  | "simple"
+  | "formal"
+  | "emotion"
+  | "storytelling"
+  | "engaging"
+  | "hashtag"
+  | "emoji"
+  | "question";
 
-export type UserType = 'business_manager' | 'influencer' | 'beginner' | 'casual_user';
+export type UserType =
+  | "business_manager"
+  | "influencer"
+  | "beginner"
+  | "casual_user";
 
-export type ExperienceLevel = 'beginner' | 'intermediate' | 'advanced';
+export type ExperienceLevel = "beginner" | "intermediate" | "advanced";
 
-export type PrimaryGoal = 'engagement' | 'sales' | 'awareness' | 'community';
+export type PrimaryGoal = "engagement" | "sales" | "awareness" | "community";
 
 export interface UserProfile {
   type: UserType;

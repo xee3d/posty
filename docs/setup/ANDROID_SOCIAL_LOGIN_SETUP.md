@@ -3,6 +3,7 @@
 ## 1. Google Sign-In 설정
 
 ### android/app/build.gradle 수정:
+
 ```gradle
 dependencies {
     implementation 'com.google.android.gms:play-services-auth:20.7.0'
@@ -16,9 +17,9 @@ dependencies {
 
 ```xml
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
-    
+
     <uses-permission android:name="android.permission.INTERNET" />
-    
+
     <application
         android:name=".MainApplication"
         android:label="@string/app_name"
@@ -26,15 +27,15 @@ dependencies {
         android:roundIcon="@mipmap/ic_launcher_round"
         android:allowBackup="false"
         android:theme="@style/AppTheme">
-        
+
         <!-- 기존 Activity들 -->
-        
+
         <!-- Naver Login Activity 추가 -->
         <activity
             android:name="com.naver.nid.oauth.NLoginAuthActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:theme="@android:style/Theme.Translucent.NoTitleBar" />
-            
+
     </application>
 </manifest>
 ```
@@ -46,7 +47,7 @@ dependencies {
 ```xml
 <application>
     <!-- 기존 내용들... -->
-    
+
     <!-- Kakao Login Activity -->
     <activity
         android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
@@ -55,7 +56,7 @@ dependencies {
             <action android:name="android.intent.action.VIEW" />
             <category android:name="android.intent.category.DEFAULT" />
             <category android:name="android.intent.category.BROWSABLE" />
-            
+
             <!-- "kakao{YOUR_KAKAO_APP_KEY}" 형태로 수정 필요 -->
             <data android:scheme="kakao1234567890abcdef" android:host="oauth" />
         </intent-filter>
@@ -69,7 +70,7 @@ dependencies {
 android {
     defaultConfig {
         // 기존 설정들...
-        
+
         // Kakao App Key 추가 (실제 키로 교체)
         manifestPlaceholders = [
             kakaoAppKey: "1234567890abcdef"
@@ -95,10 +96,10 @@ import com.kakao.sdk.common.KakaoSdk;
 @Override
 public void onCreate() {
     super.onCreate();
-    
+
     // Kakao SDK 초기화 (YOUR_KAKAO_APP_KEY를 실제 키로 교체)
     KakaoSdk.init(this, "YOUR_KAKAO_APP_KEY");
-    
+
     // 기존 코드...
 }
 ```
@@ -120,6 +121,7 @@ npx react-native run-android
 4. **SHA-1 지문**: Google과 Kakao는 SHA-1 인증서 지문 등록 필요
 
 ### SHA-1 지문 확인 방법:
+
 ```bash
 cd android
 ./gradlew signingReport

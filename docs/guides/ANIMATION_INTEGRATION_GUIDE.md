@@ -9,6 +9,7 @@
 ### 1. **새로운 컴포넌트**
 
 #### AnimatedWrapper
+
 - 선언적 애니메이션을 위한 래퍼 컴포넌트
 - 다양한 애니메이션 타입 지원 (fade, slide, scale, bounce 등)
 - Layout 애니메이션 자동 적용
@@ -20,6 +21,7 @@
 ```
 
 #### AnimatedScreenWrapper (업데이트됨)
+
 - 화면 전환 애니메이션 최적화
 - Reanimated 3의 entering/exiting 애니메이션 사용
 - 더 부드러운 화면 전환 효과
@@ -27,14 +29,17 @@
 ### 2. **커스텀 훅**
 
 #### useAnimatedTransition
+
 - 다양한 애니메이션 스타일을 쉽게 적용
 - fade, slide, scale, rotate, spring 애니메이션 지원
 
 ```tsx
-const { fadeStyle, slideInStyle, scaleStyle } = useAnimatedTransition(isVisible);
+const { fadeStyle, slideInStyle, scaleStyle } =
+  useAnimatedTransition(isVisible);
 ```
 
 #### useListItemAnimation
+
 - 리스트 아이템에 최적화된 애니메이션
 - 순차적 애니메이션 효과 자동 적용
 
@@ -43,12 +48,14 @@ const animatedStyle = useListItemAnimation(index, isVisible);
 ```
 
 #### useGestureAnimation
+
 - 제스처 기반 애니메이션을 위한 훅
 - pan, pinch, rotation 제스처 지원
 
 ### 3. **성능 모니터링**
 
 새로운 애니메이션 성능 유틸리티 추가:
+
 - FPS 모니터링
 - 드롭된 프레임 감지
 - 애니메이션 큐잉 및 우선순위 관리
@@ -57,19 +64,21 @@ const animatedStyle = useListItemAnimation(index, isVisible);
 ## 🎯 사용 예시
 
 ### 기본 애니메이션
+
 ```tsx
-import AnimatedWrapper from '../components/AnimatedWrapper';
+import AnimatedWrapper from "../components/AnimatedWrapper";
 
 <AnimatedWrapper animation="slide" duration={400}>
   <Card>
     <Text>안녕하세요!</Text>
   </Card>
-</AnimatedWrapper>
+</AnimatedWrapper>;
 ```
 
 ### 제스처 애니메이션
+
 ```tsx
-import { GestureDetector, Gesture } from 'react-native-gesture-handler';
+import { GestureDetector, Gesture } from "react-native-gesture-handler";
 
 const pinchGesture = Gesture.Pinch()
   .onUpdate((e) => {
@@ -80,22 +89,20 @@ const pinchGesture = Gesture.Pinch()
   });
 
 <GestureDetector gesture={pinchGesture}>
-  <Animated.View style={animatedStyle}>
-    {/* 콘텐츠 */}
-  </Animated.View>
-</GestureDetector>
+  <Animated.View style={animatedStyle}>{/* 콘텐츠 */}</Animated.View>
+</GestureDetector>;
 ```
 
 ### 리스트 애니메이션
+
 ```tsx
-{items.map((item, index) => (
-  <Animated.View
-    key={item.id}
-    style={useListItemAnimation(index, true)}
-  >
-    <ListItem data={item} />
-  </Animated.View>
-))}
+{
+  items.map((item, index) => (
+    <Animated.View key={item.id} style={useListItemAnimation(index, true)}>
+      <ListItem data={item} />
+    </Animated.View>
+  ));
+}
 ```
 
 ## ⚡ 성능 최적화 팁
@@ -110,6 +117,7 @@ const pinchGesture = Gesture.Pinch()
 ### 기존 Animated API에서 마이그레이션
 
 **이전 코드:**
+
 ```tsx
 const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -125,6 +133,7 @@ useEffect(() => {
 ```
 
 **새 코드:**
+
 ```tsx
 <AnimatedWrapper animation="fade" duration={300}>
   {/* 또는 */}
@@ -138,6 +147,7 @@ const { fadeStyle } = useAnimatedTransition(true);
 ## 📱 개발자 도구
 
 개발 환경에서 애니메이션 예시 화면 접근 가능:
+
 1. 홈 화면에서 "애니메이션" 버튼 클릭 (개발 모드에서만 표시)
 2. 다양한 애니메이션 예시 확인
 3. 성능 모니터링 결과 확인

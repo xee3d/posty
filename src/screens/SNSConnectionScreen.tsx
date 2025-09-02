@@ -1,19 +1,34 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, SafeAreaView, Linking, ActivityIndicator,  } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS } from '../utils/constants';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { ScaleButton, FadeInView, AnimatedCard } from '../components/AnimationComponents';
-import socialMediaService from '../services/socialMediaService';
-import localAnalyticsService from '../services/analytics/localAnalyticsService';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+  Linking,
+  ActivityIndicator,
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import { COLORS, FONTS, SPACING, BORDER_RADIUS } from "../utils/constants";
+import { useAppTheme } from "../hooks/useAppTheme";
+import {
+  ScaleButton,
+  FadeInView,
+  AnimatedCard,
+} from "../components/AnimationComponents";
+import socialMediaService from "../services/socialMediaService";
+import localAnalyticsService from "../services/analytics/localAnalyticsService";
 
-import { Alert } from '../utils/customAlert';
+import { Alert } from "../utils/customAlert";
 interface SNSConnectionScreenProps {
   onClose: () => void;
 }
 
-const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({ onClose }) => {
+const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
+  onClose,
+}) => {
   const { colors, cardTheme } = useAppTheme();
   const [connectedAccounts, setConnectedAccounts] = useState({
     instagram: false,
@@ -34,43 +49,46 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({ onClose }) =>
     });
   };
 
-  const handleConnect = async (platform: 'instagram' | 'facebook') => {
+  const handleConnect = async (platform: "instagram" | "facebook") => {
     Alert.alert(
-      `${platform === 'instagram' ? 'Instagram' : 'Facebook'} 연동`,
-      '연동 기능은 앱 설정이 필요합니다.\n\n필요한 것:\n' +
-      '1. Facebook 개발자 계정\n' +
-      '2. 앱 등록 및 심사\n' +
-      '3. OAuth 설정\n\n' +
-      '자세한 내용은 설정 가이드를 참고하세요.',
+      `${platform === "instagram" ? "Instagram" : "Facebook"} 연동`,
+      "연동 기능은 앱 설정이 필요합니다.\n\n필요한 것:\n" +
+        "1. Facebook 개발자 계정\n" +
+        "2. 앱 등록 및 심사\n" +
+        "3. OAuth 설정\n\n" +
+        "자세한 내용은 설정 가이드를 참고하세요.",
       [
-        { text: '취소', style: 'cancel' },
-        { 
-          text: '가이드 보기', 
+        { text: "취소", style: "cancel" },
+        {
+          text: "가이드 보기",
           onPress: () => {
-            const guideUrl = platform === 'instagram' 
-              ? 'https://developers.facebook.com/docs/instagram-basic-display-api'
-              : 'https://developers.facebook.com/docs/pages-api';
+            const guideUrl =
+              platform === "instagram"
+                ? "https://developers.facebook.com/docs/instagram-basic-display-api"
+                : "https://developers.facebook.com/docs/pages-api";
             Linking.openURL(guideUrl);
-          }
-        }
+          },
+        },
       ]
     );
   };
 
-  const handleDisconnect = async (platform: 'instagram' | 'facebook') => {
+  const handleDisconnect = async (platform: "instagram" | "facebook") => {
     Alert.alert(
-      '연동 해제',
-      `${platform === 'instagram' ? 'Instagram' : 'Facebook'} 연동을 해제하시겠습니까?`,
+      "연동 해제",
+      `${
+        platform === "instagram" ? "Instagram" : "Facebook"
+      } 연동을 해제하시겠습니까?`,
       [
-        { text: '취소', style: 'cancel' },
+        { text: "취소", style: "cancel" },
         {
-          text: '해제',
-          style: 'destructive',
+          text: "해제",
+          style: "destructive",
           onPress: async () => {
-            await socialMediaService.saveAccessToken(platform, '');
+            await socialMediaService.saveAccessToken(platform, "");
             checkConnections();
-          }
-        }
+          },
+        },
       ]
     );
   };
@@ -81,18 +99,16 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({ onClose }) =>
       // 모든 연결된 게시물의 인사이트 동기화
       await socialMediaService.syncAllPostInsights();
       setLastSyncTime(new Date().toLocaleString());
-      
+
       Alert.alert(
-        '동기화 완료',
-        'SNS 데이터가 성공적으로 업데이트되었습니다.',
-        [{ text: '확인' }]
+        "동기화 완료",
+        "SNS 데이터가 성공적으로 업데이트되었습니다.",
+        [{ text: "확인" }]
       );
     } catch (error) {
-      Alert.alert(
-        '동기화 실패',
-        '데이터를 가져오는 중 문제가 발생했습니다.',
-        [{ text: '확인' }]
-      );
+      Alert.alert("동기화 실패", "데이터를 가져오는 중 문제가 발생했습니다.", [
+        { text: "확인" },
+      ]);
     } finally {
       setIsSyncing(false);
     }
@@ -116,7 +132,8 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({ onClose }) =>
             <View style={styles.infoCard}>
               <MaterialIcon name="info" size={20} color={colors.primary} />
               <Text style={styles.infoText}>
-                SNS 계정을 연동하면 좋아요, 댓글 등의 성과를 자동으로 가져올 수 있어요!
+                SNS 계정을 연동하면 좋아요, 댓글 등의 성과를 자동으로 가져올 수
+                있어요!
               </Text>
             </View>
           </View>
@@ -124,7 +141,7 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({ onClose }) =>
 
         <View style={styles.accountsSection}>
           <Text style={styles.sectionTitle}>SNS 계정 연동</Text>
-          
+
           {/* Instagram */}
           <AnimatedCard delay={100} style={styles.accountCard}>
             <View style={styles.accountHeader}>
@@ -133,21 +150,21 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({ onClose }) =>
                 <View style={styles.accountDetails}>
                   <Text style={styles.accountName}>Instagram</Text>
                   <Text style={styles.accountStatus}>
-                    {connectedAccounts.instagram ? '연동됨' : '연동 안됨'}
+                    {connectedAccounts.instagram ? "연동됨" : "연동 안됨"}
                   </Text>
                 </View>
               </View>
               {connectedAccounts.instagram ? (
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.disconnectButton}
-                  onPress={() => handleDisconnect('instagram')}
+                  onPress={() => handleDisconnect("instagram")}
                 >
                   <Text style={styles.disconnectText}>연동 해제</Text>
                 </TouchableOpacity>
               ) : (
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.connectButton}
-                  onPress={() => handleConnect('instagram')}
+                  onPress={() => handleConnect("instagram")}
                 >
                   <Text style={styles.connectText}>연동하기</Text>
                 </TouchableOpacity>
@@ -157,7 +174,9 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({ onClose }) =>
               <View style={styles.accountFeatures}>
                 <View style={styles.featureItem}>
                   <Icon name="checkmark-circle" size={16} color="#10B981" />
-                  <Text style={styles.featureText}>좋아요 수 자동 업데이트</Text>
+                  <Text style={styles.featureText}>
+                    좋아요 수 자동 업데이트
+                  </Text>
                 </View>
                 <View style={styles.featureItem}>
                   <Icon name="checkmark-circle" size={16} color="#10B981" />
@@ -179,21 +198,21 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({ onClose }) =>
                 <View style={styles.accountDetails}>
                   <Text style={styles.accountName}>Facebook</Text>
                   <Text style={styles.accountStatus}>
-                    {connectedAccounts.facebook ? '연동됨' : '연동 안됨'}
+                    {connectedAccounts.facebook ? "연동됨" : "연동 안됨"}
                   </Text>
                 </View>
               </View>
               {connectedAccounts.facebook ? (
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.disconnectButton}
-                  onPress={() => handleDisconnect('facebook')}
+                  onPress={() => handleDisconnect("facebook")}
                 >
                   <Text style={styles.disconnectText}>연동 해제</Text>
                 </TouchableOpacity>
               ) : (
-                <TouchableOpacity 
+                <TouchableOpacity
                   style={styles.connectButton}
-                  onPress={() => handleConnect('facebook')}
+                  onPress={() => handleConnect("facebook")}
                 >
                   <Text style={styles.connectText}>연동하기</Text>
                 </TouchableOpacity>
@@ -223,7 +242,7 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({ onClose }) =>
           <FadeInView delay={300}>
             <View style={styles.syncSection}>
               <Text style={styles.sectionTitle}>데이터 동기화</Text>
-              
+
               <View style={styles.syncCard}>
                 <MaterialIcon name="sync" size={24} color={colors.primary} />
                 <View style={styles.syncInfo}>
@@ -286,9 +305,9 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       backgroundColor: colors.background,
     },
     header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
       paddingHorizontal: SPACING.lg,
       paddingVertical: SPACING.md,
       borderBottomWidth: 1,
@@ -299,7 +318,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     headerTitle: {
       fontSize: 18,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
     },
     content: {
@@ -309,8 +328,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       padding: SPACING.lg,
     },
     infoCard: {
-      flexDirection: 'row',
-      backgroundColor: colors.primary + '15',
+      flexDirection: "row",
+      backgroundColor: colors.primary + "15",
       padding: SPACING.md,
       borderRadius: 12,
       gap: SPACING.sm,
@@ -326,7 +345,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     sectionTitle: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
       marginBottom: SPACING.md,
     },
@@ -338,13 +357,13 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       ...cardTheme.default.shadow,
     },
     accountHeader: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
     },
     accountInfo: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.md,
     },
     accountDetails: {
@@ -352,7 +371,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     accountName: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
     },
     accountStatus: {
@@ -367,7 +386,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     connectText: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.white,
     },
     disconnectButton: {
@@ -380,7 +399,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     disconnectText: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.secondary,
     },
     accountFeatures: {
@@ -391,8 +410,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       gap: SPACING.xs,
     },
     featureItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.xs,
     },
     featureText: {
@@ -404,11 +423,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       marginTop: SPACING.xl,
     },
     syncCard: {
-      flexDirection: 'row',
+      flexDirection: "row",
       backgroundColor: colors.surface,
       borderRadius: 12,
       padding: SPACING.lg,
-      alignItems: 'center',
+      alignItems: "center",
       gap: SPACING.md,
       ...cardTheme.default.shadow,
     },
@@ -417,7 +436,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     syncTitle: {
       fontSize: 15,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
       marginBottom: 4,
     },
@@ -437,11 +456,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       paddingVertical: SPACING.sm,
       borderRadius: 20,
       minWidth: 80,
-      alignItems: 'center',
+      alignItems: "center",
     },
     syncButtonText: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.white,
     },
     noteSection: {
@@ -450,7 +469,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
     },
     noteTitle: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.secondary,
       marginBottom: SPACING.sm,
     },

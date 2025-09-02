@@ -1,5 +1,5 @@
-import { useRef, useEffect } from 'react';
-import { Animated, Easing } from 'react-native';
+import { useRef, useEffect } from "react";
+import { Animated, Easing } from "react-native";
 
 interface FadeInOptions {
   duration?: number;
@@ -8,7 +8,7 @@ interface FadeInOptions {
 }
 
 interface SlideInOptions extends FadeInOptions {
-  direction?: 'up' | 'down' | 'left' | 'right';
+  direction?: "up" | "down" | "left" | "right";
   distance?: number;
 }
 
@@ -17,10 +17,10 @@ interface ScaleOptions extends FadeInOptions {
   toValue?: number;
 }
 
-export const useFadeIn = ({ 
-  duration = 300, 
-  delay = 0, 
-  toValue = 1 
+export const useFadeIn = ({
+  duration = 300,
+  delay = 0,
+  toValue = 1,
 }: FadeInOptions = {}) => {
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -36,10 +36,10 @@ export const useFadeIn = ({
   return fadeAnim;
 };
 
-export const useSlideIn = ({ 
-  duration = 300, 
-  delay = 0, 
-  direction = 'up',
+export const useSlideIn = ({
+  duration = 300,
+  delay = 0,
+  direction = "up",
   distance = 50,
 }: SlideInOptions = {}) => {
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -47,17 +47,22 @@ export const useSlideIn = ({
 
   const getTranslateValue = () => {
     switch (direction) {
-      case 'up': return distance;
-      case 'down': return -distance;
-      case 'left': return distance;
-      case 'right': return -distance;
-      default: return distance;
+      case "up":
+        return distance;
+      case "down":
+        return -distance;
+      case "left":
+        return distance;
+      case "right":
+        return -distance;
+      default:
+        return distance;
     }
   };
 
   useEffect(() => {
     slideAnim.setValue(getTranslateValue());
-    
+
     Animated.parallel([
       Animated.timing(slideAnim, {
         toValue: 0,
@@ -77,11 +82,11 @@ export const useSlideIn = ({
 
   const getTransform = () => {
     switch (direction) {
-      case 'up':
-      case 'down':
+      case "up":
+      case "down":
         return { translateY: slideAnim };
-      case 'left':
-      case 'right':
+      case "left":
+      case "right":
         return { translateX: slideAnim };
       default:
         return { translateY: slideAnim };
@@ -94,9 +99,9 @@ export const useSlideIn = ({
   };
 };
 
-export const useScale = ({ 
-  duration = 200, 
-  delay = 0, 
+export const useScale = ({
+  duration = 200,
+  delay = 0,
   fromValue = 0.9,
   toValue = 1,
 }: ScaleOptions = {}) => {
@@ -128,9 +133,15 @@ export const useScale = ({
 };
 
 // 스태거 애니메이션 훅
-export const useStaggerAnimation = (count: number, baseDelay: number = 0, increment: number = 50) => {
+export const useStaggerAnimation = (
+  count: number,
+  baseDelay: number = 0,
+  increment: number = 50
+) => {
   const animations = useRef(
-    Array(count).fill(0).map(() => new Animated.Value(0))
+    Array(count)
+      .fill(0)
+      .map(() => new Animated.Value(0))
   ).current;
 
   useEffect(() => {
@@ -171,7 +182,7 @@ export const useTabTransition = () => {
       // 새 화면 초기 위치 설정
       translateXAnim.setValue(direction * 20);
       onComplete();
-      
+
       // 새 화면 페이드 인
       Animated.parallel([
         Animated.timing(fadeAnim, {

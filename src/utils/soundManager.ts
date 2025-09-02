@@ -1,8 +1,8 @@
-import Sound from 'react-native-sound';
-import { Vibration, Platform } from 'react-native';
+import Sound from "react-native-sound";
+import { Vibration, Platform } from "react-native";
 
 // 사운드 활성화 설정
-Sound.setCategory('Playback');
+Sound.setCategory("Playback");
 
 class SoundManager {
   private sounds: { [key: string]: Sound | null } = {};
@@ -18,18 +18,20 @@ class SoundManager {
   private loadSounds() {
     // 사운드 파일들을 미리 로드
     const soundFiles = {
-      success: 'success.mp3',
-      tap: 'tap.mp3',
-      generate: 'generate.mp3',
-      copy: 'copy.mp3',
-      error: 'error.mp3',
-      celebration: 'celebration.mp3', // 폭죽/축하 사운드 추가
+      success: "success.mp3",
+      tap: "tap.mp3",
+      generate: "generate.mp3",
+      copy: "copy.mp3",
+      error: "error.mp3",
+      celebration: "celebration.mp3", // 폭죽/축하 사운드 추가
     };
 
     Object.entries(soundFiles).forEach(([key, filename]) => {
       const sound = new Sound(filename, Sound.MAIN_BUNDLE, (error) => {
         if (error) {
-          console.log(`Sound file not found: ${filename}. Using haptic feedback only.`);
+          console.log(
+            `Sound file not found: ${filename}. Using haptic feedback only.`
+          );
           this.sounds[key] = null;
         } else {
           // 볼륨 설정 (시스템 볼륨의 70%)
@@ -40,13 +42,15 @@ class SoundManager {
         }
       });
     });
-    
+
     this.isInitialized = true;
   }
 
   // 사운드 재생
   play(soundName: keyof typeof this.sounds) {
-    if (!this.isSoundEnabled) return;
+    if (!this.isSoundEnabled) {
+      return;
+    }
 
     const sound = this.sounds[soundName];
     if (sound) {
@@ -61,8 +65,10 @@ class SoundManager {
   }
 
   // 햅틱 피드백
-  haptic(type: 'light' | 'medium' | 'heavy' = 'light') {
-    if (!this.isVibrationEnabled) return;
+  haptic(type: "light" | "medium" | "heavy" = "light") {
+    if (!this.isVibrationEnabled) {
+      return;
+    }
 
     try {
       const duration = {
@@ -73,68 +79,68 @@ class SoundManager {
 
       Vibration.vibrate(duration[type]);
     } catch (error) {
-      console.log('Vibration error:', error);
+      console.log("Vibration error:", error);
       // 진동 실패시에도 앱이 크래시되지 않도록 함
     }
   }
 
   // 버튼 탭 피드백
   playTap() {
-    this.play('tap');
-    this.haptic('light');
+    this.play("tap");
+    this.haptic("light");
   }
 
   // 성공 피드백 (기존)
   playSuccess() {
-    this.play('success');
-    this.haptic('medium');
+    this.play("success");
+    this.haptic("medium");
   }
-  
+
   // 축하 피드백 (새로 추가)
   playCelebration() {
     // celebration 사운드가 없으면 success 사운드 재생
     if (this.sounds.celebration) {
-      this.play('celebration');
+      this.play("celebration");
     } else {
-      this.play('success');
+      this.play("success");
     }
     // 축하 진동 패턴
-    if (this.isVibrationEnabled && Platform.OS !== 'web') {
+    if (this.isVibrationEnabled && Platform.OS !== "web") {
       Vibration.vibrate([0, 100, 50, 100, 50, 200]);
     }
   }
 
   // 복사 피드백
   playCopy() {
-    this.play('copy');
-    this.haptic('light');
+    this.play("copy");
+    this.haptic("light");
   }
 
   // AI 생성 시작
   playGenerate() {
-    this.play('generate');
-    this.haptic('medium');
+    this.play("generate");
+    this.haptic("medium");
   }
 
   // 에러 피드백
   playError() {
-    this.play('error');
+    this.play("error");
     try {
-      if (Platform.OS === 'ios') {
+      if (Platform.OS === "ios") {
         // iOS는 더 부드러운 햅틱 지원
         Vibration.vibrate([0, 10, 50, 10]);
       } else {
-        this.haptic('heavy');
+        this.haptic("heavy");
       }
     } catch (error) {
-      console.log('Vibration error in playError:', error);
+      console.log("Vibration error in playError:", error);
     }
   }
 
   // 새로고침 피드백
   playRefresh() {
-    this.play('tap');
-    this.haptic('light');
+    this.play("tap");
+    this.haptic("light");
   }
 
   // 설정 토글
@@ -148,7 +154,7 @@ class SoundManager {
 
   // 메모리 정리
   release() {
-    Object.values(this.sounds).forEach(sound => {
+    Object.values(this.sounds).forEach((sound) => {
       if (sound) {
         sound.release();
       }

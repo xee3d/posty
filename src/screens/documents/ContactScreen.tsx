@@ -1,73 +1,93 @@
-import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, Linking, Pressable,  } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { COLORS, SPACING, BORDER_RADIUS, FONT_SIZES } from '../../utils/constants';
-import { useAppTheme } from '../../hooks/useAppTheme';
-import Clipboard from '@react-native-clipboard/clipboard';
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  StyleSheet,
+  SafeAreaView,
+  TouchableOpacity,
+  TextInput,
+  KeyboardAvoidingView,
+  Platform,
+  Linking,
+  Pressable,
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import {
+  COLORS,
+  SPACING,
+  BORDER_RADIUS,
+  FONT_SIZES,
+} from "../../utils/constants";
+import { useAppTheme } from "../../hooks/useAppTheme";
+import Clipboard from "@react-native-clipboard/clipboard";
 
-import { Alert } from '../../utils/customAlert';
+import { Alert } from "../../utils/customAlert";
 interface ContactScreenProps {
   onBack: () => void;
   onNavigate?: (screen: string) => void;
 }
 
-const ContactScreen: React.FC<ContactScreenProps> = ({ onBack, onNavigate }) => {
+const ContactScreen: React.FC<ContactScreenProps> = ({
+  onBack,
+  onNavigate,
+}) => {
   const { colors } = useAppTheme();
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
-  const [subject, setSubject] = useState('');
-  const [message, setMessage] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const styles = createStyles(colors);
 
   const categories = [
-    { id: 'bug', label: '버그 신고', icon: 'bug' },
-    { id: 'feature', label: '기능 제안', icon: 'bulb' },
-    { id: 'payment', label: '결제 문의', icon: 'card' },
-    { id: 'other', label: '기타 문의', icon: 'help-circle' },
+    { id: "bug", label: "버그 신고", icon: "bug" },
+    { id: "feature", label: "기능 제안", icon: "bulb" },
+    { id: "payment", label: "결제 문의", icon: "card" },
+    { id: "other", label: "기타 문의", icon: "help-circle" },
   ];
 
   const handleCopyEmail = () => {
-    Clipboard.setString('getposty@gmail.com');
-    Alert.alert('복사 완료', 'getposty@gmail.com이 클립보드에 복사되었어요!');
+    Clipboard.setString("getposty@gmail.com");
+    Alert.alert("복사 완료", "getposty@gmail.com이 클립보드에 복사되었어요!");
   };
 
   const handleOpenEmail = async () => {
-    const email = 'getposty@gmail.com';
-    
+    const email = "getposty@gmail.com";
+
     try {
       const simpleMailUrl = `mailto:${email}`;
-      console.log('Trying to open email with URL:', simpleMailUrl);
-      
+      console.log("Trying to open email with URL:", simpleMailUrl);
+
       // iOS/Android에서 더 직접적인 접근 시도
       try {
         await Linking.openURL(simpleMailUrl);
-        console.log('Email app opened successfully');
+        console.log("Email app opened successfully");
         return; // 성공하면 바로 종료
       } catch (openError) {
-        console.log('Direct open failed, checking canOpenURL:', openError);
-        
+        console.log("Direct open failed, checking canOpenURL:", openError);
+
         // 직접 열기가 실패하면 canOpenURL로 확인
-        const canOpen = await Linking.canOpenURL('mailto:');
-        console.log('Can open mailto scheme:', canOpen);
-        
+        const canOpen = await Linking.canOpenURL("mailto:");
+        console.log("Can open mailto scheme:", canOpen);
+
         if (canOpen) {
           // 다시 한번 시도
           await Linking.openURL(simpleMailUrl);
-          console.log('Email app opened on retry');
+          console.log("Email app opened on retry");
         } else {
           // 정말 이메일 앱이 없는 경우
-          throw new Error('No email app available');
+          throw new Error("No email app available");
         }
       }
     } catch (error) {
-      console.error('All email opening methods failed:', error);
+      console.error("All email opening methods failed:", error);
       Alert.alert(
-        '이메일 앱을 열 수 없어요',
-        'getposty@gmail.com 주소를 복사해서 직접 이메일을 보내주세요.',
+        "이메일 앱을 열 수 없어요",
+        "getposty@gmail.com 주소를 복사해서 직접 이메일을 보내주세요.",
         [
-          { text: '취소', style: 'cancel' },
-          { text: '이메일 복사', onPress: handleCopyEmail }
+          { text: "취소", style: "cancel" },
+          { text: "이메일 복사", onPress: handleCopyEmail },
         ]
       );
     }
@@ -75,61 +95,75 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ onBack, onNavigate }) => 
 
   const handleSubmit = async () => {
     if (!subject.trim() || !message.trim() || !selectedCategory) {
-      Alert.alert('알림', '모든 필드를 입력해주세요.');
+      Alert.alert("알림", "모든 필드를 입력해주세요.");
       return;
     }
 
-    const email = 'getposty@gmail.com';
-    const categoryLabel = categories.find(c => c.id === selectedCategory)?.label || '문의';
-    
+    const email = "getposty@gmail.com";
+    const categoryLabel =
+      categories.find((c) => c.id === selectedCategory)?.label || "문의";
+
     try {
-      const encodedSubject = encodeURIComponent(`[${categoryLabel}] ${subject}`);
+      const encodedSubject = encodeURIComponent(
+        `[${categoryLabel}] ${subject}`
+      );
       const encodedBody = encodeURIComponent(message);
       const fullMailUrl = `mailto:${email}?subject=${encodedSubject}&body=${encodedBody}`;
-      
-      console.log('Trying to open email with content:', fullMailUrl);
-      
+
+      console.log("Trying to open email with content:", fullMailUrl);
+
       // 직접 열기 시도
       try {
         await Linking.openURL(fullMailUrl);
-        console.log('Email app opened with content');
+        console.log("Email app opened with content");
         return;
       } catch (openError) {
-        console.log('Full mailto URL failed, trying simple version:', openError);
-        
+        console.log(
+          "Full mailto URL failed, trying simple version:",
+          openError
+        );
+
         // 파라미터가 있는 URL이 실패하면 간단한 버전으로 시도
         const simpleMailUrl = `mailto:${email}`;
         await Linking.openURL(simpleMailUrl);
-        console.log('Email app opened with simple URL');
-        
+        console.log("Email app opened with simple URL");
+
         // 사용자에게 수동으로 내용 입력하라고 알림
         Alert.alert(
-          '이메일 앱이 열렸습니다',
+          "이메일 앱이 열렸습니다",
           `제목: [${categoryLabel}] ${subject}\n\n${message}\n\n위 내용을 복사해서 이메일에 붙여넣어 주세요.`,
           [
-            { text: '내용 복사', onPress: () => {
-              const emailContent = `제목: [${categoryLabel}] ${subject}\n\n${message}`;
-              Clipboard.setString(emailContent);
-              Alert.alert('복사됨', '이메일 내용이 복사되었습니다.');
-            }},
-            { text: '확인' }
+            {
+              text: "내용 복사",
+              onPress: () => {
+                const emailContent = `제목: [${categoryLabel}] ${subject}\n\n${message}`;
+                Clipboard.setString(emailContent);
+                Alert.alert("복사됨", "이메일 내용이 복사되었습니다.");
+              },
+            },
+            { text: "확인" },
           ]
         );
       }
     } catch (error) {
-      console.error('All email methods failed:', error);
+      console.error("All email methods failed:", error);
       // 모든 방법이 실패하면 복사 옵션 제공
       Alert.alert(
-        '이메일 앱을 열 수 없어요',
-        '이메일 주소와 내용을 복사해서 직접 보내주세요.',
+        "이메일 앱을 열 수 없어요",
+        "이메일 주소와 내용을 복사해서 직접 보내주세요.",
         [
-          { text: '취소', style: 'cancel' },
-          { text: '내용 복사', onPress: () => {
-            const categoryLabel = categories.find(c => c.id === selectedCategory)?.label || '문의';
-            const emailContent = `받는 사람: getposty@gmail.com\n제목: [${categoryLabel}] ${subject}\n\n${message}`;
-            Clipboard.setString(emailContent);
-            Alert.alert('복사됨', '이메일 정보가 모두 복사되었습니다.');
-          }}
+          { text: "취소", style: "cancel" },
+          {
+            text: "내용 복사",
+            onPress: () => {
+              const categoryLabel =
+                categories.find((c) => c.id === selectedCategory)?.label ||
+                "문의";
+              const emailContent = `받는 사람: getposty@gmail.com\n제목: [${categoryLabel}] ${subject}\n\n${message}`;
+              Clipboard.setString(emailContent);
+              Alert.alert("복사됨", "이메일 정보가 모두 복사되었습니다.");
+            },
+          },
         ]
       );
     }
@@ -138,7 +172,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ onBack, onNavigate }) => 
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
       >
         {/* 헤더 */}
@@ -164,13 +198,26 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ onBack, onNavigate }) => 
             </View>
             <Text style={styles.emailAddress}>getposty@gmail.com</Text>
             <View style={styles.emailActions}>
-              <TouchableOpacity style={styles.emailButton} onPress={handleCopyEmail}>
+              <TouchableOpacity
+                style={styles.emailButton}
+                onPress={handleCopyEmail}
+              >
                 <Icon name="copy-outline" size={18} color={colors.primary} />
                 <Text style={styles.emailButtonText}>복사</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.emailButton, styles.emailButtonPrimary]} onPress={() => handleOpenEmail()}>
+              <TouchableOpacity
+                style={[styles.emailButton, styles.emailButtonPrimary]}
+                onPress={() => handleOpenEmail()}
+              >
                 <Icon name="mail-outline" size={18} color={colors.white} />
-                <Text style={[styles.emailButtonText, styles.emailButtonTextPrimary]}>이메일 앱 열기</Text>
+                <Text
+                  style={[
+                    styles.emailButtonText,
+                    styles.emailButtonTextPrimary,
+                  ]}
+                >
+                  이메일 앱 열기
+                </Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -178,8 +225,10 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ onBack, onNavigate }) => 
           {/* 빠른 문의 양식 */}
           <View style={styles.formSection}>
             <Text style={styles.formTitle}>빠른 문의</Text>
-            <Text style={styles.formSubtitle}>아래 양식을 작성하면 이메일 앱에서 바로 보낼 수 있어요</Text>
-            
+            <Text style={styles.formSubtitle}>
+              아래 양식을 작성하면 이메일 앱에서 바로 보낼 수 있어요
+            </Text>
+
             {/* 카테고리 선택 */}
             <View style={styles.categoryContainer}>
               {categories.map((category) => (
@@ -187,19 +236,25 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ onBack, onNavigate }) => 
                   key={category.id}
                   style={[
                     styles.categoryButton,
-                    selectedCategory === category.id && styles.categoryButtonActive,
+                    selectedCategory === category.id &&
+                      styles.categoryButtonActive,
                   ]}
                   onPress={() => setSelectedCategory(category.id)}
                 >
                   <Icon
                     name={category.icon}
                     size={16}
-                    color={selectedCategory === category.id ? colors.white : colors.text.secondary}
+                    color={
+                      selectedCategory === category.id
+                        ? colors.white
+                        : colors.text.secondary
+                    }
                   />
                   <Text
                     style={[
                       styles.categoryText,
-                      selectedCategory === category.id && styles.categoryTextActive,
+                      selectedCategory === category.id &&
+                        styles.categoryTextActive,
                     ]}
                   >
                     {category.label}
@@ -248,11 +303,21 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ onBack, onNavigate }) => 
           {/* 안내사항 */}
           <View style={styles.infoSection}>
             <View style={styles.infoItem}>
-              <Icon name="time-outline" size={20} color={colors.text.secondary} />
-              <Text style={styles.infoText}>평일 기준 24시간 이내 답변드려요</Text>
+              <Icon
+                name="time-outline"
+                size={20}
+                color={colors.text.secondary}
+              />
+              <Text style={styles.infoText}>
+                평일 기준 24시간 이내 답변드려요
+              </Text>
             </View>
             <View style={styles.infoItem}>
-              <Icon name="globe-outline" size={20} color={colors.text.secondary} />
+              <Icon
+                name="globe-outline"
+                size={20}
+                color={colors.text.secondary}
+              />
               <Text style={styles.infoText}>한국어와 영어로 문의 가능해요</Text>
             </View>
           </View>
@@ -265,7 +330,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({ onBack, onNavigate }) => 
 };
 
 const createStyles = (colors: typeof COLORS) => {
-  const isDark = colors.background === '#1A202C';
+  const isDark = colors.background === "#1A202C";
 
   return StyleSheet.create({
     container: {
@@ -276,9 +341,9 @@ const createStyles = (colors: typeof COLORS) => {
       flex: 1,
     },
     header: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
       paddingHorizontal: SPACING.md,
       paddingVertical: SPACING.md,
     },
@@ -287,12 +352,12 @@ const createStyles = (colors: typeof COLORS) => {
       height: 40,
       borderRadius: 20,
       backgroundColor: colors.surface,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: "center",
+      alignItems: "center",
     },
     headerTitle: {
       fontSize: 18,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
     },
     placeholder: {
@@ -311,34 +376,34 @@ const createStyles = (colors: typeof COLORS) => {
       padding: SPACING.lg,
       borderRadius: BORDER_RADIUS.lg,
       borderWidth: 1,
-      borderColor: colors.primary + '30',
+      borderColor: colors.primary + "30",
     },
     emailHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.sm,
       marginBottom: SPACING.sm,
     },
     emailTitle: {
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.primary,
     },
     emailAddress: {
       fontSize: 18,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.primary,
       marginBottom: SPACING.md,
     },
     emailActions: {
-      flexDirection: 'row',
+      flexDirection: "row",
       gap: SPACING.sm,
     },
     emailButton: {
       flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
       gap: SPACING.xs,
       paddingVertical: SPACING.sm,
       borderRadius: BORDER_RADIUS.md,
@@ -351,7 +416,7 @@ const createStyles = (colors: typeof COLORS) => {
     },
     emailButtonText: {
       fontSize: FONT_SIZES.small,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.primary,
     },
     emailButtonTextPrimary: {
@@ -363,7 +428,7 @@ const createStyles = (colors: typeof COLORS) => {
     },
     formTitle: {
       fontSize: 18,
-      fontWeight: '700',
+      fontWeight: "700",
       color: colors.text.primary,
       marginBottom: SPACING.xs,
     },
@@ -373,14 +438,14 @@ const createStyles = (colors: typeof COLORS) => {
       marginBottom: SPACING.lg,
     },
     categoryContainer: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
+      flexDirection: "row",
+      flexWrap: "wrap",
       gap: SPACING.sm,
       marginBottom: SPACING.lg,
     },
     categoryButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       paddingVertical: SPACING.sm,
       paddingHorizontal: SPACING.md,
       borderRadius: BORDER_RADIUS.full,
@@ -395,7 +460,7 @@ const createStyles = (colors: typeof COLORS) => {
     },
     categoryText: {
       fontSize: FONT_SIZES.small,
-      fontWeight: '500',
+      fontWeight: "500",
       color: colors.text.secondary,
     },
     categoryTextActive: {
@@ -406,7 +471,7 @@ const createStyles = (colors: typeof COLORS) => {
     },
     inputLabel: {
       fontSize: FONT_SIZES.small,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.text.secondary,
       marginBottom: SPACING.sm,
     },
@@ -425,9 +490,9 @@ const createStyles = (colors: typeof COLORS) => {
       paddingTop: SPACING.md,
     },
     submitButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
       backgroundColor: colors.primary,
       paddingVertical: SPACING.md,
       borderRadius: BORDER_RADIUS.md,
@@ -435,7 +500,7 @@ const createStyles = (colors: typeof COLORS) => {
     },
     submitButtonText: {
       fontSize: FONT_SIZES.medium,
-      fontWeight: '600',
+      fontWeight: "600",
       color: colors.white,
     },
     infoSection: {
@@ -444,8 +509,8 @@ const createStyles = (colors: typeof COLORS) => {
       gap: SPACING.sm,
     },
     infoItem: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.sm,
     },
     infoText: {

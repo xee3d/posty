@@ -1,274 +1,362 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Posty - 사용자 데이터 삭제 안내</title>
     <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        .container {
-            background-color: white;
-            padding: 40px;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #1877f2;
-            border-bottom: 3px solid #1877f2;
-            padding-bottom: 10px;
-        }
-        h2 {
-            color: #444;
-            margin-top: 30px;
-        }
-        .update-date {
-            color: #666;
-            font-size: 14px;
-            margin-bottom: 30px;
-        }
-        .method-box {
-            background-color: #f0f2f5;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border-left: 4px solid #1877f2;
-        }
-        .method-box h3 {
-            margin-top: 0;
-            color: #1877f2;
-        }
-        ol, ul {
-            padding-left: 30px;
-        }
-        li {
-            margin-bottom: 10px;
-        }
-        .warning {
-            background-color: #fff3cd;
-            border: 1px solid #ffeaa7;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 20px 0;
-        }
-        .contact {
-            background-color: #e3f2fd;
-            padding: 20px;
-            border-radius: 5px;
-            margin-top: 30px;
-        }
-        code {
-            background-color: #f5f5f5;
-            padding: 2px 5px;
-            border-radius: 3px;
-            font-family: monospace;
-        }
-        .email-template {
-            background-color: #f8f9fa;
-            border: 1px solid #dee2e6;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-            font-family: monospace;
-            font-size: 14px;
-        }
-        .immediate-deletion {
-            background-color: #d4edda;
-            border: 1px solid #c3e6cb;
-            padding: 15px;
-            border-radius: 5px;
-            margin: 15px 0;
-        }
-        .step-number {
-            background-color: #1877f2;
-            color: white;
-            border-radius: 50%;
-            width: 25px;
-            height: 25px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px;
-            font-weight: bold;
-            font-size: 14px;
-        }
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+      }
+      .container {
+        background-color: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      }
+      h1 {
+        color: #1877f2;
+        border-bottom: 3px solid #1877f2;
+        padding-bottom: 10px;
+      }
+      h2 {
+        color: #444;
+        margin-top: 30px;
+      }
+      .update-date {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 30px;
+      }
+      .method-box {
+        background-color: #f0f2f5;
+        padding: 20px;
+        border-radius: 8px;
+        margin: 20px 0;
+        border-left: 4px solid #1877f2;
+      }
+      .method-box h3 {
+        margin-top: 0;
+        color: #1877f2;
+      }
+      ol,
+      ul {
+        padding-left: 30px;
+      }
+      li {
+        margin-bottom: 10px;
+      }
+      .warning {
+        background-color: #fff3cd;
+        border: 1px solid #ffeaa7;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+      .contact {
+        background-color: #e3f2fd;
+        padding: 20px;
+        border-radius: 5px;
+        margin-top: 30px;
+      }
+      code {
+        background-color: #f5f5f5;
+        padding: 2px 5px;
+        border-radius: 3px;
+        font-family: monospace;
+      }
+      .email-template {
+        background-color: #f8f9fa;
+        border: 1px solid #dee2e6;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+        font-family: monospace;
+        font-size: 14px;
+      }
+      .immediate-deletion {
+        background-color: #d4edda;
+        border: 1px solid #c3e6cb;
+        padding: 15px;
+        border-radius: 5px;
+        margin: 15px 0;
+      }
+      .step-number {
+        background-color: #1877f2;
+        color: white;
+        border-radius: 50%;
+        width: 25px;
+        height: 25px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 10px;
+        font-weight: bold;
+        font-size: 14px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <h1>Posty 사용자 데이터 삭제 안내</h1>
-        <p class="update-date">최종 업데이트: 2025년 8월 28일</p>
+      <h1>Posty 사용자 데이터 삭제 안내</h1>
+      <p class="update-date">최종 업데이트: 2025년 8월 28일</p>
 
-        <p>Posty는 사용자의 개인정보 자기결정권을 존중하며, 언제든지 본인의 데이터 삭제를 요청할 수 있습니다. GDPR 및 개인정보보호법에 따라 사용자의 '잊힐 권리'를 보장합니다.</p>
+      <p>
+        Posty는 사용자의 개인정보 자기결정권을 존중하며, 언제든지 본인의 데이터
+        삭제를 요청할 수 있습니다. GDPR 및 개인정보보호법에 따라 사용자의 '잊힐
+        권리'를 보장합니다.
+      </p>
 
-        <h2>데이터 삭제 요청 방법</h2>
+      <h2>데이터 삭제 요청 방법</h2>
 
-        <div class="method-box">
-            <h3>🚀 방법 1: 앱 내에서 즉시 삭제 (권장)</h3>
-            <div class="immediate-deletion">
-                <strong>✅ 즉시 처리:</strong> 앱 내에서 바로 계정 삭제 시 모든 데이터가 즉시 삭제됩니다.
-            </div>
-            <ol>
-                <li><span class="step-number">1</span>Posty 앱을 실행합니다</li>
-                <li><span class="step-number">2</span>하단 메뉴에서 <strong>마이페이지</strong>를 탭합니다</li>
-                <li><span class="step-number">3</span><strong>설정</strong> → <strong>계정 관리</strong>로 이동합니다</li>
-                <li><span class="step-number">4</span><strong>계정 삭제</strong> 버튼을 탭합니다</li>
-                <li><span class="step-number">5</span>삭제 확인 메시지를 읽고 <strong>"영구 삭제"</strong>를 확인합니다</li>
-                <li><span class="step-number">6</span>삭제가 완료되면 자동으로 로그아웃됩니다</li>
-            </ol>
+      <div class="method-box">
+        <h3>🚀 방법 1: 앱 내에서 즉시 삭제 (권장)</h3>
+        <div class="immediate-deletion">
+          <strong>✅ 즉시 처리:</strong> 앱 내에서 바로 계정 삭제 시 모든
+          데이터가 즉시 삭제됩니다.
         </div>
-
-        <div class="method-box">
-            <h3>📧 방법 2: 이메일로 요청</h3>
-            <p>앱에 접근할 수 없거나 추가 지원이 필요한 경우 이메일로 요청하실 수 있습니다.</p>
-            
-            <div class="email-template">
-<strong>받는 사람:</strong> getposty@gmail.com<br>
-<strong>제목:</strong> [데이터 삭제 요청] 사용자명<br><br>
-<strong>본문:</strong><br>
-안녕하세요, Posty 데이터 삭제를 요청합니다.<br><br>
-• 가입 이메일: your-email@example.com<br>
-• 소셜 로그인 유형: Google/Facebook/카카오/네이버/Apple 중 선택<br>
-• 삭제 요청 사유: (선택사항)<br>
-• 요청자 본인 확인: 본인이 직접 요청함을 확인합니다.<br><br>
-감사합니다.
-            </div>
-
-            <h4>📋 이메일 요청 시 포함할 필수 정보:</h4>
-            <ul>
-                <li><strong>가입 시 사용한 이메일 주소</strong></li>
-                <li><strong>소셜 로그인 종류</strong> (Facebook, Google, 카카오, 네이버, Apple)</li>
-                <li><strong>본인 확인</strong> (계정 소유자임을 확인하는 문구)</li>
-                <li>삭제 요청 사유 (선택사항)</li>
-            </ul>
-        </div>
-
-        <h2>삭제되는 데이터 목록</h2>
-        <p>데이터 삭제 요청 시 다음의 정보가 <strong>완전히 그리고 영구적으로</strong> 삭제됩니다:</p>
-        
-        <h3>🔍 개인 정보</h3>
-        <ul>
-            <li>프로필 정보 (이름, 이메일, 프로필 사진, 닉네임)</li>
-            <li>소셜 로그인 연동 정보</li>
-            <li>구독 정보 및 결제 이력</li>
-            <li>앱 설정 및 사용자 선호도</li>
-        </ul>
-
-        <h3>📝 콘텐츠 및 사용 기록</h3>
-        <ul>
-            <li>생성한 모든 AI 콘텐츠</li>
-            <li>저장한 텍스트 및 즐겨찾기</li>
-            <li>토큰 사용 이력</li>
-            <li>앱 사용 통계 및 분석 데이터</li>
-            <li>접속 로그 및 기기 정보</li>
-        </ul>
-
-        <h3>🎯 광고 관련 데이터</h3>
-        <ul>
-            <li>광고 식별자(ADID) 정보</li>
-            <li>맞춤형 광고 프로필</li>
-            <li>광고 상호작용 기록</li>
-        </ul>
-
-        <div class="warning">
-            <h4>⚠️ 중요 주의사항</h4>
-            <ul>
-                <li><strong>복구 불가능:</strong> 삭제된 데이터는 어떠한 방법으로도 복구할 수 없습니다</li>
-                <li><strong>법적 보관:</strong> 일부 데이터는 관련 법령(전자상거래법, 통신비밀보호법 등)에 따라 일정 기간 보관될 수 있습니다</li>
-                <li><strong>백업 시스템:</strong> 백업 시스템에서의 완전 삭제는 최대 30일이 소요될 수 있습니다</li>
-                <li><strong>익명화된 통계:</strong> 개인을 식별할 수 없는 통계 데이터는 서비스 개선 목적으로 보관될 수 있습니다</li>
-            </ul>
-        </div>
-
-        <h2>처리 기간 및 절차</h2>
-        <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
-            <tr style="background-color: #f8f9fa;">
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">삭제 방법</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">처리 시간</th>
-                <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">확인 방법</th>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 12px;"><strong>앱 내 삭제</strong></td>
-                <td style="border: 1px solid #ddd; padding: 12px;">즉시 처리</td>
-                <td style="border: 1px solid #ddd; padding: 12px;">앱에서 자동 로그아웃</td>
-            </tr>
-            <tr>
-                <td style="border: 1px solid #ddd; padding: 12px;"><strong>이메일 요청</strong></td>
-                <td style="border: 1px solid #ddd; padding: 12px;">접수 후 7일 이내</td>
-                <td style="border: 1px solid #ddd; padding: 12px;">완료 안내 이메일 발송</td>
-            </tr>
-        </table>
-
-        <h3>📋 처리 절차</h3>
         <ol>
-            <li><strong>요청 접수:</strong> 이메일 요청 시 24시간 내 접수 확인</li>
-            <li><strong>본인 확인:</strong> 계정 소유자 확인 절차 진행</li>
-            <li><strong>데이터 삭제:</strong> 모든 시스템에서 데이터 완전 삭제</li>
-            <li><strong>완료 통보:</strong> 삭제 완료 이메일 발송</li>
+          <li><span class="step-number">1</span>Posty 앱을 실행합니다</li>
+          <li>
+            <span class="step-number">2</span>하단 메뉴에서
+            <strong>마이페이지</strong>를 탭합니다
+          </li>
+          <li>
+            <span class="step-number">3</span><strong>설정</strong> →
+            <strong>계정 관리</strong>로 이동합니다
+          </li>
+          <li>
+            <span class="step-number">4</span><strong>계정 삭제</strong> 버튼을
+            탭합니다
+          </li>
+          <li>
+            <span class="step-number">5</span>삭제 확인 메시지를 읽고
+            <strong>"영구 삭제"</strong>를 확인합니다
+          </li>
+          <li>
+            <span class="step-number">6</span>삭제가 완료되면 자동으로
+            로그아웃됩니다
+          </li>
         </ol>
+      </div>
 
-        <h2>소셜 로그인 연동 해제</h2>
-        <p>Posty에서 계정을 삭제해도 <strong>소셜 로그인 제공자</strong>에 저장된 데이터는 삭제되지 않습니다. 각 플랫폼에서 Posty 앱 연동을 해제하려면:</p>
+      <div class="method-box">
+        <h3>📧 방법 2: 이메일로 요청</h3>
+        <p>
+          앱에 접근할 수 없거나 추가 지원이 필요한 경우 이메일로 요청하실 수
+          있습니다.
+        </p>
 
-        <div class="method-box">
-            <h3>🔗 소셜 플랫폼별 연동 해제 방법</h3>
-            <ul>
-                <li><strong>🔵 Facebook:</strong> 설정 → 앱 및 웹사이트 → Posty 제거</li>
-                <li><strong>🔴 Google:</strong> 계정 설정 → 보안 → 제3자 앱 액세스 → Posty 액세스 권한 삭제</li>
-                <li><strong>🟡 카카오:</strong> 카카오계정 → 연결된 서비스 관리 → Posty 연결 끊기</li>
-                <li><strong>🟢 네이버:</strong> 내 정보 → 보안설정 → 외부 사이트 연결 → Posty 삭제</li>
-                <li><strong>⚫ Apple:</strong> 설정 → Apple ID → 로그인 및 보안 → Apple로 로그인 → Posty 제거</li>
-            </ul>
+        <div class="email-template">
+          <strong>받는 사람:</strong> getposty@gmail.com<br />
+          <strong>제목:</strong> [데이터 삭제 요청] 사용자명<br /><br />
+          <strong>본문:</strong><br />
+          안녕하세요, Posty 데이터 삭제를 요청합니다.<br /><br />
+          • 가입 이메일: your-email@example.com<br />
+          • 소셜 로그인 유형: Google/Facebook/카카오/네이버/Apple 중 선택<br />
+          • 삭제 요청 사유: (선택사항)<br />
+          • 요청자 본인 확인: 본인이 직접 요청함을 확인합니다.<br /><br />
+          감사합니다.
         </div>
 
-        <h2>데이터 삭제 후 주의사항</h2>
-        <div class="warning">
-            <h4>🚫 삭제 후 불가능한 작업</h4>
-            <ul>
-                <li>동일한 계정으로 재가입 시 이전 데이터 복구</li>
-                <li>구독 서비스 환불 (삭제 전 환불 절차 완료 필요)</li>
-                <li>생성했던 AI 콘텐츠 재열람</li>
-                <li>사용 통계 및 이력 조회</li>
-            </ul>
-        </div>
-
-        <h2>개인정보 이용 내역 확인</h2>
-        <p>삭제 요청 전에 현재 저장된 개인정보를 확인하고 싶으시다면:</p>
+        <h4>📋 이메일 요청 시 포함할 필수 정보:</h4>
         <ul>
-            <li><strong>📧 이메일:</strong> getposty@gmail.com</li>
-            <li><strong>📝 제목:</strong> [개인정보 열람 요청] 사용자명</li>
-            <li><strong>⏰ 제공 기간:</strong> 요청 후 10일 이내</li>
+          <li><strong>가입 시 사용한 이메일 주소</strong></li>
+          <li>
+            <strong>소셜 로그인 종류</strong> (Facebook, Google, 카카오, 네이버,
+            Apple)
+          </li>
+          <li><strong>본인 확인</strong> (계정 소유자임을 확인하는 문구)</li>
+          <li>삭제 요청 사유 (선택사항)</li>
         </ul>
+      </div>
 
-        <div class="contact">
-            <h3>❓ 문의사항</h3>
-            <p>데이터 삭제와 관련하여 궁금한 사항이 있으시면 아래로 연락주세요:</p>
-            <p><strong>📧 이메일:</strong> getposty@gmail.com</p>
-            <p><strong>⏰ 응답 시간:</strong> 영업일 기준 24시간 이내</p>
-            <p><strong>📝 문의 시 포함 정보:</strong> 가입 이메일, 문의 내용, 연락처</p>
-            
-            <h4>🔗 추가 링크</h4>
-            <p><strong>개인정보처리방침:</strong> <a href="privacy-policy.html" style="color: #1877f2;">privacy-policy.html</a></p>
-            <p><strong>이용약관:</strong> 앱 내에서 확인 가능</p>
-        </div>
+      <h2>삭제되는 데이터 목록</h2>
+      <p>
+        데이터 삭제 요청 시 다음의 정보가
+        <strong>완전히 그리고 영구적으로</strong> 삭제됩니다:
+      </p>
 
-        <div class="warning">
-            <h4>💡 도움말</h4>
-            <p>데이터 삭제 요청 전에 다음을 고려해보세요:</p>
-            <ul>
-                <li><strong>임시 비활성화:</strong> 완전 삭제 대신 잠시 앱 사용을 중단하고 싶은 경우</li>
-                <li><strong>설정 변경:</strong> 알림, 광고 설정만 변경하고 싶은 경우</li>
-                <li><strong>부분 삭제:</strong> 특정 데이터만 삭제하고 싶은 경우</li>
-            </ul>
-            <p>위 사항들도 getposty@gmail.com으로 문의 가능합니다.</p>
-        </div>
+      <h3>🔍 개인 정보</h3>
+      <ul>
+        <li>프로필 정보 (이름, 이메일, 프로필 사진, 닉네임)</li>
+        <li>소셜 로그인 연동 정보</li>
+        <li>구독 정보 및 결제 이력</li>
+        <li>앱 설정 및 사용자 선호도</li>
+      </ul>
+
+      <h3>📝 콘텐츠 및 사용 기록</h3>
+      <ul>
+        <li>생성한 모든 AI 콘텐츠</li>
+        <li>저장한 텍스트 및 즐겨찾기</li>
+        <li>토큰 사용 이력</li>
+        <li>앱 사용 통계 및 분석 데이터</li>
+        <li>접속 로그 및 기기 정보</li>
+      </ul>
+
+      <h3>🎯 광고 관련 데이터</h3>
+      <ul>
+        <li>광고 식별자(ADID) 정보</li>
+        <li>맞춤형 광고 프로필</li>
+        <li>광고 상호작용 기록</li>
+      </ul>
+
+      <div class="warning">
+        <h4>⚠️ 중요 주의사항</h4>
+        <ul>
+          <li>
+            <strong>복구 불가능:</strong> 삭제된 데이터는 어떠한 방법으로도
+            복구할 수 없습니다
+          </li>
+          <li>
+            <strong>법적 보관:</strong> 일부 데이터는 관련 법령(전자상거래법,
+            통신비밀보호법 등)에 따라 일정 기간 보관될 수 있습니다
+          </li>
+          <li>
+            <strong>백업 시스템:</strong> 백업 시스템에서의 완전 삭제는 최대
+            30일이 소요될 수 있습니다
+          </li>
+          <li>
+            <strong>익명화된 통계:</strong> 개인을 식별할 수 없는 통계 데이터는
+            서비스 개선 목적으로 보관될 수 있습니다
+          </li>
+        </ul>
+      </div>
+
+      <h2>처리 기간 및 절차</h2>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0">
+        <tr style="background-color: #f8f9fa">
+          <th style="border: 1px solid #ddd; padding: 12px; text-align: left">
+            삭제 방법
+          </th>
+          <th style="border: 1px solid #ddd; padding: 12px; text-align: left">
+            처리 시간
+          </th>
+          <th style="border: 1px solid #ddd; padding: 12px; text-align: left">
+            확인 방법
+          </th>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 12px">
+            <strong>앱 내 삭제</strong>
+          </td>
+          <td style="border: 1px solid #ddd; padding: 12px">즉시 처리</td>
+          <td style="border: 1px solid #ddd; padding: 12px">
+            앱에서 자동 로그아웃
+          </td>
+        </tr>
+        <tr>
+          <td style="border: 1px solid #ddd; padding: 12px">
+            <strong>이메일 요청</strong>
+          </td>
+          <td style="border: 1px solid #ddd; padding: 12px">
+            접수 후 7일 이내
+          </td>
+          <td style="border: 1px solid #ddd; padding: 12px">
+            완료 안내 이메일 발송
+          </td>
+        </tr>
+      </table>
+
+      <h3>📋 처리 절차</h3>
+      <ol>
+        <li><strong>요청 접수:</strong> 이메일 요청 시 24시간 내 접수 확인</li>
+        <li><strong>본인 확인:</strong> 계정 소유자 확인 절차 진행</li>
+        <li><strong>데이터 삭제:</strong> 모든 시스템에서 데이터 완전 삭제</li>
+        <li><strong>완료 통보:</strong> 삭제 완료 이메일 발송</li>
+      </ol>
+
+      <h2>소셜 로그인 연동 해제</h2>
+      <p>
+        Posty에서 계정을 삭제해도 <strong>소셜 로그인 제공자</strong>에 저장된
+        데이터는 삭제되지 않습니다. 각 플랫폼에서 Posty 앱 연동을 해제하려면:
+      </p>
+
+      <div class="method-box">
+        <h3>🔗 소셜 플랫폼별 연동 해제 방법</h3>
+        <ul>
+          <li>
+            <strong>🔵 Facebook:</strong> 설정 → 앱 및 웹사이트 → Posty 제거
+          </li>
+          <li>
+            <strong>🔴 Google:</strong> 계정 설정 → 보안 → 제3자 앱 액세스 →
+            Posty 액세스 권한 삭제
+          </li>
+          <li>
+            <strong>🟡 카카오:</strong> 카카오계정 → 연결된 서비스 관리 → Posty
+            연결 끊기
+          </li>
+          <li>
+            <strong>🟢 네이버:</strong> 내 정보 → 보안설정 → 외부 사이트 연결 →
+            Posty 삭제
+          </li>
+          <li>
+            <strong>⚫ Apple:</strong> 설정 → Apple ID → 로그인 및 보안 →
+            Apple로 로그인 → Posty 제거
+          </li>
+        </ul>
+      </div>
+
+      <h2>데이터 삭제 후 주의사항</h2>
+      <div class="warning">
+        <h4>🚫 삭제 후 불가능한 작업</h4>
+        <ul>
+          <li>동일한 계정으로 재가입 시 이전 데이터 복구</li>
+          <li>구독 서비스 환불 (삭제 전 환불 절차 완료 필요)</li>
+          <li>생성했던 AI 콘텐츠 재열람</li>
+          <li>사용 통계 및 이력 조회</li>
+        </ul>
+      </div>
+
+      <h2>개인정보 이용 내역 확인</h2>
+      <p>삭제 요청 전에 현재 저장된 개인정보를 확인하고 싶으시다면:</p>
+      <ul>
+        <li><strong>📧 이메일:</strong> getposty@gmail.com</li>
+        <li><strong>📝 제목:</strong> [개인정보 열람 요청] 사용자명</li>
+        <li><strong>⏰ 제공 기간:</strong> 요청 후 10일 이내</li>
+      </ul>
+
+      <div class="contact">
+        <h3>❓ 문의사항</h3>
+        <p>데이터 삭제와 관련하여 궁금한 사항이 있으시면 아래로 연락주세요:</p>
+        <p><strong>📧 이메일:</strong> getposty@gmail.com</p>
+        <p><strong>⏰ 응답 시간:</strong> 영업일 기준 24시간 이내</p>
+        <p>
+          <strong>📝 문의 시 포함 정보:</strong> 가입 이메일, 문의 내용, 연락처
+        </p>
+
+        <h4>🔗 추가 링크</h4>
+        <p>
+          <strong>개인정보처리방침:</strong>
+          <a href="privacy-policy.html" style="color: #1877f2"
+            >privacy-policy.html</a
+          >
+        </p>
+        <p><strong>이용약관:</strong> 앱 내에서 확인 가능</p>
+      </div>
+
+      <div class="warning">
+        <h4>💡 도움말</h4>
+        <p>데이터 삭제 요청 전에 다음을 고려해보세요:</p>
+        <ul>
+          <li>
+            <strong>임시 비활성화:</strong> 완전 삭제 대신 잠시 앱 사용을
+            중단하고 싶은 경우
+          </li>
+          <li>
+            <strong>설정 변경:</strong> 알림, 광고 설정만 변경하고 싶은 경우
+          </li>
+          <li><strong>부분 삭제:</strong> 특정 데이터만 삭제하고 싶은 경우</li>
+        </ul>
+        <p>위 사항들도 getposty@gmail.com으로 문의 가능합니다.</p>
+      </div>
     </div>
-</body>
+  </body>
 </html>

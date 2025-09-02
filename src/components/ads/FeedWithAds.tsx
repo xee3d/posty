@@ -1,12 +1,18 @@
-import React, { useMemo } from 'react';
-import { FlatList, View, StyleSheet } from 'react-native';
-import AdaptiveNativeAd from './AdaptiveNativeAd';
-import SmartAdPlacement from './SmartAdPlacement';
-import AdIntegrationService from '../../services/AdIntegrationService';
+import React, { useMemo } from "react";
+import { FlatList, View, StyleSheet } from "react-native";
+import AdaptiveNativeAd from "./AdaptiveNativeAd";
+import SmartAdPlacement from "./SmartAdPlacement";
+import AdIntegrationService from "../../services/AdIntegrationService";
 
 interface FeedWithAdsProps {
   data: any[];
-  renderItem: ({ item, index }: { item: any; index: number }) => React.ReactElement;
+  renderItem: ({
+    item,
+    index,
+  }: {
+    item: any;
+    index: number;
+  }) => React.ReactElement;
   keyExtractor: (item: any, index: number) => string;
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement;
   ListFooterComponent?: React.ComponentType<any> | React.ReactElement;
@@ -35,54 +41,54 @@ const FeedWithAds: React.FC<FeedWithAdsProps> = ({
   const dataWithAds = useMemo(() => {
     const result: any[] = [];
     let adCount = 0;
-    
+
     data.forEach((item, index) => {
-      result.push({ type: 'content', data: item });
-      
+      result.push({ type: "content", data: item });
+
       // 광고 삽입 로직
       if ((index + 1) % adInterval === 0) {
         const adPosition = Math.floor((index + 1) / adInterval);
         const layout = AdIntegrationService.getAdLayoutType(adPosition);
-        
+
         result.push({
-          type: 'ad',
+          type: "ad",
           id: `ad_${adCount++}`,
           layout,
           position: adPosition,
         });
       }
     });
-    
+
     return result;
   }, [data, adInterval]);
-  
+
   // 렌더링 함수
   const renderItemWithAd = ({ item, index }: { item: any; index: number }) => {
-    if (item.type === 'ad') {
+    if (item.type === "ad") {
       return (
         <View style={styles.adWrapper}>
-          <AdaptiveNativeAd 
+          <AdaptiveNativeAd
             layout={item.layout}
             onPress={() => {
-              AdIntegrationService.trackUserAction('ad_click');
+              AdIntegrationService.trackUserAction("ad_click");
             }}
           />
         </View>
       );
     }
-    
+
     // 일반 콘텐츠
     return renderItem({ item: item.data, index });
   };
-  
+
   // 키 추출 함수
   const keyExtractorWithAd = (item: any, index: number) => {
-    if (item.type === 'ad') {
+    if (item.type === "ad") {
       return item.id;
     }
     return keyExtractor(item.data, index);
   };
-  
+
   return (
     <FlatList
       data={dataWithAds}
@@ -108,7 +114,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+    backgroundColor: "rgba(0, 0, 0, 0.05)",
     marginHorizontal: 16,
   },
 });

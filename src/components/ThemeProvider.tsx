@@ -1,5 +1,5 @@
-import React from 'react';
-import { useAppTheme } from '../hooks/useAppTheme';
+import React from "react";
+import { useAppTheme } from "../hooks/useAppTheme";
 
 interface ThemeProviderProps {
   children: React.ReactNode;
@@ -12,6 +12,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
 };
 
 // 테마 컨텍스트를 위한 래퍼 컴포넌트
-export const ThemedApp: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const ThemedApp: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   return <ThemeProvider>{children}</ThemeProvider>;
 };

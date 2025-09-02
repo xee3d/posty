@@ -3,6 +3,7 @@
 ## 적용할 수정사항
 
 ### 1. handleGenerate 함수 시작 부분
+
 ```javascript
 const handleGenerate = async () => {
   if (!prompt.trim() && writeMode !== 'photo') {
@@ -29,17 +30,21 @@ const handleGenerate = async () => {
 ```
 
 ### 2. 생성 성공 부분
+
 ```javascript
-  setGeneratedContent(result);
-  console.log('[AIWriteScreen] generatedContent set, now releasing loading state');
-  
-  soundManager.playSuccess(); // 추가: 생성 성공음
-  
-  // 로딩 상태를 먼저 해제
-  setIsGenerating(false);
+setGeneratedContent(result);
+console.log(
+  "[AIWriteScreen] generatedContent set, now releasing loading state"
+);
+
+soundManager.playSuccess(); // 추가: 생성 성공음
+
+// 로딩 상태를 먼저 해제
+setIsGenerating(false);
 ```
 
 ### 3. 에러 처리 부분
+
 ```javascript
 } catch (error) {
   console.error('Generation error:', error);
@@ -59,6 +64,7 @@ const handleGenerate = async () => {
 ## 추가로 적용할 부분
 
 ### 모드 전환 버튼
+
 ```javascript
 <ScaleButton
   style={[styles.modeButton, writeMode === 'text' && styles.modeButtonActive]}
@@ -73,6 +79,7 @@ const handleGenerate = async () => {
 ```
 
 ### 톤 선택
+
 ```javascript
 <TouchableOpacity
   onPress={() => {
@@ -88,6 +95,7 @@ const handleGenerate = async () => {
 ```
 
 ### 빠른 주제 선택
+
 ```javascript
 <TouchableOpacity
   onPress={() => {
@@ -98,6 +106,7 @@ const handleGenerate = async () => {
 ```
 
 ### 새로고침 버튼
+
 ```javascript
 <TouchableOpacity
   onPress={async () => {

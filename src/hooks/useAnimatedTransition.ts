@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect } from "react";
 import {
   useSharedValue,
   useAnimatedStyle,
@@ -10,12 +10,12 @@ import {
   Easing,
   WithTimingConfig,
   WithSpringConfig,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 interface AnimationConfig {
   duration?: number;
   delay?: number;
-  easing?: WithTimingConfig['easing'];
+  easing?: WithTimingConfig["easing"];
   springConfig?: WithSpringConfig;
 }
 
@@ -83,12 +83,7 @@ export const useAnimatedTransition = (
     opacity: progress.value,
     transform: [
       {
-        scale: interpolate(
-          progress.value,
-          [0, 1],
-          [0.8, 1],
-          Extrapolate.CLAMP
-        ),
+        scale: interpolate(progress.value, [0, 1], [0.8, 1], Extrapolate.CLAMP),
       },
     ],
   }));
@@ -184,7 +179,7 @@ export const useGestureAnimation = () => {
   }));
 
   const reset = () => {
-    'worklet';
+    "worklet";
     translateX.value = withSpring(0);
     translateY.value = withSpring(0);
     scale.value = withSpring(1);

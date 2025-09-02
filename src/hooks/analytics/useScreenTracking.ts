@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import analyticsService from '../../services/analytics/analyticsService';
+import { useEffect } from "react";
+import analyticsService from "../../services/analytics/analyticsService";
 
 export const useScreenTracking = (screenName: string, screenClass?: string) => {
   useEffect(() => {

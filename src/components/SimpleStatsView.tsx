@@ -1,15 +1,10 @@
-import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { COLORS, SPACING } from '../utils/constants';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { AnimatedCard, FadeInView } from '../components/AnimationComponents';
+import React from "react";
+import { View, Text, StyleSheet, ScrollView } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import { COLORS, SPACING } from "../utils/constants";
+import { useAppTheme } from "../hooks/useAppTheme";
+import { AnimatedCard, FadeInView } from "../components/AnimationComponents";
 
 interface StatCardProps {
   icon: React.ReactNode;
@@ -22,21 +17,23 @@ interface StatCardProps {
   labelStyle?: any;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ 
-  icon, 
-  value, 
-  label, 
+const StatCard: React.FC<StatCardProps> = ({
+  icon,
+  value,
+  label,
   color,
   cardStyle,
   iconContainerStyle,
   valueStyle,
-  labelStyle
+  labelStyle,
 }) => {
   const { colors } = useAppTheme();
-  
+
   return (
     <View style={cardStyle}>
-      <View style={[iconContainerStyle, color && { backgroundColor: color + '15' }]}>
+      <View
+        style={[iconContainerStyle, color && { backgroundColor: color + "15" }]}
+      >
         {icon}
       </View>
       <Text style={valueStyle}>{value}</Text>
@@ -59,34 +56,34 @@ const SimpleStatsView: React.FC = () => {
     const mockStats = {
       totalPosts: 12,
       postingPatterns: {
-        mostActiveTime: '19시',
-        mostActiveDay: '금',
+        mostActiveTime: "19시",
+        mostActiveDay: "금",
       },
-      favoriteHashtags: ['일상', '카페', '주말', '맛집', '여행'],
+      favoriteHashtags: ["일상", "카페", "주말", "맛집", "여행"],
       byTone: {
-        '캐주얼': 8,
-        '감성적': 3,
-        '유머러스': 1,
+        캐주얼: 8,
+        감성적: 3,
+        유머러스: 1,
       },
     };
-    
+
     const mockRecent = [
       {
-        id: '1',
-        content: '오늘 카페에서 마신 라떼가 정말 맛있었어요! 분위기도 좋고...',
+        id: "1",
+        content: "오늘 카페에서 마신 라떼가 정말 맛있었어요! 분위기도 좋고...",
         createdAt: new Date().toISOString(),
-        platform: 'instagram',
-        category: '카페',
+        platform: "instagram",
+        category: "카페",
       },
       {
-        id: '2', 
-        content: '주말 나들이 다녀왔는데 날씨가 너무 좋더라구요',
+        id: "2",
+        content: "주말 나들이 다녀왔는데 날씨가 너무 좋더라구요",
         createdAt: new Date(Date.now() - 86400000).toISOString(),
-        platform: 'facebook',
-        category: '일상',
+        platform: "facebook",
+        category: "일상",
       },
     ];
-    
+
     setStats(mockStats);
     setRecentPosts(mockRecent);
   };
@@ -96,22 +93,30 @@ const SimpleStatsView: React.FC = () => {
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
-    if (diffDays === 0) return '오늘';
-    if (diffDays === 1) return '어제';
-    if (diffDays < 7) return `${diffDays}일 전`;
+
+    if (diffDays === 0) {
+      return "오늘";
+    }
+    if (diffDays === 1) {
+      return "어제";
+    }
+    if (diffDays < 7) {
+      return `${diffDays}일 전`;
+    }
     return date.toLocaleDateString();
   };
 
   const styles = createStyles(colors, cardTheme);
 
-  if (!stats) return null;
+  if (!stats) {
+    return null;
+  }
 
   return (
     <View style={styles.container}>
       {/* 주요 통계 카드 */}
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.statsScroll}
       >
@@ -127,7 +132,7 @@ const SimpleStatsView: React.FC = () => {
             labelStyle={[styles.statLabel, { color: colors.text.tertiary }]}
           />
         </FadeInView>
-        
+
         <FadeInView delay={100}>
           <StatCard
             icon={<MaterialIcon name="schedule" size={24} color="#8B5CF6" />}
@@ -140,10 +145,12 @@ const SimpleStatsView: React.FC = () => {
             labelStyle={[styles.statLabel, { color: colors.text.tertiary }]}
           />
         </FadeInView>
-        
+
         <FadeInView delay={200}>
           <StatCard
-            icon={<MaterialIcon name="calendar-today" size={24} color="#10B981" />}
+            icon={
+              <MaterialIcon name="calendar-today" size={24} color="#10B981" />
+            }
             value={`${stats.postingPatterns.mostActiveDay}요일`}
             label="활발한 요일"
             color="#10B981"
@@ -156,41 +163,56 @@ const SimpleStatsView: React.FC = () => {
       </ScrollView>
 
       {/* 내 스타일 */}
-      <AnimatedCard delay={300} style={[styles.styleCard, { backgroundColor: colors.surface }]}>
+      <AnimatedCard
+        delay={300}
+        style={[styles.styleCard, { backgroundColor: colors.surface }]}
+      >
         <View style={styles.styleHeader}>
           <MaterialIcon name="auto-awesome" size={20} color={colors.primary} />
           <Text style={[styles.styleTitle, { color: colors.text.primary }]}>
             내 포스팅 스타일
           </Text>
         </View>
-        
+
         <View style={styles.styleContent}>
           <Text style={[styles.styleLabel, { color: colors.text.secondary }]}>
             자주 쓰는 톤
           </Text>
           <View style={styles.toneTags}>
             {Object.entries(stats.byTone)
-              .sort(([,a], [,b]) => (b as number) - (a as number))
+              .sort(([, a], [, b]) => (b as number) - (a as number))
               .slice(0, 3)
               .map(([tone, count], index) => (
-                <View 
-                  key={tone} 
+                <View
+                  key={tone}
                   style={[
                     styles.toneTag,
                     index === 0 && styles.primaryToneTag,
-                    { borderColor: index === 0 ? colors.primary : colors.border }
+                    {
+                      borderColor: index === 0 ? colors.primary : colors.border,
+                    },
                   ]}
                 >
-                  <Text style={[
-                    styles.toneText,
-                    { color: index === 0 ? colors.primary : colors.text.secondary }
-                  ]}>
+                  <Text
+                    style={[
+                      styles.toneText,
+                      {
+                        color:
+                          index === 0 ? colors.primary : colors.text.secondary,
+                      },
+                    ]}
+                  >
                     {tone}
                   </Text>
-                  <Text style={[
-                    styles.toneCount,
-                    { color: index === 0 ? colors.primary : colors.text.tertiary }
-                  ]}>
+                  <Text
+                    style={[
+                      styles.toneCount,
+                      {
+                        color:
+                          index === 0 ? colors.primary : colors.text.tertiary,
+                      },
+                    ]}
+                  >
                     {count}
                   </Text>
                 </View>
@@ -205,31 +227,41 @@ const SimpleStatsView: React.FC = () => {
           최근 작성한 글
         </Text>
         {recentPosts.slice(0, 2).map((post, index) => (
-          <AnimatedCard 
-            key={post.id} 
-            delay={400 + index * 100} 
+          <AnimatedCard
+            key={post.id}
+            delay={400 + index * 100}
             style={[styles.recentCard, { backgroundColor: colors.surface }]}
           >
             <View style={styles.recentHeader}>
-              <Icon 
+              <Icon
                 name={
-                  post.platform === 'instagram' ? 'logo-instagram' :
-                  post.platform === 'facebook' ? 'logo-facebook' : 'globe'
-                } 
-                size={16} 
-                color={colors.text.tertiary} 
+                  post.platform === "instagram"
+                    ? "logo-instagram"
+                    : post.platform === "facebook"
+                    ? "logo-facebook"
+                    : "globe"
+                }
+                size={16}
+                color={colors.text.tertiary}
               />
-              <Text style={[styles.recentDate, { color: colors.text.tertiary }]}>
+              <Text
+                style={[styles.recentDate, { color: colors.text.tertiary }]}
+              >
                 {formatDate(post.createdAt)}
               </Text>
-              <View style={[styles.categoryBadge, { backgroundColor: colors.primary + '15' }]}>
+              <View
+                style={[
+                  styles.categoryBadge,
+                  { backgroundColor: colors.primary + "15" },
+                ]}
+              >
                 <Text style={[styles.categoryText, { color: colors.primary }]}>
                   {post.category}
                 </Text>
               </View>
             </View>
-            <Text 
-              style={[styles.recentContent, { color: colors.text.secondary }]} 
+            <Text
+              style={[styles.recentContent, { color: colors.text.secondary }]}
               numberOfLines={1}
             >
               {post.content}
@@ -256,26 +288,26 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) => {
       borderRadius: 16,
       padding: SPACING.md,
       marginRight: SPACING.sm,
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: "center",
+      justifyContent: "center",
       ...cardTheme.default.shadow,
     },
     iconContainer: {
       width: 40,
       height: 40,
       borderRadius: 12,
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: "center",
+      justifyContent: "center",
       marginBottom: SPACING.sm,
     },
     statValue: {
       fontSize: 18,
-      fontWeight: '700',
+      fontWeight: "700",
       marginBottom: 4,
     },
     statLabel: {
       fontSize: 11,
-      textAlign: 'center',
+      textAlign: "center",
     },
     styleCard: {
       borderRadius: 16,
@@ -284,14 +316,14 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) => {
       ...cardTheme.default.shadow,
     },
     styleHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.xs,
       marginBottom: SPACING.md,
     },
     styleTitle: {
       fontSize: 15,
-      fontWeight: '600',
+      fontWeight: "600",
     },
     styleContent: {
       gap: SPACING.sm,
@@ -301,12 +333,12 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) => {
       marginBottom: SPACING.xs,
     },
     toneTags: {
-      flexDirection: 'row',
+      flexDirection: "row",
       gap: SPACING.sm,
     },
     toneTag: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 20,
@@ -314,22 +346,22 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) => {
       gap: SPACING.xs,
     },
     primaryToneTag: {
-      backgroundColor: colors.primary + '10',
+      backgroundColor: colors.primary + "10",
     },
     toneText: {
       fontSize: 13,
-      fontWeight: '500',
+      fontWeight: "500",
     },
     toneCount: {
       fontSize: 11,
-      fontWeight: '600',
+      fontWeight: "600",
     },
     recentSection: {
       gap: SPACING.sm,
     },
     recentTitle: {
       fontSize: 15,
-      fontWeight: '600',
+      fontWeight: "600",
       marginBottom: SPACING.xs,
     },
     recentCard: {
@@ -338,8 +370,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) => {
       ...cardTheme.default.shadow,
     },
     recentHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       gap: SPACING.xs,
       marginBottom: SPACING.xs,
     },
@@ -354,7 +386,7 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) => {
     },
     categoryText: {
       fontSize: 10,
-      fontWeight: '500',
+      fontWeight: "500",
     },
     recentContent: {
       fontSize: 13,
@@ -363,10 +395,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) => {
   });
 
   // statCard에만 적용되는 특별한 그림자 스타일
-  if (!colors.background.includes('#1A202C')) { // 라이트 모드일 때만
+  if (!colors.background.includes("#1A202C")) {
+    // 라이트 모드일 때만
     styles.statCard = {
       ...styles.statCard,
-      shadowColor: '#000',
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.08,
       shadowRadius: 8,

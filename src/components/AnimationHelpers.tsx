@@ -1,9 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import {
-  Animated,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import React, { useRef, useEffect } from "react";
+import { Animated, TouchableOpacity, ViewStyle } from "react-native";
 
 interface FadeInViewProps {
   children: React.ReactNode;
@@ -49,22 +45,24 @@ export const FadeInView: React.FC<FadeInViewProps> = ({
 interface SlideInViewProps {
   children: React.ReactNode;
   delay?: number;
-  direction?: 'left' | 'right' | 'up' | 'down';
+  direction?: "left" | "right" | "up" | "down";
   style?: ViewStyle;
 }
 
 export const SlideInView: React.FC<SlideInViewProps> = ({
   children,
   delay = 0,
-  direction = 'up',
+  direction = "up",
   style,
 }) => {
-  const slideAnim = useRef(new Animated.Value(
-    direction === 'up' ? 50 : direction === 'down' ? -50 : 0
-  )).current;
-  const horizontalAnim = useRef(new Animated.Value(
-    direction === 'left' ? -50 : direction === 'right' ? 50 : 0
-  )).current;
+  const slideAnim = useRef(
+    new Animated.Value(direction === "up" ? 50 : direction === "down" ? -50 : 0)
+  ).current;
+  const horizontalAnim = useRef(
+    new Animated.Value(
+      direction === "left" ? -50 : direction === "right" ? 50 : 0
+    )
+  ).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -207,16 +205,12 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
   if (onPress) {
     return (
       <ScaleButton onPress={onPress} style={style}>
-        <Animated.View style={animatedStyle}>
-          {children}
-        </Animated.View>
+        <Animated.View style={animatedStyle}>{children}</Animated.View>
       </ScaleButton>
     );
   }
 
   return (
-    <Animated.View style={[style, animatedStyle]}>
-      {children}
-    </Animated.View>
+    <Animated.View style={[style, animatedStyle]}>{children}</Animated.View>
   );
 };

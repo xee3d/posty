@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { ScrollView, StyleSheet, View, TouchableOpacity } from 'react-native';
-import { useTheme, THEME_COLORS } from '../contexts/ThemeContext';
-import { ThemedView } from './ThemedView';
-import { ThemedText } from './ThemedText';
-import ThemeDialog from './ThemeDialog';
+import React, { useState } from "react";
+import { ScrollView, StyleSheet, View, TouchableOpacity } from "react-native";
+import { useTheme, THEME_COLORS } from "../contexts/ThemeContext";
+import { ThemedView } from "./ThemedView";
+import { ThemedText } from "./ThemedText";
+import ThemeDialog from "./ThemeDialog";
 
 export default function ThemeDemo() {
   const { colors, isDark, themeColor, themeMode } = useTheme();
@@ -18,19 +18,25 @@ export default function ThemeDemo() {
             Theme System Demo
           </ThemedText>
           <ThemedText colorKey="textSecondary">
-            Current: {themeMode} mode, {isDark ? 'Dark' : 'Light'} theme
+            Current: {themeMode} mode, {isDark ? "Dark" : "Light"} theme
           </ThemedText>
         </ThemedView>
 
         {/* Theme Info Card */}
         <ThemedView style={styles.card} colorKey="cardBackground">
-          <ThemedText type="heading" colorKey="textPrimary" style={styles.cardTitle}>
+          <ThemedText
+            type="heading"
+            colorKey="textPrimary"
+            style={styles.cardTitle}
+          >
             Theme Information
           </ThemedText>
-          
+
           <View style={styles.colorInfo}>
             <ThemedText colorKey="textPrimary">Accent Color:</ThemedText>
-            <View style={[styles.colorSwatch, { backgroundColor: themeColor }]} />
+            <View
+              style={[styles.colorSwatch, { backgroundColor: themeColor }]}
+            />
             <ThemedText colorKey="textSecondary">{themeColor}</ThemedText>
           </View>
 
@@ -41,20 +47,26 @@ export default function ThemeDemo() {
 
           <View style={styles.infoRow}>
             <ThemedText colorKey="textPrimary">Dark: </ThemedText>
-            <ThemedText colorKey="accent">{isDark ? 'Yes' : 'No'}</ThemedText>
+            <ThemedText colorKey="accent">{isDark ? "Yes" : "No"}</ThemedText>
           </View>
         </ThemedView>
 
         {/* Color Palette */}
         <ThemedView style={styles.card} colorKey="cardBackground">
-          <ThemedText type="heading" colorKey="textPrimary" style={styles.cardTitle}>
+          <ThemedText
+            type="heading"
+            colorKey="textPrimary"
+            style={styles.cardTitle}
+          >
             Available Colors
           </ThemedText>
-          
+
           <View style={styles.colorPalette}>
             {THEME_COLORS.map((color, index) => (
               <View key={index} style={styles.colorItem}>
-                <View style={[styles.colorSwatch, { backgroundColor: color }]} />
+                <View
+                  style={[styles.colorSwatch, { backgroundColor: color }]}
+                />
                 <ThemedText colorKey="textSecondary" style={styles.colorText}>
                   {color}
                 </ThemedText>
@@ -65,24 +77,44 @@ export default function ThemeDemo() {
 
         {/* Text Examples */}
         <ThemedView style={styles.card} colorKey="cardBackground">
-          <ThemedText type="heading" colorKey="textPrimary" style={styles.cardTitle}>
+          <ThemedText
+            type="heading"
+            colorKey="textPrimary"
+            style={styles.cardTitle}
+          >
             Text Styles
           </ThemedText>
-          
-          <ThemedText type="title" colorKey="textPrimary">Title Text</ThemedText>
-          <ThemedText type="heading" colorKey="textPrimary">Heading Text</ThemedText>
-          <ThemedText type="subtitle" colorKey="textPrimary">Subtitle Text</ThemedText>
-          <ThemedText type="default" colorKey="textPrimary">Default Text</ThemedText>
-          <ThemedText type="caption" colorKey="textSecondary">Caption Text</ThemedText>
-          <ThemedText type="link" colorKey="accent">Link Text</ThemedText>
+
+          <ThemedText type="title" colorKey="textPrimary">
+            Title Text
+          </ThemedText>
+          <ThemedText type="heading" colorKey="textPrimary">
+            Heading Text
+          </ThemedText>
+          <ThemedText type="subtitle" colorKey="textPrimary">
+            Subtitle Text
+          </ThemedText>
+          <ThemedText type="default" colorKey="textPrimary">
+            Default Text
+          </ThemedText>
+          <ThemedText type="caption" colorKey="textSecondary">
+            Caption Text
+          </ThemedText>
+          <ThemedText type="link" colorKey="accent">
+            Link Text
+          </ThemedText>
         </ThemedView>
 
         {/* Status Colors */}
         <ThemedView style={styles.card} colorKey="cardBackground">
-          <ThemedText type="heading" colorKey="textPrimary" style={styles.cardTitle}>
+          <ThemedText
+            type="heading"
+            colorKey="textPrimary"
+            style={styles.cardTitle}
+          >
             Status Colors
           </ThemedText>
-          
+
           <View style={styles.statusRow}>
             <ThemedText colorKey="success">Success</ThemedText>
             <ThemedText colorKey="warning">Warning</ThemedText>
@@ -95,7 +127,11 @@ export default function ThemeDemo() {
           style={[styles.themeButton, { backgroundColor: colors.accent }]}
           onPress={() => setShowThemeDialog(true)}
         >
-          <ThemedText style={styles.themeButtonText} lightColor="#FFFFFF" darkColor="#FFFFFF">
+          <ThemedText
+            style={styles.themeButtonText}
+            lightColor="#FFFFFF"
+            darkColor="#FFFFFF"
+          >
             Change Theme
           </ThemedText>
         </TouchableOpacity>
@@ -121,7 +157,7 @@ const styles = StyleSheet.create({
   header: {
     padding: 20,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
   },
   card: {
     padding: 16,
@@ -131,8 +167,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   colorInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
     marginBottom: 8,
   },
@@ -142,33 +178,33 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   infoRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 4,
   },
   colorPalette: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: 12,
   },
   colorItem: {
-    alignItems: 'center',
+    alignItems: "center",
     gap: 4,
   },
   colorText: {
     fontSize: 12,
   },
   statusRow: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 16,
   },
   themeButton: {
     padding: 16,
     borderRadius: 12,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 8,
   },
   themeButtonText: {
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 16,
   },
 });

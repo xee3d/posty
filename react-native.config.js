@@ -1,47 +1,47 @@
 module.exports = {
   dependencies: {
-    'react-native-fbsdk-next': {
+    "react-native-fbsdk-next": {
       platforms: {
         ios: null,
       },
     },
-    '@react-native-google-signin/google-signin': {
+    "@react-native-google-signin/google-signin": {
       platforms: {
         ios: null,
       },
     },
-    '@react-native-seoul/kakao-login': {
+    "@react-native-seoul/kakao-login": {
       platforms: {
         ios: null,
       },
     },
-    '@react-native-seoul/naver-login': {
+    "@react-native-seoul/naver-login": {
       platforms: {
         ios: null,
       },
     },
-    'react-native-google-mobile-ads': {
+    "react-native-google-mobile-ads": {
       platforms: {
         ios: null,
       },
     },
-    'react-native-iap': {
+    "react-native-iap": {
       platforms: {
         ios: null,
       },
     },
     // ReactCommon 모듈 중복 방지
-    'ReactCommon': {
+    ReactCommon: {
       platforms: {
         ios: null,
       },
     },
-    'React-Codegen': {
+    "React-Codegen": {
       platforms: {
         ios: null,
       },
     },
-    'FBReactNativeSpec': {
+    FBReactNativeSpec: {
       platforms: {
         ios: null,
       },
@@ -50,7 +50,7 @@ module.exports = {
   // New Architecture 완전 비활성화
   project: {
     ios: {
-      sourceDir: './ios',
+      sourceDir: "./ios",
     },
     android: {},
   },

@@ -1,5 +1,10 @@
-import { Alert } from '../customAlert';
-import ImagePicker, { ImagePickerResponse, MediaType, CameraOptions, ImageLibraryOptions } from 'react-native-image-picker';
+import { Alert } from "../customAlert";
+import ImagePicker, {
+  ImagePickerResponse,
+  MediaType,
+  CameraOptions,
+  ImageLibraryOptions,
+} from "react-native-image-picker";
 
 interface ImagePickerOptions {
   title?: string;
@@ -9,86 +14,88 @@ interface ImagePickerOptions {
   maxHeight?: number;
 }
 
-export const showImagePicker = (options?: ImagePickerOptions): Promise<ImagePickerResponse> => {
+export const showImagePicker = (
+  options?: ImagePickerOptions
+): Promise<ImagePickerResponse> => {
   return new Promise((resolve) => {
-    const title = options?.title || '사진 선택';
-    
-    Alert.alert(
-      title,
-      '어떤 방법으로 사진을 선택하시겠어요?',
-      [
-        {
-          text: '카메라로 촬영',
-          onPress: () => {
-            const cameraOptions: CameraOptions = {
-              mediaType: options?.mediaType || 'photo',
-              quality: options?.quality || 0.8,
-              maxWidth: options?.maxWidth || 1920,
-              maxHeight: options?.maxHeight || 1920,
-              includeBase64: false,
-              saveToPhotos: true,
-            };
-            
-            ImagePicker.launchCamera(cameraOptions, (response) => {
-              resolve(response);
-            });
-          },
+    const title = options?.title || "사진 선택";
+
+    Alert.alert(title, "어떤 방법으로 사진을 선택하시겠어요?", [
+      {
+        text: "카메라로 촬영",
+        onPress: () => {
+          const cameraOptions: CameraOptions = {
+            mediaType: options?.mediaType || "photo",
+            quality: options?.quality || 0.8,
+            maxWidth: options?.maxWidth || 1920,
+            maxHeight: options?.maxHeight || 1920,
+            includeBase64: false,
+            saveToPhotos: true,
+          };
+
+          ImagePicker.launchCamera(cameraOptions, (response) => {
+            resolve(response);
+          });
         },
-        {
-          text: '갤러리에서 선택',
-          onPress: () => {
-            const libraryOptions: ImageLibraryOptions = {
-              mediaType: options?.mediaType || 'photo',
-              quality: options?.quality || 0.8,
-              maxWidth: options?.maxWidth || 1920,
-              maxHeight: options?.maxHeight || 1920,
-              includeBase64: false,
-              selectionLimit: 1,
-            };
-            
-            ImagePicker.launchImageLibrary(libraryOptions, (response) => {
-              resolve(response);
-            });
-          },
+      },
+      {
+        text: "갤러리에서 선택",
+        onPress: () => {
+          const libraryOptions: ImageLibraryOptions = {
+            mediaType: options?.mediaType || "photo",
+            quality: options?.quality || 0.8,
+            maxWidth: options?.maxWidth || 1920,
+            maxHeight: options?.maxHeight || 1920,
+            includeBase64: false,
+            selectionLimit: 1,
+          };
+
+          ImagePicker.launchImageLibrary(libraryOptions, (response) => {
+            resolve(response);
+          });
         },
-        {
-          text: '취소',
-          style: 'cancel',
-          onPress: () => resolve({ didCancel: true, assets: [] }),
-        },
-      ]
-    );
+      },
+      {
+        text: "취소",
+        style: "cancel",
+        onPress: () => resolve({ didCancel: true, assets: [] }),
+      },
+    ]);
   });
 };
 
-export const launchCamera = (options?: ImagePickerOptions): Promise<ImagePickerResponse> => {
+export const launchCamera = (
+  options?: ImagePickerOptions
+): Promise<ImagePickerResponse> => {
   return new Promise((resolve) => {
     const cameraOptions: CameraOptions = {
-      mediaType: options?.mediaType || 'photo',
+      mediaType: options?.mediaType || "photo",
       quality: options?.quality || 0.8,
       maxWidth: options?.maxWidth || 1920,
       maxHeight: options?.maxHeight || 1920,
       includeBase64: false,
       saveToPhotos: true,
     };
-    
+
     ImagePicker.launchCamera(cameraOptions, (response) => {
       resolve(response);
     });
   });
 };
 
-export const launchImageLibrary = (options?: ImagePickerOptions): Promise<ImagePickerResponse> => {
+export const launchImageLibrary = (
+  options?: ImagePickerOptions
+): Promise<ImagePickerResponse> => {
   return new Promise((resolve) => {
     const libraryOptions: ImageLibraryOptions = {
-      mediaType: options?.mediaType || 'photo',
+      mediaType: options?.mediaType || "photo",
       quality: options?.quality || 0.8,
       maxWidth: options?.maxWidth || 1920,
       maxHeight: options?.maxHeight || 1920,
       includeBase64: false,
       selectionLimit: 1,
     };
-    
+
     ImagePicker.launchImageLibrary(libraryOptions, (response) => {
       resolve(response);
     });

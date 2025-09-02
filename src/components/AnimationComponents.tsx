@@ -1,9 +1,5 @@
-import React, { useRef, useEffect } from 'react';
-import {
-  View,
-  TouchableOpacity,
-  ViewStyle,
-} from 'react-native';
+import React, { useRef, useEffect } from "react";
+import { View, TouchableOpacity, ViewStyle } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -11,7 +7,7 @@ import Animated, {
   withTiming,
   interpolate,
   Extrapolation,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 interface AnimatedCardProps {
   children: React.ReactNode;
@@ -20,11 +16,11 @@ interface AnimatedCardProps {
   onPress?: () => void;
 }
 
-export const AnimatedCard: React.FC<AnimatedCardProps> = ({ 
-  children, 
-  delay = 0, 
+export const AnimatedCard: React.FC<AnimatedCardProps> = ({
+  children,
+  delay = 0,
   style,
-  onPress 
+  onPress,
 }) => {
   const scale = useSharedValue(0.9);
   const opacity = useSharedValue(0);
@@ -51,17 +47,13 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
   if (onPress) {
     return (
       <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
-        <Animated.View style={[animatedStyle, style]}>
-          {children}
-        </Animated.View>
+        <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>
       </TouchableOpacity>
     );
   }
 
   return (
-    <Animated.View style={[animatedStyle, style]}>
-      {children}
-    </Animated.View>
+    <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>
   );
 };
 
@@ -69,21 +61,21 @@ export const AnimatedCard: React.FC<AnimatedCardProps> = ({
 interface SlideInViewProps {
   children: React.ReactNode;
   delay?: number;
-  direction?: 'left' | 'right' | 'up' | 'down';
+  direction?: "left" | "right" | "up" | "down";
   style?: ViewStyle;
 }
 
-export const SlideInView: React.FC<SlideInViewProps> = ({ 
-  children, 
-  delay = 0, 
-  direction = 'up',
-  style 
+export const SlideInView: React.FC<SlideInViewProps> = ({
+  children,
+  delay = 0,
+  direction = "up",
+  style,
 }) => {
   const translateX = useSharedValue(
-    direction === 'left' ? -50 : direction === 'right' ? 50 : 0
+    direction === "left" ? -50 : direction === "right" ? 50 : 0
   );
   const translateY = useSharedValue(
-    direction === 'up' ? 50 : direction === 'down' ? -50 : 0
+    direction === "up" ? 50 : direction === "down" ? -50 : 0
   );
   const opacity = useSharedValue(0);
 
@@ -114,9 +106,7 @@ export const SlideInView: React.FC<SlideInViewProps> = ({
   }));
 
   return (
-    <Animated.View style={[animatedStyle, style]}>
-      {children}
-    </Animated.View>
+    <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>
   );
 };
 
@@ -128,11 +118,11 @@ interface FadeInViewProps {
   style?: ViewStyle;
 }
 
-export const FadeInView: React.FC<FadeInViewProps> = ({ 
-  children, 
-  delay = 0, 
+export const FadeInView: React.FC<FadeInViewProps> = ({
+  children,
+  delay = 0,
   duration = 150,
-  style 
+  style,
 }) => {
   const opacity = useSharedValue(0);
 
@@ -151,9 +141,7 @@ export const FadeInView: React.FC<FadeInViewProps> = ({
   }));
 
   return (
-    <Animated.View style={[animatedStyle, style]}>
-      {children}
-    </Animated.View>
+    <Animated.View style={[animatedStyle, style]}>{children}</Animated.View>
   );
 };
 
@@ -165,11 +153,11 @@ interface ScaleButtonProps {
   scaleTo?: number;
 }
 
-export const ScaleButton: React.FC<ScaleButtonProps> = ({ 
-  children, 
-  onPress, 
+export const ScaleButton: React.FC<ScaleButtonProps> = ({
+  children,
+  onPress,
   style,
-  scaleTo = 0.95 
+  scaleTo = 0.95,
 }) => {
   const scale = useSharedValue(1);
 

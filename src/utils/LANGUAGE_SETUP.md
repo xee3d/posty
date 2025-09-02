@@ -1,26 +1,26 @@
 // Android의 경우 MainApplication.java에 다음 코드 추가 필요:
-/*
+/\*
 import com.reactcommunity.rnlocalize.RNLocalizePackage;
 
 @Override
 protected List<ReactPackage> getPackages() {
-  return Arrays.<ReactPackage>asList(
-    new MainReactPackage(),
-    new RNLocalizePackage() // 이미 있어야 함
-  );
+return Arrays.<ReactPackage>asList(
+new MainReactPackage(),
+new RNLocalizePackage() // 이미 있어야 함
+);
 }
-*/
+\*/
 
 // iOS의 경우 Info.plist에 다음 추가:
-/*
+/_
 <key>CFBundleDevelopmentRegion</key>
 <string>ko</string>
 <key>CFBundleLocalizations</key>
 <array>
-  <string>ko</string>
-  <string>en</string>
+<string>ko</string>
+<string>en</string>
 </array>
-*/
+_/
 
 // 사용법:
 // 1. deviceLanguage.ts의 FORCE_KOREAN을 false로 변경

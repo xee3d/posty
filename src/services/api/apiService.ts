@@ -42,14 +42,14 @@ class ApiService {
       clearTimeout(timeoutId);
 
       // 응답 처리
-      const contentType = response.headers.get('content-type');
+      const contentType = response.headers.get("content-type");
       let data: any;
 
-      if (contentType?.includes('application/json')) {
+      if (contentType?.includes("application/json")) {
         try {
           data = await response.json();
         } catch (e) {
-          console.error('[ApiService] JSON parse error:', e);
+          console.error("[ApiService] JSON parse error:", e);
           data = null;
         }
       } else {
@@ -78,21 +78,23 @@ class ApiService {
 
       // 재시도 가능한 에러인지 확인
       const isRetryable =
-        error.name === 'AbortError' || // 타임아웃
-        error.message.includes('network') || // 네트워크 에러
-        error.message.includes('Server error'); // 서버 에러
+        error.name === "AbortError" || // 타임아웃
+        error.message.includes("network") || // 네트워크 에러
+        error.message.includes("Server error"); // 서버 에러
 
       if (isRetryable && retries < this.MAX_RETRIES) {
-        console.log(`[ApiService] Retry ${retries + 1}/${this.MAX_RETRIES} for ${url}`);
-        
+        console.log(
+          `[ApiService] Retry ${retries + 1}/${this.MAX_RETRIES} for ${url}`
+        );
+
         // 지수 백오프
         await this.delay(this.RETRY_DELAY * Math.pow(2, retries));
-        
+
         return this.callWithRetry(url, options, retries + 1);
       }
 
       return {
-        error: error.message || 'Unknown error',
+        error: error.message || "Unknown error",
         status: 0,
       };
     }
@@ -101,10 +103,13 @@ class ApiService {
   /**
    * GET 요청
    */
-  async get<T = any>(url: string, options?: ApiOptions): Promise<ApiResponse<T>> {
+  async get<T = any>(
+    url: string,
+    options?: ApiOptions
+  ): Promise<ApiResponse<T>> {
     return this.callWithRetry<T>(url, {
       ...options,
-      method: 'GET',
+      method: "GET",
     });
   }
 
@@ -118,9 +123,9 @@ class ApiService {
   ): Promise<ApiResponse<T>> {
     return this.callWithRetry<T>(url, {
       ...options,
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...options?.headers,
       },
       body: JSON.stringify(body),
@@ -131,7 +136,7 @@ class ApiService {
    * 지연 함수
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**

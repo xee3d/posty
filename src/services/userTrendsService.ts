@@ -1,6 +1,6 @@
 // 사용자 기반 트렌드 분석 서비스
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import simplePostService from './simplePostService';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import simplePostService from "./simplePostService";
 
 interface TrendData {
   hashtag: string;
@@ -26,7 +26,7 @@ interface TimeTrend {
 }
 
 interface TrendInsight {
-  type: 'hashtag' | 'category' | 'time' | 'general';
+  type: "hashtag" | "category" | "time" | "general";
   title: string;
   message: string;
   action?: {
@@ -37,12 +37,12 @@ interface TrendInsight {
 
 class UserTrendsService {
   private STORAGE_KEYS = {
-    TRENDS_CACHE: 'USER_TRENDS_CACHE',
-    TREND_HISTORY: 'TREND_HISTORY',
+    TRENDS_CACHE: "USER_TRENDS_CACHE",
+    TREND_HISTORY: "TREND_HISTORY",
   };
 
   // 사용자 기반 트렌드 분석
-  async analyzeTrends(period: 'today' | 'week' | 'month' = 'week'): Promise<{
+  async analyzeTrends(period: "today" | "week" | "month" = "week"): Promise<{
     hashtags: TrendData[];
     categories: CategoryTrend[];
     bestTimes: TimeTrend[];
@@ -57,23 +57,34 @@ class UserTrendsService {
     try {
       // 모든 게시물 가져오기
       const allPosts = await simplePostService.getPosts();
-      
+
       // 기간별 필터링
       const filteredPosts = this.filterPostsByPeriod(allPosts, period);
       const previousPosts = this.filterPostsByPeriod(allPosts, period, true);
 
       // 해시태그 트렌드 분석
-      const hashtagTrends = this.analyzeHashtagTrends(filteredPosts, previousPosts);
-      
+      const hashtagTrends = this.analyzeHashtagTrends(
+        filteredPosts,
+        previousPosts
+      );
+
       // 카테고리 트렌드 분석
-      const categoryTrends = this.analyzeCategoryTrends(filteredPosts, previousPosts);
-      
+      const categoryTrends = this.analyzeCategoryTrends(
+        filteredPosts,
+        previousPosts
+      );
+
       // 시간대별 트렌드 분석
       const timeTrends = this.analyzeTimeTrends(filteredPosts);
-      
+
       // 인사이트 생성
-      const insights = this.generateInsights(hashtagTrends, categoryTrends, timeTrends, period);
-      
+      const insights = this.generateInsights(
+        hashtagTrends,
+        categoryTrends,
+        timeTrends,
+        period
+      );
+
       // 통계 계산
       const stats = this.calculateStats(hashtagTrends, filteredPosts.length);
 
@@ -95,19 +106,23 @@ class UserTrendsService {
         stats,
       };
     } catch (error) {
-      console.error('Failed to analyze trends:', error);
+      console.error("Failed to analyze trends:", error);
       return this.getDefaultTrends();
     }
   }
 
   // 기간별 게시물 필터링
-  private filterPostsByPeriod(posts: any[], period: 'today' | 'week' | 'month', isPrevious = false): any[] {
+  private filterPostsByPeriod(
+    posts: any[],
+    period: "today" | "week" | "month",
+    isPrevious = false
+  ): any[] {
     const now = new Date();
     let startDate: Date;
     let endDate: Date;
 
     switch (period) {
-      case 'today':
+      case "today":
         if (isPrevious) {
           startDate = new Date(now);
           startDate.setDate(startDate.getDate() - 2);
@@ -119,7 +134,7 @@ class UserTrendsService {
           endDate = now;
         }
         break;
-      case 'week':
+      case "week":
         if (isPrevious) {
           startDate = new Date(now);
           startDate.setDate(startDate.getDate() - 14);
@@ -131,7 +146,7 @@ class UserTrendsService {
           endDate = now;
         }
         break;
-      case 'month':
+      case "month":
         if (isPrevious) {
           startDate = new Date(now);
           startDate.setMonth(startDate.getMonth() - 2);
@@ -145,26 +160,30 @@ class UserTrendsService {
         break;
     }
 
-    return posts.filter(post => {
+    return posts.filter((post) => {
       const postDate = new Date(post.createdAt);
       return postDate >= startDate && postDate <= endDate;
     });
   }
 
   // 해시태그 트렌드 분석
-  private analyzeHashtagTrends(currentPosts: any[], previousPosts: any[]): TrendData[] {
+  private analyzeHashtagTrends(
+    currentPosts: any[],
+    previousPosts: any[]
+  ): TrendData[] {
     // 현재 기간 해시태그 집계
     const currentHashtags = this.countHashtags(currentPosts);
     const previousHashtags = this.countHashtags(previousPosts);
 
     // 트렌드 데이터 생성
     const trends: TrendData[] = [];
-    
+
     Object.entries(currentHashtags).forEach(([hashtag, data]) => {
       const previousCount = previousHashtags[hashtag]?.count || 0;
-      const growth = previousCount > 0 
-        ? Math.round(((data.count - previousCount) / previousCount) * 100)
-        : 100; // 새로운 해시태그는 100% 성장
+      const growth =
+        previousCount > 0
+          ? Math.round(((data.count - previousCount) / previousCount) * 100)
+          : 100; // 새로운 해시태그는 100% 성장
 
       // 관련 해시태그 찾기
       const relatedHashtags = this.findRelatedHashtags(hashtag, currentPosts);
@@ -180,16 +199,20 @@ class UserTrendsService {
 
     // 정렬: 사용 횟수 > 성장률
     return trends.sort((a, b) => {
-      if (b.count !== a.count) return b.count - a.count;
+      if (b.count !== a.count) {
+        return b.count - a.count;
+      }
       return b.growth - a.growth;
     });
   }
 
   // 해시태그 집계
-  private countHashtags(posts: any[]): Record<string, { count: number; lastUsed: Date }> {
+  private countHashtags(
+    posts: any[]
+  ): Record<string, { count: number; lastUsed: Date }> {
     const hashtags: Record<string, { count: number; lastUsed: Date }> = {};
 
-    posts.forEach(post => {
+    posts.forEach((post) => {
       const postDate = new Date(post.createdAt);
       post.hashtags.forEach((tag: string) => {
         if (!hashtags[tag]) {
@@ -209,7 +232,7 @@ class UserTrendsService {
   private findRelatedHashtags(targetHashtag: string, posts: any[]): string[] {
     const relatedTags: Record<string, number> = {};
 
-    posts.forEach(post => {
+    posts.forEach((post) => {
       if (post.hashtags.includes(targetHashtag)) {
         post.hashtags.forEach((tag: string) => {
           if (tag !== targetHashtag) {
@@ -226,7 +249,10 @@ class UserTrendsService {
   }
 
   // 카테고리 트렌드 분석
-  private analyzeCategoryTrends(currentPosts: any[], previousPosts: any[]): CategoryTrend[] {
+  private analyzeCategoryTrends(
+    currentPosts: any[],
+    previousPosts: any[]
+  ): CategoryTrend[] {
     const currentCategories = this.countCategories(currentPosts);
     const previousCategories = this.countCategories(previousPosts);
     const totalPosts = currentPosts.length || 1;
@@ -235,9 +261,10 @@ class UserTrendsService {
 
     Object.entries(currentCategories).forEach(([category, data]) => {
       const previousCount = previousCategories[category]?.count || 0;
-      const growth = previousCount > 0
-        ? Math.round(((data.count - previousCount) / previousCount) * 100)
-        : 100;
+      const growth =
+        previousCount > 0
+          ? Math.round(((data.count - previousCount) / previousCount) * 100)
+          : 100;
 
       trends.push({
         category,
@@ -252,18 +279,23 @@ class UserTrendsService {
   }
 
   // 카테고리 집계
-  private countCategories(posts: any[]): Record<string, { count: number; hashtags: string[] }> {
-    const categories: Record<string, { count: number; hashtagCount: Record<string, number> }> = {};
+  private countCategories(
+    posts: any[]
+  ): Record<string, { count: number; hashtags: string[] }> {
+    const categories: Record<
+      string,
+      { count: number; hashtagCount: Record<string, number> }
+    > = {};
 
-    posts.forEach(post => {
-      const category = post.category || '기타';
+    posts.forEach((post) => {
+      const category = post.category || "기타";
       if (!categories[category]) {
         categories[category] = { count: 0, hashtagCount: {} };
       }
       categories[category].count++;
-      
+
       post.hashtags.forEach((tag: string) => {
-        categories[category].hashtagCount[tag] = 
+        categories[category].hashtagCount[tag] =
           (categories[category].hashtagCount[tag] || 0) + 1;
       });
     });
@@ -286,7 +318,7 @@ class UserTrendsService {
   private analyzeTimeTrends(posts: any[]): TimeTrend[] {
     const timeData: Record<number, { posts: number; engagement: number }> = {};
 
-    posts.forEach(post => {
+    posts.forEach((post) => {
       const hour = new Date(post.createdAt).getHours();
       if (!timeData[hour]) {
         timeData[hour] = { posts: 0, engagement: 0 };
@@ -312,13 +344,25 @@ class UserTrendsService {
 
   // 시간 라벨 생성
   private getTimeLabel(hour: number): string {
-    if (hour >= 6 && hour < 9) return '아침 (6-9시)';
-    if (hour >= 9 && hour < 12) return '오전 (9-12시)';
-    if (hour >= 12 && hour < 15) return '점심 (12-15시)';
-    if (hour >= 15 && hour < 18) return '오후 (15-18시)';
-    if (hour >= 18 && hour < 21) return '저녁 (18-21시)';
-    if (hour >= 21 && hour < 24) return '밤 (21-24시)';
-    return '새벽 (0-6시)';
+    if (hour >= 6 && hour < 9) {
+      return "아침 (6-9시)";
+    }
+    if (hour >= 9 && hour < 12) {
+      return "오전 (9-12시)";
+    }
+    if (hour >= 12 && hour < 15) {
+      return "점심 (12-15시)";
+    }
+    if (hour >= 15 && hour < 18) {
+      return "오후 (15-18시)";
+    }
+    if (hour >= 18 && hour < 21) {
+      return "저녁 (18-21시)";
+    }
+    if (hour >= 21 && hour < 24) {
+      return "밤 (21-24시)";
+    }
+    return "새벽 (0-6시)";
   }
 
   // 인사이트 생성
@@ -331,14 +375,14 @@ class UserTrendsService {
     const insights: TrendInsight[] = [];
 
     // 급성장 해시태그 인사이트
-    const risingHashtag = hashtags.find(h => h.growth > 50);
+    const risingHashtag = hashtags.find((h) => h.growth > 50);
     if (risingHashtag) {
       insights.push({
-        type: 'hashtag',
-        title: '🚀 급상승 해시태그',
+        type: "hashtag",
+        title: "🚀 급상승 해시태그",
         message: `#${risingHashtag.hashtag}가 ${risingHashtag.growth}% 성장했어요! 지금 이 해시태그로 게시물을 작성해보세요.`,
         action: {
-          text: '이 해시태그로 글쓰기',
+          text: "이 해시태그로 글쓰기",
           data: { hashtag: risingHashtag.hashtag },
         },
       });
@@ -348,12 +392,15 @@ class UserTrendsService {
     const topCategory = categories[0];
     if (topCategory && topCategory.percentage > 30) {
       insights.push({
-        type: 'category',
-        title: '🔥 인기 카테고리',
+        type: "category",
+        title: "🔥 인기 카테고리",
         message: `${topCategory.category} 카테고리가 전체의 ${topCategory.percentage}%를 차지하고 있어요. 관련 콘텐츠가 좋은 반응을 얻고 있습니다.`,
         action: {
-          text: '카테고리 콘텐츠 작성',
-          data: { category: topCategory.category, hashtags: topCategory.topHashtags },
+          text: "카테고리 콘텐츠 작성",
+          data: {
+            category: topCategory.category,
+            hashtags: topCategory.topHashtags,
+          },
         },
       });
     }
@@ -362,18 +409,19 @@ class UserTrendsService {
     const bestTime = times[0];
     if (bestTime) {
       insights.push({
-        type: 'time',
-        title: '⏰ 최적 포스팅 시간',
+        type: "time",
+        title: "⏰ 최적 포스팅 시간",
         message: `${bestTime.label}에 게시한 콘텐츠의 참여도가 가장 높아요. 평균 ${bestTime.engagement}의 참여를 받았습니다.`,
       });
     }
 
     // 일반 인사이트
-    if (period === 'week' && hashtags.length > 20) {
+    if (period === "week" && hashtags.length > 20) {
       insights.push({
-        type: 'general',
-        title: '💡 다양성 팁',
-        message: '이번 주 다양한 해시태그가 사용되고 있어요. 트렌드를 따르면서도 자신만의 독특한 해시태그를 만들어보세요!',
+        type: "general",
+        title: "💡 다양성 팁",
+        message:
+          "이번 주 다양한 해시태그가 사용되고 있어요. 트렌드를 따르면서도 자신만의 독특한 해시태그를 만들어보세요!",
       });
     }
 
@@ -382,12 +430,13 @@ class UserTrendsService {
 
   // 통계 계산
   private calculateStats(hashtags: TrendData[], totalPosts: number): any {
-    const trendingUp = hashtags.filter(h => h.growth > 10).length;
-    const trendingDown = hashtags.filter(h => h.growth < -10).length;
+    const trendingUp = hashtags.filter((h) => h.growth > 10).length;
+    const trendingDown = hashtags.filter((h) => h.growth < -10).length;
 
     return {
       totalPosts,
-      activeUsers: Math.floor(totalPosts * 2.5) + Math.floor(Math.random() * 100),
+      activeUsers:
+        Math.floor(totalPosts * 2.5) + Math.floor(Math.random() * 100),
       trendingUp,
       trendingDown,
     };
@@ -396,9 +445,12 @@ class UserTrendsService {
   // 캐시에 저장
   private async saveTrendsToCache(data: any): Promise<void> {
     try {
-      await AsyncStorage.setItem(this.STORAGE_KEYS.TRENDS_CACHE, JSON.stringify(data));
+      await AsyncStorage.setItem(
+        this.STORAGE_KEYS.TRENDS_CACHE,
+        JSON.stringify(data)
+      );
     } catch (error) {
-      console.error('Failed to save trends to cache:', error);
+      console.error("Failed to save trends to cache:", error);
     }
   }
 
@@ -406,11 +458,13 @@ class UserTrendsService {
   async getCachedTrends(): Promise<any | null> {
     try {
       const cached = await AsyncStorage.getItem(this.STORAGE_KEYS.TRENDS_CACHE);
-      if (!cached) return null;
+      if (!cached) {
+        return null;
+      }
 
       const data = JSON.parse(cached);
       const cacheAge = Date.now() - new Date(data.timestamp).getTime();
-      
+
       // 30분 이상 지난 캐시는 무효
       if (cacheAge > 30 * 60 * 1000) {
         return null;
@@ -418,7 +472,7 @@ class UserTrendsService {
 
       return data;
     } catch (error) {
-      console.error('Failed to get cached trends:', error);
+      console.error("Failed to get cached trends:", error);
       return null;
     }
   }
@@ -427,20 +481,38 @@ class UserTrendsService {
   private getDefaultTrends(): any {
     return {
       hashtags: [
-        { hashtag: '일상', count: 0, growth: 0, lastUsed: new Date(), relatedHashtags: [] },
-        { hashtag: '주말', count: 0, growth: 0, lastUsed: new Date(), relatedHashtags: [] },
+        {
+          hashtag: "일상",
+          count: 0,
+          growth: 0,
+          lastUsed: new Date(),
+          relatedHashtags: [],
+        },
+        {
+          hashtag: "주말",
+          count: 0,
+          growth: 0,
+          lastUsed: new Date(),
+          relatedHashtags: [],
+        },
       ],
       categories: [
-        { category: '일상', count: 0, percentage: 0, topHashtags: [], growth: 0 },
+        {
+          category: "일상",
+          count: 0,
+          percentage: 0,
+          topHashtags: [],
+          growth: 0,
+        },
       ],
       bestTimes: [
-        { hour: 19, posts: 0, engagement: 0, label: '저녁 (18-21시)' },
+        { hour: 19, posts: 0, engagement: 0, label: "저녁 (18-21시)" },
       ],
       insights: [
         {
-          type: 'general' as const,
-          title: '🌟 시작이 반!',
-          message: '첫 게시물을 작성하고 트렌드를 만들어보세요!',
+          type: "general" as const,
+          title: "🌟 시작이 반!",
+          message: "첫 게시물을 작성하고 트렌드를 만들어보세요!",
         },
       ],
       stats: {
@@ -454,21 +526,22 @@ class UserTrendsService {
 
   // 해시태그 추천
   async getHashtagRecommendations(input: string): Promise<string[]> {
-    const trends = await this.analyzeTrends('week');
+    const trends = await this.analyzeTrends("week");
     const inputLower = input.toLowerCase();
 
     // 입력과 관련된 해시태그 찾기
     const related = trends.hashtags
-      .filter(trend => 
-        trend.hashtag.toLowerCase().includes(inputLower) ||
-        trend.relatedHashtags.some(tag => tag.toLowerCase().includes(inputLower))
+      .filter(
+        (trend) =>
+          trend.hashtag.toLowerCase().includes(inputLower) ||
+          trend.relatedHashtags.some((tag) =>
+            tag.toLowerCase().includes(inputLower)
+          )
       )
-      .map(trend => trend.hashtag);
+      .map((trend) => trend.hashtag);
 
     // 인기 해시태그 추가
-    const popular = trends.hashtags
-      .slice(0, 5)
-      .map(trend => trend.hashtag);
+    const popular = trends.hashtags.slice(0, 5).map((trend) => trend.hashtag);
 
     // 중복 제거하고 반환
     return [...new Set([...related, ...popular])].slice(0, 10);

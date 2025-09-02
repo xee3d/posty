@@ -3,20 +3,23 @@
 ## 🎉 축하 사운드 사용 시나리오
 
 ### 1. 결제 성공 (이미 구현됨 ✅)
+
 - PaymentSuccessModal에서 사용 중
 - `soundManager.playCelebration()`
 - 진동 패턴: `[0, 100, 50, 100, 50, 200]`
 
 ### 2. 첫 콘텐츠 생성 🎊
+
 ```tsx
 // 사용자의 첫 번째 AI 콘텐츠 생성 완료 시
 if (isFirstContent) {
   soundManager.playCelebration();
-  showCelebrationModal('첫 콘텐츠 생성을 축하합니다! 🎉');
+  showCelebrationModal("첫 콘텐츠 생성을 축하합니다! 🎉");
 }
 ```
 
 ### 3. 미션 완료 🏆
+
 ```tsx
 // 일일 미션, 주간 미션 완료 시
 const handleMissionComplete = (mission: Mission) => {
@@ -26,6 +29,7 @@ const handleMissionComplete = (mission: Mission) => {
 ```
 
 ### 4. 레벨업 📈
+
 ```tsx
 // 사용자 레벨 상승 시
 if (newLevel > currentLevel) {
@@ -35,6 +39,7 @@ if (newLevel > currentLevel) {
 ```
 
 ### 5. 특별 이벤트 🎁
+
 - 100번째 콘텐츠 생성
 - 연속 7일 로그인
 - 친구 초대 성공
@@ -43,10 +48,11 @@ if (newLevel > currentLevel) {
 ## 🎵 사운드 파일 스펙
 
 ### celebration.mp3 요구사항
+
 ```
 - 길이: 1-2초
 - 분위기: 밝고 경쾌한 멜로디
-- 구성: 
+- 구성:
   - 시작: 빠른 상승음 (0-0.3초)
   - 중간: 팡파레 스타일 (0.3-1.5초)
   - 끝: 부드러운 마무리 (1.5-2초)
@@ -54,15 +60,19 @@ if (newLevel > currentLevel) {
 ```
 
 ### 무료 사운드 리소스
+
 1. **Freesound.org**
+
    - "achievement", "celebration", "success" 검색
    - CC0 라이선스 확인
 
 2. **Zapsplat.com**
+
    - 게임 사운드 카테고리
    - 무료 계정 필요
 
 3. **Mixkit.co**
+
    - 로열티 프리 사운드
    - 즉시 다운로드 가능
 
@@ -76,6 +86,7 @@ if (newLevel > currentLevel) {
 ## 🎨 진동 패턴 가이드
 
 ### 기본 축하 패턴
+
 ```tsx
 // 짧은 축하 (1초)
 Vibration.vibrate([0, 100, 50, 100, 50, 200]);
@@ -88,12 +99,13 @@ Vibration.vibrate([0, 50, 50, 50, 50, 100, 100, 200]);
 ```
 
 ### 플랫폼별 최적화
+
 ```tsx
 const playCelebrationVibration = () => {
-  if (Platform.OS === 'ios') {
+  if (Platform.OS === "ios") {
     // iOS: 부드러운 패턴
     Vibration.vibrate([0, 80, 40, 80, 40, 160]);
-  } else if (Platform.OS === 'android') {
+  } else if (Platform.OS === "android") {
     // Android: 강한 패턴
     Vibration.vibrate([0, 100, 50, 100, 50, 200]);
   }
@@ -104,18 +116,21 @@ const playCelebrationVibration = () => {
 ## 🛠️ 구현 체크리스트
 
 ### 사운드 파일 준비
+
 - [ ] celebration.mp3 파일 준비 (1-2초)
 - [ ] Android: `android/app/src/main/res/raw/` 폴더에 복사
 - [ ] iOS: Xcode에서 프로젝트에 추가
 - [ ] 파일명 소문자 확인 (celebration.mp3)
 
 ### 코드 구현
+
 - [ ] soundManager.ts에 playCelebration() 확인
 - [ ] 첫 콘텐츠 생성 트래킹 추가
 - [ ] 미션 완료 체크 로직 추가
 - [ ] 레벨업 체크 로직 추가
 
 ### 애니메이션 연동
+
 - [ ] SimpleConfetti 컴포넌트와 함께 사용
 - [ ] Lottie 애니메이션 추가 (선택사항)
 - [ ] 모달 애니메이션과 동기화
@@ -123,16 +138,17 @@ const playCelebrationVibration = () => {
 ## 📱 사용 예시
 
 ### 완전한 축하 경험 구현
+
 ```tsx
-import React, { useEffect } from 'react';
-import { View, Text, Modal } from 'react-native';
-import { soundManager } from '../utils/soundManager';
-import SimpleConfetti from '../components/celebration/SimpleConfetti';
-import Animated, { 
-  useSharedValue, 
-  useAnimatedStyle, 
-  withSpring 
-} from 'react-native-reanimated';
+import React, { useEffect } from "react";
+import { View, Text, Modal } from "react-native";
+import { soundManager } from "../utils/soundManager";
+import SimpleConfetti from "../components/celebration/SimpleConfetti";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+} from "react-native-reanimated";
 
 export const CelebrationModal = ({ visible, title, message, onClose }) => {
   const scale = useSharedValue(0);
@@ -141,13 +157,13 @@ export const CelebrationModal = ({ visible, title, message, onClose }) => {
     if (visible) {
       // 1. 사운드 재생
       soundManager.playCelebration();
-      
+
       // 2. 애니메이션 시작
       scale.value = withSpring(1, {
         damping: 15,
         stiffness: 150,
       });
-      
+
       // 3. 자동 닫기 (3초 후)
       setTimeout(() => {
         onClose();
@@ -164,7 +180,7 @@ export const CelebrationModal = ({ visible, title, message, onClose }) => {
       <View style={styles.overlay}>
         {/* 폭죽 효과 */}
         <SimpleConfetti isVisible={visible} />
-        
+
         {/* 축하 메시지 */}
         <Animated.View style={[styles.modalContent, animatedStyle]}>
           <Text style={styles.emoji}>🎉</Text>
@@ -180,10 +196,11 @@ export const CelebrationModal = ({ visible, title, message, onClose }) => {
 ## 🎯 성과 측정
 
 ### 사용자 반응 추적
+
 ```tsx
 // Analytics 이벤트
 const trackCelebration = (type: string) => {
-  analytics.track('celebration_triggered', {
+  analytics.track("celebration_triggered", {
     type,
     soundEnabled: soundManager.isSoundEnabled,
     vibrationEnabled: soundManager.isVibrationEnabled,
@@ -192,6 +209,7 @@ const trackCelebration = (type: string) => {
 ```
 
 ### A/B 테스트 제안
+
 1. 사운드 있음 vs 없음
 2. 진동 패턴 A vs B
 3. 애니메이션 길이 (1초 vs 2초)
@@ -199,14 +217,17 @@ const trackCelebration = (type: string) => {
 ## 💡 팁
 
 1. **과도한 사용 주의**
+
    - 특별한 순간에만 사용
    - 너무 자주 사용하면 효과 감소
 
 2. **사용자 설정 존중**
+
    - 항상 사운드/진동 설정 확인
    - 시스템 무음 모드 체크
 
 3. **접근성 고려**
+
    - 시각적 피드백도 함께 제공
    - 화면 리더 호환성 확인
 

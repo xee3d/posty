@@ -1,12 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Dimensions, FlatList, Modal,  } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { Achievement, ACHIEVEMENT_CATEGORIES, ACHIEVEMENTS } from '../types/achievement';
-import AchievementCard from '../components/AchievementCard';
-import ProgressBar from '../components/ProgressBar';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  RefreshControl,
+  Dimensions,
+  FlatList,
+  Modal,
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import {
+  Achievement,
+  ACHIEVEMENT_CATEGORIES,
+  ACHIEVEMENTS,
+} from "../types/achievement";
+import AchievementCard from "../components/AchievementCard";
+import ProgressBar from "../components/ProgressBar";
 
-import { Alert } from '../utils/customAlert';
-const { width } = Dimensions.get('window');
+import { Alert } from "../utils/customAlert";
+const { width } = Dimensions.get("window");
 
 interface CategorySummary {
   total: number;
@@ -16,11 +30,16 @@ interface CategorySummary {
 
 const AchievementsScreen: React.FC = () => {
   const [achievements, setAchievements] = useState<Achievement[]>(ACHIEVEMENTS);
-  const [selectedCategory, setSelectedCategory] = useState<'all' | 'writing' | 'style' | 'social' | 'special'>('all');
+  const [selectedCategory, setSelectedCategory] = useState<
+    "all" | "writing" | "style" | "social" | "special"
+  >("all");
   const [refreshing, setRefreshing] = useState(false);
-  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [selectedAchievement, setSelectedAchievement] =
+    useState<Achievement | null>(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
-  const [categorySummaries, setCategorySummaries] = useState<Record<string, CategorySummary>>({});
+  const [categorySummaries, setCategorySummaries] = useState<
+    Record<string, CategorySummary>
+  >({});
 
   useEffect(() => {
     calculateCategorySummaries();
@@ -28,21 +47,28 @@ const AchievementsScreen: React.FC = () => {
 
   const calculateCategorySummaries = () => {
     const summaries: Record<string, CategorySummary> = {};
-    
-    Object.keys(ACHIEVEMENT_CATEGORIES).forEach(category => {
-      const categoryAchievements = achievements.filter(a => a.category === category);
-      const unlockedCount = categoryAchievements.filter(a => a.isUnlocked).length;
-      
+
+    Object.keys(ACHIEVEMENT_CATEGORIES).forEach((category) => {
+      const categoryAchievements = achievements.filter(
+        (a) => a.category === category
+      );
+      const unlockedCount = categoryAchievements.filter(
+        (a) => a.isUnlocked
+      ).length;
+
       summaries[category] = {
         total: categoryAchievements.length,
         unlocked: unlockedCount,
-        percentage: categoryAchievements.length > 0 ? (unlockedCount / categoryAchievements.length) * 100 : 0,
+        percentage:
+          categoryAchievements.length > 0
+            ? (unlockedCount / categoryAchievements.length) * 100
+            : 0,
       };
     });
 
     // 전체 통계
-    const totalUnlocked = achievements.filter(a => a.isUnlocked).length;
-    summaries['all'] = {
+    const totalUnlocked = achievements.filter((a) => a.isUnlocked).length;
+    summaries.all = {
       total: achievements.length,
       unlocked: totalUnlocked,
       percentage: (totalUnlocked / achievements.length) * 100,
@@ -65,16 +91,20 @@ const AchievementsScreen: React.FC = () => {
   };
 
   const getFilteredAchievements = () => {
-    if (selectedCategory === 'all') {
+    if (selectedCategory === "all") {
       return achievements;
     }
-    return achievements.filter(a => a.category === selectedCategory);
+    return achievements.filter((a) => a.category === selectedCategory);
   };
 
-  const renderCategoryTab = (category: 'all' | 'writing' | 'style' | 'social' | 'special', label: string, icon?: string) => {
+  const renderCategoryTab = (
+    category: "all" | "writing" | "style" | "social" | "special",
+    label: string,
+    icon?: string
+  ) => {
     const isSelected = selectedCategory === category;
     const summary = categorySummaries[category] || { unlocked: 0, total: 0 };
-    
+
     return (
       <TouchableOpacity
         style={[styles.categoryTab, isSelected && styles.selectedTab]}
@@ -84,7 +114,7 @@ const AchievementsScreen: React.FC = () => {
           <Icon
             name={icon}
             size={24}
-            color={isSelected ? '#8B5CF6' : '#999999'}
+            color={isSelected ? "#8B5CF6" : "#999999"}
           />
         )}
         <Text style={[styles.tabLabel, isSelected && styles.selectedTabLabel]}>
@@ -98,7 +128,9 @@ const AchievementsScreen: React.FC = () => {
   };
 
   const renderAchievementDetail = () => {
-    if (!selectedAchievement) return null;
+    if (!selectedAchievement) {
+      return null;
+    }
 
     return (
       <Modal
@@ -116,10 +148,10 @@ const AchievementsScreen: React.FC = () => {
               <Icon name="close" size={24} color="#666666" />
             </TouchableOpacity>
 
-            <View 
+            <View
               style={[
                 styles.modalIconContainer,
-                { backgroundColor: selectedAchievement.badgeColor }
+                { backgroundColor: selectedAchievement.badgeColor },
               ]}
             >
               <Icon
@@ -130,7 +162,9 @@ const AchievementsScreen: React.FC = () => {
             </View>
 
             <Text style={styles.modalTitle}>{selectedAchievement.name}</Text>
-            <Text style={styles.modalDescription}>{selectedAchievement.description}</Text>
+            <Text style={styles.modalDescription}>
+              {selectedAchievement.description}
+            </Text>
 
             <View style={styles.modalInfoContainer}>
               <View style={styles.modalInfoRow}>
@@ -139,13 +173,15 @@ const AchievementsScreen: React.FC = () => {
                   {ACHIEVEMENT_CATEGORIES[selectedAchievement.category].name}
                 </Text>
               </View>
-              
+
               <View style={styles.modalInfoRow}>
                 <Text style={styles.modalInfoLabel}>희귀도</Text>
-                <Text style={[
-                  styles.modalInfoValue,
-                  { color: getRarityColor(selectedAchievement.rarity) }
-                ]}>
+                <Text
+                  style={[
+                    styles.modalInfoValue,
+                    { color: getRarityColor(selectedAchievement.rarity) },
+                  ]}
+                >
                   {getRarityName(selectedAchievement.rarity)}
                 </Text>
               </View>
@@ -153,23 +189,29 @@ const AchievementsScreen: React.FC = () => {
               <View style={styles.modalInfoRow}>
                 <Text style={styles.modalInfoLabel}>진행도</Text>
                 <Text style={styles.modalInfoValue}>
-                  {selectedAchievement.requirement.current || 0} / {selectedAchievement.requirement.target}
+                  {selectedAchievement.requirement.current || 0} /{" "}
+                  {selectedAchievement.requirement.target}
                 </Text>
               </View>
 
-              {selectedAchievement.isUnlocked && selectedAchievement.unlockedAt && (
-                <View style={styles.modalInfoRow}>
-                  <Text style={styles.modalInfoLabel}>획득일</Text>
-                  <Text style={styles.modalInfoValue}>
-                    {new Date(selectedAchievement.unlockedAt).toLocaleDateString()}
-                  </Text>
-                </View>
-              )}
+              {selectedAchievement.isUnlocked &&
+                selectedAchievement.unlockedAt && (
+                  <View style={styles.modalInfoRow}>
+                    <Text style={styles.modalInfoLabel}>획득일</Text>
+                    <Text style={styles.modalInfoValue}>
+                      {new Date(
+                        selectedAchievement.unlockedAt
+                      ).toLocaleDateString()}
+                    </Text>
+                  </View>
+                )}
             </View>
 
             {selectedAchievement.isUnlocked && (
               <TouchableOpacity style={styles.selectBadgeButton}>
-                <Text style={styles.selectBadgeButtonText}>대표 업적으로 설정</Text>
+                <Text style={styles.selectBadgeButtonText}>
+                  대표 업적으로 설정
+                </Text>
               </TouchableOpacity>
             )}
           </View>
@@ -180,20 +222,20 @@ const AchievementsScreen: React.FC = () => {
 
   const getRarityColor = (rarity: string) => {
     const colors = {
-      common: '#8B5CF6',
-      rare: '#F59E0B',
-      epic: '#FFD700',
-      legendary: '#DC2626',
+      common: "#8B5CF6",
+      rare: "#F59E0B",
+      epic: "#FFD700",
+      legendary: "#DC2626",
     };
-    return colors[rarity as keyof typeof colors] || '#666666';
+    return colors[rarity as keyof typeof colors] || "#666666";
   };
 
   const getRarityName = (rarity: string) => {
     const names = {
-      common: '일반',
-      rare: '희귀',
-      epic: '영웅',
-      legendary: '전설',
+      common: "일반",
+      rare: "희귀",
+      epic: "영웅",
+      legendary: "전설",
     };
     return names[rarity as keyof typeof names] || rarity;
   };
@@ -206,11 +248,12 @@ const AchievementsScreen: React.FC = () => {
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>전체 진행도</Text>
             <Text style={styles.summaryValue}>
-              {categorySummaries['all']?.unlocked || 0} / {categorySummaries['all']?.total || 0}
+              {categorySummaries.all?.unlocked || 0} /{" "}
+              {categorySummaries.all?.total || 0}
             </Text>
           </View>
-          <ProgressBar 
-            progress={categorySummaries['all']?.percentage || 0} 
+          <ProgressBar
+            progress={categorySummaries.all?.percentage || 0}
             height={8}
             backgroundColor="#FFFFFF33"
             fillColor="#FFFFFF"
@@ -218,17 +261,17 @@ const AchievementsScreen: React.FC = () => {
         </View>
       </View>
 
-      <ScrollView 
-        horizontal 
+      <ScrollView
+        horizontal
         showsHorizontalScrollIndicator={false}
         style={styles.categoryTabs}
         contentContainerStyle={styles.categoryTabsContent}
       >
-        {renderCategoryTab('all', '전체')}
-        {renderCategoryTab('writing', '글쓰기', 'create-outline')}
-        {renderCategoryTab('style', '스타일', 'color-palette-outline')}
-        {renderCategoryTab('social', '소셜', 'people-outline')}
-        {renderCategoryTab('special', '특별', 'star-outline')}
+        {renderCategoryTab("all", "전체")}
+        {renderCategoryTab("writing", "글쓰기", "create-outline")}
+        {renderCategoryTab("style", "스타일", "color-palette-outline")}
+        {renderCategoryTab("social", "소셜", "people-outline")}
+        {renderCategoryTab("special", "특별", "star-outline")}
       </ScrollView>
 
       <FlatList
@@ -262,45 +305,45 @@ const AchievementsScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F5F5',
+    backgroundColor: "#F5F5F5",
   },
   header: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: "#8B5CF6",
     paddingTop: 50,
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
   headerTitle: {
     fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+    fontWeight: "bold",
+    color: "#FFFFFF",
     marginBottom: 16,
   },
   summaryContainer: {
-    backgroundColor: '#FFFFFF20',
+    backgroundColor: "#FFFFFF20",
     borderRadius: 12,
     padding: 16,
   },
   summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 8,
   },
   summaryLabel: {
     fontSize: 14,
-    color: '#FFFFFFCC',
+    color: "#FFFFFFCC",
   },
   summaryValue: {
     fontSize: 16,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+    fontWeight: "bold",
+    color: "#FFFFFF",
   },
   categoryTabs: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     maxHeight: 80,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -314,63 +357,63 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     marginRight: 10,
     borderRadius: 20,
-    backgroundColor: '#F5F5F5',
-    alignItems: 'center',
+    backgroundColor: "#F5F5F5",
+    alignItems: "center",
     minWidth: 80,
   },
   selectedTab: {
-    backgroundColor: '#F3E8FF',
+    backgroundColor: "#F3E8FF",
   },
   tabLabel: {
     fontSize: 14,
-    color: '#666666',
+    color: "#666666",
     marginTop: 4,
   },
   selectedTabLabel: {
-    color: '#8B5CF6',
-    fontWeight: 'bold',
+    color: "#8B5CF6",
+    fontWeight: "bold",
   },
   tabCount: {
     fontSize: 12,
-    color: '#999999',
+    color: "#999999",
     marginTop: 2,
   },
   selectedTabCount: {
-    color: '#8B5CF6',
+    color: "#8B5CF6",
   },
   listContent: {
     padding: 15,
   },
   row: {
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   emptyState: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingTop: 100,
   },
   emptyText: {
     fontSize: 16,
-    color: '#999999',
+    color: "#999999",
     marginTop: 16,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: "#FFFFFF",
     borderRadius: 20,
     padding: 24,
     width: width * 0.9,
     maxWidth: 400,
-    alignItems: 'center',
+    alignItems: "center",
   },
   modalCloseButton: {
-    position: 'absolute',
+    position: "absolute",
     top: 16,
     right: 16,
     padding: 8,
@@ -379,54 +422,54 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 16,
   },
   modalTitle: {
     fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+    fontWeight: "bold",
+    color: "#1A1A1A",
     marginBottom: 8,
   },
   modalDescription: {
     fontSize: 14,
-    color: '#666666',
-    textAlign: 'center',
+    color: "#666666",
+    textAlign: "center",
     marginBottom: 24,
   },
   modalInfoContainer: {
-    width: '100%',
-    backgroundColor: '#F5F5F5',
+    width: "100%",
+    backgroundColor: "#F5F5F5",
     borderRadius: 12,
     padding: 16,
     marginBottom: 20,
   },
   modalInfoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 12,
   },
   modalInfoLabel: {
     fontSize: 14,
-    color: '#666666',
+    color: "#666666",
   },
   modalInfoValue: {
     fontSize: 14,
-    fontWeight: 'bold',
-    color: '#1A1A1A',
+    fontWeight: "bold",
+    color: "#1A1A1A",
   },
   selectBadgeButton: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: "#8B5CF6",
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 25,
   },
   selectBadgeButtonText: {
-    color: '#FFFFFF',
+    color: "#FFFFFF",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
 });
 

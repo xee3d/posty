@@ -1,89 +1,95 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { safeAsyncStorage } from '../utils/safeAsyncStorage';
-import { Achievement, ACHIEVEMENTS, UserProfile } from '../types/achievement';
-import { PostStats } from './types/postTypes';
-import { soundManager } from '../utils/soundManager';
-import vercelAuthService from './auth/vercelAuthService';
-import { store } from '../store';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { safeAsyncStorage } from "../utils/safeAsyncStorage";
+import { Achievement, ACHIEVEMENTS, UserProfile } from "../types/achievement";
+import { PostStats } from "./types/postTypes";
+import { soundManager } from "../utils/soundManager";
+import vercelAuthService from "./auth/vercelAuthService";
+import { store } from "../store";
 
 // 순환 참조 해결을 위해 lazy import 사용
 let simplePostService: any = null;
 
 const getSimplePostService = () => {
   if (!simplePostService) {
-    simplePostService = require('./simplePostService').default;
+    simplePostService = require("./simplePostService").default;
   }
   return simplePostService;
 };
 
 class AchievementService {
-  private STORAGE_KEY_PREFIX = 'USER_ACHIEVEMENTS_';
-  private PROFILE_KEY_PREFIX = 'USER_PROFILE_';
-  private STREAK_KEY_PREFIX = 'USER_STREAK_';
+  private STORAGE_KEY_PREFIX = "USER_ACHIEVEMENTS_";
+  private PROFILE_KEY_PREFIX = "USER_PROFILE_";
+  private STREAK_KEY_PREFIX = "USER_STREAK_";
   private initialized = false;
-  
+
   // 현재 사용자 UID 가져오기
   private async getCurrentUserId(): Promise<string> {
     try {
       const vercelUser = await vercelAuthService.getCurrentUser();
       const uid = vercelUser?.uid;
-      
-      if (!uid || uid === 'undefined' || uid === 'null' || uid.trim() === '') {
-        console.warn('⚠️ getCurrentUserId: Invalid or missing UID, using fallback');
-        return 'default_user';
+
+      if (!uid || uid === "undefined" || uid === "null" || uid.trim() === "") {
+        console.warn(
+          "⚠️ getCurrentUserId: Invalid or missing UID, using fallback"
+        );
+        return "default_user";
       }
-      
+
       return uid;
     } catch (error) {
-      console.error('❌ getCurrentUserId: Error getting user ID:', error);
-      return 'default_user';
+      console.error("❌ getCurrentUserId: Error getting user ID:", error);
+      return "default_user";
     }
   }
-  
+
   // 사용자별 스토리지 키 생성 (async)
   private async getUserStorageKey(baseKey: string): Promise<string> {
-    if (!baseKey || typeof baseKey !== 'string') {
-      console.error('❌ getUserStorageKey: Invalid baseKey:', baseKey);
-      baseKey = 'INVALID_BASE_KEY_';
+    if (!baseKey || typeof baseKey !== "string") {
+      console.error("❌ getUserStorageKey: Invalid baseKey:", baseKey);
+      baseKey = "INVALID_BASE_KEY_";
     }
-    
+
     const userId = await this.getCurrentUserId();
     const key = `${baseKey}${userId}`;
-    
+
     // Key validation
-    if (!key || key.includes('undefined') || key.includes('null')) {
-      console.error('❌ getUserStorageKey: Generated invalid key:', key);
-      return `SAFE_KEY_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    if (!key || key.includes("undefined") || key.includes("null")) {
+      console.error("❌ getUserStorageKey: Generated invalid key:", key);
+      return `SAFE_KEY_${Date.now()}_${Math.random()
+        .toString(36)
+        .substring(2, 8)}`;
     }
-    
+
     return key;
   }
-  
+
   // 기존 키들을 사용자별로 변환 (async methods)
   private async getStorageKey(): Promise<string> {
     return await this.getUserStorageKey(this.STORAGE_KEY_PREFIX);
   }
-  
+
   private async getProfileKey(): Promise<string> {
     return await this.getUserStorageKey(this.PROFILE_KEY_PREFIX);
   }
-  
+
   private async getStreakKey(): Promise<string> {
     return await this.getUserStorageKey(this.STREAK_KEY_PREFIX);
   }
-  
+
   // 사용자 변경 시 업적 초기화
   async resetForNewUser(): Promise<void> {
     try {
-      console.log('Resetting achievements for new user...');
+      console.log("Resetting achievements for new user...");
       const userId = await this.getCurrentUserId();
-      console.log('New user ID:', userId);
-      
+      console.log("New user ID:", userId);
+
       // 현재 사용자의 저장된 데이터 확인
       const storageKey = await this.getStorageKey();
       const existingData = await AsyncStorage.getItem(storageKey);
       if (!existingData) {
-        console.log('No existing achievements for this user, creating new profile');
+        console.log(
+          "No existing achievements for this user, creating new profile"
+        );
         // 새 사용자이므로 기본 프로필 생성
         const defaultProfile = this.getDefaultProfile();
         const profileKey = await this.getProfileKey();
@@ -91,82 +97,87 @@ class AchievementService {
         await AsyncStorage.setItem(profileKey, JSON.stringify(defaultProfile));
         await AsyncStorage.setItem(storageKey, JSON.stringify([]));
       } else {
-        console.log('Found existing achievements for this user');
+        console.log("Found existing achievements for this user");
       }
     } catch (error) {
-      console.error('Failed to reset achievements:', error);
+      console.error("Failed to reset achievements:", error);
     }
   }
-  
+
   // 모든 사용자의 업적 데이터 삭제 (디버깅용)
   async clearAllUsersAchievements(): Promise<void> {
     try {
       const keys = await AsyncStorage.getAllKeys();
-      const achievementKeys = keys.filter(key => 
-        key.startsWith(this.STORAGE_KEY_PREFIX) ||
-        key.startsWith(this.PROFILE_KEY_PREFIX) ||
-        key.startsWith(this.STREAK_KEY_PREFIX)
+      const achievementKeys = keys.filter(
+        (key) =>
+          key.startsWith(this.STORAGE_KEY_PREFIX) ||
+          key.startsWith(this.PROFILE_KEY_PREFIX) ||
+          key.startsWith(this.STREAK_KEY_PREFIX)
       );
-      
+
       if (achievementKeys.length > 0) {
         await AsyncStorage.multiRemove(achievementKeys);
-        console.log(`Cleared ${achievementKeys.length} achievement-related keys`);
+        console.log(
+          `Cleared ${achievementKeys.length} achievement-related keys`
+        );
       }
     } catch (error) {
-      console.error('Failed to clear all achievements:', error);
+      console.error("Failed to clear all achievements:", error);
     }
   }
-  
+
   // 초기화 메서드 - 이벤트 리스너 등록
   async initialize() {
-    if (this.initialized) return;
-    
+    if (this.initialized) {
+      return;
+    }
+
     const postService = getSimplePostService();
-    
+
     // 포스트 저장 시 업적 체크
     postService.onPostSaved(async () => {
       await this.checkAchievements();
     });
-    
+
     // 특별 이벤트 등록
     postService.onSpecialEvent(async (date: Date) => {
       await this.checkSpecialEvents(date);
     });
-    
+
     this.initialized = true;
   }
-  
+
   // 사용자 프로필 가져오기
   async getUserProfile(): Promise<UserProfile> {
     try {
       // Redux에서 현재 로그인한 사용자 정보 가져오기
       const state = store.getState();
       const currentUser = state.user;
-      
+
       // Vercel Auth에서 현재 사용자 확인
       const firebaseUser = await vercelAuthService.getCurrentUser();
-      
+
       // 저장된 프로필 가져오기
       const profileKey = await this.getProfileKey();
       const saved = await AsyncStorage.getItem(profileKey);
       const savedProfile = saved ? JSON.parse(saved) : null;
-      
+
       // 로그인한 사용자 정보가 있으면 사용
-      const displayName = currentUser?.displayName || 
-                         firebaseUser?.displayName || 
-                         savedProfile?.displayName || 
-                         'Posty User';
-      
-      const email = currentUser?.email || 
-                   firebaseUser?.email || 
-                   savedProfile?.email || 
-                   '';
-      
-      const photoURL = currentUser?.photoURL || 
-                      firebaseUser?.photoURL || 
-                      savedProfile?.photoURL || 
-                      null;
-      
+      const displayName =
+        currentUser?.displayName ||
+        firebaseUser?.displayName ||
+        savedProfile?.displayName ||
+        "Posty User";
+
+      const email =
+        currentUser?.email || firebaseUser?.email || savedProfile?.email || "";
+
+      const photoURL =
+        currentUser?.photoURL ||
+        firebaseUser?.photoURL ||
+        savedProfile?.photoURL ||
+        null;
+
       // 프로필 병합
       const profile: UserProfile = {
         displayName,
@@ -180,17 +191,17 @@ class AchievementService {
         selectedBadge: savedProfile?.selectedBadge,
         selectedTitle: savedProfile?.selectedTitle,
       };
-      
+
       // 프로필 저장
       await AsyncStorage.setItem(profileKey, JSON.stringify(profile));
-      
+
       return profile;
     } catch (error) {
-      console.error('Failed to get user profile:', error);
+      console.error("Failed to get user profile:", error);
       return this.getDefaultProfile();
     }
   }
-  
+
   // 프로필 업데이트
   async updateProfile(updates: Partial<UserProfile>): Promise<void> {
     try {
@@ -199,20 +210,20 @@ class AchievementService {
       const profileKey = await this.getProfileKey();
       await AsyncStorage.setItem(profileKey, JSON.stringify(updated));
     } catch (error) {
-      console.error('Failed to update profile:', error);
+      console.error("Failed to update profile:", error);
     }
   }
-  
+
   // 대표 배지 설정
   async setSelectedBadge(achievementId: string | null): Promise<void> {
     await this.updateProfile({ selectedBadge: achievementId || undefined });
   }
-  
+
   // 대표 칭호 설정
   async setSelectedTitle(title: string | null): Promise<void> {
     await this.updateProfile({ selectedTitle: title || undefined });
   }
-  
+
   // 업적 체크 및 업데이트
   async checkAchievements(): Promise<Achievement[]> {
     try {
@@ -220,227 +231,235 @@ class AchievementService {
       const stats = await postService.getStats();
       const savedAchievements = await this.getSavedAchievements();
       const newlyUnlocked: Achievement[] = [];
-      
+
       // 각 업적에 대해 달성 여부 체크
-      const updatedAchievements = ACHIEVEMENTS.map(achievement => {
-        const saved = savedAchievements.find(a => a.id === achievement.id);
-        
+      const updatedAchievements = ACHIEVEMENTS.map((achievement) => {
+        const saved = savedAchievements.find((a) => a.id === achievement.id);
+
         // 이미 달성한 업적이면 스킵
         if (saved?.isUnlocked) {
           return saved;
         }
-        
+
         let isUnlocked = false;
         let current = 0;
-        
+
         // 업적 타입에 따른 체크
         switch (achievement.requirement.type) {
-          case 'post_count':
+          case "post_count":
             current = stats.totalPosts || 0;
             isUnlocked = current >= achievement.requirement.target;
             break;
-            
-          case 'style_challenge':
+
+          case "style_challenge":
             // 챌린지 완료 여부는 improvedStyleService에서 체크
-            const completedChallenges = savedAchievements
-              .filter(a => a.category === 'style' && a.isUnlocked)
-              .length;
+            const completedChallenges = savedAchievements.filter(
+              (a) => a.category === "style" && a.isUnlocked
+            ).length;
             current = completedChallenges;
             isUnlocked = saved?.isUnlocked || false;
             break;
-            
-          case 'special_event':
+
+          case "special_event":
             // 특별 이벤트는 별도로 체크
             isUnlocked = saved?.isUnlocked || false;
             break;
         }
-        
+
         // 새로 달성한 업적인지 확인
         if (isUnlocked && !saved?.isUnlocked) {
           newlyUnlocked.push({ ...achievement, isUnlocked: true, isNew: true });
           soundManager.playSuccess();
         }
-        
+
         return {
           ...achievement,
           requirement: { ...achievement.requirement, current },
           isUnlocked,
-          unlockedAt: isUnlocked && !saved?.unlockedAt ? new Date().toISOString() : saved?.unlockedAt,
-          isNew: isUnlocked && !saved?.isUnlocked
+          unlockedAt:
+            isUnlocked && !saved?.unlockedAt
+              ? new Date().toISOString()
+              : saved?.unlockedAt,
+          isNew: isUnlocked && !saved?.isUnlocked,
         };
       });
-      
+
       // 업적 저장
       await this.saveAchievements(updatedAchievements);
-      
+
       // 프로필 업데이트
       if (newlyUnlocked.length > 0) {
         const profile = await this.getUserProfile();
-        
+
         // 희귀도에 따른 경험치 차등 부여
         let totalExp = 0;
-        newlyUnlocked.forEach(achievement => {
+        newlyUnlocked.forEach((achievement) => {
           switch (achievement.rarity) {
-            case 'common':
+            case "common":
               totalExp += 50;
               break;
-            case 'rare':
+            case "rare":
               totalExp += 100;
               break;
-            case 'epic':
+            case "epic":
               totalExp += 200;
               break;
-            case 'legendary':
+            case "legendary":
               totalExp += 500;
               break;
           }
         });
-        
+
         const newExp = profile.experience + totalExp;
-        
+
         // 레벨 계산 - 레벨이 올라갈수록 더 많은 경험치 필요
         const newLevel = this.calculateLevel(newExp);
-        
+
         await this.updateProfile({
           totalPosts: stats.totalPosts || 0,
-          achievements: updatedAchievements.filter(a => a.isUnlocked),
+          achievements: updatedAchievements.filter((a) => a.isUnlocked),
           experience: newExp,
-          level: newLevel
+          level: newLevel,
         });
       }
-      
+
       return newlyUnlocked;
     } catch (error) {
-      console.error('Failed to check achievements:', error);
+      console.error("Failed to check achievements:", error);
       return [];
     }
   }
-  
+
   // 특별 업적 달성 처리
   async unlockSpecialAchievement(achievementId: string): Promise<boolean> {
     try {
       const achievements = await this.getSavedAchievements();
-      const achievement = achievements.find(a => a.id === achievementId);
-      
+      const achievement = achievements.find((a) => a.id === achievementId);
+
       if (!achievement || achievement.isUnlocked) {
         return false;
       }
-      
+
       // 업적 달성
-      const updated = achievements.map(a => 
-        a.id === achievementId 
-          ? { ...a, isUnlocked: true, unlockedAt: new Date().toISOString(), isNew: true }
+      const updated = achievements.map((a) =>
+        a.id === achievementId
+          ? {
+              ...a,
+              isUnlocked: true,
+              unlockedAt: new Date().toISOString(),
+              isNew: true,
+            }
           : a
       );
-      
+
       await this.saveAchievements(updated);
       soundManager.playSuccess();
-      
+
       // 프로필 업데이트
       const profile = await this.getUserProfile();
       await this.updateProfile({
-        achievements: updated.filter(a => a.isUnlocked),
+        achievements: updated.filter((a) => a.isUnlocked),
         experience: profile.experience + 100,
-        level: Math.floor((profile.experience + 100) / 500) + 1
+        level: Math.floor((profile.experience + 100) / 500) + 1,
       });
-      
+
       return true;
     } catch (error) {
-      console.error('Failed to unlock special achievement:', error);
+      console.error("Failed to unlock special achievement:", error);
       return false;
     }
   }
-  
+
   // 업적 목록 가져오기
   async getAchievements(): Promise<Achievement[]> {
     try {
       const saved = await this.getSavedAchievements();
       const postService = getSimplePostService();
       const stats = await postService.getStats();
-      
+
       // 새로운 업적이 추가된 경우를 위해 머지하고 현재 진행도 업데이트
-      return ACHIEVEMENTS.map(achievement => {
-        const savedAchievement = saved.find(a => a.id === achievement.id);
-        
+      return ACHIEVEMENTS.map((achievement) => {
+        const savedAchievement = saved.find((a) => a.id === achievement.id);
+
         // 현재 진행도 계산
         let current = 0;
         switch (achievement.requirement.type) {
-          case 'post_count':
+          case "post_count":
             current = stats.totalPosts || 0;
             break;
-          case 'style_challenge':
+          case "style_challenge":
             // 챌린지 완료 여부는 저장된 데이터 사용
-            const completedChallenges = saved
-              .filter(a => a.category === 'style' && a.isUnlocked)
-              .length;
+            const completedChallenges = saved.filter(
+              (a) => a.category === "style" && a.isUnlocked
+            ).length;
             current = completedChallenges;
             break;
-          case 'streak':
+          case "streak":
             // 연속 작성 일수는 별도 처리
             current = savedAchievement?.requirement.current || 0;
             break;
-          case 'special_event':
+          case "special_event":
             // 특별 이벤트는 저장된 데이터 사용
             current = savedAchievement?.requirement.current || 0;
             break;
         }
-        
+
         // 저장된 업적이 있으면 병합, 없으면 기본값에 현재 진행도 추가
         if (savedAchievement) {
           return {
             ...savedAchievement,
             requirement: {
               ...savedAchievement.requirement,
-              current
-            }
+              current,
+            },
           };
         } else {
           return {
             ...achievement,
             requirement: {
               ...achievement.requirement,
-              current
-            }
+              current,
+            },
           };
         }
       });
     } catch (error) {
-      console.error('Failed to get achievements:', error);
+      console.error("Failed to get achievements:", error);
       return ACHIEVEMENTS;
     }
   }
-  
+
   // 카테고리별 업적 가져오기
   async getAchievementsByCategory(category: string): Promise<Achievement[]> {
     const all = await this.getAchievements();
-    return all.filter(a => a.category === category);
+    return all.filter((a) => a.category === category);
   }
-  
+
   // 달성한 업적만 가져오기
   async getUnlockedAchievements(): Promise<Achievement[]> {
     const all = await this.getAchievements();
-    return all.filter(a => a.isUnlocked);
+    return all.filter((a) => a.isUnlocked);
   }
-  
+
   // 새로운 업적 표시 제거
   async markAchievementsAsSeen(achievementIds: string[]): Promise<void> {
     try {
       const achievements = await this.getSavedAchievements();
-      const updated = achievements.map(a => 
+      const updated = achievements.map((a) =>
         achievementIds.includes(a.id) ? { ...a, isNew: false } : a
       );
       await this.saveAchievements(updated);
     } catch (error) {
-      console.error('Failed to mark achievements as seen:', error);
+      console.error("Failed to mark achievements as seen:", error);
     }
   }
-  
+
   // 진행률 계산
   getProgress(achievement: Achievement): number {
     const { current = 0, target } = achievement.requirement;
     return Math.min((current / target) * 100, 100);
   }
-  
+
   // Private 메서드들
   private async getSavedAchievements(): Promise<Achievement[]> {
     try {
@@ -448,37 +467,37 @@ class AchievementService {
       const saved = await AsyncStorage.getItem(storageKey);
       return saved ? JSON.parse(saved) : [];
     } catch (error) {
-      console.error('Failed to get saved achievements:', error);
+      console.error("Failed to get saved achievements:", error);
       return [];
     }
   }
-  
+
   private async saveAchievements(achievements: Achievement[]): Promise<void> {
     try {
       const storageKey = await this.getStorageKey();
       await AsyncStorage.setItem(storageKey, JSON.stringify(achievements));
     } catch (error) {
-      console.error('Failed to save achievements:', error);
+      console.error("Failed to save achievements:", error);
     }
   }
-  
+
   private getDefaultProfile(): UserProfile {
     // Redux에서 현재 사용자 정보 확인
     const state = store.getState();
     const currentUser = state.user;
-    
+
     return {
-      displayName: currentUser?.displayName || 'Posty User',
-      email: currentUser?.email || '',
+      displayName: currentUser?.displayName || "Posty User",
+      email: currentUser?.email || "",
       photoURL: currentUser?.photoURL || null,
       totalPosts: 0,
       joinedDate: new Date().toISOString(),
       achievements: [],
       level: 1,
-      experience: 0
+      experience: 0,
     };
   }
-  
+
   // 특별 이벤트 체크
   async checkSpecialEvents(postTime?: Date): Promise<void> {
     const hour = postTime ? postTime.getHours() : new Date().getHours();
@@ -486,193 +505,219 @@ class AchievementService {
     const date = postTime || new Date();
     const month = date.getMonth() + 1;
     const dayOfMonth = date.getDate();
-    
+
     // 얼리버드 체크 (새벽 5시)
     if (hour === 5) {
-      await this.unlockSpecialAchievement('early_bird');
+      await this.unlockSpecialAchievement("early_bird");
     }
-    
+
     // 올빼미 체크 (새벽 2시)
     if (hour === 2) {
-      await this.unlockSpecialAchievement('night_owl');
+      await this.unlockSpecialAchievement("night_owl");
     }
-    
+
     // 점심 작가 체크 (12시)
     if (hour === 12) {
-      await this.unlockSpecialAchievement('lunch_writer');
+      await this.unlockSpecialAchievement("lunch_writer");
     }
-    
+
     // 새해 첫 글 (1월 1일)
     if (month === 1 && dayOfMonth === 1) {
-      await this.unlockSpecialAchievement('new_year');
+      await this.unlockSpecialAchievement("new_year");
     }
-    
+
     // 크리스마스 글 (12월 25일)
     if (month === 12 && dayOfMonth === 25) {
-      await this.unlockSpecialAchievement('christmas_post');
+      await this.unlockSpecialAchievement("christmas_post");
     }
-    
+
     // 주말 전사 체크
     if (day === 0 || day === 6) {
       // 오늘 작성한 글 수 체크
       const postService = getSimplePostService();
       const posts = await postService.getRecentPosts(10);
       const today = new Date().toDateString();
-      const todayPosts = posts.filter(p => 
-        new Date(p.createdAt).toDateString() === today
+      const todayPosts = posts.filter(
+        (p) => new Date(p.createdAt).toDateString() === today
       );
-      
+
       if (todayPosts.length >= 5) {
-        await this.unlockSpecialAchievement('weekend_warrior');
+        await this.unlockSpecialAchievement("weekend_warrior");
       }
     }
-    
+
     // 연속 작성 업데이트
     await this.updateStreak();
-    
+
     // 완벽한 한 주 체크
     await this.checkPerfectWeek();
-    
+
     // 돌아온 작가 체크
     await this.checkComeback();
-    
+
     // Posty 베테랑 체크
     await this.checkVeteranStatus();
   }
-  
+
   // 연속 작성 일수 가져오기
   private async getCurrentStreak(): Promise<number> {
     try {
       const streakKey = await this.getStreakKey();
       const streakData = await AsyncStorage.getItem(streakKey);
-      if (!streakData) return 0;
-      
+      if (!streakData) {
+        return 0;
+      }
+
       const { count, lastPostDate } = JSON.parse(streakData);
       const lastPost = new Date(lastPostDate);
       const today = new Date();
-      
+
       // 마지막 글이 어제가 아니면 streak 종료
-      const diffDays = Math.floor((today.getTime() - lastPost.getTime()) / (1000 * 60 * 60 * 24));
-      if (diffDays > 1) return 0;
-      
+      const diffDays = Math.floor(
+        (today.getTime() - lastPost.getTime()) / (1000 * 60 * 60 * 24)
+      );
+      if (diffDays > 1) {
+        return 0;
+      }
+
       return count;
     } catch (error) {
       return 0;
     }
   }
-  
+
   // 연속 작성 업데이트
   private async updateStreak(): Promise<void> {
     try {
       const streakKey = await this.getStreakKey();
       const streakData = await AsyncStorage.getItem(streakKey);
       const today = new Date().toDateString();
-      
+
       if (!streakData) {
         // 첫 streak
-        await AsyncStorage.setItem(streakKey, JSON.stringify({
-          count: 1,
-          lastPostDate: today,
-          startDate: today
-        }));
+        await AsyncStorage.setItem(
+          streakKey,
+          JSON.stringify({
+            count: 1,
+            lastPostDate: today,
+            startDate: today,
+          })
+        );
         return;
       }
-      
+
       const { count, lastPostDate } = JSON.parse(streakData);
-      
+
       // 오늘 이미 글을 썼다면 무시
-      if (lastPostDate === today) return;
-      
+      if (lastPostDate === today) {
+        return;
+      }
+
       const lastPost = new Date(lastPostDate);
       const todayDate = new Date(today);
-      const diffDays = Math.floor((todayDate.getTime() - lastPost.getTime()) / (1000 * 60 * 60 * 24));
-      
+      const diffDays = Math.floor(
+        (todayDate.getTime() - lastPost.getTime()) / (1000 * 60 * 60 * 24)
+      );
+
       if (diffDays === 1) {
         // 연속 작성
         const newCount = count + 1;
-        await AsyncStorage.setItem(streakKey, JSON.stringify({
-          count: newCount,
-          lastPostDate: today,
-          startDate: JSON.parse(streakData).startDate
-        }));
-        
+        await AsyncStorage.setItem(
+          streakKey,
+          JSON.stringify({
+            count: newCount,
+            lastPostDate: today,
+            startDate: JSON.parse(streakData).startDate,
+          })
+        );
+
         // Streak 업적 체크
         if (newCount === 7) {
-          await this.unlockSpecialAchievement('streak_7');
+          await this.unlockSpecialAchievement("streak_7");
         } else if (newCount === 30) {
-          await this.unlockSpecialAchievement('streak_30');
+          await this.unlockSpecialAchievement("streak_30");
         } else if (newCount === 100) {
-          await this.unlockSpecialAchievement('streak_100');
+          await this.unlockSpecialAchievement("streak_100");
         }
       } else {
         // Streak 깨짐 - 다시 시작
-        await AsyncStorage.setItem(streakKey, JSON.stringify({
-          count: 1,
-          lastPostDate: today,
-          startDate: today
-        }));
+        await AsyncStorage.setItem(
+          streakKey,
+          JSON.stringify({
+            count: 1,
+            lastPostDate: today,
+            startDate: today,
+          })
+        );
       }
     } catch (error) {
-      console.error('Failed to update streak:', error);
+      console.error("Failed to update streak:", error);
     }
   }
-  
+
   // 완벽한 한 주 체크
   private async checkPerfectWeek(): Promise<void> {
     const postService = getSimplePostService();
     const posts = await postService.getRecentPosts(50);
     const now = new Date();
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-    
+
     // 지난 7일간의 글
-    const weekPosts = posts.filter(p => {
+    const weekPosts = posts.filter((p) => {
       const postDate = new Date(p.createdAt);
       return postDate >= weekAgo && postDate <= now;
     });
-    
+
     // 각 날짜별로 글이 있는지 체크
     const daysWithPosts = new Set();
-    weekPosts.forEach(p => {
+    weekPosts.forEach((p) => {
       daysWithPosts.add(new Date(p.createdAt).toDateString());
     });
-    
+
     if (daysWithPosts.size === 7) {
-      await this.unlockSpecialAchievement('perfect_week');
+      await this.unlockSpecialAchievement("perfect_week");
     }
   }
-  
+
   // 돌아온 작가 체크
   private async checkComeback(): Promise<void> {
     const postService = getSimplePostService();
     const posts = await postService.getPosts();
-    if (posts.length < 2) return;
-    
+    if (posts.length < 2) {
+      return;
+    }
+
     // 가장 최근 두 게시물 사이의 간격 확인
-    const sortedPosts = posts.sort((a, b) => 
-      new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    const sortedPosts = posts.sort(
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
-    
+
     const latest = new Date(sortedPosts[0].createdAt);
     const previous = new Date(sortedPosts[1].createdAt);
-    const diffDays = Math.floor((latest.getTime() - previous.getTime()) / (1000 * 60 * 60 * 24));
-    
+    const diffDays = Math.floor(
+      (latest.getTime() - previous.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
     if (diffDays >= 30) {
-      await this.unlockSpecialAchievement('comeback');
+      await this.unlockSpecialAchievement("comeback");
     }
   }
-  
+
   // 베테랑 상태 체크
   private async checkVeteranStatus(): Promise<void> {
     const profile = await this.getUserProfile();
     const joinDate = new Date(profile.joinedDate);
     const now = new Date();
-    const diffDays = Math.floor((now.getTime() - joinDate.getTime()) / (1000 * 60 * 60 * 24));
-    
+    const diffDays = Math.floor(
+      (now.getTime() - joinDate.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
     if (diffDays >= 365) {
-      await this.unlockSpecialAchievement('posty_veteran');
+      await this.unlockSpecialAchievement("posty_veteran");
     }
   }
-  
+
   // 레벨 계산 - 점차 더 많은 경험치 필요
   private calculateLevel(experience: number): number {
     // 레벨 1: 0 EXP
@@ -682,26 +727,30 @@ class AchievementService {
     // 레벨 5: 700 EXP
     // ...
     // 각 레벨마다 50씩 더 필요
-    
+
     let level = 1;
     let requiredExp = 0;
     let increment = 100;
-    
+
     while (experience >= requiredExp) {
       level++;
       requiredExp += increment;
       increment += 50;
     }
-    
+
     return level - 1;
   }
-  
+
   // 다음 레벨까지 필요한 경험치
-  async getExpToNextLevel(): Promise<{ current: number; required: number; percentage: number }> {
+  async getExpToNextLevel(): Promise<{
+    current: number;
+    required: number;
+    percentage: number;
+  }> {
     const profile = await this.getUserProfile();
     const currentExp = profile.experience;
     const currentLevel = profile.level;
-    
+
     // 현재 레벨의 시작 경험치
     let levelStartExp = 0;
     let increment = 100;
@@ -709,26 +758,26 @@ class AchievementService {
       levelStartExp += increment;
       increment += 50;
     }
-    
+
     // 다음 레벨에 필요한 총 경험치
     const nextLevelExp = levelStartExp + increment;
-    
+
     // 현재 레벨에서의 진행률
     const currentLevelProgress = currentExp - levelStartExp;
     const percentage = Math.round((currentLevelProgress / increment) * 100);
-    
+
     return {
       current: currentExp,
       required: nextLevelExp,
-      percentage: Math.min(percentage, 100)
+      percentage: Math.min(percentage, 100),
     };
   }
-  
+
   // 사용자 업적 가져오기 (getUnlockedAchievements의 alias)
   async getUserAchievements(): Promise<Achievement[]> {
     return this.getUnlockedAchievements();
   }
-  
+
   // 비어 있는 업적 초기화
   async clearAchievements(): Promise<void> {
     try {
@@ -738,9 +787,9 @@ class AchievementService {
       await AsyncStorage.removeItem(storageKey);
       await AsyncStorage.removeItem(profileKey);
       await AsyncStorage.removeItem(streakKey);
-      console.log('Achievements cleared for current user');
+      console.log("Achievements cleared for current user");
     } catch (error) {
-      console.error('Failed to clear achievements:', error);
+      console.error("Failed to clear achievements:", error);
     }
   }
 }

@@ -16,9 +16,14 @@ interface LogContext {
 }
 
 class Logger {
-  private level: LogLevel = __DEV__ ? 'DEBUG' : 'WARN';
+  private level: LogLevel = __DEV__ ? "DEBUG" : "WARN";
   private isProduction: boolean = !__DEV__;
-  private logBuffer: Array<{ timestamp: number; level: LogLevel; message: string; context?: LogContext }> = [];
+  private logBuffer: Array<{
+    timestamp: number;
+    level: LogLevel;
+    message: string;
+    context?: LogContext;
+  }> = [];
   private readonly MAX_BUFFER_SIZE = 50;
 
   setLevel(level: LogLevel) {
@@ -26,27 +31,40 @@ class Logger {
   }
 
   private sanitizeData(data: any): any {
-    if (typeof data === 'object' && data !== null) {
+    if (typeof data === "object" && data !== null) {
       // Always sanitize sensitive information
       const sanitized = Array.isArray(data) ? [...data] : { ...data };
-      
+
       const sensitiveKeys = [
-        'password', 'token', 'secret', 'key', 'accessToken', 
-        'refreshToken', 'idToken', 'apiKey', 'consumerSecret',
-        'email', 'phone', 'uid', 'vercelToken', 'authToken'
+        "password",
+        "token",
+        "secret",
+        "key",
+        "accessToken",
+        "refreshToken",
+        "idToken",
+        "apiKey",
+        "consumerSecret",
+        "email",
+        "phone",
+        "uid",
+        "vercelToken",
+        "authToken",
       ];
-      
+
       const sanitizeObject = (obj: any): any => {
         if (Array.isArray(obj)) {
-          return obj.map(item => this.sanitizeData(item));
+          return obj.map((item) => this.sanitizeData(item));
         }
-        if (typeof obj === 'object' && obj !== null) {
+        if (typeof obj === "object" && obj !== null) {
           const result: any = {};
           for (const [key, value] of Object.entries(obj)) {
-            if (sensitiveKeys.some(sensitiveKey => 
-              key.toLowerCase().includes(sensitiveKey.toLowerCase())
-            )) {
-              result[key] = '[REDACTED]';
+            if (
+              sensitiveKeys.some((sensitiveKey) =>
+                key.toLowerCase().includes(sensitiveKey.toLowerCase())
+              )
+            ) {
+              result[key] = "[REDACTED]";
             } else {
               result[key] = this.sanitizeData(value);
             }
@@ -55,13 +73,17 @@ class Logger {
         }
         return obj;
       };
-      
+
       return sanitizeObject(sanitized);
     }
     return data;
   }
 
-  private addToBuffer(level: LogLevel, message: string, context?: LogContext): void {
+  private addToBuffer(
+    level: LogLevel,
+    message: string,
+    context?: LogContext
+  ): void {
     if (this.logBuffer.length >= this.MAX_BUFFER_SIZE) {
       this.logBuffer.shift(); // Remove oldest entry
     }
@@ -69,31 +91,31 @@ class Logger {
       timestamp: Date.now(),
       level,
       message,
-      context: this.sanitizeData(context)
+      context: this.sanitizeData(context),
     });
   }
 
   debug(message: string, context?: LogContext) {
     if (LOG_LEVELS[this.level] <= LOG_LEVELS.DEBUG) {
-      this.addToBuffer('DEBUG', message, context);
+      this.addToBuffer("DEBUG", message, context);
       const sanitizedContext = this.sanitizeData(context);
-      console.log(`🐛 [DEBUG] ${message}`, sanitizedContext || '');
+      console.log(`🐛 [DEBUG] ${message}`, sanitizedContext || "");
     }
   }
 
   info(message: string, context?: LogContext) {
     if (LOG_LEVELS[this.level] <= LOG_LEVELS.INFO) {
-      this.addToBuffer('INFO', message, context);
+      this.addToBuffer("INFO", message, context);
       const sanitizedContext = this.sanitizeData(context);
-      console.log(`ℹ️ [INFO] ${message}`, sanitizedContext || '');
+      console.log(`ℹ️ [INFO] ${message}`, sanitizedContext || "");
     }
   }
 
   warn(message: string, context?: LogContext) {
     if (LOG_LEVELS[this.level] <= LOG_LEVELS.WARN) {
-      this.addToBuffer('WARN', message, context);
+      this.addToBuffer("WARN", message, context);
       const sanitizedContext = this.sanitizeData(context);
-      console.warn(`⚠️ [WARN] ${message}`, sanitizedContext || '');
+      console.warn(`⚠️ [WARN] ${message}`, sanitizedContext || "");
     }
   }
 
@@ -102,13 +124,13 @@ class Logger {
       ...context,
       ...(error && {
         errorMessage: error.message,
-        errorStack: __DEV__ ? error.stack : undefined
-      })
+        errorStack: __DEV__ ? error.stack : undefined,
+      }),
     };
-    
-    this.addToBuffer('ERROR', message, errorContext);
+
+    this.addToBuffer("ERROR", message, errorContext);
     const sanitizedContext = this.sanitizeData(errorContext);
-    console.error(`🚨 [ERROR] ${message}`, sanitizedContext || '');
+    console.error(`🚨 [ERROR] ${message}`, sanitizedContext || "");
   }
 
   // Sensitive information logging (development only)
@@ -121,7 +143,7 @@ class Logger {
   // Get recent logs for debugging
   getRecentLogs(level?: LogLevel) {
     if (level) {
-      return this.logBuffer.filter(log => log.level === level);
+      return this.logBuffer.filter((log) => log.level === level);
     }
     return [...this.logBuffer];
   }
@@ -148,9 +170,16 @@ class Logger {
 const logger = new Logger();
 
 // Convenience exports
-export const logDebug = (message: string, context?: LogContext) => logger.debug(message, context);
-export const logInfo = (message: string, context?: LogContext) => logger.info(message, context);
-export const logWarn = (message: string, context?: LogContext) => logger.warn(message, context);
-export const logError = (message: string, context?: LogContext, error?: Error) => logger.error(message, context, error);
+export const logDebug = (message: string, context?: LogContext) =>
+  logger.debug(message, context);
+export const logInfo = (message: string, context?: LogContext) =>
+  logger.info(message, context);
+export const logWarn = (message: string, context?: LogContext) =>
+  logger.warn(message, context);
+export const logError = (
+  message: string,
+  context?: LogContext,
+  error?: Error
+) => logger.error(message, context, error);
 
 export default logger;

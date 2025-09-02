@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -7,10 +7,10 @@ import {
   Image,
   Linking,
   Platform,
-} from 'react-native';
-import { COLORS, SPACING } from '../../utils/constants';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import { NativeAd } from '../../utils/adConfig';
+} from "react-native";
+import { COLORS, SPACING } from "../../utils/constants";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { NativeAd } from "../../utils/adConfig";
 
 interface NativeAdViewProps {
   ad: NativeAd;
@@ -18,18 +18,22 @@ interface NativeAdViewProps {
   style?: any;
 }
 
-export const NativeAdView: React.FC<NativeAdViewProps> = ({ ad, onPress, style }) => {
+export const NativeAdView: React.FC<NativeAdViewProps> = ({
+  ad,
+  onPress,
+  style,
+}) => {
   const handlePress = () => {
     if (onPress) {
       onPress();
     }
     // 광고 클릭 추적
-    console.log('Ad clicked:', ad.headline);
+    console.log("Ad clicked:", ad.headline);
   };
 
   return (
-    <TouchableOpacity 
-      style={[styles.container, style]} 
+    <TouchableOpacity
+      style={[styles.container, style]}
       onPress={handlePress}
       activeOpacity={0.8}
     >
@@ -38,19 +42,17 @@ export const NativeAdView: React.FC<NativeAdViewProps> = ({ ad, onPress, style }
       </View>
 
       <View style={styles.content}>
-        {ad.icon && (
-          <Image source={{ uri: ad.icon }} style={styles.icon} />
-        )}
-        
+        {ad.icon && <Image source={{ uri: ad.icon }} style={styles.icon} />}
+
         <View style={styles.textContent}>
           <Text style={styles.headline} numberOfLines={2}>
             {ad.headline}
           </Text>
-          
+
           <Text style={styles.body} numberOfLines={2}>
             {ad.body}
           </Text>
-          
+
           <View style={styles.footer}>
             <Text style={styles.advertiser}>{ad.advertiser}</Text>
             {ad.starRating && (
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
     }),
   },
   adBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 8,
     right: 8,
     backgroundColor: COLORS.primary,
@@ -104,11 +106,11 @@ const styles = StyleSheet.create({
   adBadgeText: {
     fontSize: 10,
     color: COLORS.white,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   content: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   icon: {
     width: 48,
@@ -122,7 +124,7 @@ const styles = StyleSheet.create({
   },
   headline: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 4,
   },
@@ -132,16 +134,16 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   footer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   advertiser: {
     fontSize: 12,
     color: COLORS.gray,
   },
   rating: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginLeft: SPACING.small,
   },
   ratingText: {
@@ -158,7 +160,7 @@ const styles = StyleSheet.create({
   ctaText: {
     color: COLORS.white,
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
 

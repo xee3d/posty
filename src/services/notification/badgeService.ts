@@ -3,10 +3,10 @@
  * iOS/Android 앱 아이콘 상단 숫자 표시
  */
 
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
 
-const BADGE_COUNT_KEY = 'app_badge_count';
+const BADGE_COUNT_KEY = "app_badge_count";
 
 interface BadgeNotification {
   id: string;
@@ -14,7 +14,7 @@ interface BadgeNotification {
   body: string;
   timestamp: number;
   isRead: boolean;
-  type: 'mission' | 'trend' | 'achievement' | 'tip';
+  type: "mission" | "trend" | "achievement" | "tip";
 }
 
 export class BadgeService {
@@ -39,15 +39,19 @@ export class BadgeService {
       this.badgeCount = savedCount ? parseInt(savedCount, 10) : 0;
 
       // 저장된 알림 목록 불러오기
-      const savedNotifications = await AsyncStorage.getItem('badge_notifications');
-      this.notifications = savedNotifications ? JSON.parse(savedNotifications) : [];
+      const savedNotifications = await AsyncStorage.getItem(
+        "badge_notifications"
+      );
+      this.notifications = savedNotifications
+        ? JSON.parse(savedNotifications)
+        : [];
 
       // 현재 배지 적용
       await this.updateBadge(this.badgeCount);
-      
+
       console.log(`📱 Badge initialized: ${this.badgeCount} notifications`);
     } catch (error) {
-      console.error('📱 Badge initialization failed:', error);
+      console.error("📱 Badge initialization failed:", error);
     }
   }
 
@@ -65,16 +69,19 @@ export class BadgeService {
         if (this.notifications.length > 50) {
           this.notifications = this.notifications.slice(0, 50);
         }
-        await AsyncStorage.setItem('badge_notifications', JSON.stringify(this.notifications));
+        await AsyncStorage.setItem(
+          "badge_notifications",
+          JSON.stringify(this.notifications)
+        );
       }
 
       // 배지 카운트 저장 및 적용
       await AsyncStorage.setItem(BADGE_COUNT_KEY, this.badgeCount.toString());
       await this.updateBadge(this.badgeCount);
-      
+
       console.log(`📱 Badge incremented: ${this.badgeCount}`);
     } catch (error) {
-      console.error('📱 Badge increment failed:', error);
+      console.error("📱 Badge increment failed:", error);
     }
   }
 
@@ -84,13 +91,13 @@ export class BadgeService {
   async decrementBadge(decrementBy = 1): Promise<void> {
     try {
       this.badgeCount = Math.max(0, this.badgeCount - decrementBy);
-      
+
       await AsyncStorage.setItem(BADGE_COUNT_KEY, this.badgeCount.toString());
       await this.updateBadge(this.badgeCount);
-      
+
       console.log(`📱 Badge decremented: ${this.badgeCount}`);
     } catch (error) {
-      console.error('📱 Badge decrement failed:', error);
+      console.error("📱 Badge decrement failed:", error);
     }
   }
 
@@ -102,13 +109,13 @@ export class BadgeService {
       this.badgeCount = 0;
       this.notifications = []; // 모든 알림 완전 삭제
 
-      await AsyncStorage.setItem(BADGE_COUNT_KEY, '0');
-      await AsyncStorage.setItem('badge_notifications', JSON.stringify([]));
+      await AsyncStorage.setItem(BADGE_COUNT_KEY, "0");
+      await AsyncStorage.setItem("badge_notifications", JSON.stringify([]));
       await this.updateBadge(0);
-      
-      console.log('📱 Badge cleared - all notifications removed');
+
+      console.log("📱 Badge cleared - all notifications removed");
     } catch (error) {
-      console.error('📱 Badge clear failed:', error);
+      console.error("📱 Badge clear failed:", error);
     }
   }
 
@@ -123,7 +130,7 @@ export class BadgeService {
    * 읽지 않은 알림 목록 조회
    */
   getUnreadNotifications(): BadgeNotification[] {
-    return this.notifications.filter(notification => !notification.isRead);
+    return this.notifications.filter((notification) => !notification.isRead);
   }
 
   /**
@@ -138,14 +145,19 @@ export class BadgeService {
    */
   async markNotificationAsRead(notificationId: string): Promise<void> {
     try {
-      const notification = this.notifications.find(n => n.id === notificationId);
+      const notification = this.notifications.find(
+        (n) => n.id === notificationId
+      );
       if (notification && !notification.isRead) {
         notification.isRead = true;
         await this.decrementBadge(1);
-        await AsyncStorage.setItem('badge_notifications', JSON.stringify(this.notifications));
+        await AsyncStorage.setItem(
+          "badge_notifications",
+          JSON.stringify(this.notifications)
+        );
       }
     } catch (error) {
-      console.error('📱 Mark notification as read failed:', error);
+      console.error("📱 Mark notification as read failed:", error);
     }
   }
 
@@ -154,23 +166,28 @@ export class BadgeService {
    */
   async removeNotification(notificationId: string): Promise<void> {
     try {
-      const notificationIndex = this.notifications.findIndex(n => n.id === notificationId);
+      const notificationIndex = this.notifications.findIndex(
+        (n) => n.id === notificationId
+      );
       if (notificationIndex !== -1) {
         const notification = this.notifications[notificationIndex];
-        
+
         // 읽지 않은 알림이었다면 배지 카운트 감소
         if (!notification.isRead) {
           await this.decrementBadge(1);
         }
-        
+
         // 알림 목록에서 완전 제거
         this.notifications.splice(notificationIndex, 1);
-        await AsyncStorage.setItem('badge_notifications', JSON.stringify(this.notifications));
-        
+        await AsyncStorage.setItem(
+          "badge_notifications",
+          JSON.stringify(this.notifications)
+        );
+
         console.log(`📱 Notification ${notificationId} removed`);
       }
     } catch (error) {
-      console.error('📱 Remove notification failed:', error);
+      console.error("📱 Remove notification failed:", error);
     }
   }
 
@@ -179,27 +196,31 @@ export class BadgeService {
    */
   private async updateBadge(count: number): Promise<void> {
     try {
-      if (Platform.OS === 'ios') {
+      if (Platform.OS === "ios") {
         // iOS의 경우 @react-native-community/push-notification-ios 사용
         try {
-          const PushNotificationIOS = require('@react-native-community/push-notification-ios');
+          const PushNotificationIOS = require("@react-native-community/push-notification-ios");
           PushNotificationIOS.setApplicationIconBadgeNumber(count);
           console.log(`📱 iOS badge set to: ${count}`);
         } catch (error) {
           // @react-native-community/push-notification-ios 대체 시도
           try {
-            const PushNotificationIOS = require('@react-native-community/push-notification-ios').default;
+            const PushNotificationIOS =
+              require("@react-native-community/push-notification-ios").default;
             PushNotificationIOS.setApplicationIconBadgeNumber(count);
             console.log(`📱 iOS badge set to: ${count} (PushNotificationIOS)`);
           } catch (iosError) {
-            console.log('📱 iOS badge not available - 실기기에서만 동작합니다');
+            console.log("📱 iOS badge not available - 실기기에서만 동작합니다");
           }
         }
-      } else if (Platform.OS === 'android') {
+      } else if (Platform.OS === "android") {
         // Android 배지 관리 (react-native-push-notification 재활성화)
         try {
-          const PushNotification = require('react-native-push-notification');
-          if (PushNotification && PushNotification.setApplicationIconBadgeNumber) {
+          const PushNotification = require("react-native-push-notification");
+          if (
+            PushNotification &&
+            PushNotification.setApplicationIconBadgeNumber
+          ) {
             PushNotification.setApplicationIconBadgeNumber(count);
             console.log(`📱 Android badge set to: ${count}`);
           } else {
@@ -210,7 +231,7 @@ export class BadgeService {
         }
       }
     } catch (error) {
-      console.error('📱 Platform badge update failed:', error);
+      console.error("📱 Platform badge update failed:", error);
     }
   }
 
@@ -221,16 +242,16 @@ export class BadgeService {
     try {
       const notification: BadgeNotification = {
         id: Date.now().toString(),
-        title: remoteMessage.notification?.title || '',
-        body: remoteMessage.notification?.body || '',
+        title: remoteMessage.notification?.title || "",
+        body: remoteMessage.notification?.body || "",
         timestamp: Date.now(),
         isRead: false,
-        type: remoteMessage.data?.type || 'mission',
+        type: remoteMessage.data?.type || "mission",
       };
 
       await this.incrementBadge(notification);
     } catch (error) {
-      console.error('📱 Handle push notification failed:', error);
+      console.error("📱 Handle push notification failed:", error);
     }
   }
 
@@ -244,24 +265,26 @@ export class BadgeService {
         await this.decrementBadge(1);
       }
     } catch (error) {
-      console.error('📱 Handle app active failed:', error);
+      console.error("📱 Handle app active failed:", error);
     }
   }
 
   /**
    * 특정 화면 방문 시 관련 알림 읽음 처리
    */
-  async markScreenVisited(screenType: 'mission' | 'trend' | 'achievement' | 'tip'): Promise<void> {
+  async markScreenVisited(
+    screenType: "mission" | "trend" | "achievement" | "tip"
+  ): Promise<void> {
     try {
       const unreadNotifications = this.notifications.filter(
-        n => !n.isRead && n.type === screenType
+        (n) => !n.isRead && n.type === screenType
       );
 
       for (const notification of unreadNotifications) {
         await this.markNotificationAsRead(notification.id);
       }
     } catch (error) {
-      console.error('📱 Mark screen visited failed:', error);
+      console.error("📱 Mark screen visited failed:", error);
     }
   }
 }

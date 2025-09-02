@@ -1,7 +1,7 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
-import DeviceInfo from 'react-native-device-info';
-import vercelAuthService from '../auth/vercelAuthService';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Platform } from "react-native";
+import DeviceInfo from "react-native-device-info";
+import vercelAuthService from "../auth/vercelAuthService";
 
 export interface SubscriptionPlan {
   id: string;
@@ -21,11 +21,11 @@ export interface SubscriptionPlan {
 export interface UserSubscription {
   userId: string;
   planId: string;
-  status: 'active' | 'cancelled' | 'expired' | 'trial';
+  status: "active" | "cancelled" | "expired" | "trial";
   startDate: string;
   endDate: string;
   autoRenew: boolean;
-  platform: 'ios' | 'android';
+  platform: "ios" | "android";
   purchaseToken?: string;
   originalTransactionId?: string;
 }
@@ -41,9 +41,9 @@ export interface PricingInfo {
 class ServerSubscriptionService {
   private baseUrl: string;
   private cachedPlans: Map<string, SubscriptionPlan[]> = new Map();
-  
+
   constructor() {
-    this.baseUrl = process.env.API_URL || 'https://api.posty.ai';
+    this.baseUrl = process.env.API_URL || "https://api.posty.ai";
   }
 
   /**
@@ -52,30 +52,35 @@ class ServerSubscriptionService {
   async getUserSubscription(): Promise<UserSubscription | null> {
     try {
       const user = await vercelAuthService.getCurrentUser();
-      if (!user) return null;
+      if (!user) {
+        return null;
+      }
 
-      const response = await fetch(`${this.baseUrl}/subscriptions/user/${user.uid}`, {
-        headers: {
-          'Authorization': `Bearer ${await vercelAuthService.getAuthToken()}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await fetch(
+        `${this.baseUrl}/subscriptions/user/${user.uid}`,
+        {
+          headers: {
+            Authorization: `Bearer ${await vercelAuthService.getAuthToken()}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch subscription');
+        throw new Error("Failed to fetch subscription");
       }
 
       const data = await response.json();
-      
+
       // 로컬 캐시에도 저장
-      await AsyncStorage.setItem('@user_subscription', JSON.stringify(data));
-      
+      await AsyncStorage.setItem("@user_subscription", JSON.stringify(data));
+
       return data.subscription;
     } catch (error) {
-      console.error('Error fetching subscription:', error);
-      
+      console.error("Error fetching subscription:", error);
+
       // 오프라인 시 로컬 캐시 사용
-      const cached = await AsyncStorage.getItem('@user_subscription');
+      const cached = await AsyncStorage.getItem("@user_subscription");
       return cached ? JSON.parse(cached) : null;
     }
   }
@@ -85,8 +90,8 @@ class ServerSubscriptionService {
    */
   async getLocalizedPlans(): Promise<SubscriptionPlan[]> {
     try {
-      const locale = DeviceInfo.getDeviceLocale() || 'en-US'; // ko-KR, en-US 등
-      const country = (await DeviceInfo.getDeviceCountry()) || 'US'; // KR, US 등
+      const locale = DeviceInfo.getDeviceLocale() || "en-US"; // ko-KR, en-US 등
+      const country = (await DeviceInfo.getDeviceCountry()) || "US"; // KR, US 등
       const cacheKey = `${country}-${locale}`;
 
       // 캐시 확인
@@ -96,32 +101,32 @@ class ServerSubscriptionService {
 
       const response = await fetch(`${this.baseUrl}/subscriptions/plans`, {
         headers: {
-          'X-Country-Code': country,
-          'X-Locale': locale,
-          'X-Platform': Platform.OS,
-          'Content-Type': 'application/json',
+          "X-Country-Code": country,
+          "X-Locale": locale,
+          "X-Platform": Platform.OS,
+          "Content-Type": "application/json",
         },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch plans');
+        throw new Error("Failed to fetch plans");
       }
 
       const plans = await response.json();
-      
+
       // 캐시에 저장
       this.cachedPlans.set(cacheKey, plans);
       await AsyncStorage.setItem(`@plans_${cacheKey}`, JSON.stringify(plans));
 
       return plans;
     } catch (error) {
-      console.error('Error fetching localized plans:', error);
-      
+      console.error("Error fetching localized plans:", error);
+
       // 오프라인 시 로컬 캐시 사용
-      const country = (await DeviceInfo.getDeviceCountry()) || 'US';
-      const locale = DeviceInfo.getDeviceLocale() || 'en-US';
+      const country = (await DeviceInfo.getDeviceCountry()) || "US";
+      const locale = DeviceInfo.getDeviceLocale() || "en-US";
       const cached = await AsyncStorage.getItem(`@plans_${country}-${locale}`);
-      
+
       if (cached) {
         return JSON.parse(cached);
       }
@@ -135,31 +140,34 @@ class ServerSubscriptionService {
    * 지역별 가격 정보 가져오기
    */
   async getPricingForCountry(planId: string): Promise<PricingInfo> {
-    const country = (await DeviceInfo.getDeviceCountry()) || 'US';
-    
+    const country = (await DeviceInfo.getDeviceCountry()) || "US";
+
     // 국가별 통화 매핑
     const currencyMap: Record<string, { currency: string; symbol: string }> = {
-      'KR': { currency: 'KRW', symbol: '₩' },
-      'US': { currency: 'USD', symbol: '$' },
-      'JP': { currency: 'JPY', symbol: '¥' },
-      'GB': { currency: 'GBP', symbol: '£' },
-      'EU': { currency: 'EUR', symbol: '€' },
-      'CN': { currency: 'CNY', symbol: '¥' },
-      'IN': { currency: 'INR', symbol: '₹' },
-      'BR': { currency: 'BRL', symbol: 'R$' },
-      'MX': { currency: 'MXN', symbol: '$' },
-      'CA': { currency: 'CAD', symbol: 'C$' },
-      'AU': { currency: 'AUD', symbol: 'A$' },
+      KR: { currency: "KRW", symbol: "₩" },
+      US: { currency: "USD", symbol: "$" },
+      JP: { currency: "JPY", symbol: "¥" },
+      GB: { currency: "GBP", symbol: "£" },
+      EU: { currency: "EUR", symbol: "€" },
+      CN: { currency: "CNY", symbol: "¥" },
+      IN: { currency: "INR", symbol: "₹" },
+      BR: { currency: "BRL", symbol: "R$" },
+      MX: { currency: "MXN", symbol: "$" },
+      CA: { currency: "CAD", symbol: "C$" },
+      AU: { currency: "AUD", symbol: "A$" },
       // 더 많은 국가 추가...
     };
 
-    const currencyInfo = currencyMap[country] || { currency: 'USD', symbol: '$' };
+    const currencyInfo = currencyMap[country] || {
+      currency: "USD",
+      symbol: "$",
+    };
 
     try {
       const response = await fetch(`${this.baseUrl}/subscriptions/pricing`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           planId,
@@ -169,7 +177,7 @@ class ServerSubscriptionService {
       });
 
       const data = await response.json();
-      
+
       return {
         currency: currencyInfo.currency,
         currencySymbol: currencyInfo.symbol,
@@ -178,8 +186,8 @@ class ServerSubscriptionService {
         localizedPrice: this.formatPrice(data.monthlyPrice, currencyInfo),
       };
     } catch (error) {
-      console.error('Error fetching pricing:', error);
-      
+      console.error("Error fetching pricing:", error);
+
       // 기본 가격 반환
       return this.getDefaultPricing(planId);
     }
@@ -191,17 +199,19 @@ class ServerSubscriptionService {
   async purchaseSubscription(
     planId: string,
     purchaseToken: string,
-    platform: 'ios' | 'android'
+    platform: "ios" | "android"
   ): Promise<UserSubscription> {
     try {
       const user = await vercelAuthService.getCurrentUser();
-      if (!user) throw new Error('User not authenticated');
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
 
       const response = await fetch(`${this.baseUrl}/subscriptions/purchase`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${await vercelAuthService.getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${await vercelAuthService.getAuthToken()}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: user.uid,
@@ -209,26 +219,29 @@ class ServerSubscriptionService {
           purchaseToken,
           platform,
           metadata: {
-            deviceId: (await DeviceInfo.getUniqueId()) || 'unknown-device',
-            country: (await DeviceInfo.getDeviceCountry()) || 'US',
-            locale: DeviceInfo.getDeviceLocale() || 'en-US',
+            deviceId: (await DeviceInfo.getUniqueId()) || "unknown-device",
+            country: (await DeviceInfo.getDeviceCountry()) || "US",
+            locale: DeviceInfo.getDeviceLocale() || "en-US",
           },
         }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.message || 'Purchase failed');
+        throw new Error(error.message || "Purchase failed");
       }
 
       const subscription = await response.json();
-      
+
       // 로컬에 저장
-      await AsyncStorage.setItem('@user_subscription', JSON.stringify(subscription));
-      
+      await AsyncStorage.setItem(
+        "@user_subscription",
+        JSON.stringify(subscription)
+      );
+
       return subscription;
     } catch (error) {
-      console.error('Purchase error:', error);
+      console.error("Purchase error:", error);
       throw error;
     }
   }
@@ -239,13 +252,15 @@ class ServerSubscriptionService {
   async verifySubscription(): Promise<boolean> {
     try {
       const user = await vercelAuthService.getCurrentUser();
-      if (!user) return false;
+      if (!user) {
+        return false;
+      }
 
       const response = await fetch(`${this.baseUrl}/subscriptions/verify`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${await vercelAuthService.getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${await vercelAuthService.getAuthToken()}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: user.uid,
@@ -254,26 +269,32 @@ class ServerSubscriptionService {
       });
 
       const result = await response.json();
-      
+
       if (result.valid) {
-        await AsyncStorage.setItem('@subscription_verified', 'true');
-        await AsyncStorage.setItem('@subscription_verified_date', new Date().toISOString());
+        await AsyncStorage.setItem("@subscription_verified", "true");
+        await AsyncStorage.setItem(
+          "@subscription_verified_date",
+          new Date().toISOString()
+        );
       }
 
       return result.valid;
     } catch (error) {
-      console.error('Verification error:', error);
-      
+      console.error("Verification error:", error);
+
       // 오프라인 시 최근 검증 결과 사용 (24시간 유효)
-      const lastVerified = await AsyncStorage.getItem('@subscription_verified_date');
+      const lastVerified = await AsyncStorage.getItem(
+        "@subscription_verified_date"
+      );
       if (lastVerified) {
         const verifiedDate = new Date(lastVerified);
         const now = new Date();
-        const hoursDiff = (now.getTime() - verifiedDate.getTime()) / (1000 * 60 * 60);
-        
+        const hoursDiff =
+          (now.getTime() - verifiedDate.getTime()) / (1000 * 60 * 60);
+
         if (hoursDiff < 24) {
-          const verified = await AsyncStorage.getItem('@subscription_verified');
-          return verified === 'true';
+          const verified = await AsyncStorage.getItem("@subscription_verified");
+          return verified === "true";
         }
       }
 
@@ -287,28 +308,30 @@ class ServerSubscriptionService {
   async cancelSubscription(): Promise<void> {
     try {
       const user = await vercelAuthService.getCurrentUser();
-      if (!user) throw new Error('User not authenticated');
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
 
       const response = await fetch(`${this.baseUrl}/subscriptions/cancel`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${await vercelAuthService.getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${await vercelAuthService.getAuthToken()}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: user.uid,
-          reason: 'user_cancelled',
+          reason: "user_cancelled",
         }),
       });
 
       if (!response.ok) {
-        throw new Error('Failed to cancel subscription');
+        throw new Error("Failed to cancel subscription");
       }
 
       // 로컬 캐시 삭제
-      await AsyncStorage.removeItem('@user_subscription');
+      await AsyncStorage.removeItem("@user_subscription");
     } catch (error) {
-      console.error('Cancel subscription error:', error);
+      console.error("Cancel subscription error:", error);
       throw error;
     }
   }
@@ -319,14 +342,16 @@ class ServerSubscriptionService {
   async syncTokenUsage(tokensUsed: number, action: string): Promise<void> {
     try {
       const user = await vercelAuthService.getCurrentUser();
-      if (!user) return;
+      if (!user) {
+        return;
+      }
 
       // 일단 로컬에 저장
-      const today = new Date().toISOString().split('T')[0];
+      const today = new Date().toISOString().split("T")[0];
       const usageKey = `@token_usage_${today}`;
       const currentUsage = await AsyncStorage.getItem(usageKey);
       const usage = currentUsage ? JSON.parse(currentUsage) : [];
-      
+
       usage.push({
         timestamp: new Date().toISOString(),
         tokens: tokensUsed,
@@ -338,7 +363,7 @@ class ServerSubscriptionService {
       // 서버와 동기화 (비동기로 처리)
       this.syncToServer(user.uid, usage).catch(console.error);
     } catch (error) {
-      console.error('Token usage sync error:', error);
+      console.error("Token usage sync error:", error);
     }
   }
 
@@ -348,24 +373,26 @@ class ServerSubscriptionService {
   private async syncToServer(userId: string, usage: any[]): Promise<void> {
     try {
       const user = await vercelAuthService.getCurrentUser();
-      if (!user) return;
+      if (!user) {
+        return;
+      }
 
       await fetch(`${this.baseUrl}/subscriptions/usage`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Authorization': `Bearer ${await vercelAuthService.getAuthToken()}`,
-          'Content-Type': 'application/json',
+          Authorization: `Bearer ${await vercelAuthService.getAuthToken()}`,
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId,
           usage,
           date: new Date().toISOString(),
-          deviceId: (await DeviceInfo.getUniqueId()) || 'unknown-device',
+          deviceId: (await DeviceInfo.getUniqueId()) || "unknown-device",
         }),
       });
     } catch (error) {
       // 실패해도 로컬에는 저장되어 있으므로 나중에 재시도
-      console.error('Server sync failed:', error);
+      console.error("Server sync failed:", error);
     }
   }
 
@@ -373,14 +400,14 @@ class ServerSubscriptionService {
    * 가격 포맷팅
    */
   private formatPrice(
-    price: number, 
+    price: number,
     currencyInfo: { currency: string; symbol: string }
   ): string {
-    const locale = DeviceInfo.getDeviceLocale() || 'en-US';
-    
+    const locale = DeviceInfo.getDeviceLocale() || "en-US";
+
     try {
       return new Intl.NumberFormat(locale, {
-        style: 'currency',
+        style: "currency",
         currency: currencyInfo.currency,
         minimumFractionDigits: 0,
         maximumFractionDigits: 0,
@@ -397,59 +424,69 @@ class ServerSubscriptionService {
   private getDefaultPlans(): SubscriptionPlan[] {
     return [
       {
-        id: 'free',
-        name: 'Free',
+        id: "free",
+        name: "Free",
         monthlyPrice: 0,
         yearlyPrice: 0,
-        currency: 'KRW',
+        currency: "KRW",
         features: {
           monthlyTokens: 0,
           dailyTokens: 10,
-          aiModel: 'gpt-3.5-turbo',
+          aiModel: "gpt-3.5-turbo",
           hasAds: true,
-          extraFeatures: ['Basic AI', 'Daily tokens'],
+          extraFeatures: ["Basic AI", "Daily tokens"],
         },
       },
       {
-        id: 'starter',
-        name: 'Starter',
+        id: "starter",
+        name: "Starter",
         monthlyPrice: 1900,
         yearlyPrice: 19000,
-        currency: 'KRW',
+        currency: "KRW",
         features: {
           monthlyTokens: 200,
           dailyTokens: 0,
-          aiModel: 'gpt-3.5-turbo',
+          aiModel: "gpt-3.5-turbo",
           hasAds: false,
-          extraFeatures: ['No ads', 'Monthly tokens', 'MyStyle analysis'],
+          extraFeatures: ["No ads", "Monthly tokens", "MyStyle analysis"],
         },
       },
       {
-        id: 'premium',
-        name: 'Premium',
+        id: "premium",
+        name: "Premium",
         monthlyPrice: 4900,
         yearlyPrice: 49000,
-        currency: 'KRW',
+        currency: "KRW",
         features: {
           monthlyTokens: 500,
           dailyTokens: 0,
-          aiModel: 'gpt-4',
+          aiModel: "gpt-4",
           hasAds: false,
-          extraFeatures: ['GPT-4', 'No ads', 'Priority support', 'Fast image analysis'],
+          extraFeatures: [
+            "GPT-4",
+            "No ads",
+            "Priority support",
+            "Fast image analysis",
+          ],
         },
       },
       {
-        id: 'pro',
-        name: 'Pro',
+        id: "pro",
+        name: "Pro",
         monthlyPrice: 14900,
         yearlyPrice: 149000,
-        currency: 'KRW',
+        currency: "KRW",
         features: {
           monthlyTokens: -1, // Unlimited
           dailyTokens: 0,
-          aiModel: 'gpt-4-turbo',
+          aiModel: "gpt-4-turbo",
           hasAds: false,
-          extraFeatures: ['GPT-4 Turbo', 'Unlimited tokens', 'API access', 'Priority support'],
+          extraFeatures: [
+            "GPT-4 Turbo",
+            "Unlimited tokens",
+            "API access",
+            "Priority support",
+          ],
         },
       },
     ];
@@ -460,11 +497,11 @@ class ServerSubscriptionService {
    */
   private getDefaultPricing(planId: string): PricingInfo {
     const plans = this.getDefaultPlans();
-    const plan = plans.find(p => p.id === planId);
-    
+    const plan = plans.find((p) => p.id === planId);
+
     return {
-      currency: 'USD',
-      currencySymbol: '$',
+      currency: "USD",
+      currencySymbol: "$",
       monthlyPrice: plan?.monthlyPrice || 0,
       yearlyPrice: plan?.yearlyPrice || 0,
       localizedPrice: `$${plan?.monthlyPrice || 0}`,

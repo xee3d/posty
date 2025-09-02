@@ -1,10 +1,10 @@
-import CryptoJS from 'crypto-js';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import DeviceInfo from 'react-native-device-info';
+import CryptoJS from "crypto-js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import DeviceInfo from "react-native-device-info";
 
 // 시크릿 키 (실제 배포 시 환경변수로 관리)
-const SECRET_KEY = 'POSTY_TOKEN_SECURITY_KEY_2024';
-const SALT = 'posty_salt_key';
+const SECRET_KEY = "POSTY_TOKEN_SECURITY_KEY_2024";
+const SALT = "posty_salt_key";
 
 interface SecurityValidationResult {
   isValid: boolean;
@@ -34,24 +34,26 @@ class TokenSecurityManager {
         buildId,
         serialNumber,
         androidId,
-        instanceId
+        instanceId,
       ] = await Promise.all([
         DeviceInfo.getDeviceId(),
         DeviceInfo.getBrand(),
         DeviceInfo.getModel(),
         DeviceInfo.getSystemVersion(),
         DeviceInfo.getBuildId(),
-        DeviceInfo.getSerialNumber().catch(() => 'unknown'),
-        DeviceInfo.getAndroidId().catch(() => 'unknown'),
-        DeviceInfo.getInstanceId().catch(() => 'unknown')
+        DeviceInfo.getSerialNumber().catch(() => "unknown"),
+        DeviceInfo.getAndroidId().catch(() => "unknown"),
+        DeviceInfo.getInstanceId().catch(() => "unknown"),
       ]);
 
       const fingerprintData = `${deviceId}-${brand}-${model}-${systemVersion}-${buildId}-${serialNumber}-${androidId}-${instanceId}`;
-      this.deviceFingerprint = CryptoJS.SHA256(fingerprintData + SALT).toString();
-      
+      this.deviceFingerprint = CryptoJS.SHA256(
+        fingerprintData + SALT
+      ).toString();
+
       return this.deviceFingerprint;
     } catch (error) {
-      console.error('Device fingerprint generation failed:', error);
+      console.error("Device fingerprint generation failed:", error);
       // 폴백: 랜덤하지만 영구적인 ID 생성
       const fallbackId = await this.getOrCreateFallbackId();
       this.deviceFingerprint = CryptoJS.SHA256(fallbackId + SALT).toString();
@@ -63,14 +65,16 @@ class TokenSecurityManager {
    * 폴백 디바이스 ID 생성/조회
    */
   private async getOrCreateFallbackId(): Promise<string> {
-    const key = '@posty_device_fallback_id';
+    const key = "@posty_device_fallback_id";
     let fallbackId = await AsyncStorage.getItem(key);
-    
+
     if (!fallbackId) {
-      fallbackId = `fallback_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+      fallbackId = `fallback_${Date.now()}_${Math.random()
+        .toString(36)
+        .substring(2, 15)}`;
       await AsyncStorage.setItem(key, fallbackId);
     }
-    
+
     return fallbackId;
   }
 
@@ -84,7 +88,7 @@ class TokenSecurityManager {
   ): Promise<string> {
     const deviceFingerprint = await this.generateDeviceFingerprint();
     const data = `${deviceFingerprint}-${taskType}-${timestamp}-${amount}`;
-    
+
     return CryptoJS.HmacSHA256(data, SECRET_KEY).toString();
   }
 
@@ -102,7 +106,7 @@ class TokenSecurityManager {
       timestamp,
       amount
     );
-    
+
     return expectedSignature === signature;
   }
 
@@ -111,15 +115,15 @@ class TokenSecurityManager {
    */
   validateTimestamp(timestamp: number): SecurityValidationResult {
     const now = Date.now();
-    const fiveMinutesAgo = now - (5 * 60 * 1000);
-    const oneMinuteInFuture = now + (1 * 60 * 1000);
+    const fiveMinutesAgo = now - 5 * 60 * 1000;
+    const oneMinuteInFuture = now + 1 * 60 * 1000;
 
     // 너무 오래된 요청
     if (timestamp < fiveMinutesAgo) {
       return {
         isValid: false,
-        reason: 'Request timestamp too old',
-        suspiciousActivity: true
+        reason: "Request timestamp too old",
+        suspiciousActivity: true,
       };
     }
 
@@ -127,8 +131,8 @@ class TokenSecurityManager {
     if (timestamp > oneMinuteInFuture) {
       return {
         isValid: false,
-        reason: 'Request timestamp in future',
-        suspiciousActivity: true
+        reason: "Request timestamp in future",
+        suspiciousActivity: true,
       };
     }
 
@@ -141,47 +145,51 @@ class TokenSecurityManager {
   async validateDailyLimit(): Promise<SecurityValidationResult> {
     const today = new Date().toDateString();
     const key = `@posty_daily_token_attempts_${today}`;
-    
+
     const attemptsStr = await AsyncStorage.getItem(key);
     const attempts = attemptsStr ? parseInt(attemptsStr) : 0;
 
     if (attempts >= this.maxDailyAttempts) {
       return {
         isValid: false,
-        reason: 'Daily token limit exceeded',
-        suspiciousActivity: attempts > this.suspiciousActivityThreshold
+        reason: "Daily token limit exceeded",
+        suspiciousActivity: attempts > this.suspiciousActivityThreshold,
       };
     }
 
     // 시도 횟수 증가
     await AsyncStorage.setItem(key, (attempts + 1).toString());
 
-    return { 
+    return {
       isValid: true,
-      suspiciousActivity: attempts > this.suspiciousActivityThreshold
+      suspiciousActivity: attempts > this.suspiciousActivityThreshold,
     };
   }
 
   /**
    * 의심스러운 패턴 감지
    */
-  async detectSuspiciousPattern(taskType: string): Promise<SecurityValidationResult> {
+  async detectSuspiciousPattern(
+    taskType: string
+  ): Promise<SecurityValidationResult> {
     const now = Date.now();
-    const tenMinutesAgo = now - (10 * 60 * 1000);
+    const tenMinutesAgo = now - 10 * 60 * 1000;
     const key = `@posty_task_history_${taskType}`;
-    
+
     const historyStr = await AsyncStorage.getItem(key);
     const history: number[] = historyStr ? JSON.parse(historyStr) : [];
-    
+
     // 최근 10분간의 요청만 유지
-    const recentHistory = history.filter(timestamp => timestamp > tenMinutesAgo);
-    
+    const recentHistory = history.filter(
+      (timestamp) => timestamp > tenMinutesAgo
+    );
+
     // 10분간 같은 작업을 5번 이상 시도한 경우
     if (recentHistory.length >= 5) {
       return {
         isValid: false,
-        reason: 'Too many requests for same task type',
-        suspiciousActivity: true
+        reason: "Too many requests for same task type",
+        suspiciousActivity: true,
       };
     }
 
@@ -195,35 +203,32 @@ class TokenSecurityManager {
   /**
    * 의심스러운 활동 로깅
    */
-  async logSuspiciousActivity(
-    activity: string,
-    details: any
-  ): Promise<void> {
+  async logSuspiciousActivity(activity: string, details: any): Promise<void> {
     const deviceFingerprint = await this.generateDeviceFingerprint();
     const logEntry = {
       timestamp: Date.now(),
       deviceFingerprint,
       activity,
       details,
-      userAgent: await DeviceInfo.getUserAgent().catch(() => 'unknown')
+      userAgent: await DeviceInfo.getUserAgent().catch(() => "unknown"),
     };
 
-    const key = '@posty_suspicious_activities';
+    const key = "@posty_suspicious_activities";
     const existingLogs = await AsyncStorage.getItem(key);
     const logs = existingLogs ? JSON.parse(existingLogs) : [];
-    
+
     logs.push(logEntry);
-    
+
     // 최근 100개 로그만 유지
     if (logs.length > 100) {
       logs.splice(0, logs.length - 100);
     }
-    
+
     await AsyncStorage.setItem(key, JSON.stringify(logs));
-    
+
     // 개발 모드에서는 콘솔에 출력
     if (__DEV__) {
-      console.warn('🚨 Suspicious Activity Detected:', logEntry);
+      console.warn("🚨 Suspicious Activity Detected:", logEntry);
     }
   }
 
@@ -240,10 +245,10 @@ class TokenSecurityManager {
     // 1. 타임스탬프 검증
     const timestampResult = this.validateTimestamp(timestamp);
     if (!timestampResult.isValid) {
-      await this.logSuspiciousActivity('invalid_timestamp', {
+      await this.logSuspiciousActivity("invalid_timestamp", {
         taskType,
         timestamp,
-        reason: timestampResult.reason
+        reason: timestampResult.reason,
       });
       return timestampResult;
     }
@@ -256,17 +261,17 @@ class TokenSecurityManager {
         amount,
         signature
       );
-      
+
       if (!signatureValid) {
-        await this.logSuspiciousActivity('invalid_signature', {
+        await this.logSuspiciousActivity("invalid_signature", {
           taskType,
           amount,
-          signature
+          signature,
         });
         return {
           isValid: false,
-          reason: 'Invalid request signature',
-          suspiciousActivity: true
+          reason: "Invalid request signature",
+          suspiciousActivity: true,
         };
       }
     }
@@ -280,16 +285,17 @@ class TokenSecurityManager {
     // 4. 의심스러운 패턴 감지
     const patternResult = await this.detectSuspiciousPattern(taskType);
     if (!patternResult.isValid) {
-      await this.logSuspiciousActivity('suspicious_pattern', {
+      await this.logSuspiciousActivity("suspicious_pattern", {
         taskType,
-        reason: patternResult.reason
+        reason: patternResult.reason,
       });
       return patternResult;
     }
 
-    return { 
+    return {
       isValid: true,
-      suspiciousActivity: dailyLimitResult.suspiciousActivity || patternResult.suspiciousActivity
+      suspiciousActivity:
+        dailyLimitResult.suspiciousActivity || patternResult.suspiciousActivity,
     };
   }
 
@@ -298,12 +304,13 @@ class TokenSecurityManager {
    */
   async resetSecurityData(): Promise<void> {
     const keys = await AsyncStorage.getAllKeys();
-    const securityKeys = keys.filter(key => 
-      key.startsWith('@posty_daily_token_attempts_') ||
-      key.startsWith('@posty_task_history_') ||
-      key === '@posty_suspicious_activities'
+    const securityKeys = keys.filter(
+      (key) =>
+        key.startsWith("@posty_daily_token_attempts_") ||
+        key.startsWith("@posty_task_history_") ||
+        key === "@posty_suspicious_activities"
     );
-    
+
     await AsyncStorage.multiRemove(securityKeys);
   }
 }

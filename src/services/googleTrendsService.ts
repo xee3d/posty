@@ -26,7 +26,7 @@ export interface TrendHashtag {
   rank: number;
   tag: string;
   traffic: string;
-  trend: 'up' | 'down' | 'stable';
+  trend: "up" | "down" | "stable";
   relatedTags?: string[];
   count?: string;
   change?: string;
@@ -34,8 +34,8 @@ export interface TrendHashtag {
 
 class GoogleTrendsService {
   private defaultOptions = {
-    geo: 'KR', // 한국
-    hl: 'ko',  // 한국어
+    geo: "KR", // 한국
+    hl: "ko", // 한국어
   };
 
   // React Native에서는 직접 fetch를 사용해야 함
@@ -43,21 +43,22 @@ class GoogleTrendsService {
     try {
       const response = await fetch(url, {
         headers: {
-          'Accept': 'application/json',
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          Accept: "application/json",
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
         },
       });
-      
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-      
+
       const text = await response.text();
       // Google Trends API는 ")]}'" 접두사를 붙여서 반환함
-      const jsonData = text.replace(/^\)\]\}\'/, '');
+      const jsonData = text.replace(/^\)\]\}\'/, "");
       return JSON.parse(jsonData);
     } catch (error) {
-      console.error('Fetch error:', error);
+      console.error("Fetch error:", error);
       throw error;
     }
   }
@@ -66,15 +67,15 @@ class GoogleTrendsService {
   async getTrendsAsHashtags(): Promise<TrendHashtag[]> {
     // React Native에서는 CORS 제한으로 직접 Google Trends 접근 불가
     // 백엔드 프록시 서버가 필요하거나 대체 API 사용
-    
+
     // 옵션 1: 백엔드 서버를 통한 프록시
     // const response = await fetch('https://your-backend.com/api/trends');
     // const data = await response.json();
     // return this.formatTrendsData(data);
-    
+
     // 옵션 2: 대체 API 사용 (예: Twitter Trends API)
     // 실제 구현 시 이 부분을 교체
-    
+
     // 임시로 시뮬레이션된 데이터 반환
     return this.getSimulatedTrends();
   }
@@ -82,16 +83,16 @@ class GoogleTrendsService {
   // 시뮬레이션된 트렌드 데이터 (개발/테스트용)
   private getSimulatedTrends(): TrendHashtag[] {
     const trends = [
-      { query: '크리스마스', traffic: '50K+' },
-      { query: '연말정산', traffic: '30K+' },
-      { query: '새해계획', traffic: '25K+' },
-      { query: '겨울여행', traffic: '20K+' },
-      { query: '홈파티', traffic: '15K+' },
-      { query: '연말모임', traffic: '12K+' },
-      { query: '선물추천', traffic: '10K+' },
-      { query: '할인행사', traffic: '8K+' },
-      { query: '따뜻한차', traffic: '5K+' },
-      { query: '실내데이트', traffic: '3K+' },
+      { query: "크리스마스", traffic: "50K+" },
+      { query: "연말정산", traffic: "30K+" },
+      { query: "새해계획", traffic: "25K+" },
+      { query: "겨울여행", traffic: "20K+" },
+      { query: "홈파티", traffic: "15K+" },
+      { query: "연말모임", traffic: "12K+" },
+      { query: "선물추천", traffic: "10K+" },
+      { query: "할인행사", traffic: "8K+" },
+      { query: "따뜻한차", traffic: "5K+" },
+      { query: "실내데이트", traffic: "3K+" },
     ];
 
     return trends.map((trend, index) => ({
@@ -104,57 +105,63 @@ class GoogleTrendsService {
     }));
   }
 
-  private getRandomTrend(): 'up' | 'down' | 'stable' {
+  private getRandomTrend(): "up" | "down" | "stable" {
     const random = Math.random();
-    if (random > 0.6) return 'up';
-    if (random > 0.3) return 'stable';
-    return 'down';
+    if (random > 0.6) {
+      return "up";
+    }
+    if (random > 0.3) {
+      return "stable";
+    }
+    return "down";
   }
 
   private getRandomChange(): string {
     const trend = this.getRandomTrend();
     const percentage = Math.floor(Math.random() * 30) + 1;
-    
+
     switch (trend) {
-      case 'up':
+      case "up":
         return `+${percentage}%`;
-      case 'down':
+      case "down":
         return `-${percentage}%`;
       default:
-        return '+0%';
+        return "+0%";
     }
   }
 
   // 카테고리별 트렌드
-  async getCategoryTrends(category: 'food' | 'beauty' | 'lifestyle' | 'entertainment'): Promise<any> {
+  async getCategoryTrends(
+    category: "food" | "beauty" | "lifestyle" | "entertainment"
+  ): Promise<any> {
     const categoryTrends = {
       food: [
-        { keyword: '크리스마스케이크', averageInterest: 85, trend: 'up' },
-        { keyword: '홈파티음식', averageInterest: 72, trend: 'up' },
-        { keyword: '따뜻한국물', averageInterest: 68, trend: 'stable' },
-        { keyword: '연말술안주', averageInterest: 60, trend: 'up' },
-        { keyword: '겨울디저트', averageInterest: 55, trend: 'stable' },
+        { keyword: "크리스마스케이크", averageInterest: 85, trend: "up" },
+        { keyword: "홈파티음식", averageInterest: 72, trend: "up" },
+        { keyword: "따뜻한국물", averageInterest: 68, trend: "stable" },
+        { keyword: "연말술안주", averageInterest: 60, trend: "up" },
+        { keyword: "겨울디저트", averageInterest: 55, trend: "stable" },
       ],
       beauty: [
-        { keyword: '겨울립스틱', averageInterest: 78, trend: 'up' },
-        { keyword: '보습크림', averageInterest: 82, trend: 'up' },
-        { keyword: '파티메이크업', averageInterest: 65, trend: 'stable' },
-        { keyword: '핸드크림', averageInterest: 70, trend: 'up' },
-        { keyword: '향수추천', averageInterest: 58, trend: 'stable' },
+        { keyword: "겨울립스틱", averageInterest: 78, trend: "up" },
+        { keyword: "보습크림", averageInterest: 82, trend: "up" },
+        { keyword: "파티메이크업", averageInterest: 65, trend: "stable" },
+        { keyword: "핸드크림", averageInterest: 70, trend: "up" },
+        { keyword: "향수추천", averageInterest: 58, trend: "stable" },
       ],
       lifestyle: [
-        { keyword: '연말정리', averageInterest: 90, trend: 'up' },
-        { keyword: '새해다짐', averageInterest: 75, trend: 'up' },
-        { keyword: '겨울인테리어', averageInterest: 60, trend: 'stable' },
-        { keyword: '홈트레이닝', averageInterest: 55, trend: 'stable' },
-        { keyword: '독서추천', averageInterest: 48, trend: 'down' },
+        { keyword: "연말정리", averageInterest: 90, trend: "up" },
+        { keyword: "새해다짐", averageInterest: 75, trend: "up" },
+        { keyword: "겨울인테리어", averageInterest: 60, trend: "stable" },
+        { keyword: "홈트레이닝", averageInterest: 55, trend: "stable" },
+        { keyword: "독서추천", averageInterest: 48, trend: "down" },
       ],
       entertainment: [
-        { keyword: '넷플릭스추천', averageInterest: 88, trend: 'up' },
-        { keyword: '연말영화', averageInterest: 76, trend: 'up' },
-        { keyword: '크리스마스노래', averageInterest: 82, trend: 'up' },
-        { keyword: '보드게임', averageInterest: 52, trend: 'stable' },
-        { keyword: '실내놀이', averageInterest: 45, trend: 'stable' },
+        { keyword: "넷플릭스추천", averageInterest: 88, trend: "up" },
+        { keyword: "연말영화", averageInterest: 76, trend: "up" },
+        { keyword: "크리스마스노래", averageInterest: 82, trend: "up" },
+        { keyword: "보드게임", averageInterest: 52, trend: "stable" },
+        { keyword: "실내놀이", averageInterest: 45, trend: "stable" },
       ],
     };
 
@@ -167,9 +174,9 @@ class GoogleTrendsService {
   // 실시간 업데이트 시뮬레이션 (배터리 최적화)
   subscribeToTrends(callback: (trends: TrendHashtag[]) => void): () => void {
     // 배터리 최적화: batteryOptimizer 사용
-    import('../utils/batteryOptimization').then(({ batteryOptimizer }) => {
+    import("../utils/batteryOptimization").then(({ batteryOptimizer }) => {
       batteryOptimizer.registerInterval(
-        'trends-update',
+        "trends-update",
         async () => {
           const trends = await this.getTrendsAsHashtags();
           callback(trends);
@@ -177,15 +184,15 @@ class GoogleTrendsService {
         60 * 60 * 1000, // 1시간으로 늘림 (배터리 절약)
         {
           runInBackground: false,
-          priority: 'low'
+          priority: "low",
         }
       );
     });
 
     // cleanup 함수 반환
     return () => {
-      import('../utils/batteryOptimization').then(({ batteryOptimizer }) => {
-        batteryOptimizer.clearInterval('trends-update');
+      import("../utils/batteryOptimization").then(({ batteryOptimizer }) => {
+        batteryOptimizer.clearInterval("trends-update");
       });
     };
   }

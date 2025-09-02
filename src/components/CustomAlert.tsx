@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,12 +7,12 @@ import {
   StyleSheet,
   Animated,
   Dimensions,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { SPACING, BORDER_RADIUS } from '../utils/constants';
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import { useAppTheme } from "../hooks/useAppTheme";
+import { SPACING, BORDER_RADIUS } from "../utils/constants";
 
-const { width: screenWidth } = Dimensions.get('window');
+const { width: screenWidth } = Dimensions.get("window");
 
 interface CustomAlertProps {
   visible: boolean;
@@ -21,7 +21,7 @@ interface CustomAlertProps {
   buttons?: Array<{
     text: string;
     onPress?: () => void;
-    style?: 'default' | 'cancel' | 'destructive';
+    style?: "default" | "cancel" | "destructive";
   }>;
   icon?: string;
   iconColor?: string;
@@ -31,7 +31,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
   visible,
   title,
   message,
-  buttons = [{ text: 'OK', style: 'default' }],
+  buttons = [{ text: "OK", style: "default" }],
   icon,
   iconColor,
 }) => {
@@ -44,7 +44,7 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
     if (visible) {
       // 아이콘 초기화
       iconScaleAnim.setValue(0.8);
-      
+
       Animated.parallel([
         Animated.spring(scaleAnim, {
           toValue: 1,
@@ -95,72 +95,72 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
       animationType="none"
       statusBarTranslucent
     >
-      <Animated.View 
-        style={[
-          styles.overlay,
-          { opacity: opacityAnim }
-        ]}
-      >
-        <Animated.View 
+      <Animated.View style={[styles.overlay, { opacity: opacityAnim }]}>
+        <Animated.View
           style={[
             styles.alertContainer,
             {
               transform: [{ scale: scaleAnim }],
               opacity: opacityAnim,
-            }
+            },
           ]}
         >
           {/* 아이콘 */}
           {icon && (
             <View style={styles.iconWrapper}>
-              <Animated.View 
+              <Animated.View
                 style={[
-                  styles.iconContainer, 
-                  iconColor && { backgroundColor: iconColor + '20' },
+                  styles.iconContainer,
+                  iconColor && { backgroundColor: iconColor + "20" },
                   {
-                    transform: [{ scale: iconScaleAnim }]
-                  }
+                    transform: [{ scale: iconScaleAnim }],
+                  },
                 ]}
               >
-                <Icon name={icon} size={40} color={iconColor || colors.primary} />
+                <Icon
+                  name={icon}
+                  size={40}
+                  color={iconColor || colors.primary}
+                />
               </Animated.View>
             </View>
           )}
 
           {/* 타이틀 */}
-          {title && (
-            <Text style={styles.title}>{title}</Text>
-          )}
+          {title && <Text style={styles.title}>{title}</Text>}
 
           {/* 메시지 */}
-          <Text style={styles.message}>
-            {message}
-          </Text>
+          <Text style={styles.message}>{message}</Text>
 
           {/* 버튼들 */}
-          <View style={[
-            styles.buttonContainer,
-            buttons.length === 2 && styles.twoButtons,
-            buttons.length >= 3 && styles.threeButtons
-          ]}>
+          <View
+            style={[
+              styles.buttonContainer,
+              buttons.length === 2 && styles.twoButtons,
+              buttons.length >= 3 && styles.threeButtons,
+            ]}
+          >
             {buttons.map((button, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
                   styles.button,
-                  button.style === 'cancel' && styles.cancelButton,
-                  button.style === 'destructive' && styles.destructiveButton,
+                  button.style === "cancel" && styles.cancelButton,
+                  button.style === "destructive" && styles.destructiveButton,
                   buttons.length >= 3 && styles.buttonThree,
                   buttons.length >= 3 && index === 0 && { marginTop: 0 },
                 ]}
                 onPress={button.onPress}
                 activeOpacity={0.8}
               >
-                <Text style={[
-                  styles.buttonText,
-                  button.style === 'cancel' && styles.cancelButtonText,
-                  button.style === 'destructive' && styles.destructiveButtonText,
-                ]}>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    button.style === "cancel" && styles.cancelButtonText,
+                    button.style === "destructive" &&
+                      styles.destructiveButtonText,
+                  ]}
+                >
                   {button.text}
                 </Text>
               </TouchableOpacity>
@@ -172,127 +172,128 @@ export const CustomAlert: React.FC<CustomAlertProps> = ({
   );
 };
 
-const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: isDark ? 'rgba(0, 0, 0, 0.7)' : 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 30, // 40에서 30으로 줄임
-  },
-  alertContainer: {
-    backgroundColor: isDark ? colors.surface : colors.white,
-    borderRadius: 24, // 28에서 24로 조정
-    paddingTop: 24,
-    paddingHorizontal: 24,
-    paddingBottom: 24, // 하단 패딩 증가
-    width: '100%',
-    maxWidth: 320, // 340에서 320으로 조정
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: isDark ? 0.4 : 0.3,
-    shadowRadius: 30,
-    elevation: 15,
-    borderWidth: isDark ? 1 : 0,
-    borderColor: isDark ? colors.border : 'transparent',
-  },
-  iconContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: colors.primary + '20',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 16,
-    overflow: 'hidden',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: 10,
-    textAlign: 'center',
-    letterSpacing: -0.3,
-  },
-  message: {
-    fontSize: 15,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 22,
-    marginBottom: 24,
-    paddingHorizontal: 8,
-  },
-  buttonContainer: {
-    width: '100%',
-    gap: 12, // 버튼 사이 간격 추가
-    marginTop: 20,
-    marginBottom: 8, // 하단 여백 추가
-  },
-  twoButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    gap: 12, // 버튼 사이 간격
-  },
-  threeButtons: {
-    flexDirection: 'column',
-  },
-  button: {
-    backgroundColor: colors.primary,
-    paddingVertical: 14,
-    paddingHorizontal: 24,
-    borderRadius: 14,
-    flex: 1, // 버튼이 균등하게 늘어나도록
-    minHeight: 48, // 최소 높이 보장
-    alignItems: 'center',
-    justifyContent: 'center', // 세로 중앙 정렬 추가
-    shadowColor: colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  firstButtonTwo: {
-    // marginRight 제거 (gap으로 대체)
-  },
-  buttonThree: {
-    width: '100%',
-    marginTop: 10,
-    shadowOpacity: 0.15,
-    elevation: 2,
-    flex: 0, // 3개 이상일 때는 flex 제거
-  },
-  cancelButton: {
-    backgroundColor: isDark ? colors.surface : colors.lightGray,
-    borderWidth: 1.5,
-    borderColor: colors.border,
-    shadowOpacity: 0,
-    elevation: 0,
-  },
-  destructiveButton: {
-    backgroundColor: colors.error,
-    shadowColor: colors.error,
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.white,
-    letterSpacing: -0.3,
-  },
-  cancelButtonText: {
-    color: colors.text.primary,
-  },
-  destructiveButtonText: {
-    color: colors.white,
-  },
-  iconWrapper: {
-    width: 80,
-    height: 80,
-    marginBottom: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
+const createStyles = (colors: any, isDark: boolean) =>
+  StyleSheet.create({
+    overlay: {
+      flex: 1,
+      backgroundColor: isDark ? "rgba(0, 0, 0, 0.7)" : "rgba(0, 0, 0, 0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+      paddingHorizontal: 30, // 40에서 30으로 줄임
+    },
+    alertContainer: {
+      backgroundColor: isDark ? colors.surface : colors.white,
+      borderRadius: 24, // 28에서 24로 조정
+      paddingTop: 24,
+      paddingHorizontal: 24,
+      paddingBottom: 24, // 하단 패딩 증가
+      width: "100%",
+      maxWidth: 320, // 340에서 320으로 조정
+      alignItems: "center",
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 20 },
+      shadowOpacity: isDark ? 0.4 : 0.3,
+      shadowRadius: 30,
+      elevation: 15,
+      borderWidth: isDark ? 1 : 0,
+      borderColor: isDark ? colors.border : "transparent",
+    },
+    iconContainer: {
+      width: 80,
+      height: 80,
+      borderRadius: 40,
+      backgroundColor: colors.primary + "20",
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: 16,
+      overflow: "hidden",
+    },
+    title: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.text.primary,
+      marginBottom: 10,
+      textAlign: "center",
+      letterSpacing: -0.3,
+    },
+    message: {
+      fontSize: 15,
+      color: colors.text.secondary,
+      textAlign: "center",
+      lineHeight: 22,
+      marginBottom: 24,
+      paddingHorizontal: 8,
+    },
+    buttonContainer: {
+      width: "100%",
+      gap: 12, // 버튼 사이 간격 추가
+      marginTop: 20,
+      marginBottom: 8, // 하단 여백 추가
+    },
+    twoButtons: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      gap: 12, // 버튼 사이 간격
+    },
+    threeButtons: {
+      flexDirection: "column",
+    },
+    button: {
+      backgroundColor: colors.primary,
+      paddingVertical: 14,
+      paddingHorizontal: 24,
+      borderRadius: 14,
+      flex: 1, // 버튼이 균등하게 늘어나도록
+      minHeight: 48, // 최소 높이 보장
+      alignItems: "center",
+      justifyContent: "center", // 세로 중앙 정렬 추가
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 5,
+    },
+    firstButtonTwo: {
+      // marginRight 제거 (gap으로 대체)
+    },
+    buttonThree: {
+      width: "100%",
+      marginTop: 10,
+      shadowOpacity: 0.15,
+      elevation: 2,
+      flex: 0, // 3개 이상일 때는 flex 제거
+    },
+    cancelButton: {
+      backgroundColor: isDark ? colors.surface : colors.lightGray,
+      borderWidth: 1.5,
+      borderColor: colors.border,
+      shadowOpacity: 0,
+      elevation: 0,
+    },
+    destructiveButton: {
+      backgroundColor: colors.error,
+      shadowColor: colors.error,
+    },
+    buttonText: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.white,
+      letterSpacing: -0.3,
+    },
+    cancelButtonText: {
+      color: colors.text.primary,
+    },
+    destructiveButtonText: {
+      color: colors.white,
+    },
+    iconWrapper: {
+      width: 80,
+      height: 80,
+      marginBottom: 16,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+  });
 
 // Alert 유틸리티 함수
 class AlertManager {
@@ -300,7 +301,7 @@ class AlertManager {
 
   static setAlertRef(ref: any) {
     if (__DEV__) {
-      console.log('AlertManager.setAlertRef called');
+      console.log("AlertManager.setAlertRef called");
     }
     this.alertRef = ref;
   }
@@ -311,7 +312,7 @@ class AlertManager {
     buttons?: Array<{
       text: string;
       onPress?: () => void;
-      style?: 'default' | 'cancel' | 'destructive';
+      style?: "default" | "cancel" | "destructive";
     }>,
     options?: {
       icon?: string;
@@ -319,36 +320,32 @@ class AlertManager {
     }
   ) {
     if (__DEV__) {
-      console.log('AlertManager.show called with:', { 
-        title, 
-        message: message?.substring(0, 30) + (message?.length > 30 ? '...' : ''), 
-        buttonsCount: buttons?.length || 0 
+      console.log("AlertManager.show called with:", {
+        title,
+        message:
+          message?.substring(0, 30) + (message?.length > 30 ? "..." : ""),
+        buttonsCount: buttons?.length || 0,
       });
     }
-    
+
     if (this.alertRef && this.alertRef.show) {
       this.alertRef.show({ title, message, buttons, ...options });
     } else {
       // AlertProvider가 아직 준비되지 않은 경우 재시도
       if (__DEV__) {
-        console.log('AlertManager: Ref not ready, will retry in 100ms');
+        console.log("AlertManager: Ref not ready, will retry in 100ms");
       }
-      
+
       setTimeout(() => {
         if (this.alertRef && this.alertRef.show) {
           this.alertRef.show({ title, message, buttons, ...options });
         } else {
           // 여전히 준비되지 않은 경우 fallback
           if (__DEV__) {
-            console.log('AlertManager: Using fallback React Native Alert');
+            console.log("AlertManager: Using fallback React Native Alert");
           }
-          const RNAlert = require('react-native').Alert;
-          RNAlert.alert(
-            title || '',
-            message,
-            buttons,
-            { cancelable: true }
-          );
+          const RNAlert = require("react-native").Alert;
+          RNAlert.alert(title || "", message, buttons, { cancelable: true });
         }
       }, 100);
     }

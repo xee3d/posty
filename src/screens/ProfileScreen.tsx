@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -10,78 +10,96 @@ import {
   Modal,
   Animated,
   Dimensions,
-} from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { SPACING, TYPOGRAPHY, FONT_SIZES } from '../utils/constants';
-import achievementService from '../services/achievementService';
-import { Achievement, ACHIEVEMENT_CATEGORIES, UserProfile } from '../types/achievement';
-import { ScaleButton, FadeInView } from '../components/AnimationComponents';
-import { soundManager } from '../utils/soundManager';
-import { Alert } from '../utils/customAlert';
-import { useAppSelector } from '../hooks/redux';
-import ProfileDetailModal from '../components/ProfileDetailModal';
-import { getProfileGuideMessage } from '../types/userProfile';
-import LinearGradient from 'react-native-linear-gradient';
+} from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
+import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import { useAppTheme } from "../hooks/useAppTheme";
+import { SPACING, TYPOGRAPHY, FONT_SIZES } from "../utils/constants";
+import achievementService from "../services/achievementService";
+import {
+  Achievement,
+  ACHIEVEMENT_CATEGORIES,
+  UserProfile,
+} from "../types/achievement";
+import { ScaleButton, FadeInView } from "../components/AnimationComponents";
+import { soundManager } from "../utils/soundManager";
+import { Alert } from "../utils/customAlert";
+import { useAppSelector } from "../hooks/redux";
+import ProfileDetailModal from "../components/ProfileDetailModal";
+import { getProfileGuideMessage } from "../types/userProfile";
+import LinearGradient from "react-native-linear-gradient";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 interface ProfileScreenProps {
   navigation?: any;
   onClose?: () => void;
 }
 
-const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) => {
+const ProfileScreen: React.FC<ProfileScreenProps> = ({
+  navigation,
+  onClose,
+}) => {
   const { colors, isDark } = useAppTheme();
-  const userInfo = useAppSelector(state => state.user);
+  const userInfo = useAppSelector((state) => state.user);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
   const [showBadgeModal, setShowBadgeModal] = useState(false);
-  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [selectedAchievement, setSelectedAchievement] =
+    useState<Achievement | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [expProgress, setExpProgress] = useState({ current: 0, required: 100, percentage: 0 });
+  const [expProgress, setExpProgress] = useState({
+    current: 0,
+    required: 100,
+    percentage: 0,
+  });
   const [showProfileDetailModal, setShowProfileDetailModal] = useState(false);
-  
+
   const progressAnim = useRef(new Animated.Value(0)).current;
-  
+
   // 프로필 완성도 관련
-  const profileCompleteness = userInfo.detailedProfile?.profileCompleteness || 0;
+  const profileCompleteness =
+    userInfo.detailedProfile?.profileCompleteness || 0;
   const profileGuideMessage = getProfileGuideMessage(profileCompleteness);
-  
+
   // 디버깅을 위해 userInfo 확인
   useEffect(() => {
-    console.log('ProfileScreen - userInfo:', {
+    console.log("ProfileScreen - userInfo:", {
       displayName: userInfo.displayName,
       photoURL: userInfo.photoURL,
       provider: userInfo.provider,
       email: userInfo.email,
       detailedProfile: userInfo.detailedProfile,
       profileCompleteness: profileCompleteness,
-      profileGuideMessage: profileGuideMessage
+      profileGuideMessage: profileGuideMessage,
     });
   }, [userInfo, profileCompleteness, profileGuideMessage]);
 
   // 프로필 완성도 변경 감지
   useEffect(() => {
-    console.log('🎯 Profile completeness changed:', profileCompleteness + '%');
+    console.log("🎯 Profile completeness changed:", profileCompleteness + "%");
   }, [profileCompleteness]);
-  
+
   // 소셜 로그인 정보
   const getProviderInfo = () => {
-    console.log('getProviderInfo - provider:', userInfo.provider);
+    console.log("getProviderInfo - provider:", userInfo.provider);
     switch (userInfo.provider) {
-      case 'google':
-        return { name: 'Google', icon: 'logo-google', color: '#4285F4' };
-      case 'naver':
-        return { name: 'Naver', icon: 'logo-apple', color: '#03C75A', text: 'N' }; // Naver 아이콘이 없으므로 대체
-      case 'kakao':
-        return { name: 'Kakao', icon: 'chatbubble', color: '#FEE500' };
-      case 'facebook':
-        return { name: 'Facebook', icon: 'logo-facebook', color: '#1877F2' };
+      case "google":
+        return { name: "Google", icon: "logo-google", color: "#4285F4" };
+      case "naver":
+        return {
+          name: "Naver",
+          icon: "logo-apple",
+          color: "#03C75A",
+          text: "N",
+        }; // Naver 아이콘이 없으므로 대체
+      case "kakao":
+        return { name: "Kakao", icon: "chatbubble", color: "#FEE500" };
+      case "facebook":
+        return { name: "Facebook", icon: "logo-facebook", color: "#1877F2" };
       default:
-        return { name: 'Email', icon: 'mail', color: colors.primary };
+        return { name: "Email", icon: "mail", color: colors.primary };
     }
   };
 
@@ -95,14 +113,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
       const [userProfile, userAchievements, expData] = await Promise.all([
         achievementService.getUserProfile(),
         achievementService.getAchievements(),
-        achievementService.getExpToNextLevel()
+        achievementService.getExpToNextLevel(),
       ]);
-      
+
       setProfile(userProfile);
       setAchievements(userAchievements);
       setExpProgress(expData);
     } catch (error) {
-      console.error('Failed to load profile data:', error);
+      console.error("Failed to load profile data:", error);
     } finally {
       setIsLoading(false);
     }
@@ -114,33 +132,41 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
   };
 
   const handleSetBadge = async () => {
-    if (!selectedAchievement) return;
-    
+    if (!selectedAchievement) {
+      return;
+    }
+
     await achievementService.setSelectedBadge(selectedAchievement.id);
     await achievementService.setSelectedTitle(selectedAchievement.name);
-    setProfile(prev => prev ? {
-      ...prev,
-      selectedBadge: selectedAchievement.id,
-      selectedTitle: selectedAchievement.name
-    } : null);
-    
+    setProfile((prev) =>
+      prev
+        ? {
+            ...prev,
+            selectedBadge: selectedAchievement.id,
+            selectedTitle: selectedAchievement.name,
+          }
+        : null
+    );
+
     setShowBadgeModal(false);
     soundManager.playSuccess();
-    Alert.alert('성공', '대표 배지가 설정되었습니다!');
+    Alert.alert("성공", "대표 배지가 설정되었습니다!");
   };
 
-  const filteredAchievements = selectedCategory === 'all' 
-    ? achievements 
-    : achievements.filter(a => a.category === selectedCategory);
+  const filteredAchievements =
+    selectedCategory === "all"
+      ? achievements
+      : achievements.filter((a) => a.category === selectedCategory);
 
-  const unlockedCount = achievements.filter(a => a.isUnlocked).length;
+  const unlockedCount = achievements.filter((a) => a.isUnlocked).length;
   const totalCount = achievements.length;
-  const completionRate = totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
-  
-  console.log('[ProfileScreen] Achievement progress:', {
+  const completionRate =
+    totalCount > 0 ? Math.round((unlockedCount / totalCount) * 100) : 0;
+
+  console.log("[ProfileScreen] Achievement progress:", {
     unlockedCount,
     totalCount,
-    completionRate
+    completionRate,
   });
 
   const styles = createStyles(colors, isDark);
@@ -173,50 +199,67 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
           <View style={styles.profileSection}>
             <View style={styles.profileImageContainer}>
               {userInfo.photoURL ? (
-                <Image 
-                  source={{ uri: userInfo.photoURL }} 
+                <Image
+                  source={{ uri: userInfo.photoURL }}
                   style={styles.profileImage}
                 />
               ) : profile?.selectedBadge ? (
-                <View style={[
-                  styles.profileBadge,
-                  { backgroundColor: achievements.find(a => a.id === profile.selectedBadge)?.badgeColor }
-                ]}>
-                  <Icon 
-                    name={achievements.find(a => a.id === profile.selectedBadge)?.icon || 'person'} 
-                    size={48} 
-                    color={achievements.find(a => a.id === profile.selectedBadge)?.iconColor} 
+                <View
+                  style={[
+                    styles.profileBadge,
+                    {
+                      backgroundColor: achievements.find(
+                        (a) => a.id === profile.selectedBadge
+                      )?.badgeColor,
+                    },
+                  ]}
+                >
+                  <Icon
+                    name={
+                      achievements.find((a) => a.id === profile.selectedBadge)
+                        ?.icon || "person"
+                    }
+                    size={48}
+                    color={
+                      achievements.find((a) => a.id === profile.selectedBadge)
+                        ?.iconColor
+                    }
                   />
                 </View>
               ) : (
                 <View style={styles.profilePlaceholder}>
                   <Text style={styles.profileInitial}>
-                    {userInfo.displayName?.charAt(0).toUpperCase() || 'U'}
+                    {userInfo.displayName?.charAt(0).toUpperCase() || "U"}
                   </Text>
                 </View>
               )}
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.editBadgeButton}
-                onPress={() => setSelectedCategory('unlocked')}
+                onPress={() => setSelectedCategory("unlocked")}
               >
                 <Icon name="create" size={16} color={colors.white} />
               </TouchableOpacity>
             </View>
-            
+
             <Text style={styles.profileName}>{profile?.displayName}</Text>
-            
+
             {/* 소셜 로그인 정보 - 더 크고 눈에 띄게 표시 */}
             {userInfo.provider && (
               <View style={styles.providerInfoEnhanced}>
-                {userInfo.provider === 'naver' ? (
-                  <View style={[styles.naverIconBoxLarge, { backgroundColor: getProviderInfo().color }]}>
+                {userInfo.provider === "naver" ? (
+                  <View
+                    style={[
+                      styles.naverIconBoxLarge,
+                      { backgroundColor: getProviderInfo().color },
+                    ]}
+                  >
                     <Text style={styles.naverIconTextLarge}>N</Text>
                   </View>
                 ) : (
-                  <Icon 
-                    name={getProviderInfo().icon} 
-                    size={20} 
-                    color={getProviderInfo().color} 
+                  <Icon
+                    name={getProviderInfo().icon}
+                    size={20}
+                    color={getProviderInfo().color}
                   />
                 )}
                 <Text style={styles.providerTextEnhanced}>
@@ -224,13 +267,13 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
                 </Text>
               </View>
             )}
-            
+
             {profile?.selectedTitle && (
               <View style={styles.titleBadge}>
                 <Text style={styles.titleText}>{profile.selectedTitle}</Text>
               </View>
             )}
-            
+
             {/* 프로필 완성도 섹션 추가 */}
             {profileGuideMessage && (
               <TouchableOpacity
@@ -239,35 +282,58 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
                 activeOpacity={0.8}
               >
                 <LinearGradient
-                  colors={isDark ? [colors.surfaceVariant || '#2A1A1A', colors.surface || '#3A2A2A'] : [colors.primary + '10', colors.primary + '05']}
+                  colors={
+                    isDark
+                      ? [
+                          colors.surfaceVariant || "#2A1A1A",
+                          colors.surface || "#3A2A2A",
+                        ]
+                      : [colors.primary + "10", colors.primary + "05"]
+                  }
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={styles.profileGuideGradient}
                 >
                   <View style={styles.profileGuideContent}>
                     <View style={styles.profileGuideLeft}>
-                      <Text style={styles.profileGuideTitle}>프로필 {profileCompleteness}% 완성</Text>
-                      <Text style={styles.profileGuideMessage}>{profileGuideMessage}</Text>
+                      <Text style={styles.profileGuideTitle}>
+                        프로필 {profileCompleteness}% 완성
+                      </Text>
+                      <Text style={styles.profileGuideMessage}>
+                        {profileGuideMessage}
+                      </Text>
                     </View>
-                    <Icon name="chevron-forward" size={20} color={colors.primary} />
+                    <Icon
+                      name="chevron-forward"
+                      size={20}
+                      color={colors.primary}
+                    />
                   </View>
                   <View style={styles.profileProgressBar}>
-                    <View style={[
-                      styles.profileProgressFill, 
-                      { 
-                        width: `${Math.max(profileCompleteness, 1)}%`,
-                        minWidth: 1
-                      }
-                    ]} />
+                    <View
+                      style={[
+                        styles.profileProgressFill,
+                        {
+                          width: `${Math.max(profileCompleteness, 1)}%`,
+                          minWidth: 1,
+                        },
+                      ]}
+                    />
                     {/* 디버깅용: 진행바 너비 확인 */}
-                    <Text style={{ fontSize: 10, color: colors.text.tertiary, marginTop: 2 }}>
+                    <Text
+                      style={{
+                        fontSize: 10,
+                        color: colors.text.tertiary,
+                        marginTop: 2,
+                      }}
+                    >
                       진행률: {profileCompleteness}%
                     </Text>
                   </View>
                 </LinearGradient>
               </TouchableOpacity>
             )}
-            
+
             <View style={styles.statsContainer}>
               <View style={styles.statItem}>
                 <Text style={styles.statValue}>{profile?.totalPosts || 0}</Text>
@@ -284,7 +350,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
                 <Text style={styles.statLabel}>업적</Text>
               </View>
             </View>
-            
+
             {/* 레벨 진행률 */}
             <View style={styles.levelProgressSection}>
               <View style={styles.levelProgressHeader}>
@@ -296,12 +362,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
                 </Text>
               </View>
               <View style={styles.levelProgressBar}>
-                <View 
+                <View
                   style={[
                     styles.levelProgressFill,
                     {
-                      width: `${expProgress.percentage}%`
-                    }
+                      width: `${expProgress.percentage}%`,
+                    },
                   ]}
                 />
               </View>
@@ -317,12 +383,12 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
               <Text style={styles.progressText}>{completionRate}%</Text>
             </View>
             <View style={styles.progressBar}>
-              <View 
+              <View
                 style={[
                   styles.progressFill,
                   {
-                    width: `${completionRate}%`
-                  }
+                    width: `${completionRate}%`,
+                  },
                 ]}
               />
             </View>
@@ -332,63 +398,73 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
           </View>
         </FadeInView>
 
-
         {/* 카테고리 탭 */}
         <FadeInView delay={300}>
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.categoryTabs}
           >
             <TouchableOpacity
               style={[
                 styles.categoryTab,
-                selectedCategory === 'all' && styles.categoryTabActive
+                selectedCategory === "all" && styles.categoryTabActive,
               ]}
-              onPress={() => setSelectedCategory('all')}
+              onPress={() => setSelectedCategory("all")}
             >
-              <Text style={[
-                styles.categoryTabText,
-                selectedCategory === 'all' && styles.categoryTabTextActive
-              ]}>
+              <Text
+                style={[
+                  styles.categoryTabText,
+                  selectedCategory === "all" && styles.categoryTabTextActive,
+                ]}
+              >
                 전체
               </Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={[
                 styles.categoryTab,
-                selectedCategory === 'unlocked' && styles.categoryTabActive
+                selectedCategory === "unlocked" && styles.categoryTabActive,
               ]}
-              onPress={() => setSelectedCategory('unlocked')}
+              onPress={() => setSelectedCategory("unlocked")}
             >
-              <Text style={[
-                styles.categoryTabText,
-                selectedCategory === 'unlocked' && styles.categoryTabTextActive
-              ]}>
+              <Text
+                style={[
+                  styles.categoryTabText,
+                  selectedCategory === "unlocked" &&
+                    styles.categoryTabTextActive,
+                ]}
+              >
                 획득한 배지
               </Text>
             </TouchableOpacity>
-            
+
             {Object.entries(ACHIEVEMENT_CATEGORIES).map(([key, category]) => (
               <TouchableOpacity
                 key={key}
                 style={[
                   styles.categoryTab,
-                  selectedCategory === key && styles.categoryTabActive
+                  selectedCategory === key && styles.categoryTabActive,
                 ]}
                 onPress={() => setSelectedCategory(key)}
               >
-                <Icon 
-                  name={category.icon} 
-                  size={16} 
-                  color={selectedCategory === key ? colors.white : colors.text.secondary} 
+                <Icon
+                  name={category.icon}
+                  size={16}
+                  color={
+                    selectedCategory === key
+                      ? colors.white
+                      : colors.text.secondary
+                  }
                   style={{ marginRight: 4 }}
                 />
-                <Text style={[
-                  styles.categoryTabText,
-                  selectedCategory === key && styles.categoryTabTextActive
-                ]}>
+                <Text
+                  style={[
+                    styles.categoryTabText,
+                    selectedCategory === key && styles.categoryTabTextActive,
+                  ]}
+                >
                   {category.name}
                 </Text>
               </TouchableOpacity>
@@ -398,85 +474,110 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
 
         {/* 업적 그리드 */}
         <View style={styles.achievementGrid}>
-          {(selectedCategory === 'unlocked' ? achievements.filter(a => a.isUnlocked) : filteredAchievements)
-            .map((achievement, index) => {
-              const rowIndex = Math.floor(index / 3);
-              const colIndex = index % 3;
-              const isLastInRow = colIndex === 2;
-              
-              return (
-                <FadeInView key={achievement.id} delay={400 + index * 50}>
-                  <TouchableOpacity
+          {(selectedCategory === "unlocked"
+            ? achievements.filter((a) => a.isUnlocked)
+            : filteredAchievements
+          ).map((achievement, index) => {
+            const rowIndex = Math.floor(index / 3);
+            const colIndex = index % 3;
+            const isLastInRow = colIndex === 2;
+
+            return (
+              <FadeInView key={achievement.id} delay={400 + index * 50}>
+                <TouchableOpacity
+                  style={[
+                    styles.achievementCard,
+                    achievement.isUnlocked && styles.achievementCardUnlocked,
+                    achievement.isNew && styles.achievementCardNew,
+                    !isLastInRow && { marginRight: SPACING.sm },
+                  ]}
+                  onPress={() =>
+                    achievement.isUnlocked && handleSelectBadge(achievement)
+                  }
+                  activeOpacity={achievement.isUnlocked ? 0.7 : 1}
+                >
+                  <View
                     style={[
-                      styles.achievementCard,
-                      achievement.isUnlocked && styles.achievementCardUnlocked,
-                      achievement.isNew && styles.achievementCardNew,
-                      !isLastInRow && { marginRight: SPACING.sm }
-                    ]}
-                    onPress={() => achievement.isUnlocked && handleSelectBadge(achievement)}
-                    activeOpacity={achievement.isUnlocked ? 0.7 : 1}
-                  >
-                    <View style={[
                       styles.achievementIcon,
-                      { backgroundColor: achievement.isUnlocked ? achievement.badgeColor : colors.lightGray }
-                    ]}>
-                      <Icon 
-                        name={achievement.icon} 
-                        size={32} 
-                        color={achievement.isUnlocked ? achievement.iconColor : colors.text.tertiary} 
+                      {
+                        backgroundColor: achievement.isUnlocked
+                          ? achievement.badgeColor
+                          : colors.lightGray,
+                      },
+                    ]}
+                  >
+                    <Icon
+                      name={achievement.icon}
+                      size={32}
+                      color={
+                        achievement.isUnlocked
+                          ? achievement.iconColor
+                          : colors.text.tertiary
+                      }
+                    />
+                  </View>
+
+                  <Text
+                    style={[
+                      styles.achievementName,
+                      !achievement.isUnlocked && styles.achievementNameLocked,
+                    ]}
+                  >
+                    {achievement.name}
+                  </Text>
+
+                  <Text
+                    style={[
+                      styles.achievementDesc,
+                      !achievement.isUnlocked && styles.achievementDescLocked,
+                    ]}
+                  >
+                    {achievement.description}
+                  </Text>
+
+                  {!achievement.isUnlocked && (
+                    <View style={styles.achievementProgress}>
+                      <View style={styles.achievementProgressBar}>
+                        <View
+                          style={[
+                            styles.achievementProgressFill,
+                            {
+                              width: `${Math.min(
+                                ((achievement.requirement.current || 0) /
+                                  (achievement.requirement.target || 1)) *
+                                  100,
+                                100
+                              )}%`,
+                            },
+                          ]}
+                        />
+                      </View>
+                      <Text style={styles.achievementProgressText}>
+                        {achievement.requirement.current || 0}/
+                        {achievement.requirement.target}
+                      </Text>
+                    </View>
+                  )}
+
+                  {achievement.isNew && (
+                    <View style={styles.newBadge}>
+                      <Text style={styles.newBadgeText}>NEW</Text>
+                    </View>
+                  )}
+
+                  {profile?.selectedBadge === achievement.id && (
+                    <View style={styles.selectedBadge}>
+                      <Icon
+                        name="checkmark-circle"
+                        size={20}
+                        color={colors.primary}
                       />
                     </View>
-                    
-                    <Text style={[
-                      styles.achievementName,
-                      !achievement.isUnlocked && styles.achievementNameLocked
-                    ]}>
-                      {achievement.name}
-                    </Text>
-                    
-                    <Text style={[
-                      styles.achievementDesc,
-                      !achievement.isUnlocked && styles.achievementDescLocked
-                    ]}>
-                      {achievement.description}
-                    </Text>
-                    
-                    {!achievement.isUnlocked && (
-                      <View style={styles.achievementProgress}>
-                        <View style={styles.achievementProgressBar}>
-                          <View 
-                            style={[
-                              styles.achievementProgressFill,
-                              { 
-                                width: `${Math.min(
-                                  ((achievement.requirement.current || 0) / (achievement.requirement.target || 1)) * 100, 
-                                  100
-                                )}%` 
-                              }
-                            ]}
-                          />
-                        </View>
-                        <Text style={styles.achievementProgressText}>
-                          {achievement.requirement.current || 0}/{achievement.requirement.target}
-                        </Text>
-                      </View>
-                    )}
-                    
-                    {achievement.isNew && (
-                      <View style={styles.newBadge}>
-                        <Text style={styles.newBadgeText}>NEW</Text>
-                      </View>
-                    )}
-                    
-                    {profile?.selectedBadge === achievement.id && (
-                      <View style={styles.selectedBadge}>
-                        <Icon name="checkmark-circle" size={20} color={colors.primary} />
-                      </View>
-                    )}
-                  </TouchableOpacity>
-                </FadeInView>
-              );
-            })}
+                  )}
+                </TouchableOpacity>
+              </FadeInView>
+            );
+          })}
         </View>
       </ScrollView>
 
@@ -491,20 +592,26 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
           <View style={styles.modalContent}>
             {selectedAchievement && (
               <>
-                <View style={[
-                  styles.modalBadge,
-                  { backgroundColor: selectedAchievement.badgeColor }
-                ]}>
-                  <Icon 
-                    name={selectedAchievement.icon} 
-                    size={64} 
-                    color={selectedAchievement.iconColor} 
+                <View
+                  style={[
+                    styles.modalBadge,
+                    { backgroundColor: selectedAchievement.badgeColor },
+                  ]}
+                >
+                  <Icon
+                    name={selectedAchievement.icon}
+                    size={64}
+                    color={selectedAchievement.iconColor}
                   />
                 </View>
-                
-                <Text style={styles.modalTitle}>{selectedAchievement.name}</Text>
-                <Text style={styles.modalDesc}>{selectedAchievement.description}</Text>
-                
+
+                <Text style={styles.modalTitle}>
+                  {selectedAchievement.name}
+                </Text>
+                <Text style={styles.modalDesc}>
+                  {selectedAchievement.description}
+                </Text>
+
                 <View style={styles.modalButtons}>
                   <TouchableOpacity
                     style={[styles.modalButton, styles.modalButtonCancel]}
@@ -512,12 +619,14 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
                   >
                     <Text style={styles.modalButtonCancelText}>취소</Text>
                   </TouchableOpacity>
-                  
+
                   <TouchableOpacity
                     style={[styles.modalButton, styles.modalButtonConfirm]}
                     onPress={handleSetBadge}
                   >
-                    <Text style={styles.modalButtonConfirmText}>대표 배지로 설정</Text>
+                    <Text style={styles.modalButtonConfirmText}>
+                      대표 배지로 설정
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </>
@@ -525,7 +634,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
           </View>
         </View>
       </Modal>
-      
+
       {/* 프로필 세부 설정 모달 */}
       <ProfileDetailModal
         visible={showProfileDetailModal}
@@ -542,495 +651,496 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({ navigation, onClose }) =>
   );
 };
 
-const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: SPACING.md,
-    fontSize: FONT_SIZES.medium,
-    color: colors.text.secondary,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  headerTitle: {
-    fontSize: FONT_SIZES.xlarge,
-    fontWeight: '600',
-    color: colors.text.primary,
-  },
-  profileSection: {
-    alignItems: 'center',
-    paddingVertical: SPACING.xl,
-  },
-  profileImageContainer: {
-    position: 'relative',
-    marginBottom: SPACING.md,
-  },
-  profileImage: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 3,
-    borderColor: colors.primary,
-  },
-  profileBadge: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  profilePlaceholder: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.primary + '20',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: colors.primary,
-  },
-  profileInitial: {
-    fontSize: 48,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  editBadgeButton: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: colors.background,
-  },
-  profileName: {
-    fontSize: FONT_SIZES.xxlarge,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: SPACING.xs,
-  },
-  providerInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
-  },
-  providerText: {
-    fontSize: FONT_SIZES.small,
-    color: colors.text.secondary,
-    marginLeft: SPACING.xs,
-  },
-  naverIconBox: {
-    width: 16,
-    height: 16,
-    borderRadius: 3,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  naverIconText: {
-    fontSize: 11,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  // 향상된 플랫폼 정보 스타일
-  providerInfoEnhanced: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: SPACING.md,
-    backgroundColor: colors.surface,
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.sm,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  providerTextEnhanced: {
-    fontSize: FONT_SIZES.medium,
-    color: colors.text.primary,
-    marginLeft: SPACING.sm,
-    fontWeight: '600',
-  },
-  naverIconBoxLarge: {
-    width: 20,
-    height: 20,
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  naverIconTextLarge: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    color: 'white',
-  },
-  titleBadge: {
-    backgroundColor: colors.primary + '20',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.xs,
-    borderRadius: 16,
-    marginBottom: SPACING.lg,
-  },
-  titleText: {
-    fontSize: FONT_SIZES.small,
-    fontWeight: '600',
-    color: colors.primary,
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  statItem: {
-    alignItems: 'center',
-    paddingHorizontal: SPACING.xl,
-  },
-  statValue: {
-    fontSize: FONT_SIZES.xlarge,
-    fontWeight: '700',
-    color: colors.text.primary,
-  },
-  statLabel: {
-    fontSize: FONT_SIZES.small,
-    color: colors.text.secondary,
-    marginTop: 4,
-  },
-  statDivider: {
-    width: 1,
-    height: 30,
-    backgroundColor: colors.border,
-  },
-  levelProgressSection: {
-    marginTop: SPACING.lg,
-    backgroundColor: colors.lightGray,
-    borderRadius: 12,
-    padding: SPACING.md,
-  },
-  levelProgressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
-    gap: SPACING.md, // 레벨과 경험치 사이 간격 추가
-  },
-  levelProgressLabel: {
-    fontSize: FONT_SIZES.small,
-    fontWeight: '600',
-    color: colors.text.secondary,
-    flex: 1, // 남은 공간 차지
-  },
-  levelProgressExp: {
-    fontSize: FONT_SIZES.small,
-    fontWeight: '700',
-    color: colors.primary,
-    marginLeft: SPACING.md, // 추가 간격
-  },
-  levelProgressBar: {
-    height: 6,
-    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E5E5EA',
-    borderRadius: 3,
-    overflow: 'hidden',
-  },
-  levelProgressFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: 3,
-  },
-  progressSection: {
-    paddingHorizontal: SPACING.lg,
-    paddingVertical: SPACING.lg,
-    backgroundColor: colors.surface,
-    marginHorizontal: SPACING.lg,
-    borderRadius: 16,
-    marginBottom: SPACING.lg,
-  },
-  progressHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
-  },
-  progressTitle: {
-    fontSize: FONT_SIZES.medium,
-    fontWeight: '600',
-    color: colors.text.primary,
-  },
-  progressText: {
-    fontSize: FONT_SIZES.large,
-    fontWeight: '700',
-    color: colors.primary,
-  },
-  progressBar: {
-    height: 8,
-    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E5E5EA',
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  progressFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: 4,
-  },
-  progressSubtext: {
-    fontSize: FONT_SIZES.small,
-    color: colors.text.secondary,
-    marginTop: SPACING.xs,
-  },
-  categoryTabs: {
-    flexDirection: 'row',
-    paddingHorizontal: SPACING.lg,
-    marginBottom: SPACING.lg,
-  },
-  categoryTab: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
-    marginRight: SPACING.sm,
-    borderRadius: 20,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  categoryTabActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  categoryTabText: {
-    fontSize: FONT_SIZES.small,
-    fontWeight: '500',
-    color: colors.text.secondary,
-  },
-  categoryTabTextActive: {
-    color: colors.white,
-  },
-  achievementGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingHorizontal: SPACING.md,
-    paddingBottom: SPACING.xl,
-    justifyContent: 'space-between',
-  },
-  achievementCard: {
-    width: (width - SPACING.md * 2 - SPACING.sm * 2) / 3,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: SPACING.md,
-    marginBottom: SPACING.sm,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: colors.border,
-  },
-  achievementCardUnlocked: {
-    borderColor: colors.primary + '30',
-  },
-  achievementCardNew: {
-    borderColor: colors.warning,
-    borderWidth: 2,
-  },
-  achievementIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: SPACING.sm,
-  },
-  achievementName: {
-    fontSize: FONT_SIZES.small,
-    fontWeight: '600',
-    color: colors.text.primary,
-    textAlign: 'center',
-    marginBottom: 4,
-  },
-  achievementNameLocked: {
-    color: colors.text.tertiary,
-  },
-  achievementDesc: {
-    fontSize: 11,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    lineHeight: 14,
-  },
-  achievementDescLocked: {
-    color: colors.text.tertiary,
-  },
-  achievementProgress: {
-    width: '100%',
-    marginTop: SPACING.xs,
-  },
-  achievementProgressBar: {
-    height: 4,
-    backgroundColor: isDark ? 'rgba(255, 255, 255, 0.1)' : '#E5E5EA',
-    borderRadius: 2,
-    overflow: 'hidden',
-  },
-  achievementProgressFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: 2,
-  },
-  achievementProgressText: {
-    fontSize: 10,
-    color: colors.text.tertiary,
-    textAlign: 'center',
-    marginTop: 2,
-  },
-  newBadge: {
-    position: 'absolute',
-    top: 4,
-    right: 4,
-    backgroundColor: colors.warning,
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  newBadgeText: {
-    fontSize: 9,
-    fontWeight: '700',
-    color: colors.white,
-  },
-  selectedBadge: {
-    position: 'absolute',
-    top: 4,
-    left: 4,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: colors.background,
-    borderRadius: 20,
-    padding: SPACING.xl,
-    width: width - SPACING.xl * 2,
-    alignItems: 'center',
-  },
-  modalBadge: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: SPACING.lg,
-  },
-  modalTitle: {
-    fontSize: FONT_SIZES.xlarge,
-    fontWeight: '700',
-    color: colors.text.primary,
-    marginBottom: SPACING.sm,
-  },
-  modalDesc: {
-    fontSize: FONT_SIZES.medium,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginBottom: SPACING.xl,
-    lineHeight: 22,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    gap: SPACING.sm,
-  },
-  modalButton: {
-    flex: 1,
-    paddingVertical: SPACING.md,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  modalButtonCancel: {
-    backgroundColor: colors.lightGray,
-  },
-  modalButtonConfirm: {
-    backgroundColor: colors.primary,
-  },
-  modalButtonCancelText: {
-    fontSize: FONT_SIZES.medium,
-    fontWeight: '600',
-    color: colors.text.secondary,
-  },
-  modalButtonConfirmText: {
-    fontSize: FONT_SIZES.medium,
-    fontWeight: '600',
-    color: colors.white,
-  },
-  // 프로필 완성도 가이드 스타일
-  profileGuideSection: {
-    marginTop: SPACING.lg,
-    marginHorizontal: SPACING.sm,
-  },
-  profileGuideGradient: {
-    borderRadius: 16,
-    padding: SPACING.md,
-  },
-  profileGuideContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  profileGuideLeft: {
-    flex: 1,
-  },
-  profileGuideTitle: {
-    fontSize: FONT_SIZES.small,
-    fontWeight: '600',
-    color: colors.primary,
-    marginBottom: 4,
-  },
-  profileGuideMessage: {
-    fontSize: FONT_SIZES.small,
-    color: colors.text.secondary,
-    lineHeight: 18,
-  },
-  profileProgressBar: {
-    height: 4,
-    backgroundColor: isDark ? colors.primary + '20' : colors.primary + '30',
-    borderRadius: 2,
-    marginTop: SPACING.sm,
-    overflow: 'hidden',
-  },
-  profileProgressFill: {
-    height: '100%',
-    backgroundColor: colors.primary,
-    borderRadius: 2,
-  },
-  // 임시 테스트 버튼 스타일
-  testButton: {
-    marginHorizontal: SPACING.lg,
-    marginVertical: SPACING.md,
-    backgroundColor: '#FF6B6B',
-    paddingVertical: SPACING.md,
-    borderRadius: 12,
-    alignItems: 'center',
-    shadowColor: '#FF6B6B',
-    shadowOffset: {
-      width: 0,
-      height: 4,
+const createStyles = (colors: any, isDark: boolean) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  testButtonText: {
-    color: '#fff',
-    fontSize: FONT_SIZES.medium,
-    fontWeight: '600',
-  },
-});
+    loadingContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    loadingText: {
+      marginTop: SPACING.md,
+      fontSize: FONT_SIZES.medium,
+      color: colors.text.secondary,
+    },
+    header: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.md,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border,
+    },
+    headerTitle: {
+      fontSize: FONT_SIZES.xlarge,
+      fontWeight: "600",
+      color: colors.text.primary,
+    },
+    profileSection: {
+      alignItems: "center",
+      paddingVertical: SPACING.xl,
+    },
+    profileImageContainer: {
+      position: "relative",
+      marginBottom: SPACING.md,
+    },
+    profileImage: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      borderWidth: 3,
+      borderColor: colors.primary,
+    },
+    profileBadge: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    profilePlaceholder: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      backgroundColor: colors.primary + "20",
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 3,
+      borderColor: colors.primary,
+    },
+    profileInitial: {
+      fontSize: 48,
+      fontWeight: "700",
+      color: colors.primary,
+    },
+    editBadgeButton: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      backgroundColor: colors.primary,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 2,
+      borderColor: colors.background,
+    },
+    profileName: {
+      fontSize: FONT_SIZES.xxlarge,
+      fontWeight: "700",
+      color: colors.text.primary,
+      marginBottom: SPACING.xs,
+    },
+    providerInfo: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: SPACING.sm,
+    },
+    providerText: {
+      fontSize: FONT_SIZES.small,
+      color: colors.text.secondary,
+      marginLeft: SPACING.xs,
+    },
+    naverIconBox: {
+      width: 16,
+      height: 16,
+      borderRadius: 3,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    naverIconText: {
+      fontSize: 11,
+      fontWeight: "bold",
+      color: "white",
+    },
+    // 향상된 플랫폼 정보 스타일
+    providerInfoEnhanced: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: SPACING.md,
+      backgroundColor: colors.surface,
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.sm,
+      borderRadius: 20,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    providerTextEnhanced: {
+      fontSize: FONT_SIZES.medium,
+      color: colors.text.primary,
+      marginLeft: SPACING.sm,
+      fontWeight: "600",
+    },
+    naverIconBoxLarge: {
+      width: 20,
+      height: 20,
+      borderRadius: 4,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    naverIconTextLarge: {
+      fontSize: 14,
+      fontWeight: "bold",
+      color: "white",
+    },
+    titleBadge: {
+      backgroundColor: colors.primary + "20",
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.xs,
+      borderRadius: 16,
+      marginBottom: SPACING.lg,
+    },
+    titleText: {
+      fontSize: FONT_SIZES.small,
+      fontWeight: "600",
+      color: colors.primary,
+    },
+    statsContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    statItem: {
+      alignItems: "center",
+      paddingHorizontal: SPACING.xl,
+    },
+    statValue: {
+      fontSize: FONT_SIZES.xlarge,
+      fontWeight: "700",
+      color: colors.text.primary,
+    },
+    statLabel: {
+      fontSize: FONT_SIZES.small,
+      color: colors.text.secondary,
+      marginTop: 4,
+    },
+    statDivider: {
+      width: 1,
+      height: 30,
+      backgroundColor: colors.border,
+    },
+    levelProgressSection: {
+      marginTop: SPACING.lg,
+      backgroundColor: colors.lightGray,
+      borderRadius: 12,
+      padding: SPACING.md,
+    },
+    levelProgressHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: SPACING.sm,
+      gap: SPACING.md, // 레벨과 경험치 사이 간격 추가
+    },
+    levelProgressLabel: {
+      fontSize: FONT_SIZES.small,
+      fontWeight: "600",
+      color: colors.text.secondary,
+      flex: 1, // 남은 공간 차지
+    },
+    levelProgressExp: {
+      fontSize: FONT_SIZES.small,
+      fontWeight: "700",
+      color: colors.primary,
+      marginLeft: SPACING.md, // 추가 간격
+    },
+    levelProgressBar: {
+      height: 6,
+      backgroundColor: isDark ? "rgba(255, 255, 255, 0.1)" : "#E5E5EA",
+      borderRadius: 3,
+      overflow: "hidden",
+    },
+    levelProgressFill: {
+      height: "100%",
+      backgroundColor: colors.primary,
+      borderRadius: 3,
+    },
+    progressSection: {
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.lg,
+      backgroundColor: colors.surface,
+      marginHorizontal: SPACING.lg,
+      borderRadius: 16,
+      marginBottom: SPACING.lg,
+    },
+    progressHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: SPACING.sm,
+    },
+    progressTitle: {
+      fontSize: FONT_SIZES.medium,
+      fontWeight: "600",
+      color: colors.text.primary,
+    },
+    progressText: {
+      fontSize: FONT_SIZES.large,
+      fontWeight: "700",
+      color: colors.primary,
+    },
+    progressBar: {
+      height: 8,
+      backgroundColor: isDark ? "rgba(255, 255, 255, 0.1)" : "#E5E5EA",
+      borderRadius: 4,
+      overflow: "hidden",
+    },
+    progressFill: {
+      height: "100%",
+      backgroundColor: colors.primary,
+      borderRadius: 4,
+    },
+    progressSubtext: {
+      fontSize: FONT_SIZES.small,
+      color: colors.text.secondary,
+      marginTop: SPACING.xs,
+    },
+    categoryTabs: {
+      flexDirection: "row",
+      paddingHorizontal: SPACING.lg,
+      marginBottom: SPACING.lg,
+    },
+    categoryTab: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.sm,
+      marginRight: SPACING.sm,
+      borderRadius: 20,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    categoryTabActive: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    },
+    categoryTabText: {
+      fontSize: FONT_SIZES.small,
+      fontWeight: "500",
+      color: colors.text.secondary,
+    },
+    categoryTabTextActive: {
+      color: colors.white,
+    },
+    achievementGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      paddingHorizontal: SPACING.md,
+      paddingBottom: SPACING.xl,
+      justifyContent: "space-between",
+    },
+    achievementCard: {
+      width: (width - SPACING.md * 2 - SPACING.sm * 2) / 3,
+      backgroundColor: colors.surface,
+      borderRadius: 12,
+      padding: SPACING.md,
+      marginBottom: SPACING.sm,
+      alignItems: "center",
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    achievementCardUnlocked: {
+      borderColor: colors.primary + "30",
+    },
+    achievementCardNew: {
+      borderColor: colors.warning,
+      borderWidth: 2,
+    },
+    achievementIcon: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: SPACING.sm,
+    },
+    achievementName: {
+      fontSize: FONT_SIZES.small,
+      fontWeight: "600",
+      color: colors.text.primary,
+      textAlign: "center",
+      marginBottom: 4,
+    },
+    achievementNameLocked: {
+      color: colors.text.tertiary,
+    },
+    achievementDesc: {
+      fontSize: 11,
+      color: colors.text.secondary,
+      textAlign: "center",
+      lineHeight: 14,
+    },
+    achievementDescLocked: {
+      color: colors.text.tertiary,
+    },
+    achievementProgress: {
+      width: "100%",
+      marginTop: SPACING.xs,
+    },
+    achievementProgressBar: {
+      height: 4,
+      backgroundColor: isDark ? "rgba(255, 255, 255, 0.1)" : "#E5E5EA",
+      borderRadius: 2,
+      overflow: "hidden",
+    },
+    achievementProgressFill: {
+      height: "100%",
+      backgroundColor: colors.primary,
+      borderRadius: 2,
+    },
+    achievementProgressText: {
+      fontSize: 10,
+      color: colors.text.tertiary,
+      textAlign: "center",
+      marginTop: 2,
+    },
+    newBadge: {
+      position: "absolute",
+      top: 4,
+      right: 4,
+      backgroundColor: colors.warning,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      borderRadius: 8,
+    },
+    newBadgeText: {
+      fontSize: 9,
+      fontWeight: "700",
+      color: colors.white,
+    },
+    selectedBadge: {
+      position: "absolute",
+      top: 4,
+      left: 4,
+    },
+    modalOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalContent: {
+      backgroundColor: colors.background,
+      borderRadius: 20,
+      padding: SPACING.xl,
+      width: width - SPACING.xl * 2,
+      alignItems: "center",
+    },
+    modalBadge: {
+      width: 120,
+      height: 120,
+      borderRadius: 60,
+      justifyContent: "center",
+      alignItems: "center",
+      marginBottom: SPACING.lg,
+    },
+    modalTitle: {
+      fontSize: FONT_SIZES.xlarge,
+      fontWeight: "700",
+      color: colors.text.primary,
+      marginBottom: SPACING.sm,
+    },
+    modalDesc: {
+      fontSize: FONT_SIZES.medium,
+      color: colors.text.secondary,
+      textAlign: "center",
+      marginBottom: SPACING.xl,
+      lineHeight: 22,
+    },
+    modalButtons: {
+      flexDirection: "row",
+      gap: SPACING.sm,
+    },
+    modalButton: {
+      flex: 1,
+      paddingVertical: SPACING.md,
+      borderRadius: 12,
+      alignItems: "center",
+    },
+    modalButtonCancel: {
+      backgroundColor: colors.lightGray,
+    },
+    modalButtonConfirm: {
+      backgroundColor: colors.primary,
+    },
+    modalButtonCancelText: {
+      fontSize: FONT_SIZES.medium,
+      fontWeight: "600",
+      color: colors.text.secondary,
+    },
+    modalButtonConfirmText: {
+      fontSize: FONT_SIZES.medium,
+      fontWeight: "600",
+      color: colors.white,
+    },
+    // 프로필 완성도 가이드 스타일
+    profileGuideSection: {
+      marginTop: SPACING.lg,
+      marginHorizontal: SPACING.sm,
+    },
+    profileGuideGradient: {
+      borderRadius: 16,
+      padding: SPACING.md,
+    },
+    profileGuideContent: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+    },
+    profileGuideLeft: {
+      flex: 1,
+    },
+    profileGuideTitle: {
+      fontSize: FONT_SIZES.small,
+      fontWeight: "600",
+      color: colors.primary,
+      marginBottom: 4,
+    },
+    profileGuideMessage: {
+      fontSize: FONT_SIZES.small,
+      color: colors.text.secondary,
+      lineHeight: 18,
+    },
+    profileProgressBar: {
+      height: 4,
+      backgroundColor: isDark ? colors.primary + "20" : colors.primary + "30",
+      borderRadius: 2,
+      marginTop: SPACING.sm,
+      overflow: "hidden",
+    },
+    profileProgressFill: {
+      height: "100%",
+      backgroundColor: colors.primary,
+      borderRadius: 2,
+    },
+    // 임시 테스트 버튼 스타일
+    testButton: {
+      marginHorizontal: SPACING.lg,
+      marginVertical: SPACING.md,
+      backgroundColor: "#FF6B6B",
+      paddingVertical: SPACING.md,
+      borderRadius: 12,
+      alignItems: "center",
+      shadowColor: "#FF6B6B",
+      shadowOffset: {
+        width: 0,
+        height: 4,
+      },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    testButtonText: {
+      color: "#fff",
+      fontSize: FONT_SIZES.medium,
+      fontWeight: "600",
+    },
+  });
 
 export default ProfileScreen;

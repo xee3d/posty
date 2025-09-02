@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -7,28 +7,31 @@ import {
   Animated,
   Dimensions,
   Platform,
-} from 'react-native';
-import { useAppTheme } from '../hooks/useAppTheme';
-import { SPACING } from '../utils/constants';
+} from "react-native";
+import { useAppTheme } from "../hooks/useAppTheme";
+import { SPACING } from "../utils/constants";
 
 interface MinimalWelcomeProps {
   onComplete: () => void;
   onSkip?: () => void;
 }
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
-const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) => {
+const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({
+  onComplete,
+  onSkip,
+}) => {
   const { colors } = useAppTheme();
   const [currentSloganIndex, setSloganIndex] = useState(0);
-  const [displayText, setDisplayText] = useState('');
+  const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
-  
+
   // 애니메이션 값들
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
   const cursorOpacity = useRef(new Animated.Value(1)).current;
-  
+
   // 타이핑 인터벌 참조
   const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -38,7 +41,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
     "당신의 이야기를\n세상에 전하세요.",
     "간단한 한 줄이\n특별한 순간이 됩니다.",
     "Posty가 도와드릴게요.\n더 나은 글쓰기를.",
-    "시작해볼까요?"
+    "시작해볼까요?",
   ];
 
   // 타이핑 애니메이션
@@ -49,7 +52,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
 
     const currentSlogan = slogans[currentSloganIndex];
     let charIndex = 0;
-    setDisplayText('');
+    setDisplayText("");
     setIsTyping(true);
 
     // 기존 인터벌 및 타임아웃 정리
@@ -71,7 +74,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
         toValue: 1,
         duration: 400,
         useNativeDriver: true,
-      })
+      }),
     ]).start();
 
     typingIntervalRef.current = setInterval(() => {
@@ -84,7 +87,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
           typingIntervalRef.current = null;
         }
         setIsTyping(false);
-        
+
         // 마지막 슬로건이 아니면 다음으로 이동
         if (currentSloganIndex < slogans.length - 1) {
           timeoutRef.current = setTimeout(() => {
@@ -99,7 +102,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
                 toValue: 0.8,
                 duration: 250,
                 useNativeDriver: true,
-              })
+              }),
             ]).start(() => {
               setSloganIndex(currentSloganIndex + 1);
               fadeAnim.setValue(0);
@@ -136,7 +139,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
         }),
       ])
     );
-    
+
     if (isTyping || currentSloganIndex === slogans.length - 1) {
       cursorBlink.start();
     } else {
@@ -160,12 +163,12 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
         clearTimeout(timeoutRef.current);
         timeoutRef.current = null;
       }
-      
+
       // 현재 슬로건 전체 텍스트 즉시 표시
       const currentSlogan = slogans[currentSloganIndex];
       setDisplayText(currentSlogan);
       setIsTyping(false);
-      
+
       // 마지막 슬로건이 아니면 다음으로 이동
       if (currentSloganIndex < slogans.length - 1) {
         setTimeout(() => {
@@ -179,7 +182,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
               toValue: 0.8,
               duration: 250,
               useNativeDriver: true,
-            })
+            }),
           ]).start(() => {
             setSloganIndex(currentSloganIndex + 1);
             fadeAnim.setValue(0);
@@ -196,10 +199,11 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
   };
 
   // 시작하기 버튼 표시 조건
-  const showStartButton = currentSloganIndex === slogans.length - 1 && !isTyping;
+  const showStartButton =
+    currentSloganIndex === slogans.length - 1 && !isTyping;
 
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[styles.container, { backgroundColor: colors.background }]}
       onPress={handleScreenTap}
       activeOpacity={1}
@@ -220,7 +224,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
             <Animated.Text
               style={[
                 styles.cursor,
-                { color: colors.primary, opacity: cursorOpacity }
+                { color: colors.primary, opacity: cursorOpacity },
               ]}
             >
               |
@@ -270,9 +274,10 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
             style={[
               styles.progressDot,
               {
-                backgroundColor: index <= currentSloganIndex 
-                  ? colors.primary 
-                  : colors.text.tertiary,
+                backgroundColor:
+                  index <= currentSloganIndex
+                    ? colors.primary
+                    : colors.text.tertiary,
               },
             ]}
           />
@@ -285,39 +290,39 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({ onComplete, onSkip }) =
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     paddingHorizontal: SPACING.xl,
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+    justifyContent: "center",
+    alignItems: "center",
+    width: "100%",
   },
   textContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     minHeight: 120,
   },
   sloganText: {
     fontSize: 32,
-    fontWeight: '300',
-    textAlign: 'center',
+    fontWeight: "300",
+    textAlign: "center",
     lineHeight: 44,
     letterSpacing: -0.5,
     fontFamily: Platform.select({
-      ios: 'SF Pro Display',
-      android: 'Roboto',
+      ios: "SF Pro Display",
+      android: "Roboto",
     }),
   },
   cursor: {
     fontSize: 32,
-    fontWeight: '300',
+    fontWeight: "300",
   },
   buttonContainer: {
-    width: '100%',
-    alignItems: 'center',
+    width: "100%",
+    alignItems: "center",
     paddingBottom: SPACING.xl * 2,
   },
   startButton: {
@@ -326,9 +331,9 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     marginBottom: SPACING.lg,
     minWidth: 200,
-    alignItems: 'center',
-    backgroundColor: '#7C3AED', // 기본 배경색 추가 (보라색)
-    shadowColor: '#000',
+    alignItems: "center",
+    backgroundColor: "#7C3AED", // 기본 배경색 추가 (보라색)
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -336,7 +341,7 @@ const styles = StyleSheet.create({
   },
   startButtonText: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     letterSpacing: -0.3,
   },
   skipButton: {
@@ -345,12 +350,12 @@ const styles = StyleSheet.create({
   },
   skipText: {
     fontSize: 16,
-    fontWeight: '400',
+    fontWeight: "400",
   },
   progressContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     paddingBottom: SPACING.xl,
     gap: 8,
   },
