@@ -1,18 +1,34 @@
-# 🔧 Posty 프로덕션 환경변수 설정 가이드
+# 🔐 Posty 프로덕션 환경변수 설정 가이드 (업데이트)
 
-## 📋 필수 환경변수 목록
+## 필수 환경변수
 
-### 🔐 보안 및 인증
+### Vercel 배포 설정
+
+Vercel 대시보드에서 다음 환경변수들을 설정해야 합니다:
+
+#### 1. 앱 보안 키
 ```bash
-# JWT 인증 (필수 - 강력한 시크릿 생성 필요)
-JWT_SECRET="your-super-secure-jwt-secret-min-32-chars"
-
-# 앱 보안 토큰 (API 접근 제어)
-APP_SECRET="your-app-secret-key"
-
-# Vercel 접근 토큰 (서버 관리용)
-VERCEL_TOKEN="your-vercel-access-token"
+POSTY_APP_SECRET=your-secure-random-string-here
 ```
+- **용도**: API 인증, JWT 서명
+- **생성 방법**: `openssl rand -base64 32` 또는 강력한 랜덤 문자열
+- **보안**: 절대 소스코드에 포함하지 말 것
+
+#### 2. JWT 시크릿
+```bash
+JWT_SECRET=another-secure-random-string-here
+```
+- **용도**: 소셜 로그인 JWT 토큰 서명
+- **생성 방법**: `openssl rand -base64 64`
+- **중요**: POSTY_APP_SECRET과 다른 값 사용
+
+#### 3. NewsAPI 키 (선택사항)
+```bash
+NEWS_API_KEY=your-newsapi-org-key
+```
+- **용도**: 트렌드 데이터 수집
+- **발급**: [newsapi.org](https://newsapi.org)에서 무료 발급
+- **제한**: 무료 플랜은 일일 1000 요청
 
 ### 🤖 AI 서비스
 ```bash

@@ -1,6 +1,12 @@
 import crypto from 'crypto';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-jwt-secret-key';
+const JWT_SECRET = process.env.JWT_SECRET || (process.env.NODE_ENV === 'production' 
+  ? (() => {
+      console.error('🚨 JWT_SECRET 환경변수가 프로덕션에서 설정되지 않았습니다!');
+      throw new Error('Missing required environment variable: JWT_SECRET');
+    })()
+  : 'dev-jwt-secret-kakao-2025'
+);
 const KAKAO_APP_KEY = process.env.KAKAO_APP_KEY;
 
 // JWT 토큰 생성 함수
