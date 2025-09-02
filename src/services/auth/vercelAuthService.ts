@@ -14,19 +14,25 @@ let fbSDKAvailable = false;
 
 try {
   const fbSDK = require('react-native-fbsdk-next');
-  LoginManager = fbSDK.LoginManager;
-  AccessToken = fbSDK.AccessToken;
-  GraphRequest = fbSDK.GraphRequest;
-  GraphRequestManager = fbSDK.GraphRequestManager;
-  Settings = fbSDK.Settings;
   
-  // Facebook 앱 정보 설정 (시뮬레이터에서도 웹뷰 로그인 가능하도록)
-  Settings.setAppID('757255383655974');
-  Settings.setClientToken('d8ee82c1aee6b4a49fd02b398354f2b7');
-  Settings.initializeSDK();
-  
-  fbSDKAvailable = true;
-  console.log('✅ Facebook SDK 로드 및 초기화 성공');
+  // Check if the SDK modules are properly loaded
+  if (fbSDK && fbSDK.LoginManager && fbSDK.AccessToken && fbSDK.Settings) {
+    LoginManager = fbSDK.LoginManager;
+    AccessToken = fbSDK.AccessToken;
+    GraphRequest = fbSDK.GraphRequest;
+    GraphRequestManager = fbSDK.GraphRequestManager;
+    Settings = fbSDK.Settings;
+    
+    // Facebook 앱 정보 설정 (시뮬레이터에서도 웹뷰 로그인 가능하도록)
+    Settings.setAppID('757255383655974');
+    Settings.setClientToken('d8ee82c1aee6b4a49fd02b398354f2b7');
+    Settings.initializeSDK();
+    
+    fbSDKAvailable = true;
+    console.log('✅ Facebook SDK 로드 및 초기화 성공');
+  } else {
+    throw new Error('Facebook SDK modules not properly loaded');
+  }
 } catch (error) {
   console.warn('Facebook SDK 로드 실패:', error.message);
   fbSDKAvailable = false;

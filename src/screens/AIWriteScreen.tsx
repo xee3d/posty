@@ -8,14 +8,12 @@ import {
   SafeAreaView,
   TextInput,
   KeyboardAvoidingView,
-  Platform,
   Image,
   ActivityIndicator,
 } from 'react-native';
-import { COLORS, FONTS, SPACING, BORDER_RADIUS, MOLLY_MESSAGES, BRAND, CARD_THEME } from '../utils/constants';
+import { COLORS, SPACING, MOLLY_MESSAGES, CARD_THEME } from '../utils/constants';
 import { useAppTheme } from '../hooks/useAppTheme';
 import Icon from 'react-native-vector-icons/Ionicons';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
 import { useAppSelector, useAppDispatch } from '../hooks/redux';
 import { useTokenManagement } from '../hooks/useTokenManagement';
 import { useTimer } from '../hooks/useCleanup';
@@ -25,11 +23,9 @@ import { AnimatedCard, SlideInView, FadeInView, ScaleButton } from '../component
 import { TokenBadge, CharacterCount } from '../components/common';
 import GeneratedContentDisplay from '../components/GeneratedContentDisplay';
 import aiService from '../services/aiServiceWrapper';
-import Clipboard from '@react-native-clipboard/clipboard';
 import { saveContent } from '../utils/storage';
 import contentSaveService from '../services/contentSaveService';
 import userBehaviorAnalytics from '../services/userBehaviorAnalytics';
-import { APP_TEXT, getText } from '../utils/textConstants';
 import { soundManager } from '../utils/soundManager';
 import trendService from '../services/trendService';
 import personalizedHashtagService from '../services/personalizedHashtagService';

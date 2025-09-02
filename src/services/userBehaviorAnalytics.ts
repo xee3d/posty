@@ -382,7 +382,7 @@ class UserBehaviorAnalytics {
           icon: this.getTopicIcon(topTopic),
           iconColor: this.getTopicColor(topTopic),
           badge: `${this.getTopicEmoji(topTopic)} 관심사`,
-          meta: { icon: 'favorite', text: '관심 주제' },
+          meta: { icon: 'heart', text: '관심 주제' },
           priority: 9
         });
       }

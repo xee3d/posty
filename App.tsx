@@ -254,7 +254,6 @@ const AppContent: React.FC = () => {
             adService.initialize(),
             subscriptionService.initialize(),
             tokenService.initialize(),
-            offlineSyncService.initialize(),
             analyticsService.initialize(),
             notificationService.initialize(),
             trendService.initialize(), // 트렌드 서비스 초기화

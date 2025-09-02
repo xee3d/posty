@@ -48,7 +48,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
   
   const renderFeedLayout = () => (
     <TouchableOpacity 
-      style={[styles.feedContainer, { backgroundColor: colors.card }]}
+      style={[styles.feedContainer, { backgroundColor: colors.cardBackground }]}
       onPress={onPress}
       activeOpacity={0.9}
     >
@@ -61,7 +61,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
       <View style={styles.feedHeader}>
         <Image source={{ uri: adData.iconUrl }} style={styles.feedIcon} />
         <View style={styles.feedHeaderText}>
-          <Text style={[styles.advertiser, { color: colors.text }]}>
+          <Text style={[styles.advertiser, { color: colors.text.primary }]}>
             {adData.advertiser}
           </Text>
           <View style={styles.ratingRow}>
@@ -73,7 +73,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
                 color={i < Math.floor(adData.rating) ? '#FFD700' : '#E0E0E0'}
               />
             ))}
-            <Text style={[styles.ratingText, { color: colors.textSecondary }]}>
+            <Text style={[styles.ratingText, { color: colors.text.secondary }]}>
               {adData.rating}
             </Text>
           </View>
@@ -83,10 +83,10 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
       <Image source={{ uri: adData.imageUrl }} style={styles.feedImage} />
       
       <View style={styles.feedContent}>
-        <Text style={[styles.headline, { color: colors.text }]}>
+        <Text style={[styles.headline, { color: colors.text.primary }]}>
           {adData.headline}
         </Text>
-        <Text style={[styles.body, { color: colors.textSecondary }]}>
+        <Text style={[styles.body, { color: colors.text.secondary }]}>
           {adData.body}
         </Text>
         
@@ -105,7 +105,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
   
   const renderCardLayout = () => (
     <TouchableOpacity 
-      style={[styles.cardContainer, { backgroundColor: colors.card }]}
+      style={[styles.cardContainer, { backgroundColor: colors.cardBackground }]}
       onPress={onPress}
       activeOpacity={0.9}
     >
@@ -126,7 +126,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
           <Text style={[styles.cardHeadline, { color: colors.text }]} numberOfLines={2}>
             {adData.headline}
           </Text>
-          <Text style={[styles.cardBody, { color: colors.textSecondary }]} numberOfLines={3}>
+          <Text style={[styles.cardBody, { color: colors.text.secondary }]} numberOfLines={3}>
             {adData.body}
           </Text>
           
@@ -145,7 +145,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
   
   const renderBannerLayout = () => (
     <TouchableOpacity 
-      style={[styles.bannerContainer, { backgroundColor: colors.card }]}
+      style={[styles.bannerContainer, { backgroundColor: colors.cardBackground }]}
       onPress={onPress}
       activeOpacity={0.9}
     >
@@ -180,7 +180,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
   const renderInlineLayout = () => (
     <View style={[styles.inlineContainer, { backgroundColor: colors.surface }]}>
       {showSponsoredLabel && (
-        <Text style={[styles.inlineSponsored, { color: colors.textTertiary }]}>
+        <Text style={[styles.inlineSponsored, { color: colors.text.tertiary }]}>
           • 광고 •
         </Text>
       )}
@@ -196,7 +196,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
           <Text style={[styles.inlineHeadline, { color: colors.text }]} numberOfLines={1}>
             {adData.headline}
           </Text>
-          <Text style={[styles.inlineBody, { color: colors.textSecondary }]} numberOfLines={1}>
+          <Text style={[styles.inlineBody, { color: colors.text.secondary }]} numberOfLines={1}>
             {adData.body}
           </Text>
         </View>
