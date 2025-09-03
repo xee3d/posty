@@ -61,7 +61,8 @@ class TokenService {
       }
 
       // 2. Firebase 비활성화 상태에서는 로컬 스토리지만 사용
-      const currentUser = auth().currentUser;
+      // Firebase removed - using Vercel-based auth
+      // const currentUser = auth().currentUser;
       // if (currentUser) {
       //   console.log('TokenService: Fetching from Firestore for user:', currentUser.uid);
       //

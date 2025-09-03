@@ -4,12 +4,13 @@ import ImagePicker, {
   MediaType,
   CameraOptions,
   ImageLibraryOptions,
+  PhotoQuality,
 } from "react-native-image-picker";
 
 interface ImagePickerOptions {
   title?: string;
   mediaType?: MediaType;
-  quality?: number;
+  quality?: PhotoQuality;
   maxWidth?: number;
   maxHeight?: number;
 }
@@ -26,7 +27,7 @@ export const showImagePicker = (
         onPress: () => {
           const cameraOptions: CameraOptions = {
             mediaType: options?.mediaType || "photo",
-            quality: options?.quality || 0.8,
+            quality: options?.quality || (0.8 as PhotoQuality),
             maxWidth: options?.maxWidth || 1920,
             maxHeight: options?.maxHeight || 1920,
             includeBase64: false,
@@ -43,7 +44,7 @@ export const showImagePicker = (
         onPress: () => {
           const libraryOptions: ImageLibraryOptions = {
             mediaType: options?.mediaType || "photo",
-            quality: options?.quality || 0.8,
+            quality: options?.quality || (0.8 as PhotoQuality),
             maxWidth: options?.maxWidth || 1920,
             maxHeight: options?.maxHeight || 1920,
             includeBase64: false,
@@ -70,7 +71,7 @@ export const launchCamera = (
   return new Promise((resolve) => {
     const cameraOptions: CameraOptions = {
       mediaType: options?.mediaType || "photo",
-      quality: options?.quality || 0.8,
+      quality: options?.quality || (0.8 as PhotoQuality),
       maxWidth: options?.maxWidth || 1920,
       maxHeight: options?.maxHeight || 1920,
       includeBase64: false,
@@ -89,7 +90,7 @@ export const launchImageLibrary = (
   return new Promise((resolve) => {
     const libraryOptions: ImageLibraryOptions = {
       mediaType: options?.mediaType || "photo",
-      quality: options?.quality || 0.8,
+      quality: options?.quality || (0.8 as PhotoQuality),
       maxWidth: options?.maxWidth || 1920,
       maxHeight: options?.maxHeight || 1920,
       includeBase64: false,

@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 16,
     fontWeight: "600",
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: 4,
   },
   body: {

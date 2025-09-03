@@ -90,8 +90,8 @@ class ServerSubscriptionService {
    */
   async getLocalizedPlans(): Promise<SubscriptionPlan[]> {
     try {
-      const locale = DeviceInfo.getDeviceLocale() || "en-US"; // ko-KR, en-US 등
-      const country = (await DeviceInfo.getDeviceCountry()) || "US"; // KR, US 등
+      const locale = "ko-KR" || "en-US"; // ko-KR, en-US 등
+      const country = "KR"; // KR, US 등
       const cacheKey = `${country}-${locale}`;
 
       // 캐시 확인
@@ -123,8 +123,8 @@ class ServerSubscriptionService {
       console.error("Error fetching localized plans:", error);
 
       // 오프라인 시 로컬 캐시 사용
-      const country = (await DeviceInfo.getDeviceCountry()) || "US";
-      const locale = DeviceInfo.getDeviceLocale() || "en-US";
+      const country = "KR";
+      const locale = "ko-KR" || "en-US";
       const cached = await AsyncStorage.getItem(`@plans_${country}-${locale}`);
 
       if (cached) {
@@ -140,7 +140,7 @@ class ServerSubscriptionService {
    * 지역별 가격 정보 가져오기
    */
   async getPricingForCountry(planId: string): Promise<PricingInfo> {
-    const country = (await DeviceInfo.getDeviceCountry()) || "US";
+    const country = "KR";
 
     // 국가별 통화 매핑
     const currencyMap: Record<string, { currency: string; symbol: string }> = {
@@ -220,8 +220,8 @@ class ServerSubscriptionService {
           platform,
           metadata: {
             deviceId: (await DeviceInfo.getUniqueId()) || "unknown-device",
-            country: (await DeviceInfo.getDeviceCountry()) || "US",
-            locale: DeviceInfo.getDeviceLocale() || "en-US",
+            country: "KR",
+            locale: "ko-KR" || "en-US",
           },
         }),
       });
@@ -403,7 +403,7 @@ class ServerSubscriptionService {
     price: number,
     currencyInfo: { currency: string; symbol: string }
   ): string {
-    const locale = DeviceInfo.getDeviceLocale() || "en-US";
+    const locale = "ko-KR" || "en-US";
 
     try {
       return new Intl.NumberFormat(locale, {

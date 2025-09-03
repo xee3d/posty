@@ -1,6 +1,6 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { NEWS_API_KEY } from "@env";
+const NEWS_API_KEY = process.env.NEWS_API_KEY || 'development-key';
 import {
   getDeviceLanguage,
   getNewsAPICountry,
@@ -121,7 +121,7 @@ class TrendService {
 
         // 네이버 트렌드 우선 (한국 검색어)
         if (naverTrends.status === "fulfilled" && naverTrends.value) {
-          allTrends.push(...naverTrends.value);
+          allTrends.push(...(naverTrends.value as TrendItem[]));
         }
 
         // Google 트렌드 추가 (검색어)
@@ -135,14 +135,14 @@ class TrendService {
         if (newsTraends.status === "fulfilled" && newsTraends.value) {
           console.log(
             "[TrendService] Adding news trends:",
-            newsTraends.value.length
+            (newsTraends.value as TrendItem[]).length
           );
-          allTrends.push(...newsTraends.value);
+          allTrends.push(...(newsTraends.value as TrendItem[]));
         }
 
         // Reddit 트렌드 마지막에 추가 (소셜)
         if (redditTrends.status === "fulfilled" && redditTrends.value) {
-          allTrends.push(...redditTrends.value.slice(0, 5)); // 최대 5개만
+          allTrends.push(...(redditTrends.value as TrendItem[]).slice(0, 5)); // 최대 5개만
         }
       }
 
@@ -1644,76 +1644,6 @@ class TrendService {
     }
   }
 
-  /**
-   * 실시간 트렌드 API 호출
-   */
-  private async fetchRealTimeTrends(): Promise<TrendItem[]> {
-    try {
-      console.log("[TrendService] Fetching real-time trends from API...");
-      console.log("[TrendService] API URL:", `${this.API_BASE_URL}/trends`);
-
-      const response = await axios.get(`${this.API_BASE_URL}/trends`, {
-        timeout: 8000, // 8초 타임아웃 (더 빠른 응답)
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log("[TrendService] API Response status:", response.status);
-      console.log("[TrendService] API Response headers:", response.headers);
-      console.log(
-        "[TrendService] API Response data type:",
-        typeof response.data
-      );
-      console.log(
-        "[TrendService] API Response data keys:",
-        response.data ? Object.keys(response.data) : "null"
-      );
-      console.log(
-        "[TrendService] API Response data:",
-        JSON.stringify(response.data, null, 2)
-      );
-
-      // 입력 데이터 검증
-      if (!response.data) {
-        console.error("[TrendService] No data in response");
-        return this.getSampleTrends();
-      }
-
-      if (response.data.error) {
-        console.error(
-          "[TrendService] API returned error:",
-          response.data.error
-        );
-        return this.getSampleTrends();
-      }
-
-      if (response.data && response.data.trends) {
-        const parsed = this.parseApiTrends(response.data.trends);
-        console.log("[TrendService] Parsed trends count:", parsed.length);
-        console.log("[TrendService] Parsed trends by source:", {
-          news: parsed.filter((t) => t.source === "news").length,
-          social: parsed.filter((t) => t.source === "social").length,
-          naver: parsed.filter((t) => t.source === "naver").length,
-          google: parsed.filter((t) => t.source === "google").length,
-        });
-        return parsed;
-      }
-
-      console.log("[TrendService] No trends data from API, using sample data");
-      return this.getSampleTrends();
-    } catch (error) {
-      console.error("[TrendService] API error:", error);
-      console.error("[TrendService] Error details:", {
-        message: error.message,
-        code: error.code,
-        response: error.response?.data,
-      });
-      // API 오류 시 샘플 데이터 사용
-      return this.getSampleTrends();
-    }
-  }
 
   /**
    * API 응답 파싱

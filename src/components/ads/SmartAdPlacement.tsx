@@ -23,7 +23,7 @@ const SmartAdPlacement: React.FC<SmartAdPlacementProps> = ({
   context,
   children,
 }) => {
-  const subscription = useAppSelector((state) => state.user.subscription);
+  const subscriptionPlan = useAppSelector((state) => state.user.subscriptionPlan);
   const [shouldShowAd, setShouldShowAd] = useState(false);
   const [adLayout, setAdLayout] = useState<
     "feed" | "card" | "banner" | "inline" | "fullwidth"
@@ -43,7 +43,7 @@ const SmartAdPlacement: React.FC<SmartAdPlacementProps> = ({
     }
 
     // 프리미엄 이상 구독자는 광고 없음
-    if (subscription?.plan === "premium" || subscription?.plan === "pro") {
+    if (subscriptionPlan === "premium" || subscriptionPlan === "pro") {
       setShouldShowAd(false);
       return;
     }
@@ -57,7 +57,7 @@ const SmartAdPlacement: React.FC<SmartAdPlacementProps> = ({
       const layout = AdIntegrationService.getAdLayoutType(position);
       setAdLayout(layout);
     }
-  }, [position, subscription]);
+  }, [position, subscriptionPlan]);
 
   if (!shouldShowAd) {
     return <>{children}</>;

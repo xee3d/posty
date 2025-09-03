@@ -349,7 +349,6 @@ const ICON_MAPPING: Record<
   "add-circle-outline": { type: "ionicons", name: "add-circle-outline" },
 
   // personalizedRecommendationService에서 사용하는 추가 아이콘들 (안전한 대체재)
-  "access-time": { type: "ionicons", name: "time-outline" },
   "trending-up": { type: "ionicons", name: "trending-up-outline" },
   event: { type: "ionicons", name: "calendar-outline" },
   today: { type: "ionicons", name: "calendar-outline" },
@@ -383,13 +382,9 @@ const ICON_MAPPING: Record<
   "checkmark-circle": { type: "ionicons", name: "checkmark-circle" },
   "chevron-forward": { type: "ionicons", name: "chevron-forward" },
   block: { type: "ionicons", name: "ban" },
-  "auto-awesome": { type: "ionicons", name: "sparkles" },
-  event: { type: "ionicons", name: "calendar" },
   check: { type: "ionicons", name: "checkmark" },
   "arrow-back": { type: "ionicons", name: "arrow-back" },
   "flight-takeoff": { type: "ionicons", name: "airplane" },
-  "account-circle": { type: "ionicons", name: "person-circle" },
-  "workspace-premium": { type: "ionicons", name: "diamond" },
   "account-balance-wallet": { type: "ionicons", name: "wallet" },
   flower: { type: "ionicons", name: "flower-outline" },
   "flower-outline": { type: "ionicons", name: "flower-outline" },

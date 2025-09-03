@@ -314,7 +314,7 @@ ${userTypePrompt}
 
     return (
       structures[platform]?.[userProfile.type] ||
-      structures.instagram.casual_user
+      structures.instagram.beginner
     );
   }
 }

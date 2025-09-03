@@ -90,7 +90,7 @@ const ConfettiPiece: React.FC<{
       { translateX: translateX.value },
       { rotate: `${rotate.value}deg` },
       { scale: scale.value },
-    ],
+    ] as any,
     opacity: opacity.value,
   }));
 

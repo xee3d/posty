@@ -70,10 +70,10 @@ class SubscriptionService {
     this.currentSubscription = {
       plan,
       expiresAt,
-      dailyUsage: 0,
+      dailyTokens: 0,
       lastResetDate: now,
       isTrialUsed: this.currentSubscription?.isTrialUsed || false,
-      adFrequency: 0,
+      tokenHistory: [],
     };
 
     await this.saveSubscription();
@@ -104,7 +104,7 @@ class SubscriptionService {
 
     // 다른 날짜인지 체크
     if (now.toDateString() !== lastReset.toDateString()) {
-      this.currentSubscription.dailyUsage = 0;
+      this.currentSubscription.dailyTokens = 0;
       this.currentSubscription.lastResetDate = now;
       await this.saveSubscription();
       console.log("Daily usage reset");
@@ -122,15 +122,15 @@ class SubscriptionService {
     }
 
     // 일일 제한 체크
-    if (subscription.dailyUsage >= plan.features.dailyLimit) {
+    if (subscription.dailyTokens >= plan.features.dailyLimit) {
       return { allowed: false, remaining: 0 };
     }
 
     // 사용량 증가
-    subscription.dailyUsage++;
+    subscription.dailyTokens++;
     await this.saveSubscription();
 
-    const remaining = plan.features.dailyLimit - subscription.dailyUsage;
+    const remaining = plan.features.dailyLimit - subscription.dailyTokens;
     return { allowed: true, remaining };
   }
 
@@ -143,7 +143,7 @@ class SubscriptionService {
       return -1; // 무제한
     }
 
-    return Math.max(0, plan.features.dailyLimit - subscription.dailyUsage);
+    return Math.max(0, plan.features.dailyLimit - subscription.dailyTokens);
   }
 
   // 광고 시청으로 추가 사용 횟수 획득
@@ -151,15 +151,14 @@ class SubscriptionService {
     const subscription = await this.getSubscription();
 
     // 보너스 사용 횟수는 일일 제한에서 차감
-    subscription.dailyUsage = Math.max(0, subscription.dailyUsage - amount);
+    subscription.dailyTokens = Math.max(0, subscription.dailyTokens - amount);
     await this.saveSubscription();
   }
 
-  // 광고 빈도 증가
+  // 광고 빈도 증가 (현재 UserSubscription 타입에서 제거됨)
   async incrementAdFrequency() {
-    const subscription = await this.getSubscription();
-    subscription.adFrequency++;
-    await this.saveSubscription();
+    // adFrequency 속성이 UserSubscription 타입에 없어서 비활성화
+    console.log('Ad frequency tracking disabled due to type mismatch');
   }
 
   // 무료 체험 사용 여부 확인

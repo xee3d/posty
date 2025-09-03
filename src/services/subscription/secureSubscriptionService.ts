@@ -190,7 +190,6 @@ class SecureSubscriptionService {
             ...receipt,
             userId,
           }),
-          timeout: 30000,
         }
       );
 
@@ -284,7 +283,6 @@ class SecureSubscriptionService {
           headers: {
             "Content-Type": "application/json",
           },
-          timeout: 30000,
         }
       );
 

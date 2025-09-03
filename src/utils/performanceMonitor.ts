@@ -1,5 +1,6 @@
 // 성능 및 배터리 사용량 모니터링 유틸리티
-import { AppState, DeviceInfo } from "react-native";
+import { AppState } from "react-native";
+import DeviceInfo from "react-native-device-info";
 import { batteryOptimizer } from "./batteryOptimization";
 
 interface PerformanceMetrics {

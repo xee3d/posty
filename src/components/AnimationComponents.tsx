@@ -101,7 +101,7 @@ export const SlideInView: React.FC<SlideInViewProps> = ({
     transform: [
       { translateX: translateX.value },
       { translateY: translateY.value },
-    ],
+    ] as any,
     opacity: opacity.value,
   }));
 

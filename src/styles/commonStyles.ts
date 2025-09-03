@@ -90,7 +90,7 @@ export const createButtonStyles = (colors: typeof COLORS) =>
       backgroundColor: colors.primary,
       paddingHorizontal: SPACING.lg,
       paddingVertical: SPACING.md,
-      borderRadius: BORDER_RADIUS.sm,
+      borderRadius: BORDER_RADIUS.small,
       alignItems: "center",
       justifyContent: "center",
     },

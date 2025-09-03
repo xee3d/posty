@@ -421,7 +421,7 @@ class PersonalizedHashtagService {
   }
 
   // 사용자 선호도 가져오기
-  private async getUserPreferences(): Promise<UserHashtagPreferences> {
+  public async getUserPreferences(): Promise<UserHashtagPreferences> {
     try {
       const stored = await AsyncStorage.getItem(this.STORAGE_KEY);
       if (stored) {

@@ -126,7 +126,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
 
         <View style={styles.cardContent}>
           <Text
-            style={[styles.cardHeadline, { color: colors.text }]}
+            style={[styles.cardHeadline, { color: colors.text.primary }]}
             numberOfLines={2}
           >
             {adData.headline}
@@ -205,7 +205,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
 
         <View style={styles.inlineTextContent}>
           <Text
-            style={[styles.inlineHeadline, { color: colors.text }]}
+            style={[styles.inlineHeadline, { color: colors.text.primary }]}
             numberOfLines={1}
           >
             {adData.headline}

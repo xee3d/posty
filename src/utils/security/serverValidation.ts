@@ -1,4 +1,5 @@
 import { tokenSecurityManager } from "./tokenSecurity";
+import { Platform } from "react-native";
 
 interface ServerValidationRequest {
   endpoint: string;
@@ -46,7 +47,7 @@ class ServerValidationClient {
         timestamp,
         amount,
         signature,
-        userAgent: navigator.userAgent || "unknown",
+        userAgent: `ReactNative/${Platform.OS}` || "unknown",
         metadata: {
           platform: "react-native",
           version: "1.0.0",

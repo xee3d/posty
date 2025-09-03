@@ -349,7 +349,7 @@ class InAppPurchaseService {
   /**
    * 구매 성공 처리
    */
-  private async handleSuccessfulPurchase(purchase: Purchase): Promise<void> {
+  private async handleSuccessfulPurchase(purchase: any): Promise<void> {
     const productId = purchase.productId;
 
     // 구독 상품인지 확인
@@ -463,8 +463,8 @@ class InAppPurchaseService {
   /**
    * 특정 상품 정보 가져오기
    */
-  getProduct(productId: string): Product | undefined {
-    return this.products.find((p) => p.productId === productId);
+  getProduct(productId: string): any {
+    return this.products.find((p: any) => p.productId === productId);
   }
 
   /**

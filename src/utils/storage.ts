@@ -13,10 +13,11 @@ export interface SavedContent {
   prompt?: string;
 }
 
-const STORAGE_KEYS = {
+export const STORAGE_KEYS = {
   SAVED_CONTENTS: "saved_contents",
   USER_PREFERENCES: "user_preferences",
   USER_STATS: "user_stats",
+  USAGE_STATS: "usage_stats",
 };
 
 // 콘텐츠 저장 - 로컬 스토리지만 사용

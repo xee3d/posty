@@ -36,7 +36,7 @@ export const FeedNativeAd: React.FC<FeedNativeAdProps> = ({ ad, onPress }) => {
     >
       <View style={styles.header}>
         {ad.icon && (
-          <Image source={{ uri: ad.icon }} style={styles.profileImage} />
+          <Image source={{ uri: ad.icon }} style={styles.profileImage as any} />
         )}
         <View style={styles.headerText}>
           <Text style={styles.advertiserName}>{ad.advertiser}</Text>
@@ -53,7 +53,7 @@ export const FeedNativeAd: React.FC<FeedNativeAdProps> = ({ ad, onPress }) => {
       {ad.images && ad.images[0] && (
         <Image
           source={{ uri: ad.images[0] }}
-          style={styles.mainImage}
+          style={styles.mainImage as any}
           resizeMode="cover"
         />
       )}
@@ -109,7 +109,7 @@ const styles = StyleSheet.create({
   advertiserName: {
     fontSize: 14,
     fontWeight: "600",
-    color: COLORS.text,
+    color: COLORS.text.primary,
   },
   sponsoredRow: {
     flexDirection: "row",
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
   headline: {
     fontSize: 18,
     fontWeight: "700",
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginBottom: SPACING.small,
   },
   body: {
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 14,
     fontWeight: "600",
-    color: COLORS.text,
+    color: COLORS.text.primary,
     marginRight: SPACING.small,
   },
   store: {

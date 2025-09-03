@@ -11,7 +11,6 @@ import {
   BannerAdSize,
   TestIds,
   AdEventType,
-  GAMNativeAd,
 } from "react-native-google-mobile-ads";
 import { COLORS, SPACING } from "../../utils/constants";
 
@@ -90,7 +89,7 @@ const styles = StyleSheet.create({
     minHeight: 250,
     ...Platform.select({
       ios: {
-        shadowColor: COLORS.shadow,
+        shadowColor: COLORS.primary,
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,

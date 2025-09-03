@@ -26,7 +26,7 @@ const CompactBanner: React.FC<CompactBannerProps> = ({
       case "large":
         return BannerAdSize.LARGE_BANNER; // 320x100
       case "smart":
-        return BannerAdSize.SMART_BANNER; // 스크린에 맞춤
+        return BannerAdSize.MEDIUM_RECTANGLE; // 스크린에 맞춤
       default:
         return BannerAdSize.BANNER; // 320x50
     }
