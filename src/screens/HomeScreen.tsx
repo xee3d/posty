@@ -342,7 +342,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     try {
       const posts = await simplePostService.getRecentPosts(20);
       if (posts.length > 0) {
-        const analysis = await improvedStyleService.analyzeUserStyle(posts);
+        const analysis = await improvedStyleService.analyzeUserStyle();
         setStyleAnalysis(analysis);
 
         // 주간 포스트 수 계산 - stats 업데이트 제거
@@ -743,7 +743,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 </ScaleButton>
 
                 {/* 문장 정리하기 - 신규 사용자 외 모든 레벨 */}
-                {userLevel !== "new" && (
+                {userLevel !== "beginner" && (
                   <ScaleButton
                     style={styles.mainActionCard}
                     onPress={() => handleQuickAction("문장 정리하기")}
@@ -803,7 +803,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
         {/* 작은 배너 광고 - 해시태그 아래 배치 */}
         {Date.now() % 2 === 0 && (
-          <SlideInView delay={600} duration={300}>
+          <SlideInView delay={600}>
             <View style={styles.smallBannerContainer}>
               <BannerCarousel
                 autoPlay={true}
@@ -901,7 +901,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     style={[
                       styles.recommendCard,
                       index > 0 && { marginLeft: SPACING.sm },
-                    ]}
+                    ] as any}
                   >
                     <View
                       style={[
@@ -964,14 +964,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                         index > 0 && { marginLeft: SPACING.sm },
                       ]}
                     >
-                      <View style={styles.recommendSkeletonHeader}>
+                      <View style={{height: 20, backgroundColor: '#E0E0E0', borderRadius: 4, marginBottom: 8}}>
                         <View
                           style={[
                             styles.recommendIconContainer,
                             { backgroundColor: "#E5E5E5" },
                           ]}
                         />
-                        <View style={styles.recommendSkeletonBadge} />
+                        <View style={{width: 60, height: 20, backgroundColor: '#E0E0E0', borderRadius: 4}} />
                       </View>
                       <TextSkeleton
                         lines={1}
@@ -983,9 +983,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                         lineHeight={14}
                         lastLineWidth="80%"
                       />
-                      <View style={styles.recommendSkeletonFooter}>
-                        <View style={styles.recommendSkeletonMeta} />
-                        <View style={styles.recommendSkeletonButton} />
+                      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8}}>
+                        <View style={{flex: 1, height: 12, backgroundColor: '#E0E0E0', borderRadius: 4}} />
+                        <View style={{width: 60, height: 24, backgroundColor: '#E0E0E0', borderRadius: 4, marginLeft: 8}} />
                       </View>
                     </View>
                   ))}
@@ -1025,7 +1025,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
                   <AnimatedCard
                     delay={750}
-                    style={[styles.recommendCard, { marginLeft: SPACING.sm }]}
+                    style={[styles.recommendCard, { marginLeft: SPACING.sm }] as any}
                   >
                     <View
                       style={[
@@ -1408,7 +1408,11 @@ const createStyles = (
       paddingVertical: 20,
       paddingHorizontal: 20,
       marginBottom: 12,
-      ...cardTheme.default.shadow,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
     },
     mainActionRow: {
       flexDirection: "row",
@@ -1542,7 +1546,11 @@ const createStyles = (
       borderRadius: 16,
       padding: SPACING.lg,
       width: 280,
-      ...cardTheme.default.shadow,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
     },
     recommendIconContainer: {
       width: 48,
@@ -1641,7 +1649,11 @@ const createStyles = (
       borderRadius: 12,
       padding: SPACING.md,
       marginBottom: SPACING.sm,
-      ...cardTheme.default.shadow,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
     },
     postHeader: {
       flexDirection: "row",
@@ -1755,7 +1767,11 @@ const createStyles = (
       backgroundColor: colors.surface,
       borderRadius: 16,
       padding: SPACING.lg,
-      ...cardTheme.default.shadow,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
     },
     styleCardHeader: {
       flexDirection: "row",
@@ -1871,7 +1887,11 @@ const createStyles = (
       borderRadius: 16,
       padding: SPACING.md,
       alignItems: "center",
-      ...cardTheme.default.shadow,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
     },
 
     templateTitle: {

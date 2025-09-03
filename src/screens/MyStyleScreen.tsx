@@ -111,6 +111,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const [recommendedTemplates, setRecommendedTemplates] = useState<string[]>(
     []
   );
+  const [writingPatterns, setWritingPatterns] = useState<WritingPattern[]>([]);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(50)).current;
@@ -675,7 +676,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         {insights.map((insight, index) => (
           <TouchableOpacity
             key={index}
-            style={[styles.insightCard, cardTheme.card]}
+            style={[styles.insightCard, cardTheme.default]}
             onPress={() => insight.action && handleInsightAction(insight)}
             activeOpacity={0.8}
           >
@@ -827,7 +828,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     return (
       <View>
         {/* 성장 그래프 */}
-        <View style={[styles.growthSection, cardTheme.card]}>
+        <View style={[styles.growthSection, cardTheme.default]}>
           <Text style={styles.sectionTitle}>📈 성장 분석</Text>
 
           {/* 주요 지표 */}
@@ -881,7 +882,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         </View>
 
         {/* 톤 분석 */}
-        <View style={[styles.toneAnalysis, cardTheme.card]}>
+        <View style={[styles.toneAnalysis, cardTheme.default]}>
           <Text style={styles.sectionTitle}>🎨 톤 사용 분석</Text>
           <View style={styles.toneGrid}>
             {Object.entries(stats?.byTone || {}).map(([tone, count]) => (
@@ -980,7 +981,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               key={template.id}
               style={[
                 styles.templateCard,
-                cardTheme.card,
+                cardTheme.default,
                 isRecommended && styles.recommendedTemplate,
                 pressedTemplateId === template.id && styles.templateCardPressed,
                 isLocked && styles.lockedTemplate,
@@ -1095,7 +1096,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               key={challenge.id}
               style={[
                 styles.challengeCard,
-                cardTheme.card,
+                cardTheme.default,
                 activeChallenge?.id === challenge.id &&
                   styles.activeChallengeCardBorder,
               ]}
@@ -1302,7 +1303,7 @@ const createStyles = (
     loadingText: {
       marginTop: SPACING.md,
       fontSize: 16,
-      color: colors.textSecondary,
+      color: colors.secondary,
     },
     header: {
       flexDirection: "row",

@@ -1089,7 +1089,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                   styles.profileGuide,
                   {
                     backgroundColor: isDark
-                      ? colors.surfaceVariant + "80"
+                      ? colors.secondary + "80"
                       : colors.primary + "10",
                     borderLeftColor: colors.primary,
                   },
@@ -1755,7 +1755,7 @@ const createStyles = (colors: any, cardTheme: any) => {
     profileGuide: {
       marginTop: SPACING.sm,
       padding: SPACING.sm,
-      backgroundColor: isDark ? "#2A1A1A" : colors.surfaceVariant || "#F7FAFC",
+      backgroundColor: isDark ? "#2A1A1A" : colors.secondary + "20",
       borderRadius: 8,
       borderLeftWidth: 3,
       borderLeftColor: colors.warning,

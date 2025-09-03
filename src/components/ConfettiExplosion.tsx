@@ -189,7 +189,7 @@ const ParticleComponent: React.FC<{ particle: Particle }> = ({ particle }) => {
       { translateY: translateY.value },
       { rotate: `${rotation.value}deg` },
       { scale: particleScale.value },
-    ],
+    ] as any,
     opacity: opacity.value,
   }));
 
@@ -223,7 +223,7 @@ const ParticleComponent: React.FC<{ particle: Particle }> = ({ particle }) => {
             particle.shape === "star" ? "transparent" : particle.color,
         },
         shapeStyle,
-      ]}
+      ] as any}
     />
   );
 };

@@ -165,7 +165,7 @@ const SimpleStatsView: React.FC = () => {
       {/* 내 스타일 */}
       <AnimatedCard
         delay={300}
-        style={[styles.styleCard, { backgroundColor: colors.surface }]}
+        style={[styles.styleCard, { backgroundColor: colors.surface }] as any}
       >
         <View style={styles.styleHeader}>
           <MaterialIcon name="auto-awesome" size={20} color={colors.primary} />
@@ -213,7 +213,7 @@ const SimpleStatsView: React.FC = () => {
                       },
                     ]}
                   >
-                    {count}
+                    {count as number}
                   </Text>
                 </View>
               ))}
@@ -230,7 +230,7 @@ const SimpleStatsView: React.FC = () => {
           <AnimatedCard
             key={post.id}
             delay={400 + index * 100}
-            style={[styles.recentCard, { backgroundColor: colors.surface }]}
+            style={[styles.recentCard, { backgroundColor: colors.surface }] as any}
           >
             <View style={styles.recentHeader}>
               <Icon

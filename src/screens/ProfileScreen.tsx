@@ -285,7 +285,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
                   colors={
                     isDark
                       ? [
-                          colors.surfaceVariant || "#2A1A1A",
+                          colors.secondary + "40",
                           colors.surface || "#3A2A2A",
                         ]
                       : [colors.primary + "10", colors.primary + "05"]

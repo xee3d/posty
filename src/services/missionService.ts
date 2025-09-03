@@ -11,6 +11,10 @@ export interface Mission {
   icon: string;
   completed: boolean;
   expiresAt?: Date;
+  // MissionModal에서 사용하는 추가 프로퍼티들
+  claimedReward?: boolean;
+  targetCount: number;
+  currentCount: number;
 }
 
 const STORAGE_KEYS = {
@@ -147,6 +151,64 @@ class MissionService {
       weeklyCompleted,
       achievementsCompleted,
     };
+  }
+
+  // MissionModal에서 사용하는 메서드들 추가
+  async initializeMissions(): Promise<void> {
+    if (!this.isEnabled) {
+      console.log("[MissionService] Mission system is disabled");
+      return;
+    }
+    // 초기화 로직이 필요하면 여기에 추가
+  }
+
+  getDailyMissions(): Mission[] {
+    if (!this.isEnabled) {
+      return [];
+    }
+    return this.missions.filter((mission) => mission.type === "daily");
+  }
+
+  getWeeklyMissions(): Mission[] {
+    if (!this.isEnabled) {
+      return [];
+    }
+    return this.missions.filter((mission) => mission.type === "weekly");
+  }
+
+  async claimReward(missionId: string): Promise<number> {
+    if (!this.isEnabled) {
+      console.log("[MissionService] Mission system is disabled");
+      return 0;
+    }
+    
+    const mission = this.missions.find((m) => m.id === missionId);
+    if (!mission || !mission.completed || mission.claimedReward) {
+      return 0;
+    }
+
+    mission.claimedReward = true;
+    // 미션 데이터 저장
+    await this.saveMissions();
+    
+    return mission.reward;
+  }
+
+  getAvailableRewards(): number {
+    if (!this.isEnabled) {
+      return 0;
+    }
+    return this.missions.filter(
+      (mission) => mission.completed && !mission.claimedReward
+    ).length;
+  }
+
+  private async saveMissions(): Promise<void> {
+    try {
+      await AsyncStorage.setItem(STORAGE_KEYS.MISSIONS, JSON.stringify(this.missions));
+    } catch (error) {
+      console.error("[MissionService] Failed to save missions:", error);
+    }
   }
 }
 

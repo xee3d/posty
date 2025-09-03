@@ -308,7 +308,7 @@ const createStyles = (colors: typeof COLORS) => {
       flex: 1,
       paddingVertical: SPACING.sm,
       paddingHorizontal: SPACING.md,
-      borderRadius: BORDER_RADIUS.full,
+      borderRadius: 50,
       backgroundColor: colors.surface,
       alignItems: "center",
     },
@@ -334,7 +334,7 @@ const createStyles = (colors: typeof COLORS) => {
     },
     featureCard: {
       backgroundColor: colors.surface,
-      borderRadius: BORDER_RADIUS.lg,
+      borderRadius: BORDER_RADIUS.large,
       padding: SPACING.lg,
       borderWidth: 1,
       borderColor: colors.border,
@@ -403,7 +403,7 @@ const createStyles = (colors: typeof COLORS) => {
     },
     faqItem: {
       backgroundColor: colors.surface,
-      borderRadius: BORDER_RADIUS.lg,
+      borderRadius: BORDER_RADIUS.large,
       padding: SPACING.lg,
     },
     faqHeader: {
@@ -443,8 +443,8 @@ const createStyles = (colors: typeof COLORS) => {
       marginBottom: SPACING.lg,
     },
     ctaCard: {
-      backgroundColor: isDark ? colors.primary + "20" : colors.primaryLight,
-      borderRadius: BORDER_RADIUS.xl,
+      backgroundColor: isDark ? colors.primary + "20" : colors.primary + "20",
+      borderRadius: BORDER_RADIUS.xlarge,
       padding: SPACING.xl,
       alignItems: "center",
     },
@@ -466,7 +466,7 @@ const createStyles = (colors: typeof COLORS) => {
       backgroundColor: colors.primary,
       paddingVertical: SPACING.sm,
       paddingHorizontal: SPACING.lg,
-      borderRadius: BORDER_RADIUS.full,
+      borderRadius: 50,
       gap: SPACING.xs,
     },
     ctaButtonText: {

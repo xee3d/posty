@@ -303,7 +303,7 @@ const createStyles = (colors: typeof COLORS) =>
     },
     section: {
       backgroundColor: colors.card,
-      borderRadius: BORDER_RADIUS.lg,
+      borderRadius: BORDER_RADIUS.large,
       padding: SPACING.lg,
     },
     sectionTitle: {
@@ -358,7 +358,7 @@ const createStyles = (colors: typeof COLORS) =>
       marginTop: SPACING.md,
       paddingVertical: SPACING.sm,
       backgroundColor: colors.primary + "15",
-      borderRadius: BORDER_RADIUS.md,
+      borderRadius: BORDER_RADIUS.medium,
     },
     testButtonText: {
       marginLeft: SPACING.xs,
@@ -372,7 +372,7 @@ const createStyles = (colors: typeof COLORS) =>
       marginTop: SPACING.md,
       padding: SPACING.md,
       backgroundColor: colors.warning + "15",
-      borderRadius: BORDER_RADIUS.md,
+      borderRadius: BORDER_RADIUS.medium,
     },
     permissionWarningText: {
       marginLeft: SPACING.sm,
@@ -387,7 +387,7 @@ const createStyles = (colors: typeof COLORS) =>
       marginTop: SPACING.md,
       padding: SPACING.md,
       backgroundColor: colors.error + "15",
-      borderRadius: BORDER_RADIUS.md,
+      borderRadius: BORDER_RADIUS.medium,
     },
     errorText: {
       marginLeft: SPACING.sm,

@@ -53,7 +53,7 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
     setLoading(true);
     try {
       // 프로필 정보 저장
-      await storage.setUser({
+      await (storage as any).setUser({
         id: "1",
         name: name.trim(),
         email: email.trim(),
@@ -165,8 +165,8 @@ const createStyles = (colors: typeof COLORS) =>
     },
     modalContent: {
       backgroundColor: colors.surface,
-      borderTopLeftRadius: BORDER_RADIUS.xxl,
-      borderTopRightRadius: BORDER_RADIUS.xxl,
+      borderTopLeftRadius: BORDER_RADIUS.xlarge,
+      borderTopRightRadius: BORDER_RADIUS.xlarge,
       paddingTop: SPACING.lg,
       paddingBottom: SPACING.xxl,
       maxHeight: "80%",
@@ -200,7 +200,7 @@ const createStyles = (colors: typeof COLORS) =>
     },
     input: {
       backgroundColor: colors.background,
-      borderRadius: BORDER_RADIUS.md,
+      borderRadius: BORDER_RADIUS.medium,
       paddingHorizontal: SPACING.md,
       paddingVertical: SPACING.md,
       fontSize: 16,
@@ -216,7 +216,7 @@ const createStyles = (colors: typeof COLORS) =>
     button: {
       flex: 1,
       paddingVertical: SPACING.md,
-      borderRadius: BORDER_RADIUS.md,
+      borderRadius: BORDER_RADIUS.medium,
       alignItems: "center",
     },
     cancelButton: {

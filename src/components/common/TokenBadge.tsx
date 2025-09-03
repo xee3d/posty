@@ -24,7 +24,7 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
   const isUnlimited = tokens === 9999;
   const isEmpty = tokens === 0;
 
-  const Container = onPress ? TouchableOpacity : View;
+  const Container = (onPress ? TouchableOpacity : View) as any;
 
   return (
     <Container

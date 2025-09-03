@@ -526,6 +526,30 @@ export class PushNotificationService {
   async sendTestNotification(): Promise<void> {
     await this.sendSmartNotification("content_suggestion");
   }
+
+  /**
+   * 토큰 갱신 처리
+   */
+  handleTokenRefresh(token: string): void {
+    console.log("📱 Token refreshed:", token);
+    this.deviceToken = token;
+  }
+
+  /**
+   * 토픽 구독
+   */
+  subscribeToTopic(topic: string): void {
+    console.log("📱 Subscribing to topic:", topic);
+    // Firebase 없이는 구현하지 않음
+  }
+
+  /**
+   * 토픽 구독 해제
+   */
+  unsubscribeFromTopic(topic: string): void {
+    console.log("📱 Unsubscribing from topic:", topic);
+    // Firebase 없이는 구현하지 않음
+  }
 }
 
 // 싱글톤 인스턴스 export

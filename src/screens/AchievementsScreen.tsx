@@ -256,7 +256,7 @@ const AchievementsScreen: React.FC = () => {
             progress={categorySummaries.all?.percentage || 0}
             height={8}
             backgroundColor="#FFFFFF33"
-            fillColor="#FFFFFF"
+            progressColor="#FFFFFF"
           />
         </View>
       </View>

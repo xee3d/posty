@@ -76,7 +76,7 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
         await pushNotificationService.scheduleLocalNotifications();
 
         // 토큰 새로고침 핸들러 등록
-        await pushNotificationService.handleTokenRefresh();
+        await pushNotificationService.handleTokenRefresh(settings.token || "");
 
         // 기본 토픽 구독
         await pushNotificationService.subscribeToTopic("general");

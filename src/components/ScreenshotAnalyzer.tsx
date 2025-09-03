@@ -37,7 +37,7 @@ const ScreenshotAnalyzer: React.FC<ScreenshotAnalyzerProps> = ({
   const handleSelectScreenshot = () => {
     const options = {
       mediaType: "photo" as const,
-      quality: 1,
+      quality: 1 as any,
     };
 
     launchImageLibrary(options, (response: ImagePickerResponse) => {

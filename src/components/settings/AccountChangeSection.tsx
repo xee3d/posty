@@ -82,7 +82,7 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
           ]
         );
 
-        if (result !== 1) {
+        if ((result as any) !== 1) {
           setChanging(null);
           return;
         }
@@ -135,7 +135,7 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
 
   return (
     <View style={[styles.section, { backgroundColor: colors.surface }]}>
-      <Text style={[styles.sectionTitle, { color: colors.text }]}>
+      <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
         계정 관리
       </Text>
 
@@ -156,16 +156,16 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
                 { backgroundColor: colors.border },
               ]}
             >
-              <Icon name="person" size={24} color={colors.textSecondary} />
+              <Icon name="person" size={24} color={colors.text.secondary} />
             </View>
           )}
 
           <View style={styles.accountDetails}>
-            <Text style={[styles.accountName, { color: colors.text }]}>
+            <Text style={[styles.accountName, { color: colors.text.primary }]}>
               {currentName}
             </Text>
             <Text
-              style={[styles.accountEmail, { color: colors.textSecondary }]}
+              style={[styles.accountEmail, { color: colors.text.secondary }]}
             >
               {currentEmail}
             </Text>
@@ -180,7 +180,7 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
       </View>
 
       {/* 계정 변경 옵션 */}
-      <Text style={[styles.changeTitle, { color: colors.textSecondary }]}>
+      <Text style={[styles.changeTitle, { color: colors.text.secondary }]}>
         다른 계정으로 변경
       </Text>
 
@@ -214,7 +214,7 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
               <Icon name={provider.icon} size={24} color={provider.color} />
             )}
 
-            <Text style={[styles.providerName, { color: colors.text }]}>
+            <Text style={[styles.providerName, { color: colors.text.primary }]}>
               {provider.name}
             </Text>
 
@@ -231,7 +231,7 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
       </View>
 
       {/* 안내 메시지 */}
-      <Text style={[styles.helpText, { color: colors.textSecondary }]}>
+      <Text style={[styles.helpText, { color: colors.text.secondary }]}>
         계정을 변경하면 현재 계정에서 로그아웃되고 선택한 서비스로 다시
         로그인됩니다.
       </Text>
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontFamily: FONTS.KOREAN.BOLD,
+    fontFamily: FONTS.bold,
     marginBottom: SPACING.medium,
   },
   currentAccount: {
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   },
   accountName: {
     fontSize: 16,
-    fontFamily: FONTS.KOREAN.MEDIUM,
+    fontFamily: FONTS.medium,
     marginBottom: 4,
   },
   accountEmail: {
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
   },
   providerText: {
     fontSize: 12,
-    fontFamily: FONTS.KOREAN.MEDIUM,
+    fontFamily: FONTS.medium,
   },
   changeTitle: {
     fontSize: 14,
@@ -318,7 +318,7 @@ const styles = StyleSheet.create({
   },
   providerName: {
     fontSize: 14,
-    fontFamily: FONTS.KOREAN.MEDIUM,
+    fontFamily: FONTS.medium,
     marginLeft: SPACING.small,
   },
   checkIcon: {

@@ -175,7 +175,7 @@ export const GeneratingIndicator: React.FC<GeneratingIndicatorProps> = ({
         <View
           style={[styles.mascotContainer, { backgroundColor: colors.mascotBg }]}
         >
-          <Text style={styles.mascotEmoji}>{BRAND.mascot}</Text>
+          <Text style={styles.mascotEmoji}>{BRAND.mascot.emoji}</Text>
           <View style={styles.typingIndicator}>
             <TypingAnimation theme={theme} />
           </View>

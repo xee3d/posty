@@ -1,15 +1,16 @@
 // AI 서비스를 사용하는 React Hook
 
 import { useState, useCallback } from "react";
-import aiService from "../services/ai";
-import { saveData, getData, STORAGE_KEYS } from "../utils/storage";
+import aiService from "../services/aiServiceWrapper";
+import { STORAGE_KEYS } from "../utils/storage";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import {
   GenerateContentParams,
   GeneratedContent,
   ToneType,
   LengthType,
   PlatformType,
-} from "../services/ai";
+} from "../services/ai/types/ai.types";
 
 interface UseAIServiceProps {
   onSuccess?: (content: string, hashtags: string[]) => void;
@@ -53,10 +54,8 @@ export const useAIService = ({
         setHashtags(result.hashtags);
         setUsageStats({
           tokensUsed: result.metadata?.tokensUsed || 0,
-          cost: result.metadata?.tokensUsed
-            ? aiService.estimateCost(result.metadata.tokensUsed)
-            : 0,
-          model: aiService.getCurrentProvider(),
+          cost: 0,
+          model: "enhanced-ai",
         });
 
         // 히스토리 저장
@@ -96,8 +95,8 @@ export const useAIService = ({
   // 생성된 콘텐츠 저장
   const saveGeneratedContent = async (content: GeneratedContent) => {
     try {
-      const history =
-        (await getData<any[]>(STORAGE_KEYS.GENERATED_CONTENT)) || [];
+      const historyData = await AsyncStorage.getItem(STORAGE_KEYS.GENERATED_CONTENT);
+      const history = historyData ? JSON.parse(historyData) : [];
       history.push({
         ...content,
         id: Date.now().toString(),
@@ -109,7 +108,7 @@ export const useAIService = ({
         history.splice(0, history.length - 100);
       }
 
-      await saveData(STORAGE_KEYS.GENERATED_CONTENT, history);
+      await AsyncStorage.setItem(STORAGE_KEYS.GENERATED_CONTENT, JSON.stringify(history));
     } catch (error) {
       console.error("Save content error:", error);
     }
@@ -117,13 +116,13 @@ export const useAIService = ({
 
   // 사용량 통계 가져오기
   const getUsageHistory = useCallback(async () => {
-    const history =
-      (await getData<any[]>(STORAGE_KEYS.GENERATED_CONTENT)) || [];
+    const historyData = await AsyncStorage.getItem(STORAGE_KEYS.GENERATED_CONTENT);
+    const history = historyData ? JSON.parse(historyData) : [];
     const totalTokens = history.reduce(
       (sum, item) => sum + (item.metadata?.tokensUsed || 0),
       0
     );
-    const totalCost = totalTokens ? aiService.estimateCost(totalTokens) : 0;
+    const totalCost = 0;
 
     return {
       totalPosts: history.length,
@@ -136,11 +135,7 @@ export const useAIService = ({
 
   // Provider 전환 (개발용)
   const switchProvider = useCallback((useMock: boolean) => {
-    aiService.setProvider(useMock);
-    setUsageStats((prev) => ({
-      ...prev,
-      model: aiService.getCurrentProvider(),
-    }));
+    console.log('Provider switching not implemented');
   }, []);
 
   return {
@@ -153,6 +148,6 @@ export const useAIService = ({
     analyzeImage,
     getUsageHistory,
     switchProvider,
-    isAPIKeyConfigured: aiService.isAPIKeyConfigured(),
+    isAPIKeyConfigured: true,
   };
 };

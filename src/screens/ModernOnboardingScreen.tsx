@@ -515,7 +515,6 @@ const ModernOnboardingScreen: React.FC<ModernOnboardingScreenProps> = ({
               name="arrow-forward"
               size={20}
               color={canProceed ? colors.white : colors.text.secondary}
-              style={{ marginLeft: 8 }}
             />
           )}
         </TouchableOpacity>

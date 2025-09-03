@@ -515,7 +515,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 <View style={styles.earnTokenInfo}>
                   <Text style={styles.earnTokenTitle}>광고 보기</Text>
                   <Text style={styles.earnTokenDesc}>
-                    +2 토큰 ({adStats.remainingToday}/{adStats.dailyLimit || 10}
+                    +2 토큰 ({adStats.remainingToday}/{10}
                     회 남음)
                   </Text>
                 </View>

@@ -5,11 +5,11 @@ import SettingsScreen from "../screens/SettingsScreen";
 import MyStyleScreen from "../screens/MyStyleScreen";
 import AIWriteScreen from "../screens/AIWriteScreen";
 import TrendScreen from "../screens/TrendScreen";
-import FeedWithAdsExample from "../screens/FeedWithAdsExample";
+// import FeedWithAdsExample from "../screens/FeedWithAdsExample";
 import ModernSubscriptionScreen from "../screens/subscription/ModernSubscriptionScreen";
 import CostMonitorScreen from "../screens/CostMonitorScreen";
 import MissionScreen from "../screens/MissionScreen";
-import AnimationExamplesScreen from "../screens/AnimationExamplesScreen";
+// import AnimationExamplesScreen from "../screens/AnimationExamplesScreen";
 import TabNavigator from "../components/TabNavigator";
 import { COLORS } from "../utils/constants";
 
@@ -97,7 +97,7 @@ const AppNavigator: React.FC = () => {
       case "trend":
         return <TrendScreen key="trend" onNavigate={handleNavigate} />;
       case "feed-ads":
-        return <FeedWithAdsExample key="feed-ads" />;
+        return <HomeScreen key="feed-ads" onNavigate={handleNavigate} />;
       case "subscription":
         return (
           <ModernSubscriptionScreen
@@ -111,7 +111,7 @@ const AppNavigator: React.FC = () => {
       case "mission":
         return <MissionScreen key="mission" />;
       case "animation-examples":
-        return <AnimationExamplesScreen key="animation-examples" />;
+        return <HomeScreen key="animation-examples" onNavigate={handleNavigate} />;
       default:
         return <HomeScreen key="home-default" onNavigate={handleNavigate} />;
     }

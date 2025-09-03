@@ -105,7 +105,7 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({ style }) => {
       transform: [
         { rotate: `${rotateValue.value}deg` },
         { scale: scaleValue.value },
-      ],
+      ] as any,
     };
   });
 

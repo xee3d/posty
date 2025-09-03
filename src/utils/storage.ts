@@ -18,6 +18,7 @@ export const STORAGE_KEYS = {
   USER_PREFERENCES: "user_preferences",
   USER_STATS: "user_stats",
   USAGE_STATS: "usage_stats",
+  GENERATED_CONTENT: "generated_content",
 };
 
 // 콘텐츠 저장 - 로컬 스토리지만 사용

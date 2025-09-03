@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
-import { BlurView } from "@react-native-community/blur";
+// import { BlurView } from "@react-native-community/blur"; // Module not installed
 import { SUBSCRIPTION_PLANS } from "../utils/adConfig";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -133,9 +133,9 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
                 </Text>
                 <Text style={styles.period}>/월</Text>
               </View>
-              {plan.key !== "free" && planData.originalPrice && (
+              {plan.key !== "free" && (planData as any).originalPrice && (
                 <Text style={styles.originalPrice}>
-                  ₩{planData.originalPrice.toLocaleString()}
+                  ₩{(planData as any).originalPrice.toLocaleString()}
                 </Text>
               )}
             </View>

@@ -163,10 +163,10 @@ class VercelAuthService {
         "🔍 Google Sign-In 전체 응답:",
         JSON.stringify(userInfo, null, 2)
       );
-      console.log("🔍 userInfo.user:", JSON.stringify(userInfo.user, null, 2));
+      console.log("🔍 userInfo.user:", JSON.stringify((userInfo as any).user, null, 2));
       console.log("🔍 userInfo keys:", Object.keys(userInfo));
-      if (userInfo.user) {
-        console.log("🔍 userInfo.user keys:", Object.keys(userInfo.user));
+      if ((userInfo as any).user) {
+        console.log("🔍 userInfo.user keys:", Object.keys((userInfo as any).user));
       }
 
       logger.info(

@@ -156,7 +156,7 @@ function MainTabs() {
         },
         headerTitleStyle: {
           fontSize: FONTS.sizes.xl,
-          fontWeight: FONTS.weights.bold as any,
+          fontWeight: "bold" as any,
           color: COLORS.text.primary,
         },
       }}
@@ -165,7 +165,7 @@ function MainTabs() {
         name="Home"
         component={HomeScreen}
         options={{
-          headerTitle: BRAND.koreanName,
+          headerTitle: BRAND.characterNameKo,
           headerRight: () => (
             <TouchableOpacity style={{ marginRight: SPACING.md }}>
               <Icon

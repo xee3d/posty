@@ -41,16 +41,6 @@ export const useAppTheme = () => {
       },
       // 레거시 색상들은 fallback으로만 사용
       ...(isDark ? DARK_COLORS : LIGHT_COLORS),
-      // 다시 새로운 테마 색상으로 덮어쓰기 (확실히 하기 위해)
-      primary: newColors.accent,
-      background: newColors.background,
-      surface: newColors.surface,
-      border: newColors.border,
-      text: {
-        primary: newColors.textPrimary,
-        secondary: newColors.textSecondary,
-        tertiary: newColors.textTertiary,
-      },
     }),
     [newColors, isDark]
   );

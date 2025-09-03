@@ -128,7 +128,7 @@ export const GradientButton: React.FC<GradientButtonProps> = ({
 
 const styles = StyleSheet.create({
   gradient: {
-    borderRadius: BORDER_RADIUS.md,
+    borderRadius: BORDER_RADIUS.medium,
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
   },
   outlineContainer: {
     borderWidth: 2,
-    borderRadius: BORDER_RADIUS.md,
+    borderRadius: BORDER_RADIUS.medium,
   },
   outlineGradient: {
     margin: -2, // 테두리와 겹치지 않도록

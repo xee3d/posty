@@ -112,7 +112,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                 실시간 API 사용
               </Text>
               <Text
-                style={[styles.settingDescription, { color: colors.subText }]}
+                style={[styles.settingDescription, { color: colors.secondary }]}
               >
                 실시간 트렌드 데이터를 가져옵니다
               </Text>
@@ -136,12 +136,12 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                 캐시 삭제
               </Text>
               <Text
-                style={[styles.settingDescription, { color: colors.subText }]}
+                style={[styles.settingDescription, { color: colors.secondary }]}
               >
                 저장된 트렌드 데이터를 삭제합니다
               </Text>
             </View>
-            <Icon name="refresh" size={20} color={colors.subText} />
+            <Icon name="refresh" size={20} color={colors.secondary} />
           </TouchableOpacity>
         </View>
 
@@ -149,7 +149,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           <Text style={[styles.infoTitle, { color: colors.text }]}>
             API 정보
           </Text>
-          <Text style={[styles.infoText, { color: colors.subText }]}>
+          <Text style={[styles.infoText, { color: colors.secondary }]}>
             {isRealApiEnabled
               ? "• 실시간 트렌드 데이터 사용 중\n• 5분마다 자동 업데이트\n• 네트워크 연결 필요"
               : "• 샘플 데이터 사용 중\n• 30분마다 자동 변경\n• 오프라인 사용 가능"}
@@ -167,7 +167,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
               <View
                 style={[styles.statusDot, { backgroundColor: "#4CAF50" }]}
               />
-              <Text style={[styles.statusText, { color: colors.subText }]}>
+              <Text style={[styles.statusText, { color: colors.secondary }]}>
                 정상 작동 중
               </Text>
             </View>

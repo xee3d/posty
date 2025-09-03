@@ -1,6 +1,11 @@
 import { useRef, useEffect } from "react";
 import { Animated, Easing } from "react-native";
 
+export const useAnimatedValue = (initialValue: number = 0) => {
+  const animatedValue = useRef(new Animated.Value(initialValue)).current;
+  return animatedValue;
+};
+
 interface FadeInOptions {
   duration?: number;
   delay?: number;

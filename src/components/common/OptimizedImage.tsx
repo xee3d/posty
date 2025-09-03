@@ -69,9 +69,9 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       imageStyle,
       {
         backgroundColor: loading ? placeholderColor : "transparent",
-        overflow: "hidden",
+        overflow: "hidden" as const,
       },
-    ];
+    ] as any;
   }, [imageStyle, loading, placeholderColor]);
 
   // 캐시 설정이 적용된 source
@@ -103,7 +103,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
     return {
       ...source,
       headers,
-      cache: cachePolicy === "memory" ? "reload" : "default",
+      cache: (cachePolicy === "memory" ? "reload" : "default") as any,
     };
   }, [source, cachePolicy]);
 

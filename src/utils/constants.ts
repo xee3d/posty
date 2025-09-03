@@ -18,6 +18,11 @@ export const BRAND = {
     experience: "사진 한 장으로 AI의 마법을 경험하세요!",
     promotion: "지금 가입하면 첫 달 무료 토큰 10개 증정!",
   },
+  mascot: {
+    name: "포스티",
+    emoji: "🤖",
+    character: "AI 마스코트",
+  },
 };
 
 // 라이트 테마 색상
@@ -56,6 +61,7 @@ const LIGHT_COLORS = {
   lightBackground: "#FAFAFA",
   surface: "#FFFFFF",
   border: "#E5E7EB",
+  card: "#FFFFFF",
 
   transparent: "transparent",
 };
@@ -95,6 +101,7 @@ const DARK_COLORS = {
   lightBackground: "#0A0A0A", // 약간 밝은 블랙
   surface: "#141414", // 카드 배경 (약간 밝은 검정)
   border: "#3A3A3A", // 어두운 경계선 (좀 더 밝게)
+  card: "#141414", // 카드 배경
 
   transparent: "transparent",
 };

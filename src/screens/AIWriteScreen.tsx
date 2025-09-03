@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Image,
   ActivityIndicator,
+  Platform,
 } from "react-native";
 import {
   COLORS,
@@ -253,12 +254,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     }
 
     // 초기 길이 설정
-    const styleInfo = style ? getStyleById(style) : null;
+    const currentStyleInfo = style ? getStyleById(style) : null;
     let desiredLength = "medium";
-    if (styleInfo?.characteristics.avgLength.includes("50")) {
+    if (currentStyleInfo?.characteristics.avgLength.includes("50")) {
       desiredLength = "short";
     }
-    if (styleInfo?.characteristics.avgLength.includes("200")) {
+    if (currentStyleInfo?.characteristics.avgLength.includes("200")) {
       desiredLength = "long";
     }
 
@@ -542,7 +543,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
 
       // aiServiceWrapper는 객체를 반환하므로 객체 처리도 추가
       if (analysis) {
-        if (typeof analysis === "string" && analysis.length > 5) {
+        if (typeof analysis === "string" && (analysis as string).length > 5) {
           // 문자열인 경우
           setImageAnalysis(analysis);
           setImageAnalysisResult({ description: analysis });
@@ -744,7 +745,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         const response = await aiService.generateContent({
           prompt: enhancedPrompt,
           tone: selectedTone as any,
-          length: selectedLength,
+          length: selectedLength as any,
           platform: "instagram", // 기본 플랫폼 추가
           hashtags:
             selectedHashtags.length > 0
@@ -768,7 +769,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           text: prompt.trim(),
           polishType: selectedPolishOption,
           tone: selectedTone as any,
-          length: selectedLength, // 길이 추가
+          length: selectedLength as any, // 길이 추가
           platform: "instagram", // 기본 플랫폼 (플랫폼별 생성을 위함)
         });
         // 객체에서 content 문자열만 추출
@@ -815,7 +816,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         const response = await aiService.generateContent({
           prompt: photoPrompt,
           tone: selectedTone as any,
-          length: selectedLength,
+          length: selectedLength as any,
           platform: "instagram", // 기본 플랫폼 추가
           hashtags:
             selectedHashtags.length > 0
@@ -875,7 +876,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
             return "instagram";
           }
           if (selectedTone === "professional" || selectedTone === "formal") {
-            return "linkedin";
+            return "facebook";
           }
           if (selectedTone === "concise") {
             return "twitter";
@@ -892,7 +893,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           content: result,
           hashtags: hashtags,
           tone: selectedTone,
-          length: selectedLength,
+          length: selectedLength as any,
           platform: platformToSave,
           prompt: writeMode === "photo" ? "사진 글쓰기" : prompt,
         });
@@ -1084,7 +1085,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                   style={[
                     styles.modeButton,
                     writeMode === "text" && styles.modeButtonActive,
-                  ]}
+                  ] as any}
                   onPress={() => {
                     soundManager.haptic("light"); // 모드 전환 햄틱
                     if (writeMode !== "text") {
@@ -1115,7 +1116,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                   style={[
                     styles.modeButton,
                     writeMode === "polish" && styles.modeButtonActive,
-                  ]}
+                  ] as any}
                   onPress={() => {
                     soundManager.haptic("light"); // 모드 전환 햄틱
                     if (writeMode !== "polish") {
@@ -1146,7 +1147,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                   style={[
                     styles.modeButton,
                     writeMode === "photo" && styles.modeButtonActive,
-                  ]}
+                  ] as any}
                   onPress={() => {
                     soundManager.haptic("light"); // 모드 전환 햄틱
                     if (writeMode !== "photo") {
@@ -2101,14 +2102,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     (writeMode === "photo" &&
                       currentTokens < getImageAnalysisTokens(userPlan))) &&
                     styles.generateButtonNoToken,
-                ]}
+                ] as any}
                 onPress={handleGenerate}
-                disabled={
-                  currentTokens === 0 ||
-                  (writeMode === "photo" &&
-                    currentTokens < getImageAnalysisTokens(userPlan)) ||
-                  (writeMode === "photo" && isAnalyzingImage)
-                }
               >
                 <View style={styles.generateButtonContent}>
                   <View style={styles.generateButtonMain}>

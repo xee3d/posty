@@ -35,7 +35,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
 }) => {
   const subscription = useAppSelector((state) => state.user.subscription);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
-  const userPlan = getUserPlan(subscription);
+  const userPlan = getUserPlan(subscription as any);
   const planBonus = TOKEN_PURCHASE_CONFIG.planBonuses[userPlan];
 
   // 첫 구매 여부 확인 (실제로는 서버에서 가져와야 함)
@@ -196,7 +196,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                 ? "PRO"
                 : userPlan === "pro"
                 ? "MAX"
-                : userPlan.toUpperCase()}{" "}
+                : (userPlan as string).toUpperCase()}{" "}
               플랜 혜택
             </Text>
             <Text style={styles.planBenefitDesc}>

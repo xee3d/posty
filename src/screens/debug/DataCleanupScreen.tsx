@@ -104,10 +104,10 @@ const DataCleanupScreen: React.FC = () => {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[styles.title, { color: colors.text }]}>데이터 관리</Text>
+        <Text style={[styles.title, { color: colors.text.primary }]}>데이터 관리</Text>
 
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
             디버깅 도구
           </Text>
 
@@ -137,7 +137,7 @@ const DataCleanupScreen: React.FC = () => {
           <Text style={[styles.warning, { color: "#DC2626" }]}>
             ⚠️ 주의: 데이터 삭제는 되돌릴 수 없습니다!
           </Text>
-          <Text style={[styles.info, { color: colors.textSecondary }]}>
+          <Text style={[styles.info, { color: colors.secondary }]}>
             이 화면은 개발/디버깅 목적으로만 사용하세요.
           </Text>
         </View>

@@ -85,12 +85,12 @@ export const GradientCard: React.FC<GradientCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: BORDER_RADIUS.lg,
+    borderRadius: BORDER_RADIUS.large,
     overflow: "hidden",
   },
   gradient: {
     flex: 1,
-    borderRadius: BORDER_RADIUS.lg,
+    borderRadius: BORDER_RADIUS.large,
   },
   elevated: {
     shadowColor: "#7C3AED",
@@ -102,7 +102,6 @@ const styles = StyleSheet.create({
   glass: {
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.1)",
-    backdropFilter: "blur(10px)",
   },
   glassOverlay: {
     position: "absolute",
@@ -110,7 +109,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    borderRadius: BORDER_RADIUS.lg,
+    borderRadius: BORDER_RADIUS.large,
     borderWidth: 1,
     borderColor: "rgba(255, 255, 255, 0.1)",
   },

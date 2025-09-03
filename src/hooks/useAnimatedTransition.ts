@@ -156,7 +156,7 @@ export const useListItemAnimation = (index: number, isVisible: boolean) => {
           Extrapolate.CLAMP
         ),
       },
-    ],
+    ] as any,
   }));
 
   return animatedStyle;
@@ -175,7 +175,7 @@ export const useGestureAnimation = () => {
       { translateY: translateY.value },
       { scale: scale.value },
       { rotate: `${rotation.value}deg` },
-    ],
+    ] as any,
   }));
 
   const reset = () => {

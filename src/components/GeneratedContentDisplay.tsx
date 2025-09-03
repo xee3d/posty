@@ -552,7 +552,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
       {/* 액션 버튼들 */}
       <View style={styles.actionButtons}>
         <ScaleButton
-          style={[styles.actionButton, styles.copyButton]}
+          style={[styles.actionButton, styles.copyButton] as any}
           onPress={handleCopy}
         >
           <Icon
@@ -569,7 +569,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
         </ScaleButton>
 
         <ScaleButton
-          style={[styles.actionButton, styles.shareButton]}
+          style={[styles.actionButton, styles.shareButton] as any}
           onPress={handleShareToSNS}
         >
           <Icon name="share-social-outline" size={20} color={colors.primary} />
@@ -592,7 +592,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
 
         {onEdit && (
           <ScaleButton
-            style={[styles.actionButton, styles.editButton]}
+            style={[styles.actionButton, styles.editButton] as any}
             onPress={() => onEdit(getCurrentContent())}
           >
             <Icon
