@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { COLORS, SPACING } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
@@ -229,15 +230,15 @@ const ScreenshotAnalyzer: React.FC<ScreenshotAnalyzerProps> = ({
 
           <View style={styles.features}>
             <View style={styles.featureItem}>
-              <Icon name="checkmark-circle" size={16} color="#10B981" />
+              <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
               <Text style={styles.featureText}>Instagram 스토리/피드 지원</Text>
             </View>
             <View style={styles.featureItem}>
-              <Icon name="checkmark-circle" size={16} color="#10B981" />
+              <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
               <Text style={styles.featureText}>Facebook 게시물 지원</Text>
             </View>
             <View style={styles.featureItem}>
-              <Icon name="checkmark-circle" size={16} color="#10B981" />
+              <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
               <Text style={styles.featureText}>자동 숫자 인식</Text>
             </View>
           </View>

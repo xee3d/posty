@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { SPACING } from "../utils/constants";
 
@@ -32,11 +33,11 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
       <View style={styles.overlay}>
         <View style={styles.container}>
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-            <Icon name="close" size={24} color={colors.text.secondary} />
+            <SafeIcon name="close" size={24} color={colors.text.secondary} />
           </TouchableOpacity>
 
           <View style={styles.iconContainer}>
-            <Icon name="battery-alert" size={48} color={colors.warning} />
+            <SafeIcon name="battery-alert" size={48} color={colors.warning} />
           </View>
 
           <Text style={styles.title}>토큰이 부족해요!</Text>
@@ -51,7 +52,7 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
               style={[styles.button, styles.primaryButton]}
               onPress={onEarnTokens}
             >
-              <Icon name="gift" size={20} color={colors.white} />
+              <SafeIcon name="gift" size={20} color={colors.white} />
               <Text style={styles.primaryButtonText}>무료 토큰 받기</Text>
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>최대 +20</Text>
@@ -90,7 +91,7 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
               style={[styles.button, styles.secondaryButton]}
               onPress={onUpgrade}
             >
-              <Icon name="diamond-outline" size={20} color={colors.primary} />
+              <SafeIcon name="diamond-outline" size={20} color={colors.primary} />
               <Text style={styles.secondaryButtonText}>Pro로 업그레이드</Text>
               <Text style={styles.buttonSubtext}>무제한 토큰</Text>
             </TouchableOpacity>

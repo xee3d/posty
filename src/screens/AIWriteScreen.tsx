@@ -19,7 +19,7 @@ import {
   CARD_THEME,
 } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
 import { useTokenManagement } from "../hooks/useTokenManagement";
 import { useTimer } from "../hooks/useCleanup";
@@ -1025,7 +1025,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     { backgroundColor: styleInfo.color + "20" },
                   ]}
                 >
-                  <Icon
+                  <SafeIcon
                     name={styleInfo.icon}
                     size={20}
                     color={styleInfo.color}
@@ -1041,7 +1041,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     >
                       {styleInfo.name} 스타일로 작성 중
                     </Text>
-                    <Icon
+                    <SafeIcon
                       name={styleGuideCollapsed ? "chevron-down" : "chevron-up"}
                       size={16}
                       color={colors.text.secondary}
@@ -1071,7 +1071,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                   }}
                   style={styles.styleGuideCloseButton}
                 >
-                  <Icon name="close" size={16} color={colors.text.tertiary} />
+                  <SafeIcon name="close" size={16} color={colors.text.tertiary} />
                 </TouchableOpacity>
               </TouchableOpacity>
             </SlideInView>
@@ -1094,7 +1094,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     setWriteMode("text");
                   }}
                 >
-                  <Icon
+                  <SafeIcon
                     name="create-outline"
                     size={20}
                     color={
@@ -1125,7 +1125,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     setWriteMode("polish");
                   }}
                 >
-                  <Icon
+                  <SafeIcon
                     name="color-wand-outline"
                     size={20}
                     color={
@@ -1156,7 +1156,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     setWriteMode("photo");
                   }}
                 >
-                  <Icon
+                  <SafeIcon
                     name="image-outline"
                     size={20}
                     color={
@@ -1197,7 +1197,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         );
                       }}
                     >
-                      <Icon name="refresh" size={16} color={colors.primary} />
+                      <SafeIcon name="refresh" size={16} color={colors.primary} />
                       <Text style={styles.refreshButtonText}>새로고침</Text>
                     </TouchableOpacity>
                   </View>
@@ -1234,7 +1234,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         }}
                       >
                         {trendingPrompts.includes(quickPrompt) && (
-                          <Icon
+                          <SafeIcon
                             name="trending-up-outline"
                             size={12}
                             color={colors.primary}
@@ -1317,7 +1317,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           setSelectedPolishOption("summarize");
                         }}
                       >
-                        <Icon
+                        <SafeIcon
                           name="document-text-outline"
                           size={18}
                           color={
@@ -1373,7 +1373,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           setSelectedPolishOption("simple");
                         }}
                       >
-                        <Icon
+                        <SafeIcon
                           name="happy-outline"
                           size={18}
                           color={
@@ -1429,7 +1429,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           setSelectedPolishOption("formal");
                         }}
                       >
-                        <Icon
+                        <SafeIcon
                           name="business-outline"
                           size={18}
                           color={
@@ -1494,7 +1494,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           setSelectedPolishOption("emotion");
                         }}
                       >
-                        <Icon
+                        <SafeIcon
                           name="heart-outline"
                           size={18}
                           color={
@@ -1553,7 +1553,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           setSelectedPolishOption("storytelling");
                         }}
                       >
-                        <Icon
+                        <SafeIcon
                           name="book-outline"
                           size={18}
                           color={
@@ -1610,7 +1610,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           setSelectedPolishOption("engaging");
                         }}
                       >
-                        <Icon
+                        <SafeIcon
                           name="sparkles-outline"
                           size={18}
                           color={
@@ -1675,7 +1675,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           setSelectedPolishOption("hashtag");
                         }}
                       >
-                        <Icon
+                        <SafeIcon
                           name="pricetag-outline"
                           size={18}
                           color={
@@ -1732,7 +1732,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           setSelectedPolishOption("emoji");
                         }}
                       >
-                        <Icon
+                        <SafeIcon
                           name="happy"
                           size={18}
                           color={
@@ -1789,7 +1789,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           setSelectedPolishOption("question");
                         }}
                       >
-                        <Icon
+                        <SafeIcon
                           name="help-circle-outline"
                           size={18}
                           color={
@@ -1847,14 +1847,14 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             handleSelectImage();
                           }}
                         >
-                          <Icon name="camera" size={16} color="#FFFFFF" />
+                          <SafeIcon name="camera" size={16} color="#FFFFFF" />
                           <Text style={styles.changePhotoText}>변경</Text>
                         </TouchableOpacity>
                       </View>
                     ) : (
                       <View style={styles.uploadPlaceholder}>
                         <View style={styles.uploadIconContainer}>
-                          <Icon
+                          <SafeIcon
                             name="image-outline"
                             size={56}
                             color={colors.primary}
@@ -1868,7 +1868,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           갤러리에서 선택하거나 직접 촬영하세요
                         </Text>
                         <View style={styles.uploadButton}>
-                          <Icon name="add" size={20} color="#FFFFFF" />
+                          <SafeIcon name="add" size={20} color="#FFFFFF" />
                           <Text style={styles.uploadButtonText}>사진 선택</Text>
                         </View>
                       </View>
@@ -1887,7 +1887,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             </>
                           ) : (
                             <>
-                              <Icon name="sparkles" size={14} color="#7C3AED" />{" "}
+                              <SafeIcon name="sparkles" size={14} color="#7C3AED" />{" "}
                               {imageAnalysis}
                             </>
                           )}
@@ -1950,7 +1950,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       }}
                       activeOpacity={0.7}
                     >
-                      <Icon
+                      <SafeIcon
                         name={tone.icon}
                         size={32}
                         color={
@@ -2018,7 +2018,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     }}
                     activeOpacity={0.7}
                   >
-                    <Icon
+                    <SafeIcon
                       name={length.label}
                       size={length.iconSize}
                       color={
@@ -2079,7 +2079,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       }}
                     >
                       <Text style={styles.selectedHashtagText}>#{hashtag}</Text>
-                      <Icon
+                      <SafeIcon
                         name="close-circle"
                         size={16}
                         color={colors.white}
@@ -2110,7 +2110,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     {isGenerating ? (
                       <ActivityIndicator size="small" color={colors.white} />
                     ) : (
-                      <Icon
+                      <SafeIcon
                         name="sparkles"
                         size={20}
                         color={
@@ -2145,7 +2145,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         currentTokens < getImageAnalysisTokens(userPlan)
                       ) && (
                         <View style={styles.tokenBadgeInButton}>
-                          <Icon name="flash" size={14} color="#FFFFFF" />
+                          <SafeIcon name="flash" size={14} color="#FFFFFF" />
                           <Text style={styles.tokenTextInButton}>
                             {writeMode === "photo"
                               ? getImageAnalysisTokens(userPlan).toString()
@@ -2176,7 +2176,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                 <View style={styles.resultHeader}>
                   <Text style={styles.resultTitle}>짠! 완성됐어요 🎉</Text>
                   <ScaleButton onPress={handleGenerate}>
-                    <Icon name="refresh" size={20} color={COLORS.primary} />
+                    <SafeIcon name="refresh" size={20} color={COLORS.primary} />
                   </ScaleButton>
                 </View>
 

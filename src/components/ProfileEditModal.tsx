@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from "../utils/constants";
 import { APP_TEXT } from "../utils/textConstants";
 import { storage } from "../utils/storage";
@@ -95,7 +96,7 @@ const ProfileEditModal: React.FC<ProfileEditModalProps> = ({
           <View style={styles.header}>
             <Text style={styles.title}>프로필 편집</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Icon name="close" size={24} color={colors.text.primary} />
+              <SafeIcon name="close" size={24} color={colors.text.primary} />
             </TouchableOpacity>
           </View>
 

@@ -176,7 +176,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
               <View style={styles.handleBar} />
               <Text style={styles.title}>나의 상세 프로필</Text>
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-                <Icon name="close" size={24} color={colors.text.primary} />
+                <SafeIcon name="close" size={24} color={colors.text.primary} />
               </TouchableOpacity>
             </View>
 

@@ -11,6 +11,7 @@ import {
   Animated,
   Dimensions,
 } from "react-native";
+import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useAppTheme } from "../hooks/useAppTheme";
@@ -175,7 +176,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.loadingContainer}>
-          <Icon name="hourglass" size={48} color={colors.primary} />
+          <SafeIcon name="hourglass" size={48} color={colors.primary} />
           <Text style={styles.loadingText}>프로필 로딩 중...</Text>
         </View>
       </SafeAreaView>
@@ -188,7 +189,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
         {/* 헤더 */}
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose || (() => navigation?.goBack())}>
-            <Icon name="close" size={28} color={colors.text.primary} />
+            <SafeIcon name="close" size={28} color={colors.text.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>프로필</Text>
           <View style={{ width: 28 }} />
@@ -237,7 +238,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
                 style={styles.editBadgeButton}
                 onPress={() => setSelectedCategory("unlocked")}
               >
-                <Icon name="create" size={16} color={colors.white} />
+                <SafeIcon name="create" size={16} color={colors.white} />
               </TouchableOpacity>
             </View>
 

@@ -294,6 +294,7 @@ interface SafeIconProps {
   size?: number;
   color?: string;
   type?: "ionicons" | "material" | "material-community";
+  style?: any;
 }
 
 // 아이콘 이름 매핑 (Material Design Icons -> Ionicons)
@@ -397,6 +398,7 @@ export const SafeIcon: React.FC<SafeIconProps> = ({
   size = 24,
   color = "#000000",
   type = "ionicons",
+  style,
 }) => {
   // Check if we have a mapping for this icon
   const mapping = ICON_MAPPING[name];
@@ -411,10 +413,10 @@ export const SafeIcon: React.FC<SafeIconProps> = ({
     try {
       switch (type) {
         case "material":
-          return <MaterialIcon name={name} size={size} color={color} />;
+          return <MaterialIcon name={name} size={size} color={color} style={style} />;
         case "material-community":
           return (
-            <MaterialCommunityIcon name={name} size={size} color={color} />
+            <MaterialCommunityIcon name={name} size={size} color={color} style={style} />
           );
         case "ionicons":
         default:
@@ -435,31 +437,27 @@ export const SafeIcon: React.FC<SafeIconProps> = ({
               isValidIoniconName(fallbackName);
 
             if (fallbackIsValid) {
-              return <Icon name={fallbackName} size={size} color={color} />;
+              return <Icon name={fallbackName} size={size} color={color} style={style} />;
             }
 
             // 최종 폴백
             console.warn(`⚠️ Using final fallback icon for "${name}".`);
-            return (
-              <Icon name="help-circle-outline" size={size} color={color} />
-            );
+            return <Icon name="help-circle-outline" size={size} color={color} style={style} />;
           }
 
           try {
-            return <Icon name={name} size={size} color={color} />;
+            return <Icon name={name} size={size} color={color} style={style} />;
           } catch (iconError) {
             console.warn(
               `Error rendering icon "${name}". Using fallback.`,
               iconError
             );
-            return (
-              <Icon name="help-circle-outline" size={size} color={color} />
-            );
+            return <Icon name="help-circle-outline" size={size} color={color} style={style} />;
           }
       }
     } catch (error) {
       console.error(`Critical error rendering icon "${name}":`, error);
-      return <Icon name="help-circle-outline" size={size} color={color} />;
+      return <Icon name="help-circle-outline" size={size} color={color} style={style} />;
     }
   };
 

@@ -13,6 +13,7 @@ import {
   Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { usePushNotifications } from "../hooks/usePushNotifications";
 import { COLORS, SPACING, FONTS, BORDER_RADIUS } from "../utils/constants";
@@ -267,7 +268,7 @@ export const PushNotificationSettings: React.FC<
                 style={styles.testButton}
                 onPress={handleTestNotification}
               >
-                <Icon name="send-outline" size={16} color={colors.primary} />
+                <SafeIcon name="send-outline" size={16} color={colors.primary} />
                 <Text style={styles.testButtonText}>테스트 알림 보내기</Text>
               </TouchableOpacity>
             )}
@@ -277,7 +278,7 @@ export const PushNotificationSettings: React.FC<
         {/* 권한이 없는 경우 안내 */}
         {!state.hasPermission && (
           <View style={styles.permissionWarning}>
-            <Icon name="warning-outline" size={20} color={colors.warning} />
+            <SafeIcon name="warning-outline" size={20} color={colors.warning} />
             <Text style={styles.permissionWarningText}>
               푸시 알림을 받으려면 설정에서 알림 권한을 허용해주세요.
             </Text>
@@ -287,7 +288,7 @@ export const PushNotificationSettings: React.FC<
         {/* 에러 표시 */}
         {state.error && (
           <View style={styles.errorContainer}>
-            <Icon name="alert-circle-outline" size={20} color={colors.error} />
+            <SafeIcon name="alert-circle-outline" size={20} color={colors.error} />
             <Text style={styles.errorText}>{state.error}</Text>
           </View>
         )}

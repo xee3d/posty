@@ -11,9 +11,10 @@ import {
   Share,
   Platform,
 } from "react-native";
+import { SafeIcon } from "../../utils/SafeIcon";
+import Icon from "react-native-vector-icons/Ionicons";
 import { COLORS, SPACING } from "../../utils/constants";
 import { SUBSCRIPTION_PLANS } from "../../config/adConfig";
-import { SafeIcon } from "../../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { useAppSelector } from "../../hooks/redux";
@@ -599,7 +600,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             <View
               style={[styles.selectedCheckmark, { backgroundColor: planColor }]}
             >
-              <Icon name="checkmark" size={16} color="#FFFFFF" />
+              <SafeIcon name="checkmark" size={16} color="#FFFFFF" />
             </View>
           )}
         </View>
@@ -691,7 +692,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 : "구독하기"}
             </Text>
             {!isCurrent && !isDowngrade && (
-              <Icon name="arrow-forward-outline" size={18} color="#FFFFFF" />
+              <SafeIcon name="arrow-forward-outline" size={18} color="#FFFFFF" />
             )}
           </TouchableOpacity>
         )}
@@ -725,7 +726,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           style={styles.headerButton}
           onPress={() => setShowEarnTokenModal(true)}
         >
-          <Icon name="flash" size={20} color={colors.primary} />
+          <SafeIcon name="flash" size={20} color={colors.primary} />
           <Text style={styles.currentTokens}>
             {subscriptionPlan === "pro" ? "무제한" : currentTokens}
           </Text>
@@ -831,7 +832,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     { backgroundColor: "#8B5CF6" + "20" },
                   ]}
                 >
-                  <Icon name="flash" size={24} color="#8B5CF6" />
+                  <SafeIcon name="flash" size={24} color="#8B5CF6" />
                 </View>
                 <View style={styles.benefitContent}>
                   <Text style={styles.benefitTitle}>더 많은 토큰</Text>
@@ -1101,7 +1102,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                       { backgroundColor: "#F59E0B" + "20" },
                     ]}
                   >
-                    <Icon name="person-add-outline" size={24} color="#F59E0B" />
+                    <SafeIcon name="person-add-outline" size={24} color="#F59E0B" />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>친구 초대</Text>
@@ -1124,7 +1125,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                       { backgroundColor: "#6366F1" + "20" },
                     ]}
                   >
-                    <Icon name="star-outline" size={24} color="#6366F1" />
+                    <SafeIcon name="star-outline" size={24} color="#6366F1" />
                   </View>
                   <View style={styles.earnTokenInfo}>
                     <Text style={styles.earnTokenTitle}>앱 평가하기</Text>
@@ -1164,7 +1165,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               </View>
 
               <View style={styles.earnTokenTip}>
-                <Icon name="bulb-outline" size={20} color={colors.primary} />
+                <SafeIcon name="bulb-outline" size={20} color={colors.primary} />
                 <Text style={styles.earnTokenTipText}>
                   무료 플랜 사용자는 매일 자정에 10개의 토큰이 자동 충전됩니다
                 </Text>

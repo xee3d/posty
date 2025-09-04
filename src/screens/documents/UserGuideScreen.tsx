@@ -10,6 +10,7 @@ import {
   Animated,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../../utils/SafeIcon";
 import {
   COLORS,
   SPACING,
@@ -110,7 +111,7 @@ const UserGuideScreen: React.FC<UserGuideScreenProps> = ({
       {/* 헤더 */}
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Icon name="chevron-back" size={24} color={colors.text.primary} />
+          <SafeIcon name="chevron-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>사용 가이드</Text>
         <View style={styles.placeholder} />
@@ -119,7 +120,7 @@ const UserGuideScreen: React.FC<UserGuideScreenProps> = ({
       {/* 히어로 섹션 */}
       <View style={styles.hero}>
         <View style={styles.heroIconContainer}>
-          <Icon name="rocket-outline" size={32} color={colors.primary} />
+          <SafeIcon name="rocket-outline" size={32} color={colors.primary} />
         </View>
         <Text style={styles.heroTitle}>Posty 시작하기</Text>
         <Text style={styles.heroSubtitle}>
@@ -171,7 +172,7 @@ const UserGuideScreen: React.FC<UserGuideScreenProps> = ({
                       { backgroundColor: feature.color + "20" },
                     ]}
                   >
-                    <Icon name={feature.icon} size={24} color={feature.color} />
+                    <SafeIcon name={feature.icon} size={24} color={feature.color} />
                   </View>
                   <View style={styles.featureInfo}>
                     <Text style={styles.featureTitle}>{feature.title}</Text>
@@ -226,12 +227,12 @@ const UserGuideScreen: React.FC<UserGuideScreenProps> = ({
         {/* CTA 섹션 */}
         <View style={styles.ctaSection}>
           <View style={styles.ctaCard}>
-            <Icon name="headset" size={24} color={colors.primary} />
+            <SafeIcon name="headset" size={24} color={colors.primary} />
             <Text style={styles.ctaTitle}>도움이 더 필요하신가요?</Text>
             <Text style={styles.ctaDescription}>언제든지 문의해주세요</Text>
             <TouchableOpacity style={styles.ctaButton} onPress={onContact}>
               <Text style={styles.ctaButtonText}>문의하기</Text>
-              <Icon name="arrow-forward" size={16} color={colors.white} />
+              <SafeIcon name="arrow-forward" size={16} color={colors.white} />
             </TouchableOpacity>
           </View>
         </View>

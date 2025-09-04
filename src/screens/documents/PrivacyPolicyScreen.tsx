@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../../utils/SafeIcon";
 import {
   COLORS,
   SPACING,
@@ -36,7 +37,7 @@ const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Icon name="arrow-back" size={24} color={colors.text.primary} />
+          <SafeIcon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>개인정보 처리방침</Text>
         <View style={styles.placeholder} />

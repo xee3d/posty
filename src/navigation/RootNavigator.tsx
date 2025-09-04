@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 
@@ -123,7 +124,7 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
           >
             {route.name === "AIWrite" && isFocused ? (
               <View style={styles.aiWriteActiveIcon}>
-                <Icon name="create" size={24} color="#FFFFFF" />
+                <SafeIcon name="create" size={24} color="#FFFFFF" />
               </View>
             ) : (
               <IconComponent

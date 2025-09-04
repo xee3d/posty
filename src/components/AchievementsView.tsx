@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import {
   Achievement,
   ACHIEVEMENT_CATEGORIES,
@@ -143,7 +144,7 @@ const AchievementsView: React.FC<AchievementsViewProps> = ({
               style={styles.modalCloseButton}
               onPress={() => setShowDetailModal(false)}
             >
-              <Icon name="close" size={24} color="#666666" />
+              <SafeIcon name="close" size={24} color="#666666" />
             </TouchableOpacity>
 
             <View
@@ -272,7 +273,7 @@ const AchievementsView: React.FC<AchievementsViewProps> = ({
         )}
         ListEmptyComponent={
           <View style={styles.emptyState}>
-            <Icon name="trophy-outline" size={64} color="#CCCCCC" />
+            <SafeIcon name="trophy-outline" size={64} color="#CCCCCC" />
             <Text style={styles.emptyText}>아직 획득한 업적이 없습니다</Text>
           </View>
         }

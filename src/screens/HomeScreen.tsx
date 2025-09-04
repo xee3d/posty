@@ -24,7 +24,6 @@ import {
   FONT_SIZES,
 } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
-import Icon from "react-native-vector-icons/Ionicons";
 import { SafeIcon } from "../utils/SafeIcon";
 import {
   AnimatedCard,
@@ -549,6 +548,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     );
   }
 
+  console.log("🏠 [HomeScreen] Starting render");
+  
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -593,7 +594,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     onPress={() => setShowEarnTokenModal(true)}
                     activeOpacity={0.7}
                   >
-                    <Icon name="add-circle" size={20} color={colors.primary} />
+                    <SafeIcon name="add-circle" size={20} color={colors.primary} />
                     {currentTokens === 0 && (
                       <View style={styles.earnTokenBadge}>
                         <Text style={styles.earnTokenBadgeText}>!</Text>
@@ -680,7 +681,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     onNavigate("ai-write", { content: "오늘 날씨가 좋아서" })
                   }
                 >
-                  <Icon name="sunny-outline" size={32} color={colors.primary} />
+                  <SafeIcon name="sunny-outline" size={32} color={colors.primary} />
                   <Text style={styles.templateTitle}>날씨 이야기</Text>
                   <Text style={styles.templateDesc}>
                     오늘 날씨로 시작해보기
@@ -693,7 +694,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     onNavigate("ai-write", { content: "오늘 먹은" })
                   }
                 >
-                  <Icon
+                  <SafeIcon
                     name="restaurant-outline"
                     size={32}
                     color={colors.primary}
@@ -706,7 +707,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                   style={styles.templateCard}
                   onPress={() => onNavigate("ai-write", { mode: "photo" })}
                 >
-                  <Icon
+                  <SafeIcon
                     name="camera-outline"
                     size={32}
                     color={colors.primary}
@@ -731,7 +732,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 >
                   <View style={styles.mainActionRow}>
                     <View style={styles.mainActionIcon}>
-                      <Icon name="create" size={24} color={colors.white} />
+                      <SafeIcon name="create" size={24} color={colors.white} />
                     </View>
                     <View style={styles.mainActionTextContainer}>
                       <Text style={styles.mainActionTitle}>글쓰기 도와줘</Text>
@@ -755,7 +756,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                           { backgroundColor: "#9C27B0" },
                         ]}
                       >
-                        <Icon
+                        <SafeIcon
                           name="color-wand"
                           size={24}
                           color={colors.white}
@@ -786,7 +787,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                         { backgroundColor: "#E91E63" },
                       ]}
                     >
-                      <Icon name="image" size={24} color={colors.white} />
+                      <SafeIcon name="image" size={24} color={colors.white} />
                     </View>
                     <View style={styles.mainActionTextContainer}>
                       <Text style={styles.mainActionTitle}>사진으로 시작</Text>
@@ -825,10 +826,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
             >
               <View style={styles.styleCardHeader}>
                 <View style={styles.styleIconContainer}>
-                  <Icon name="color-palette" size={20} color={colors.white} />
+                  <SafeIcon name="color-palette" size={20} color={colors.white} />
                 </View>
                 <Text style={styles.styleCardTitle}>나의 글쓰기 스타일</Text>
-                <Icon
+                <SafeIcon
                   name="chevron-forward"
                   size={20}
                   color={colors.text.secondary}
@@ -996,7 +997,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 <>
                   <AnimatedCard delay={700} style={styles.recommendCard}>
                     <View style={styles.recommendIconContainer}>
-                      <Icon name="create" size={24} color={colors.white} />
+                      <SafeIcon name="create" size={24} color={colors.white} />
                     </View>
                     <View style={styles.recommendBadge}>
                       <Text style={styles.recommendBadgeText}>🔥 쉬워요</Text>
@@ -1007,7 +1008,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     </Text>
                     <View style={styles.recommendFooter}>
                       <View style={styles.recommendMeta}>
-                        <Icon
+                        <SafeIcon
                           name="star"
                           size={14}
                           color={colors.text.secondary}
@@ -1033,7 +1034,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                         { backgroundColor: "#E91E63" },
                       ]}
                     >
-                      <Icon name="camera" size={24} color={colors.white} />
+                      <SafeIcon name="camera" size={24} color={colors.white} />
                     </View>
                     <View style={styles.recommendBadge}>
                       <Text style={styles.recommendBadgeText}>
@@ -1046,7 +1047,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     </Text>
                     <View style={styles.recommendFooter}>
                       <View style={styles.recommendMeta}>
-                        <Icon
+                        <SafeIcon
                           name="images"
                           size={14}
                           color={colors.text.secondary}
@@ -1103,7 +1104,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                   >
                     <View style={styles.postHeader}>
                       <View style={styles.postMeta}>
-                        <Icon
+                        <SafeIcon
                           name={
                             post.platform === "instagram"
                               ? "logo-instagram"
@@ -1128,7 +1129,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                           {formatDate(post.createdAt)}
                         </Text>
                       </View>
-                      <Icon
+                      <SafeIcon
                         name={
                           expandedPostId === post.id
                             ? "chevron-up"
@@ -1168,7 +1169,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                         onPress={() => handleCopyPost(post)}
                         activeOpacity={0.7}
                       >
-                        <Icon
+                        <SafeIcon
                           name="copy-outline"
                           size={18}
                           color={colors.text.secondary}
@@ -1181,7 +1182,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                         onPress={() => handleSharePost(post)}
                         activeOpacity={0.7}
                       >
-                        <Icon
+                        <SafeIcon
                           name="share-social-outline"
                           size={18}
                           color={colors.text.secondary}

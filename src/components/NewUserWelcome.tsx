@@ -8,6 +8,7 @@ import {
   Animated,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { SafeIcon } from "../utils/SafeIcon";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { SPACING } from "../utils/constants";
 
@@ -198,7 +199,7 @@ const NewUserWelcome: React.FC<NewUserWelcomeProps> = ({
                     { backgroundColor: colors.primary + "15" },
                   ]}
                 >
-                  <Icon name={tip.icon} size={20} color={colors.primary} />
+                  <SafeIcon name={tip.icon} size={20} color={colors.primary} />
                 </View>
                 <Text style={[styles.tipText, { color: colors.text.primary }]}>
                   {tip.text}
@@ -234,7 +235,7 @@ const NewUserWelcome: React.FC<NewUserWelcomeProps> = ({
           <Text style={[styles.nextButtonText, { color: colors.white }]}>
             {currentStep === welcomeSteps.length - 1 ? "시작하기" : "다음"}
           </Text>
-          <Icon name="arrow-forward" size={20} color={colors.white} />
+          <SafeIcon name="arrow-forward" size={20} color={colors.white} />
         </TouchableOpacity>
       </View>
     </View>

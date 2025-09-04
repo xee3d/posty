@@ -8,6 +8,7 @@ import {
   TextStyle,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { useAppSelector } from "../hooks/redux";
 import {
@@ -113,7 +114,7 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
       activeOpacity={onPress ? 0.7 : 1}
       disabled={!onPress}
     >
-      <Icon name="flash" size={sizeStyles.icon.size} color={colors.white} />
+      <SafeIcon name="flash" size={sizeStyles.icon.size} color={colors.white} />
       <Text
         style={[
           styles.tokenText,

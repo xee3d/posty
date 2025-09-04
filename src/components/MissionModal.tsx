@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { SafeIcon } from "../utils/SafeIcon";
+import Icon from "react-native-vector-icons/Ionicons";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { SPACING } from "../utils/constants";
 import missionService, { Mission } from "../services/missionService";
@@ -102,7 +103,7 @@ const MissionModal: React.FC<MissionModalProps> = ({
                 { backgroundColor: colors.primary + "20" },
               ]}
             >
-              <Icon name={mission.icon} size={24} color={colors.primary} />
+              <SafeIcon name={mission.icon} size={24} color={colors.primary} />
             </View>
             <View style={styles.missionText}>
               <Text
@@ -128,21 +129,21 @@ const MissionModal: React.FC<MissionModalProps> = ({
                 <ActivityIndicator size="small" color="#FFFFFF" />
               ) : (
                 <>
-                  <Icon name="gift-outline" size={16} color="#FFFFFF" />
+                  <SafeIcon name="gift-outline" size={16} color="#FFFFFF" />
                   <Text style={styles.claimButtonText}>받기</Text>
                 </>
               )}
             </TouchableOpacity>
           ) : mission.claimedReward ? (
             <View style={styles.claimedBadge}>
-              <Icon name="checkmark-circle" size={20} color="#10B981" />
+              <SafeIcon name="checkmark-circle" size={20} color="#10B981" />
               <Text style={[styles.claimedText, { color: "#10B981" }]}>
                 완료
               </Text>
             </View>
           ) : (
             <View style={styles.rewardBadge}>
-              <Icon name="flash" size={16} color={colors.primary} />
+              <SafeIcon name="flash" size={16} color={colors.primary} />
               <Text style={[styles.rewardText, { color: colors.primary }]}>
                 +{mission.reward}
               </Text>
@@ -210,7 +211,7 @@ const MissionModal: React.FC<MissionModalProps> = ({
               )}
             </View>
             <TouchableOpacity onPress={onClose}>
-              <Icon name="close" size={24} color={colors.text.secondary} />
+              <SafeIcon name="close" size={24} color={colors.text.secondary} />
             </TouchableOpacity>
           </View>
 

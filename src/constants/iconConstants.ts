@@ -169,4 +169,4 @@ export function getIonIconName(materialIconName: string): string {
 
 // 사용 예시:
 // import { ICON_NAMES } from './constants/iconConstants';
-// <Icon name={ICON_NAMES.TIME} size={24} color="#000" />
+// <SafeIcon name={ICON_NAMES.TIME} size={24} color="#000" />

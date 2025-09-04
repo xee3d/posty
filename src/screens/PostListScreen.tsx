@@ -13,6 +13,7 @@ import {
   Clipboard,
   Share,
 } from "react-native";
+import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import {
@@ -185,7 +186,7 @@ const PostItemComponent = React.memo<{
             onPress={handleCopy}
             activeOpacity={0.7}
           >
-            <Icon name="copy-outline" size={18} color={colors.text.secondary} />
+            <SafeIcon name="copy-outline" size={18} color={colors.text.secondary} />
             <Text style={styles.actionButtonText}>복사</Text>
           </TouchableOpacity>
 
@@ -341,7 +342,7 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-            <Icon name="close" size={24} color={colors.text.primary} />
+            <SafeIcon name="close" size={24} color={colors.text.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>내 게시물</Text>
           <View style={{ width: 44 }} />
@@ -357,7 +358,7 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Icon name="close" size={24} color={colors.text.primary} />
+          <SafeIcon name="close" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>내 게시물</Text>
         <View style={{ width: 44 }} />

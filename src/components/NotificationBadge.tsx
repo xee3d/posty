@@ -14,6 +14,7 @@ import {
   SafeAreaView,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { badgeService } from "../services/notification/badgeService";
 import { COLORS, SPACING, FONTS } from "../utils/constants";
@@ -191,7 +192,7 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
                 style={styles.closeButton}
                 onPress={() => setShowModal(false)}
               >
-                <Icon name="close" size={24} color={colors.text.primary} />
+                <SafeIcon name="close" size={24} color={colors.text.primary} />
               </TouchableOpacity>
             </View>
           </View>

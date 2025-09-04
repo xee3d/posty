@@ -589,7 +589,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
                         />
                       ) : (
                         <View style={styles.tokenBadge}>
-                          <Icon name="flash" size={16} color={colors.primary} />
+                          <SafeIcon name="flash" size={16} color={colors.primary} />
                           <Text style={styles.tokenCount}>+{task.tokens}</Text>
                         </View>
                       )}

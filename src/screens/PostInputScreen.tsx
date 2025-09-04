@@ -8,6 +8,7 @@ import {
   ScrollView,
   SafeAreaView,
 } from "react-native";
+import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from "../utils/constants";
@@ -124,7 +125,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
     <SafeAreaView style={styles.container}>
       <View style={styles.modalHeader}>
         <TouchableOpacity onPress={onClose} style={styles.backButton}>
-          <Icon name="close" size={20} color={colors.text.primary} />
+          <SafeIcon name="close" size={20} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.modalHeaderTitle}>게시물 기록하기</Text>
         <TouchableOpacity
@@ -236,7 +237,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
             <View style={styles.metricsGrid}>
               <View style={styles.metricItem}>
                 <View style={styles.metricHeader}>
-                  <Icon name="heart" size={16} color="#EF4444" />
+                  <SafeIcon name="heart" size={16} color="#EF4444" />
                   <Text style={styles.metricLabel}>좋아요</Text>
                 </View>
                 <TextInput
@@ -253,7 +254,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
 
               <View style={styles.metricItem}>
                 <View style={styles.metricHeader}>
-                  <Icon name="chatbubble" size={16} color="#3B82F6" />
+                  <SafeIcon name="chatbubble" size={16} color="#3B82F6" />
                   <Text style={styles.metricLabel}>댓글</Text>
                 </View>
                 <TextInput
@@ -270,7 +271,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
 
               <View style={styles.metricItem}>
                 <View style={styles.metricHeader}>
-                  <Icon name="share-social" size={16} color="#10B981" />
+                  <SafeIcon name="share-social" size={16} color="#10B981" />
                   <Text style={styles.metricLabel}>공유</Text>
                 </View>
                 <TextInput
@@ -287,7 +288,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
 
               <View style={styles.metricItem}>
                 <View style={styles.metricHeader}>
-                  <Icon name="people" size={16} color="#8B5CF6" />
+                  <SafeIcon name="people" size={16} color="#8B5CF6" />
                   <Text style={styles.metricLabel}>도달</Text>
                 </View>
                 <TextInput

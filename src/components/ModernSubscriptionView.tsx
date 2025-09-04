@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 // import { BlurView } from "@react-native-community/blur"; // Module not installed
 import { SUBSCRIPTION_PLANS } from "../utils/adConfig";
 
@@ -104,7 +105,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
             {/* Current plan indicator */}
             {isCurrent && (
               <View style={styles.currentPlanBadge}>
-                <Icon name="checkmark-circle" size={16} color="#FFFFFF" />
+                <SafeIcon name="checkmark-circle" size={16} color="#FFFFFF" />
                 <Text style={styles.currentPlanText}>현재 플랜</Text>
               </View>
             )}
@@ -146,7 +147,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
                 colors={["rgba(255,255,255,0.2)", "rgba(255,255,255,0.1)"]}
                 style={styles.tokenInfoGradient}
               >
-                <Icon name="flash" size={20} color="#FFFFFF" />
+                <SafeIcon name="flash" size={20} color="#FFFFFF" />
                 <Text style={styles.tokenInfoText}>
                   {plan.key === "free"
                     ? "일일 10개"
@@ -162,7 +163,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
               {plan.features.map((feature, index) => (
                 <View key={index} style={styles.featureItem}>
                   <View style={styles.featureIconWrapper}>
-                    <Icon name={feature.icon} size={16} color="#FFFFFF" />
+                    <SafeIcon name={feature.icon} size={16} color="#FFFFFF" />
                   </View>
                   <Text style={styles.featureText}>{feature.text}</Text>
                 </View>
@@ -172,7 +173,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
             {/* Selection Indicator */}
             {isSelected && (
               <View style={styles.selectionIndicator}>
-                <Icon name="check" size={20} color="#FFFFFF" />
+                <SafeIcon name="check" size={20} color="#FFFFFF" />
               </View>
             )}
           </LinearGradient>
@@ -240,9 +241,9 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
           <View style={styles.comparisonRow}>
             <Text style={styles.comparisonLabel}>광고</Text>
             <View style={styles.comparisonValues}>
-              <Icon name="close" size={18} color="#EF4444" />
-              <Icon name="check" size={18} color="#10B981" />
-              <Icon name="check" size={18} color="#10B981" />
+              <SafeIcon name="close" size={18} color="#EF4444" />
+              <SafeIcon name="check" size={18} color="#10B981" />
+              <SafeIcon name="check" size={18} color="#10B981" />
             </View>
           </View>
         </View>
@@ -259,7 +260,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <Icon name="flash" size={32} color="#FFFFFF" />
+            <SafeIcon name="flash" size={32} color="#FFFFFF" />
             <Text style={styles.benefitTitle}>더 많은 토큰</Text>
             <Text style={styles.benefitDesc}>
               더 많은 콘텐츠를 제한 없이 생성하세요
@@ -272,7 +273,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <Icon name="sparkles" size={32} color="#FFFFFF" />
+            <SafeIcon name="sparkles" size={32} color="#FFFFFF" />
             <Text style={styles.benefitTitle}>고급 AI</Text>
             <Text style={styles.benefitDesc}>
               GPT-4 기반의 더 똑똑한 AI 활용
@@ -285,7 +286,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <Icon name="ban-outline" size={32} color="#FFFFFF" />
+            <SafeIcon name="ban-outline" size={32} color="#FFFFFF" />
             <Text style={styles.benefitTitle}>광고 제거</Text>
             <Text style={styles.benefitDesc}>
               방해 없이 집중해서 작업하세요
@@ -298,7 +299,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
           >
-            <Icon name="speed" size={32} color="#FFFFFF" />
+            <SafeIcon name="speed" size={32} color="#FFFFFF" />
             <Text style={styles.benefitTitle}>빠른 처리</Text>
             <Text style={styles.benefitDesc}>
               우선 처리로 더 빠른 결과를 받아보세요
@@ -313,7 +314,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
 
         <View style={styles.faqList}>
           <View style={styles.faqItem}>
-            <Icon name="help-circle-outline" size={20} color={colors.primary} />
+            <SafeIcon name="help-circle-outline" size={20} color={colors.primary} />
             <View style={styles.faqContent}>
               <Text style={styles.faqQuestion}>
                 언제든지 플랜을 변경할 수 있나요?
@@ -325,7 +326,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
           </View>
 
           <View style={styles.faqItem}>
-            <Icon name="help-circle-outline" size={20} color={colors.primary} />
+            <SafeIcon name="help-circle-outline" size={20} color={colors.primary} />
             <View style={styles.faqContent}>
               <Text style={styles.faqQuestion}>
                 토큰은 다음 달로 이월되나요?

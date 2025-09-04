@@ -11,6 +11,7 @@ import {
   Animated,
 } from "react-native";
 import { SafeIcon } from "../utils/SafeIcon";
+import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import Clipboard from "@react-native-clipboard/clipboard";
 // import { optimizeForPlatform, getPlatformTips } from '../utils/platformOptimizer'; // 제거 - API에서만 처리
@@ -396,7 +397,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
               regenerateCount[platform.id] > 0 &&
               activePlatform === platform.id && (
                 <View style={styles.regenerateBadge}>
-                  <Icon name="refresh" size={10} color={colors.white} />
+                  <SafeIcon name="refresh" size={10} color={colors.white} />
                 </View>
               )}
           </TouchableOpacity>
@@ -425,7 +426,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
               {safeOriginalContent.split("#")[0].trim().length}자
             </Text>
           </View>
-          <Icon name="arrow-forward" size={16} color={colors.text.tertiary} />
+          <SafeIcon name="arrow-forward" size={16} color={colors.text.tertiary} />
           <View style={styles.conversionInfoItem}>
             <Text style={styles.conversionLabel}>변환 후:</Text>
             <Text
@@ -498,7 +499,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
         <View style={styles.contentHeader}>
           {activePlatform === "original" && (
             <View style={styles.originalBadge}>
-              <Icon name="create-outline" size={12} color={colors.primary} />
+              <SafeIcon name="create-outline" size={12} color={colors.primary} />
               <Text style={styles.originalBadgeText}>생성된 원본</Text>
             </View>
           )}
@@ -572,7 +573,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
           style={[styles.actionButton, styles.shareButton] as any}
           onPress={handleShareToSNS}
         >
-          <Icon name="share-social-outline" size={20} color={colors.primary} />
+          <SafeIcon name="share-social-outline" size={20} color={colors.primary} />
           <Text
             style={[
               styles.actionButtonText,
@@ -623,7 +624,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>공유하기</Text>
               <TouchableOpacity onPress={() => setShowAllPlatforms(false)}>
-                <Icon name="close" size={24} color={colors.text.primary} />
+                <SafeIcon name="close" size={24} color={colors.text.primary} />
               </TouchableOpacity>
             </View>
 
@@ -645,7 +646,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
                         { backgroundColor: platform.color },
                       ]}
                     >
-                      <Icon name={platform.icon} size={28} color="#FFFFFF" />
+                      <SafeIcon name={platform.icon} size={28} color="#FFFFFF" />
                     </View>
                     <Text style={styles.platformLabel}>{platform.name}</Text>
                   </TouchableOpacity>

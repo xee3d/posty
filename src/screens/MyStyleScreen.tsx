@@ -29,6 +29,7 @@ import {
   FONT_SIZES,
 } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
+import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { ScaleButton } from "../components/AnimationComponents";
@@ -736,7 +737,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             ]}
           >
             <View style={styles.metricHeader}>
-              <Icon name="sync" size={24} color={colors.primary} />
+              <SafeIcon name="sync" size={24} color={colors.primary} />
               <Text style={styles.metricLabel}>일관성</Text>
             </View>
             <Text style={styles.metricValue}>
@@ -767,7 +768,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             ]}
           >
             <View style={styles.metricHeader}>
-              <Icon name="color-palette" size={24} color={colors.accent} />
+              <SafeIcon name="color-palette" size={24} color={colors.accent} />
               <Text style={styles.metricLabel}>다양성</Text>
             </View>
             <Text style={styles.metricValue}>
@@ -791,7 +792,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         {activeChallenge && (
           <View style={styles.activeChallengeCard}>
             <View style={styles.challengeHeader}>
-              <Icon name="trophy" size={20} color={colors.warning} />
+              <SafeIcon name="trophy" size={20} color={colors.warning} />
               <Text style={styles.challengeTitle}>{activeChallenge.name}</Text>
             </View>
             <Text style={styles.challengeProgress}>
@@ -811,7 +812,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       return (
         <View style={styles.accessDeniedContainer}>
           <View style={styles.accessDeniedIcon}>
-            <Icon name="lock-closed" size={40} color={colors.text.tertiary} />
+            <SafeIcon name="lock-closed" size={40} color={colors.text.tertiary} />
           </View>
           <Text style={styles.accessDeniedTitle}>프리미엄 기능입니다</Text>
           <Text style={styles.accessDeniedSubtitle}>
@@ -836,19 +837,19 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           {/* 주요 지표 */}
           <View style={styles.metricsGrid}>
             <View style={styles.metricItem}>
-              <Icon name="create-outline" size={24} color={colors.primary} />
+              <SafeIcon name="create-outline" size={24} color={colors.primary} />
               <Text style={styles.metricValue}>{stats?.totalPosts || 0}</Text>
               <Text style={styles.metricLabel}>총 게시물</Text>
             </View>
             <View style={styles.metricItem}>
-              <Icon name="calendar-outline" size={24} color={colors.accent} />
+              <SafeIcon name="calendar-outline" size={24} color={colors.accent} />
               <Text style={styles.metricValue}>
                 {stats?.postingPatterns?.mostActiveDay || "월요일"}
               </Text>
               <Text style={styles.metricLabel}>최다 작성 요일</Text>
             </View>
             <View style={styles.metricItem}>
-              <Icon name="time-outline" size={24} color={colors.success} />
+              <SafeIcon name="time-outline" size={24} color={colors.success} />
               <Text style={styles.metricValue}>
                 {stats?.postingPatterns?.mostActiveTime || "19시"}
               </Text>
@@ -919,7 +920,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       return (
         <View style={styles.accessDeniedContainer}>
           <View style={styles.accessDeniedIcon}>
-            <Icon name="lock-closed" size={40} color={colors.text.tertiary} />
+            <SafeIcon name="lock-closed" size={40} color={colors.text.tertiary} />
           </View>
           <Text style={styles.accessDeniedTitle}>프리미엄 기능입니다</Text>
           <Text style={styles.accessDeniedSubtitle}>
@@ -1018,7 +1019,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                     },
                   ]}
                 >
-                  <Icon name="star" size={12} color="#fff" />
+                  <SafeIcon name="star" size={12} color="#fff" />
                   <Text style={styles.recommendedText}>추천</Text>
                 </Animated.View>
               )}
@@ -1073,7 +1074,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
               {isLocked ? (
                 <View style={styles.lockIconContainer}>
-                  <Icon name="lock-closed" size={20} color={colors.primary} />
+                  <SafeIcon name="lock-closed" size={20} color={colors.primary} />
                 </View>
               ) : (
                 <Icon
@@ -1118,7 +1119,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                     },
                   ]}
                 >
-                  <Icon name="trophy" size={28} color={colors.warning} />
+                  <SafeIcon name="trophy" size={28} color={colors.warning} />
                 </View>
               </View>
               <View style={styles.challengeContent}>
@@ -1155,7 +1156,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                   <Text style={styles.challengeStatusText}>진행 중</Text>
                 </View>
               ) : (
-                <Icon name="arrow-forward" size={20} color={colors.primary} />
+                <SafeIcon name="arrow-forward" size={20} color={colors.primary} />
               )}
             </TouchableOpacity>
           ))}

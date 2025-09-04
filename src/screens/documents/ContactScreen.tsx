@@ -13,6 +13,7 @@ import {
   Pressable,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../../utils/SafeIcon";
 import {
   COLORS,
   SPACING,
@@ -178,7 +179,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
         {/* 헤더 */}
         <View style={styles.header}>
           <TouchableOpacity onPress={onBack} style={styles.backButton}>
-            <Icon name="chevron-back" size={24} color={colors.text.primary} />
+            <SafeIcon name="chevron-back" size={24} color={colors.text.primary} />
           </TouchableOpacity>
           <Text style={styles.headerTitle}>문의하기</Text>
           <View style={styles.placeholder} />
@@ -193,7 +194,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
           {/* 이메일 정보 카드 */}
           <View style={styles.emailCard}>
             <View style={styles.emailHeader}>
-              <Icon name="mail" size={24} color={colors.primary} />
+              <SafeIcon name="mail" size={24} color={colors.primary} />
               <Text style={styles.emailTitle}>이메일로 문의하기</Text>
             </View>
             <Text style={styles.emailAddress}>getposty@gmail.com</Text>
@@ -202,14 +203,14 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
                 style={styles.emailButton}
                 onPress={handleCopyEmail}
               >
-                <Icon name="copy-outline" size={18} color={colors.primary} />
+                <SafeIcon name="copy-outline" size={18} color={colors.primary} />
                 <Text style={styles.emailButtonText}>복사</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.emailButton, styles.emailButtonPrimary]}
                 onPress={() => handleOpenEmail()}
               >
-                <Icon name="mail-outline" size={18} color={colors.white} />
+                <SafeIcon name="mail-outline" size={18} color={colors.white} />
                 <Text
                   style={[
                     styles.emailButtonText,
@@ -296,7 +297,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
               onPress={handleSubmit}
             >
               <Text style={styles.submitButtonText}>이메일로 보내기</Text>
-              <Icon name="send" size={18} color={colors.white} />
+              <SafeIcon name="send" size={18} color={colors.white} />
             </TouchableOpacity>
           </View>
 

@@ -8,6 +8,7 @@ import {
   RefreshControl,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { SafeIcon } from "../utils/SafeIcon";
 import missionService, { Mission } from "../services/missionService";
 // import { useSubscription } from "../contexts/SubscriptionContext";
 import ProgressBar from "../components/ProgressBar";
@@ -46,7 +47,7 @@ const MissionItem: React.FC<MissionItemProps> = ({ mission, onPress }) => {
           <Text style={styles.missionDescription}>{mission.description}</Text>
         </View>
         <View style={styles.rewardContainer}>
-          <Icon name="star" size={16} color="#FFC107" />
+          <SafeIcon name="star" size={16} color="#FFC107" />
           <Text style={styles.rewardText}>{mission.reward}</Text>
         </View>
       </View>
@@ -64,7 +65,7 @@ const MissionItem: React.FC<MissionItemProps> = ({ mission, onPress }) => {
 
       {mission.completed && (
         <View style={styles.completedBadge}>
-          <Icon name="checkmark-circle" size={20} color="#4CAF50" />
+          <SafeIcon name="checkmark-circle" size={20} color="#4CAF50" />
           <Text style={styles.completedText}>완료</Text>
         </View>
       )}
@@ -198,7 +199,7 @@ const MissionScreen: React.FC = () => {
     if (isLoading) {
       return (
         <View style={styles.emptyState}>
-          <Icon name="spinner" size={48} color="#ccc" />
+          <SafeIcon name="spinner" size={48} color="#ccc" />
           <Text style={styles.emptyText}>미션을 불러오는 중...</Text>
         </View>
       );
@@ -207,7 +208,7 @@ const MissionScreen: React.FC = () => {
     if (missionList.length === 0) {
       return (
         <View style={styles.emptyState}>
-          <Icon name="tasks" size={48} color="#ccc" />
+          <SafeIcon name="tasks" size={48} color="#ccc" />
           <Text style={styles.emptyText}>미션이 없습니다</Text>
         </View>
       );

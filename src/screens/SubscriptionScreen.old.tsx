@@ -11,9 +11,10 @@ import {
   Share,
   Platform,
 } from "react-native";
+import { SafeIcon } from "../utils/SafeIcon";
+import Icon from "react-native-vector-icons/Ionicons";
 import { COLORS, SPACING, BRAND } from "../utils/constants";
 import { SUBSCRIPTION_PLANS, TOKEN_USAGE } from "../utils/adConfig";
-import Icon from "react-native-vector-icons/MaterialIcons";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
 import {
@@ -352,7 +353,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Icon name="arrow-back" size={24} color={colors.text.primary} />
+          <SafeIcon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {activeTab === "subscription"
@@ -365,7 +366,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           style={styles.headerButton}
           onPress={() => setShowEarnTokenModal(true)}
         >
-          <Icon name="flash-on" size={20} color={colors.primary} />
+          <SafeIcon name="flash-on" size={20} color={colors.primary} />
           <Text style={styles.currentTokens}>{currentTokens}</Text>
         </TouchableOpacity>
       </View>
@@ -513,7 +514,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     { backgroundColor: "#8B5CF6" + "20" },
                   ]}
                 >
-                  <Icon name="play-circle" size={24} color="#8B5CF6" />
+                  <SafeIcon name="play-circle" size={24} color="#8B5CF6" />
                 </View>
                 <View style={styles.earnTokenInfo}>
                   <Text style={styles.earnTokenTitle}>광고 보기</Text>
@@ -539,7 +540,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     { backgroundColor: "#10B981" + "20" },
                   ]}
                 >
-                  <Icon name="event-available" size={24} color="#10B981" />
+                  <SafeIcon name="event-available" size={24} color="#10B981" />
                 </View>
                 <View style={styles.earnTokenInfo}>
                   <Text style={styles.earnTokenTitle}>일일 출석</Text>
@@ -562,7 +563,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     { backgroundColor: "#EC4899" + "20" },
                   ]}
                 >
-                  <Icon name="share" size={24} color="#EC4899" />
+                  <SafeIcon name="share" size={24} color="#EC4899" />
                 </View>
                 <View style={styles.earnTokenInfo}>
                   <Text style={styles.earnTokenTitle}>SNS 공유</Text>
@@ -585,7 +586,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     { backgroundColor: "#F59E0B" + "20" },
                   ]}
                 >
-                  <Icon name="person-add" size={24} color="#F59E0B" />
+                  <SafeIcon name="person-add" size={24} color="#F59E0B" />
                 </View>
                 <View style={styles.earnTokenInfo}>
                   <Text style={styles.earnTokenTitle}>친구 초대</Text>
@@ -608,7 +609,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     { backgroundColor: "#6366F1" + "20" },
                   ]}
                 >
-                  <Icon name="star" size={24} color="#6366F1" />
+                  <SafeIcon name="star" size={24} color="#6366F1" />
                 </View>
                 <View style={styles.earnTokenInfo}>
                   <Text style={styles.earnTokenTitle}>앱 평가하기</Text>
@@ -624,7 +625,7 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
             {/* 추가 안내 */}
             <View style={styles.earnTokenTip}>
-              <Icon name="lightbulb-outline" size={20} color={colors.primary} />
+              <SafeIcon name="lightbulb-outline" size={20} color={colors.primary} />
               <Text style={styles.earnTokenTipText}>
                 무료 플랜 사용자는 매일 자정에 10개의 토큰이 자동 충전됩니다
               </Text>

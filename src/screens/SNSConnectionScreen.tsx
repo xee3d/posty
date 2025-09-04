@@ -9,7 +9,7 @@ import {
   Linking,
   ActivityIndicator,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
@@ -120,7 +120,7 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Icon name="close" size={24} color={colors.text.primary} />
+          <SafeIcon name="close" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>SNS 연동 관리</Text>
         <View style={{ width: 44 }} />
@@ -146,7 +146,7 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
           <AnimatedCard delay={100} style={styles.accountCard}>
             <View style={styles.accountHeader}>
               <View style={styles.accountInfo}>
-                <Icon name="logo-instagram" size={24} color="#E4405F" />
+                <SafeIcon name="logo-instagram" size={24} color="#E4405F" />
                 <View style={styles.accountDetails}>
                   <Text style={styles.accountName}>Instagram</Text>
                   <Text style={styles.accountStatus}>
@@ -173,17 +173,17 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
             {connectedAccounts.instagram && (
               <View style={styles.accountFeatures}>
                 <View style={styles.featureItem}>
-                  <Icon name="checkmark-circle" size={16} color="#10B981" />
+                  <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
                   <Text style={styles.featureText}>
                     좋아요 수 자동 업데이트
                   </Text>
                 </View>
                 <View style={styles.featureItem}>
-                  <Icon name="checkmark-circle" size={16} color="#10B981" />
+                  <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
                   <Text style={styles.featureText}>댓글 수 자동 업데이트</Text>
                 </View>
                 <View style={styles.featureItem}>
-                  <Icon name="checkmark-circle" size={16} color="#10B981" />
+                  <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
                   <Text style={styles.featureText}>도달 및 저장 수 확인</Text>
                 </View>
               </View>
@@ -194,7 +194,7 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
           <AnimatedCard delay={200} style={styles.accountCard}>
             <View style={styles.accountHeader}>
               <View style={styles.accountInfo}>
-                <Icon name="logo-facebook" size={24} color="#1877F2" />
+                <SafeIcon name="logo-facebook" size={24} color="#1877F2" />
                 <View style={styles.accountDetails}>
                   <Text style={styles.accountName}>Facebook</Text>
                   <Text style={styles.accountStatus}>
@@ -221,15 +221,15 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
             {connectedAccounts.facebook && (
               <View style={styles.accountFeatures}>
                 <View style={styles.featureItem}>
-                  <Icon name="checkmark-circle" size={16} color="#10B981" />
+                  <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
                   <Text style={styles.featureText}>페이지 게시물 인사이트</Text>
                 </View>
                 <View style={styles.featureItem}>
-                  <Icon name="checkmark-circle" size={16} color="#10B981" />
+                  <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
                   <Text style={styles.featureText}>반응, 댓글, 공유 수</Text>
                 </View>
                 <View style={styles.featureItem}>
-                  <Icon name="checkmark-circle" size={16} color="#10B981" />
+                  <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
                   <Text style={styles.featureText}>도달 및 참여 통계</Text>
                 </View>
               </View>

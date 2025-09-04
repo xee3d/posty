@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { SafeIcon } from "../utils/SafeIcon";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -214,7 +215,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
               <>
                 <View style={styles.socialIconContainer}>
                   {provider === "google" && (
-                    <Icon name="mail" size={20} color={textColor} />
+                    <SafeIcon name="mail" size={20} color={textColor} />
                   )}
                   {provider === "naver" && (
                     <Text style={[styles.naverIcon, { color: textColor }]}>
@@ -222,13 +223,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                     </Text>
                   )}
                   {provider === "kakao" && (
-                    <Icon name="chat-bubble" size={20} color={textColor} />
+                    <SafeIcon name="chat-bubble" size={20} color={textColor} />
                   )}
                   {provider === "facebook" && (
-                    <Icon name="facebook" size={20} color={textColor} />
+                    <SafeIcon name="facebook" size={20} color={textColor} />
                   )}
                   {provider === "apple" && (
-                    <Icon name="apple" size={20} color={textColor} />
+                    <SafeIcon name="apple" size={20} color={textColor} />
                   )}
                 </View>
                 <Text style={[styles.socialButtonText, { color: textColor }]}>
@@ -295,7 +296,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                   ) : (
                     <>
                       <View style={styles.socialIconContainer}>
-                        <Icon name="chat-bubble" size={20} color="#191919" />
+                        <SafeIcon name="chat-bubble" size={20} color="#191919" />
                       </View>
                       <Text
                         style={[styles.socialButtonText, { color: "#191919" }]}

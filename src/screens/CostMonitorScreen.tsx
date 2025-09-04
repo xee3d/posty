@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { COLORS, SPACING } from "../utils/constants";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import costAnalyzer from "../utils/costAnalyzer";
 
@@ -95,14 +95,14 @@ const CostMonitorScreen: React.FC = () => {
         <>
           <View style={styles.metricsGrid}>
             <View style={styles.metricCard}>
-              <Icon name="create-outline" size={24} color="#3B82F6" />
+              <SafeIcon name="create-outline" size={24} color="#3B82F6" />
               <Text style={styles.metricValue}>
                 {formatNumber(report.summary.totalTextGenerations)}
               </Text>
               <Text style={styles.metricLabel}>텍스트 생성</Text>
             </View>
             <View style={styles.metricCard}>
-              <Icon name="image-outline" size={24} color="#8B5CF6" />
+              <SafeIcon name="image-outline" size={24} color="#8B5CF6" />
               <Text style={styles.metricValue}>
                 {formatNumber(report.summary.totalImageAnalyses)}
               </Text>
@@ -225,7 +225,7 @@ const CostMonitorScreen: React.FC = () => {
             <View style={styles.breakdownCard}>
               <View style={styles.breakdownItem}>
                 <View style={styles.breakdownLeft}>
-                  <Icon name="create-outline" size={20} color="#3B82F6" />
+                  <SafeIcon name="create-outline" size={20} color="#3B82F6" />
                   <Text style={styles.breakdownLabel}>텍스트 생성</Text>
                 </View>
                 <Text style={styles.breakdownValue}>
@@ -237,7 +237,7 @@ const CostMonitorScreen: React.FC = () => {
               <View style={styles.breakdownDivider} />
               <View style={styles.breakdownItem}>
                 <View style={styles.breakdownLeft}>
-                  <Icon name="image-outline" size={20} color="#8B5CF6" />
+                  <SafeIcon name="image-outline" size={20} color="#8B5CF6" />
                   <Text style={styles.breakdownLabel}>이미지 분석</Text>
                 </View>
                 <Text style={styles.breakdownValue}>

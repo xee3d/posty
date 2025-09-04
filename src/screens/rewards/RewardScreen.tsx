@@ -9,6 +9,7 @@ import {
   Animated,
 } from "react-native";
 import { SafeIcon } from "../../utils/SafeIcon";
+import Icon from "react-native-vector-icons/Ionicons";
 import { COLORS, SPACING } from "../../utils/constants";
 import { useAppTheme } from "../../hooks/useAppTheme";
 
@@ -211,7 +212,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
               ]}
             >
               {isClaimed ? (
-                <Icon name="check" size={16} color="#10B981" />
+                <SafeIcon name="check" size={16} color="#10B981" />
               ) : (
                 <>
                   <Icon
@@ -247,7 +248,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
           style={styles.backButton}
           onPress={() => navigation.goBack()}
         >
-          <Icon name="arrow-back" size={24} color={colors.text.primary} />
+          <SafeIcon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>리워드</Text>
         <View style={{ width: 40 }} />
@@ -258,7 +259,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
         <View style={styles.tokenStat}>
           <Text style={styles.tokenStatLabel}>현재 토큰</Text>
           <View style={styles.tokenStatValue}>
-            <Icon name="flash" size={24} color={colors.primary} />
+            <SafeIcon name="flash" size={24} color={colors.primary} />
             <Text style={styles.tokenStatNumber}>{availableTokens}</Text>
           </View>
         </View>
@@ -268,7 +269,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
         <View style={styles.tokenStat}>
           <Text style={styles.tokenStatLabel}>누적 획득</Text>
           <View style={styles.tokenStatValue}>
-            <Icon name="stars" size={24} color="#F59E0B" />
+            <SafeIcon name="stars" size={24} color="#F59E0B" />
             <Text style={styles.tokenStatNumber}>{totalTokens}</Text>
           </View>
         </View>

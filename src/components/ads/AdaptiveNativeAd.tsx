@@ -9,6 +9,7 @@ import {
   Platform,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../../utils/SafeIcon";
 import LinearGradient from "react-native-linear-gradient";
 import { useAppTheme } from "../../hooks/useAppTheme";
 
@@ -99,7 +100,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
           end={{ x: 1, y: 0 }}
         >
           <Text style={styles.ctaText}>{adData.callToAction}</Text>
-          <Icon name="arrow-forward" size={16} color="#FFFFFF" />
+          <SafeIcon name="arrow-forward" size={16} color="#FFFFFF" />
         </LinearGradient>
       </View>
     </TouchableOpacity>
@@ -117,7 +118,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
       >
         {showSponsoredLabel && (
           <View style={styles.cardSponsoredBadge}>
-            <Icon name="megaphone-outline" size={12} color="#6366F1" />
+            <SafeIcon name="megaphone-outline" size={12} color="#6366F1" />
             <Text style={styles.cardSponsoredText}>AD</Text>
           </View>
         )}
@@ -253,7 +254,7 @@ const AdaptiveNativeAd: React.FC<AdaptiveNativeAdProps> = ({
             <Text style={styles.fullWidthPrice}>{adData.price}</Text>
             <TouchableOpacity style={styles.fullWidthCtaButton}>
               <Text style={styles.fullWidthCtaText}>{adData.callToAction}</Text>
-              <Icon name="arrow-forward" size={14} color="#000" />
+              <SafeIcon name="arrow-forward" size={14} color="#000" />
             </TouchableOpacity>
           </View>
         </View>

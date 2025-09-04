@@ -17,7 +17,7 @@ import {
   BORDER_RADIUS,
   BRAND,
 } from "../utils/constants";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useAppTheme } from "../hooks/useAppTheme";
 // import { useFocusEffect } from '@react-navigation/native'; // NavigationContainer 밖에서 사용 불가
@@ -308,7 +308,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
 
         <View style={styles.accessDeniedContainer}>
           <View style={styles.accessDeniedIcon}>
-            <Icon name="lock-closed" size={48} color={colors.text.tertiary} />
+            <SafeIcon name="lock-closed" size={48} color={colors.text.tertiary} />
           </View>
           <Text style={styles.accessDeniedTitle}>프리미엄 기능입니다</Text>
           <Text style={styles.accessDeniedSubtitle}>
@@ -387,7 +387,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
                     handleCategoryChange(category.id as TrendCategory)
                   }
                 >
-                  <Icon
+                  <SafeIcon
                     name={category.icon}
                     size={16}
                     color={
@@ -466,7 +466,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
           {/* 에러 상태 표시 */}
           {error && (
             <View style={styles.errorContainer}>
-              <Icon
+              <SafeIcon
                 name="alert-circle-outline"
                 size={48}
                 color={colors.error}
@@ -518,7 +518,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
                   </View>
                   {trend.volume && (
                     <View style={styles.trendStats}>
-                      <Icon
+                      <SafeIcon
                         name="eye-outline"
                         size={14}
                         color={colors.text.tertiary}
@@ -529,7 +529,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
                 </View>
                 <View style={styles.trendFooter}>
                   <View style={styles.trendSource}>
-                    <Icon
+                    <SafeIcon
                       name={
                         trend.source === "news"
                           ? "newspaper-outline"
@@ -567,7 +567,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
           ) : (
             !error && (
               <View style={styles.emptyState}>
-                <Icon
+                <SafeIcon
                   name="trending-up-outline"
                   size={48}
                   color={colors.text.tertiary}
@@ -604,7 +604,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         {/* 업데이트 빈도 표시 */}
         {trendAccess?.updateFrequency === "daily" && userPlan !== "pro" && (
           <View style={styles.updateFrequencyBadge}>
-            <Icon name="time-outline" size={16} color={colors.text.secondary} />
+            <SafeIcon name="time-outline" size={16} color={colors.text.secondary} />
             <Text style={styles.updateFrequencyText}>
               트렌드가 매일 업데이트됩니다
             </Text>
@@ -613,7 +613,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
 
         {trendAccess?.updateFrequency === "realtime" && (
           <View style={styles.updateFrequencyBadge}>
-            <Icon name="flash" size={16} color={colors.primary} />
+            <SafeIcon name="flash" size={16} color={colors.primary} />
             <Text
               style={[styles.updateFrequencyText, { color: colors.primary }]}
             >

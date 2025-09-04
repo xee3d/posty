@@ -127,7 +127,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
       <View style={styles.tokenCard}>
         <View style={styles.tokenHeader}>
           <View style={styles.tokenInfo}>
-            <Icon name="flash" size={24} color={getPlanColor()} />
+            <SafeIcon name="flash" size={24} color={getPlanColor()} />
             <View>
               <Text style={styles.tokenLabel}>보유 토큰</Text>
               <View style={styles.tokenCount}>
@@ -186,7 +186,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
                 }, 100);
               }}
             >
-              <Icon name="gift" size={18} color="#10B981" />
+              <SafeIcon name="gift" size={18} color="#10B981" />
               <Text style={[styles.actionButtonText, { color: "#10B981" }]}>
                 무료 토큰 받기
               </Text>
@@ -208,7 +208,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
               }
             }}
           >
-            <Icon name="add-circle" size={18} color={colors.primary} />
+            <SafeIcon name="add-circle" size={18} color={colors.primary} />
             <Text style={[styles.actionButtonText, { color: colors.primary }]}>
               토큰 충전하기
             </Text>
@@ -218,8 +218,8 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
 
       {/* 빠른 정보 */}
       <View style={styles.quickInfo}>
-        <Icon
-                          name="info-outline"
+        <SafeIcon
+          name="info-outline"
           size={16}
           color={colors.text.tertiary}
         />

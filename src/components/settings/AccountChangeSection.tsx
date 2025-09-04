@@ -10,6 +10,7 @@ import {
   Image,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { SPACING, BORDER_RADIUS, FONTS } from "../../utils/constants";
@@ -156,7 +157,7 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
                 { backgroundColor: colors.border },
               ]}
             >
-              <Icon name="person" size={24} color={colors.text.secondary} />
+              <SafeIcon name="person" size={24} color={colors.text.secondary} />
             </View>
           )}
 
@@ -211,7 +212,7 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
                 {provider.icon}
               </Text>
             ) : (
-              <Icon name={provider.icon} size={24} color={provider.color} />
+              <SafeIcon name={provider.icon} size={24} color={provider.color} />
             )}
 
             <Text style={[styles.providerName, { color: colors.text.primary }]}>

@@ -10,7 +10,7 @@ import {
   SafeAreaView,
   ScrollView,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../../utils/SafeIcon";
 import trendService from "../../services/trendService";
 import { useAppTheme } from "../../hooks/useAppTheme";
 
@@ -88,7 +88,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     >
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Icon name="arrow-back" size={24} color={colors.text.primary} />
+          <SafeIcon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={[styles.headerTitle, { color: colors.text.primary }]}>
           뒤로가기
@@ -98,7 +98,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
       <ScrollView style={styles.content}>
         <View style={[styles.section, { backgroundColor: colors.card }]}>
           <View style={styles.sectionHeader}>
-            <Icon name="trending-up-outline" size={24} color={colors.primary} />
+            <SafeIcon name="trending-up-outline" size={24} color={colors.primary} />
             <Text style={[styles.title, { color: colors.text.primary }]}>
               트렌드 API 설정
             </Text>
@@ -141,7 +141,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
                 저장된 트렌드 데이터를 삭제합니다
               </Text>
             </View>
-            <Icon name="refresh" size={20} color={colors.secondary} />
+            <SafeIcon name="refresh" size={20} color={colors.secondary} />
           </TouchableOpacity>
         </View>
 

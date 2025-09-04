@@ -6,8 +6,8 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
 import { Achievement } from "../types/achievement";
+import { SafeIcon } from "../utils/SafeIcon";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 45) / 2; // 화면 너비에서 패딩을 뺀 후 2로 나눔
@@ -64,7 +64,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
             { backgroundColor: achievement.badgeColor },
           ]}
         >
-          <Icon
+          <SafeIcon
             name={achievement.icon}
             size={32}
             color={achievement.isUnlocked ? achievement.iconColor : "#C7C7CC"}
@@ -118,7 +118,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
 
           {achievement.isUnlocked && (
             <View style={styles.unlockedInfo}>
-              <Icon name="checkmark-circle" size={16} color="#4CAF50" />
+              <SafeIcon name="checkmark-circle" size={16} color="#4CAF50" />
               <Text style={styles.unlockedText}>획득 완료</Text>
             </View>
           )}

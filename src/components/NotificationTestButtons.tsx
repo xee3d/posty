@@ -6,6 +6,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { SafeIcon } from "../utils/SafeIcon";
+import Icon from "react-native-vector-icons/Ionicons";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { badgeService } from "../services/notification/badgeService";
 import { COLORS, SPACING } from "../utils/constants";
@@ -109,7 +110,7 @@ const NotificationTestButtons: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Icon name="flask-outline" size={20} color={colors.primary} />
+        <SafeIcon name="flask-outline" size={20} color={colors.primary} />
         <Text style={styles.headerTitle}>알림 테스트</Text>
       </View>
 
@@ -118,7 +119,7 @@ const NotificationTestButtons: React.FC = () => {
           style={styles.testButton}
           onPress={testIncrementBadge}
         >
-          <Icon name="add-circle-outline" size={16} color={colors.primary} />
+          <SafeIcon name="add-circle-outline" size={16} color={colors.primary} />
           <Text style={styles.buttonText}>배지 +1</Text>
         </TouchableOpacity>
 
@@ -126,7 +127,7 @@ const NotificationTestButtons: React.FC = () => {
           style={styles.testButton}
           onPress={testMultipleNotifications}
         >
-          <Icon name="notifications-outline" size={16} color={colors.primary} />
+          <SafeIcon name="notifications-outline" size={16} color={colors.primary} />
           <Text style={styles.buttonText}>3개 추가</Text>
         </TouchableOpacity>
       </View>
@@ -144,7 +145,7 @@ const NotificationTestButtons: React.FC = () => {
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.clearButton} onPress={testClearBadge}>
-          <Icon name="trash-outline" size={16} color={colors.error} />
+          <SafeIcon name="trash-outline" size={16} color={colors.error} />
           <Text style={styles.clearButtonText}>초기화</Text>
         </TouchableOpacity>
       </View>

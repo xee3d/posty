@@ -8,6 +8,7 @@ import {
   Animated,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import { useOptimizedTheme } from "../hooks/useOptimizedTheme";
 import { SPACING, BORDER_RADIUS } from "../utils/constants";
 
@@ -85,7 +86,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
       <Animated.View
         style={[styles.iconContainer, { transform: [{ scale: scaleAnim }] }]}
       >
-        <Icon name={getIcon()} size={24} color={colors.text.primary} />
+        <SafeIcon name={getIcon()} size={24} color={colors.text.primary} />
       </Animated.View>
       {showLabel && <Text style={styles.label}>{getLabel()}</Text>}
     </TouchableOpacity>

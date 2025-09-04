@@ -39,6 +39,8 @@ class AdIntegrationService {
 
   private initializeAds() {
     console.log("Initializing ad integration service...");
+    // 광고 서비스 초기화 완료
+    console.log("✅ Ad integration service initialized successfully");
   }
 
   // 사용자 액션 추적 및 전면 광고 표시 결정

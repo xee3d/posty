@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../../utils/SafeIcon";
 import {
   COLORS,
   SPACING,
@@ -36,7 +37,7 @@ const TermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Icon name="arrow-back" size={24} color={colors.text.primary} />
+          <SafeIcon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>이용약관</Text>
         <View style={styles.placeholder} />

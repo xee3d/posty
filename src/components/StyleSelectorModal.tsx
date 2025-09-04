@@ -9,6 +9,7 @@ import {
   Modal,
 } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import { UNIFIED_STYLES } from "../utils/unifiedStyleConstants";
 import { COLORS, SPACING } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
@@ -83,7 +84,7 @@ const StyleSelectorModal: React.FC<StyleSelectorModalProps> = ({
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>어떤 스타일로 쓸까요?</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Icon name="close" size={24} color={colors.text.primary} />
+              <SafeIcon name="close" size={24} color={colors.text.primary} />
             </TouchableOpacity>
           </View>
 
@@ -146,7 +147,7 @@ const StyleSelectorModal: React.FC<StyleSelectorModalProps> = ({
                       { backgroundColor: style.color + "20" },
                     ]}
                   >
-                    <Icon name={style.icon} size={32} color={style.color} />
+                    <SafeIcon name={style.icon} size={32} color={style.color} />
                   </View>
                   <Text style={styles.styleName} numberOfLines={1}>
                     {style.name}

@@ -9,6 +9,7 @@ import {
   Platform,
 } from "react-native";
 import { COLORS, SPACING } from "../../utils/constants";
+import { SafeIcon } from "../../utils/SafeIcon";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { NativeAd } from "../../utils/adConfig";
 
@@ -42,7 +43,7 @@ export const FeedNativeAd: React.FC<FeedNativeAdProps> = ({ ad, onPress }) => {
           <Text style={styles.advertiserName}>{ad.advertiser}</Text>
           <View style={styles.sponsoredRow}>
             <Text style={styles.sponsoredText}>Sponsored</Text>
-            <Icon name="public" size={12} color={COLORS.gray} />
+            <SafeIcon name="public" size={12} color={COLORS.gray} />
           </View>
         </View>
         <View style={styles.adBadge}>
@@ -64,14 +65,14 @@ export const FeedNativeAd: React.FC<FeedNativeAdProps> = ({ ad, onPress }) => {
 
         <TouchableOpacity style={styles.ctaButton} onPress={handlePress}>
           <Text style={styles.ctaText}>{ad.callToAction}</Text>
-          <Icon name="arrow-forward" size={16} color={COLORS.white} />
+          <SafeIcon name="arrow-forward" size={16} color={COLORS.white} />
         </TouchableOpacity>
 
         {(ad.starRating || ad.price) && (
           <View style={styles.footer}>
             {ad.starRating && (
               <View style={styles.rating}>
-                <Icon name="star" size={14} color={COLORS.warning} />
+                <SafeIcon name="star" size={14} color={COLORS.warning} />
                 <Text style={styles.ratingText}>{ad.starRating}</Text>
               </View>
             )}

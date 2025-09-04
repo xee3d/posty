@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { SafeIcon } from "../utils/SafeIcon";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -124,11 +125,11 @@ export const SyncIndicator: React.FC<SyncIndicatorProps> = ({ style }) => {
     >
       <Animated.View style={animatedStyle}>
         {!isOnline ? (
-          <Icon name="cloud-off" size={20} color={colors.error} />
+          <SafeIcon name="cloud-off" size={20} color={colors.error} />
         ) : isSyncing ? (
-          <Icon name="sync" size={20} color={colors.primary} />
+          <SafeIcon name="sync" size={20} color={colors.primary} />
         ) : (
-          <Icon name="cloud-queue" size={20} color={colors.warning} />
+          <SafeIcon name="cloud-queue" size={20} color={colors.warning} />
         )}
       </Animated.View>
 

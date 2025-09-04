@@ -9,6 +9,7 @@ import {
   Animated,
 } from "react-native";
 import { COLORS, SPACING, FONTS, BRAND } from "../utils/constants";
+import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 
@@ -244,7 +245,7 @@ export const ButtonLoadingIndicator: React.FC<{ color?: string }> = ({
   return (
     <View style={styles.buttonLoading}>
       <Animated.View style={{ transform: [{ rotate }] }}>
-        <Icon name="sync-outline" size={20} color={color} />
+        <SafeIcon name="sync-outline" size={20} color={color} />
       </Animated.View>
       <Text style={[styles.buttonLoadingText, { color }]}>생성 중</Text>
       <View style={styles.miniTyping}>

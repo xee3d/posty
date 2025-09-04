@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { SafeIcon } from "../utils/SafeIcon";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -187,7 +188,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <Icon name="gift" size={20} color="#FFFFFF" />
+          <SafeIcon name="gift" size={20} color="#FFFFFF" />
           <View style={styles.planBenefitContent}>
             <Text style={styles.planBenefitTitle}>
               {userPlan === "starter"
@@ -218,7 +219,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <Icon name="gift" size={20} color="#FFFFFF" />
+          <SafeIcon name="gift" size={20} color="#FFFFFF" />
           <View style={styles.firstPurchaseContent}>
             <Text style={styles.firstPurchaseTitle}>첫 구매 특별 혜택</Text>
             <Text style={styles.firstPurchaseDesc}>
@@ -236,7 +237,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <Icon name="stars" size={24} color="#FFFFFF" />
+          <SafeIcon name="stars" size={24} color="#FFFFFF" />
           <View style={styles.proNoticeContent}>
             <Text style={styles.proNoticeTitle}>MAX 플랜 사용 중</Text>
             <Text style={styles.proNoticeDesc}>
@@ -262,7 +263,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
               >
-                <Icon name="star" size={12} color="#FFFFFF" />
+                <SafeIcon name="star" size={12} color="#FFFFFF" />
                 <Text style={styles.popularText}>BEST</Text>
               </LinearGradient>
             )}
@@ -300,7 +301,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                     >
-                      <Icon name="gift" size={14} color="#FFFFFF" />
+                      <SafeIcon name="gift" size={14} color="#FFFFFF" />
                       <Text style={styles.bonusText}>+{pkg.bonus} 보너스</Text>
                     </LinearGradient>
                   )}
@@ -354,7 +355,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                   end={{ x: 1, y: 0 }}
                 >
                   <Text style={styles.purchaseButtonText}>구매하기</Text>
-                  <Icon name="arrow-forward" size={18} color="#FFFFFF" />
+                  <SafeIcon name="arrow-forward" size={18} color="#FFFFFF" />
                 </LinearGradient>
               </LinearGradient>
             </View>
@@ -379,7 +380,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <Icon name="trending-up-outline" size={24} color="#FFFFFF" />
+              <SafeIcon name="trending-up-outline" size={24} color="#FFFFFF" />
             </LinearGradient>
             <Text style={styles.featureTitle}>대량 구매 혜택</Text>
             <Text style={styles.featureDesc}>
@@ -399,7 +400,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <Icon name="lock-open-outline" size={24} color="#FFFFFF" />
+              <SafeIcon name="lock-open-outline" size={24} color="#FFFFFF" />
             </LinearGradient>
             <Text style={styles.featureTitle}>유연한 사용</Text>
             <Text style={styles.featureDesc}>
@@ -419,7 +420,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <Icon name="rocket-outline" size={24} color="#FFFFFF" />
+              <SafeIcon name="rocket-outline" size={24} color="#FFFFFF" />
             </LinearGradient>
             <Text style={styles.featureTitle}>영구 소유</Text>
             <Text style={styles.featureDesc}>
@@ -439,7 +440,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
-              <Icon name="star" size={24} color="#FFFFFF" />
+              <SafeIcon name="star" size={24} color="#FFFFFF" />
             </LinearGradient>
             <Text style={styles.featureTitle}>플랜 혜택</Text>
             <Text style={styles.featureDesc}>구독 플랜별 보너스 토큰 제공</Text>
@@ -452,7 +453,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
         <Text style={styles.sectionTitle}>토큰 구매 vs 구독 플랜</Text>
 
         <View style={styles.comparisonCard}>
-          <Icon name="help-circle-outline" size={20} color={colors.primary} />
+          <SafeIcon name="help-circle-outline" size={20} color={colors.primary} />
           <View style={styles.comparisonContent}>
             <Text style={styles.comparisonTitle}>
               어떤 경우 토큰 구매가 좋나요?
@@ -465,7 +466,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
         </View>
 
         <View style={styles.comparisonCard}>
-          <Icon name="diamond-outline" size={20} color={colors.primary} />
+          <SafeIcon name="diamond-outline" size={20} color={colors.primary} />
           <View style={styles.comparisonContent}>
             <Text style={styles.comparisonTitle}>구독 플랜의 장점</Text>
             <Text style={styles.comparisonDesc}>
@@ -494,12 +495,12 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
         </View>
         <View style={styles.trustDivider} />
         <View style={styles.trustBadge}>
-          <Icon name="refresh-outline" size={20} color={colors.primary} />
+          <SafeIcon name="refresh-outline" size={20} color={colors.primary} />
           <Text style={styles.trustText}>즉시 환불</Text>
         </View>
         <View style={styles.trustDivider} />
         <View style={styles.trustBadge}>
-          <Icon name="headset-outline" size={20} color={colors.primary} />
+          <SafeIcon name="headset-outline" size={20} color={colors.primary} />
           <Text style={styles.trustText}>24/7 지원</Text>
         </View>
       </LinearGradient>

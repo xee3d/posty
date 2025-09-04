@@ -7,6 +7,7 @@ import {
   Animated,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import { SafeIcon } from "../utils/SafeIcon";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { SPACING } from "../utils/constants";
@@ -85,7 +86,7 @@ const MigrationBanner: React.FC<MigrationBannerProps> = ({
   return (
     <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
       <View style={styles.content}>
-        <Icon name="cloud-upload" size={24} color={colors.primary} />
+        <SafeIcon name="cloud-upload" size={24} color={colors.primary} />
         <View style={styles.textContainer}>
           <Text style={styles.title}>데이터 백업 가능</Text>
           <Text style={styles.description}>

@@ -12,6 +12,8 @@ import {
   ActivityIndicator,
   Image,
 } from "react-native";
+import { SafeIcon } from "../utils/SafeIcon";
+import Icon from "react-native-vector-icons/Ionicons";
 import { User, Platform } from "../types";
 import {
   COLORS,
@@ -24,7 +26,6 @@ import {
   TYPOGRAPHY,
   FONT_SIZES,
 } from "../utils/constants";
-import Icon from "react-native-vector-icons/Ionicons";
 import { APP_TEXT } from "../utils/textConstants";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { useTheme } from "../contexts/ThemeContext";
@@ -1044,7 +1045,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                 }
               }}
             >
-              <Icon name="trophy" size={20} color={colors.primary} />
+              <SafeIcon name="trophy" size={20} color={colors.primary} />
               <Text
                 style={[
                   styles.editProfileButtonText,
@@ -1063,7 +1064,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               ]}
               onPress={() => setShowProfileDetailModal(true)}
             >
-              <Icon name="person-circle" size={20} color={colors.primary} />
+              <SafeIcon name="person-circle" size={20} color={colors.primary} />
               <Text
                 style={[
                   styles.editProfileButtonText,
@@ -1258,7 +1259,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
         {/* 로그아웃 버튼 */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Icon name="log-out-outline" size={20} color={colors.error} />
+          <SafeIcon name="log-out-outline" size={20} color={colors.error} />
           <Text style={styles.logoutText}>로그아웃</Text>
         </TouchableOpacity>
 

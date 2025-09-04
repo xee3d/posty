@@ -9,6 +9,7 @@ import {
   Platform,
 } from "react-native";
 import { COLORS, SPACING } from "../../utils/constants";
+import { SafeIcon } from "../../utils/SafeIcon";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { NativeAd } from "../../utils/adConfig";
 
@@ -57,7 +58,7 @@ export const NativeAdView: React.FC<NativeAdViewProps> = ({
             <Text style={styles.advertiser}>{ad.advertiser}</Text>
             {ad.starRating && (
               <View style={styles.rating}>
-                <Icon name="star" size={12} color={COLORS.warning} />
+                <SafeIcon name="star" size={12} color={COLORS.warning} />
                 <Text style={styles.ratingText}>{ad.starRating}</Text>
               </View>
             )}

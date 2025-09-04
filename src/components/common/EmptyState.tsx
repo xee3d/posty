@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../../utils/SafeIcon";
 import { COLORS, SPACING } from "../../utils/constants";
 import { useAppTheme } from "../../hooks/useAppTheme";
 
@@ -25,7 +26,7 @@ export const EmptyState: React.FC<EmptyStateProps> = ({
   return (
     <View style={[styles.container, style]}>
       <View style={styles.iconContainer}>
-        <Icon name={icon} size={iconSize} color={colors.text.tertiary} />
+        <SafeIcon name={icon} size={iconSize} color={colors.text.tertiary} />
       </View>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.subtitle}>{subtitle}</Text>
