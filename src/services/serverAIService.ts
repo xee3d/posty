@@ -1,4 +1,5 @@
-// import { getCurrentLanguage } from '../locales/i18n';
+import { getCurrentLanguage } from './localization/languageService';
+import { generatePrompt, getImageAnalysisPrompt } from './localization/promptTemplates';
 
 // 서버 API 서비스 - Posty 백엔드 서버와 통신
 import API_CONFIG, { getApiUrl, getAuthHeader } from "../config/api";
@@ -108,10 +109,10 @@ class ServerAIService {
           "X-App-Version": "1.0.0",
         },
         body: JSON.stringify({
-          prompt: this.enhancePromptWithLength(params.prompt, params.length),
+          prompt: this.enhancePromptWithLanguage(params.prompt, params.tone, params.platform || "instagram", params.length),
           tone: params.tone,
           platform: params.platform || "instagram",
-          language: "ko", // getCurrentLanguage(), // 현재 언어 추가
+          language: getCurrentLanguage(), // 동적 언어 감지
           length: params.length || "medium", // 길이 추가
           model: params.model, // AI 모델 추가
           includeEmojis: params.includeEmojis ?? true,
@@ -289,13 +290,14 @@ class ServerAIService {
         "MB"
       );
 
+      const currentLanguage = getCurrentLanguage();
       const requestBody = {
-        prompt:
-          "이 사진의 핵심만 간단히 설명해주세요. 무엇을, 어디서, 어떤 분위기인지 1-2문장으로.",
+        prompt: getImageAnalysisPrompt(currentLanguage),
         image: imageBase64, // imageBase64 대신 image로 변경
         platform: "instagram",
         tone: "casual",
         length: "short",
+        language: currentLanguage,
       };
 
       // 개발 모드에서만 상세 로그 출력
@@ -398,7 +400,32 @@ class ServerAIService {
     }
   }
 
-  // 길이에 따라 프롬프트 보강
+  // 언어별 프롬프트 생성
+  private enhancePromptWithLanguage(
+    prompt: string, 
+    tone: string, 
+    platform: string, 
+    length?: string
+  ): string {
+    const currentLanguage = getCurrentLanguage();
+    const lengthParam = length || "medium";
+    
+    try {
+      return generatePrompt(
+        currentLanguage,
+        platform,
+        tone,
+        lengthParam,
+        prompt
+      );
+    } catch (error) {
+      console.warn('[ServerAIService] Failed to generate localized prompt, using fallback:', error);
+      // 언어별 프롬프트 생성 실패 시 기본 한국어 방식으로 fallback
+      return this.enhancePromptWithLength(prompt, length);
+    }
+  }
+
+  // 길이에 따라 프롬프트 보강 (fallback용)
   private enhancePromptWithLength(prompt: string, length?: string): string {
     if (length === "long") {
       return `${prompt} (자세히 300-400자로 설명해주세요. 구체적인 예시와 상세한 설명을 포함해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;

@@ -5,6 +5,8 @@ import React, {
   useMemo,
   useRef,
 } from "react";
+import languageService from "./src/services/localization/languageService";
+import pricingService from "./src/services/localization/pricingService";
 import SplashScreen from "react-native-splash-screen";
 import AnimatedSplashScreen from "./src/components/AnimatedSplashScreen";
 import {
@@ -112,6 +114,24 @@ const AppContent: React.FC = () => {
   // 앱 초기화
   useEffect(() => {
     console.log("[App] App initialization started");
+
+    const initializeServices = async () => {
+      try {
+        // 언어 서비스 초기화
+        console.log("[App] Initializing language service...");
+        await languageService.initialize();
+        
+        // 가격 서비스 언어 업데이트
+        pricingService.updateLanguage();
+        
+        console.log("[App] Language and pricing services initialized");
+      } catch (error) {
+        console.error("[App] Service initialization error:", error);
+      }
+    };
+
+    // 서비스 초기화
+    initializeServices();
 
     // 앱 초기화 (첫 설치 감지 및 데이터 정리)
     AppInitializer.initialize();

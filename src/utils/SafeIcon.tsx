@@ -1,4 +1,5 @@
 import React from "react";
+import { ViewStyle, TextStyle } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -289,12 +290,12 @@ const CORE_VALID_IONICONS = [
   "hand-right",
 ];
 
-interface SafeIconProps {
+export interface SafeIconProps {
   name: string;
   size?: number;
   color?: string;
   type?: "ionicons" | "material" | "material-community";
-  style?: any;
+  style?: ViewStyle | TextStyle | any;
 }
 
 // 아이콘 이름 매핑 (Material Design Icons -> Ionicons)
@@ -649,3 +650,6 @@ export const withSafeIcon = (Component: React.ComponentType<any>) => {
 export const IoniconsIcon = withSafeIcon(Icon);
 export const MaterialIcons = withSafeIcon(MaterialIcon);
 export const MaterialCommunityIcons = withSafeIcon(MaterialCommunityIcon);
+
+// Also make SafeIcon the default export for easier imports
+export default SafeIcon;

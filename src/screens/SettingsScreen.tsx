@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
+import LanguageSettings from "../components/settings/LanguageSettings";
 import { User, Platform } from "../types";
 import {
   COLORS,
@@ -1124,6 +1125,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
         {/* 앱 설정 섹션 */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>앱 설정</Text>
+          
+          {/* 언어 설정 */}
+          <LanguageSettings 
+            onLanguageChange={(language) => {
+              console.log('[SettingsScreen] Language changed to:', language);
+            }}
+          />
           <View style={styles.settingItem}>
             <View style={styles.settingInfo}>
               <View style={styles.settingHeader}>
