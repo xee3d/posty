@@ -1274,18 +1274,20 @@ const createStyles = (
     mollyIcon: {
       fontSize: 24,
       fontWeight: "700",
-      color: "#FFFFFF",
+      color: colors.white,
     },
     appTitle: {
       fontSize: 20,
       fontWeight: "700",
-      color: "#FFFFFF",
+      color: colors.white,
       letterSpacing: -0.5,
     },
     appSubtitle: {
-      fontSize: 14,
-      color: "rgba(255,255,255,0.85)",
+      fontSize: 15,
+      color: isDark ? "rgba(255,255,255,0.95)" : colors.text.primary,
       marginTop: 2,
+      lineHeight: 22,
+      fontWeight: "500",
     },
     headerButton: {
       width: 44,
@@ -1315,7 +1317,7 @@ const createStyles = (
       gap: 4,
     },
     tokenBalanceText: {
-      color: "#FFFFFF",
+      color: colors.white,
       fontSize: 16,
       fontWeight: "700",
     },
@@ -1323,7 +1325,7 @@ const createStyles = (
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: colors.white || "#FFFFFF", // 기본값 추가
+      backgroundColor: colors.white,
       justifyContent: "center",
       alignItems: "center",
       shadowColor: "#000",
@@ -1403,7 +1405,7 @@ const createStyles = (
     },
     // 기존 스타일 (2줄 버전)
     mainActionCard: {
-      backgroundColor: colors.surface || "#FFFFFF", // 기본값 추가
+      backgroundColor: colors.surface,
       borderRadius: 12,
       paddingVertical: 20,
       paddingHorizontal: 20,

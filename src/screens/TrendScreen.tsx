@@ -39,6 +39,7 @@ import {
 import { CompactBanner, SmartAdPlacement } from "../components/ads";
 import trendCache from "../utils/trendCache";
 import AppLogo from "../components/AppLogo";
+import { createHeaderStyles, createSectionStyles, createButtonStyles } from "../styles/commonStyles";
 
 type TrendCategory = "all" | "news" | "social" | "keywords";
 
@@ -273,6 +274,9 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   }, [trends, selectedCategory]);
 
   const styles = createStyles(colors, isDark);
+  const headerStyles = createHeaderStyles(colors);
+  const sectionStyles = createSectionStyles(colors);
+  const buttonStyles = createButtonStyles(colors);
 
   // 초기 로딩 시 전체 스켈레톤 표시
   if (isInitialLoading) {
@@ -292,14 +296,14 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <View style={styles.header}>
-          <View style={styles.headerTop}>
+        <View style={headerStyles.headerSection}>
+          <View style={headerStyles.headerTop}>
             <View style={styles.mollyBadge}>
-              <Text style={styles.mollyBadgeText}>T</Text>
+              <Text style={styles.mollyBadgeText}>P</Text>
             </View>
-            <Text style={styles.headerTitle}>실시간 트렌드</Text>
+            <Text style={headerStyles.headerTitle}>실시간 트렌드</Text>
           </View>
-          <Text style={styles.headerSubtitle}>{BRAND.slogans.creative}</Text>
+          <Text style={headerStyles.headerSubtitle}>실시간 인기 트렌드와 키워드</Text>
         </View>
 
         <View style={styles.accessDeniedContainer}>
@@ -347,12 +351,14 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
       >
         {/* 헤더 */}
         <FadeInView delay={0}>
-          <View style={styles.header}>
-            <View style={styles.headerTop}>
-              <AppLogo size={32} showText={false} />
-              <Text style={styles.headerTitle}>실시간 트렌드</Text>
+          <View style={headerStyles.headerSection}>
+            <View style={headerStyles.headerTop}>
+              <View style={styles.mollyBadge}>
+                <Text style={styles.mollyBadgeText}>P</Text>
+              </View>
+              <Text style={headerStyles.headerTitle}>실시간 트렌드</Text>
             </View>
-            <Text style={styles.headerSubtitle}>{BRAND.slogans.creative}</Text>
+            <Text style={headerStyles.headerSubtitle}>실시간 인기 트렌드와 키워드</Text>
           </View>
         </FadeInView>
 
@@ -416,7 +422,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
             ) : userTrends && userTrends.hashtags?.length > 0 ? (
               <SlideInView direction="right" delay={200}>
                 <View style={styles.myTrendsSection}>
-                  <Text style={styles.sectionTitle}>내가 자주 쓴 태그</Text>
+                  <Text style={sectionStyles.sectionTitle}>내가 자주 쓴 태그</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {userTrends.hashtags
                       .slice(0, 5)
@@ -447,7 +453,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
 
         {/* 실시간 트렌드 리스트 */}
         <View style={styles.trendsSection}>
-          <Text style={styles.sectionTitle}>
+          <Text style={sectionStyles.sectionTitle}>
             {selectedCategory === "all"
               ? "전체 트렌드"
               : selectedCategory === "news"
@@ -641,16 +647,6 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       fontSize: 14,
       color: colors.text.secondary,
     },
-    header: {
-      paddingHorizontal: SPACING.lg,
-      paddingTop: SPACING.xl,
-      paddingBottom: SPACING.lg,
-    },
-    headerTop: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: SPACING.sm,
-    },
     mollyBadge: {
       width: 36,
       height: 36,
@@ -664,17 +660,6 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
       fontSize: 18,
       fontWeight: "700",
       color: colors.white,
-    },
-    headerTitle: {
-      fontSize: 28,
-      fontWeight: "700",
-      color: colors.text.primary,
-      letterSpacing: -0.5,
-    },
-    headerSubtitle: {
-      fontSize: 15,
-      color: colors.text.secondary,
-      lineHeight: 22,
     },
     categoryScroll: {
       marginBottom: SPACING.lg,
@@ -709,13 +694,6 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
     },
     myTrendsSection: {
       marginBottom: SPACING.xl,
-    },
-    sectionTitle: {
-      fontSize: 16,
-      fontWeight: "600",
-      color: colors.text.primary,
-      marginBottom: SPACING.md,
-      paddingHorizontal: SPACING.lg,
     },
     myHashtagChip: {
       flexDirection: "row",
@@ -919,7 +897,7 @@ const createStyles = (colors: typeof COLORS, isDark: boolean) =>
     upgradeButtonText: {
       fontSize: 16,
       fontWeight: "700",
-      color: "#FFFFFF",
+      color: colors.white,
     },
     trendPreview: {
       marginTop: SPACING.xxl,

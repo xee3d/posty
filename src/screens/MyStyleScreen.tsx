@@ -46,6 +46,7 @@ import {
 } from "../utils/unifiedStyleConstants";
 import { soundManager } from "../utils/soundManager";
 import { saveContent } from "../utils/storage";
+import { createHeaderStyles, createSectionStyles } from "../styles/commonStyles";
 
 import { Alert } from "../utils/customAlert";
 import { useAppSelector } from "../hooks/redux";
@@ -81,6 +82,7 @@ interface TemplateUsage {
 const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
   const styles = createStyles(colors, cardTheme, isDark);
+  const headerStyles = createHeaderStyles(colors);
 
   // 구독 플랜 정보
   const subscription = useAppSelector((state) => state.user.subscription);
@@ -630,7 +632,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                       <Text style={styles.styleScoreName}>
                         {template?.name}
                       </Text>
-                      <Text style={styles.styleScoreValue}>{score}%</Text>
+                      <Text style={styles.styleScoreValue}>{Number(score) || 0}%</Text>
                     </View>
                   );
                 })}
@@ -1178,13 +1180,16 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.headerTitle}>내 스타일</Text>
-            <Text style={styles.headerSubtitle}>
-              나만의 콘텐츠 브랜드를 만들어가세요
-            </Text>
+        <View style={headerStyles.headerSection}>
+          <View style={headerStyles.headerTop}>
+            <View style={styles.mollyBadge}>
+              <Text style={styles.mollyBadgeText}>P</Text>
+            </View>
+            <Text style={headerStyles.headerTitle}>내 스타일</Text>
           </View>
+          <Text style={headerStyles.headerSubtitle}>
+            나만의 콘텐츠 브랜드를 만들어가세요
+          </Text>
         </View>
         <EmptyState
           icon="brush-outline"
@@ -1204,19 +1209,16 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         showsVerticalScrollIndicator={false}
       >
         {/* 헤더 */}
-        <View style={styles.header}>
-          <View>
-            <Text style={styles.headerTitle}>내 스타일</Text>
-            <Text style={styles.headerSubtitle}>
-              나만의 콘텐츠 브랜드를 만들어가세요
-            </Text>
+        <View style={headerStyles.headerSection}>
+          <View style={headerStyles.headerTop}>
+            <View style={styles.mollyBadge}>
+              <Text style={styles.mollyBadgeText}>P</Text>
+            </View>
+            <Text style={headerStyles.headerTitle}>내 스타일</Text>
           </View>
-          <TouchableOpacity
-            style={styles.refreshButton}
-            onPress={loadDataAndAnalyze}
-          >
-            <Icon name="refresh" size={24} color={colors.primary} />
-          </TouchableOpacity>
+          <Text style={headerStyles.headerSubtitle}>
+            나만의 콘텐츠 브랜드를 만들어가세요
+          </Text>
         </View>
 
         {/* 탭 선택 */}
@@ -1284,7 +1286,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
 const createStyles = (
   colors: typeof COLORS,
-  cardTheme: typeof CARD_THEME,
+  cardTheme: any, // cardTheme 타입을 추후 정의 필요
   isDark: boolean
 ) =>
   StyleSheet.create({
@@ -1304,24 +1306,6 @@ const createStyles = (
       marginTop: SPACING.md,
       fontSize: 16,
       color: colors.secondary,
-    },
-    header: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingHorizontal: SPACING.lg,
-      paddingTop: SPACING.lg,
-      paddingBottom: SPACING.md,
-    },
-    headerTitle: {
-      fontSize: 28,
-      fontWeight: "700",
-      color: colors.text.primary,
-    },
-    headerSubtitle: {
-      fontSize: 14,
-      color: colors.text.secondary,
-      marginTop: 4,
     },
     refreshButton: {
       padding: SPACING.sm,
@@ -1357,7 +1341,7 @@ const createStyles = (
       paddingBottom: SPACING.xl,
     },
     brandIdentity: {
-      backgroundColor: isDark ? colors.surface : "#FFFFFF",
+      backgroundColor: colors.surface,
       borderRadius: 16,
       padding: SPACING.lg,
       marginBottom: SPACING.lg,
@@ -1440,7 +1424,7 @@ const createStyles = (
       padding: SPACING.md,
       borderRadius: 12,
       marginBottom: SPACING.sm,
-      backgroundColor: isDark ? colors.surface : "#FFFFFF",
+      backgroundColor: colors.surface,
       borderWidth: isDark ? 0 : 1,
       borderColor: isDark ? "transparent" : colors.border,
       ...cardTheme.default.shadow,
@@ -1473,7 +1457,7 @@ const createStyles = (
       marginTop: 8,
     },
     patternsSection: {
-      backgroundColor: isDark ? colors.surface : "#FFFFFF",
+      backgroundColor: colors.surface,
       borderRadius: 16,
       padding: SPACING.lg,
       borderWidth: isDark ? 0 : 1,
@@ -1622,7 +1606,7 @@ const createStyles = (
       padding: SPACING.lg,
       borderRadius: 16,
       marginBottom: SPACING.md,
-      backgroundColor: isDark ? colors.surface : "#FFFFFF",
+      backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: isDark ? colors.border + "50" : "#E5E7EB",
       minHeight: 100, // 최소 높이 설정
@@ -1800,7 +1784,7 @@ const createStyles = (
       padding: SPACING.lg,
       borderRadius: 16,
       marginBottom: SPACING.md,
-      backgroundColor: isDark ? colors.surface : "#FFFFFF",
+      backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: isDark ? colors.border : "#E5E7EB",
       shadowColor: "#000",
@@ -1917,7 +1901,7 @@ const createStyles = (
     upgradeButtonText: {
       fontSize: 16,
       fontWeight: "700",
-      color: "#FFFFFF",
+      color: colors.white,
     },
     templateLimitBadge: {
       flexDirection: "row",
@@ -1946,6 +1930,20 @@ const createStyles = (
       alignItems: "center",
       borderWidth: 2,
       borderColor: colors.primary,
+    },
+    mollyBadge: {
+      width: 36,
+      height: 36,
+      borderRadius: 18,
+      backgroundColor: colors.primary,
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: SPACING.sm,
+    },
+    mollyBadgeText: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.white,
     },
   });
 

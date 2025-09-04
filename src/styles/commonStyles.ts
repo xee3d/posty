@@ -2,9 +2,10 @@ import { StyleSheet, TextStyle, ViewStyle } from "react-native";
 import { COLORS, SPACING, BORDER_RADIUS, CARD_THEME } from "../utils/constants";
 import { getFontStyle, TEXT_STYLES } from "../utils/fonts";
 
-// 공통 헤더 스타일
+// 공통 헤더 스타일 - UI 일관성을 위한 통합된 헤더
 export const createHeaderStyles = (colors: typeof COLORS) =>
   StyleSheet.create({
+    // 메인 화면 헤더 (홈, 트렌드, 내스타일, 설정)
     headerSection: {
       paddingHorizontal: SPACING.lg,
       paddingTop: SPACING.xl,
@@ -17,15 +18,56 @@ export const createHeaderStyles = (colors: typeof COLORS) =>
     },
     headerTitle: {
       ...getFontStyle("xxl", "bold"),
-      fontSize: 28, // 커스텀 크기
+      fontSize: 28, // 일관된 크기로 복원
+      fontWeight: "700",
       color: colors.text.primary,
-      letterSpacing: -0.5,
+      letterSpacing: -0.3,
     },
     headerSubtitle: {
       ...getFontStyle("sm", "regular"),
-      fontSize: 15, // 커스텀 크기
+      fontSize: 15,
       color: colors.text.secondary,
       lineHeight: 22,
+    },
+    
+    // 모달/팝업 헤더 (PostInputScreen 등)
+    modalHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.md,
+      minHeight: 56,
+    },
+    modalHeaderTitle: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: colors.text.primary,
+    },
+    
+    // 네비게이션 헤더 (뒤로가기 버튼 포함)
+    navHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.md,
+      minHeight: 56,
+    },
+    navHeaderTitle: {
+      fontSize: 20,
+      fontWeight: "600", 
+      color: colors.text.primary,
+      marginLeft: SPACING.md,
+    },
+    
+    // 공통 뒤로가기 버튼
+    backButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.surface,
     },
   });
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
   View,
   Text,
@@ -28,6 +28,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { APP_TEXT } from "../utils/textConstants";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { useTheme } from "../contexts/ThemeContext";
+import { createHeaderStyles } from "../styles/commonStyles";
 import { storage } from "../utils/storage";
 import socialMediaService from "../services/socialMediaService";
 // ProfileEditModal 제거
@@ -865,7 +866,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   ];
 
   const planBadge = getSubscriptionBadge();
-  const styles = createStyles(colors, cardTheme);
+  const styles = useMemo(() => createStyles(colors, cardTheme), [colors, cardTheme]);
+  const headerStyles = createHeaderStyles(colors);
 
   // 문서 화면들 렌더링
   if (showUserGuide) {
@@ -937,12 +939,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* 헤더 */}
-        <View style={styles.header}>
-          <View style={styles.headerTop}>
+        <View style={headerStyles.headerSection}>
+          <View style={headerStyles.headerTop}>
             <View style={styles.mollyBadge}>
               <Text style={styles.mollyBadgeText}>P</Text>
             </View>
-            <Text style={styles.headerTitle}>설정</Text>
+            <Text style={headerStyles.headerTitle}>설정</Text>
           </View>
         </View>
 
@@ -1089,8 +1091,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                   styles.profileGuide,
                   {
                     backgroundColor: isDark
-                      ? colors.secondary + "80"
-                      : colors.primary + "10",
+                      ? colors.primary + "20"
+                      : colors.primary + "08",
                     borderLeftColor: colors.primary,
                   },
                 ]}
@@ -1098,10 +1100,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                 <Text
                   style={[
                     styles.profileGuideText,
-                    { color: colors.text.secondary },
+                    { color: colors.primary },
                   ]}
                 >
-                  {profileGuideMessage || "프로필을 완성해보세요"}
+                  {profileGuideMessage || "프로필을 설정하고 맞춤 AI를 경험해보세요 🎨"}
                 </Text>
               </View>
             )}
@@ -1272,7 +1274,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
       {/* 테마 설정 다이얼로그 */}
       <ThemeDialog
         visible={showThemeDialog}
-        onClose={() => setShowThemeDialog(false)}
+        onClose={() => {
+          setShowThemeDialog(false);
+          // 테마 변경 후 강제 리렌더링
+        }}
       />
     </SafeAreaView>
   );
@@ -1294,20 +1299,11 @@ const createStyles = (colors: any, cardTheme: any) => {
     content: {
       flex: 1,
     },
-    header: {
-      paddingHorizontal: SPACING.lg,
-      paddingTop: SPACING.xl,
-      paddingBottom: SPACING.lg,
-    },
-    headerTop: {
-      flexDirection: "row",
-      alignItems: "center",
-    },
     mollyBadge: {
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: colors.accent,
+      backgroundColor: colors.primary,
       justifyContent: "center",
       alignItems: "center",
       marginRight: SPACING.sm,
@@ -1316,12 +1312,6 @@ const createStyles = (colors: any, cardTheme: any) => {
       fontSize: 18,
       fontWeight: "700",
       color: colors.white,
-    },
-    headerTitle: {
-      fontSize: 24,
-      fontWeight: "700",
-      color: colors.textPrimary,
-      letterSpacing: -0.5,
     },
     section: {
       backgroundColor: colors.surface,
@@ -1337,7 +1327,7 @@ const createStyles = (colors: any, cardTheme: any) => {
     sectionTitle: {
       fontSize: 14,
       fontWeight: "600",
-      color: colors.text.tertiary,
+      color: colors.text.secondary,
       paddingHorizontal: SPACING.lg,
       marginBottom: SPACING.md,
     },
@@ -1448,10 +1438,12 @@ const createStyles = (colors: any, cardTheme: any) => {
       color: colors.primary,
     },
     tokenStatusContainer: {
-      backgroundColor: colors.lightGray,
+      backgroundColor: isDark ? colors.surface : colors.lightGray,
       borderRadius: 12,
       padding: SPACING.md,
       marginBottom: SPACING.md,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     tokenStatusHeader: {
       flexDirection: "row",
@@ -1476,7 +1468,9 @@ const createStyles = (colors: any, cardTheme: any) => {
     },
     tokenProgressBar: {
       height: 6,
-      backgroundColor: colors.border,
+      backgroundColor: isDark 
+        ? colors.surface + "80" 
+        : colors.border + "40",
       borderRadius: 3,
       overflow: "hidden",
     },
@@ -1484,15 +1478,22 @@ const createStyles = (colors: any, cardTheme: any) => {
       height: "100%",
       backgroundColor: colors.primary,
       borderRadius: 3,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 0 },
+      shadowOpacity: 0.3,
+      shadowRadius: 3,
+      elevation: 2,
     },
     miniStats: {
       flexDirection: "row",
       alignItems: "center",
       paddingVertical: SPACING.md,
       paddingHorizontal: SPACING.md,
-      backgroundColor: colors.lightGray,
+      backgroundColor: isDark ? colors.surface : colors.lightGray,
       borderRadius: 12,
       marginTop: SPACING.md,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     miniStatItem: {
       flex: 1,
@@ -1516,10 +1517,14 @@ const createStyles = (colors: any, cardTheme: any) => {
     upgradePrompt: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: colors.primary + "10",
+      backgroundColor: isDark 
+        ? colors.primary + "15"
+        : colors.primary + "08",
       borderRadius: 12,
       padding: SPACING.md,
       marginTop: SPACING.sm,
+      borderWidth: 1,
+      borderColor: colors.primary + "20",
     },
     earnTokenPrompt: {
       backgroundColor: "#10B981" + "10",
@@ -1577,7 +1582,9 @@ const createStyles = (colors: any, cardTheme: any) => {
       backgroundColor: colors.primary,
     },
     connectedButton: {
-      backgroundColor: colors.lightGray,
+      backgroundColor: isDark ? colors.surface : colors.lightGray,
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     connectionButtonText: {
       fontSize: FONT_SIZES.small,
@@ -1593,6 +1600,8 @@ const createStyles = (colors: any, cardTheme: any) => {
       alignItems: "center",
       paddingHorizontal: SPACING.lg,
       paddingVertical: SPACING.md,
+      borderBottomWidth: 0.5,
+      borderBottomColor: colors.border + "50", // 50% 투명도
     },
     settingInfo: {
       flex: 1,
@@ -1624,7 +1633,12 @@ const createStyles = (colors: any, cardTheme: any) => {
       height: 24,
       borderRadius: 12,
       borderWidth: 2,
-      borderColor: colors.border,
+      borderColor: isDark ? colors.border : colors.border + "60",
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 3,
     },
     themeSection: {
       paddingHorizontal: SPACING.lg,
@@ -1742,10 +1756,15 @@ const createStyles = (colors: any, cardTheme: any) => {
     profileBadge: {
       position: "absolute",
       right: 12,
-      backgroundColor: colors.warning,
+      backgroundColor: colors.primary,
       borderRadius: 12,
       paddingHorizontal: 8,
       paddingVertical: 2,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.3,
+      shadowRadius: 2,
+      elevation: 2,
     },
     profileBadgeText: {
       color: colors.white,
@@ -1755,10 +1774,17 @@ const createStyles = (colors: any, cardTheme: any) => {
     profileGuide: {
       marginTop: SPACING.sm,
       padding: SPACING.sm,
-      backgroundColor: isDark ? "#2A1A1A" : colors.secondary + "20",
-      borderRadius: 8,
+      backgroundColor: isDark 
+        ? colors.surface + "CC"
+        : colors.primary + "08",
+      borderRadius: 12,
       borderLeftWidth: 3,
-      borderLeftColor: colors.warning,
+      borderLeftColor: colors.primary,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 1,
     },
     profileGuideText: {
       fontSize: FONT_SIZES.small,

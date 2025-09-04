@@ -275,8 +275,9 @@ const styles = StyleSheet.create({
     color: "#1A1A1A",
   },
   headerSubtitle: {
-    fontSize: 14,
+    fontSize: 15,
     color: "#6B7280",
+    lineHeight: 22,
   },
   tabSelector: {
     flexDirection: "row",
