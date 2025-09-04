@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet, Image } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
+import { useAppTheme } from "../hooks/useAppTheme";
 
 interface AppLogoProps {
   size?: number;
@@ -15,6 +16,7 @@ const AppLogo: React.FC<AppLogoProps> = ({
   variant = "primary",
   useAppIcon = false,
 }) => {
+  const { colors } = useAppTheme();
   const isWhite = variant === "white";
   const [displayedText, setDisplayedText] = useState("");
   const fullText = "AI가 쓰고, 나는 빛나고";
@@ -57,8 +59,7 @@ const AppLogo: React.FC<AppLogoProps> = ({
           <Text
             style={[
               styles.logoText,
-              { fontSize: size * 0.5 },
-              styles.whiteLogoText,
+              { fontSize: size * 0.5, color: colors.primary },
             ]}
           >
             P

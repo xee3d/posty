@@ -189,6 +189,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
             autoSchedule: true,
             notificationsEnabled: true,
             aiRecommendationFrequency: "medium",
+            preferredPostingTimes: [],
           },
         });
       }
@@ -719,13 +720,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
     }
 
     // 패턴 2: 동일한 작업 반복 (같은 소스에서 5번 이상)
-    const sourceCounts = recentLogs.reduce((acc, log) => {
+    const sourceCounts = recentLogs.reduce((acc: Record<string, number>, log) => {
       acc[log.source] = (acc[log.source] || 0) + 1;
       return acc;
     }, {});
 
     Object.entries(sourceCounts).forEach(([source, count]) => {
-      if (count > 5) {
+      if ((count as number) > 5) {
         console.warn(`Suspicious pattern detected: Repeated ${source} actions`);
       }
     });
@@ -1248,7 +1249,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
         {/* 버전 정보 */}
         <View style={styles.versionSection}>
-          <AppLogo useAppIcon={true} size={80} showRoundBackground={true} />
+          <AppLogo useAppIcon={true} size={80} />
           <Text style={styles.versionText}>Posty v1.0.0</Text>
           <Text style={styles.copyrightText}>
             © 2025 Posty AI. Made with 💕

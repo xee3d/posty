@@ -567,7 +567,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 onPress={() => onNavigate("profile")}
                 activeOpacity={0.7}
               >
-                <AppLogo size={40} showText={false} />
+                <AppLogo size={40} showText={false} variant="white" />
                 <View style={styles.logoTextContainer}>
                   <Text style={styles.appTitle}>{BRAND.name}</Text>
                   <Text style={styles.appSubtitle}>{BRAND.tagline}</Text>
