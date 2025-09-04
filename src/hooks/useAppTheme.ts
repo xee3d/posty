@@ -11,37 +11,43 @@ export type ThemeMode = "light" | "dark" | "system";
 
 export const useAppTheme = () => {
   // 새로운 테마 시스템 사용
-  const { themeMode, setThemeMode, colors: newColors, isDark } = useTheme();
+  const { themeMode, setThemeMode, colors: newColors, isDark, themeColor } = useTheme();
 
   // 기존 API와의 호환성을 위한 변환
   const changeTheme = setThemeMode;
 
   // 최적화된 색상 객체 (memoized)
   const colors = useMemo(
-    () => ({
-      // 새로운 테마 색상으로 구성
-      primary: newColors.accent,
-      background: newColors.background,
-      surface: newColors.surface,
-      cardBackground: newColors.cardBackground || newColors.surface,
-      border: newColors.border,
-      lightGray: newColors.lightGray || (isDark ? "#2A2A2A" : "#F5F5F5"),
-      white: newColors.white,
-      // 상태 색상들
-      success: newColors.success,
-      warning: newColors.warning,
-      error: newColors.error,
-      // 액센트 관련
-      accentLight: newColors.accentLight,
-      // 텍스트 색상 직접 매핑
-      text: {
-        primary: newColors.textPrimary,
-        secondary: newColors.textSecondary,
-        tertiary: newColors.textTertiary,
-      },
-      // 레거시 색상들은 fallback으로만 사용
-      ...(isDark ? DARK_COLORS : LIGHT_COLORS),
-    }),
+    () => {
+      // 레거시 색상들을 먼저 로드하고, 동적 색상들로 덮어쓰기
+      const legacyColors = isDark ? DARK_COLORS : LIGHT_COLORS;
+      
+      return {
+        // 레거시 색상들 먼저 적용
+        ...legacyColors,
+        // 동적 테마 색상으로 덮어쓰기 (이것이 우선순위)
+        primary: newColors.accent,
+        background: newColors.background,
+        surface: newColors.surface,
+        cardBackground: newColors.cardBackground || newColors.surface,
+        border: newColors.border,
+        lightGray: newColors.lightGray || (isDark ? "#404040" : "#F5F5F5"),
+        white: newColors.white,
+        // 상태 색상들
+        success: newColors.success,
+        warning: newColors.warning,
+        error: newColors.error,
+        // 액센트 관련 (동적 색상 기반)
+        accent: newColors.accent,
+        accentLight: newColors.accentLight,
+        // 텍스트 색상 직접 매핑
+        text: {
+          primary: newColors.textPrimary,
+          secondary: newColors.textSecondary,
+          tertiary: newColors.textTertiary,
+        },
+      };
+    },
     [newColors, isDark]
   );
 

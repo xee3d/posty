@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   colorOptionSelected: {
-    borderWidth: 3,
+    borderWidth: 2,
     borderColor: "#FFFFFF",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },

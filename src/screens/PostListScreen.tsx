@@ -254,7 +254,11 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
       console.error("Failed to load posts:", error);
       const localPosts = await localAnalyticsService.getAllPosts();
       // 에러 시에도 최대 10개만 표시
-      setPosts(localPosts.slice(0, 10));
+      setPosts(localPosts.slice(0, 10).map(post => ({
+        ...post,
+        category: post.category || '일상',
+        tone: post.tone || 'casual' // tone이 없으면 기본값 설정
+      })));
     } finally {
       setIsLoading(false);
       setIsRefreshing(false);

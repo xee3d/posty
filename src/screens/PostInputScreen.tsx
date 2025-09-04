@@ -13,6 +13,7 @@ import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { ScaleButton, FadeInView } from "../components/AnimationComponents";
+import { createHeaderStyles } from "../styles/commonStyles";
 import localAnalyticsService from "../services/analytics/localAnalyticsService";
 import { soundManager } from "../utils/soundManager";
 import { Alert } from "../utils/customAlert";
@@ -121,20 +122,20 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Icon name="close" size={24} color={colors.text.primary} />
+      <View style={styles.modalHeader}>
+        <TouchableOpacity onPress={onClose} style={styles.backButton}>
+          <Icon name="close" size={20} color={colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>게시물 기록하기</Text>
-        <ScaleButton
-          style={styles.saveButton}
-          onPress={handleSave}
+        <Text style={styles.modalHeaderTitle}>게시물 기록하기</Text>
+        <TouchableOpacity
+          style={[styles.saveButton, isSaving && styles.disabledButton]}
+          onPress={isSaving ? undefined : handleSave}
           disabled={isSaving}
         >
           <Text style={styles.saveButtonText}>
             {isSaving ? "저장 중..." : "저장"}
           </Text>
-        </ScaleButton>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -310,34 +311,31 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
   );
 };
 
-const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
-  StyleSheet.create({
+const createStyles = (colors: typeof COLORS, cardTheme: any) => {
+  const headerStyles = createHeaderStyles(colors);
+  
+  return StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.background,
     },
-    header: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.md,
+    // 공통 헤더 스타일 사용
+    ...headerStyles,
+    // 모달 헤더에 보더 추가
+    modalHeader: {
+      ...headerStyles.modalHeader,
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
-    },
-    closeButton: {
-      padding: SPACING.xs,
-    },
-    headerTitle: {
-      fontSize: 18,
-      fontWeight: "600",
-      color: colors.text.primary,
     },
     saveButton: {
       backgroundColor: colors.primary,
       paddingHorizontal: SPACING.lg,
       paddingVertical: SPACING.sm,
       borderRadius: 20,
+    },
+    disabledButton: {
+      backgroundColor: colors.text.tertiary,
+      opacity: 0.6,
     },
     saveButtonText: {
       color: colors.white,
@@ -465,5 +463,6 @@ const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
       height: SPACING.xxl,
     },
   });
+};
 
 export default PostInputScreen;

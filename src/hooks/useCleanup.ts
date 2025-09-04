@@ -105,14 +105,17 @@ export const useTimer = () => {
 };
 
 /**
- * 이벤트 리스너 관리를 위한 훅
- * 자동으로 이벤트 리스너를 정리합니다.
+ * React Native용 이벤트 리스너 관리 훅
+ * 컴포넌트 언마운트 시 이벤트 리스너를 자동으로 정리합니다.
+ * 
+ * @param eventName - 이벤트 이름
+ * @param handler - 이벤트 핸들러 함수
+ * @param target - 이벤트 대상 객체 (선택사항)
  */
-export const useEventListener = <K extends keyof WindowEventMap>(
-  eventName: K,
-  handler: (event: WindowEventMap[K]) => void,
-  element: EventTarget = window,
-  options?: boolean | AddEventListenerOptions
+export const useEventListener = <T = any>(
+  eventName: string,
+  handler: (event: T) => void,
+  target?: any
 ) => {
   const cleanup = useCleanup();
   const savedHandler = useRef(handler);
@@ -122,18 +125,22 @@ export const useEventListener = <K extends keyof WindowEventMap>(
   }, [handler]);
 
   useEffect(() => {
-    const eventListener = (event: Event) =>
-      savedHandler.current(event as WindowEventMap[K]);
+    if (!target) return;
 
-    element.addEventListener(eventName, eventListener, options);
-    cleanup.addCleanup(() => {
-      element.removeEventListener(eventName, eventListener, options);
-    });
+    const eventListener = (event: T) => savedHandler.current(event);
 
-    return () => {
-      element.removeEventListener(eventName, eventListener, options);
-    };
-  }, [eventName, element, options, cleanup]);
+    // React Native에서는 addEventListener 대신 컴포넌트별 이벤트 처리
+    if (target?.addEventListener) {
+      target.addEventListener(eventName, eventListener);
+      cleanup.addCleanup(() => {
+        target.removeEventListener?.(eventName, eventListener);
+      });
+
+      return () => {
+        target.removeEventListener?.(eventName, eventListener);
+      };
+    }
+  }, [eventName, target, cleanup]);
 };
 
 /**

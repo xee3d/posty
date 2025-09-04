@@ -187,14 +187,19 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
               </Text>
               <View style={styles.progressBar}>
                 <LinearGradient
-                  colors={[colors.primary, colors.primary + "80"]}
+                  colors={["#4F46E5", "#7C3AED"]}  // 진한 인디고에서 보라색으로
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={[styles.progressFill, { width: `${completeness}%` }]}
                 />
               </View>
               {guideMessage && showGuide && (
-                <Text style={styles.guideMessage}>{guideMessage}</Text>
+                <View style={styles.guideContainer}>
+                  <View style={styles.guideIconContainer}>
+                    <Icon name="information-circle" size={18} color={colors.info} />
+                  </View>
+                  <Text style={styles.guideMessage}>{guideMessage}</Text>
+                </View>
               )}
             </View>
 
@@ -676,23 +681,58 @@ const createStyles = (colors: any, isDark: boolean) =>
     },
     completenessText: {
       fontSize: 14,
-      color: colors.text.secondary,
+      color: colors.text.primary,
       marginBottom: 8,
+      fontWeight: "600",
     },
     progressBar: {
-      height: 8,
+      height: 10,
       backgroundColor: colors.border,
-      borderRadius: 4,
+      borderRadius: 6,
       overflow: "hidden",
+      marginVertical: 4,
     },
     progressFill: {
       height: "100%",
-      borderRadius: 4,
+      borderRadius: 6,
+      shadowColor: "#4F46E5",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    guideContainer: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      marginTop: 10,
+      padding: 14,
+      backgroundColor: isDark 
+        ? colors.info + "20" 
+        : colors.info + "10", // 다크모드에서 더 진한 배경
+      borderRadius: 10,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.info,
+      shadowColor: colors.info,
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.1,
+      shadowRadius: 2,
+      elevation: 2,
+    },
+    guideIconContainer: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: colors.info + "20",
+      alignItems: "center",
+      justifyContent: "center",
+      marginRight: 10,
+      marginTop: -1, // 텍스트와 수직 정렬
     },
     guideMessage: {
+      flex: 1,
       fontSize: 13,
-      color: colors.warning,
-      marginTop: 8,
+      color: isDark ? colors.info + "E6" : colors.info, // 다크모드에서 살짝 투명도
+      lineHeight: 18,
       fontWeight: "500",
     },
     scrollContent: {

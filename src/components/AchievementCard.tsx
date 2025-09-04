@@ -11,6 +11,7 @@ import { Achievement } from "../types/achievement";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 45) / 2; // 화면 너비에서 패딩을 뺀 후 2로 나눔
+const CARD_HEIGHT = 220; // 카드 높이를 250 -> 220으로 조정하여 더 균형잡힌 레이아웃
 
 interface AchievementCardProps {
   achievement: Achievement;
@@ -55,64 +56,73 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
         </View>
       )}
 
-      <View
-        style={[
-          styles.iconContainer,
-          { backgroundColor: achievement.badgeColor },
-        ]}
-      >
-        <Icon
-          name={achievement.icon}
-          size={32}
-          color={achievement.isUnlocked ? achievement.iconColor : "#C7C7CC"}
-        />
+      {/* 아이콘 영역 - 고정 크기 */}
+      <View style={styles.iconWrapper}>
+        <View
+          style={[
+            styles.iconContainer,
+            { backgroundColor: achievement.badgeColor },
+          ]}
+        >
+          <Icon
+            name={achievement.icon}
+            size={32}
+            color={achievement.isUnlocked ? achievement.iconColor : "#C7C7CC"}
+          />
+        </View>
       </View>
 
+      {/* 텍스트 콘텐츠 영역 - 고정 크기 */}
       <View style={styles.contentContainer}>
-        <Text
-          style={[styles.name, !achievement.isUnlocked && styles.lockedText]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {achievement.name}
-        </Text>
+        <View style={styles.textWrapper}>
+          <Text
+            style={[styles.name, !achievement.isUnlocked && styles.lockedText]}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {achievement.name}
+          </Text>
 
-        <Text
-          style={[
-            styles.description,
-            !achievement.isUnlocked && styles.lockedText,
-          ]}
-          numberOfLines={2}
-          ellipsizeMode="tail"
-        >
-          {achievement.description}
-        </Text>
+          <Text
+            style={[
+              styles.description,
+              !achievement.isUnlocked && styles.lockedText,
+            ]}
+            numberOfLines={2}
+            ellipsizeMode="tail"
+          >
+            {achievement.description}
+          </Text>
+        </View>
 
-        {!achievement.isUnlocked && (
-          <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
-              <View
-                style={[
-                  styles.progressFill,
-                  {
-                    width: `${Math.max(progressPercentage, 0)}%`,
-                    backgroundColor: rarityColors[achievement.rarity],
-                  },
-                ]}
-              />
+        {/* 상태 영역 - 고정 크기 */}
+        <View style={styles.statusWrapper}>
+          {!achievement.isUnlocked && (
+            <View style={styles.progressContainer}>
+              <View style={styles.progressBar}>
+                <View
+                  style={[
+                    styles.progressFill,
+                    {
+                      width: `${Math.max(progressPercentage, 0)}%`,
+                      backgroundColor: rarityColors[achievement.rarity],
+                    },
+                  ]}
+                />
+              </View>
+              <Text style={styles.progressText}>
+                {progress}/{target}
+              </Text>
             </View>
-            <Text style={styles.progressText}>
-              {progress}/{target}
-            </Text>
-          </View>
-        )}
+          )}
 
-        {achievement.isUnlocked && (
-          <View style={styles.unlockedInfo}>
-            <Icon name="checkmark-circle" size={16} color="#4CAF50" />
-            <Text style={styles.unlockedText}>획득 완료</Text>
-          </View>
-        )}
+          {achievement.isUnlocked && (
+            <View style={styles.unlockedInfo}>
+              <Icon name="checkmark-circle" size={16} color="#4CAF50" />
+              <Text style={styles.unlockedText}>획득 완료</Text>
+            </View>
+          )}
+        </View>
       </View>
 
       <View
@@ -128,9 +138,10 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
 const styles = StyleSheet.create({
   card: {
     width: CARD_WIDTH,
-    backgroundColor: "#FFFFFF",
+    height: CARD_HEIGHT,
+    backgroundColor: "#FFFFFF", // 원래 색상으로 복원
     borderRadius: 16,
-    padding: 16,
+    padding: 12,
     marginBottom: 15,
     elevation: 3,
     shadowColor: "#000",
@@ -139,14 +150,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     borderWidth: 1,
     borderColor: "#F0F0F0",
-    minHeight: 180, // 최소 높이를 160에서 180으로 증가
-    justifyContent: "space-between", // 내용을 균등하게 배치
+    position: "relative",
   },
   unlockedCard: {
-    backgroundColor: "#FFFFFF",
+    // backgroundColor 제거하여 card 스타일이 우선 적용되도록 함
   },
   lockedCard: {
-    backgroundColor: "#FAFAFA",
+    // backgroundColor 제거하여 card 스타일이 우선 적용되도록 함
   },
   newBadge: {
     position: "absolute",
@@ -163,42 +173,57 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
   },
-  iconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+  iconWrapper: {
+    height: 65,
     alignItems: "center",
     justifyContent: "center",
-    marginBottom: 12,
-    alignSelf: "center",
+  },
+  iconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
   },
   contentContainer: {
-    flex: 1,
+    height: 120,
+    justifyContent: "space-between",
+  },
+  textWrapper: {
+    height: 75,
     alignItems: "center",
+    paddingHorizontal: 4,
+    justifyContent: "center",
   },
   name: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
     color: "#1A1A1A",
     marginBottom: 4,
     textAlign: "center",
+    lineHeight: 16,
+    // Fixed: Allow 2 lines for long titles
   },
   description: {
-    fontSize: 12,
+    fontSize: 11,
     color: "#666666",
     textAlign: "center",
-    lineHeight: 16,
-    marginBottom: 8,
-    minHeight: 32, // 최소 높이 설정으로 2줄 공간 확보
+    lineHeight: 14,
   },
   lockedText: {
     color: "#999999",
   },
+  statusWrapper: {
+    height: 40,
+    justifyContent: "center",
+    paddingTop: 4,
+  },
   progressContainer: {
     width: "100%",
-    marginTop: 8,
+    alignItems: "center",
   },
   progressBar: {
+    width: "80%",
     height: 4,
     backgroundColor: "#E5E5EA",
     borderRadius: 2,
@@ -217,7 +242,7 @@ const styles = StyleSheet.create({
   unlockedInfo: {
     flexDirection: "row",
     alignItems: "center",
-    marginTop: 8,
+    justifyContent: "center",
   },
   unlockedText: {
     fontSize: 12,

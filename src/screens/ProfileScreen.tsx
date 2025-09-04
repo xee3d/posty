@@ -96,7 +96,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
         }; // Naver 아이콘이 없으므로 대체
       case "kakao":
         return { name: "Kakao", icon: "chatbubble", color: "#FEE500" };
-      case "facebook":
+      case "facebook" as any:
         return { name: "Facebook", icon: "logo-facebook", color: "#1877F2" };
       default:
         return { name: "Email", icon: "mail", color: colors.primary };
@@ -274,65 +274,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
               </View>
             )}
 
-            {/* 프로필 완성도 섹션 추가 */}
-            {profileGuideMessage && (
-              <TouchableOpacity
-                style={styles.profileGuideSection}
-                onPress={() => setShowProfileDetailModal(true)}
-                activeOpacity={0.8}
-              >
-                <LinearGradient
-                  colors={
-                    isDark
-                      ? [
-                          colors.secondary + "40",
-                          colors.surface || "#3A2A2A",
-                        ]
-                      : [colors.primary + "10", colors.primary + "05"]
-                  }
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                  style={styles.profileGuideGradient}
-                >
-                  <View style={styles.profileGuideContent}>
-                    <View style={styles.profileGuideLeft}>
-                      <Text style={styles.profileGuideTitle}>
-                        프로필 {profileCompleteness}% 완성
-                      </Text>
-                      <Text style={styles.profileGuideMessage}>
-                        {profileGuideMessage}
-                      </Text>
-                    </View>
-                    <Icon
-                      name="chevron-forward"
-                      size={20}
-                      color={colors.primary}
-                    />
-                  </View>
-                  <View style={styles.profileProgressBar}>
-                    <View
-                      style={[
-                        styles.profileProgressFill,
-                        {
-                          width: `${Math.max(profileCompleteness, 1)}%`,
-                          minWidth: 1,
-                        },
-                      ]}
-                    />
-                    {/* 디버깅용: 진행바 너비 확인 */}
-                    <Text
-                      style={{
-                        fontSize: 10,
-                        color: colors.text.tertiary,
-                        marginTop: 2,
-                      }}
-                    >
-                      진행률: {profileCompleteness}%
-                    </Text>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
-            )}
 
             <View style={styles.statsContainer}>
               <View style={styles.statItem}>
@@ -351,27 +292,6 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
               </View>
             </View>
 
-            {/* 레벨 진행률 */}
-            <View style={styles.levelProgressSection}>
-              <View style={styles.levelProgressHeader}>
-                <Text style={styles.levelProgressLabel}>
-                  Lv.{profile?.level} → Lv.{(profile?.level || 1) + 1}
-                </Text>
-                <Text style={styles.levelProgressExp}>
-                  {expProgress.current} / {expProgress.required} EXP
-                </Text>
-              </View>
-              <View style={styles.levelProgressBar}>
-                <View
-                  style={[
-                    styles.levelProgressFill,
-                    {
-                      width: `${expProgress.percentage}%`,
-                    },
-                  ]}
-                />
-              </View>
-            </View>
           </View>
         </FadeInView>
 
@@ -489,7 +409,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
                     styles.achievementCard,
                     achievement.isUnlocked && styles.achievementCardUnlocked,
                     achievement.isNew && styles.achievementCardNew,
-                    !isLastInRow && { marginRight: SPACING.sm },
+                    { marginRight: colIndex < 2 ? SPACING.sm : 0 }, // 마지막 열이 아닌 경우에만 오른쪽 마진 적용
                   ]}
                   onPress={() =>
                     achievement.isUnlocked && handleSelectBadge(achievement)
@@ -933,11 +853,12 @@ const createStyles = (colors: any, isDark: boolean) =>
       flexWrap: "wrap",
       paddingHorizontal: SPACING.md,
       paddingBottom: SPACING.xl,
-      justifyContent: "space-between",
+      justifyContent: "flex-start", // space-between에서 flex-start로 변경하여 마지막 행 정렬 개선
     },
     achievementCard: {
       width: (width - SPACING.md * 2 - SPACING.sm * 2) / 3,
-      backgroundColor: colors.surface,
+      height: 180, // 고정 높이 추가하여 카드 높이 통일
+      backgroundColor: colors.surface, // 원래 색상으로 복원
       borderRadius: 12,
       padding: SPACING.md,
       marginBottom: SPACING.sm,
@@ -959,13 +880,15 @@ const createStyles = (colors: any, isDark: boolean) =>
       justifyContent: "center",
       alignItems: "center",
       marginBottom: SPACING.sm,
+      marginTop: SPACING.xs, // 상단 여백 추가
     },
     achievementName: {
       fontSize: FONT_SIZES.small,
       fontWeight: "600",
       color: colors.text.primary,
       textAlign: "center",
-      marginBottom: 4,
+      marginBottom: 6, // 4 -> 6으로 증가
+      lineHeight: 18, // 라인 높이 추가
     },
     achievementNameLocked: {
       color: colors.text.tertiary,
@@ -974,7 +897,8 @@ const createStyles = (colors: any, isDark: boolean) =>
       fontSize: 11,
       color: colors.text.secondary,
       textAlign: "center",
-      lineHeight: 14,
+      lineHeight: 16, // 14 -> 16으로 증가
+      marginBottom: SPACING.xs, // 하단 여백 추가
     },
     achievementDescLocked: {
       color: colors.text.tertiary,
@@ -982,6 +906,8 @@ const createStyles = (colors: any, isDark: boolean) =>
     achievementProgress: {
       width: "100%",
       marginTop: SPACING.xs,
+      height: 32, // 고정 높이 추가
+      justifyContent: "center", // 세로 중앙 정렬
     },
     achievementProgressBar: {
       height: 4,

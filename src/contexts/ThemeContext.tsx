@@ -6,6 +6,7 @@ import React, {
   useEffect,
   useMemo,
 } from "react";
+import { DevSettings } from "react-native";
 import { Appearance, ColorSchemeName } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
@@ -166,46 +167,46 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const createColors = (dark: boolean, color: string): ThemeColors => {
     if (dark) {
       return {
-        // 다크 테마 - OLED 친화적이면서 현대적인 색상
-        background: "#000000", // 진정한 블랙으로 OLED 최적화
-        surface: "#111111", // 카드나 모달 배경 (더 깊은 검정)
-        surfaceVariant: "#1E1E1E", // 입력 필드, 버튼 배경
-        cardBackground: "#111111", // 카드 배경
+        // 다크 테마 - TodayLucky 스타일 개선된 색상
+        background: "#0F0F0F", // 부드러운 검정 (완전한 검정보다 눈에 편함)
+        surface: "#1F1F1F", // 카드나 모달 배경 (더 밝게)
+        surfaceVariant: "#2A2A2A", // 입력 필드, 버튼 배경 (더 밝게)
+        cardBackground: "#1A1A1A", // 카드 배경 (약간 밝게)
         text: "#FFFFFF", // 기본 텍스트
-        textPrimary: "#FFFFFF", // 중요 텍스트 (최대 대비 - 순백색)
-        textSecondary: "#E0E0E0", // 보조 텍스트 (더 밝게)
-        textTertiary: "#AAAAAA", // 3차 텍스트 (적절한 대비 유지)
-        border: "#2A2A2A", // 경계선 (더 섬세하게)
+        textPrimary: "#FFFFFF", // 중요 텍스트
+        textSecondary: "#BBBBBB", // 보조 텍스트 (가독성 개선)
+        textTertiary: "#888888", // 3차 텍스트 (더 밝게)
+        border: "#404040", // 경계선 (더 밝게)
         accent: color, // 액센트 컬러
-        headerBackground: "#000000", // 헤더 배경
+        headerBackground: "#141414", // 헤더 배경 (약간 밝게)
         isDark: true,
-        warning: "#FFB340", // 주황색 (다크테마에서 더 선명)
-        success: "#40D158", // 초록색 (더 밝고 선명)
-        error: "#FF5555", // 빨간색 (더 밝고 부드럽게)
+        warning: "#FF9F0A", // 주황색 (약간 밝게)
+        success: "#32D74B", // 초록색 (약간 밝게)
+        error: "#FF453A", // 빨간색 (약간 밝게)
         primary: color, // Legacy compatibility
         accentLight: color + "25", // Legacy compatibility (투명도 증가)
         white: "#FFFFFF", // Legacy compatibility
         // 다크테마 전용 추가 색상들
-        lightGray: "#2A2A2A", // Switch 등에서 사용
+        lightGray: "#404040", // Switch 등에서 사용 (더 밝게)
       };
     } else {
       return {
-        // 라이트 테마 - 깔끔하고 현대적인 색상
-        background: "#F8F9FA", // 시스템 배경 (더 부드럽게)
+        // 라이트 테마 - TodayLucky 스타일 개선된 색상
+        background: "#F2F2F7", // 시스템 배경
         surface: "#FFFFFF", // 카드나 모달 배경
-        surfaceVariant: "#F1F3F4", // 입력 필드, 버튼 배경
+        surfaceVariant: "#F2F2F7", // 입력 필드, 버튼 배경
         cardBackground: "#FFFFFF", // 카드 배경
         text: "#1D1D1F", // 기본 텍스트
-        textPrimary: "#000000", // 중요 텍스트 (최대 대비)
-        textSecondary: "#6C7B7F", // 보조 텍스트 (더 읽기 좋게)
-        textTertiary: "#9AA0A6", // 3차 텍스트
-        border: "#E8EAED", // 경계선 (더 섬세하게)
+        textPrimary: "#1D1D1F", // 중요 텍스트
+        textSecondary: "#8E8E93", // 보조 텍스트 (더 읽기 좋게)
+        textTertiary: "#C7C7CC", // 3차 텍스트
+        border: "#E5E5EA", // 경계선 (더 섬세하게)
         accent: color, // 액센트 컬러
         headerBackground: "#FFFFFF", // 헤더 배경
         isDark: false,
-        warning: "#F57C00", // 주황색 (더 깊은 톤)
-        success: "#2E7D32", // 초록색 (더 안정적인 톤)
-        error: "#D32F2F", // 빨간색 (더 차분한 톤)
+        warning: "#FF9500", // 주황색
+        success: "#34C759", // 초록색
+        error: "#FF3B30", // 빨간색
         primary: color, // Legacy compatibility
         accentLight: color + "15", // Legacy compatibility
         white: "#FFFFFF", // Legacy compatibility

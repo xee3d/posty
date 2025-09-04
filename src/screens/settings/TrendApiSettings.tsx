@@ -88,9 +88,9 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
     >
       <View style={styles.header}>
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Icon name="arrow-back" size={24} color={colors.text} />
+          <Icon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>
+        <Text style={[styles.headerTitle, { color: colors.text.primary }]}>
           뒤로가기
         </Text>
       </View>
@@ -99,7 +99,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         <View style={[styles.section, { backgroundColor: colors.card }]}>
           <View style={styles.sectionHeader}>
             <Icon name="trending-up-outline" size={24} color={colors.primary} />
-            <Text style={[styles.title, { color: colors.text }]}>
+            <Text style={[styles.title, { color: colors.text.primary }]}>
               트렌드 API 설정
             </Text>
           </View>
@@ -108,7 +108,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             style={[styles.settingItem, { borderBottomColor: colors.border }]}
           >
             <View style={styles.settingInfo}>
-              <Text style={[styles.settingTitle, { color: colors.text }]}>
+              <Text style={[styles.settingTitle, { color: colors.text.primary }]}>
                 실시간 API 사용
               </Text>
               <Text
@@ -132,7 +132,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
             disabled={isToggling}
           >
             <View style={styles.settingInfo}>
-              <Text style={[styles.settingTitle, { color: colors.text }]}>
+              <Text style={[styles.settingTitle, { color: colors.text.primary }]}>
                 캐시 삭제
               </Text>
               <Text
@@ -146,7 +146,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
         </View>
 
         <View style={[styles.infoSection, { backgroundColor: colors.card }]}>
-          <Text style={[styles.infoTitle, { color: colors.text }]}>
+          <Text style={[styles.infoTitle, { color: colors.text.primary }]}>
             API 정보
           </Text>
           <Text style={[styles.infoText, { color: colors.secondary }]}>
@@ -160,7 +160,7 @@ const TrendApiSettings: React.FC<{ onBack?: () => void }> = ({ onBack }) => {
           <View
             style={[styles.statusSection, { backgroundColor: colors.card }]}
           >
-            <Text style={[styles.statusTitle, { color: colors.text }]}>
+            <Text style={[styles.statusTitle, { color: colors.text.primary }]}>
               API 상태
             </Text>
             <View style={styles.statusItem}>

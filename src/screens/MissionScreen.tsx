@@ -91,7 +91,10 @@ const MissionScreen: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<
     "daily" | "weekly" | "achievements"
   >("daily");
-  const { addTokens } = useSubscription();
+  // TODO: useSubscription 훅 구현 필요
+  const addTokens = (amount: number) => {
+    console.log(`Added ${amount} tokens`);
+  };
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {

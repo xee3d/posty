@@ -13,7 +13,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   progress,
   height = 6,
   backgroundColor = "#E5E7EB",
-  progressColor = "#2196F3",
+  progressColor = "#8B5CF6", // 보라색으로 변경
   style,
 }) => {
   // progress를 0-100 사이로 제한

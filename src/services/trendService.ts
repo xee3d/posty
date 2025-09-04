@@ -39,7 +39,7 @@ class TrendService {
 
   // 실시간 API 설정 - 뉴스/검색어는 별도 처리
   private USE_REAL_API = false; // 서버 API 비활성화 (소셜 트렌드만)
-  private USE_NEWS_API = true; // 뉴스 API 활성화
+  private USE_NEWS_API = false; // 뉴스 API 비활성화 (샘플 데이터 사용)
   private USE_GOOGLE_TRENDS = true; // Google 트렌드 활성화
   private API_BASE_URL = "https://posty-api.vercel.app/api"; // 새 API URL
 

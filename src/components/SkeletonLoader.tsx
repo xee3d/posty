@@ -45,7 +45,7 @@ export const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
       width: customWidth,
       height,
       borderRadius,
-      backgroundColor: isDark ? "#141414" : "#E5E5E5",
+      backgroundColor: isDark ? colors.surface : colors.border,
     },
     style,
   ];

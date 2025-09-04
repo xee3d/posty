@@ -4,6 +4,7 @@
     "target": "esnext",
     "module": "commonjs",
     "lib": ["es2017", "es2018.promise"],
+    "types": ["node", "jest", "@react-native-async-storage/async-storage"],
     "allowJs": true,
     "jsx": "react-native",
     "noEmit": true,

@@ -64,10 +64,13 @@
       "Bash(./android/gradlew:*)",
       "Bash(timeout:*)",
       "Bash(java:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(expo start:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
-    "additionalDirectories": ["/Users/ethanchoi"]
+    "additionalDirectories": [
+      "/Users/ethanchoi"
+    ]
   }
 }
