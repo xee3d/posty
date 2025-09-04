@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../../utils/SafeIcon";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { SPACING } from "../../utils/constants";
 import tokenService from "../../services/subscription/tokenService";
@@ -219,7 +219,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
       {/* 빠른 정보 */}
       <View style={styles.quickInfo}>
         <Icon
-          name="information-circle-outline"
+                          name="info-outline"
           size={16}
           color={colors.text.tertiary}
         />

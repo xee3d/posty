@@ -9,7 +9,7 @@ import {
   Platform,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -337,7 +337,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
 
                 <View style={styles.unitPriceWrapper}>
                   <Icon
-                    name="information-circle-outline"
+                    name="info-outline"
                     size={14}
                     color="#FFFFFF"
                   />

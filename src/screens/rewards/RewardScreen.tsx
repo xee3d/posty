@@ -8,7 +8,7 @@ import {
   SafeAreaView,
   Animated,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../../utils/SafeIcon";
 import { COLORS, SPACING } from "../../utils/constants";
 import { useAppTheme } from "../../hooks/useAppTheme";
 
@@ -307,7 +307,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
         {/* 토큰 사용 안내 */}
         <View style={styles.infoSection}>
           <Icon
-            name="information-circle-outline"
+                            name="info-outline"
             size={20}
             color={colors.primary}
           />

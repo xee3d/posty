@@ -8,7 +8,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { SPACING } from "../utils/constants";
 import missionService, { Mission } from "../services/missionService";
@@ -255,7 +255,7 @@ const MissionModal: React.FC<MissionModalProps> = ({
                   ]}
                 >
                   <Icon
-                    name="information-circle-outline"
+                    name="info-outline"
                     size={20}
                     color={colors.primary}
                   />

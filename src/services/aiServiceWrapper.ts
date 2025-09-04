@@ -224,8 +224,9 @@ class AIServiceWrapper {
         platforms: response.platforms,
         estimatedEngagement: 0,
         metadata: {
-          provider: "posty-server",
-          tone: params.tone,
+          tokensUsed: 0,
+          generationTime: 0,
+          strategy: "posty-server",
         },
       };
     } catch (error) {

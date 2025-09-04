@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { COLORS, SPACING } from "../../utils/constants";
 import { SUBSCRIPTION_PLANS } from "../../config/adConfig";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { useAppSelector } from "../../hooks/redux";
@@ -160,7 +160,11 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   const loadAdStats = async () => {
     try {
       const stats = await rewardAdService.getAdStats();
-      setAdStats(stats);
+      setAdStats({
+        dailyCount: stats.dailyCount,
+        remainingToday: stats.remainingDaily,
+        dailyLimit: stats.limits.dailyLimit,
+      });
     } catch (error) {
       console.error("Failed to load ad stats:", error);
     }
@@ -987,7 +991,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             </View>
 
             <View style={styles.tokenInfoBanner}>
-              <Icon
+              <SafeIcon
                 name="information-circle-outline"
                 size={16}
                 color={colors.text.secondary}

@@ -8,7 +8,7 @@ import {
   ActivityIndicator,
   Platform,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
@@ -491,7 +491,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
             <View style={styles.header}>
               <View style={styles.headerLeft}>
                 <View style={styles.tokenIcon}>
-                  <Icon name="flash" size={24} color={colors.primary} />
+                  <SafeIcon name="flash" size={24} color={colors.primary} />
                 </View>
                 <View>
                   <Text style={styles.title}>무료 토큰 받기</Text>
@@ -501,7 +501,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
                 </View>
               </View>
               <TouchableOpacity onPress={onClose}>
-                <Icon name="close" size={24} color={colors.text.secondary} />
+                <SafeIcon name="close" size={24} color={colors.text.secondary} />
               </TouchableOpacity>
             </View>
 
@@ -543,7 +543,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
                             }
                           />
                         ) : (
-                          <Icon
+                          <SafeIcon
                             name={task.icon}
                             size={24}
                             color={
@@ -582,7 +582,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
                       ) : task.completed ||
                         (task.dailyLimit &&
                           task.currentCount >= task.dailyLimit) ? (
-                        <Icon
+                        <SafeIcon
                           name="checkmark-circle"
                           size={24}
                           color={colors.success}
@@ -601,7 +601,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
 
             {/* 안내 메시지 */}
             <View style={styles.infoBox}>
-              <Icon
+              <SafeIcon
                 name="information-circle"
                 size={20}
                 color={colors.primary}

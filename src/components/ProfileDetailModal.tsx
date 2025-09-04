@@ -22,7 +22,7 @@ import {
   getProfileGuideMessage,
   calculateProfileCompleteness,
 } from "../types/userProfile";
-import Icon from "react-native-vector-icons/MaterialIcons";
+import { SafeIcon } from "../utils/SafeIcon";
 import LinearGradient from "react-native-linear-gradient";
 import { useAppTheme } from "../hooks/useAppTheme";
 
@@ -196,7 +196,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
               {guideMessage && showGuide && (
                 <View style={styles.guideContainer}>
                   <View style={styles.guideIconContainer}>
-                    <Icon name="information-circle" size={18} color={colors.info} />
+                    <SafeIcon name="information-circle" size={18} color={colors.info} />
                   </View>
                   <Text style={styles.guideMessage}>{guideMessage}</Text>
                 </View>

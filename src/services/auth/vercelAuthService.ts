@@ -137,7 +137,6 @@ class VercelAuthService {
           consumerSecret: NAVER_CONSUMER_SECRET,
           serviceUrlSchemeIOS: "postynaverlogin",
           disableNaverAppAuthIOS: true, // 시뮬레이터에서는 웹 로그인 강제 사용
-          disableNaverAppAuthAndroid: false, // Android에서 네이버 앱 로그인 허용
         });
         this.naverInitialized = true;
         console.log("✅ Naver Login 초기화 완료");
@@ -170,10 +169,9 @@ class VercelAuthService {
       }
 
       logger.info(
-        "Google 로그인 성공:",
-        userInfo.data?.user?.name ||
+        "Google 로그인 성공: " + (userInfo.data?.user?.name ||
           userInfo.data?.user?.email ||
-          "no name/email found"
+          "no name/email found")
       );
 
       // 실제 Google 사용자 정보로 로컬 사용자 생성 (올바른 경로 수정)
@@ -181,14 +179,14 @@ class VercelAuthService {
 
       // 🎯 다양한 필드 시도해서 실제 이름 가져오기
       const userName =
-        googleUser?.name ||
-        googleUser?.displayName ||
-        googleUser?.givenName ||
-        googleUser?.familyName ||
+        (googleUser as any)?.name ||
+        (googleUser as any)?.displayName ||
+        (googleUser as any)?.givenName ||
+        (googleUser as any)?.familyName ||
         "Google User";
 
-      const userEmail = googleUser?.email || "google_user@gmail.com";
-      const userPhoto = googleUser?.photo || googleUser?.picture || null;
+      const userEmail = (googleUser as any)?.email || "google_user@gmail.com";
+      const userPhoto = (googleUser as any)?.photo || (googleUser as any)?.picture || null;
 
       console.log("🎯 추출된 사용자 정보:", {
         name: userName,
@@ -216,8 +214,7 @@ class VercelAuthService {
       ]);
 
       logger.info(
-        "✅ 실제 Google 사용자 정보로 로컬 인증 완료:",
-        localUser.displayName
+        "✅ 실제 Google 사용자 정보로 로컬 인증 완료: " + localUser.displayName
       );
 
       return {
@@ -280,14 +277,14 @@ class VercelAuthService {
       clearTimeout(timeoutId); // 타임아웃 정리
 
       console.log("🔍 Naver 로그인 결과:", JSON.stringify(result, null, 2));
-      console.log("🔍 result.isSuccess:", result.isSuccess);
-      console.log("🔍 result.successResponse:", result.successResponse);
-      console.log("🔍 result.failureResponse:", result.failureResponse);
+      console.log("🔍 result.isSuccess:", (result as any).isSuccess);
+      console.log("🔍 result.successResponse:", (result as any).successResponse);
+      console.log("🔍 result.failureResponse:", (result as any).failureResponse);
 
-      if (!result.isSuccess || !result.successResponse?.accessToken) {
+      if (!(result as any).isSuccess || !(result as any).successResponse?.accessToken) {
         const errorMsg =
-          result.failureResponse?.message || "네이버 로그인 실패";
-        const errorCode = result.failureResponse?.code || "UNKNOWN";
+          (result as any).failureResponse?.message || "네이버 로그인 실패";
+        const errorCode = (result as any).failureResponse?.code || "UNKNOWN";
 
         console.log("❌ 네이버 로그인 실패 상세 정보:");
         console.log("  - 에러 코드:", errorCode);
@@ -295,8 +292,7 @@ class VercelAuthService {
         console.log("  - 전체 응답:", result);
 
         logger.error(
-          "Naver 로그인 실패:",
-          result.failureResponse || "Unknown error"
+          "Naver 로그인 실패: " + ((result as any).failureResponse || "Unknown error")
         );
 
         // 구체적인 에러 메시지 제공
@@ -334,7 +330,7 @@ class VercelAuthService {
 
       // Naver 사용자 프로필 가져오기
       const profileResult = await NaverLogin.getProfile(
-        result.successResponse.accessToken
+        (result as any).successResponse.accessToken
       );
 
       console.log(
@@ -343,19 +339,19 @@ class VercelAuthService {
       );
 
       // 프로필 정보에서 사용자 정보 추출
-      const naverProfile = profileResult.response || profileResult;
+      const naverProfile = (profileResult as any).response || profileResult;
 
       const localUser = {
-        uid: `naver_${naverProfile.id || Date.now()}`,
-        email: naverProfile.email || "naver_user@naver.com",
-        displayName: naverProfile.name || naverProfile.nickname || "Naver User",
-        photoURL: naverProfile.profile_image || null,
+        uid: `naver_${(naverProfile as any).id || Date.now()}`,
+        email: (naverProfile as any).email || "naver_user@naver.com",
+        displayName: (naverProfile as any).name || (naverProfile as any).nickname || "Naver User",
+        photoURL: (naverProfile as any).profile_image || null,
         provider: "naver",
       };
 
       // 로컬 토큰 생성 (서버 호출 없음)
       const localToken = `local_naver_${
-        naverProfile.id || Date.now()
+        (naverProfile as any).id || Date.now()
       }_${Date.now()}`;
 
       // 로컬 저장 (배치 처리로 우선순위 역전 방지)
@@ -365,8 +361,7 @@ class VercelAuthService {
       ]);
 
       logger.info(
-        "✅ 실제 Naver 사용자 정보로 로컬 인증 완료:",
-        localUser.displayName
+        "✅ 실제 Naver 사용자 정보로 로컬 인증 완료: " + localUser.displayName
       );
 
       return {
@@ -434,8 +429,7 @@ class VercelAuthService {
       ]);
 
       logger.info(
-        "✅ 실제 Kakao 사용자 정보로 로컬 인증 완료:",
-        localUser.displayName
+        "✅ 실제 Kakao 사용자 정보로 로컬 인증 완료: " + localUser.displayName
       );
 
       return {
@@ -501,8 +495,7 @@ class VercelAuthService {
       ]);
 
       logger.info(
-        "✅ 실제 Apple 사용자 정보로 로컬 인증 완료:",
-        localUser.displayName
+        "✅ 실제 Apple 사용자 정보로 로컬 인증 완료: " + localUser.displayName
       );
 
       return {
@@ -606,8 +599,7 @@ class VercelAuthService {
             ])
               .then(() => {
                 logger.info(
-                  "✅ 실제 Facebook 사용자 정보로 로컬 인증 완료:",
-                  localUser.displayName
+                  "✅ 실제 Facebook 사용자 정보로 로컬 인증 완료: " + localUser.displayName
                 );
 
                 resolve({

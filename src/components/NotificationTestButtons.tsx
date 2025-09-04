@@ -5,7 +5,7 @@
 
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { badgeService } from "../services/notification/badgeService";
 import { COLORS, SPACING } from "../utils/constants";
@@ -134,7 +134,7 @@ const NotificationTestButtons: React.FC = () => {
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.testButton} onPress={showBadgeStatus}>
           <Icon
-            name="information-circle-outline"
+                            name="info-outline"
             size={16}
             color={colors.text.secondary}
           />

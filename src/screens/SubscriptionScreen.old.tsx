@@ -107,7 +107,10 @@ export const SubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   const loadAdStats = async () => {
     try {
       const stats = await rewardAdService.getAdStats();
-      setAdStats(stats);
+      setAdStats({
+        dailyCount: stats.dailyCount,
+        remainingToday: stats.remainingDaily,
+      });
     } catch (error) {
       console.error("Failed to load ad stats:", error);
     }

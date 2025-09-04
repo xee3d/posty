@@ -298,7 +298,7 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
   );
 };
 
-const createStyles = (colors: typeof COLORS, cardTheme: typeof CARD_THEME) =>
+const createStyles = (colors: typeof COLORS, cardTheme: any) =>
   StyleSheet.create({
     container: {
       flex: 1,

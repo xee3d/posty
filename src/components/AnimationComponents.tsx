@@ -151,6 +151,7 @@ interface ScaleButtonProps {
   onPress?: () => void;
   style?: ViewStyle;
   scaleTo?: number;
+  disabled?: boolean;
 }
 
 export const ScaleButton: React.FC<ScaleButtonProps> = ({
@@ -158,6 +159,7 @@ export const ScaleButton: React.FC<ScaleButtonProps> = ({
   onPress,
   style,
   scaleTo = 0.95,
+  disabled = false,
 }) => {
   const scale = useSharedValue(1);
 
@@ -186,6 +188,7 @@ export const ScaleButton: React.FC<ScaleButtonProps> = ({
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
         activeOpacity={1}
+        disabled={disabled}
       >
         {children}
       </TouchableOpacity>

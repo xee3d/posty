@@ -951,7 +951,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             styleAccess?.templateLimit &&
             styleAccess.templateLimit > 0 && (
               <View style={styles.templateLimitBadge}>
-                <Icon
+                <SafeIcon
                   name="information-circle"
                   size={16}
                   color={colors.primary}

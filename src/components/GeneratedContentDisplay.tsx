@@ -10,7 +10,7 @@ import {
   ScrollView,
   Animated,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
+import { SafeIcon } from "../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import Clipboard from "@react-native-clipboard/clipboard";
 // import { optimizeForPlatform, getPlatformTips } from '../utils/platformOptimizer'; // 제거 - API에서만 처리
@@ -457,7 +457,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
       {activePlatform !== "original" && (
         <View style={[styles.tokenNotice]}>
           <Icon
-            name="information-circle-outline"
+                            name="info-outline"
             size={14}
             color={colors.text.tertiary}
           />
