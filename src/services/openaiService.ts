@@ -6,9 +6,7 @@
 import { OPENAI_API_KEY } from "@env";
 
 // API 키가 없을 경우 기본값
-// const API_KEY = OPENAI_API_KEY || 'YOUR_OPENAI_API_KEY_HERE';
-const API_KEY =
-  "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"; // 임시 하드코딩
+const API_KEY = OPENAI_API_KEY || "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";
 
 interface GenerateContentParams {
   prompt: string;

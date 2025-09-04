@@ -264,7 +264,7 @@ class DailyTipsService {
 
       // 지난 주 콘텐츠
       const weeklyContents = savedContents.filter(
-        (content) => new Date(content.timestamp) > weekAgo
+        (content) => new Date(content.createdAt) > weekAgo
       );
 
       // 통계 계산
@@ -291,7 +291,7 @@ class DailyTipsService {
 
       // 최고 게시 시간 분석
       const postHours = savedContents.map((content) =>
-        new Date(content.timestamp).getHours()
+        new Date(content.createdAt).getHours()
       );
       const hourCounts = postHours.reduce((acc, hour) => {
         acc[hour] = (acc[hour] || 0) + 1;

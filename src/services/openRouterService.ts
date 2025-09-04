@@ -449,6 +449,57 @@ class OpenRouterService {
       };
     }
   }
+
+  /**
+   * 이미지 설명에서 객체를 추출하는 메서드
+   */
+  private extractObjects(description: string): string[] {
+    const objects: string[] = [];
+    
+    // 일반적인 객체/사물 단어들 추출
+    const commonObjects = [
+      '사람', '여자', '남자', '아이', '가족', '친구',
+      '꽃', '나무', '음식', '요리', '커피', '차', '물', '맥주',
+      '고양이', '강아지', '동물', '새', '물고기',
+      '자동차', '자전거', '버스', '기차', '비행기',
+      '집', '건물', '방', '침실', '주방', '화장실',
+      '하늘', '바다', '산', '강', '공원', '해변',
+      '책', '컴퓨터', '휴대폰', '카메라', '음악',
+      '옷', '신발', '가방', '모자', '시계',
+      '운동', '축구', '농구', '테니스', '수영'
+    ];
+
+    commonObjects.forEach(obj => {
+      if (description.includes(obj)) {
+        objects.push(obj);
+      }
+    });
+
+    return objects.slice(0, 5); // 최대 5개까지
+  }
+
+  /**
+   * 이미지 설명에서 분위기/감정을 감지하는 메서드
+   */
+  private detectMood(description: string): string {
+    const moodKeywords = {
+      happy: ['행복', '즐거운', '웃음', '기쁨', '밝은', '웃고', '축제', '파티'],
+      calm: ['평화', '고요', '조용', '편안', '여유', '릴랙스', '휴식'],
+      romantic: ['로맨틱', '사랑', '데이트', '커플', '둘이서', '달콤한'],
+      energetic: ['활발', '에너지', '운동', '스포츠', '활동', '역동적'],
+      cozy: ['따뜻한', '아늑한', '포근한', '집', '가정적', '편안한'],
+      natural: ['자연', '야외', '숲', '산', '바다', '하늘', '공원'],
+      food: ['음식', '맛있는', '요리', '식사', '레스토랑', '카페']
+    };
+
+    for (const [mood, keywords] of Object.entries(moodKeywords)) {
+      if (keywords.some(keyword => description.includes(keyword))) {
+        return mood;
+      }
+    }
+
+    return 'general'; // 기본값
+  }
 }
 
 export default new OpenRouterService();

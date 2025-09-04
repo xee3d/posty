@@ -469,12 +469,12 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       return;
     }
 
-    // 다운그레이드 체크
+    // 다운그레이드 체크 (targetPlan is now narrowed to exclude "free")
     const isDowngrade =
       (subscriptionPlan === "pro" && targetPlan !== "pro") ||
       (subscriptionPlan === "premium" &&
-        (targetPlan === "starter" || targetPlan === "free")) ||
-      (subscriptionPlan === "starter" && targetPlan === "free");
+        targetPlan === "starter") ||
+      (subscriptionPlan === "starter" && false); // targetPlan cannot be "free" here
 
     if (isDowngrade) {
       Alert.alert(
@@ -549,11 +549,12 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const planColor = planColors[planKey];
 
     // 다운그레이드 체크
+    const currentPlan = subscriptionPlan as "free" | "starter" | "premium" | "pro";
     const isDowngrade =
-      (subscriptionPlan === "pro" && planKey !== "pro") ||
-      (subscriptionPlan === "premium" &&
+      (currentPlan === "pro" && planKey !== "pro") ||
+      (currentPlan === "premium" &&
         (planKey === "starter" || planKey === "free")) ||
-      (subscriptionPlan === "starter" && planKey === "free");
+      (currentPlan === "starter" && planKey === "free");
 
     return (
       <TouchableOpacity

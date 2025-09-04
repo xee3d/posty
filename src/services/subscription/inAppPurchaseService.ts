@@ -185,7 +185,7 @@ class InAppPurchaseService {
 
         try {
           // 영수증 검증
-          const receipt = purchase.purchaseToken || purchase.transactionReceipt;
+          const receipt = (purchase as any).purchaseToken || (purchase as any).transactionReceipt;
           if (!receipt) {
             throw new Error("No receipt found");
           }
@@ -200,7 +200,7 @@ class InAppPurchaseService {
             // 트랜잭션 완료
             await finishTransaction({
               purchase,
-              isConsumable: this.isConsumable(purchase.productId),
+              isConsumable: this.isConsumable((purchase as any).productId),
             });
           } else {
             throw new Error("Invalid purchase");
@@ -251,7 +251,7 @@ class InAppPurchaseService {
 
     try {
       const sku = this.getSubscriptionSku(planId, isYearly);
-      const product = this.products.find((p) => p.productId === sku);
+      const product = this.products.find((p) => (p as any).productId === sku);
 
       if (!product) {
         throw new Error("Product not found");
@@ -293,7 +293,7 @@ class InAppPurchaseService {
 
     try {
       const sku = this.getTokenSku(packageId);
-      const product = this.products.find((p) => p.productId === sku);
+      const product = this.products.find((p) => (p as any).productId === sku);
 
       if (!product) {
         throw new Error("Product not found");
@@ -334,8 +334,8 @@ class InAppPurchaseService {
 
       // 서버 검증
       const response = await serverSubscriptionService.purchaseSubscription(
-        purchase.productId,
-        purchase.purchaseToken || purchase.transactionReceipt || "",
+        (purchase as any).productId,
+        (purchase as any).purchaseToken || (purchase as any).transactionReceipt || "",
         Platform.OS as "ios" | "android"
       );
 
@@ -350,7 +350,7 @@ class InAppPurchaseService {
    * 구매 성공 처리
    */
   private async handleSuccessfulPurchase(purchase: any): Promise<void> {
-    const productId = purchase.productId;
+    const productId = (purchase as any).productId;
 
     // 구독 상품인지 확인
     if (subscriptionIds.includes(productId)) {
@@ -426,7 +426,7 @@ class InAppPurchaseService {
 
       // 가장 최근 구독 찾기
       const subscriptions = purchases
-        .filter((p) => subscriptionIds.includes(p.productId))
+        .filter((p) => subscriptionIds.includes((p as any).productId))
         .sort((a, b) => (b.transactionDate || 0) - (a.transactionDate || 0));
 
       if (subscriptions.length > 0) {

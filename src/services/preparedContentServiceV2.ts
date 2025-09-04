@@ -1,8 +1,8 @@
 // 포스티가 준비한 글 서비스 (개선된 버전)
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getSavedContents } from "../utils/storage";
-import * as ImagePicker from "expo-image-picker";
-import * as Calendar from "expo-calendar";
+// import * as ImagePicker from "expo-image-picker";
+// import * as Calendar from "expo-calendar";
 
 interface PreparedContent {
   id: string;
@@ -203,7 +203,7 @@ class PreparedContentService {
     }, {} as Record<string, number>);
 
     return Object.entries(hashtagCounts)
-      .sort(([, a], [, b]) => b - a)
+      .sort(([, a], [, b]) => (b as number) - (a as number))
       .slice(0, 10)
       .map(([tag]) => tag);
   }

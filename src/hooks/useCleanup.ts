@@ -125,7 +125,9 @@ export const useEventListener = <T = any>(
   }, [handler]);
 
   useEffect(() => {
-    if (!target) return;
+    if (!target) {
+      return;
+    }
 
     const eventListener = (event: T) => savedHandler.current(event);
 

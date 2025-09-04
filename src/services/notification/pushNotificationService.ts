@@ -478,7 +478,7 @@ export class PushNotificationService {
         body: notification.body,
         timestamp: Date.now(),
         isRead: false,
-        type: notification.data.type,
+        type: notification.data.type as "trend" | "mission" | "achievement" | "tip",
       };
       await badgeService.incrementBadge(badgeNotification);
     }

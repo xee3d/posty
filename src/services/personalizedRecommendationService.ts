@@ -612,6 +612,7 @@ class PersonalizedRecommendationService {
       const convertedBehaviorRecs = behaviorRecommendations.map((rec) => ({
         ...rec,
         type: "completion" as const, // 적절한 타입으로 설정
+        badgeEmoji: "✨", // 기본 이모지 추가
       }));
 
       recommendations.push(...convertedBehaviorRecs);
