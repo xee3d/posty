@@ -1,4 +1,5 @@
 // 사용자 프로필 타입 정의
+import i18next from '../locales/i18nextConfig';
 export interface DetailedUserProfile {
   // 기본 정보
   ageGroup?: "10s" | "20s" | "30s" | "40s" | "50s" | "60s+";
@@ -64,41 +65,17 @@ export const getToneByProfile = (
   profile: DetailedUserProfile,
   context?: string
 ): string => {
-  const toneMap: Record<string, Record<string, string>> = {
-    // 연령대별 기본 톤
-    "10s": {
-      default: "신나고 활기찬",
-      baby_photo: "귀여워요!! 완전 천사 아기다 ㅠㅠ",
-    },
-    "20s": {
-      default: "트렌디하고 캐주얼한",
-      baby_photo: "아기 너무 사랑스럽다 🥺 심장 녹아요",
-    },
-    "30s": {
-      default: "편안하고 공감되는",
-      baby_photo: "정말 사랑스러운 아가네요. 건강하게 자라길 바라요",
-    },
-    "40s": {
-      default: "진솔하고 따뜻한",
-      baby_photo: "아이가 참 복스럽게 생겼네요. 부모님이 행복하시겠어요",
-    },
-    "50s": {
-      default: "성숙하고 지혜로운",
-      baby_photo: "정말 예쁜 아기네요. 축복받은 가정이신 것 같아요",
-    },
-    "60s+": {
-      default: "경험 많고 따뜻한",
-      baby_photo: "복덩이네요. 건강하게 잘 자라길 바랍니다",
-    },
-  };
+  const toneMap = i18next.t("userProfile.tones.ageGroups", { returnObjects: true }) as Record<string, Record<string, string>>;
 
   // 가족 역할별 조정
+  const familyRoles = i18next.t("userProfile.tones.familyRoles", { returnObjects: true }) as Record<string, string>;
+  
   if (profile.parentType === "mother" && context === "baby_photo") {
-    return "사랑이 넘치는 엄마의 마음으로";
+    return familyRoles.mother;
   } else if (profile.parentType === "father" && context === "baby_photo") {
-    return "자랑스러운 아빠의 마음으로";
+    return familyRoles.father;
   } else if (profile.familyRole === "grandparent" && context === "baby_photo") {
-    return "손주를 바라보는 따뜻한 조부모의 마음으로";
+    return familyRoles.grandparent;
   }
 
   const ageGroup = profile.ageGroup || "30s";
@@ -106,47 +83,20 @@ export const getToneByProfile = (
 };
 
 // 관심사 추천 목록
-export const INTEREST_SUGGESTIONS = [
-  "여행",
-  "맛집",
-  "카페",
-  "요리",
-  "베이킹",
-  "운동",
-  "헬스",
-  "요가",
-  "러닝",
-  "등산",
-  "육아",
-  "교육",
-  "독서",
-  "영화",
-  "드라마",
-  "음악",
-  "콘서트",
-  "전시회",
-  "사진",
-  "그림",
-  "패션",
-  "뷰티",
-  "인테리어",
-  "가드닝",
-  "반려동물",
-  "게임",
-  "IT",
-  "주식",
-  "부동산",
-  "자기계발",
-];
+export const INTEREST_SUGGESTIONS = () => {
+  return i18next.t("userProfile.interests", { returnObjects: true }) as string[];
+};
 
 // 프로필 완성 가이드 메시지
 export const getProfileGuideMessage = (completeness: number): string | null => {
+  const completion = i18next.t("userProfile.completion", { returnObjects: true }) as Record<string, string>;
+  
   if (completeness < 30) {
-    return "프로필을 설정하면 나만의 맞춤형 AI 글쓰기를 경험할 수 있어요 ✨";
+    return completion.low;
   } else if (completeness < 60) {
-    return "조금만 더! AI가 당신의 스타일을 더 정확히 파악할 수 있어요 🎯";
+    return completion.medium;
   } else if (completeness < 80) {
-    return "거의 완성! 개인화된 AI 라이팅 서비스를 곧 만나보세요 🚀";
+    return completion.high;
   }
   return null;
 };

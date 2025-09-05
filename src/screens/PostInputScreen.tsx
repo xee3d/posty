@@ -12,6 +12,7 @@ import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from "../utils/constants";
+import { useTranslation } from "react-i18next";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { ScaleButton, FadeInView } from "../components/AnimationComponents";
 import { createHeaderStyles } from "../styles/commonStyles";
@@ -33,12 +34,13 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
   initialHashtags = [],
 }) => {
   const { colors, cardTheme } = useAppTheme();
+  const { t } = useTranslation();
   const [content, setContent] = useState(initialContent);
   const [hashtags, setHashtags] = useState(initialHashtags.join(" "));
   const [platform, setPlatform] = useState<
     "instagram" | "facebook" | "twitter"
   >("instagram");
-  const [category, setCategory] = useState<string>("일상");
+  const [category, setCategory] = useState<string>(t('posts.categories.daily'));
   const [metrics, setMetrics] = useState({
     likes: "",
     comments: "",
@@ -48,14 +50,14 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
   const [isSaving, setIsSaving] = useState(false);
 
   const categories = [
-    "카페",
-    "맛집",
-    "일상",
-    "운동",
-    "여행",
-    "패션",
-    "뷰티",
-    "기타",
+    t('posts.categories.cafe'),
+    t('posts.categories.food'),
+    t('posts.categories.daily'),
+    t('posts.categories.exercise'),
+    t('posts.categories.travel'),
+    t('posts.categories.fashion'),
+    t('posts.categories.beauty'),
+    t('posts.categories.other'),
   ];
   const platforms = [
     {
@@ -75,7 +77,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
 
   const handleSave = async () => {
     if (!content.trim()) {
-      Alert.alert("알림", "게시물 내용을 입력해주세요.");
+      Alert.alert(t('common.error'), t('posts.input.required'));
       return;
     }
 
@@ -102,9 +104,9 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
         },
       });
 
-      Alert.alert("성공", "게시물이 저장되었습니다!", [
+      Alert.alert(t('common.success'), t('posts.actions.saveSuccess'), [
         {
-          text: "확인",
+          text: t('common.close'),
           onPress: () => {
             onSave();
             onClose();
@@ -113,7 +115,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
       ]);
     } catch (error) {
       console.error("Failed to save post:", error);
-      Alert.alert("오류", "게시물 저장 중 문제가 발생했습니다.");
+      Alert.alert(t('common.error'), t('posts.actions.saveError'));
     } finally {
       setIsSaving(false);
     }
@@ -127,14 +129,14 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
         <TouchableOpacity onPress={onClose} style={styles.backButton}>
           <SafeIcon name="close" size={20} color={colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.modalHeaderTitle}>게시물 기록하기</Text>
+        <Text style={styles.modalHeaderTitle}>{t('posts.input.title')}</Text>
         <TouchableOpacity
           style={[styles.saveButton, isSaving && styles.disabledButton]}
           onPress={isSaving ? undefined : handleSave}
           disabled={isSaving}
         >
           <Text style={styles.saveButtonText}>
-            {isSaving ? "저장 중..." : "저장"}
+            {isSaving ? t('posts.actions.saving') : t('posts.actions.save')}
           </Text>
         </TouchableOpacity>
       </View>
@@ -142,10 +144,10 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <FadeInView delay={0}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>게시물 내용</Text>
+            <Text style={styles.sectionTitle}>{t('posts.input.contentSection')}</Text>
             <TextInput
               style={styles.contentInput}
-              placeholder="게시물 내용을 입력하세요..."
+              placeholder={t('posts.input.placeholder')}
               placeholderTextColor={colors.text.tertiary}
               value={content}
               onChangeText={setContent}
@@ -157,10 +159,10 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
 
         <FadeInView delay={100}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>해시태그</Text>
+            <Text style={styles.sectionTitle}>{t('posts.input.hashtags')}</Text>
             <TextInput
               style={styles.input}
-              placeholder="#일상 #카페 #주말"
+              placeholder={t('posts.input.hashtagPlaceholder')}
               placeholderTextColor={colors.text.tertiary}
               value={hashtags}
               onChangeText={setHashtags}
@@ -170,7 +172,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
 
         <FadeInView delay={200}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>플랫폼</Text>
+            <Text style={styles.sectionTitle}>{t('posts.input.platform')}</Text>
             <View style={styles.platformSelector}>
               {platforms.map((p) => (
                 <TouchableOpacity
@@ -203,7 +205,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
 
         <FadeInView delay={300}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>카테고리</Text>
+            <Text style={styles.sectionTitle}>{t('posts.input.category')}</Text>
             <View style={styles.categoryGrid}>
               {categories.map((cat) => (
                 <TouchableOpacity
@@ -231,14 +233,14 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
         <FadeInView delay={400}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>
-              성과 지표
-              <Text style={styles.sectionSubtitle}> (선택사항)</Text>
+              {t('posts.input.metrics')}
+              <Text style={styles.sectionSubtitle}> {t('posts.input.optional')}</Text>
             </Text>
             <View style={styles.metricsGrid}>
               <View style={styles.metricItem}>
                 <View style={styles.metricHeader}>
                   <SafeIcon name="heart" size={16} color="#EF4444" />
-                  <Text style={styles.metricLabel}>좋아요</Text>
+                  <Text style={styles.metricLabel}>{t('posts.metrics.likes')}</Text>
                 </View>
                 <TextInput
                   style={styles.metricInput}
@@ -255,7 +257,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
               <View style={styles.metricItem}>
                 <View style={styles.metricHeader}>
                   <SafeIcon name="chatbubble" size={16} color="#3B82F6" />
-                  <Text style={styles.metricLabel}>댓글</Text>
+                  <Text style={styles.metricLabel}>{t('posts.metrics.comments')}</Text>
                 </View>
                 <TextInput
                   style={styles.metricInput}
@@ -272,7 +274,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
               <View style={styles.metricItem}>
                 <View style={styles.metricHeader}>
                   <SafeIcon name="share-social" size={16} color="#10B981" />
-                  <Text style={styles.metricLabel}>공유</Text>
+                  <Text style={styles.metricLabel}>{t('posts.metrics.shares')}</Text>
                 </View>
                 <TextInput
                   style={styles.metricInput}
@@ -289,7 +291,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
               <View style={styles.metricItem}>
                 <View style={styles.metricHeader}>
                   <SafeIcon name="people" size={16} color="#8B5CF6" />
-                  <Text style={styles.metricLabel}>도달</Text>
+                  <Text style={styles.metricLabel}>{t('posts.metrics.reach')}</Text>
                 </View>
                 <TextInput
                   style={styles.metricInput}

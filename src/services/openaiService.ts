@@ -70,7 +70,7 @@ class OpenAIService {
       API_KEY ? `${API_KEY.substring(0, 10)}...` : "undefined"
     );
 
-    if (!API_KEY || API_KEY === "YOUR_OPENAI_API_KEY_HERE") {
+    if (!API_KEY || API_KEY.includes("YOUR_OPENAI_API_KEY_HERE")) {
       console.warn("⚠️ OpenAI API key not configured!");
       console.warn("Please add OPENAI_API_KEY to your .env file");
       console.warn(

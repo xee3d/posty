@@ -17,6 +17,7 @@ import { useAppTheme } from '../../hooks/useAppTheme';
 import SafeIcon from '../../utils/SafeIcon';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SPACING, FONT_SIZES } from '../../utils/constants';
+import { useTranslation } from 'react-i18next';
 
 interface LanguageSettingsProps {
   onLanguageChange?: (language: SupportedLanguage) => void;
@@ -24,6 +25,7 @@ interface LanguageSettingsProps {
 
 const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange }) => {
   const { colors, isDark } = useAppTheme();
+  const { t } = useTranslation();
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('ko');
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [supportedLanguages, setSupportedLanguages] = useState<LanguageConfig[]>([]);
@@ -60,12 +62,12 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
 
       Alert.alert(
         getLanguageConfig(language).name,
-        '언어가 변경되었습니다. 새로 생성되는 콘텐츠부터 적용됩니다.',
-        [{ text: '확인' }]
+        t('alerts.language.changed'),
+        [{ text: t('alerts.buttons.ok') }]
       );
     } catch (error) {
       console.error('Failed to change language:', error);
-      Alert.alert('오류', '언어 변경 중 오류가 발생했습니다.');
+      Alert.alert('Error', 'Language change failed.');
     }
   };
 
@@ -147,10 +149,10 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
               size={20}
               color={colors.text.secondary}
             />
-            <Text style={[styles.settingLabel, { color: colors.text.primary }]}>언어</Text>
+            <Text style={[styles.settingLabel, { color: colors.text.primary }]}>{t('settings.language')}</Text>
           </View>
           <Text style={[styles.settingDescription, { color: colors.text.tertiary }]}>
-            {currentConfig.nativeName} {isSystemLanguage ? '(시스템)' : ''}
+            {t('language.current', { language: currentConfig.nativeName, isSystem: isSystemLanguage ? t('language.system') : '' })}
           </Text>
         </View>
         <View style={styles.settingRight}>
@@ -175,11 +177,11 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
           <View style={[styles.modalHeader, { borderBottomColor: colors.border }]}>
             <TouchableOpacity onPress={() => setShowLanguageModal(false)}>
               <Text style={[styles.modalCancelButton, { color: colors.primary }]}>
-                취소
+                {t('alerts.buttons.cancel')}
               </Text>
             </TouchableOpacity>
             <Text style={[styles.modalTitle, { color: colors.text.primary }]}>
-              언어 선택
+              {t('language.selectLanguage')}
             </Text>
             <View style={{ width: 50 }} />
           </View>
@@ -212,7 +214,7 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
                     color={colors.text.secondary}
                   />
                   <Text style={[styles.systemLanguageText, { color: colors.text.secondary }]}>
-                    시스템 언어로 재설정
+                    {t('language.resetToSystem')}
                   </Text>
                 </TouchableOpacity>
               ) : null
@@ -221,7 +223,7 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
 
           <View style={[styles.modalFooter, { borderTopColor: colors.border }]}>
             <Text style={[styles.footerNote, { color: colors.text.secondary }]}>
-              언어 변경 시 새로 생성되는 콘텐츠부터 선택한 언어로 표시됩니다.
+              {t('language.note')}
             </Text>
           </View>
         </View>

@@ -35,6 +35,7 @@ import { setUser } from "../store/slices/userSlice";
 import { BRAND } from "../utils/constants";
 
 import { Alert } from "../utils/customAlert";
+import { useTranslation } from "react-i18next";
 
 interface LoginScreenProps {
   onNavigate: (screen: string, data?: any) => void;
@@ -43,6 +44,7 @@ interface LoginScreenProps {
 const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
   const { colors, isDark } = useAppTheme();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
@@ -134,34 +136,31 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
       } catch (error: any) {
         console.error(`${provider} 로그인 에러:`, error);
 
-        let errorMessage = "로그인에 실패했습니다. 다시 시도해주세요.";
+        let errorMessage = t("login.errors.default");
 
         if (error.message && error.message.includes("Vercel SSO")) {
-          errorMessage = "서버 인증 중입니다. 잠시 후 다시 시도해주세요.";
+          errorMessage = t("login.errors.serverAuth");
         } else if (
           error.code === "auth/account-exists-with-different-credential"
         ) {
-          errorMessage = "이미 다른 방법으로 가입된 계정입니다.";
+          errorMessage = t("login.errors.existingAccount");
         } else if (error.code === "auth/cancelled") {
-          errorMessage = "로그인이 취소되었습니다.";
+          errorMessage = t("login.errors.cancelled");
         } else if (
           error.message.includes("구글 로그인 취소") ||
           error.message.includes("cancelled")
         ) {
-          errorMessage = "로그인이 취소되었습니다.";
+          errorMessage = t("login.errors.cancelled");
         } else if (
           error.message.includes("invalid android_key_hash or ios_bundle_id")
         ) {
-          errorMessage =
-            "카카오 개발자 콘솔에서 Bundle ID 설정을 확인해주세요.\n현재 Bundle ID: com.posty";
+          errorMessage = t("login.errors.bundleId");
         } else if (error.message.includes("타임아웃")) {
-          errorMessage = "로그인 시간이 초과되었습니다. 다시 시도해주세요.";
+          errorMessage = t("login.errors.timeout");
         } else if (provider === "kakao" && error.code === "RNKakaoLogins") {
-          errorMessage =
-            "카카오 로그인 실패\n1. 카카오 개발자 콘솔에서 Bundle ID 확인\n2. 카카오톡 앱 설치 확인";
+          errorMessage = t("login.errors.kakaoSetup");
         } else if (provider === "naver") {
-          errorMessage =
-            "네이버 로그인 실패\n1. 네이버 개발자센터에서 Bundle ID 확인\n2. URL 스키마 설정 확인";
+          errorMessage = t("login.errors.naverSetup");
         } else if (error.message.includes("misconfigured")) {
           errorMessage = `${provider} 서비스 설정 오류\n개발자 콘솔에서 앱 설정을 확인해주세요.`;
         }
@@ -175,7 +174,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
           });
         }
 
-        Alert.alert("로그인 실패", errorMessage);
+        Alert.alert(t("login.errors.title"), errorMessage);
       } finally {
         setIsLoading(false);
         setLoadingProvider(null);
@@ -271,7 +270,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
             <View style={styles.fixedButtonContainer}>
               {/* 간편 로그인 타이틀 */}
               <Animated.View entering={FadeIn.delay(300).duration(600)}>
-                <Text style={styles.loginTitle}>간편 로그인</Text>
+                <Text style={styles.loginTitle}>{t("login.title")}</Text>
               </Animated.View>
 
               {/* 카카오 로그인 버튼 */}
@@ -301,7 +300,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                       <Text
                         style={[styles.socialButtonText, { color: "#191919" }]}
                       >
-                        카카오로 시작하기
+                        {t("login.buttons.kakao")}
                       </Text>
                     </>
                   )}
@@ -321,7 +320,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                     disabled={isLoading}
                   >
                     <Text style={styles.moreOptionsText}>
-                      다른 계정으로 연결
+                      {t("login.moreOptions")}
                     </Text>
                   </TouchableOpacity>
                 </Animated.View>
@@ -342,7 +341,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                   >
                     {renderSocialButton(
                       "google",
-                      "Google로 시작하기",
+                      t("login.buttons.google"),
                       "google",
                       "#FFFFFF",
                       "#1F1F1F",
@@ -355,7 +354,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                   >
                     {renderSocialButton(
                       "naver",
-                      "네이버로 시작하기",
+                      t("login.buttons.naver"),
                       "naver",
                       "#03C75A",
                       "#FFFFFF",
@@ -368,7 +367,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                   >
                     {renderSocialButton(
                       "facebook",
-                      "Facebook으로 시작하기",
+                      t("login.buttons.facebook"),
                       "facebook",
                       "#1877F2",
                       "#FFFFFF",
@@ -382,7 +381,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                     >
                       {renderSocialButton(
                         "apple",
-                        "Apple로 시작하기",
+                        t("login.buttons.apple"),
                         "apple",
                         "#000000",
                         "#FFFFFF",

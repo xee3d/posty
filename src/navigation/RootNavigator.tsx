@@ -6,6 +6,7 @@ import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import { useTranslation } from "react-i18next";
 
 // Import screens
 import HomeScreen from "../screens/HomeScreen";
@@ -36,6 +37,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 // Custom Tab Bar to match existing design
 function CustomTabBar({ state, descriptors, navigation }: any) {
+  const { t } = useTranslation();
   return (
     <View style={styles.tabBarContainer}>
       {state.routes.map((route: any, index: number) => {
@@ -98,15 +100,15 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
         const getTabLabel = (routeName: string) => {
           switch (routeName) {
             case "Home":
-              return "홈";
+              return t("tabs.home");
             case "AIWrite":
-              return "글쓰기";
+              return t("tabs.aiWrite");
             case "Trend":
-              return "트렌드";
+              return t("tabs.trend");
             case "MyStyle":
-              return "내 스타일";
+              return t("tabs.myStyle");
             case "Settings":
-              return "설정";
+              return t("tabs.settings");
             default:
               return routeName;
           }
@@ -143,8 +145,9 @@ function CustomTabBar({ state, descriptors, navigation }: any) {
   );
 }
 
-// Main Tab Navigator with custom tab bar
+// Main Tab Navigator with custom tab bar  
 function MainTabs() {
+  const { t } = useTranslation();
   return (
     <Tab.Navigator
       tabBar={(props) => <CustomTabBar {...props} />}
@@ -182,28 +185,28 @@ function MainTabs() {
         name="AIWrite"
         component={AIWriteScreen}
         options={{
-          headerTitle: "AI 글쓰기",
+          headerTitle: t("tabs.aiWrite"),
         }}
       />
       <Tab.Screen
         name="Trend"
         component={TrendScreen}
         options={{
-          headerTitle: "트렌드",
+          headerTitle: t("tabs.trend"),
         }}
       />
       <Tab.Screen
         name="MyStyle"
         component={MyStyleScreen}
         options={{
-          headerTitle: "내 스타일",
+          headerTitle: t("tabs.myStyle"),
         }}
       />
       <Tab.Screen
         name="Settings"
         component={SettingsScreen}
         options={{
-          headerTitle: "설정",
+          headerTitle: t("tabs.settings"),
         }}
       />
     </Tab.Navigator>

@@ -609,10 +609,19 @@ class PersonalizedRecommendationService {
         await userBehaviorAnalytics.generatePersonalizedRecommendations();
 
       // PersonalizedRecommendation을 RecommendationCard로 변환
-      const convertedBehaviorRecs = behaviorRecommendations.map((rec) => ({
-        ...rec,
-        type: "completion" as const, // 적절한 타입으로 설정
-        badgeEmoji: "✨", // 기본 이모지 추가
+      const convertedBehaviorRecs = behaviorRecommendations.map((rec): RecommendationCard => ({
+        id: rec.id,
+        type: "completion" as const,
+        icon: rec.icon,
+        iconColor: rec.iconColor,
+        badge: rec.badge,
+        badgeEmoji: "✨",
+        title: rec.title,
+        content: rec.content,
+        meta: rec.meta,
+        actionText: rec.actionText,
+        actionPayload: rec.actionPayload,
+        priority: Math.floor(rec.personalityScore * 100), // personalityScore를 priority로 변환
       }));
 
       recommendations.push(...convertedBehaviorRecs);

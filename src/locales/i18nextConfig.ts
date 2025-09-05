@@ -7,10 +7,10 @@ import ja from './ja';
 import zhCN from './zh-CN';
 
 const resources = {
-  en: en,
-  ko: ko,
-  ja: ja,
-  'zh-CN': zhCN,
+  en: { translation: en },
+  ko: { translation: ko },
+  ja: { translation: ja },
+  'zh-CN': { translation: zhCN },
 };
 
 const getDeviceLanguage = () => {
@@ -41,11 +41,7 @@ i18next
     react: {
       useSuspense: false,
     },
+    returnObjects: true,
   });
-
-// 호환성을 위한 export들
-export const t = (key: string, options?: any) => i18next.t(key, options);
-export const getCurrentLanguage = () => i18next.language;
-export const changeLanguage = (language: string) => i18next.changeLanguage(language);
 
 export default i18next;

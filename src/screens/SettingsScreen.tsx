@@ -13,7 +13,6 @@ import {
   Image,
 } from "react-native";
 import { SafeIcon } from "../utils/SafeIcon";
-import Icon from "react-native-vector-icons/Ionicons";
 import LanguageSettings from "../components/settings/LanguageSettings";
 import { User, Platform } from "../types";
 import {
@@ -28,6 +27,7 @@ import {
   FONT_SIZES,
 } from "../utils/constants";
 import { APP_TEXT } from "../utils/textConstants";
+import { useTranslation } from "react-i18next";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { useTheme } from "../contexts/ThemeContext";
 import { createHeaderStyles } from "../styles/commonStyles";
@@ -75,6 +75,7 @@ interface SettingsScreenProps {
 }
 
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
+  const { t } = useTranslation();
   // useAppTheme으로 변경하여 기존 코드와의 호환성 확보
   const { themeMode, colors, isDark, changeTheme, cardTheme } = useAppTheme();
   const { resetThemeToDefault } = useTheme();
@@ -344,10 +345,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
       if (value) {
         Alert.alert(
           "Posty",
-          "알림을 켰어요! 중요한 소식을 놓치지 않도록 도와드릴게요 🔔"
+          t('alerts.notifications.enabled')
         );
       } else {
-        Alert.alert("Posty", "알림을 끄셨네요. 언제든 다시 켜실 수 있어요 😊");
+        Alert.alert("Posty", t('alerts.notifications.disabled'));
       }
     } catch (error) {
       console.error("Failed to save push setting:", error);
@@ -365,7 +366,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
         soundManager.playTap();
         Alert.alert(
           "Posty",
-          "사운드를 켰어요! 버튼을 누를 때마다 소리가 날 거예요 🔊"
+          t('alerts.sound.enabled')
         );
       }
     } catch (error) {
@@ -384,7 +385,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
         soundManager.haptic("medium");
         Alert.alert(
           "Posty",
-          "진동을 켰어요! 터치할 때마다 진동 피드백을 느낄 수 있어요 📳"
+          t('alerts.vibration.enabled')
         );
       }
     } catch (error) {
@@ -402,14 +403,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   };
 
   const handleConnectPlatform = async (platform: string) => {
-    Alert.alert(`${platform} 연결`, `${platform} 계정을 연결하시겠어요?`, [
-      { text: "취소", style: "cancel" },
+    Alert.alert(t('alerts.platform.connect.title', { platform }), t('alerts.platform.connect.message', { platform }), [
+      { text: t('alerts.buttons.cancel'), style: "cancel" },
       {
-        text: "연결하기",
+        text: t('alerts.buttons.connect'),
         onPress: async () => {
           Alert.alert(
             "Posty",
-            `${platform} 연결 기능은 곧 추가될 예정이에요! 조금만 기다려주세요 🚀`
+            t('alerts.platform.connect.comingSoon', { platform })
           );
         },
       },
@@ -417,10 +418,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   };
 
   const handleDisconnectPlatform = async (platform: string) => {
-    Alert.alert("연결 해제", `정말 ${platform} 연결을 해제하시겠어요?`, [
-      { text: "취소", style: "cancel" },
+    Alert.alert(t('alerts.platform.disconnect.title'), t('alerts.platform.disconnect.message', { platform }), [
+      { text: t('alerts.buttons.cancel'), style: "cancel" },
       {
-        text: "해제",
+        text: t('alerts.buttons.disconnect'),
         style: "destructive",
         onPress: async () => {
           try {
@@ -438,10 +439,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
             Alert.alert(
               "Posty",
-              `${platform} 연결이 해제되었어요. 언제든 다시 연결할 수 있어요!`
+              t('alerts.platform.disconnect.success', { platform })
             );
           } catch (error) {
-            Alert.alert("오류", "연결 해제에 실패했어요. 다시 시도해주세요.");
+            Alert.alert(t('alerts.buttons.error'), t('alerts.platform.disconnect.failed'));
           }
         },
       },
@@ -458,19 +459,19 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
   const handleRestorePurchases = async () => {
     try {
-      Alert.alert("구매 복원", "이전에 구매한 구독을 복원하시겠습니까?", [
-        { text: "취소", style: "cancel" },
+      Alert.alert(t('alerts.purchase.restore.title'), t('alerts.purchase.restore.message'), [
+        { text: t('alerts.buttons.cancel'), style: "cancel" },
         {
-          text: "복원하기",
+          text: t('alerts.buttons.restore'),
           onPress: async () => {
             try {
               await inAppPurchaseService.restorePurchases();
             } catch (error) {
               console.error("Restore error:", error);
               Alert.alert(
-                "복원 실패",
-                "구매 복원에 실패했습니다. 다시 시도해주세요.",
-                [{ text: "확인" }]
+                t('alerts.purchase.restore.failedTitle'),
+                t('alerts.purchase.restore.failed'),
+                [{ text: t('alerts.buttons.ok') }]
               );
             }
           },
@@ -482,10 +483,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   };
 
   const handleClearHistory = () => {
-    Alert.alert("히스토리 삭제", "생성 및 활동 기록을 모두 삭제하시겠어요?", [
-      { text: "취소", style: "cancel" },
+    Alert.alert(t('alerts.data.clearHistory.title'), t('alerts.data.clearHistory.message'), [
+      { text: t('alerts.buttons.cancel'), style: "cancel" },
       {
-        text: "삭제",
+        text: t('alerts.buttons.delete'),
         style: "destructive",
         onPress: async () => {
           try {
@@ -498,10 +499,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
             );
             await AsyncStorage.multiRemove(historyKeys);
 
-            Alert.alert("완료", "히스토리가 삭제되었습니다.");
+            Alert.alert(t('alerts.buttons.completed'), t('alerts.data.clearHistory.success'));
             loadStats();
           } catch (error) {
-            Alert.alert("오류", "히스토리 삭제에 실패했습니다.");
+            Alert.alert(t('alerts.buttons.error'), t('alerts.data.clearHistory.failed'));
           }
         },
       },
@@ -510,23 +511,23 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
   const handleDeleteAllData = () => {
     Alert.alert(
-      "모든 데이터 삭제",
-      "정말 모든 데이터를 삭제하시겠어요?\n이 작업은 되돌릴 수 없습니다.",
+      t('alerts.data.deleteAll.title'),
+      t('alerts.data.deleteAll.message'),
       [
-        { text: "취소", style: "cancel" },
+        { text: t('alerts.buttons.cancel'), style: "cancel" },
         {
-          text: "삭제",
+          text: t('alerts.buttons.delete'),
           style: "destructive",
           onPress: async () => {
             try {
               const keys = await AsyncStorage.getAllKeys();
               await AsyncStorage.multiRemove(keys);
 
-              Alert.alert("완료", "모든 데이터가 삭제되었습니다.", [
-                { text: "확인", onPress: () => loadAllData() },
+              Alert.alert(t('alerts.buttons.completed'), t('alerts.data.deleteAll.success'), [
+                { text: t('alerts.buttons.ok'), onPress: () => loadAllData() },
               ]);
             } catch (error) {
-              Alert.alert("오류", "데이터 삭제에 실패했습니다.");
+              Alert.alert(t('alerts.buttons.error'), t('alerts.data.deleteAll.failed'));
             }
           },
         },
@@ -535,10 +536,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   };
 
   const handleLogout = () => {
-    Alert.alert("로그아웃", "정말 로그아웃 하시겠어요?", [
-      { text: "취소", style: "cancel" },
+    Alert.alert(t('alerts.auth.logout.title'), t('alerts.auth.logout.message'), [
+      { text: t('alerts.buttons.cancel'), style: "cancel" },
       {
-        text: "로그아웃",
+        text: t('alerts.auth.logout.action'),
         style: "destructive",
         onPress: async () => {
           try {
@@ -595,10 +596,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   };
 
   const handleRateApp = () => {
-    Alert.alert("앱 평가하기", "Posty가 도움이 되셨나요? 평가를 남겨주세요!", [
-      { text: "나중에", style: "cancel" },
+    Alert.alert(t('alerts.rating.title'), t('alerts.rating.message'), [
+      { text: t('alerts.rating.later'), style: "cancel" },
       {
-        text: "평가하러 가기",
+        text: t('alerts.rating.rate'),
         onPress: () => {
           const storeUrl =
             RNPlatform.OS === "ios"
@@ -606,7 +607,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               : "https://play.google.com/store/apps/details?id=com.posty.ai";
 
           Linking.openURL(storeUrl).catch(() => {
-            Alert.alert("오류", "스토어를 열 수 없어요.");
+            Alert.alert(t('alerts.buttons.error'), t('alerts.rating.error'));
           });
         },
       },
@@ -628,9 +629,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
       const MAX_DAILY_EARNED = 20;
       if (totalEarnedToday >= MAX_DAILY_EARNED) {
         Alert.alert(
-          "일일 한도 초과",
-          `오늘은 이미 최대 ${MAX_DAILY_EARNED}개의 추가 토큰을 획득했어요.\n내일 다시 도전해주세요!`,
-          [{ text: "확인" }]
+          t('alerts.tokens.dailyLimitExceeded.title'),
+          t('alerts.tokens.dailyLimitExceeded.message', { limit: MAX_DAILY_EARNED }),
+          [{ text: t('alerts.buttons.ok') }]
         );
         return;
       }
@@ -641,9 +642,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
       if (actualTokensToAdd < tokens) {
         Alert.alert(
-          "부분 지급",
-          `일일 한도로 인해 ${actualTokensToAdd}개만 지급됩니다.`,
-          [{ text: "확인" }]
+          t('alerts.tokens.partialGrant.title'),
+          t('alerts.tokens.partialGrant.message', { tokens: actualTokensToAdd }),
+          [{ text: t('alerts.buttons.ok') }]
         );
       }
 
@@ -817,26 +818,26 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
     {
       id: "instagram",
       name: "Instagram",
-      username: connectedAccounts.instagram ? "@username" : "연결되지 않음",
+      username: connectedAccounts.instagram ? "@username" : t('alerts.platform.status.notConnected'),
       color: isDark ? "#F56565" : "#E4405F",
       connected: connectedAccounts.instagram,
-      status: connectedAccounts.instagram ? "연결됨" : "연결하기",
+      status: connectedAccounts.instagram ? t('alerts.platform.status.connected') : t('alerts.platform.status.connectAction'),
     },
     {
       id: "facebook",
       name: "Facebook",
-      username: connectedAccounts.facebook ? "개인 계정" : "연결되지 않음",
+      username: connectedAccounts.facebook ? "Personal Account" : t('alerts.platform.status.notConnected'),
       color: isDark ? "#4A90E2" : "#1877F2",
       connected: connectedAccounts.facebook,
-      status: connectedAccounts.facebook ? "연결됨" : "연결하기",
+      status: connectedAccounts.facebook ? t('alerts.platform.status.connected') : t('alerts.platform.status.connectAction'),
     },
     {
       id: "twitter",
       name: "X (Twitter)",
-      username: "연결되지 않음",
+      username: t('alerts.platform.status.notConnected'),
       color: isDark ? colors.text.primary : colors.text.secondary,
       connected: false,
-      status: "연결하기",
+      status: t('alerts.platform.status.connectAction'),
     },
   ];
 
@@ -848,22 +849,22 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
     // },
     {
       icon: "help-circle-outline",
-      label: "사용 가이드",
+      label: t('settings.userGuide'),
       onPress: handleOpenHelp,
     },
     {
       icon: "mail-outline",
-      label: "문의하기",
+      label: t('settings.contact'),
       onPress: () => setShowContact(true),
     },
     {
       icon: "document-text-outline",
-      label: "이용약관",
+      label: t('settings.terms'),
       onPress: () => setShowTerms(true),
     },
     {
       icon: "shield-checkmark-outline",
-      label: "개인정보 처리방침",
+      label: t('settings.privacy'),
       onPress: () => setShowPrivacy(true),
     },
   ];
@@ -947,7 +948,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
             <View style={styles.mollyBadge}>
               <Text style={styles.mollyBadgeText}>P</Text>
             </View>
-            <Text style={headerStyles.headerTitle}>설정</Text>
+            <Text style={headerStyles.headerTitle}>{t('settings.title')}</Text>
           </View>
         </View>
 
@@ -968,7 +969,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                   ]}
                 >
                   {userProfile?.selectedBadge ? (
-                    <Icon
+                    <SafeIcon
                       name={
                         userProfile.achievements?.find(
                           (a) => a.id === userProfile.selectedBadge
@@ -1004,7 +1005,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                   {/* 플랫폼 정보 표시 */}
                   {reduxUser.provider ? (
                     <View style={styles.profilePlatformInfo}>
-                      <Icon
+                      <SafeIcon
                         name={getProviderIcon(reduxUser.provider)}
                         size={14}
                         color={getProviderColor(reduxUser.provider)}
@@ -1053,7 +1054,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                   { color: colors.primary },
                 ]}
               >
-                내 업적 보기
+                {t('settings.achievements')}
               </Text>
             </TouchableOpacity>
 
@@ -1072,7 +1073,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                   { color: colors.primary },
                 ]}
               >
-                세부 프로필 설정
+                {t('settings.profileDetails')}
               </Text>
               {profileCompleteness < 100 && (
                 <View
@@ -1106,7 +1107,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                     { color: colors.primary },
                   ]}
                 >
-                  {profileGuideMessage || "프로필을 설정하고 맞춤 AI를 경험해보세요 🎨"}
+                  {profileGuideMessage || t('settings.profileGuideDefault')}
                 </Text>
               </View>
             )}
@@ -1115,7 +1116,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
         {/* 토큰 관리 섹션 */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>토큰 관리</Text>
+          <Text style={styles.sectionTitle}>{t('settings.tokenManagement')}</Text>
           <TokenManagementSection
             onNavigateToSubscription={handleUpgradePlan}
             onTokensUpdated={loadStats}
@@ -1124,7 +1125,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
         {/* 앱 설정 섹션 */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>앱 설정</Text>
+          <Text style={styles.sectionTitle}>{t('settings.appSettings')}</Text>
           
           {/* 언어 설정 */}
           <LanguageSettings 
@@ -1135,15 +1136,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
           <View style={styles.settingItem}>
             <View style={styles.settingInfo}>
               <View style={styles.settingHeader}>
-                <Icon
+                <SafeIcon
                   name="notifications-outline"
                   size={20}
                   color={colors.text.secondary}
                 />
-                <Text style={styles.settingLabel}>푸시 알림</Text>
+                <Text style={styles.settingLabel}>{t('settings.pushNotifications')}</Text>
               </View>
               <Text style={styles.settingDescription}>
-                Posty가 중요한 소식을 알려드려요
+                {t('settings.notifications.enabled')}
               </Text>
             </View>
             <Switch
@@ -1157,15 +1158,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
           <View style={styles.settingItem}>
             <View style={styles.settingInfo}>
               <View style={styles.settingHeader}>
-                <Icon
+                <SafeIcon
                   name="volume-high-outline"
                   size={20}
                   color={colors.text.secondary}
                 />
-                <Text style={styles.settingLabel}>사운드 효과</Text>
+                <Text style={styles.settingLabel}>{t('settings.soundEffects')}</Text>
               </View>
               <Text style={styles.settingDescription}>
-                버튼 클릭 및 알림 소리
+                {t('settings.notifications.soundEnabled')}
               </Text>
             </View>
             <Switch
@@ -1179,14 +1180,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
           <View style={styles.settingItem}>
             <View style={styles.settingInfo}>
               <View style={styles.settingHeader}>
-                <Icon
+                <SafeIcon
                   name="phone-portrait-outline"
                   size={20}
                   color={colors.text.secondary}
                 />
-                <Text style={styles.settingLabel}>진동</Text>
+                <Text style={styles.settingLabel}>{t('settings.vibration')}</Text>
               </View>
-              <Text style={styles.settingDescription}>터치 시 진동 피드백</Text>
+              <Text style={styles.settingDescription}>{t('settings.notifications.vibrationEnabled')}</Text>
             </View>
             <Switch
               value={vibrationEnabled}
@@ -1202,15 +1203,15 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
           >
             <View style={styles.settingInfo}>
               <View style={styles.settingHeader}>
-                <Icon
+                <SafeIcon
                   name="color-palette-outline"
                   size={20}
                   color={colors.text.secondary}
                 />
-                <Text style={styles.settingLabel}>테마 및 색상</Text>
+                <Text style={styles.settingLabel}>{t('settings.themeAndColors')}</Text>
               </View>
               <Text style={styles.settingDescription}>
-                앱 테마와 액센트 색상을 설정하세요
+                {t('settings.themeDescription')}
               </Text>
             </View>
             <View style={styles.themePreview}>
@@ -1220,7 +1221,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                   { backgroundColor: colors.primary },
                 ]}
               />
-              <Icon
+              <SafeIcon
                 name="chevron-forward"
                 size={20}
                 color={colors.text.tertiary}
@@ -1231,7 +1232,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
         {/* 기타 메뉴 */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>지원</Text>
+          <Text style={styles.sectionTitle}>{t('settings.support')}</Text>
 
           {menuItems.map((item, index) => (
             <TouchableOpacity
@@ -1240,14 +1241,14 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               onPress={item.onPress}
             >
               <View style={styles.menuItemLeft}>
-                <Icon
+                <SafeIcon
                   name={item.icon}
                   size={20}
                   color={colors.text.secondary}
                 />
                 <Text style={styles.menuItemLabel}>{item.label}</Text>
               </View>
-              <Icon
+              <SafeIcon
                 name="chevron-forward"
                 size={20}
                 color={colors.text.tertiary}
@@ -1268,7 +1269,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
         {/* 로그아웃 버튼 */}
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
           <SafeIcon name="log-out-outline" size={20} color={colors.error} />
-          <Text style={styles.logoutText}>로그아웃</Text>
+          <Text style={styles.logoutText}>{t('alerts.auth.logout.action')}</Text>
         </TouchableOpacity>
 
         <View style={styles.bottomSpace} />

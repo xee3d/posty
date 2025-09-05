@@ -1,6 +1,13 @@
 // Global type declarations for React Native environment
 
+import React from 'react';
+import { SafeIconProps } from '../utils/SafeIcon';
+import { IconProps } from 'react-native-vector-icons/Icon';
+
 declare global {
+  var SafeIcon: React.FC<SafeIconProps>;
+  var Icon: React.FC<IconProps>;
+  
   namespace NodeJS {
     interface Timeout {}
     interface Timer {}

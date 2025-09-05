@@ -25,6 +25,7 @@ import {
 import { SafeIcon } from "../utils/SafeIcon";
 import LinearGradient from "react-native-linear-gradient";
 import { useAppTheme } from "../hooks/useAppTheme";
+import { useTranslation } from "react-i18next";
 
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 
@@ -42,6 +43,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
   const dispatch = useDispatch();
   const { detailedProfile } = useSelector((state: RootState) => state.user);
   const { colors, isDark } = useAppTheme();
+  const { t } = useTranslation();
   const slideAnim = useRef(new Animated.Value(SCREEN_HEIGHT)).current;
 
   // 로컬 상태 관리
@@ -106,9 +108,9 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
     console.log("🎯 Profile completion after save:", completionAfterSave + "%");
 
     Alert.alert(
-      "프로필 업데이트 완료! 🎉",
-      `프로필이 ${completionAfterSave}% 완성되었습니다.\n이제 AI가 당신의 스타일에 맞는 글을 작성해드려요!`,
-      [{ text: "확인", onPress: onClose }]
+      t("profile.updateSuccess"),
+      t("profile.updateMessage", { completion: completionAfterSave }),
+      [{ text: t("profile.confirm"), onPress: onClose }]
     );
   };
 
@@ -174,7 +176,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
             {/* 헤더 */}
             <View style={styles.header}>
               <View style={styles.handleBar} />
-              <Text style={styles.title}>나의 상세 프로필</Text>
+              <Text style={styles.title}>{t("settings.profileDetails")}</Text>
               <TouchableOpacity style={styles.closeButton} onPress={onClose}>
                 <SafeIcon name="close" size={24} color={colors.text.primary} />
               </TouchableOpacity>
@@ -183,7 +185,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
             {/* 프로필 완성도 */}
             <View style={styles.completenessSection}>
               <Text style={styles.completenessText}>
-                프로필 완성도 {completeness}%
+                {t("myStyle.profileCompletion", "프로필 완성도 {{completeness}}%", { completeness })}
               </Text>
               <View style={styles.progressBar}>
                 <LinearGradient
@@ -211,14 +213,12 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
             >
               {/* 연령대 */}
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>연령대</Text>
+                <Text style={styles.sectionTitle}>{t("profile.sections.ageGroup")}</Text>
                 <View style={styles.optionGrid}>
                   {["10s", "20s", "30s", "40s", "50s", "60s+"].map((age) => (
                     <SelectButton
                       key={age}
-                      label={
-                        age === "60s+" ? "60대 이상" : age.replace("s", "대")
-                      }
+                      label={t(`profile.age.${age}`)}
                       selected={localProfile.ageGroup === age}
                       onPress={() => {
                         setLocalProfile((prev) => ({
@@ -234,10 +234,10 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
 
               {/* 성별 */}
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>성별</Text>
+                <Text style={styles.sectionTitle}>{t("profile.sections.gender")}</Text>
                 <View style={styles.optionGrid}>
                   <SelectButton
-                    label="남성"
+                    label={t("profile.gender.male")}
                     selected={localProfile.gender === "male"}
                     onPress={() => {
                       setLocalProfile((prev) => ({ ...prev, gender: "male" }));
@@ -245,7 +245,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }}
                   />
                   <SelectButton
-                    label="여성"
+                    label={t("profile.gender.female")}
                     selected={localProfile.gender === "female"}
                     onPress={() => {
                       setLocalProfile((prev) => ({
@@ -256,7 +256,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }}
                   />
                   <SelectButton
-                    label="기타"
+                    label={t("profile.gender.other")}
                     selected={localProfile.gender === "other"}
                     onPress={() => {
                       setLocalProfile((prev) => ({ ...prev, gender: "other" }));
@@ -264,7 +264,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }}
                   />
                   <SelectButton
-                    label="비공개"
+                    label={t("profile.gender.private")}
                     selected={localProfile.gender === "prefer_not_to_say"}
                     onPress={() => {
                       setLocalProfile((prev) => ({
@@ -279,10 +279,10 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
 
               {/* 가족 관계 */}
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>가족 상태</Text>
+                <Text style={styles.sectionTitle}>{t("profile.sections.maritalStatus")}</Text>
                 <View style={styles.optionGrid}>
                   <SelectButton
-                    label="미혼"
+                    label={t("profile.maritalStatus.single")}
                     selected={localProfile.familyRole === "single"}
                     onPress={() => {
                       setLocalProfile((prev) => ({
@@ -293,7 +293,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }}
                   />
                   <SelectButton
-                    label="기혼"
+                    label={t("profile.maritalStatus.married")}
                     selected={localProfile.familyRole === "married"}
                     onPress={() => {
                       setLocalProfile((prev) => ({
@@ -304,7 +304,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }}
                   />
                   <SelectButton
-                    label="부모"
+                    label={t("profile.familyRole.parent")}
                     selected={localProfile.familyRole === "parent"}
                     onPress={() => {
                       setLocalProfile((prev) => ({
@@ -315,7 +315,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }}
                   />
                   <SelectButton
-                    label="조부모"
+                    label={t("profile.familyRole.grandparent")}
                     selected={localProfile.familyRole === "grandparent"}
                     onPress={() => {
                       setLocalProfile((prev) => ({
@@ -331,10 +331,10 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
               {/* 부모 타입 (부모 선택시만 표시) */}
               {localProfile.familyRole === "parent" && (
                 <View style={styles.section}>
-                  <Text style={styles.sectionTitle}>부모 역할</Text>
+                  <Text style={styles.sectionTitle}>{t("profile.sections.parentRole")}</Text>
                   <View style={styles.optionGrid}>
                     <SelectButton
-                      label="엄마"
+                      label={t("profile.parentRole.mother")}
                       selected={localProfile.parentType === "mother"}
                       onPress={() =>
                         setLocalProfile((prev) => ({
@@ -344,7 +344,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                       }
                     />
                     <SelectButton
-                      label="아빠"
+                      label={t("profile.parentRole.father")}
                       selected={localProfile.parentType === "father"}
                       onPress={() =>
                         setLocalProfile((prev) => ({
@@ -356,7 +356,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                   </View>
 
                   <Text style={[styles.sectionTitle, { marginTop: 15 }]}>
-                    자녀 연령
+                    {t("profile.sections.childAge")}
                   </Text>
                   <View style={styles.optionGrid}>
                     {[
@@ -367,18 +367,11 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                       "high_school",
                       "adult",
                     ].map((age) => {
-                      const labels: Record<string, string> = {
-                        baby: "영아",
-                        toddler: "유아",
-                        elementary: "초등",
-                        middle_school: "중등",
-                        high_school: "고등",
-                        adult: "성인",
-                      };
+                      // Using translation keys instead of hardcoded labels
                       return (
                         <SelectButton
                           key={age}
-                          label={labels[age]}
+                          label={t(`profile.childAge.${age}`)}
                           selected={localProfile.childrenAge === age}
                           onPress={() =>
                             setLocalProfile((prev) => ({
@@ -395,7 +388,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
 
               {/* 직업 */}
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>직업</Text>
+                <Text style={styles.sectionTitle}>{t("profile.sections.occupation")}</Text>
                 <View style={styles.optionGrid}>
                   {[
                     "student",
@@ -405,18 +398,11 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     "homemaker",
                     "retired",
                   ].map((job) => {
-                    const labels: Record<string, string> = {
-                      student: "학생",
-                      office_worker: "직장인",
-                      business_owner: "사업가",
-                      freelancer: "프리랜서",
-                      homemaker: "주부/주부",
-                      retired: "은퇴",
-                    };
+                    // Using translation keys instead of hardcoded labels
                     return (
                       <SelectButton
                         key={job}
-                        label={labels[job]}
+                        label={t(`profile.occupation.${job}`)}
                         selected={localProfile.occupation === job}
                         onPress={() =>
                           setLocalProfile((prev) => ({
@@ -433,7 +419,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                   localProfile.occupation !== "student" && (
                     <TextInput
                       style={styles.textInput}
-                      placeholder="구체적인 직업을 입력해주세요 (선택사항)"
+                      placeholder={t("profile.occupation.custom_placeholder")}
                       value={customOccupation}
                       onChangeText={setCustomOccupation}
                       placeholderTextColor={colors.text.tertiary}
@@ -443,9 +429,9 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
 
               {/* 관심사 */}
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>관심사 (복수 선택 가능)</Text>
+                <Text style={styles.sectionTitle}>{t("myStyle.interests", "관심사 (복수 선택 가능)")}</Text>
                 <View style={styles.interestGrid}>
-                  {INTEREST_SUGGESTIONS.map((interest) => (
+                  {INTEREST_SUGGESTIONS().map((interest) => (
                     <TouchableOpacity
                       key={interest}
                       style={[
@@ -471,12 +457,12 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
 
               {/* 글쓰기 스타일 */}
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>선호하는 글쓰기 스타일</Text>
+                <Text style={styles.sectionTitle}>{t("profile.sections.writingStyle")}</Text>
 
-                <Text style={styles.subSectionTitle}>격식</Text>
+                <Text style={styles.subSectionTitle}>{t("myStyle.formality", "격식")}</Text>
                 <View style={styles.optionGrid}>
                   <SelectButton
-                    label="캐주얼"
+                    label={t("profile.writingStyle.casual")}
                     selected={localProfile.writingStyle?.formality === "casual"}
                     onPress={() =>
                       setLocalProfile((prev) => ({
@@ -489,7 +475,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }
                   />
                   <SelectButton
-                    label="균형"
+                    label={t("profile.writingStyle.balanced")}
                     selected={
                       localProfile.writingStyle?.formality === "balanced"
                     }
@@ -504,7 +490,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }
                   />
                   <SelectButton
-                    label="격식"
+                    label={t("profile.writingStyle.formal")}
                     selected={localProfile.writingStyle?.formality === "formal"}
                     onPress={() =>
                       setLocalProfile((prev) => ({
@@ -518,10 +504,10 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                   />
                 </View>
 
-                <Text style={styles.subSectionTitle}>감정 표현</Text>
+                <Text style={styles.subSectionTitle}>{t("myStyle.emotiveness", "감정 표현")}</Text>
                 <View style={styles.optionGrid}>
                   <SelectButton
-                    label="절제"
+                    label={t("profile.emojiUsage.minimal")}
                     selected={localProfile.writingStyle?.emotiveness === "low"}
                     onPress={() =>
                       setLocalProfile((prev) => ({
@@ -534,7 +520,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }
                   />
                   <SelectButton
-                    label="적당히"
+                    label={t("profile.emojiUsage.moderate")}
                     selected={
                       localProfile.writingStyle?.emotiveness === "medium"
                     }
@@ -549,7 +535,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }
                   />
                   <SelectButton
-                    label="풍부하게"
+                    label={t("profile.emojiUsage.abundant")}
                     selected={localProfile.writingStyle?.emotiveness === "high"}
                     onPress={() =>
                       setLocalProfile((prev) => ({
@@ -563,10 +549,10 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                   />
                 </View>
 
-                <Text style={styles.subSectionTitle}>유머</Text>
+                <Text style={styles.subSectionTitle}>{t("myStyle.humor", "유머")}</Text>
                 <View style={styles.optionGrid}>
                   <SelectButton
-                    label="진지하게"
+                    label={t("profile.tone.serious")}
                     selected={localProfile.writingStyle?.humor === "none"}
                     onPress={() =>
                       setLocalProfile((prev) => ({
@@ -579,7 +565,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }
                   />
                   <SelectButton
-                    label="가볍게"
+                    label={t("profile.tone.light")}
                     selected={localProfile.writingStyle?.humor === "light"}
                     onPress={() =>
                       setLocalProfile((prev) => ({
@@ -592,7 +578,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                     }
                   />
                   <SelectButton
-                    label="재치있게"
+                    label={t("profile.tone.witty")}
                     selected={localProfile.writingStyle?.humor === "witty"}
                     onPress={() =>
                       setLocalProfile((prev) => ({
@@ -615,7 +601,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
                   end={{ x: 1, y: 0 }}
                   style={styles.saveButtonGradient}
                 >
-                  <Text style={styles.saveButtonText}>프로필 저장하기</Text>
+                  <Text style={styles.saveButtonText}>{t("myStyle.saveProfile", "프로필 저장하기")}</Text>
                 </LinearGradient>
               </TouchableOpacity>
             </ScrollView>

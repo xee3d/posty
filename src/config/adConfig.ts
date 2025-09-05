@@ -1,4 +1,5 @@
 // 광고 및 수익화 관련 설정
+import i18next from "../locales/i18nextConfig";
 
 export type PlanType = "free" | "starter" | "premium" | "pro";
 

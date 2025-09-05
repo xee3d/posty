@@ -2,6 +2,9 @@
 import { NativeModules, Platform } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { changeLanguage as changeI18nLanguage } from '../../locales/i18n';
+import { store } from '../../store';
+import { updateSettings } from '../../store/slices/userSlice';
 
 // 지원하는 언어 목록
 export type SupportedLanguage = 'ko' | 'en' | 'ja' | 'zh-CN';
@@ -61,17 +64,25 @@ class LanguageService {
       // 저장된 언어 설정 확인
       const storedLanguage = await AsyncStorage.getItem(STORAGE_KEY);
       
+      // 시스템 언어 감지 (우선순위를 시스템 언어로)
+      const systemLanguage = this.detectSystemLanguage();
+      
       if (storedLanguage && this.isSupportedLanguage(storedLanguage)) {
-        this.currentLanguage = storedLanguage as SupportedLanguage;
-        console.log('[LanguageService] Using stored language:', this.currentLanguage);
+        // 저장된 언어가 있지만, 한국 사용자라면 한국어 우선
+        if (systemLanguage === 'ko') {
+          this.currentLanguage = 'ko';
+          console.log('[LanguageService] Korean system detected, using Korean');
+        } else {
+          this.currentLanguage = storedLanguage as SupportedLanguage;
+          console.log('[LanguageService] Using stored language:', this.currentLanguage);
+        }
       } else {
-        // 시스템 언어 감지
-        this.currentLanguage = this.detectSystemLanguage();
+        this.currentLanguage = systemLanguage;
         console.log('[LanguageService] Using system language:', this.currentLanguage);
-        
-        // 초기 설정 저장
-        await this.setLanguage(this.currentLanguage);
       }
+      
+      // 언어 설정 저장
+      await this.setLanguage(this.currentLanguage);
       
       this.isInitialized = true;
       return this.currentLanguage;
@@ -148,6 +159,12 @@ class LanguageService {
 
       this.currentLanguage = language;
       await AsyncStorage.setItem(STORAGE_KEY, language);
+      
+      // i18n 시스템과 연동
+      changeI18nLanguage(language);
+      
+      // Redux 상태 업데이트
+      store.dispatch(updateSettings({ language }));
       
       console.log('[LanguageService] Language changed to:', language);
       

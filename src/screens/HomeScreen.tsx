@@ -39,7 +39,7 @@ import {
 } from "../components/SkeletonLoader";
 import { getSavedContents, SavedContent } from "../utils/storage";
 import PostListScreen from "./PostListScreen";
-import { APP_TEXT, getText } from "../utils/textConstants";
+// import { APP_TEXT, getText } from "../utils/textConstants"; // Replaced with i18n
 import {
   enhancedTipsService,
   trendingHashtagService,
@@ -71,6 +71,7 @@ import AdIntegrationService from "../services/AdIntegrationService";
 import AppLogo from "../components/AppLogo";
 import NotificationBadge from "../components/NotificationBadge";
 import NotificationTestButtons from "../components/NotificationTestButtons";
+import { useTranslation } from "react-i18next";
 
 interface HomeScreenProps {
   onNavigate: (tab: string, content?: any) => void;
@@ -79,6 +80,7 @@ interface HomeScreenProps {
 const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme, isDark, theme } = useAppTheme();
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   // 화면 추적
   useScreenTracking("HomeScreen");
@@ -111,13 +113,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [coachingTip, setCoachingTip] = useState<any>(null);
   const [trendingHashtags, setTrendingHashtags] = useState<string[]>([
-    "일상",
-    "주말",
-    "카페",
-    "맛집",
-    "여행",
-    "운동",
-    "책스타그램",
+    t("home.topics.daily"),
+    t("home.topics.weekend"),
+    t("home.topics.cafe"),
+    t("home.topics.food"),
+    t("home.topics.travel"),
+    t("home.topics.exercise"),
+    t("home.topics.bookstagram"),
   ]);
   const [showPostList, setShowPostList] = useState(false);
   const [recentPosts, setRecentPosts] = useState<SavedContent[]>([]);
@@ -158,7 +160,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   // 개인화된 인사말
   const getPersonalizedGreeting = () => {
     const hour = new Date().getHours();
-    const userName = reduxState.displayName || "친구";
+    const userName = reduxState.displayName || t("home.defaultUserName");
     const postCount = stats?.totalPosts || 0;
     const level = getUserLevel(postCount);
 
@@ -166,10 +168,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     if (level === "new") {
       return {
         emoji: "👋",
-        title: "안녕! 나는 포스티야",
-        message: "글쓰기 도와줄게! 부담 갖지 말고 편하게 시작해보자 😊",
-        action: "첫 글 쓰기",
-        subMessage: "한 줄만 써도 내가 멋지게 만들어줄게!",
+        title: t("home.welcome.title"),
+        message: t("home.welcome.message"),
+        action: t("home.welcome.action"),
+        subMessage: t("home.welcome.subMessage"),
       };
     }
 
@@ -177,49 +179,49 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     if (hour < 6) {
       return {
         emoji: "🌙",
-        title: `${userName}, 새벽감성이네?`,
-        message: "이 시간의 생각들은 특별해. 기록해볼까?",
-        action: "새벽 감성 글쓰기",
+        title: t("home.greetings.dawn.title", { userName }),
+        message: t("home.greetings.dawn.message"),
+        action: t("home.greetings.dawn.action"),
       };
     } else if (hour < 10) {
       return {
         emoji: "☕",
-        title: `좋은 아침! ${userName}`,
-        message: "오늘은 뭐 올릴거야? 모닝커피 사진이라도 좋아!",
-        action: "아침 일상 공유",
+        title: t("home.greetings.morning.title", { userName }),
+        message: t("home.greetings.morning.message"),
+        action: t("home.greetings.morning.action"),
       };
     } else if (hour < 14) {
       return {
         emoji: "🍴",
-        title: `${userName}, 점심은 먹었어?`,
-        message: "맛있는 거 먹었으면 자랑해야지!",
-        action: "점심 리뷰",
-        quickTemplates: ["오늘 점심 ✨", "JMT 발견!", "이거 먹고 힘내자"],
+        title: t("home.greetings.lunch.title", { userName }),
+        message: t("home.greetings.lunch.message"),
+        action: t("home.greetings.lunch.action"),
+        quickTemplates: t("home.quickTemplates.lunch", { returnObjects: true }) as unknown as string[],
       };
     } else if (hour < 18) {
       return {
         emoji: "🚀",
-        title: `${userName}, 오후도 힙내자!`,
+        title: t("home.greetings.afternoon.title", { userName }),
         message:
           level === "regular"
-            ? "오늘 벨써 " + postCount + "개나 썼네! 대단해 👍"
-            : "짧은 글이라도 좋아. 오늘의 순간을 기록해보자",
-        action: "일상 공유",
+            ? t("home.greetings.afternoon.messageRegular", { postCount })
+            : t("home.greetings.afternoon.message"),
+        action: t("home.greetings.afternoon.action"),
       };
     } else if (hour < 22) {
       return {
         emoji: "🌃",
-        title: `${userName}, 오늘 하루 어땠어?`,
-        message: "하루를 마무리하는 글 하나 쓸까? 간단하게라도 좋아",
-        action: "저녁 감성 글",
-        quickTemplates: ["오늘도 수고했어 🌙", "내일은 더 좋은 날", "하루 끝!"],
+        title: t("home.greetings.evening.title", { userName }),
+        message: t("home.greetings.evening.message"),
+        action: t("home.greetings.evening.action"),
+        quickTemplates: t("home.quickTemplates.evening", { returnObjects: true }) as unknown as string[],
       };
     } else {
       return {
         emoji: "🌜",
-        title: `${userName}, 아직 안 자?`,
-        message: "잠들기 전 오늘 있었던 일 기록해볼까?",
-        action: "밤 감성 글",
+        title: t("home.greetings.night.title", { userName }),
+        message: t("home.greetings.night.message"),
+        action: t("home.greetings.night.action"),
       };
     }
   };
@@ -270,10 +272,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       // 기본 팁 설정
       setCoachingTip({
         emoji: "👍",
-        label: "오늘의 꿀팁",
-        value: "꾸준한 포스팅이 핵심",
-        subtext:
-          "매일 작은 이야기라도 공유하면 팔로워들과의 유대감이 깊어져요!",
+        label: t("home.tips.todayTip"),
+        value: t("home.tips.consistentPosting"),
+        subtext: t("home.tips.consistentPostingDesc"),
       });
     }
   };
@@ -296,13 +297,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       console.error("Failed to load trending hashtags:", error);
       // 기본 해시태그 설정
       setTrendingHashtags([
-        "일상",
-        "주말",
-        "카페",
-        "맛집",
-        "여행",
-        "운동",
-        "책스타그램",
+        t("home.topics.daily"),
+        t("home.topics.weekend"),
+        t("home.topics.cafe"),
+        t("home.topics.food"),
+        t("home.topics.travel"),
+        t("home.topics.exercise"),
+        t("home.topics.bookstagram"),
       ]);
     }
   };
@@ -370,20 +371,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
       if (diffHours === 0) {
         const diffMinutes = Math.floor(diffTime / (1000 * 60));
-        return diffMinutes === 0 ? "방금 전" : `${diffMinutes}분 전`;
+        return diffMinutes === 0 ? t("posts.time.justNow") : t("posts.time.minutesAgo", { minutes: diffMinutes });
       }
-      return `${diffHours}시간 전`;
+      return t("posts.time.hoursAgo", { hours: diffHours });
     }
     if (diffDays === 1) {
-      return "어제";
+      return t("posts.time.yesterday");
     }
     if (diffDays < 7) {
-      return `${diffDays}일 전`;
+      return t("posts.time.daysAgo", { days: diffDays });
     }
     if (diffDays < 30) {
-      return `${Math.floor(diffDays / 7)}주 전`;
+      return t("posts.time.weeksAgo", { weeks: Math.floor(diffDays / 7) });
     }
-    return `${Math.floor(diffDays / 30)}개월 전`;
+    return t("posts.time.monthsAgo", { months: Math.floor(diffDays / 30) });
   };
 
   // 최근 게시물 불러오기
@@ -422,7 +423,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       .join(" ")}`;
     Clipboard.setString(fullText);
     soundManager.playSuccess();
-    Alert.alert("복사 완료", "클립보드에 복사되었습니다.");
+    Alert.alert(t("home.messages.copySuccess"), t("home.messages.copySuccessDesc"));
   };
 
   // 게시물 공유 핸들러
@@ -442,36 +443,36 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
   const handleQuickAction = (action: string) => {
     switch (action) {
-      case APP_TEXT.home.quickActions.writePost:
+      case t("home.quickActions.writePost"):
         onNavigate("ai-write");
         break;
-      case APP_TEXT.home.quickActions.analyzePhoto:
+      case t("home.quickActions.analyzePhoto"):
         onNavigate("ai-write", { initialMode: "photo" });
         break;
-      case "문장 정리하기":
+      case t("aiWrite.modes.polish"):
         onNavigate("ai-write", { initialMode: "polish" });
         break;
-      case "내 스타일":
+      case t("home.navigation.myStyle"):
         onNavigate("my-style");
         break;
-      case "템플릿":
+      case t("home.navigation.templates"):
         // 템플릿 화면이 없으므로 AI 글쓰기로 이동
         onNavigate("ai-write");
         break;
-      case "트렌드":
+      case t("home.navigation.trends"):
         onNavigate("trend");
         break;
-      case "구독":
+      case t("home.navigation.subscription"):
         onNavigate("subscription");
         break;
       // 개인화된 액션들
-      case "첫 글 쓰기":
-      case "새벽 감성 글쓰기":
-      case "아침 일상 공유":
-      case "점심 리뷰":
-      case "일상 공유":
-      case "저녁 감성 글":
-      case "밤 감성 글":
+      case t("home.actions.firstWrite"):
+      case t("home.greetings.dawn.action"):
+      case t("home.greetings.morning.action"):
+      case t("home.greetings.lunch.action"):
+      case t("home.greetings.afternoon.action"):
+      case t("home.greetings.evening.action"):
+      case t("home.greetings.night.action"):
         onNavigate("ai-write");
         break;
       default:
@@ -646,7 +647,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
               showsHorizontalScrollIndicator={false}
               style={styles.quickTemplateScroll}
             >
-              {getPersonalizedGreeting().quickTemplates.map(
+              {getPersonalizedGreeting().quickTemplates?.map(
                 (template, index) => (
                   <TouchableOpacity
                     key={index}
@@ -668,8 +669,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           <View style={styles.quickActions}>
             <Text style={styles.sectionTitle}>
               {userLevel === "new"
-                ? "뭘 써야 할지 모르겠다면?"
-                : "오늘은 뭘 올릴까?"}
+                ? t("home.sections.newUserQuestion")
+                : t("home.sections.regularUserQuestion")}
             </Text>
 
             {/* 신규 사용자를 위한 간단한 템플릿 */}
@@ -678,20 +679,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 <TouchableOpacity
                   style={styles.templateCard}
                   onPress={() =>
-                    onNavigate("ai-write", { content: "오늘 날씨가 좋아서" })
+                    onNavigate("ai-write", { content: t("home.templates.weather.content") })
                   }
                 >
                   <SafeIcon name="sunny-outline" size={32} color={colors.primary} />
-                  <Text style={styles.templateTitle}>날씨 이야기</Text>
+                  <Text style={styles.templateTitle}>{t("home.templates.weather.title")}</Text>
                   <Text style={styles.templateDesc}>
-                    오늘 날씨로 시작해보기
+                    {t("home.templates.weather.desc")}
                   </Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
                   style={styles.templateCard}
                   onPress={() =>
-                    onNavigate("ai-write", { content: "오늘 먹은" })
+                    onNavigate("ai-write", { content: t("home.templates.food.content") })
                   }
                 >
                   <SafeIcon
@@ -699,8 +700,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     size={32}
                     color={colors.primary}
                   />
-                  <Text style={styles.templateTitle}>음식 후기</Text>
-                  <Text style={styles.templateDesc}>오늘 먹은 맛있는 것</Text>
+                  <Text style={styles.templateTitle}>{t("home.templates.food.title")}</Text>
+                  <Text style={styles.templateDesc}>{t("home.templates.food.desc")}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -712,8 +713,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     size={32}
                     color={colors.primary}
                   />
-                  <Text style={styles.templateTitle}>사진으로</Text>
-                  <Text style={styles.templateDesc}>사진만 있으면 OK</Text>
+                  <Text style={styles.templateTitle}>{t("home.templates.photo.title")}</Text>
+                  <Text style={styles.templateDesc}>{t("home.templates.photo.desc")}</Text>
                 </TouchableOpacity>
               </View>
             )}
@@ -726,7 +727,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                   onPress={() =>
                     handleQuickAction(
                       getPersonalizedGreeting().action ||
-                        APP_TEXT.home.quickActions.writePost
+                        t("home.quickActions.writePost")
                     )
                   }
                 >
@@ -735,9 +736,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                       <SafeIcon name="create" size={24} color={colors.white} />
                     </View>
                     <View style={styles.mainActionTextContainer}>
-                      <Text style={styles.mainActionTitle}>글쓰기 도와줘</Text>
+                      <Text style={styles.mainActionTitle}>{t("home.actions.writeAssist")}</Text>
                       <Text style={styles.mainActionDesc}>
-                        한 줄만 써도 멋지게 만들어줄게
+                        {t("home.messages.writeAssistDesc")}
                       </Text>
                     </View>
                   </View>
@@ -747,7 +748,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 {userLevel !== "beginner" && (
                   <ScaleButton
                     style={styles.mainActionCard}
-                    onPress={() => handleQuickAction("문장 정리하기")}
+                    onPress={() => handleQuickAction(t("aiWrite.modes.polish"))}
                   >
                     <View style={styles.mainActionRow}>
                       <View
@@ -764,10 +765,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                       </View>
                       <View style={styles.mainActionTextContainer}>
                         <Text style={styles.mainActionTitle}>
-                          AI 글 완성도구
+                          {t("home.mainActions.polishTool")}
                         </Text>
                         <Text style={styles.mainActionDesc}>
-                          어색한 문장을 자연스럽게 다듬어줘
+                          {t("home.mainActions.polishDesc")}
                         </Text>
                       </View>
                     </View>
@@ -777,7 +778,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 <ScaleButton
                   style={styles.mainActionCard}
                   onPress={() =>
-                    handleQuickAction(APP_TEXT.home.quickActions.analyzePhoto)
+                    handleQuickAction(t("home.quickActions.analyzePhoto"))
                   }
                 >
                   <View style={styles.mainActionRow}>
@@ -790,9 +791,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                       <SafeIcon name="image" size={24} color={colors.white} />
                     </View>
                     <View style={styles.mainActionTextContainer}>
-                      <Text style={styles.mainActionTitle}>사진으로 시작</Text>
+                      <Text style={styles.mainActionTitle}>{t("home.actions.photoStart")}</Text>
                       <Text style={styles.mainActionDesc}>
-                        사진만 보여주면 글 써줄게
+                        {t("home.messages.photoStartDesc")}
                       </Text>
                     </View>
                   </View>
@@ -828,7 +829,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 <View style={styles.styleIconContainer}>
                   <SafeIcon name="color-palette" size={20} color={colors.white} />
                 </View>
-                <Text style={styles.styleCardTitle}>나의 글쓰기 스타일</Text>
+                <Text style={styles.styleCardTitle}>{t("home.mainActions.styleGuide")}</Text>
                 <SafeIcon
                   name="chevron-forward"
                   size={20}
@@ -840,27 +841,27 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 <View style={styles.styleMainInfo}>
                   <Text style={styles.styleType}>
                     {styleAnalysis.dominantStyle === "minimalist"
-                      ? "🎯 미니멀리스트"
+                      ? t("home.styleTypes.minimalist")
                       : styleAnalysis.dominantStyle === "storyteller"
-                      ? "📖 스토리텔러"
+                      ? t("home.styleTypes.storyteller")
                       : styleAnalysis.dominantStyle === "visualist"
-                      ? "📸 비주얼리스트"
+                      ? t("home.styleTypes.visualist")
                       : styleAnalysis.dominantStyle === "trendsetter"
-                      ? "✨ 트렌드세터"
-                      : "🎨 나만의 스타일"}
+                      ? t("home.styleTypes.trendsetter")
+                      : t("home.styleTypes.unique")}
                   </Text>
                   <View style={styles.styleStats}>
                     <View style={styles.styleStat}>
-                      <Text style={styles.styleStatLabel}>일관성</Text>
+                      <Text style={styles.styleStatLabel}>{t("home.weeklyCount.consistency")}</Text>
                       <Text style={styles.styleStatValue}>
                         {styleAnalysis.consistency}%
                       </Text>
                     </View>
                     <View style={styles.styleStatDivider} />
                     <View style={styles.styleStat}>
-                      <Text style={styles.styleStatLabel}>이번 주</Text>
+                      <Text style={styles.styleStatLabel}>{t("home.weeklyCount.thisWeek")}</Text>
                       <Text style={styles.styleStatValue}>
-                        {stats?.weeklyPosts || 0}개
+{stats?.weeklyPosts || 0}{t("common.count")}
                       </Text>
                     </View>
                   </View>
@@ -885,7 +886,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleContainer}>
                 <SafeIcon name="target" size={18} color={colors.success} />
-                <Text style={styles.sectionTitle}>오늘 뭐 쓸까?</Text>
+                <Text style={styles.sectionTitle}>{t("home.sections.todayRecommendation")}</Text>
               </View>
             </View>
 
@@ -1000,11 +1001,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                       <SafeIcon name="create" size={24} color={colors.white} />
                     </View>
                     <View style={styles.recommendBadge}>
-                      <Text style={styles.recommendBadgeText}>🔥 쉬워요</Text>
+                      <Text style={styles.recommendBadgeText}>{t("home.recommend.easy")}</Text>
                     </View>
-                    <Text style={styles.recommendTitle}>한 줄로 시작해요</Text>
+                    <Text style={styles.recommendTitle}>{t("home.recommend.easyTitle")}</Text>
                     <Text style={styles.recommendContent}>
-                      긴 글 필요 없어요!{"\n"}오늘 뭐했는지만 써도 OK
+                      {t("home.recommend.easyContent")}
                     </Text>
                     <View style={styles.recommendFooter}>
                       <View style={styles.recommendMeta}>
@@ -1013,13 +1014,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                           size={14}
                           color={colors.text.secondary}
                         />
-                        <Text style={styles.recommendMetaText}>추천</Text>
+                        <Text style={styles.recommendMetaText}>{t("home.recommend.recommended")}</Text>
                       </View>
                       <ScaleButton
                         style={styles.writeButton}
                         onPress={() => onNavigate("ai-write")}
                       >
-                        <Text style={styles.writeButtonText}>글쓰기</Text>
+                        <Text style={styles.writeButtonText}>{t("home.recommend.writeButton")}</Text>
                       </ScaleButton>
                     </View>
                   </AnimatedCard>
@@ -1038,12 +1039,12 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     </View>
                     <View style={styles.recommendBadge}>
                       <Text style={styles.recommendBadgeText}>
-                        📸 더 쉬워요
+                        {t("home.recommend.easierPhoto")}
                       </Text>
                     </View>
-                    <Text style={styles.recommendTitle}>사진만 있으면 끝!</Text>
+                    <Text style={styles.recommendTitle}>{t("home.recommend.photoTitle")}</Text>
                     <Text style={styles.recommendContent}>
-                      사진 하나 골라주면{"\n"}글은 내가 써줄게!
+                      {t("home.recommend.photoContent")}
                     </Text>
                     <View style={styles.recommendFooter}>
                       <View style={styles.recommendMeta}>
@@ -1052,7 +1053,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                           size={14}
                           color={colors.text.secondary}
                         />
-                        <Text style={styles.recommendMetaText}>간편하게</Text>
+                        <Text style={styles.recommendMetaText}>{t("home.recommend.convenient")}</Text>
                       </View>
                       <ScaleButton
                         style={styles.writeButton}
@@ -1060,7 +1061,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                           onNavigate("ai-write", { mode: "photo" })
                         }
                       >
-                        <Text style={styles.writeButtonText}>사진 선택</Text>
+                        <Text style={styles.writeButtonText}>{t("home.recommend.photoSelectButton")}</Text>
                       </ScaleButton>
                     </View>
                   </AnimatedCard>
@@ -1081,10 +1082,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     size={18}
                     color={colors.text.primary}
                   />
-                  <Text style={styles.sectionTitle}>내가 쓴 글</Text>
+                  <Text style={styles.sectionTitle}>{t("home.sections.myPosts")}</Text>
                 </View>
                 <TouchableOpacity onPress={() => setShowPostList(true)}>
-                  <Text style={styles.moreText}>전체보기</Text>
+                  <Text style={styles.moreText}>{t("home.actions.viewAll")}</Text>
                 </TouchableOpacity>
               </View>
 
@@ -1174,7 +1175,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                           size={18}
                           color={colors.text.secondary}
                         />
-                        <Text style={styles.postActionButtonText}>복사</Text>
+                        <Text style={styles.postActionButtonText}>{t("home.postActions.copy")}</Text>
                       </TouchableOpacity>
 
                       <TouchableOpacity
@@ -1187,7 +1188,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                           size={18}
                           color={colors.text.secondary}
                         />
-                        <Text style={styles.postActionButtonText}>공유</Text>
+                        <Text style={styles.postActionButtonText}>{t("home.postActions.share")}</Text>
                       </TouchableOpacity>
                     </View>
                   </TouchableOpacity>

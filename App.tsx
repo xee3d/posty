@@ -7,7 +7,14 @@ import React, {
 } from "react";
 import languageService from "./src/services/localization/languageService";
 import pricingService from "./src/services/localization/pricingService";
+import "./src/locales/i18n";
+import { SafeIcon } from "./src/utils/SafeIcon";
+import IconComponent from "react-native-vector-icons/Ionicons";
 import SplashScreen from "react-native-splash-screen";
+
+// Global declarations for easier component usage
+(global as any).SafeIcon = SafeIcon;
+(global as any).Icon = IconComponent;
 import AnimatedSplashScreen from "./src/components/AnimatedSplashScreen";
 import {
   View,

@@ -471,10 +471,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
     // 다운그레이드 체크 (targetPlan is now narrowed to exclude "free")
     const isDowngrade =
-      (subscriptionPlan === "pro" && targetPlan !== "pro") ||
-      (subscriptionPlan === "premium" &&
-        targetPlan === "starter") ||
-      (subscriptionPlan === "starter" && false); // targetPlan cannot be "free" here
+      (subscriptionPlan === "pro" && (targetPlan === "premium" || targetPlan === "starter")) ||
+      (subscriptionPlan === "premium" && targetPlan === "starter");
 
     if (isDowngrade) {
       Alert.alert(

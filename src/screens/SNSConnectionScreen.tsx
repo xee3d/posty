@@ -18,6 +18,7 @@ import {
   FadeInView,
   AnimatedCard,
 } from "../components/AnimationComponents";
+import { useTranslation } from "react-i18next";
 import socialMediaService from "../services/socialMediaService";
 import localAnalyticsService from "../services/analytics/localAnalyticsService";
 
@@ -30,6 +31,7 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
   onClose,
 }) => {
   const { colors, cardTheme } = useAppTheme();
+  const { t } = useTranslation();
   const [connectedAccounts, setConnectedAccounts] = useState({
     instagram: false,
     facebook: false,
@@ -51,16 +53,12 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
 
   const handleConnect = async (platform: "instagram" | "facebook") => {
     Alert.alert(
-      `${platform === "instagram" ? "Instagram" : "Facebook"} 연동`,
-      "연동 기능은 앱 설정이 필요합니다.\n\n필요한 것:\n" +
-        "1. Facebook 개발자 계정\n" +
-        "2. 앱 등록 및 심사\n" +
-        "3. OAuth 설정\n\n" +
-        "자세한 내용은 설정 가이드를 참고하세요.",
+      t("sns.alerts.connect.title", { platform: platform === "instagram" ? "Instagram" : "Facebook" }),
+      t("sns.alerts.connect.message"),
       [
-        { text: "취소", style: "cancel" },
+        { text: t("sns.alerts.connect.cancel"), style: "cancel" },
         {
-          text: "가이드 보기",
+          text: t("sns.alerts.connect.guide"),
           onPress: () => {
             const guideUrl =
               platform === "instagram"
@@ -75,14 +73,12 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
 
   const handleDisconnect = async (platform: "instagram" | "facebook") => {
     Alert.alert(
-      "연동 해제",
-      `${
-        platform === "instagram" ? "Instagram" : "Facebook"
-      } 연동을 해제하시겠습니까?`,
+      t("sns.alerts.disconnect.title"),
+      t("sns.alerts.disconnect.message", { platform: platform === "instagram" ? "Instagram" : "Facebook" }),
       [
-        { text: "취소", style: "cancel" },
+        { text: t("sns.alerts.disconnect.cancel"), style: "cancel" },
         {
-          text: "해제",
+          text: t("sns.alerts.disconnect.disconnect"),
           style: "destructive",
           onPress: async () => {
             await socialMediaService.saveAccessToken(platform, "");
@@ -101,14 +97,16 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
       setLastSyncTime(new Date().toLocaleString());
 
       Alert.alert(
-        "동기화 완료",
-        "SNS 데이터가 성공적으로 업데이트되었습니다.",
-        [{ text: "확인" }]
+        t("sns.alerts.sync.success.title"),
+        t("sns.alerts.sync.success.message"),
+        [{ text: t("sns.alerts.sync.confirm") }]
       );
     } catch (error) {
-      Alert.alert("동기화 실패", "데이터를 가져오는 중 문제가 발생했습니다.", [
-        { text: "확인" },
-      ]);
+      Alert.alert(
+        t("sns.alerts.sync.error.title"), 
+        t("sns.alerts.sync.error.message"), 
+        [{ text: t("sns.alerts.sync.confirm") }]
+      );
     } finally {
       setIsSyncing(false);
     }
@@ -122,7 +120,7 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <SafeIcon name="close" size={24} color={colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>SNS 연동 관리</Text>
+        <Text style={styles.headerTitle}>{t("sns.title")}</Text>
         <View style={{ width: 44 }} />
       </View>
 
@@ -132,15 +130,14 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
             <View style={styles.infoCard}>
               <MaterialIcon name="info" size={20} color={colors.primary} />
               <Text style={styles.infoText}>
-                SNS 계정을 연동하면 좋아요, 댓글 등의 성과를 자동으로 가져올 수
-                있어요!
+                {t("sns.description")}
               </Text>
             </View>
           </View>
         </FadeInView>
 
         <View style={styles.accountsSection}>
-          <Text style={styles.sectionTitle}>SNS 계정 연동</Text>
+          <Text style={styles.sectionTitle}>{t("sns.sections.accounts")}</Text>
 
           {/* Instagram */}
           <AnimatedCard delay={100} style={styles.accountCard}>
@@ -150,7 +147,9 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
                 <View style={styles.accountDetails}>
                   <Text style={styles.accountName}>Instagram</Text>
                   <Text style={styles.accountStatus}>
-                    {connectedAccounts.instagram ? "연동됨" : "연동 안됨"}
+                    {connectedAccounts.instagram 
+                      ? t("sns.status.connected") 
+                      : t("sns.status.disconnected")}
                   </Text>
                 </View>
               </View>
@@ -159,14 +158,14 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
                   style={styles.disconnectButton}
                   onPress={() => handleDisconnect("instagram")}
                 >
-                  <Text style={styles.disconnectText}>연동 해제</Text>
+                  <Text style={styles.disconnectText}>{t("sns.buttons.disconnect")}</Text>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
                   style={styles.connectButton}
                   onPress={() => handleConnect("instagram")}
                 >
-                  <Text style={styles.connectText}>연동하기</Text>
+                  <Text style={styles.connectText}>{t("sns.buttons.connect")}</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -175,16 +174,16 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
                 <View style={styles.featureItem}>
                   <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
                   <Text style={styles.featureText}>
-                    좋아요 수 자동 업데이트
+                    {t("sns.features.instagram.likes")}
                   </Text>
                 </View>
                 <View style={styles.featureItem}>
                   <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
-                  <Text style={styles.featureText}>댓글 수 자동 업데이트</Text>
+                  <Text style={styles.featureText}>{t("sns.features.instagram.comments")}</Text>
                 </View>
                 <View style={styles.featureItem}>
                   <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
-                  <Text style={styles.featureText}>도달 및 저장 수 확인</Text>
+                  <Text style={styles.featureText}>{t("sns.features.instagram.insights")}</Text>
                 </View>
               </View>
             )}
@@ -198,7 +197,9 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
                 <View style={styles.accountDetails}>
                   <Text style={styles.accountName}>Facebook</Text>
                   <Text style={styles.accountStatus}>
-                    {connectedAccounts.facebook ? "연동됨" : "연동 안됨"}
+                    {connectedAccounts.facebook 
+                      ? t("sns.status.connected") 
+                      : t("sns.status.disconnected")}
                   </Text>
                 </View>
               </View>
@@ -207,14 +208,14 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
                   style={styles.disconnectButton}
                   onPress={() => handleDisconnect("facebook")}
                 >
-                  <Text style={styles.disconnectText}>연동 해제</Text>
+                  <Text style={styles.disconnectText}>{t("sns.buttons.disconnect")}</Text>
                 </TouchableOpacity>
               ) : (
                 <TouchableOpacity
                   style={styles.connectButton}
                   onPress={() => handleConnect("facebook")}
                 >
-                  <Text style={styles.connectText}>연동하기</Text>
+                  <Text style={styles.connectText}>{t("sns.buttons.connect")}</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -222,15 +223,15 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
               <View style={styles.accountFeatures}>
                 <View style={styles.featureItem}>
                   <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
-                  <Text style={styles.featureText}>페이지 게시물 인사이트</Text>
+                  <Text style={styles.featureText}>{t("sns.features.facebook.insights")}</Text>
                 </View>
                 <View style={styles.featureItem}>
                   <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
-                  <Text style={styles.featureText}>반응, 댓글, 공유 수</Text>
+                  <Text style={styles.featureText}>{t("sns.features.facebook.engagement")}</Text>
                 </View>
                 <View style={styles.featureItem}>
                   <SafeIcon name="checkmark-circle" size={16} color="#10B981" />
-                  <Text style={styles.featureText}>도달 및 참여 통계</Text>
+                  <Text style={styles.featureText}>{t("sns.features.facebook.reach")}</Text>
                 </View>
               </View>
             )}
@@ -241,18 +242,18 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
         {(connectedAccounts.instagram || connectedAccounts.facebook) && (
           <FadeInView delay={300}>
             <View style={styles.syncSection}>
-              <Text style={styles.sectionTitle}>데이터 동기화</Text>
+              <Text style={styles.sectionTitle}>{t("sns.sections.sync")}</Text>
 
               <View style={styles.syncCard}>
                 <MaterialIcon name="sync" size={24} color={colors.primary} />
                 <View style={styles.syncInfo}>
-                  <Text style={styles.syncTitle}>성과 데이터 동기화</Text>
+                  <Text style={styles.syncTitle}>{t("sns.sync.title")}</Text>
                   <Text style={styles.syncDescription}>
-                    연동된 SNS 계정의 최신 데이터를 가져옵니다
+                    {t("sns.sync.description")}
                   </Text>
                   {lastSyncTime && (
                     <Text style={styles.lastSyncText}>
-                      마지막 동기화: {lastSyncTime}
+                      {t("sns.sync.lastSync", { time: lastSyncTime })}
                     </Text>
                   )}
                 </View>
@@ -264,7 +265,7 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
                   {isSyncing ? (
                     <ActivityIndicator size="small" color={colors.white} />
                   ) : (
-                    <Text style={styles.syncButtonText}>동기화</Text>
+                    <Text style={styles.syncButtonText}>{t("sns.buttons.sync")}</Text>
                   )}
                 </ScaleButton>
               </View>
@@ -274,22 +275,12 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
 
         {/* 참고사항 */}
         <View style={styles.noteSection}>
-          <Text style={styles.noteTitle}>참고사항</Text>
-          <View style={styles.noteItem}>
-            <Text style={styles.noteText}>
-              • Instagram 비즈니스 또는 크리에이터 계정이 필요합니다
-            </Text>
-          </View>
-          <View style={styles.noteItem}>
-            <Text style={styles.noteText}>
-              • Facebook은 페이지 계정만 연동 가능합니다
-            </Text>
-          </View>
-          <View style={styles.noteItem}>
-            <Text style={styles.noteText}>
-              • API 제한으로 인해 일부 데이터는 지연될 수 있습니다
-            </Text>
-          </View>
+          <Text style={styles.noteTitle}>{t("sns.sections.notes")}</Text>
+          {(t("sns.notes", { returnObjects: true }) as string[]).map((note: string, index: number) => (
+            <View key={index} style={styles.noteItem}>
+              <Text style={styles.noteText}>• {note}</Text>
+            </View>
+          ))}
         </View>
 
         <View style={styles.bottomSpace} />

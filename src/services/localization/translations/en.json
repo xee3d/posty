@@ -1,0 +1,353 @@
+{
+  "settings": {
+    "title": "Settings",
+    "appSettings": "App Settings",
+    "language": "Language",
+    "pushNotifications": "Push Notifications",
+    "soundEffects": "Sound Effects",
+    "vibration": "Vibration",
+    "theme": "Theme",
+    "themeAndColors": "Theme & Colors",
+    "themeDescription": "Customize app theme and accent colors",
+    "account": "Account",
+    "subscription": "Subscription",
+    "tokenManagement": "Token Management",
+    "support": "Support",
+    "userGuide": "User Guide",
+    "contact": "Contact",
+    "terms": "Terms of Service",
+    "privacy": "Privacy Policy",
+    "achievements": "View Achievements",
+    "profileDetails": "Profile Details",
+    "profileGuideDefault": "Set up your profile to experience personalized AI 🎨",
+    "notifications": {
+      "enabled": "Posty will notify you of important updates",
+      "soundEnabled": "Button clicks and notification sounds",
+      "vibrationEnabled": "Haptic feedback on touch"
+    }
+  },
+  "alerts": {
+    "notifications": {
+      "enabled": "Notifications enabled! We'll keep you updated on important news 🔔",
+      "disabled": "Notifications disabled. You can turn them back on anytime 😊"
+    },
+    "sound": {
+      "enabled": "Sound enabled! You'll hear sounds with every button press 🔊"
+    },
+    "vibration": {
+      "enabled": "Vibration enabled! You'll feel haptic feedback with every touch 📳"
+    },
+    "language": {
+      "changed": "Language has been changed. It will apply to newly generated content."
+    },
+    "platform": {
+      "connect": {
+        "title": "Connect {{platform}}",
+        "message": "Would you like to connect your {{platform}} account?",
+        "comingSoon": "{{platform}} connection feature is coming soon! Please wait a little longer 🚀"
+      },
+      "disconnect": {
+        "title": "Disconnect",
+        "message": "Are you sure you want to disconnect {{platform}}?",
+        "success": "{{platform}} has been disconnected. You can reconnect anytime!",
+        "failed": "Failed to disconnect. Please try again."
+      },
+      "status": {
+        "notConnected": "Not connected",
+        "connected": "Connected",
+        "connectAction": "Connect"
+      }
+    },
+    "purchase": {
+      "restore": {
+        "title": "Restore Purchases",
+        "message": "Would you like to restore previous purchases?",
+        "failed": "Failed to restore purchases. Please try again.",
+        "failedTitle": "Restore Failed"
+      }
+    },
+    "data": {
+      "clearHistory": {
+        "title": "Clear History",
+        "message": "Are you sure you want to clear all activity history?",
+        "success": "History has been cleared.",
+        "failed": "Failed to clear history."
+      },
+      "deleteAll": {
+        "title": "Delete All Data",
+        "message": "Are you sure you want to delete all data?\nThis action cannot be undone.",
+        "success": "All data has been deleted.",
+        "failed": "Failed to delete data."
+      }
+    },
+    "auth": {
+      "logout": {
+        "title": "Logout",
+        "message": "Are you sure you want to logout?",
+        "action": "Logout"
+      }
+    },
+    "rating": {
+      "title": "Rate App",
+      "message": "Has Posty been helpful? Please leave us a review!",
+      "later": "Later",
+      "rate": "Rate Now",
+      "error": "Cannot open store."
+    },
+    "tokens": {
+      "dailyLimitExceeded": {
+        "title": "Daily Limit Exceeded",
+        "message": "You've already earned the maximum of {{limit}} additional tokens today.\nTry again tomorrow!"
+      },
+      "partialGrant": {
+        "title": "Partial Grant",
+        "message": "Due to daily limit, only {{tokens}} tokens will be granted."
+      }
+    },
+    "buttons": {
+      "ok": "OK",
+      "cancel": "Cancel",
+      "connect": "Connect",
+      "disconnect": "Disconnect",
+      "restore": "Restore",
+      "delete": "Delete",
+      "completed": "Completed",
+      "error": "Error"
+    }
+  },
+  "language": {
+    "current": "{{language}} {{isSystem}}",
+    "system": "(System)",
+    "selectLanguage": "Select Language",
+    "resetToSystem": "Reset to System Language",
+    "note": "Language changes will apply to newly generated content."
+  },
+  "home": {
+    "welcome": {
+      "title": "Hello! I'm Posty",
+      "message": "I'll help you write! Let's start comfortably without pressure 😊",
+      "subMessage": "Even one line is enough, I'll make it amazing!"
+    },
+    "greetings": {
+      "dawn": {
+        "title": "{{userName}}, feeling those late night vibes?",
+        "message": "Your thoughts at this hour are special. Want to capture them?",
+        "action": "Write dawn thoughts"
+      },
+      "morning": {
+        "title": "Good morning, {{userName}}!",
+        "message": "What will you share today? Even a morning coffee photo would be perfect!",
+        "action": "Share morning routine"
+      },
+      "lunch": {
+        "title": "{{userName}}, have you had lunch yet?",
+        "message": "If you had something delicious, you should definitely show it off!",
+        "action": "Lunch review"
+      },
+      "afternoon": {
+        "title": "{{userName}}, let's keep the momentum going!",
+        "message": "Wow, you've already written {{postCount}} posts today! That's amazing 👍",
+        "messageDefault": "Even a short post would be great. Let's capture today's moments",
+        "action": "Share daily life"
+      },
+      "evening": {
+        "title": "{{userName}}, how was your day?",
+        "message": "How about writing a post to wrap up the day? Even something brief would be perfect",
+        "action": "Evening thoughts"
+      },
+      "night": {
+        "title": "{{userName}}, still up?",
+        "message": "Want to record what happened today before you sleep?",
+        "action": "Night thoughts"
+      }
+    },
+    "quickTemplates": {
+      "lunch": ["Today's lunch ✨", "Found great food!", "Eating this for energy"],
+      "evening": ["Good work today 🌙", "Tomorrow will be better", "Day's end!"]
+    },
+    "sections": {
+      "whatToWrite": {
+        "new": "Don't know what to write?",
+        "regular": "What to post today?"
+      },
+      "myStyle": "My Writing Style",
+      "recommendations": "What to write today?",
+      "myPosts": "My Posts"
+    },
+    "templates": {
+      "weather": {
+        "title": "Weather Story",
+        "description": "Start with today's weather",
+        "content": "The weather is nice today"
+      },
+      "food": {
+        "title": "Food Review", 
+        "description": "Today's delicious meal",
+        "content": "Today I ate"
+      },
+      "photo": {
+        "title": "With Photo",
+        "description": "Just need a photo"
+      }
+    },
+    "actions": {
+      "help": "Help me write",
+      "helpDesc": "Even one line is enough, I'll make it amazing!",
+      "polish": "AI Writing Assistant",
+      "polishDesc": "Transform awkward sentences into natural, flowing text",
+      "photo": "Start with photo",
+      "photoDesc": "Just show me a photo and I'll craft the perfect caption",
+      "write": "Write",
+      "selectPhoto": "Select Photo", 
+      "firstWrite": "Write your first post",
+      "writeAssist": "Help me write",
+      "writeAssistDesc": "Even one line is enough, I'll make it amazing!",
+      "polishText": "AI Writing Assistant",
+      "polishTextDesc": "Transform awkward sentences into natural, flowing text",
+      "photoStart": "Start with photo", 
+      "photoStartDesc": "Just show me a photo and I'll craft the perfect caption"
+    },
+    "recommendations": {
+      "default1": {
+        "badge": "🔥 Easy",
+        "title": "Start with one line",
+        "content": "No need for long posts!\nJust write what you did today",
+        "meta": "Recommended"
+      },
+      "default2": {
+        "badge": "📸 Even easier",
+        "title": "Just need a photo!",
+        "content": "Pick one photo and\nI'll write the perfect post for you!",
+        "meta": "Simple"
+      }
+    },
+    "style": {
+      "consistency": "Consistency",
+      "thisWeek": "This week",
+      "posts": "posts",
+      "types": {
+        "minimalist": "🎯 Minimalist",
+        "storyteller": "📖 Storyteller", 
+        "visualist": "📸 Visualist",
+        "trendsetter": "✨ Trendsetter",
+        "default": "🎨 My own style"
+      }
+    },
+    "time": {
+      "justNow": "just now",
+      "minutesAgo": "{{minutes}}m ago",
+      "hoursAgo": "{{hours}}h ago", 
+      "yesterday": "yesterday",
+      "daysAgo": "{{days}}d ago",
+      "weeksAgo": "{{weeks}}w ago",
+      "monthsAgo": "{{months}}mo ago"
+    },
+    "copy": {
+      "success": "Copied",
+      "message": "Copied to clipboard."
+    },
+    "viewAll": "View All",
+    "tips": {
+      "default": {
+        "label": "Today's Tip",
+        "value": "Consistent posting is key",
+        "subtext": "Sharing even small stories daily deepens bonds with followers!"
+      }
+    },
+    "topics": {
+      "daily": "daily",
+      "weekend": "weekend",
+      "cafe": "cafe",
+      "food": "food",
+      "travel": "travel",
+      "exercise": "exercise",
+      "bookstagram": "books"
+    },
+    "greeting": "friend"
+  },
+  "navigation": {
+    "home": "Home",
+    "write": "Write",
+    "posts": "Posts",
+    "profile": "Profile",
+    "settings": "Settings",
+    "trends": "Trends",
+    "achievements": "Achievements",
+    "mission": "Mission",
+    "subscription": "Subscription"
+  },
+  "common": {
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit", 
+    "share": "Share",
+    "copy": "Copy",
+    "paste": "Paste",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "done": "Done",
+    "retry": "Retry"
+  },
+  "home": {
+    "welcome": {
+      "title": "Hello! I'm Posty",
+      "message": "I'll help you write! Let's start comfortably without pressure 😊",
+      "subMessage": "Even one line is enough, I'll make it amazing!"
+    },
+    "topics": {
+      "daily": "Daily Life",
+      "weekend": "Weekend",
+      "cafe": "Cafe",
+      "food": "Restaurant",
+      "travel": "Travel",
+      "exercise": "Exercise",
+      "bookstagram": "Bookstagram"
+    },
+    "greeting": "friend"
+  },
+  "posts": {
+    "styles": {
+      "casual": "Casual",
+      "professional": "Professional",
+      "humorous": "Humorous", 
+      "emotional": "Emotional",
+      "genz": "Gen Z",
+      "millennial": "Millennial",
+      "minimalist": "Minimalist",
+      "storytelling": "Storytelling",
+      "motivational": "Motivational"
+    },
+    "categories": {
+      "cafe": "Café",
+      "food": "Restaurant", 
+      "daily": "Daily",
+      "exercise": "Exercise",
+      "travel": "Travel",
+      "fashion": "Fashion",
+      "beauty": "Beauty",
+      "other": "Other"
+    },
+    "time": {
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "actions": {
+      "copy": "Copied",
+      "copyMessage": "Copied to clipboard.",
+      "save": "Save",
+      "saving": "Saving...",
+      "saveSuccess": "Post saved successfully!",
+      "saveError": "An error occurred while saving the post."
+    },
+    "input": {
+      "placeholder": "Enter your post content...",
+      "required": "Please enter post content.",
+      "title": "Record Post",
+      "contentSection": "Post Content"
+    }
+  }
+}

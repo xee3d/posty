@@ -23,6 +23,7 @@ import {
   BORDER_RADIUS,
   CARD_THEME,
 } from "../utils/constants";
+import { useTranslation } from "react-i18next";
 import { useAppTheme } from "../hooks/useAppTheme";
 import {
   ScaleButton,
@@ -48,35 +49,35 @@ interface PostItem {
   createdAt: string;
 }
 
-// 톤에서 카테고리 추출 헬퍼 함수
-const getCategoryFromTone = (tone: string): string => {
+// 톤에서 카테고리 추출 헬퍼 함수  
+const getCategoryFromTone = (tone: string, t: any): string => {
   const toneToCategory: { [key: string]: string } = {
-    casual: "일상",
-    professional: "비즈니스",
-    humorous: "유머",
-    emotional: "감성",
-    genz: "트렌드",
-    millennial: "라이프스타일",
-    minimalist: "미니멀",
-    storytelling: "스토리",
-    motivational: "동기부여",
+    casual: t('posts.styles.casual'),
+    professional: t('posts.styles.professional'),
+    humorous: t('posts.styles.humorous'),
+    emotional: t('posts.styles.emotional'),
+    genz: t('posts.styles.genz'),
+    millennial: t('posts.styles.millennial'),
+    minimalist: t('posts.styles.minimalist'),
+    storytelling: t('posts.styles.storytelling'),
+    motivational: t('posts.styles.motivational'),
   };
 
-  return toneToCategory[tone] || "일상";
+  return toneToCategory[tone] || t('posts.categories.daily');
 };
 
-// 날짜 포맷 함수 메모이제이션
-const formatDate = (dateString: string) => {
+// 날짜 포맷 함수 (t 함수는 컴포넌트 내부에서 정의)
+const createFormatDate = (t: (key: string) => string) => (dateString: string) => {
   const date = new Date(dateString);
   const now = new Date();
   const diffTime = Math.abs(now.getTime() - date.getTime());
   const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
   if (diffDays === 0) {
-    return "오늘";
+    return t('posts.time.today');
   }
   if (diffDays === 1) {
-    return "어제";
+    return t('posts.time.yesterday');
   }
   if (diffDays < 7) {
     return `${diffDays}일 전`;
@@ -102,7 +103,9 @@ const PostItemComponent = React.memo<{
   onToggleExpand: (id: string) => void;
   colors: typeof COLORS;
   cardTheme: any;
-}>(({ item, index, expandedPostId, onToggleExpand, colors, cardTheme }) => {
+  t: (key: string) => string;
+  formatDate: (dateString: string) => string;
+}>(({ item, index, expandedPostId, onToggleExpand, colors, cardTheme, t, formatDate }) => {
   const isExpanded = expandedPostId === item.id;
   const styles = useMemo(
     () => createPostStyles(colors, cardTheme),
@@ -116,8 +119,8 @@ const PostItemComponent = React.memo<{
       .join(" ")}`;
     Clipboard.setString(fullText);
     soundManager.playSuccess();
-    Alert.alert("복사 완료", "클립보드에 복사되었습니다.");
-  }, [item]);
+    Alert.alert(t('posts.actions.copy'), t('posts.actions.copyMessage'));
+  }, [item, t]);
 
   // 공유하기 핸들러
   const handleShare = useCallback(async () => {
@@ -212,10 +215,14 @@ PostItemComponent.displayName = "PostItemComponent";
 
 const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
   const { colors, cardTheme } = useAppTheme();
+  const { t } = useTranslation();
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  // formatDate 함수 생성
+  const formatDate = useMemo(() => createFormatDate(t), [t]);
 
   // 메인 스타일 메모이제이션
   const styles = useMemo(
@@ -239,7 +246,7 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
         content: content.content,
         hashtags: content.hashtags,
         platform: content.platform || "instagram",
-        category: getCategoryFromTone(content.tone),
+        category: getCategoryFromTone(content.tone, t),
         tone: content.tone,
         createdAt: content.createdAt,
       }));
@@ -257,7 +264,7 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
       // 에러 시에도 최대 10개만 표시
       setPosts(localPosts.slice(0, 10).map(post => ({
         ...post,
-        category: post.category || '일상',
+        category: post.category || t('posts.categories.daily'),
         tone: post.tone || 'casual' // tone이 없으면 기본값 설정
       })));
     } finally {
@@ -292,9 +299,11 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
         onToggleExpand={handleToggleExpand}
         colors={colors}
         cardTheme={cardTheme}
+        t={t}
+        formatDate={formatDate}
       />
     ),
-    [expandedPostId, handleToggleExpand, colors, cardTheme]
+    [expandedPostId, handleToggleExpand, colors, cardTheme, t, formatDate]
   );
 
   // 키 추출기

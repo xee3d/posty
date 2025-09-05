@@ -12,18 +12,20 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import achievementService from "../../services/achievementService";
 import simplePostService from "../../services/simplePostService";
+import { useTranslation } from "react-i18next";
 
 const DataCleanupScreen: React.FC = () => {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
 
   const handleClearAllData = async () => {
     Alert.alert(
-      "모든 데이터 삭제",
-      "정말로 모든 사용자의 데이터를 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+      t("debug.alerts.clearAll.title"),
+      t("debug.alerts.clearAll.message"),
       [
-        { text: "취소", style: "cancel" },
+        { text: t("debug.alerts.clearAll.cancel"), style: "cancel" },
         {
-          text: "삭제",
+          text: t("debug.alerts.clearAll.delete"),
           style: "destructive",
           onPress: async () => {
             try {
@@ -41,9 +43,15 @@ const DataCleanupScreen: React.FC = () => {
               ];
               await AsyncStorage.multiRemove(keysToRemove);
 
-              Alert.alert("완료", "모든 데이터가 삭제되었습니다.");
+              Alert.alert(
+                t("debug.alerts.clearAll.success.title"),
+                t("debug.alerts.clearAll.success.message")
+              );
             } catch (error) {
-              Alert.alert("오류", "데이터 삭제 중 오류가 발생했습니다.");
+              Alert.alert(
+                t("debug.alerts.clearAll.error.title"),
+                t("debug.alerts.clearAll.error.message")
+              );
               console.error(error);
             }
           },
@@ -64,9 +72,9 @@ const DataCleanupScreen: React.FC = () => {
       );
 
       Alert.alert(
-        "저장된 키 목록",
-        relevantKeys.join("\n") || "관련 키가 없습니다.",
-        [{ text: "확인" }]
+        t("debug.alerts.storageKeys.title"),
+        relevantKeys.join("\n") || t("debug.alerts.storageKeys.noKeys"),
+        [{ text: t("debug.alerts.storageKeys.confirm") }]
       );
     } catch (error) {
       console.error(error);
@@ -75,22 +83,25 @@ const DataCleanupScreen: React.FC = () => {
 
   const handleClearCurrentUser = async () => {
     Alert.alert(
-      "현재 사용자 데이터 삭제",
-      "현재 로그인한 사용자의 데이터만 삭제하시겠습니까?",
+      t("debug.alerts.clearCurrentUser.title"),
+      t("debug.alerts.clearCurrentUser.message"),
       [
-        { text: "취소", style: "cancel" },
+        { text: t("debug.alerts.clearAll.cancel"), style: "cancel" },
         {
-          text: "삭제",
+          text: t("debug.alerts.clearAll.delete"),
           style: "destructive",
           onPress: async () => {
             try {
               await achievementService.clearAchievements();
               Alert.alert(
-                "완료",
-                "현재 사용자의 업적 데이터가 삭제되었습니다."
+                t("debug.alerts.clearCurrentUser.success.title"),
+                t("debug.alerts.clearCurrentUser.success.message")
               );
             } catch (error) {
-              Alert.alert("오류", "데이터 삭제 중 오류가 발생했습니다.");
+              Alert.alert(
+                t("debug.alerts.clearAll.error.title"),
+                t("debug.alerts.clearAll.error.message")
+              );
               console.error(error);
             }
           },
@@ -104,41 +115,49 @@ const DataCleanupScreen: React.FC = () => {
       style={[styles.container, { backgroundColor: colors.background }]}
     >
       <ScrollView contentContainerStyle={styles.content}>
-        <Text style={[styles.title, { color: colors.text.primary }]}>데이터 관리</Text>
+        <Text style={[styles.title, { color: colors.text.primary }]}>
+          {t("debug.title")}
+        </Text>
 
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
-            디버깅 도구
+            {t("debug.toolsTitle")}
           </Text>
 
           <TouchableOpacity
             style={[styles.button, { backgroundColor: colors.primary }]}
             onPress={handleShowStorageKeys}
           >
-            <Text style={styles.buttonText}>저장된 키 목록 보기</Text>
+            <Text style={styles.buttonText}>
+              {t("debug.buttons.showKeys")}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#FF6B6B" }]}
             onPress={handleClearCurrentUser}
           >
-            <Text style={styles.buttonText}>현재 사용자 데이터 삭제</Text>
+            <Text style={styles.buttonText}>
+              {t("debug.buttons.clearCurrentUser")}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={[styles.button, { backgroundColor: "#DC2626" }]}
             onPress={handleClearAllData}
           >
-            <Text style={styles.buttonText}>모든 사용자 데이터 삭제</Text>
+            <Text style={styles.buttonText}>
+              {t("debug.buttons.clearAllData")}
+            </Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.section}>
           <Text style={[styles.warning, { color: "#DC2626" }]}>
-            ⚠️ 주의: 데이터 삭제는 되돌릴 수 없습니다!
+            {t("debug.warnings.destructive")}
           </Text>
           <Text style={[styles.info, { color: colors.secondary }]}>
-            이 화면은 개발/디버깅 목적으로만 사용하세요.
+            {t("debug.warnings.devOnly")}
           </Text>
         </View>
       </ScrollView>

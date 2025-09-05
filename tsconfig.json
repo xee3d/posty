@@ -36,6 +36,12 @@
       "@types/*": ["src/types/*"]
     }
   },
+  "include": [
+    "src/**/*",
+    "src/types/global.d.ts",
+    "index.js",
+    "App.tsx"
+  ],
   "exclude": [
     "node_modules",
     "babel.config.js",

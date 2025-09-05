@@ -472,13 +472,20 @@ export class PushNotificationService {
       }
 
       // 배지 카운트 업데이트
+      const validateNotificationType = (type: string): "mission" | "trend" | "achievement" | "tip" => {
+        if (["mission", "trend", "achievement", "tip"].includes(type)) {
+          return type as "mission" | "trend" | "achievement" | "tip";
+        }
+        return "tip"; // default fallback
+      };
+
       const badgeNotification = {
         id: Date.now().toString(),
         title: notification.title,
         body: notification.body,
         timestamp: Date.now(),
         isRead: false,
-        type: notification.data.type as "trend" | "mission" | "achievement" | "tip",
+        type: validateNotificationType(notification.data.type || "tip"),
       };
       await badgeService.incrementBadge(badgeNotification);
     }

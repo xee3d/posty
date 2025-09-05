@@ -185,7 +185,7 @@ class InAppPurchaseService {
 
         try {
           // 영수증 검증
-          const receipt = (purchase as any).purchaseToken || (purchase as any).transactionReceipt;
+          const receipt = (purchase as any).purchaseToken || (purchase as any).transactionId;
           if (!receipt) {
             throw new Error("No receipt found");
           }
@@ -335,7 +335,7 @@ class InAppPurchaseService {
       // 서버 검증
       const response = await serverSubscriptionService.purchaseSubscription(
         (purchase as any).productId,
-        (purchase as any).purchaseToken || (purchase as any).transactionReceipt || "",
+        (purchase as any).purchaseToken || (purchase as any).transactionId || "",
         Platform.OS as "ios" | "android"
       );
 
