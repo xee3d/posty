@@ -131,6 +131,10 @@ export default {
       polish: "書いた文章をより素敵に仕上げます！",
       photo: "写真を見せていただければ、ぴったりの文章を作ります！",
     },
+    errors: {
+      imageSelection: "画像の選択中にエラーが発生しました。",
+      cameraAccess: "カメラの使用中にエラーが発生しました。"
+    },
     modes: {
       text: "新規作成",
       polish: "文章整理",
@@ -351,6 +355,23 @@ export default {
     },
   },
   
+  trends: {
+    title: "リアルタイムトレンド",
+    subtitle: "リアルタイムの人気トレンドとキーワード",
+    errors: {
+      loadFailed: "トレンドの読み込みに失敗しました",
+      refreshFailed: "トレンドの更新に失敗しました"
+    },
+    premium: {
+      title: "プレミアム機能",
+      subtitle: "リアルタイムトレンドはプレミアムプランでご利用いただけます",
+      upgradeButton: "プランをアップグレード",
+      preview: {
+        title: "トレンドプレビュー"
+      }
+    }
+  },
+
   trending: {
     title: "トレンド",
     subtitle: "今話題のトピック",
@@ -705,7 +726,8 @@ export default {
     count: "",
     start: "開始",
     skip: "スキップ",
-    loading: "読み込み中..."
+    loading: "読み込み中...",
+    later: "後で"
   },
 
   // Alerts

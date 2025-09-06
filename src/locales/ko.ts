@@ -29,6 +29,10 @@ export default {
       polish: "작성하신 글을 더 멋지게 다듬어드릴게요!",
       photo: "사진을 보여주시면 어울리는 글을 만들어드려요!",
     },
+    errors: {
+      imageSelection: "이미지를 선택하는 중 문제가 발생했습니다.",
+      cameraAccess: "카메라를 사용하는 중 문제가 발생했습니다."
+    },
     modes: {
       text: "새글 쓰기",
       polish: "문장 정리",
@@ -780,7 +784,8 @@ export default {
     count: "개",
     start: "시작하기",
     skip: "건너뛰기",
-    loading: "로딩 중..."
+    loading: "로딩 중...",
+    later: "나중에"
   },
 
   // Analytics

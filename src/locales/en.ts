@@ -29,6 +29,10 @@ export default {
       polish: "I'll polish your text to make it shine!",
       photo: "Show me a photo and I'll create matching content!",
     },
+    errors: {
+      imageSelection: "An error occurred while selecting an image.",
+      cameraAccess: "An error occurred while using the camera."
+    },
     modes: {
       text: "New Post",
       polish: "Polish Text",
@@ -939,7 +943,8 @@ export default {
     count: "",
     start: "Start",
     skip: "Skip",
-    loading: "Loading..."
+    loading: "Loading...",
+    later: "Later"
   },
 
   // Analytics

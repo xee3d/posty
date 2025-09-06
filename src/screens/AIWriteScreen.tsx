@@ -644,7 +644,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         console.log("사용자가 이미지 선택을 취소했습니다");
       } else if (response.errorMessage) {
         console.error("ImagePicker Error: ", response.errorMessage);
-        Alert.alert("오류", "이미지를 선택하는 중 문제가 발생했습니다.");
+        Alert.alert(t("common.error"), t("aiWrite.errors.imageSelection"));
       } else if (response.assets && response.assets[0]) {
         const asset = response.assets[0];
         console.log("[AIWriteScreen] Selected asset:", {
@@ -698,7 +698,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         console.log("사용자가 카메라 촬영을 취소했습니다");
       } else if (response.errorMessage) {
         console.error("Camera Error: ", response.errorMessage);
-        Alert.alert("오류", "카메라를 사용하는 중 문제가 발생했습니다.");
+        Alert.alert(t("common.error"), t("aiWrite.errors.cameraAccess"));
       } else if (response.assets && response.assets[0]) {
         const asset = response.assets[0];
         console.log("[AIWriteScreen] Camera asset:", {
@@ -1975,7 +1975,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                 : "Pro"
                             } 플랜 이상에서 사용 가능해요.\n\n업그레이드하면 더 다양한 스타일로 글을 작성할 수 있어요!`,
                             [
-                              { text: "나중에", style: "cancel" },
+                              { text: t("common.later"), style: "cancel" },
                               {
                                 text: "플랜 보기",
                                 onPress: () => onNavigate?.("subscription"),
@@ -2044,7 +2044,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               : "Pro"
                           } 플랜 이상에서 사용 가능해요.\n\n더 긴 글을 작성하면 더 풍부한 콘텐츠를 만들 수 있어요!`,
                           [
-                            { text: "나중에", style: "cancel" },
+                            { text: t("common.later"), style: "cancel" },
                             {
                               text: "플랜 보기",
                               onPress: () => onNavigate?.("subscription"),

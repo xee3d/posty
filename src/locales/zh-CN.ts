@@ -128,6 +128,10 @@ export default {
     title: "用Posty写作",
     subtitle: "想写什么故事呢？",
     placeholder: "在这里输入文本...",
+    errors: {
+      imageSelection: "选择图像时发生错误。",
+      cameraAccess: "使用相机时发生错误。"
+    },
     
     sections: {
       selectTone: "选择什么语调？",
@@ -343,6 +347,23 @@ export default {
     },
   },
   
+  trends: {
+    title: "实时趋势",
+    subtitle: "实时热门趋势和关键词",
+    errors: {
+      loadFailed: "加载趋势失败",
+      refreshFailed: "刷新趋势失败"
+    },
+    premium: {
+      title: "高级功能",
+      subtitle: "实时趋势需要高级计划",
+      upgradeButton: "升级计划",
+      preview: {
+        title: "趋势预览"
+      }
+    }
+  },
+
   trending: {
     title: "趋势",
     subtitle: "当前热门话题",
@@ -621,7 +642,8 @@ export default {
     count: "",
     start: "开始",
     skip: "跳过",
-    loading: "加载中..."
+    loading: "加载中...",
+    later: "稍后"
   },
 
   // Alerts
