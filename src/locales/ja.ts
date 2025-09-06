@@ -302,6 +302,12 @@ export default {
     title: "マイスタイル",
     subtitle: "あなたの書き方スタイルを分析",
     description: "過去の投稿を分析してあなただけの文体を学習します",
+    profileCompletion: "プロフィール完成度 {{completeness}}%",
+    interests: "興味（複数選択可能）",
+    formality: "形式",
+    emotiveness: "感情表現",
+    humor: "ユーモア",
+    saveProfile: "プロフィール保存",
     
     access: {
       freeMessage: "STARTERプランからマイスタイル機能をご利用いただけます",

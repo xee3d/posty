@@ -294,6 +294,12 @@ export default {
     title: "我的风格",
     subtitle: "分析您的写作风格",
     description: "分析过往投稿，学习您独特的文体",
+    profileCompletion: "个人资料完成度 {{completeness}}%",
+    interests: "兴趣（多选）",
+    formality: "正式程度",
+    emotiveness: "情感表达",
+    humor: "幽默感",
+    saveProfile: "保存个人资料",
     
     access: {
       freeMessage: "从STARTER计划开始可使用我的风格功能",
