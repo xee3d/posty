@@ -65,7 +65,8 @@
       "Bash(timeout:*)",
       "Bash(java:*)",
       "Bash(echo:*)",
-      "Bash(expo start:*)"
+      "Bash(expo start:*)",
+      "mcp__playwright__browser_navigate"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

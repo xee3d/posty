@@ -1,13 +1,13 @@
 // 브랜드 정보
 export const BRAND = {
   name: "Posty",
-  tagline: "AI가 쓰고, 나는 빛나고",
-  subTagline: "1분 만에 완성되는 완벽한 포스팅",
-  description: "사진 한 장으로 멋진 포스팅을 완성하세요",
+  tagline: "AI가 쓰고, 나는 빛나고", // 번역 키로 변경 필요
+  subTagline: "1분 만에 완성되는 완벽한 포스팅", // 번역 키로 변경 필요
+  description: "사진 한 장으로 멋진 포스팅을 완성하세요", // 번역 키로 변경 필요
   characterName: "Posty",
   characterNameKo: "포스티",
   slogans: {
-    main: "AI가 쓰고, 나는 빛나고",
+    main: "AI가 쓰고, 나는 빛나고", // 번역 키로 변경 필요
     emotional: "당신의 일상을 특별하게, 포스티 AI",
     practical: "SNS 고민 끝! AI가 다 써드려요",
     busy: "바쁜 당신을 위한 AI 비서",

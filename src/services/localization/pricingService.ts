@@ -121,7 +121,7 @@ class PricingService {
 
   // 현재 로케일의 가격 정보 가져오기
   getCurrentPricing(): LocalePricing {
-    return LOCALE_PRICING[this.currentLanguage] || LOCALE_PRICING['ko'];
+    return LOCALE_PRICING[this.currentLanguage] || LOCALE_PRICING.ko;
   }
 
   // 토큰 가격 가져오기

@@ -1,5 +1,5 @@
 // 광고 및 수익화 관련 설정
-import i18next from "../locales/i18nextConfig";
+import i18next from "../locales/i18n";
 
 export type PlanType = "free" | "starter" | "premium" | "pro";
 
@@ -147,10 +147,10 @@ export const canAccessPolishOption = (
 };
 
 // MyStyle 접근 권한
-export const MY_STYLE_ACCESS = {
+export const getMyStyleAccess = () => ({
   free: {
     hasAccess: false,
-    message: "STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.",
+    message: i18next.t("myStyle.access.freeMessage"),
     templateLimit: 0,
   },
   starter: {
@@ -168,7 +168,10 @@ export const MY_STYLE_ACCESS = {
     message: "",
     templateLimit: 0, // 제한 없음
   },
-};
+});
+
+// 호환성을 위한 기존 상수 (함수 호출로 변경)
+export const MY_STYLE_ACCESS = getMyStyleAccess();
 
 // 트렌드 접근 권한
 export const TREND_ACCESS = {

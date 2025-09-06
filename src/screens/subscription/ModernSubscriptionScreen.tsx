@@ -18,6 +18,9 @@ import { SUBSCRIPTION_PLANS } from "../../config/adConfig";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { useAppSelector } from "../../hooks/redux";
+import { useTranslation } from "react-i18next";
+import i18n from "../../locales/i18n";
+import priceLocalizationService from "../../services/localization/priceLocalizationService";
 import {
   selectCurrentTokens,
   selectSubscriptionPlan,
@@ -49,6 +52,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   currentPlan = "free",
 }) => {
   const { colors, isDark } = useAppTheme();
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const currentTokens = useAppSelector(selectCurrentTokens);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
@@ -182,8 +186,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
       await loadTokenStats();
 
-      Alert.alert("토큰 획득! 🎉", `${tokens}개의 토큰을 받았어요!`, [
-        { text: "확인" },
+      Alert.alert(t("subscription.earnTokens"), t("subscription.earnTokensMessage", { tokens }), [
+        { text: t("alerts.buttons.ok") },
       ]);
     } catch (error) {
       console.error("Failed to add tokens:", error);
@@ -194,17 +198,17 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const { canWatch, reason } = await rewardAdService.canWatchAd();
 
     if (!canWatch) {
-      Alert.alert("광고 시청 불가", reason || "잠시 후 다시 시도해주세요.");
+      Alert.alert(t("subscription.alerts.adWatch.unavailable"), reason || t("subscription.alerts.adWatch.defaultMessage"));
       return;
     }
 
     Alert.alert(
-      "광고 시청",
-      "30초 광고를 시청하고 2개의 토큰을 받으시겠어요?",
+      t("subscription.watchAd"),
+      t("subscription.watchAdMessage"),
       [
-        { text: "취소", style: "cancel" },
+        { text: t("alerts.buttons.cancel"), style: "cancel" },
         {
-          text: "시청하기",
+          text: t("subscription.watchVideo"),
           onPress: async () => {
             const result = await rewardAdService.showRewardedAd();
 
@@ -217,11 +221,11 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               if (missionResult.rewardsEarned > 0) {
                 setTimeout(() => {
                   Alert.alert(
-                    "미션 완료! 🎯",
+                    t("subscription.alerts.mission.complete"),
                     `광고 시청 미션을 완료하여 추가로 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`,
                     [
                       {
-                        text: "확인",
+                        text: t("alerts.buttons.ok"),
                         onPress: () =>
                           handleEarnTokens(missionResult.rewardsEarned),
                       },
@@ -232,7 +236,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
               await loadAdStats();
             } else if (result.error) {
-              Alert.alert("광고 시청 실패", result.error);
+              Alert.alert(t("subscription.alerts.mission.failed"), result.error);
             }
           },
         },
@@ -245,7 +249,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const lastCheck = await AsyncStorage.getItem("last_daily_check");
 
     if (lastCheck === today) {
-      Alert.alert("알림", "오늘은 이미 출석 체크를 했어요!");
+      Alert.alert(t("alerts.notification"), t("subscription.alreadyCheckedIn"));
       return;
     }
 
@@ -255,7 +259,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const result = await missionService.trackAction("login");
     if (result.rewardsEarned > 0) {
       Alert.alert(
-        "미션 완료! 🎯",
+        t("subscription.alerts.mission.complete"),
         `출석 미션을 완료하여 추가로 ${result.rewardsEarned}개의 토큰을 받았습니다!`
       );
       await handleEarnTokens(result.rewardsEarned);
@@ -265,9 +269,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   const handleShareSNS = async () => {
     try {
       const result = await Share.share({
-        message:
-          "Posty로 AI가 만드는 SNS 콘텐츠! 지금 바로 사용해보세요 🚀\nhttps://posty.app",
-        title: "Posty - AI 콘텐츠 생성",
+        message: t("subscription.alerts.share.invitation.message"),
+        title: t("subscription.alerts.share.invitation.title"),
       });
 
       if (result.action === Share.sharedAction) {
@@ -281,13 +284,13 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           const missionResult = await missionService.trackAction("share");
           if (missionResult.rewardsEarned > 0) {
             Alert.alert(
-              "미션 완료! 🎯",
+              t("subscription.alerts.mission.complete"),
               `공유 미션을 완료하여 추가로 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`
             );
             await handleEarnTokens(missionResult.rewardsEarned);
           }
         } else {
-          Alert.alert("알림", "오늘은 이미 SNS 공유를 했어요!");
+          Alert.alert(t("alerts.notification"), t("subscription.alreadyShared"));
         }
       }
     } catch (error) {
@@ -305,14 +308,14 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
       const result = await Share.share({
         message: `Posty로 친구를 초대하세요! 초대 코드: ${inviteCode}\n${inviteLink}`,
-        title: "Posty 초대하기",
+        title: t("subscription.alerts.share.invitation.title"),
       });
 
       if (result.action === Share.sharedAction) {
         Alert.alert(
-          "초대 전송",
-          "친구가 가입하면 5개의 토큰을 받을 수 있어요!",
-          [{ text: "확인" }]
+          t("subscription.inviteFriends"),
+          t("subscription.inviteFriendsMessage"),
+          [{ text: t("alerts.buttons.ok") }]
         );
 
         await missionService.trackAction("invite");
@@ -326,14 +329,14 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const hasRated = await AsyncStorage.getItem("app_rated");
 
     if (hasRated) {
-      Alert.alert("알림", "이미 앱을 평가해주셨어요. 감사합니다!");
+      Alert.alert(t("alerts.notification"), t("subscription.alreadyRated"));
       return;
     }
 
-    Alert.alert("앱 평가하기", "Posty가 도움이 되셨나요? 평가를 남겨주세요!", [
-      { text: "나중에", style: "cancel" },
+    Alert.alert(t("subscription.alerts.rating.title"), t("subscription.alerts.rating.message"), [
+      { text: t("alerts.buttons.later"), style: "cancel" },
       {
-        text: "평가하러 가기",
+        text: t("subscription.alerts.rating.rate"),
         onPress: async () => {
           try {
             const storeUrl =
@@ -348,7 +351,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               await handleEarnTokens(10);
             }, 3000);
           } catch (error) {
-            Alert.alert("오류", "스토어를 열 수 없어요.");
+            Alert.alert(t("alerts.error"), t("subscription.alerts.rating.error"));
           }
         },
       },
@@ -378,7 +381,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
-    return `${year}년 ${month}월 ${day}일`;
+    return i18n.language === 'ko' ? `${year}년 ${month}월 ${day}일` : `${month}/${day}/${year}`;
   };
 
   const calculateDaysRemaining = (expiryDate: Date) => {
@@ -390,12 +393,12 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   const handleCancelSubscription = () => {
     Alert.alert(
-      "구독 취소",
-      `${SUBSCRIPTION_PLANS[subscriptionPlan].name} 플랜 구독을 취소하시겠습니까?\n\n취소해도 다음 결제일까지 현재 플랜을 이용할 수 있습니다.`,
+      t("subscription.cancelSubscription"),
+      t("subscription.cancelSubscriptionMessage", { planName: SUBSCRIPTION_PLANS[subscriptionPlan].name }),
       [
-        { text: "취소", style: "cancel" },
+        { text: t("alerts.buttons.cancel"), style: "cancel" },
         {
-          text: "구독 취소",
+          text: t("subscription.cancelSubscriptionAction"),
           style: "destructive",
           onPress: async () => {
             try {
@@ -406,15 +409,15 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               // await inAppPurchaseService.cancelSubscription();
 
               Alert.alert(
-                "구독 취소 완료",
-                "구독이 취소되었습니다. 다음 결제일까지 현재 플랜을 계속 이용할 수 있습니다.",
-                [{ text: "확인" }]
+                t("subscription.cancelSubscriptionSuccess"),
+                t("subscription.cancelSubscriptionSuccessMessage"),
+                [{ text: t("alerts.buttons.ok") }]
               );
             } catch (error) {
               Alert.alert(
-                "구독 취소 실패",
-                "구독 취소 중 문제가 발생했습니다. 다시 시도해주세요.",
-                [{ text: "확인" }]
+                t("subscription.cancelSubscriptionFailed"),
+                t("subscription.cancelSubscriptionFailedMessage"),
+                [{ text: t("alerts.buttons.ok") }]
               );
             }
           },
@@ -430,29 +433,29 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     if (subscriptionPlan === "free") {
       if (newPlan === "starter") {
         tokenChange = 300;
-        description = "가입 즉시 300개 토큰을 받게 됩니다";
+        description = t("subscription.descriptions.signup300");
       } else if (newPlan === "premium") {
         tokenChange = 500;
-        description = "가입 즉시 500개 토큰을 받게 됩니다";
+        description = t("subscription.descriptions.signup500");
       } else if (newPlan === "pro") {
         tokenChange = 9999;
-        description = "무제한 토큰을 사용할 수 있습니다";
+        description = t("subscription.descriptions.unlimitedAccess");
       }
     } else if (subscriptionPlan === "starter") {
       if (newPlan === "premium") {
         tokenChange = 500;
-        description = "전액 500개 토큰을 추가로 받게 됩니다";
+        description = t("subscription.descriptions.upgrade500");
       } else if (newPlan === "pro") {
         tokenChange = 9999;
-        description = "무제한 토큰을 사용할 수 있습니다";
+        description = t("subscription.descriptions.unlimitedAccess");
       }
     } else if (subscriptionPlan === "premium") {
       if (newPlan === "pro") {
         tokenChange = 9999;
-        description = "무제한 토큰을 사용할 수 있습니다";
+        description = t("subscription.descriptions.unlimitedAccess");
       } else if (newPlan === "starter") {
         tokenChange = 0;
-        description = "경고: 무료 토큰이 300개로 제한됩니다";
+        description = t("subscription.descriptions.downgradeWarning");
       }
     }
 
@@ -476,9 +479,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
     if (isDowngrade) {
       Alert.alert(
-        "다운그레이드 불가",
-        "하위 플랜으로 변경할 수 없습니다.\n\n현재 구독을 취소하고 만료 후 새로 가입해주세요.",
-        [{ text: "확인" }]
+        t("subscription.downgradeNotAllowed"),
+        t("subscription.downgradeNotAllowedMessage"),
+        [{ text: t("alerts.buttons.ok") }]
       );
       return;
     }
@@ -486,7 +489,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const { tokenChange, description } = calculateTokenChange(targetPlan);
     const afterTokens =
       targetPlan === "pro"
-        ? "무제한"
+        ? t("subscription.status.unlimited")
         : targetPlan === "starter" && subscriptionPlan === "free"
         ? currentTokens + 300
         : targetPlan === "premium" && subscriptionPlan === "free"
@@ -498,13 +501,13 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const message = `${
       SUBSCRIPTION_PLANS[targetPlan].name
     } 플랜을 구독하시겠습니까?\n\n${description}\n현재 토큰: ${currentTokens}개\n변경 후: ${
-      targetPlan === "pro" ? "무제한" : afterTokens + "개"
+      targetPlan === "pro" ? t("subscription.status.unlimited") : t("tokens.count", { count: afterTokens })
     }`;
 
-    Alert.alert("구독 확인", message, [
-      { text: "취소", style: "cancel" },
+    Alert.alert(t("subscription.confirmSubscription"), message, [
+      { text: t("alerts.buttons.cancel"), style: "cancel" },
       {
-        text: "구독하기",
+        text: t("subscription.confirmSubscriptionAction"),
         onPress: async () => {
           try {
             await inAppPurchaseService.purchaseSubscription(targetPlan, false);
@@ -515,9 +518,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           } catch (error) {
             console.error("Subscription error:", error);
             Alert.alert(
-              "구독 실패",
-              "구독 처리 중 문제가 발생했습니다. 다시 시도해주세요.",
-              [{ text: "확인" }]
+              t("subscription.subscriptionFailed"),
+              t("subscription.subscriptionFailedMessage"),
+              [{ text: t("alerts.buttons.ok") }]
             );
           }
         },
@@ -569,7 +572,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       >
         {isPopular && (
           <View style={[styles.popularBadge, { backgroundColor: planColor }]}>
-            <Text style={styles.popularBadgeText}>인기</Text>
+            <Text style={styles.popularBadgeText}>{t("subscription.popular")}</Text>
           </View>
         )}
 
@@ -591,7 +594,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             </Text>
             {isCurrent && (
               <View style={styles.currentBadge}>
-                <Text style={styles.currentBadgeText}>현재 이용중</Text>
+                <Text style={styles.currentBadgeText}>{t("subscription.status.currentPlan")}</Text>
               </View>
             )}
           </View>
@@ -606,9 +609,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
         <View style={styles.priceContainer}>
           <Text style={[styles.price, isSelected && { color: planColor }]}>
-            {plan.price === 0 ? "무료" : `₩${plan.price.toLocaleString()}`}
+            {priceLocalizationService.formatPrice(plan.id as "free" | "starter" | "premium" | "pro")}
           </Text>
-          <Text style={styles.priceUnit}>/월</Text>
+          <Text style={styles.priceUnit}>{t("subscription.perMonth")}</Text>
         </View>
 
         <View
@@ -633,14 +636,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             ]}
           >
             {isDowngrade
-              ? "하위 플랜으로 변경 불가"
-              : planKey === "free"
-              ? "매일 10개 무료 충전"
-              : planKey === "starter"
-              ? "가입 시 300개 + 매일 10개"
-              : planKey === "premium"
-              ? "가입 시 500개 + 매일 20개"
-              : "무제한 토큰"}
+              ? t("subscription.planDescriptions.downgradeBlocked")
+              : t(`subscription.planDescriptions.${planKey}`)}
           </Text>
         </View>
 
@@ -685,10 +682,10 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               ]}
             >
               {isCurrent
-                ? "현재 이용중"
+                ? t("subscription.status.currentPlan")
                 : isDowngrade
-                ? "구매 불가"
-                : "구독하기"}
+                ? t("subscription.status.cannotPurchase")
+                : t("subscription.status.subscribeAction")}
             </Text>
             {!isCurrent && !isDowngrade && (
               <SafeIcon name="arrow-forward-outline" size={18} color="#FFFFFF" />
@@ -716,10 +713,10 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
           {activeTab === "subscription"
-            ? "구독 플랜"
+            ? t("subscription.title")
             : activeTab === "tokens"
-            ? "토큰 구매"
-            : "무료 토큰"}
+            ? t("subscription.tokenPurchase")
+            : t("subscription.freeTokens")}
         </Text>
         <TouchableOpacity
           style={styles.headerButton}
@@ -727,7 +724,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         >
           <SafeIcon name="flash" size={20} color={colors.primary} />
           <Text style={styles.currentTokens}>
-            {subscriptionPlan === "pro" ? "무제한" : currentTokens}
+            {subscriptionPlan === "pro" ? t("subscription.status.unlimited") : currentTokens}
           </Text>
         </TouchableOpacity>
       </View>
@@ -755,7 +752,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               activeTab === "subscription" && styles.activeTabText,
             ]}
           >
-            구독 플랜
+            {t("subscription.title")}
           </Text>
         </TouchableOpacity>
 
@@ -776,7 +773,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               activeTab === "tokens" && styles.activeTabText,
             ]}
           >
-            토큰 구매
+            {t("subscription.tokenPurchase")}
           </Text>
         </TouchableOpacity>
 
@@ -797,7 +794,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               activeTab === "manage" && styles.activeTabText,
             ]}
           >
-            무료 토큰
+            {t("subscription.freeTokens")}
           </Text>
         </TouchableOpacity>
       </View>
@@ -807,10 +804,10 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           <>
             <View style={styles.heroSection}>
               <Text style={styles.heroTitle}>
-                포스티와 함께{"\n"}더 많은 콘텐츠를 만들어보세요
+                {t("subscription.hero.title")}
               </Text>
               <Text style={styles.heroSubtitle}>
-                AI가 당신의 크리에이티브 파트너가 되어드립니다
+                {t("subscription.hero.subtitle")}
               </Text>
             </View>
 
@@ -937,8 +934,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                       ]}
                     >
                       {subscriptionAutoRenew
-                        ? "자동 갱신 활성화됨"
-                        : "자동 갱신 취소됨"}
+                        ? t("subscription.status.autoRenewActive")
+                        : t("subscription.status.autoRenewCanceled")}
                     </Text>
                   </View>
                 </View>
@@ -1178,12 +1175,12 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 />
                 <Text style={styles.premiumNoticeText}>
                   {realSubscriptionPlan === "free"
-                    ? "무료 회원은 매일 10개의 토큰이 자동 충전됩니다"
+                    ? t("subscription.membershipNotices.free")
                     : realSubscriptionPlan === "starter"
-                    ? "STARTER 회원은 가입 시 300개 + 매일 10개씩 추가 토큰을 받습니다"
+                    ? t("subscription.membershipNotices.starter")
                     : realSubscriptionPlan === "premium"
-                    ? "PRO 회원은 가입 시 500개 + 매일 20개씩 추가 토큰을 받습니다"
-                    : "MAX 회원은 무제한 토큰을 사용할 수 있습니다"}
+                    ? t("subscription.membershipNotices.premium")
+                    : t("subscription.membershipNotices.pro")}
                 </Text>
               </View>
             </View>

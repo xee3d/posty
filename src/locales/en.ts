@@ -3,6 +3,22 @@ export default {
   app: {
     name: "Posty",
     tagline: "Creative content powered by AI",
+    slogan: "AI writes, I shine",
+    subTagline: "Perfect posting completed in 1 minute",
+    description: "Complete amazing posts with just one photo",
+    slogan1: "Share your story\nwith the world.",
+    slogan2: "A simple line becomes\na special moment.",
+    slogan3: "Posty will help you.\nBetter writing.",
+    slogan4: "Shall we start?",
+  },
+
+  // Navigation
+  navigation: {
+    home: "Home",
+    write: "Write",
+    trend: "Trend",
+    myStyle: "My Style",
+    settings: "Settings",
   },
 
   // AI Write Screen
@@ -22,6 +38,14 @@ export default {
       text: "What would you like to write about?",
       polish: "Enter the text you'd like to polish",
       photo: "Select a photo!",
+    },
+    prompt: {
+      title: "What would you like to write about?",
+      refresh: "Refresh",
+      trendUpdate: {
+        title: "Trend Update",
+        message: "Latest trends have been loaded!"
+      }
     },
     tones: {
       casual: "Casual",
@@ -46,11 +70,82 @@ export default {
       save: "Save",
       share: "Share",
     },
+    photo: {
+      select: {
+        title: "Select Photo",
+        message: "How would you like to select a photo?",
+        camera: "Take with Camera",
+        gallery: "Choose from Gallery",
+      }
+    },
     alerts: {
       noPrompt: "Tell me what to write about! 🤔",
       noPhoto: "Please select a photo first! 📸",
       success: "Done! Here you go 🎉",
       error: "Oops! Something went wrong. Please try again 🥺",
+      waitAnalysis: "Please wait for photo analysis to complete.",
+      completeAnalysis: "Please complete photo analysis first.",
+      imageTooBig: {
+        title: "Notice",
+        message: "Image is too large. Please select a smaller image.",
+        analysisResult: "Image is too large."
+      }
+    },
+    keywords: {
+      morning: ["morning routine", "cafe", "commute", "breakfast", "coffee", "exercise"],
+      afternoon: ["lunch", "daily life", "afternoon", "break", "walk", "cafe"],
+      evening: ["evening", "workout", "hobby", "rest", "restaurant"],
+      night: ["late snack", "netflix", "rest", "daily life", "hobby", "dawn"]
+    },
+    descriptions: {
+      short: "~50 chars",
+      medium: "~150 chars",
+      long: "~300 chars"
+    },
+    example: "e.g.",
+    analysis: {
+      analyzing: "Analyzing image...",
+      failed: "Photo analysis failed. Please try again.",
+      error: "An error occurred during photo analysis.",
+      fallback: {
+        description: "Great photo! What story would you like to tell?",
+        suggestedContent: ["today's photo", "daily record", "special moment"]
+      }
+    },
+    sections: {
+      quickTopic: "Quick Topics",
+      selectTone: "What tone would you like?",
+      selectLength: "How long should it be?",
+      selectedHashtags: "Selected Hashtags",
+      polishOptions: "Polish Options",
+      photoSelect: "Show me a photo!",
+      photoAnalyzing: "Analyzing photo...",
+      resultTitle: "Done! 🎉",
+    },
+    polishOptions: {
+      summarize: "Summarize",
+      simple: "Simplify", 
+      formal: "Make Formal",
+      emotion: "Add Emotion",
+      storytelling: "Storytelling",
+      engaging: "Make Engaging",
+      hashtag: "Extract Hashtags",
+      emoji: "Add Emojis",
+      question: "Make Questions",
+    },
+    photo: {
+      select: {
+        title: "Select Photo",
+        message: "How would you like to select a photo?",
+        camera: "Take Photo",
+        gallery: "Choose from Gallery",
+      },
+      upload: {
+        title: "Please select a photo",
+        subtitle: "Choose from gallery or take a new one",
+        button: "Select Photo",
+        change: "Change",
+      }
     },
   },
 
@@ -256,10 +351,171 @@ export default {
     },
   },
 
+  // Subscription Plans
+  subscription: {
+    watchVideo: "Watch Video",
+    alreadyCheckedIn: "You've already checked in today!",
+    alreadyShared: "You've already shared on SNS today!",
+    alreadyRated: "You've already rated the app. Thank you!",
+    title: "Subscription Plan",
+    tokenPurchase: "Token Purchase", 
+    freeTokens: "Free Tokens",
+    popular: "Popular",
+    perMonth: "/month",
+    hero: {
+      title: "Create more content\nwith Posty",
+      subtitle: "AI becomes your creative partner",
+    },
+    benefits: {
+      title: "Premium Benefits",
+      moreTokens: {
+        title: "More Tokens",
+        description: "STARTER provides 600 tokens total (300 initial + 10x30 daily), PRO provides 1,100 tokens total (500 initial + 20x30 daily), MAX provides unlimited tokens"
+      },
+      advancedAI: {
+        title: "Advanced AI Models",
+        description: "Differentiated AI models by plan (GPT-4o, GPT-4 Turbo)"
+      },
+      noAds: {
+        title: "Ad-Free",
+        description: "Focus on content creation without interruptions"
+      }
+    },
+    management: {
+      title: "Subscription Management",
+      currentPlan: "Current Plan",
+      monthlyFee: "Monthly Fee",
+      nextBilling: "Next Billing Date",
+      daysRemaining: "{{days}} days remaining",
+      activeUntil: "Even after cancellation, you can continue using the current plan until {{date}}.",
+      canceledUntil: "Your subscription has been canceled and will expire on {{date}}.",
+      cancelButton: "Cancel Subscription"
+    },
+    earnTokensSection: {
+      title: "Earn Free Tokens",
+      subtitle: "Get free tokens through various activities",
+      currentTokens: "You currently have {{tokens}} tokens",
+      watchAd: {
+        title: "Watch Ads",
+        description: "+2 tokens ({{remaining}}/{{limit}} remaining)"
+      },
+      dailyCheckin: {
+        title: "Daily Check-in",
+        description: "+1 token (available today)"
+      },
+      socialShare: {
+        title: "Social Share",
+        description: "+3 tokens (1/1 remaining)"
+      },
+      inviteFriend: {
+        title: "Invite Friends",
+        description: "+5 tokens (per friend)"
+      },
+      rateApp: {
+        title: "Rate App",
+        description: "+10 tokens (one time)"
+      },
+      dailyMission: {
+        title: "Complete Mission",
+        description: "+3 tokens (daily mission)"
+      },
+      autoRefill: "Free plan users get 10 tokens automatically recharged every day at midnight"
+    },
+    earnTokens: "Tokens Earned! 🎉",
+    earnTokensMessage: "You received {{tokens}} tokens!",
+    watchAd: "Watch Ad",
+    watchAdMessage: "Watch a 30-second ad to get 2 tokens?",
+    inviteFriends: "Invite Sent",
+    inviteFriendsMessage: "You'll get 5 tokens when your friend signs up!",
+    cancelSubscription: "Cancel Subscription",
+    cancelSubscriptionMessage: "Are you sure you want to cancel your {{planName}} plan subscription?\n\nYou can continue using the current plan until the next billing date even after cancellation.",
+    cancelSubscriptionAction: "Cancel Subscription",
+    cancelSubscriptionSuccess: "Subscription Canceled",
+    cancelSubscriptionSuccessMessage: "Your subscription has been canceled. You can continue using the current plan until the next billing date.",
+    cancelSubscriptionFailed: "Subscription Cancellation Failed",
+    cancelSubscriptionFailedMessage: "There was an issue canceling your subscription. Please try again.",
+    confirmSubscription: "Confirm Subscription",
+    confirmSubscriptionAction: "Subscribe",
+    subscriptionFailed: "Subscription Failed",
+    subscriptionFailedMessage: "There was an issue processing your subscription. Please try again.",
+    downgradeNotAllowed: "Downgrade Not Allowed",
+    downgradeNotAllowedMessage: "You cannot change to a lower plan.\n\nPlease cancel your current subscription and sign up for a new one after expiration.",
+    // Additional translation keys
+    alerts: {
+      adWatch: {
+        unavailable: "Ad Watch Unavailable",
+        defaultMessage: "Please try again later."
+      },
+      mission: {
+        complete: "Mission Complete! 🎯",
+        failed: "Ad Watch Failed"
+      },
+      rating: {
+        title: "Rate App",
+        message: "Has Posty been helpful? Please leave a review!",
+        cancel: "Cancel",
+        rate: "Rate Now",
+        error: "Cannot open store."
+      },
+      share: {
+        invitation: {
+          title: "Invite to Posty",
+          message: "AI-powered SNS content creation with Posty! Try it now 🚀\nhttps://posty.app"
+        }
+      }
+    },
+    status: {
+      free: "Free",
+      unlimited: "Unlimited",
+      currentPlan: "Current Plan",
+      cannotPurchase: "Cannot Purchase",
+      subscribeAction: "Subscribe",
+      autoRenewActive: "Auto-renewal Active",
+      autoRenewCanceled: "Auto-renewal Canceled"
+    },
+    descriptions: {
+      signup300: "You will receive 300 tokens immediately upon signup",
+      signup500: "You will receive 500 tokens immediately upon signup",
+      unlimitedAccess: "You can use unlimited tokens",
+      upgrade500: "You will receive an additional 500 tokens in total",
+      downgradeWarning: "Warning: Free tokens will be limited to 300"
+    },
+    membershipNotices: {
+      free: "Free members get 10 tokens automatically recharged daily",
+      starter: "STARTER members get 300 on signup + 10 additional tokens daily",
+      premium: "PRO members get 500 on signup + 20 additional tokens daily", 
+      pro: "MAX members can use unlimited tokens"
+    },
+    planDescriptions: {
+      free: "10 free tokens daily",
+      starter: "300 on signup + 10 daily", 
+      premium: "500 on signup + 20 daily",
+      pro: "Unlimited tokens",
+      downgradeBlocked: "Cannot downgrade to lower plan"
+    },
+    membershipNotices: {
+      free: "Free members get 10 tokens automatically recharged daily",
+      starter: "STARTER members get 300 tokens on signup + 10 additional tokens daily",
+      premium: "PRO members get 500 tokens on signup + 20 additional tokens daily", 
+      pro: "MAX members can use unlimited tokens"
+    },
+    upgradeDescriptions: {
+      starterImmediate: "You'll receive 300 tokens immediately upon signup",
+      premiumImmediate: "You'll receive 500 tokens immediately upon signup",
+      proImmediate: "You'll have access to unlimited tokens",
+      premiumUpgrade: "You'll receive an additional 500 tokens in full",
+      proUpgrade: "You'll have access to unlimited tokens",
+      starterDowngrade: "Warning: Free tokens will be limited to 300"
+    }
+  },
+
   // Home Screen
   home: {
     greeting: "",
     defaultUserName: "friend",
+    navigation: {
+      subscription: "Subscription"
+    },
     welcome: {
       title: "Welcome to Posty!",
       message: "How about writing your first post? I'll help you!",
@@ -349,12 +605,6 @@ export default {
         title: "With Photo",
         desc: "Just need a photo"
       }
-    },
-    navigation: {
-      myStyle: "My Style",
-      templates: "Templates", 
-      trends: "Trends",
-      subscription: "Subscription"
     },
     tips: {
       todayTip: "Today's Tip",
@@ -575,6 +825,7 @@ export default {
     buttons: {
       ok: "OK",
       cancel: "Cancel",
+      later: "Later",
       delete: "Delete",
       error: "Error",
       completed: "Completed",
@@ -585,6 +836,21 @@ export default {
     },
     language: {
       changed: "Language changed"
+    },
+    permission: {
+      title: "Permission Required",
+      message: "Please allow notification permissions in settings to receive push notifications.",
+      goToSettings: "Go to Settings"
+    },
+    testNotification: {
+      title: "Test Notification",
+      message: "Which notification would you like to test?",
+      mission: "Mission Notification",
+      trend: "Trend Notification", 
+      token: "Token Notification",
+      achievement: "Achievement Notification",
+      tips: "Tips Notification",
+      send: "Send Test Notification"
     }
   },
 
@@ -670,7 +936,10 @@ export default {
     error: "Error",
     success: "Success",
     close: "Close",
-    count: ""
+    count: "",
+    start: "Start",
+    skip: "Skip",
+    loading: "Loading..."
   },
 
   // Analytics
@@ -698,51 +967,6 @@ export default {
     },
   },
 
-  // Subscription Plans
-  subscription: {
-    plans: {
-      free: {
-        name: "Free",
-        priceDisplay: "Free",
-        features: [
-          "10 daily tokens",
-          "3 tone styles",
-          "Short/medium length",
-          "Includes ads",
-        ],
-      },
-      starter: {
-        features: [
-          "300 tokens upon signup",
-          "Daily 10 token recharge",
-          "4 tone styles", 
-          "Long text creation",
-          "Ad removal",
-          "MyStyle analysis",
-        ],
-      },
-      premium: {
-        features: [
-          "500 tokens upon signup",
-          "Daily 20 token recharge", 
-          "6 tone styles",
-          "All text lengths",
-          "Ad removal",
-          "MyStyle analysis",
-          "Priority processing",
-        ],
-      },
-      pro: {
-        features: [
-          "500 tokens upon signup",
-          "Unlimited tokens (Fair Use)",
-          "All tone styles",
-          "Priority processing",
-          "Complete ad removal",
-        ],
-      },
-    },
-  },
 
   // Time and Date
   time: {
@@ -758,5 +982,229 @@ export default {
     selectLanguage: "Select Language",
     resetToSystem: "Reset to system language",
     note: "App will restart when language is changed"
+  },
+
+  // Trends Screen
+  trends: {
+    title: "Real-time Trends",
+    subtitle: "Real-time popular trends and keywords",
+    refresh: "Refresh",
+    lastUpdated: "Last updated: {{time}}",
+    categories: {
+      all: "All",
+      news: "News", 
+      social: "Social",
+      keywords: "Keywords"
+    },
+    categoryTitles: {
+      all: "All Trends",
+      news: "News",
+      social: "Community",
+      keywords: "Popular Keywords"
+    },
+    sources: {
+      news: "News",
+      social: "Community",
+      naver: "Naver",
+      keywords: "Keywords"
+    },
+    loading: {
+      initial: "Loading trends...",
+      refresh: "Refreshing..."
+    },
+    errors: {
+      loadFailed: "An error occurred while loading trends.",
+      refreshFailed: "An error occurred while refreshing.",
+      cannotLoad: "Unable to load trends",
+      tryAgain: "Please try again later",
+      networkError: "Please check your network connection",
+      retryButton: "Try Again"
+    },
+    premium: {
+      title: "Premium Feature",
+      subtitle: "Real-time trends are available from PRO plan.",
+      upgradeButton: "Upgrade",
+      preview: {
+        title: "Trend Preview",
+        subtitle: "Analyze trends to increase traffic and create content based on real-time issues."
+      }
+    },
+    tips: {
+      title: "Trend Usage Tips",
+      content: "Click on trends to have AI write articles on that topic. Modify with keywords to match your style!",
+      writeWithTrend: "Write with this trend"
+    },
+    updates: {
+      daily: "Trends are updated daily",
+      realtime: "Real-time trend updates"
+    },
+    actions: {
+      viewMore: "View More",
+      writePost: "Write Post",
+      share: "Share"
+    }
+  },
+
+  // MyStyle Screen
+  mystyle: {
+    title: "My Style",
+    subtitle: "Build your own content brand",
+    loading: "Analyzing style...",
+    refresh: "Refresh",
+    empty: {
+      title: "No content created yet",
+      subtitle: "Create your first content with Posty!",
+      startWriting: "Start Writing"
+    },
+    tabs: {
+      templates: "Templates"
+    },
+    templates: {
+      title: "Style Templates",
+      subtitle: "Try various styles and find your own style",
+      starterLimit: "STARTER Plan: Only {{limit}} templates available"
+    },
+    insights: {
+      title: "Style Insights",
+      styleTitle: "{{name}} Style",
+      styleDescription: "You have {{description}}.",
+      styleAction: "Continue developing this style",
+      consistentTitle: "Consistent Style",
+      consistentDescription: "You maintain {{percentage}}% high consistency!",
+      improvementTitle: "Style Consistency",
+      improvementDescription: "Try to maintain more consistent length and tone in your writing.",
+      improvementAction: "View Style Guide",
+      diverseTitle: "Diverse Content",
+      diverseDescription: "You're trying various topics and styles!",
+      challengeTitle: "New Challenge",
+      challengeDescription: "Try the {{name}} challenge!",
+      challengeAction: "Start Challenge"
+    },
+    analysis: {
+      title: "Writing Analysis",
+      totalPosts: "Total {{count}} posts",
+      averageLength: "Average word count",
+      mostUsedTone: "Primary tone",
+      consistency: "Consistency",
+      improvement: "Improvement suggestions"
+    },
+    timeSlots: {
+      title: "Activity Time Slots",
+      morning: "Morning",
+      afternoon: "Afternoon",
+      evening: "Evening",
+      night: "Night",
+      morningLabel: "6-12 AM",
+      afternoonLabel: "12-6 PM",
+      eveningLabel: "6-10 PM",
+      nightLabel: "10 PM-6 AM"
+    },
+    templates: {
+      title: "My Templates",
+      subtitle: "Save frequently used patterns as templates",
+      bestStyle: {
+        name: "My Best Style",
+        description: "Structure of your most engaging posts",
+        opening: "Emotional greeting",
+        body: "Specific experience sharing",
+        closing: "Engaging question"
+      },
+      toneMaster: {
+        name: "{{tone}} Master",
+        description: "Your most frequently used tone",
+        tips: "Write emphasizing the characteristics of this tone"
+      },
+      growthStory: {
+        name: "Growth Story",
+        description: "Posts about challenges and achievements",
+        hook: "Interesting introduction",
+        challenge: "Difficulties faced",
+        solution: "Problem-solving process",
+        lesson: "Lessons learned"
+      },
+      saveTemplate: "Save Template",
+      useTemplate: "Use Template"
+    },
+    premium: {
+      title: "Premium Feature",
+      subtitle: "Use more detailed analysis and templates",
+      upgradeButton: "Upgrade"
+    },
+    alerts: {
+      challengeStart: "Challenge Started!",
+      challengeStarted: "{{name}} challenge has started!",
+      templateSaved: "Template saved successfully",
+      templateUsed: "Template applied",
+      premiumTemplate: "Premium Template",
+      premiumTemplateMessage: "All templates are available in PRO plan.",
+      cancel: "Cancel",
+      upgrade: "Upgrade",
+      confirm: "Confirm"
+    },
+    metrics: {
+      title: "Statistics",
+      mostActiveDay: "Most active day",
+      averageWordsPerPost: "Average words per post",
+      totalWritingTime: "Total writing time",
+      improvementTip: "Improvement tip"
+    },
+    weekdays: {
+      monday: "Monday",
+      tuesday: "Tuesday",
+      wednesday: "Wednesday",
+      thursday: "Thursday",
+      friday: "Friday",
+      saturday: "Saturday",
+      sunday: "Sunday"
+    },
+    actions: {
+      analyze: "Analyze",
+      viewDetails: "View Details",
+      shareInsights: "Share Insights",
+      exportData: "Export Data"
+    }
+  },
+
+  // Mission System
+  missions: {
+    completed: {
+      title: "Mission Complete! 🎯",
+      message: "You've completed the content creation mission and earned {{tokens}} tokens!"
+    }
+  },
+
+  // Tokens
+  tokens: {
+    count: "{{count}}",
+    current: "Current Tokens",
+    unlimited: "Unlimited",
+    usage: {
+      today: "Used {{count}} today",
+    },
+    actions: {
+      getFree: "Get Free Tokens",
+      charge: "Charge Tokens"
+    },
+    info: {
+      free: "10 free tokens are recharged daily at midnight",
+      starter: "STARTER plan allows 200 tokens per month",
+      premium: "PREMIUM plan allows 500 tokens per month",
+      pro: "Using unlimited tokens with PRO plan"
+    },
+    alerts: {
+      proTitle: "PRO Plan Active",
+      proMessage: "You're currently using PRO plan with unlimited tokens. 🚀"
+    }
+  },
+  myStyle: {
+    access: {
+      freeMessage: "My Style analysis is available from STARTER plan.",
+    },
+  },
+  plans: {
+    free: {
+      name: "Free",
+      priceDisplay: "Free",
+    },
   }
 };

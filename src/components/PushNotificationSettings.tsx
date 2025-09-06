@@ -17,6 +17,7 @@ import { SafeIcon } from "../utils/SafeIcon";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { usePushNotifications } from "../hooks/usePushNotifications";
 import { COLORS, SPACING, FONTS, BORDER_RADIUS } from "../utils/constants";
+import { useTranslation } from "react-i18next";
 
 interface PushNotificationSettingsProps {
   style?: any;
@@ -26,6 +27,7 @@ export const PushNotificationSettings: React.FC<
   PushNotificationSettingsProps
 > = ({ style }) => {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const {
     state,
     requestPermission,
@@ -81,12 +83,12 @@ export const PushNotificationSettings: React.FC<
       const granted = await requestPermission();
       if (!granted) {
         Alert.alert(
-          "권한 필요",
-          "푸시 알림을 받으려면 설정에서 알림 권한을 허용해주세요.",
+          t("alerts.permission.title", "권한 필요"),
+          t("alerts.permission.message", "푸시 알림을 받으려면 설정에서 알림 권한을 허용해주세요."),
           [
-            { text: "취소", style: "cancel" },
+            { text: t("alerts.buttons.cancel", "취소"), style: "cancel" },
             {
-              text: "설정으로 이동",
+              text: t("alerts.permission.goToSettings", "설정으로 이동"),
               onPress: () => {
                 // 설정 화면으로 이동하는 코드
                 // Linking.openSettings();
@@ -103,19 +105,19 @@ export const PushNotificationSettings: React.FC<
    * 테스트 알림 전송
    */
   const handleTestNotification = () => {
-    Alert.alert("테스트 알림", "어떤 알림을 테스트하시겠어요?", [
-      { text: "취소", style: "cancel" },
-      { text: "미션 알림", onPress: () => sendTestNotification("mission") },
-      { text: "트렌드 알림", onPress: () => sendTestNotification("trend") },
-      { text: "토큰 알림", onPress: () => sendTestNotification("token") },
-      { text: "업적 알림", onPress: () => sendTestNotification("achievement") },
+    Alert.alert(t("alerts.testNotification.title", "테스트 알림"), t("alerts.testNotification.message", "어떤 알림을 테스트하시겠어요?"), [
+      { text: t("alerts.buttons.cancel", "취소"), style: "cancel" },
+      { text: t("alerts.testNotification.mission", "미션 알림"), onPress: () => sendTestNotification("mission") },
+      { text: t("alerts.testNotification.trend", "트렌드 알림"), onPress: () => sendTestNotification("trend") },
+      { text: t("alerts.testNotification.token", "토큰 알림"), onPress: () => sendTestNotification("token") },
+      { text: t("alerts.testNotification.achievement", "업적 알림"), onPress: () => sendTestNotification("achievement") },
     ]);
   };
 
   if (state.isLoading) {
     return (
       <View style={[styles.container, style]}>
-        <Text style={styles.loadingText}>푸시 알림 설정을 로드하는 중...</Text>
+        <Text style={styles.loadingText}>{t("common.loading", "푸시 알림 설정을 로드하는 중...")}</Text>
       </View>
     );
   }
@@ -248,7 +250,7 @@ export const PushNotificationSettings: React.FC<
                   size={18}
                   color={colors.text.secondary}
                 />
-                <Text style={styles.settingLabel}>팁 알림</Text>
+                <Text style={styles.settingLabel}>{t("alerts.testNotification.tips", "팁 알림")}</Text>
               </View>
               <Switch
                 value={notificationTypes.tips}
@@ -269,7 +271,7 @@ export const PushNotificationSettings: React.FC<
                 onPress={handleTestNotification}
               >
                 <SafeIcon name="send-outline" size={16} color={colors.primary} />
-                <Text style={styles.testButtonText}>테스트 알림 보내기</Text>
+                <Text style={styles.testButtonText}>{t("alerts.testNotification.send", "테스트 알림 보내기")}</Text>
               </TouchableOpacity>
             )}
           </>
@@ -280,7 +282,7 @@ export const PushNotificationSettings: React.FC<
           <View style={styles.permissionWarning}>
             <SafeIcon name="warning-outline" size={20} color={colors.warning} />
             <Text style={styles.permissionWarningText}>
-              푸시 알림을 받으려면 설정에서 알림 권한을 허용해주세요.
+              {t("alerts.permission.message", "푸시 알림을 받으려면 설정에서 알림 권한을 허용해주세요.")}
             </Text>
           </View>
         )}

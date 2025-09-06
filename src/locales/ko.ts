@@ -3,6 +3,22 @@ export default {
   app: {
     name: "Posty",
     tagline: "AI가 만드는 창의적인 콘텐츠",
+    slogan: "AI가 쓰고, 나는 빛나고",
+    subTagline: "1분 만에 완성되는 완벽한 포스팅",
+    description: "사진 한 장으로 멋진 포스팅을 완성하세요",
+    slogan1: "당신의 이야기를\n세상에 전하세요.",
+    slogan2: "간단한 한 줄이\n특별한 순간이 됩니다.",
+    slogan3: "포스티가 도와드릴게요.\n더 나은 글쓰기를.",
+    slogan4: "시작해볼까요?",
+  },
+
+  // 네비게이션
+  navigation: {
+    home: "홈",
+    write: "글쓰기",
+    trend: "트렌드",
+    myStyle: "내 스타일",
+    settings: "설정",
   },
 
   // AI 작성 화면
@@ -22,6 +38,14 @@ export default {
       text: "무엇에 대해 쓸까요?",
       polish: "정리하고 싶은 글을 입력해주세요",
       photo: "사진을 보여주세요!",
+    },
+    prompt: {
+      title: "무엇에 대해 쓸까요?",
+      refresh: "새로고침",
+      trendUpdate: {
+        title: "트렌드 업데이트",
+        message: "최신 트렌드를 불러왔어요!"
+      }
     },
     tones: {
       casual: "캐주얼",
@@ -46,11 +70,82 @@ export default {
       save: "저장",
       share: "공유",
     },
+    photo: {
+      select: {
+        title: "사진 선택",
+        message: "어떤 방법으로 사진을 선택하시겠어요?",
+        camera: "카메라로 촬영",
+        gallery: "갤러리에서 선택",
+      }
+    },
     alerts: {
       noPrompt: "무엇에 대해 쓸지 알려주세요! 🤔",
       noPhoto: "사진을 먼저 선택해주세요! 📸",
       success: "짠! 완성됐어요 🎉",
       error: "앗! 뭔가 문제가 생겼어요. 다시 시도해주세요 🥺",
+      waitAnalysis: "사진 분석이 완료될 때까지 기다려주세요.",
+      completeAnalysis: "사진 분석을 먼저 완료해주세요.",
+      imageTooBig: {
+        title: "알림",
+        message: "이미지가 너무 큽니다. 더 작은 이미지를 선택해주세요.",
+        analysisResult: "이미지가 너무 큽니다."
+      }
+    },
+    keywords: {
+      morning: ["모닝루틴", "카페", "출근", "아침", "커피", "운동"],
+      afternoon: ["점심", "일상", "오후", "휴식", "산책", "카페"],
+      evening: ["저녁", "퇴근", "운동", "취미", "휴식", "맛집"],
+      night: ["야식", "넷플릭스", "휴식", "일상", "취미", "새벽"]
+    },
+    descriptions: {
+      short: "~50자",
+      medium: "~150자",
+      long: "~300자"
+    },
+    example: "예",
+    analysis: {
+      analyzing: "이미지를 분석하는 중...",
+      failed: "사진 분석에 실패했습니다. 다시 시도해주세요.",
+      error: "사진 분析 중 오류가 발생했습니다.",
+      fallback: {
+        description: "멋진 사진이네요! 어떤 이야기를 담아볼까요?",
+        suggestedContent: ["오늘의사진", "일상기록", "특별한순간"]
+      }
+    },
+    sections: {
+      quickTopic: "빠른 주제 선택",
+      selectTone: "어떤 느낌으로 쓸까요?",
+      selectLength: "얼마나 길게 쓸까요?",
+      selectedHashtags: "선택된 해시태그",
+      polishOptions: "원하는 변환 방향",
+      photoSelect: "사진을 보여주세요!",
+      photoAnalyzing: "사진을 분석하는 중...",
+      resultTitle: "짠! 완성됐어요 🎉",
+    },
+    polishOptions: {
+      summarize: "요약하기",
+      simple: "쉽게 풀어쓰기", 
+      formal: "격식체 변환",
+      emotion: "감정 강화",
+      storytelling: "스토리텔링",
+      engaging: "매력적으로",
+      hashtag: "해시태그 추출",
+      emoji: "이모지 추가",
+      question: "질문형 변환",
+    },
+    photo: {
+      select: {
+        title: "사진 선택",
+        message: "어떤 방법으로 사진을 선택하시겠어요?",
+        camera: "카메라로 촬영",
+        gallery: "갤러리에서 선택",
+      },
+      upload: {
+        title: "사진을 선택해주세요",
+        subtitle: "갤러리에서 선택하거나 직접 촬영하세요",
+        button: "사진 선택",
+        change: "변경",
+      }
     },
   },
 
@@ -350,12 +445,6 @@ export default {
         desc: "사진만 있으면 OK"
       }
     },
-    navigation: {
-      myStyle: "내 스타일",
-      templates: "템플릿",
-      trends: "트렌드",
-      subscription: "구독"
-    },
     tips: {
       todayTip: "오늘의 꿀팁",
       consistentPosting: "꾸준한 포스팅이 핵심",
@@ -465,7 +554,9 @@ export default {
     },
     time: {
       today: "오늘",
-      yesterday: "어제"
+      yesterday: "어제",
+      weeksAgo: "{{weeks}}주 전",
+      monthsAgo: "{{months}}개월 전"
     },
     actions: {
       copy: "복사",
@@ -575,6 +666,7 @@ export default {
     buttons: {
       ok: "확인",
       cancel: "취소",
+      later: "나중에",
       delete: "삭제",
       error: "오류",
       completed: "완료",
@@ -585,6 +677,21 @@ export default {
     },
     language: {
       changed: "언어가 변경되었습니다"
+    },
+    permission: {
+      title: "권한 필요",
+      message: "푸시 알림을 받으려면 설정에서 알림 권한을 허용해주세요.",
+      goToSettings: "설정으로 이동"
+    },
+    testNotification: {
+      title: "테스트 알림",
+      message: "어떤 알림을 테스트하시겠어요?",
+      mission: "미션 알림",
+      trend: "트렌드 알림",
+      token: "토큰 알림",
+      achievement: "업적 알림",
+      tips: "팁 알림",
+      send: "테스트 알림 보내기"
     }
   },
 
@@ -670,7 +777,10 @@ export default {
     error: "오류",
     success: "성공",
     close: "닫기",
-    count: "개"
+    count: "개",
+    start: "시작하기",
+    skip: "건너뛰기",
+    loading: "로딩 중..."
   },
 
   // Analytics
@@ -700,8 +810,163 @@ export default {
 
   // Subscription Plans
   subscription: {
+    watchVideo: "시청하기",
+    alreadyCheckedIn: "오늘은 이미 출석 체크를 했어요!",
+    alreadyShared: "오늘은 이미 SNS 공유를 했어요!",
+    alreadyRated: "이미 앱을 평가해주셨어요. 감사합니다!",
+    title: "구독 플랜",
+    tokenPurchase: "토큰 구매", 
+    freeTokens: "무료 토큰",
+    popular: "인기",
+    perMonth: "/월",
+    hero: {
+      title: "포스티와 함께\n더 많은 콘텐츠를 만들어보세요",
+      subtitle: "AI가 당신의 크리에이티브 파트너가 되어드립니다",
+    },
+    benefits: {
+      title: "프리미엄 혜택",
+      moreTokens: {
+        title: "더 많은 토큰",
+        description: "STARTER는 총 600개(초기 300 + 일일 10x30), PRO는 총 1,100개(초기 500 + 일일 20x30), MAX는 무제한 토큰을 제공합니다"
+      },
+      advancedAI: {
+        title: "고급 AI 모델",
+        description: "플랜별 차별화된 AI 모델 제공 (GPT-4o, GPT-4 Turbo)"
+      },
+      noAds: {
+        title: "광고 제거",
+        description: "방해받지 않고 콘텐츠 제작에만 집중할 수 있습니다"
+      }
+    },
+    management: {
+      title: "구독 관리",
+      currentPlan: "현재 플랜",
+      monthlyFee: "월 요금",
+      nextBilling: "다음 결제일",
+      daysRemaining: "{{days}}일 남음",
+      activeUntil: "구독을 취소해도 {{date}}까지 현재 플랜을 계속 이용할 수 있습니다.",
+      canceledUntil: "구독이 취소되었으며, {{date}}에 만료됩니다.",
+      cancelButton: "구독 취소"
+    },
+    earnTokensSection: {
+      title: "무료 토큰 받기",
+      subtitle: "다양한 활동으로 무료 토큰을 획득하세요",
+      currentTokens: "현재 {{tokens}}개의 토큰을 보유하고 있습니다",
+      watchAd: {
+        title: "광고 보기",
+        description: "+2 토큰 ({{remaining}}/{{limit}}회 남음)"
+      },
+      dailyCheckin: {
+        title: "일일 출석",
+        description: "+1 토큰 (오늘 가능)"
+      },
+      socialShare: {
+        title: "SNS 공유",
+        description: "+3 토큰 (1/1회 남음)"
+      },
+      inviteFriend: {
+        title: "친구 초대",
+        description: "+5 토큰 (친구당)"
+      },
+      rateApp: {
+        title: "앱 평가하기",
+        description: "+10 토큰 (1회)"
+      },
+      dailyMission: {
+        title: "미션 완료",
+        description: "+3 토큰 (일일 미션)"
+      },
+      autoRefill: "무료 플랜 사용자는 매일 자정에 10개의 토큰이 자동 충전됩니다"
+    },
+    earnTokens: "토큰 획득! 🎉",
+    earnTokensMessage: "{{tokens}}개의 토큰을 받았어요!",
+    watchAd: "광고 시청",
+    watchAdMessage: "30초 광고를 시청하고 2개의 토큰을 받으시겠어요?",
+    inviteFriends: "초대 전송",
+    inviteFriendsMessage: "친구가 가입하면 5개의 토큰을 받을 수 있어요!",
+    cancelSubscription: "구독 취소",
+    cancelSubscriptionMessage: "{{planName}} 플랜 구독을 취소하시겠습니까?\n\n취소해도 다음 결제일까지 현재 플랜을 이용할 수 있습니다.",
+    cancelSubscriptionAction: "구독 취소",
+    cancelSubscriptionSuccess: "구독 취소 완료",
+    cancelSubscriptionSuccessMessage: "구독이 취소되었습니다. 다음 결제일까지 현재 플랜을 계속 이용할 수 있습니다.",
+    cancelSubscriptionFailed: "구독 취소 실패",
+    cancelSubscriptionFailedMessage: "구독 취소 중 문제가 발생했습니다. 다시 시도해주세요.",
+    confirmSubscription: "구독 확인",
+    confirmSubscriptionAction: "구독하기",
+    subscriptionFailed: "구독 실패",
+    subscriptionFailedMessage: "구독 처리 중 문제가 발생했습니다. 다시 시도해주세요.",
+    downgradeNotAllowed: "다운그레이드 불가",
+    downgradeNotAllowedMessage: "하위 플랜으로 변경할 수 없습니다.\n\n현재 구독을 취소하고 만료 후 새로 가입해주세요.",
+    // 추가 번역 키들
+    alerts: {
+      adWatch: {
+        unavailable: "광고 시청 불가",
+        defaultMessage: "잠시 후 다시 시도해주세요."
+      },
+      mission: {
+        complete: "미션 완료! 🎯",
+        failed: "광고 시청 실패"
+      },
+      rating: {
+        title: "앱 평가하기",
+        message: "Posty가 도움이 되셨나요? 평가를 남겨주세요!",
+        cancel: "취소",
+        rate: "평가하러 가기",
+        error: "스토어를 열 수 없어요."
+      },
+      share: {
+        invitation: {
+          title: "Posty 초대하기",
+          message: "Posty로 AI가 만드는 SNS 콘텐츠! 지금 바로 사용해보세요 🚀\nhttps://posty.app"
+        }
+      }
+    },
+    status: {
+      free: "무료",
+      unlimited: "무제한",
+      currentPlan: "현재 이용중",
+      cannotPurchase: "구매 불가",
+      subscribeAction: "구독하기",
+      autoRenewActive: "자동 갱신 활성화됨",
+      autoRenewCanceled: "자동 갱신 취소됨"
+    },
+    descriptions: {
+      signup300: "가입 즉시 300개 토큰을 받게 됩니다",
+      signup500: "가입 즉시 500개 토큰을 받게 됩니다",
+      unlimitedAccess: "무제한 토큰을 사용할 수 있습니다",
+      upgrade500: "전액 500개 토큰을 추가로 받게 됩니다",
+      downgradeWarning: "경고: 무료 토큰이 300개로 제한됩니다"
+    },
+    membershipNotices: {
+      free: "무료 회원은 매일 10개의 토큰이 자동 충전됩니다",
+      starter: "STARTER 회원은 가입 시 300개 + 매일 10개씩 추가 토큰을 받습니다",
+      premium: "PRO 회원은 가입 시 500개 + 매일 20개씩 추가 토큰을 받습니다",
+      pro: "MAX 회원은 무제한 토큰을 사용할 수 있습니다"
+    },
+    planDescriptions: {
+      free: "매일 10개 무료 충전",
+      starter: "가입 시 300개 + 매일 10개", 
+      premium: "가입 시 500개 + 매일 20개",
+      pro: "무제한 토큰",
+      downgradeBlocked: "하위 플랜으로 변경 불가"
+    },
+    membershipNotices: {
+      free: "무료 회원은 매일 10개의 토큰이 자동 충전됩니다",
+      starter: "STARTER 회원은 가입 시 300개 + 매일 10개씩 추가 토큰을 받습니다",
+      premium: "PRO 회원은 가입 시 500개 + 매일 20개씩 추가 토큰을 받습니다", 
+      pro: "MAX 회원은 무제한 토큰을 사용할 수 있습니다"
+    },
+    upgradeDescriptions: {
+      starterImmediate: "가입 즉시 300개 토큰을 받게 됩니다",
+      premiumImmediate: "가입 즉시 500개 토큰을 받게 됩니다",
+      proImmediate: "무제한 토큰을 사용할 수 있습니다",
+      premiumUpgrade: "전액 500개 토큰을 추가로 받게 됩니다",
+      proUpgrade: "무제한 토큰을 사용할 수 있습니다",
+      starterDowngrade: "경고: 무료 토큰이 300개로 제한됩니다"
+    },
     plans: {
-      free: {
+      free: "무료",
+      freeDetails: {
         name: "무료",
         priceDisplay: "무료",
         features: [
@@ -758,5 +1023,229 @@ export default {
     selectLanguage: "언어 선택",
     resetToSystem: "시스템 언어로 재설정",
     note: "언어를 변경하면 앱이 다시 시작됩니다"
+  },
+
+  // Trends Screen
+  trends: {
+    title: "실시간 트렌드",
+    subtitle: "실시간 인기 트렌드와 키워드",
+    refresh: "새로고침",
+    lastUpdated: "마지막 업데이트: {{time}}",
+    categories: {
+      all: "전체",
+      news: "뉴스", 
+      social: "소셜",
+      keywords: "검색어"
+    },
+    categoryTitles: {
+      all: "전체 트렌드",
+      news: "뉴스",
+      social: "커뮤니티",
+      keywords: "인기 검색어"
+    },
+    sources: {
+      news: "뉴스",
+      social: "커뮤니티",
+      naver: "네이버",
+      keywords: "검색어"
+    },
+    loading: {
+      initial: "트렌드를 불러오는 중...",
+      refresh: "새로고침 중..."
+    },
+    errors: {
+      loadFailed: "트렌드를 불러오는 중 오류가 발생했습니다.",
+      refreshFailed: "새로고침 중 오류가 발생했습니다.",
+      cannotLoad: "트렌드를 불러올 수 없어요",
+      tryAgain: "잠시 후 다시 시도해주세요",
+      networkError: "네트워크 연결을 확인해주세요",
+      retryButton: "다시 시도"
+    },
+    premium: {
+      title: "프리미엄 기능입니다",
+      subtitle: "PRO 플랜부터 실시간 트렌드를 확인할 수 있습니다.",
+      upgradeButton: "업그레이드",
+      preview: {
+        title: "트렌드 미리보기",
+        subtitle: "트렌드를 분석하여 트래픽을 높이고,\n실시간 이슈에 맞춰 콘텐츠를 작성해보세요."
+      }
+    },
+    tips: {
+      title: "트렌드 활용 팁",
+      content: "트렌드를 클릭하면 AI가 해당 주제로 글을 작성해드려요. 키워드를 바탕으로 나만의 스타일로 수정해보세요!",
+      writeWithTrend: "이 트렌드로 글쓰기"
+    },
+    updates: {
+      daily: "트렌드가 매일 업데이트됩니다",
+      realtime: "실시간 트렌드 업데이트"
+    },
+    actions: {
+      viewMore: "더보기",
+      writePost: "글쓰기",
+      share: "공유"
+    }
+  },
+
+  // MyStyle Screen
+  mystyle: {
+    title: "내 스타일",
+    subtitle: "나만의 콘텐츠 브랜드를 만들어가세요",
+    loading: "스타일 분석 중...",
+    refresh: "새로고침",
+    empty: {
+      title: "아직 작성한 콘텐츠가 없어요",
+      subtitle: "포스티와 함께 첫 콘텐츠를 만들어보세요!",
+      startWriting: "첫 글 쓰기"
+    },
+    tabs: {
+      templates: "템플릿"
+    },
+    templates: {
+      title: "스타일 템플릿",
+      subtitle: "다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요",
+      starterLimit: "STARTER 플랜: {{limit}}개 템플릿만 사용 가능"
+    },
+    insights: {
+      title: "스타일 인사이트",
+      styleTitle: "{{name}} 스타일",
+      styleDescription: "당신은 {{description}}을 가지고 있어요.",
+      styleAction: "이 스타일로 계속 발전하기",
+      consistentTitle: "일관된 스타일",
+      consistentDescription: "{{percentage}}%의 높은 일관성을 유지하고 있어요!",
+      improvementTitle: "스타일 일관성",
+      improvementDescription: "글의 길이와 톤을 더 일관되게 유지해보세요.",
+      improvementAction: "스타일 가이드 보기",
+      diverseTitle: "다양한 콘텐츠",
+      diverseDescription: "다양한 주제와 스타일을 시도하고 있어요!",
+      challengeTitle: "새로운 챌린지",
+      challengeDescription: "{{name}} 챌린지에 도전해보세요!",
+      challengeAction: "챌린지 시작하기"
+    },
+    analysis: {
+      title: "글쓰기 분석",
+      totalPosts: "총 {{count}}개 글",
+      averageLength: "평균 글자수",
+      mostUsedTone: "주요 톤",
+      consistency: "일관성",
+      improvement: "개선 제안"
+    },
+    timeSlots: {
+      title: "활동 시간대",
+      morning: "아침",
+      afternoon: "오후",
+      evening: "저녁",
+      night: "밤",
+      morningLabel: "6-12시",
+      afternoonLabel: "12-18시",
+      eveningLabel: "18-22시",
+      nightLabel: "22-6시"
+    },
+    templates: {
+      title: "나만의 템플릿",
+      subtitle: "자주 사용하는 패턴을 템플릿으로 저장하세요",
+      bestStyle: {
+        name: "나의 베스트 스타일",
+        description: "가장 반응이 좋았던 글의 구조",
+        opening: "감정을 담은 인사",
+        body: "구체적인 경험 공유",
+        closing: "공감 유도 질문"
+      },
+      toneMaster: {
+        name: "{{tone}} 마스터",
+        description: "가장 자주 사용하는 톤",
+        tips: "이 톤의 특징을 살려서 작성하세요"
+      },
+      growthStory: {
+        name: "성장 스토리",
+        description: "도전과 성취를 담은 글",
+        hook: "흥미로운 도입",
+        challenge: "겪었던 어려움",
+        solution: "해결 과정",
+        lesson: "배운 점"
+      },
+      saveTemplate: "템플릿 저장",
+      useTemplate: "템플릿 사용"
+    },
+    premium: {
+      title: "프리미엄 기능",
+      subtitle: "더 자세한 분석과 템플릿을 이용하세요",
+      upgradeButton: "업그레이드"
+    },
+    alerts: {
+      challengeStart: "챌린지 시작!",
+      challengeStarted: "{{name}} 챌린지가 시작되었습니다!",
+      templateSaved: "템플릿이 저장되었습니다",
+      templateUsed: "템플릿을 적용했습니다",
+      premiumTemplate: "프리미엄 템플릿",
+      premiumTemplateMessage: "PRO 플랜에서 모든 템플릿을 사용할 수 있습니다.",
+      cancel: "취소",
+      upgrade: "업그레이드",
+      confirm: "확인"
+    },
+    metrics: {
+      title: "통계",
+      mostActiveDay: "최다 작성 요일",
+      averageWordsPerPost: "글당 평균 단어수",
+      totalWritingTime: "총 글쓰기 시간",
+      improvementTip: "개선 팁"
+    },
+    weekdays: {
+      monday: "월요일",
+      tuesday: "화요일",
+      wednesday: "수요일",
+      thursday: "목요일",
+      friday: "금요일",
+      saturday: "토요일",
+      sunday: "일요일"
+    },
+    actions: {
+      analyze: "분석하기",
+      viewDetails: "자세히 보기",
+      shareInsights: "인사이트 공유",
+      exportData: "데이터 내보내기"
+    }
+  },
+
+  // 미션 시스템
+  missions: {
+    completed: {
+      title: "미션 완료! 🎯",
+      message: "콘텐츠 생성 미션을 완료하여 {{tokens}}개의 토큰을 받았습니다!"
+    }
+  },
+
+  // 토큰 관련
+  tokens: {
+    count: "{{count}}개",
+    current: "보유 토큰",
+    unlimited: "무제한",
+    usage: {
+      today: "오늘 {{count}}개 사용",
+    },
+    actions: {
+      getFree: "무료 토큰 받기",
+      charge: "토큰 충전하기"
+    },
+    info: {
+      free: "매일 자정에 10개의 무료 토큰이 충전됩니다",
+      starter: "STARTER 플랜으로 매월 200개의 토큰을 사용할 수 있습니다",
+      premium: "PREMIUM 플랜으로 매월 500개의 토큰을 사용할 수 있습니다",
+      pro: "PRO 플랜으로 무제한 토큰을 사용 중입니다"
+    },
+    alerts: {
+      proTitle: "PRO 플랜 사용 중",
+      proMessage: "현재 PRO 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. 🚀"
+    }
+  },
+  myStyle: {
+    access: {
+      freeMessage: "STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.",
+    },
+  },
+  plans: {
+    free: {
+      name: "무료",
+      priceDisplay: "무료",
+    },
   }
 };

@@ -2,7 +2,7 @@
 import { NativeModules, Platform } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { changeLanguage as changeI18nLanguage } from '../../locales/i18n';
+import i18n from '../../locales/i18n';
 import { store } from '../../store';
 import { updateSettings } from '../../store/slices/userSlice';
 
@@ -68,14 +68,9 @@ class LanguageService {
       const systemLanguage = this.detectSystemLanguage();
       
       if (storedLanguage && this.isSupportedLanguage(storedLanguage)) {
-        // 저장된 언어가 있지만, 한국 사용자라면 한국어 우선
-        if (systemLanguage === 'ko') {
-          this.currentLanguage = 'ko';
-          console.log('[LanguageService] Korean system detected, using Korean');
-        } else {
-          this.currentLanguage = storedLanguage as SupportedLanguage;
-          console.log('[LanguageService] Using stored language:', this.currentLanguage);
-        }
+        // 저장된 언어 설정이 있으면 우선 사용
+        this.currentLanguage = storedLanguage as SupportedLanguage;
+        console.log('[LanguageService] Using stored language:', this.currentLanguage);
       } else {
         this.currentLanguage = systemLanguage;
         console.log('[LanguageService] Using system language:', this.currentLanguage);
@@ -161,7 +156,12 @@ class LanguageService {
       await AsyncStorage.setItem(STORAGE_KEY, language);
       
       // i18n 시스템과 연동
-      changeI18nLanguage(language);
+      try {
+        await i18n.changeLanguage(language);
+        console.log('[LanguageService] i18n language changed successfully to:', language);
+      } catch (error) {
+        console.warn('[LanguageService] i18n language change failed:', error);
+      }
       
       // Redux 상태 업데이트
       store.dispatch(updateSettings({ language }));

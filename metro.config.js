@@ -7,17 +7,17 @@ const config = {
   transformer: {
     minifierPath: "metro-minify-terser",
     minifierConfig: {
-      keep_fnames: false,
+      keep_fnames: true, // 디버깅을 위해 함수명 유지
       mangle: {
-        keep_fnames: false,
+        keep_fnames: true, // 함수명 난독화 방지
       },
       compress: {
-        drop_console: true,
-        drop_debugger: true,
-        pure_funcs: ["console.log", "console.info", "console.warn"],
+        drop_console: false, // 개발 중에는 console 유지
+        drop_debugger: false,
+        pure_funcs: [], // 개발 중에는 pure 함수 제거하지 않음
       },
       output: {
-        comments: false,
+        comments: true, // 주석 유지
         ascii_only: true,
       },
     },

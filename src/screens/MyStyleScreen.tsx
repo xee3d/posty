@@ -29,6 +29,7 @@ import {
   FONT_SIZES,
 } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
+import { useTranslation } from "react-i18next";
 import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
@@ -51,7 +52,7 @@ import { createHeaderStyles, createSectionStyles } from "../styles/commonStyles"
 
 import { Alert } from "../utils/customAlert";
 import { useAppSelector } from "../hooks/redux";
-import { getUserPlan, MY_STYLE_ACCESS, PlanType } from "../config/adConfig";
+import { getUserPlan, getMyStyleAccess, PlanType } from "../config/adConfig";
 import { CompactBanner, SmartAdPlacement } from "../components/ads";
 const { width } = Dimensions.get("window");
 
@@ -82,6 +83,7 @@ interface TemplateUsage {
 
 const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
+  const { t } = useTranslation();
   const styles = createStyles(colors, cardTheme, isDark);
   const headerStyles = createHeaderStyles(colors);
 
@@ -93,6 +95,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const userPlan = getUserPlan(
     subscriptionPlan || subscription?.plan || "free"
   );
+  const MY_STYLE_ACCESS = getMyStyleAccess();
   const styleAccess = MY_STYLE_ACCESS[userPlan] || MY_STYLE_ACCESS.free;
 
   console.log("[MyStyleScreen] subscription:", subscription);
@@ -315,9 +318,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       insights.push({
         type: "strength",
         icon: dominantTemplate.icon,
-        title: `${dominantTemplate.name} 스타일`,
-        description: `당신은 ${dominantTemplate.description}을 가지고 있어요.`,
-        action: "이 스타일로 계속 발전하기",
+        title: t("mystyle.insights.styleTitle", { name: dominantTemplate.name }),
+        description: t("mystyle.insights.styleDescription", { description: dominantTemplate.description }),
+        action: t("mystyle.insights.styleAction"),
       });
     }
 
@@ -326,16 +329,16 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       insights.push({
         type: "strength",
         icon: "checkmark-circle",
-        title: "일관된 스타일",
-        description: `${analysis.consistency}%의 높은 일관성을 유지하고 있어요!`,
+        title: t("mystyle.insights.consistentTitle"),
+        description: t("mystyle.insights.consistentDescription", { percentage: analysis.consistency }),
       });
     } else if (analysis.consistency < 50) {
       insights.push({
         type: "improvement",
         icon: "sync",
-        title: "스타일 일관성",
-        description: "글의 길이와 톤을 더 일관되게 유지해보세요.",
-        action: "스타일 가이드 보기",
+        title: t("mystyle.insights.improvementTitle"),
+        description: t("mystyle.insights.improvementDescription"),
+        action: t("mystyle.insights.improvementAction"),
       });
     }
 
@@ -344,8 +347,8 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       insights.push({
         type: "strength",
         icon: "color-palette",
-        title: "다양한 콘텐츠",
-        description: "다양한 주제와 스타일을 시도하고 있어요!",
+        title: t("mystyle.insights.diverseTitle"),
+        description: t("mystyle.insights.diverseDescription"),
       });
     }
 
@@ -359,9 +362,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       insights.push({
         type: "trend",
         icon: "trophy",
-        title: "새로운 챌린지",
-        description: `${recommendedChallenge.name} 챌린지에 도전해보세요!`,
-        action: "챌린지 시작하기",
+        title: t("mystyle.insights.challengeTitle"),
+        description: t("mystyle.insights.challengeDescription", { name: recommendedChallenge.name }),
+        action: t("mystyle.insights.challengeAction"),
       });
     }
 
@@ -372,19 +375,19 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const analyzeWritingPatterns = (posts: any[]) => {
     if (posts.length === 0) {
       setWritingPatterns([
-        { time: "아침", percentage: 25, label: "6-12시" },
-        { time: "오후", percentage: 35, label: "12-18시" },
-        { time: "저녁", percentage: 30, label: "18-22시" },
-        { time: "밤", percentage: 10, label: "22-6시" },
+        { time: t("mystyle.timeSlots.morning"), percentage: 25, label: t("mystyle.timeSlots.morningLabel") },
+        { time: t("mystyle.timeSlots.afternoon"), percentage: 35, label: t("mystyle.timeSlots.afternoonLabel") },
+        { time: t("mystyle.timeSlots.evening"), percentage: 30, label: t("mystyle.timeSlots.eveningLabel") },
+        { time: t("mystyle.timeSlots.night"), percentage: 10, label: t("mystyle.timeSlots.nightLabel") },
       ]);
       return;
     }
 
     const timeSlots = {
-      morning: { count: 0, label: "6-12시", name: "아침" },
-      afternoon: { count: 0, label: "12-18시", name: "오후" },
-      evening: { count: 0, label: "18-22시", name: "저녁" },
-      night: { count: 0, label: "22-6시", name: "밤" },
+      morning: { count: 0, label: t("mystyle.timeSlots.morningLabel"), name: t("mystyle.timeSlots.morning") },
+      afternoon: { count: 0, label: t("mystyle.timeSlots.afternoonLabel"), name: t("mystyle.timeSlots.afternoon") },
+      evening: { count: 0, label: t("mystyle.timeSlots.eveningLabel"), name: t("mystyle.timeSlots.evening") },
+      night: { count: 0, label: t("mystyle.timeSlots.nightLabel"), name: t("mystyle.timeSlots.night") },
     };
 
     posts.forEach((post) => {
@@ -418,14 +421,14 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     if (posts.length > 0) {
       templates.push({
         id: "1",
-        name: "나의 베스트 스타일",
-        description: "가장 반응이 좋았던 글의 구조",
+        name: t("mystyle.templates.bestStyle.name"),
+        description: t("mystyle.templates.bestStyle.description"),
         icon: "star",
         color: colors.primary,
         structure: {
-          opening: "감정을 담은 인사",
-          body: "구체적인 경험 공유",
-          closing: "공감 유도 질문",
+          opening: t("mystyle.templates.bestStyle.opening"),
+          body: t("mystyle.templates.bestStyle.body"),
+          closing: t("mystyle.templates.bestStyle.closing"),
         },
       });
     }
@@ -439,13 +442,13 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       if (topTone) {
         templates.push({
           id: "2",
-          name: `${topTone[0]} 마스터`,
-          description: "가장 자주 사용하는 톤",
+          name: t("mystyle.templates.toneMaster.name", { tone: topTone[0] }),
+          description: t("mystyle.templates.toneMaster.description"),
           icon: "color-palette",
           color: colors.accent,
           structure: {
             tone: topTone[0],
-            tips: "이 톤의 특징을 살려서 작성하세요",
+            tips: t("mystyle.templates.toneMaster.tips"),
           },
         });
       }
@@ -454,15 +457,15 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     // 성장 템플릿
     templates.push({
       id: "3",
-      name: "성장 스토리",
-      description: "도전과 성취를 담은 글",
+      name: t("mystyle.templates.growthStory.name"),
+      description: t("mystyle.templates.growthStory.description"),
       icon: "rocket-outline",
       color: colors.success,
       structure: {
-        hook: "흥미로운 도입",
-        challenge: "겪었던 어려움",
-        solution: "해결 과정",
-        lesson: "배운 점",
+        hook: t("mystyle.templates.growthStory.hook"),
+        challenge: t("mystyle.templates.growthStory.challenge"),
+        solution: t("mystyle.templates.growthStory.solution"),
+        lesson: t("mystyle.templates.growthStory.lesson"),
       },
     });
 
@@ -481,8 +484,8 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       const challenge = STYLE_CHALLENGES.find((c) => c.id === challengeId);
       setActiveChallenge(challenge);
       Alert.alert(
-        "챌린지 시작!",
-        `${challenge?.name} 챌린지가 시작되었습니다!`
+        t("mystyle.alerts.challengeStart"),
+        t("mystyle.alerts.challengeStarted", { name: challenge?.name })
       );
     }
   };
@@ -505,13 +508,13 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const handleInsightAction = (insight: StyleInsight) => {
     soundManager.playTap();
 
-    if (insight.action === "챌린지 시작하기") {
+    if (insight.action === t("mystyle.insights.challengeAction")) {
       const recommendedChallenge =
         STYLE_CHALLENGES.find((c) =>
           c.id.includes(styleAnalysis.dominantStyle.split("ist")[0])
         ) || STYLE_CHALLENGES[0];
       handleStartChallenge(recommendedChallenge.id);
-    } else if (insight.action === "이 스타일로 계속 발전하기" && onNavigate) {
+    } else if (insight.action === t("mystyle.insights.styleAction") && onNavigate) {
       const template = getStyleById(styleAnalysis.dominantStyle);
       if (template) {
         onNavigate("ai-write", {
@@ -814,15 +817,15 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <View style={styles.accessDeniedIcon}>
             <SafeIcon name="lock-closed" size={40} color={colors.text.tertiary} />
           </View>
-          <Text style={styles.accessDeniedTitle}>프리미엄 기능입니다</Text>
+          <Text style={styles.accessDeniedTitle}>{t("mystyle.premium.title")}</Text>
           <Text style={styles.accessDeniedSubtitle}>
-            STARTER 플랜부터 상세 분석을 확인할 수 있습니다.
+            {t("mystyle.premium.subtitle")}
           </Text>
           <TouchableOpacity
             style={styles.upgradeButton}
             onPress={() => onNavigate?.("subscription")}
           >
-            <Text style={styles.upgradeButtonText}>구독 플랜 보기</Text>
+            <Text style={styles.upgradeButtonText}>{t("mystyle.premium.upgradeButton")}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -844,9 +847,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             <View style={styles.metricItem}>
               <SafeIcon name="calendar-outline" size={24} color={colors.accent} />
               <Text style={styles.metricValue}>
-                {stats?.postingPatterns?.mostActiveDay || "월요일"}
+                {stats?.postingPatterns?.mostActiveDay || t("mystyle.weekdays.monday")}
               </Text>
-              <Text style={styles.metricLabel}>최다 작성 요일</Text>
+              <Text style={styles.metricLabel}>{t("mystyle.metrics.mostActiveDay")}</Text>
             </View>
             <View style={styles.metricItem}>
               <SafeIcon name="time-outline" size={24} color={colors.success} />
@@ -922,15 +925,15 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <View style={styles.accessDeniedIcon}>
             <SafeIcon name="lock-closed" size={40} color={colors.text.tertiary} />
           </View>
-          <Text style={styles.accessDeniedTitle}>프리미엄 기능입니다</Text>
+          <Text style={styles.accessDeniedTitle}>{t("mystyle.premium.title")}</Text>
           <Text style={styles.accessDeniedSubtitle}>
-            STARTER 플랜부터 템플릿을 사용할 수 있습니다.
+            {t("mystyle.premium.subtitle")}
           </Text>
           <TouchableOpacity
             style={styles.upgradeButton}
             onPress={() => onNavigate?.("subscription")}
           >
-            <Text style={styles.upgradeButtonText}>구독 플랜 보기</Text>
+            <Text style={styles.upgradeButtonText}>{t("mystyle.premium.upgradeButton")}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -944,9 +947,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             transform: [{ translateY: Animated.multiply(slideAnim, 0.5) }],
           }}
         >
-          <Text style={styles.sectionTitle}>📝 스타일 템플릿</Text>
+          <Text style={styles.sectionTitle}>📝 {t("mystyle.templates.title", "스타일 템플릿")}</Text>
           <Text style={styles.sectionSubtitle}>
-            다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요
+            {t("mystyle.templates.subtitle", "다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요")}
           </Text>
           {userPlan === "starter" &&
             styleAccess?.templateLimit &&
@@ -958,7 +961,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                   color={colors.primary}
                 />
                 <Text style={styles.templateLimitText}>
-                  STARTER 플랜: {styleAccess.templateLimit}개 템플릿만 사용 가능
+{t("mystyle.templates.starterLimit", "STARTER 플랜: {{limit}}개 템플릿만 사용 가능", { limit: styleAccess.templateLimit })}
                 </Text>
               </View>
             )}
@@ -994,12 +997,12 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               onPress={() => {
                 if (isLocked) {
                   Alert.alert(
-                    "프리미엄 템플릿",
-                    "PRO 플랜에서 모든 템플릿을 사용할 수 있습니다.",
+                    t("mystyle.alerts.premiumTemplate"),
+                    t("mystyle.alerts.premiumTemplateMessage"),
                     [
-                      { text: "취소", style: "cancel" },
+                      { text: t("mystyle.alerts.cancel"), style: "cancel" },
                       {
-                        text: "업그레이드",
+                        text: t("mystyle.alerts.upgrade"),
                         onPress: () => onNavigate?.("subscription"),
                       },
                     ]
@@ -1170,7 +1173,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <LoadingScreen message="스타일 분석 중..." fullScreen={true} />
+        <LoadingScreen message={t("mystyle.loading")} fullScreen={true} />
       </SafeAreaView>
     );
   }
@@ -1186,16 +1189,16 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             <View style={styles.mollyBadge}>
               <Text style={styles.mollyBadgeText}>P</Text>
             </View>
-            <Text style={headerStyles.headerTitle}>내 스타일</Text>
+            <Text style={headerStyles.headerTitle}>{t("mystyle.title")}</Text>
           </View>
           <Text style={headerStyles.headerSubtitle}>
-            나만의 콘텐츠 브랜드를 만들어가세요
+            {t("mystyle.subtitle")}
           </Text>
         </View>
         <EmptyState
           icon="brush-outline"
-          title="아직 작성한 콘텐츠가 없어요"
-          subtitle="포스티와 함께 첫 콘텐츠를 만들어보세요!"
+          title={t("mystyle.empty.title")}
+          subtitle={t("mystyle.empty.subtitle")}
         />
       </SafeAreaView>
     );
@@ -1215,10 +1218,10 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             <View style={styles.mollyBadge}>
               <Text style={styles.mollyBadgeText}>P</Text>
             </View>
-            <Text style={headerStyles.headerTitle}>내 스타일</Text>
+            <Text style={headerStyles.headerTitle}>{t("mystyle.title")}</Text>
           </View>
           <Text style={headerStyles.headerSubtitle}>
-            나만의 콘텐츠 브랜드를 만들어가세요
+            {t("mystyle.subtitle")}
           </Text>
         </View>
 
@@ -1266,7 +1269,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 selectedTab === "templates" && styles.tabTextActive,
               ]}
             >
-              템플릿
+{t("mystyle.tabs.templates", "템플릿")}
             </Text>
           </TouchableOpacity>
         </View>

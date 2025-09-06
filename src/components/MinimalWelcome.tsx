@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { SPACING } from "../utils/constants";
+import { useTranslation } from "react-i18next";
 
 interface MinimalWelcomeProps {
   onComplete: () => void;
@@ -23,6 +24,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({
   onSkip,
 }) => {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const [currentSloganIndex, setSloganIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
@@ -38,10 +40,10 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({
 
   // 슬로건 배열
   const slogans = [
-    "당신의 이야기를\n세상에 전하세요.",
-    "간단한 한 줄이\n특별한 순간이 됩니다.",
-    "Posty가 도와드릴게요.\n더 나은 글쓰기를.",
-    "시작해볼까요?",
+    t("app.slogan1", "당신의 이야기를\n세상에 전하세요."),
+    t("app.slogan2", "간단한 한 줄이\n특별한 순간이 됩니다."),
+    t("app.slogan3", "Posty가 도와드릴게요.\n더 나은 글쓰기를."),
+    t("app.slogan4", "시작해볼까요?"),
   ];
 
   // 타이핑 애니메이션
@@ -250,7 +252,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({
             activeOpacity={0.8}
           >
             <Text style={[styles.startButtonText, { color: colors.white }]}>
-              시작하기
+              {t("common.start", "시작하기")}
             </Text>
           </TouchableOpacity>
 
@@ -260,7 +262,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({
             activeOpacity={0.6}
           >
             <Text style={[styles.skipText, { color: colors.text.secondary }]}>
-              건너뛰기
+              {t("common.skip", "건너뛰기")}
             </Text>
           </TouchableOpacity>
         </Animated.View>

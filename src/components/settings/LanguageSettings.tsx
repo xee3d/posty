@@ -51,6 +51,7 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
 
   const handleLanguageChange = async (language: SupportedLanguage) => {
     try {
+      console.log('[LanguageSettings] Changing language to:', language);
       await languageService.setLanguage(language);
       setCurrentLanguage(language);
       setIsSystemLanguage(language === languageService.getCurrentLanguage());
@@ -60,11 +61,7 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
         onLanguageChange(language);
       }
 
-      Alert.alert(
-        getLanguageConfig(language).name,
-        t('alerts.language.changed'),
-        [{ text: t('alerts.buttons.ok') }]
-      );
+      // 언어 변경 완료 - 팝업 제거됨
     } catch (error) {
       console.error('Failed to change language:', error);
       Alert.alert('Error', 'Language change failed.');
@@ -82,11 +79,7 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
         onLanguageChange(newLanguage);
       }
 
-      Alert.alert(
-        '시스템 언어',
-        `시스템 언어(${getLanguageConfig(newLanguage).nativeName})로 설정되었습니다.`,
-        [{ text: '확인' }]
-      );
+      // 시스템 언어로 재설정 완료 - 팝업 제거됨
     } catch (error) {
       console.error('Failed to reset to system language:', error);
     }

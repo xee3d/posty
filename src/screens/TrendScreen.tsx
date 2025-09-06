@@ -20,6 +20,7 @@ import {
 import { SafeIcon } from "../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useAppTheme } from "../hooks/useAppTheme";
+import { useTranslation } from "react-i18next";
 // import { useFocusEffect } from '@react-navigation/native'; // NavigationContainer 밖에서 사용 불가
 import { soundManager } from "../utils/soundManager";
 import trendService from "../services/trendService";
@@ -50,6 +51,7 @@ interface TrendScreenProps {
 const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   console.log("[TrendScreen] ===== Component Mounted/Rendered =====");
   const { colors, isDark } = useAppTheme();
+  const { t } = useTranslation();
 
   // 구독 플랜 정보
   const subscription = useAppSelector((state) => state.user.subscription);
@@ -124,7 +126,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         });
       } else {
         console.error("Failed to load trends:", trendData.reason);
-        const errorMsg = "트렌드를 불러오는 중 오류가 발생했습니다.";
+        const errorMsg = t("trends.errors.loadFailed");
         setError(errorMsg);
         setTrends([]);
 
@@ -143,7 +145,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
       }
     } catch (error) {
       console.error("Failed to load trends:", error);
-      setError("트렌드를 불러오는 중 오류가 발생했습니다.");
+      setError(t("trends.errors.loadFailed"));
       setTrends([]);
     } finally {
       setIsLoading(false);
@@ -229,7 +231,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
       await loadTrends(true); // forceRefresh = true
     } catch (error) {
       console.error("[TrendScreen] Refresh error:", error);
-      setError("새로고침 중 오류가 발생했습니다.");
+      setError(t("trends.errors.refreshFailed"));
     }
   };
 
@@ -301,31 +303,30 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
             <View style={styles.mollyBadge}>
               <Text style={styles.mollyBadgeText}>P</Text>
             </View>
-            <Text style={headerStyles.headerTitle}>실시간 트렌드</Text>
+            <Text style={headerStyles.headerTitle}>{t("trends.title")}</Text>
           </View>
-          <Text style={headerStyles.headerSubtitle}>실시간 인기 트렌드와 키워드</Text>
+          <Text style={headerStyles.headerSubtitle}>{t("trends.subtitle")}</Text>
         </View>
 
         <View style={styles.accessDeniedContainer}>
           <View style={styles.accessDeniedIcon}>
             <SafeIcon name="lock-closed" size={48} color={colors.text.tertiary} />
           </View>
-          <Text style={styles.accessDeniedTitle}>프리미엄 기능입니다</Text>
+          <Text style={styles.accessDeniedTitle}>{t("trends.premium.title")}</Text>
           <Text style={styles.accessDeniedSubtitle}>
-            PRO 플랜부터 실시간 트렌드를 확인할 수 있습니다.
+            {t("trends.premium.subtitle")}
           </Text>
           <TouchableOpacity
             style={styles.upgradeButton}
             onPress={() => onNavigate?.("subscription")}
           >
-            <Text style={styles.upgradeButtonText}>구독 플랜 보기</Text>
+            <Text style={styles.upgradeButtonText}>{t("trends.premium.upgradeButton")}</Text>
           </TouchableOpacity>
 
           <View style={styles.trendPreview}>
-            <Text style={styles.trendPreviewTitle}>트렌드 미리보기</Text>
+            <Text style={styles.trendPreviewTitle}>{t("trends.premium.preview.title")}</Text>
             <Text style={styles.trendPreviewSubtitle}>
-              트렌드를 분석하여 트래픽을 높이고,{"\n"}
-              실시간 이슈에 맞춰 콘텐츠를 작성해보세요.
+              {t("trends.premium.preview.subtitle")}
             </Text>
           </View>
         </View>
@@ -356,9 +357,9 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
               <View style={styles.mollyBadge}>
                 <Text style={styles.mollyBadgeText}>P</Text>
               </View>
-              <Text style={headerStyles.headerTitle}>실시간 트렌드</Text>
+              <Text style={headerStyles.headerTitle}>{t("trends.title")}</Text>
             </View>
-            <Text style={headerStyles.headerSubtitle}>실시간 인기 트렌드와 키워드</Text>
+            <Text style={headerStyles.headerSubtitle}>{t("trends.subtitle")}</Text>
           </View>
         </FadeInView>
 
@@ -371,10 +372,10 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
           >
             <View style={styles.categoryContainer}>
               {[
-                { id: "all", label: "전체", icon: "globe" },
-                { id: "news", label: "뉴스", icon: "newspaper" },
-                { id: "social", label: "소셜", icon: "people" },
-                { id: "keywords", label: "검색어", icon: "search" },
+                { id: "all", label: t("trends.categories.all"), icon: "globe" },
+                { id: "news", label: t("trends.categories.news"), icon: "newspaper" },
+                { id: "social", label: t("trends.categories.social"), icon: "people" },
+                { id: "keywords", label: t("trends.categories.keywords"), icon: "search" },
               ].map((category) => (
                 <TouchableOpacity
                   key={category.id}
@@ -422,7 +423,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
             ) : userTrends && userTrends.hashtags?.length > 0 ? (
               <SlideInView direction="right" delay={200}>
                 <View style={styles.myTrendsSection}>
-                  <Text style={sectionStyles.sectionTitle}>내가 자주 쓴 태그</Text>
+                  <Text style={sectionStyles.sectionTitle}>{t("mystyle.insights.title")}</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {userTrends.hashtags
                       .slice(0, 5)
@@ -455,12 +456,12 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
         <View style={styles.trendsSection}>
           <Text style={sectionStyles.sectionTitle}>
             {selectedCategory === "all"
-              ? "전체 트렌드"
+              ? t("trends.categoryTitles.all")
               : selectedCategory === "news"
-              ? "뉴스"
+              ? t("trends.categoryTitles.news")
               : selectedCategory === "social"
-              ? "커뮤니티"
-              : "인기 검색어"}
+              ? t("trends.categoryTitles.social")
+              : t("trends.categoryTitles.keywords")}
           </Text>
 
           {/* 에러 상태 표시 */}
@@ -476,7 +477,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
                 style={styles.retryButton}
                 onPress={() => loadTrends()}
               >
-                <Text style={styles.retryButtonText}>다시 시도</Text>
+                <Text style={styles.retryButtonText}>{t("trends.errors.retryButton")}</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -542,12 +543,12 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
                     />
                     <Text style={styles.trendSourceText}>
                       {trend.source === "news"
-                        ? "뉴스"
+                        ? t("trends.sources.news")
                         : trend.source === "social"
-                        ? "커뮤니티"
+                        ? t("trends.sources.social")
                         : trend.source === "naver"
-                        ? "네이버"
-                        : "검색어"}
+                        ? t("trends.sources.naver")
+                        : t("trends.sources.keywords")}
                     </Text>
                   </View>
                   <TouchableOpacity
@@ -559,7 +560,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
                       size={14}
                       color={colors.primary}
                     />
-                    <Text style={styles.writeButtonText}>글쓰기</Text>
+                    <Text style={styles.writeButtonText}>{t("trends.actions.writePost")}</Text>
                   </TouchableOpacity>
                 </View>
               </AnimatedCard>
@@ -572,9 +573,9 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
                   size={48}
                   color={colors.text.tertiary}
                 />
-                <Text style={styles.emptyText}>트렌드를 불러올 수 없어요</Text>
+                <Text style={styles.emptyText}>{t("trends.errors.cannotLoad")}</Text>
                 <Text style={styles.emptySubtext}>
-                  잠시 후 다시 시도해주세요
+                  {t("trends.errors.tryAgain")}
                 </Text>
               </View>
             )
@@ -592,10 +593,9 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
               />
             </View>
             <View style={styles.tipContent}>
-              <Text style={styles.tipTitle}>트렌드 활용 팁</Text>
+              <Text style={styles.tipTitle}>{t("trends.tips.title")}</Text>
               <Text style={styles.tipText}>
-                트렌드를 클릭하면 AI가 해당 주제로 글을 작성해드려요. 키워드를
-                바탕으로 나만의 스타일로 수정해보세요!
+                {t("trends.tips.content")}
               </Text>
             </View>
           </View>
@@ -606,7 +606,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
           <View style={styles.updateFrequencyBadge}>
             <SafeIcon name="time-outline" size={16} color={colors.text.secondary} />
             <Text style={styles.updateFrequencyText}>
-              트렌드가 매일 업데이트됩니다
+              {t("trends.updates.daily")}
             </Text>
           </View>
         )}
@@ -617,7 +617,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
             <Text
               style={[styles.updateFrequencyText, { color: colors.primary }]}
             >
-              실시간 트렌드 업데이트
+              {t("trends.updates.realtime")}
             </Text>
           </View>
         )}

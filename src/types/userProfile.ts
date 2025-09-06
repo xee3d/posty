@@ -1,5 +1,5 @@
 // 사용자 프로필 타입 정의
-import i18next from '../locales/i18nextConfig';
+import i18next from '../locales/i18n';
 export interface DetailedUserProfile {
   // 기본 정보
   ageGroup?: "10s" | "20s" | "30s" | "40s" | "50s" | "60s+";

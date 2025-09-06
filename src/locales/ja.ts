@@ -1,115 +1,569 @@
 export default {
-  // 공통
-  app: {
-    name: "Posty",
-    tagline: "AIが作るクリエイティブなコンテンツ",
+  common: {
+    confirm: "確認",
+    cancel: "キャンセル",
+    save: "保存",
+    delete: "削除",
+    edit: "編集",
+    close: "閉じる",
+    back: "戻る",
+    next: "次へ",
+    loading: "読み込み中...",
+    error: "エラーが発生しました",
+    success: "成功しました",
+    warning: "警告",
+    info: "情報",
+    yes: "はい",
+    no: "いいえ",
+    ok: "OK",
+    retry: "再試行",
+    skip: "スキップ",
+    done: "完了",
+    continue: "続行",
+    finish: "終了",
+    start: "開始",
+    stop: "停止"
   },
 
-  // AI 작성 화면
+  navigation: {
+    home: "ホーム",
+    trending: "トレンド",
+    aiWrite: "AI執筆",
+    myStyle: "マイスタイル",
+    settings: "設定"
+  },
+
+  settings: {
+    title: "設定",
+    language: "言語",
+    languageTitle: "言語設定",
+    languageDescription: "アプリの言語を選択してください"
+  },
+
+  subscription: {
+    title: "プレミアムプラン",
+    subtitle: "すべての機能をアンロック",
+    popular: "人気",
+    currentPlan: "現在のプラン",
+    upgradeNow: "今すぐアップグレード",
+    manageSubscription: "サブスクリプション管理",
+    cancelSubscription: "サブスクリプション解除",
+    renewalDate: "更新日",
+    perMonth: "/月",
+    perYear: "/年",
+    monthly: "月額",
+    yearly: "年額",
+    save: "{{percentage}}%お得",
+    freeTrial: "無料トライアル",
+    startFreeTrial: "無料トライアルを開始",
+    trialEnds: "トライアル終了日: {{date}}",
+    features: {
+      unlimitedTokens: "無制限トークン",
+      allTones: "すべてのトーン",
+      allLengths: "すべての長さ",
+      noAds: "広告なし",
+      myStyleAnalysis: "マイスタイル分析",
+      instantImageAnalysis: "瞬時画像分析",
+      gpt4Turbo: "GPT-4 Turbo",
+      apiAccess: "API アクセス",
+      prioritySupport: "優先サポート",
+      dailyTokens: "毎日{{tokens}}トークン",
+      monthlyTokens: "月間{{tokens}}トークン"
+    },
+    hero: {
+      title: "Postyをフル活用しよう",
+      subtitle: "プレミアム機能でコンテンツ作成を次のレベルへ",
+      startTrial: "7日間無料で試す"
+    },
+    benefits: {
+      title: "プレミアム特典",
+      unlimitedCreation: {
+        title: "無制限作成",
+        description: "制限なくコンテンツを作成"
+      },
+      advancedFeatures: {
+        title: "高度な機能",
+        description: "プロフェッショナル向けツール"
+      },
+      prioritySupport: {
+        title: "優先サポート",
+        description: "24時間以内に返答"
+      }
+    },
+    management: {
+      title: "サブスクリプション管理",
+      currentPlan: "現在のプラン",
+      nextBilling: "次回請求日",
+      managePayment: "支払い方法管理",
+      viewInvoices: "請求書を表示",
+      cancelPlan: "プラン解除",
+      upgradePlan: "プランアップグレード"
+    },
+    earnTokensSection: {
+      title: "無料でトークンを獲得",
+      dailyCheckin: {
+        title: "毎日チェックイン",
+        description: "毎日ログインして{{tokens}}トークン獲得",
+        button: "チェックイン ({{tokens}}トークン)"
+      },
+      watchAd: {
+        title: "広告視聴",
+        description: "短い広告を見て{{tokens}}トークン獲得",
+        button: "広告を見る ({{tokens}}トークン)"
+      },
+      shareApp: {
+        title: "アプリ共有",
+        description: "友達にアプリを紹介して{{tokens}}トークン獲得",
+        button: "共有する ({{tokens}}トークン)"
+      },
+      reviewApp: {
+        title: "アプリレビュー",
+        description: "App Storeでレビューして{{tokens}}トークン獲得",
+        button: "レビューする ({{tokens}}トークン)"
+      }
+    }
+  },
+
   aiWrite: {
-    title: "Postyと文章作成",
+    title: "Postyで執筆",
     subtitle: {
       text: "どんなストーリーを書きましょうか？お手伝いします！",
-      polish: "作成された文章をより素敵に仕上げます！",
-      photo: "写真を見せていただければ、ぴったりの文章を作成します！",
+      polish: "書いた文章をより素敵に仕上げます！",
+      photo: "写真を見せていただければ、ぴったりの文章を作ります！",
     },
     modes: {
-      text: "新規投稿",
+      text: "新規作成",
       polish: "文章整理",
-      photo: "写真投稿",
+      photo: "写真から作成",
     },
     prompts: {
       text: "何について書きましょうか？",
       polish: "整理したい文章を入力してください",
       photo: "写真を見せてください！",
     },
+    prompt: {
+      title: "何について書きましょうか？",
+      refresh: "更新",
+      trendUpdate: {
+        title: "トレンド更新",
+        message: "最新のトレンドを取得しました！"
+      }
+    },
+    
     tones: {
       casual: "カジュアル",
-      professional: "専門的",
+      professional: "プロフェッショナル",
       humorous: "ユーモラス",
       emotional: "感情的",
-      genz: "GenZ",
-      millennial: "ミレニアル",
+      genz: "Z世代",
+      millennial: "ミレニアル世代",
       minimalist: "ミニマル",
       storytelling: "ストーリーテリング",
-      motivational: "モチベーション",
+      motivational: "やる気を起こす",
     },
+    
     lengths: {
       short: "短く",
       medium: "普通",
       long: "長く",
     },
     buttons: {
-      generate: "Postyにお願い",
+      generate: "Postyに依頼する",
       generating: "Postyが書いています...",
       copy: "コピー",
       save: "保存",
       share: "共有",
     },
+    photo: {
+      select: {
+        title: "写真選択",
+        message: "どの方法で写真を選択しますか？",
+        camera: "カメラで撮影",
+        gallery: "ギャラリーから選択",
+      },
+      upload: {
+        title: "写真をアップロード",
+        subtitle: "ギャラリーから選択するか直接撮影してください",
+        button: "写真選択",
+        change: "変更",
+      }
+    },
     alerts: {
-      noPrompt: "何について書くか教えてください！ 🤔",
-      noPhoto: "まず写真を選択してください！ 📸",
-      success: "完成しました！ 🎉",
-      error: "問題が発生しました。もう一度お試しください 🥺",
+      noPrompt: "何について書くか教えてください！🤔",
+      noPhoto: "まず写真を選択してください！📸",
+      success: "完成しました！🎉",
+      error: "何か問題が発生しました。もう一度お試しください🥺",
+      waitAnalysis: "写真の分析が完了するまでお待ちください。",
+      completeAnalysis: "まず写真の分析を完了してください。",
+      imageTooBig: {
+        title: "お知らせ",
+        message: "画像が大きすぎます。より小さい画像を選択してください。",
+        analysisResult: "画像が大きすぎます。"
+      }
+    },
+    keywords: {
+      morning: ["朝のルーティン", "カフェ", "出勤", "朝", "コーヒー", "運動"],
+      afternoon: ["昼食", "日常", "午後", "休憩", "散歩", "カフェ"],
+      evening: ["夕食", "退勤", "運動", "趣味", "休憩", "グルメ"],
+      night: ["夜食", "Netflix", "休憩", "日常", "趣味", "夜更かし"]
+    },
+    descriptions: {
+      short: "〜50文字",
+      medium: "〜150文字",
+      long: "〜300文字"
+    },
+    example: "例",
+    analysis: {
+      analyzing: "画像を分析中...",
+      failed: "写真の分析に失敗しました。もう一度お試しください。",
+      error: "写真の分析中にエラーが発生しました。",
+      fallback: {
+        description: "素敵な写真ですね！どんなストーリーを書きましょうか？",
+        suggestedContent: ["今日の写真", "日常記録", "特別な瞬間"]
+      }
+    },
+    sections: {
+      quickTopic: "クイックトピック選択",
+      selectTone: "どんなトーンでいきますか？",
+      selectLength: "どれくらいの長さにしますか？",
+      selectedHashtags: "選択されたハッシュタグ",
+      polishOptions: "希望する変換方向",
+      photoSelect: "写真を見せてください！",
+      photoAnalyzing: "写真を分析中...",
+      resultTitle: "完成しました！🎉",
+    },
+    
+    photoUpload: {
+      title: "画像で書く",
+      description: "写真をアップロードしてコンテンツを生成",
+      selectImage: "画像を選択",
+      takePhoto: "写真を撮る",
+      fromGallery: "ギャラリーから",
+      analyzing: "画像を分析中...",
+      analysisComplete: "分析完了",
+      analysisError: "画像の分析に失敗しました",
+      noImageSelected: "画像が選択されていません"
+    },
+    
+    polishOptions: {
+      summarize: "要約",
+      simple: "シンプル",
+      formal: "フォーマル",
+      emotion: "感情",
+      storytelling: "ストーリー",
+      engaging: "魅力的",
+      hashtag: "ハッシュタグ",
+      emoji: "絵文字",
+      question: "質問",
+    },
+    
+    actions: {
+      generate: "生成",
+      regenerate: "再生成",
+      copy: "コピー",
+      share: "共有",
+      save: "保存",
+      edit: "編集",
+      delete: "削除",
+      polish: "磨く",
+      translate: "翻訳",
+      analyze: "分析"
+    },
+    
+    status: {
+      generating: "生成中...",
+      polishing: "磨き中...",
+      translating: "翻訳中...",
+      analyzing: "分析中...",
+      completed: "完了",
+      error: "エラー",
+      cancelled: "キャンセル"
+    },
+    
+    errors: {
+      noInput: "テキストを入力してください",
+      tooLong: "テキストが長すぎます",
+      networkError: "ネットワークエラー",
+      serverError: "サーバーエラー",
+      rateLimitExceeded: "利用制限を超えました",
+      insufficientTokens: "トークンが不足しています"
+    },
+    
+    tokens: {
+      remaining: "残りトークン: {{count}}",
+      used: "使用トークン: {{count}}",
+      required: "必要トークン: {{count}}",
+      insufficient: "トークンが不足しています",
+      purchaseMore: "追加購入"
+    }
+  },
+
+  myStyle: {
+    title: "マイスタイル",
+    subtitle: "あなたの書き方スタイルを分析",
+    description: "過去の投稿を分析してあなただけの文体を学習します",
+    
+    access: {
+      freeMessage: "STARTERプランからマイスタイル機能をご利用いただけます",
+      upgradeButton: "プランをアップグレード"
+    },
+    
+    analysis: {
+      title: "スタイル分析",
+      inProgress: "分析中...",
+      completed: "分析完了",
+      noData: "分析するデータがありません"
+    },
+    
+    templates: {
+      title: "マイテンプレート",
+      create: "テンプレート作成",
+      edit: "編集",
+      delete: "削除",
+      duplicate: "複製"
+    }
+  },
+
+  // MyStyle Screen
+  mystyle: {
+    title: "マイスタイル",
+    subtitle: "あなただけのコンテンツブランドを構築",
+    loading: "スタイルを分析中...",
+    refresh: "更新",
+    empty: {
+      title: "まだコンテンツが作成されていません",
+      subtitle: "Postyで最初のコンテンツを作成しましょう！",
+      startWriting: "執筆を開始"
+    },
+    tabs: {
+      templates: "テンプレート"
+    },
+    templates: {
+      title: "スタイルテンプレート",
+      subtitle: "様々なスタイルを試して、あなただけのスタイルを見つけましょう",
+      starterLimit: "STARTERプラン：{{limit}}個のテンプレートのみ利用可能"
     },
   },
-
-  // 토큰 시스템
+  
+  trending: {
+    title: "トレンド",
+    subtitle: "今話題のトピック",
+    categories: {
+      all: "すべて",
+      technology: "テクノロジー",
+      lifestyle: "ライフスタイル",
+      business: "ビジネス",
+      entertainment: "エンターテインメント",
+      sports: "スポーツ",
+      news: "ニュース"
+    },
+    updateFrequency: {
+      realtime: "リアルタイム",
+      daily: "毎日更新"
+    }
+  },
+  
   tokens: {
-    badge: "トークン",
-    noTokens: "トークンが不足しています",
-    earnTokens: "無料トークン獲得",
-    subscribe: "トークンが不足しています。購読しますか？",
+    title: "トークン",
+    balance: "残高",
+    purchase: "購入",
+    earn: "獲得",
+    history: "履歴",
+    packages: {
+      title: "トークンパッケージ",
+      small: "30トークン",
+      medium: "100トークン",
+      large: "300トークン",
+      xlarge: "1000トークン"
+    },
+    earn: {
+      title: "無料でトークンを獲得",
+      dailyBonus: "デイリーボーナス",
+      watchAd: "広告視聴",
+      shareApp: "アプリ共有",
+      rateApp: "アプリ評価"
+    }
   },
 
-  // 탭 네비게이션
+  language: {
+    korean: "한국어",
+    english: "English",
+    japanese: "日本語",
+    chinese: "中文"
+  },
+  
+  currencies: {
+    KRW: "₩",
+    USD: "$",
+    JPY: "¥",
+    CNY: "¥"
+  },
+  
+  errors: {
+    generic: "エラーが発生しました",
+    network: "ネットワークに接続してください",
+    server: "サーバーエラー",
+    unauthorized: "認証が必要です",
+    forbidden: "アクセスが拒否されました",
+    notFound: "見つかりません",
+    validation: "入力内容を確認してください",
+    timeout: "タイムアウトしました"
+  },
+  
+  // タブナビゲーション
   tabs: {
     home: "ホーム",
-    aiWrite: "AI作成",
+    aiWrite: "AI執筆",
+    trend: "トレンド",
     myStyle: "マイスタイル",
     settings: "設定",
   },
 
-  // 홈 화면
+  // ホーム画面
   home: {
     greeting: "さん",
+    defaultUserName: "ユーザー",
     welcome: {
       title: "Postyへようこそ！",
       message: "最初の投稿を書いてみませんか？お手伝いします！",
-      action: "最初の投稿",
-      subMessage: "簡単な日常から始めてみてください。Postyが素敵な文章にします！"
+      startWriting: "さあ、書いてみましょう！"
+    },
+    quickActions: {
+      title: "クイックスタート",
+      newPost: "新しい投稿",
+      trendingPost: "トレンドで投稿",
+      myStylePost: "マイスタイルで投稿"
+    },
+    recentPosts: {
+      title: "最近の投稿",
+      empty: "まだ投稿がありません",
+      viewAll: "すべて表示"
+    },
+    stats: {
+      title: "統計",
+      postsCount: "投稿数",
+      totalViews: "総閲覧数",
+      averageViews: "平均閲覧数",
+      engagement: "エンゲージメント"
+    },
+    tips: {
+      title: "今日のヒント",
+      viewMore: "もっと見る"
+    }
+  },
+
+  // アラート・確認ダイアログ
+  alerts: {
+    buttons: {
+      ok: "OK",
+      cancel: "キャンセル",
+      later: "後で",
+      delete: "削除",
+      error: "エラー",
+      completed: "完了",
+      connect: "接続",
+      disconnect: "切断",
+      restore: "復元",
+      close: "閉じる"
+    },
+    language: {
+      changed: "言語が変更されました"
+    },
+    permission: {
+      title: "権限が必要",
+      message: "プッシュ通知を受信するには、設定で通知権限を許可してください。",
+      goToSettings: "設定に移動"
+    },
+    testNotification: {
+      title: "テスト通知",
+      message: "どの通知をテストしますか？",
+      mission: "ミッション通知",
+      trend: "トレンド通知",
+      token: "トークン通知",
+      achievement: "実績通知",
+      tips: "ヒント通知",
+      send: "テスト通知を送信"
+    }
+  },
+
+  success: {
+    generic: "成功しました",
+    saved: "保存されました",
+    updated: "更新されました",
+    deleted: "削除されました",
+    created: "作成されました",
+    uploaded: "アップロードされました",
+    downloaded: "ダウンロードされました",
+    shared: "共有されました",
+    copied: "コピーされました"
+  },
+
+  // App
+  app: {
+    name: "Posty",
+    tagline: "AIが生み出すクリエイティブコンテンツ",
+    slogan: "AIが書いて、私が輝く",
+    subTagline: "1分で完璧な投稿を完成",
+    description: "写真1枚で素晴らしい投稿を完成",
+    slogan1: "あなたの物語を\n世界に伝えましょう。",
+    slogan2: "簡単な一行が\n特別な瞬間になります。",
+    slogan3: "Postyがお手伝いします。\nより良い執筆を。",
+    slogan4: "始めてみませんか？",
+  },
+
+  // Navigation
+  navigation: {
+    home: "ホーム",
+    write: "執筆",
+    trend: "トレンド",
+    myStyle: "マイスタイル",
+    settings: "設定",
+  },
+
+  // Home Screen
+  home: {
+    greeting: "",
+    defaultUserName: "友達",
+    navigation: {
+      subscription: "サブスクリプション"
+    },
+    welcome: {
+      title: "Postyへようこそ！",
+      message: "最初の投稿を書いてみませんか？お手伝いします！",
+      action: "最初の投稿を書く",
+      subMessage: "日常の簡単なことから始めましょう。Postyが素晴らしいコンテンツに変えます！"
     },
     greetings: {
       dawn: {
-        title: "{{userName}}さん、夜更かししてますね？",
-        message: "この時間の思いは特別です。記録してみませんか？",
-        action: "夜更けの感性"
+        title: "{{userName}}、夜明けの雰囲気を感じていますか？",
+        message: "この時間の考えは特別です。記録してみませんか？",
+        action: "夜明けの執筆"
       },
       morning: {
-        title: "おはようございます！{{userName}}さん",
-        message: "今日は何を投稿しますか？モーニングコーヒーの写真でも良いですよ！",
-        action: "朝の日常シェア"
+        title: "おはよう！{{userName}}",
+        message: "今日は何を投稿しますか？朝のコーヒー写真でも素晴らしいです！",
+        action: "朝の共有"
       },
       lunch: {
-        title: "{{userName}}さん、お昼は食べましたか？",
-        message: "美味しいものを食べたなら自慢しなくちゃ！",
+        title: "{{userName}}、お昼は食べましたか？",
+        message: "美味しいものを食べたなら、自慢してみてください！",
         action: "ランチレビュー"
       },
       afternoon: {
-        title: "{{userName}}さん、午後も頑張りましょう！",
-        message: "短い文章でも良いです。今日の瞬間を記録してみましょう",
-        messageRegular: "今日はもう{{postCount}}個も書きましたね！すごいです 👍",
-        action: "日常シェア"
+        title: "{{userName}}、午後も頑張りましょう！",
+        message: "短い投稿でも大丈夫です。今日のこの瞬間を記録しましょう",
+        messageRegular: "今日はすでに{{postCount}}件の投稿を書いています！素晴らしい👍",
+        action: "日常共有"
       },
       evening: {
-        title: "{{userName}}さん、今日一日はいかがでしたか？",
-        message: "一日を締めくくる文章を書いてみませんか？簡単でも良いですよ",
-        action: "夕方の感性"
+        title: "{{userName}}、今日はどうでしたか？",
+        message: "一日を締めくくる投稿を書いてみませんか？簡単なものでも大丈夫です",
+        action: "夕方の思い"
       },
       night: {
-        title: "{{userName}}さん、まだ起きてるんですね？",
-        message: "寝る前に今日あったことを記録してみませんか？",
-        action: "夜の感性"
+        title: "{{userName}}、まだ起きていますか？",
+        message: "寝る前に今日起こったことを記録してみませんか？",
+        action: "夜の執筆"
       }
     },
     topics: {
@@ -119,62 +573,69 @@ export default {
       food: "グルメ",
       travel: "旅行",
       exercise: "運動",
-      bookstagram: "ブックスタグラム"
+      bookstagram: "読書"
     },
     quickTemplates: {
-      lunch: ["今日のランチ ✨", "美味しい発見！", "これを食べて元気出そう"],
-      evening: ["今日もお疲れ様 🌙", "明日はもっと良い日", "一日終了！"]
+      lunch: ["今日のランチ✨", "隠れた名店発見！", "これで元気が出ました"],
+      evening: ["今日もお疲れ様🌙", "明日はもっと良くなります", "一日完了！"]
     },
     sections: {
-      newUserQuestion: "何を書けば良いかわからない？",
-      regularUserQuestion: "今日は何を投稿しましょうか？",
-      todayRecommendation: "今日は何を書こう？",
-      myPosts: "私が書いた投稿"
+      newUserQuestion: "何を書けばいいかわからない？",
+      regularUserQuestion: "今日は何を投稿しますか？",
+      todayRecommendation: "今日は何を書きましょうか？",
+      myPosts: "私の投稿"
     },
     actions: {
-      firstWrite: "最初の投稿",
-      writeAssist: "文章作成補助",
-      photoStart: "写真から開始",
-      polishText: "AI文章完成ツール",
-      viewAll: "全て見る",
+      firstWrite: "最初の投稿を書く",
+      writeAssist: "執筆を手伝って",
+      photoStart: "写真から始める",
+      polishText: "AIテキスト磨き",
+      viewAll: "すべて表示",
       copy: "コピー",
       share: "共有"
     },
     messages: {
-      writeAssistDesc: "一行でも素敵にしてくれます",
-      polishTextDesc: "不自然な文章を自然に整えます",
-      photoStartDesc: "写真だけ見せていただければ文章を書きます",
-      copySuccess: "コピー完了",
-      copySuccessDesc: "クリップボードにコピーされました"
+      writeAssistDesc: "一行でも素晴らしく仕上げます",
+      polishTextDesc: "不自然な文章を自然に磨きます",
+      photoStartDesc: "写真を見せてくれれば、文章を書きます",
+      copySuccess: "コピーしました",
+      copySuccessDesc: "クリップボードにコピーしました"
     },
     templates: {
       weather: {
         title: "天気の話",
-        desc: "今日の天気から始める"
+        desc: "今日の天気から始める",
+        content: "今日の天気がいいので"
       },
       food: {
-        title: "食べ物レビュー",
-        desc: "今日食べた美味しいもの"
+        title: "グルメレビュー",
+        desc: "今日食べた美味しいもの",
+        content: "今日は"
       },
       photo: {
-        title: "写真で",
+        title: "写真付き",
         desc: "写真があればOK"
       }
+    },
+    tips: {
+      todayTip: "今日のヒント",
+      consistentPosting: "継続的な投稿が鍵",
+      consistentPostingDesc: "小さな日常の話でも共有することで、フォロワーとの絆が強くなります！"
     },
     recommend: {
       easy: "🔥 簡単",
       easierPhoto: "📸 もっと簡単",
-      easyTitle: "一行から始めましょう",
-      easyContent: "長い文章は不要！\n今日何をしたかだけでもOK",
-      photoTitle: "写真だけあれば終了！",
-      photoContent: "写真を一枚選んでいただければ\n文章は私が書きます！",
+      easyTitle: "一行から始める",
+      easyContent: "長い投稿は不要！\n今日何をしたか書くだけ",
+      photoTitle: "写真があればOK！",
+      photoContent: "写真を選んで\n文章を書きます！",
       recommended: "おすすめ",
-      convenient: "簡単に",
-      writeButton: "書く",
+      convenient: "便利",
+      writeButton: "執筆",
       photoSelectButton: "写真選択"
     },
     styleCard: {
-      title: "私の文章スタイル",
+      title: "私の執筆スタイル",
       consistency: "一貫性",
       thisWeek: "今週"
     },
@@ -183,20 +644,20 @@ export default {
       storyteller: "📖 ストーリーテラー",
       visualist: "📸 ビジュアリスト",
       trendsetter: "✨ トレンドセッター",
-      unique: "🎨 私だけのスタイル"
+      unique: "🎨 ユニークスタイル"
     },
     mainActions: {
-      polishTool: "AI文章校正ツール",
-      polishDesc: "ぎこちない文章を自然にしてくれる",
-      styleGuide: "私の文章スタイル",
+      polishTool: "AIテキスト磨きツール",
+      polishDesc: "不自然な文章を自然に磨く",
+      styleGuide: "私の執筆スタイル",
     },
     quickActions: {
-      writePost: "Postyと一緒に書く",
-      analyzePhoto: "写真を分析",
+      writePost: "Postyで執筆",
+      analyzePhoto: "写真分析",
     },
     postActions: {
       copy: "コピー",
-      share: "シェア",
+      share: "共有",
     },
     weeklyCount: {
       thisWeek: "今週",
@@ -209,12 +670,12 @@ export default {
     title: "設定",
     achievements: "実績",
     profileDetails: "プロフィール詳細",
-    profileGuideDefault: "プロフィールを設定してみてください",
+    profileGuideDefault: "プロフィールを設定",
     tokenManagement: "トークン管理",
     appSettings: "アプリ設定",
     pushNotifications: "プッシュ通知",
-    soundEffects: "サウンドエフェクト",
-    vibration: "バイブレーション",
+    soundEffects: "音響効果",
+    vibration: "振動",
     themeAndColors: "テーマと色",
     themeDescription: "テーマ設定",
     support: "サポート",
@@ -224,106 +685,73 @@ export default {
     terms: "利用規約",
     privacy: "プライバシーポリシー",
     notifications: {
-      enabled: "通知が有効化されました",
-      soundEnabled: "サウンドが有効化されました",
-      vibrationEnabled: "バイブレーションが有効化されました"
+      enabled: "通知が有効",
+      soundEnabled: "音が有効",
+      vibrationEnabled: "振動が有効"
     }
   },
 
-  // Posts
-  posts: {
-    styles: {
-      casual: "カジュアル",
-      professional: "専門的",
-      humorous: "ユーモラス",
-      emotional: "感情的",
-      genz: "GenZ",
-      millennial: "ミレニアル",
-      minimalist: "ミニマル",
-      storytelling: "ストーリーテリング",
-      motivational: "モチベーション"
-    },
-    categories: {
-      daily: "日常",
-      cafe: "カフェ",
-      food: "グルメ",
-      exercise: "運動",
-      travel: "旅行",
-      fashion: "ファッション",
-      beauty: "ビューティー",
-      other: "その他"
-    },
-    time: {
-      today: "今日",
-      yesterday: "昨日"
-    },
-    actions: {
-      copy: "コピー",
-      copyMessage: "コピーされました",
-      save: "保存",
-      saving: "保存中...",
-      saveSuccess: "保存されました",
-      saveError: "保存に失敗しました",
-      share: "共有"
-    },
-    input: {
-      title: "投稿作成",
-      contentSection: "内容",
-      placeholder: "何について書きましょうか？",
-      required: "内容を入力してください"
-    }
+  // Common
+  common: {
+    error: "エラー",
+    success: "成功",
+    close: "閉じる",
+    count: "",
+    start: "開始",
+    skip: "スキップ",
+    loading: "読み込み中..."
   },
 
   // Alerts
   alerts: {
     notifications: {
-      enabled: "プッシュ通知が有効化されました",
-      disabled: "プッシュ通知が無効化されました"
+      enabled: "プッシュ通知が有効",
+      disabled: "プッシュ通知が無効"
     },
     sound: {
-      enabled: "サウンドが有効化されました"
+      enabled: "音が有効"
     },
     vibration: {
-      enabled: "バイブレーションが有効化されました"
+      enabled: "振動が有効"
     },
     platform: {
       connect: {
-        title: "{{platform}} 接続",
+        title: "{{platform}}に接続",
         message: "{{platform}}に接続しますか？",
-        comingSoon: "{{platform}} 接続機能は近日提供予定です"
+        comingSoon: "{{platform}}接続機能は近日公開"
       },
       disconnect: {
-        title: "接続解除",
-        message: "{{platform}} 接続を解除しますか？",
-        success: "{{platform}} 接続が解除されました",
-        failed: "接続解除に失敗しました"
+        title: "切断",
+        message: "{{platform}}から切断しますか？",
+        success: "{{platform}}から切断しました",
+        failed: "切断に失敗しました"
       },
       status: {
         connected: "接続済み",
         notConnected: "未接続",
-        connectAction: "接続する"
+        connectAction: "接続"
       }
     },
     purchase: {
       restore: {
-        title: "購入復元",
+        title: "購入を復元",
         message: "購入履歴を復元しますか？",
         failedTitle: "復元失敗",
-        failed: "購入復元に失敗しました"
+        failed: "購入の復元に失敗しました"
       }
     },
     data: {
       clearHistory: {
-        title: "履歴削除",
-        message: "履歴を削除しますか？",
-        success: "履歴が削除されました",
-        failed: "履歴削除に失敗しました"
+        title: "履歴をクリア",
+        message: "履歴をクリアしますか？",
+        success: "履歴をクリアしました",
+        failed: "履歴のクリアに失敗しました"
       },
       deleteAll: {
-        title: "全てのデータ削除",
-        message: "全てのデータを削除しますか？",
-        success: "全てのデータが削除されました",
-        failed: "データ削除に失敗しました"
+        title: "すべてのデータを削除",
+        message: "すべてのデータを削除しますか？",
+        success: "すべてのデータを削除しました",
+        failed: "データの削除に失敗しました"
       }
     },
     auth: {
@@ -334,30 +762,31 @@ export default {
       }
     },
     rating: {
-      title: "評価する",
-      message: "アプリが満足いただけたら評価してください",
+      title: "アプリを評価",
+      message: "満足していただけましたらアプリを評価してください",
       later: "後で",
-      rate: "評価する",
+      rate: "評価",
       error: "評価ページを開けません"
     },
     tokens: {
       dailyLimitExceeded: {
-        title: "日次上限超過",
-        message: "日次取得可能なトークン上限（{{limit}}個）を超過しました"
+        title: "日次制限超過",
+        message: "日次トークン制限({{limit}})を超過しました"
       },
       partialGrant: {
-        title: "一部トークン付与",
-        message: "{{tokens}}個のトークンが付与されました"
+        title: "部分トークン付与",
+        message: "{{tokens}}トークンが付与されました"
       }
     },
     buttons: {
-      ok: "確認",
+      ok: "OK",
       cancel: "キャンセル",
+      later: "後で",
       delete: "削除",
       error: "エラー",
       completed: "完了",
       connect: "接続",
-      disconnect: "接続解除",
+      disconnect: "切断",
       restore: "復元",
       close: "閉じる"
     },
@@ -366,98 +795,12 @@ export default {
     }
   },
 
-  // Common
-  common: {
-    error: "エラー",
-    success: "成功", 
-    close: "閉じる",
-    count: "個"
-  },
-
-  // Analytics
-  analytics: {
-    insights: {
-      likesIncrease: "いいねが大幅に増加しました！🎉",
-      reachGrowth: "リーチが爆発的に成長しました！🚀",
-      topCategory: "{{category}}関連の投稿が最も多いです",
-      highActivity: "活発な投稿活動をしています！👏", 
-      lowActivity: "もう少し頻繁に投稿するといいですね",
-    },
-    timeSlots: {
-      morning: "朝 (6-9時)",
-      forenoon: "午前 (9-12時)",
-      lunch: "昼 (12-15時)",
-      afternoon: "午後 (15-18時)",
-      evening: "夕方 (18-21時)",
-      night: "夜 (21-24時)",
-      dawn: "明け方 (0-6時)",
-    },
-    sampleData: {
-      categories: ["カフェ", "グルメ", "日常", "運動", "旅行"],
-      hashtags: ["日常", "デイリー"],
-      postContent: "サンプル投稿",
-    },
-  },
-
-  // Time and Date
-  time: {
-    days: ["日", "月", "火", "水", "木", "金", "土"],
-    none: "なし",
-    hour: "時",
-  },
-
-  // Subscription Plans  
-  subscription: {
-    plans: {
-      free: {
-        name: "無料",
-        priceDisplay: "無料",
-        features: [
-          "毎日10個のトークン",
-          "3つのトーンスタイル",
-          "短い/中程度の長さ",
-          "広告あり",
-        ],
-      },
-      starter: {
-        features: [
-          "登録時に300個のトークンを即時付与",
-          "毎日10個のトークン追加充電",
-          "4つのトーンスタイル",
-          "長い文章作成可能",
-          "広告削除",
-          "MyStyle分析",
-        ],
-      },
-      premium: {
-        features: [
-          "登録時に500個のトークンを即時付与",
-          "毎日20個のトークン追加充電", 
-          "6つのトーンスタイル",
-          "すべての文章長",
-          "広告削除",
-          "MyStyle分析",
-          "優先処理",
-        ],
-      },
-      pro: {
-        features: [
-          "登録時に500個のトークンを即時付与",
-          "無制限トークン (Fair Use)",
-          "すべてのトーンスタイル",
-          "優先処理",
-          "広告完全削除",
-        ],
-      },
-    },
-  },
-
   // Language
   language: {
-    current: "現在の言語: {{language}} {{isSystem}}",
-    system: "(システム)",
-    selectLanguage: "言語選択",
+    current: "現在の言語：{{language}} {{isSystem}}",
+    system: "（システム）",
+    selectLanguage: "言語を選択",
     resetToSystem: "システム言語にリセット",
-    note: "言語を変更するとアプリが再起動されます"
+    note: "言語を変更するとアプリが再起動します"
   }
 };

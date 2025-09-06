@@ -19,6 +19,8 @@ import {
   CARD_THEME,
 } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
+import { useTranslation } from "react-i18next";
+import i18next from "i18next";
 import { SafeIcon } from "../utils/SafeIcon";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
 import { useTokenManagement } from "../hooks/useTokenManagement";
@@ -80,7 +82,7 @@ import {
   canAccessTone,
   canAccessLength,
   getImageAnalysisTokens,
-  MY_STYLE_ACCESS,
+  getMyStyleAccess,
   TREND_ACCESS,
   PlanType,
   canAccessPolishOption,
@@ -112,6 +114,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
 }) => {
   // console.log('AIWriteScreen mounted with:', { initialText, initialHashtags, initialTitle });
   const { colors, cardTheme, isDark } = useAppTheme();
+  const { t } = useTranslation();
   const timer = useTimer();
 
   // 토큰 관리 훅 사용
@@ -339,63 +342,63 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   const allTones = [
     {
       id: "casual",
-      label: "캐주얼",
+      label: t("aiWrite.tones.casual"),
       icon: "happy-outline",
       iconType: "ionicon",
       color: "#FF6B6B",
     },
     {
       id: "professional",
-      label: "전문적",
+      label: t("aiWrite.tones.professional"),
       icon: "briefcase-outline",
       iconType: "ionicon",
       color: "#4ECDC4",
     },
     {
       id: "humorous",
-      label: "유머러스",
+      label: t("aiWrite.tones.humorous"),
       icon: "happy",
       iconType: "ionicon",
       color: "#FFD93D",
     },
     {
       id: "emotional",
-      label: "감성적",
+      label: t("aiWrite.tones.emotional"),
       icon: "heart-outline",
       iconType: "ionicon",
       color: "#FF6B9D",
     },
     {
       id: "genz",
-      label: "Gen Z",
+      label: t("aiWrite.tones.genz"),
       icon: "flame-outline",
       iconType: "ionicon",
       color: "#FE5F55",
     },
     {
       id: "millennial",
-      label: "밀레니얼",
+      label: t("aiWrite.tones.millennial"),
       icon: "cafe-outline",
       iconType: "ionicon",
       color: "#A8896C",
     },
     {
       id: "minimalist",
-      label: "미니멀",
+      label: t("aiWrite.tones.minimalist"),
       icon: "ellipse-outline",
       iconType: "ionicon",
       color: "#95A3B3",
     },
     {
       id: "storytelling",
-      label: "스토리텔링",
+      label: t("aiWrite.tones.storytelling"),
       icon: "book-outline",
       iconType: "ionicon",
       color: "#6C5B7B",
     },
     {
       id: "motivational",
-      label: "동기부여",
+      label: t("aiWrite.tones.motivational"),
       icon: "fitness-outline",
       iconType: "ionicon",
       color: "#4ECDC4",
@@ -407,22 +410,22 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     {
       id: "short",
       label: "text-outline",
-      count: "짧게",
-      desc: "~50자",
+      count: t("aiWrite.lengths.short"),
+      desc: t("aiWrite.descriptions.short"),
       iconSize: 24,
     },
     {
       id: "medium",
       label: "document-text-outline",
-      count: "보통",
-      desc: "~150자",
+      count: t("aiWrite.lengths.medium"),
+      desc: t("aiWrite.descriptions.medium"),
       iconSize: 28,
     },
     {
       id: "long",
       label: "newspaper-outline",
-      count: "길게",
-      desc: "~300자",
+      count: t("aiWrite.lengths.long"),
+      desc: t("aiWrite.descriptions.long"),
       iconSize: 32,
     },
   ];
@@ -434,16 +437,52 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   // 기본 키워드 목록
   const getDefaultKeywords = () => {
     const hour = new Date().getHours();
-
-    if (hour >= 6 && hour < 12) {
-      return ["모닝루틴", "카페", "출근", "아침", "커피", "운동"];
-    } else if (hour >= 12 && hour < 18) {
-      return ["점심", "일상", "오후", "휴식", "산책", "카페"];
-    } else if (hour >= 18 && hour < 22) {
-      return ["저녁", "퇴근", "운동", "취미", "휴식", "맛집"];
-    } else {
-      return ["야식", "넷플릭스", "휴식", "일상", "취미", "새벽"];
+    const currentLang = i18next.language || 'ko';
+    
+    if (currentLang === 'ko') {
+      if (hour >= 6 && hour < 12) {
+        return t("aiWrite.keywords.morning", { returnObjects: true });
+      } else if (hour >= 12 && hour < 18) {
+        return t("aiWrite.keywords.afternoon", { returnObjects: true });
+      } else if (hour >= 18 && hour < 22) {
+        return t("aiWrite.keywords.evening", { returnObjects: true });
+      } else {
+        return t("aiWrite.keywords.night", { returnObjects: true });
+      }
+    } else if (currentLang === 'en') {
+      if (hour >= 6 && hour < 12) {
+        return ["morning routine", "cafe", "commute", "breakfast", "coffee", "exercise"];
+      } else if (hour >= 12 && hour < 18) {
+        return ["lunch", "daily life", "afternoon", "break", "walk", "cafe"];
+      } else if (hour >= 18 && hour < 22) {
+        return ["evening", "workout", "hobby", "rest", "restaurant"];
+      } else {
+        return ["late night snack", "netflix", "rest", "daily life", "hobby", "dawn"];
+      }
+    } else if (currentLang === 'ja') {
+      if (hour >= 6 && hour < 12) {
+        return ["モーニングルーティン", "カフェ", "通勤", "朝食", "コーヒー", "運動"];
+      } else if (hour >= 12 && hour < 18) {
+        return ["昼食", "日常", "午後", "休憩", "散歩", "カフェ"];
+      } else if (hour >= 18 && hour < 22) {
+        return ["夕方", "退勤", "運動", "趣味", "休憩", "レストラン"];
+      } else {
+        return ["夜食", "ネットフリックス", "休憩", "日常", "趣味", "夜明け"];
+      }
+    } else if (currentLang === 'zh-CN') {
+      if (hour >= 6 && hour < 12) {
+        return ["晨间例行", "咖啡", "通勤", "早餐", "咖啡", "运动"];
+      } else if (hour >= 12 && hour < 18) {
+        return ["午餐", "日常生活", "下午", "休息", "散步", "咖啡"];
+      } else if (hour >= 18 && hour < 22) {
+        return ["晚上", "下班", "运动", "爱好", "休息", "餐厅"];
+      } else {
+        return ["夜宵", "网飞", "休息", "日常生活", "爱好", "黎明"];
+      }
     }
+    
+    // 기본값 (아침 키워드)
+    return t("aiWrite.keywords.morning", { returnObjects: true });
   };
 
   // 스타일에 맞는 placeholder 생성
@@ -452,7 +491,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
       const examples = styleInfo.characteristics.examples;
       if (examples && examples.length > 0) {
         // 랜덤하게 예시 중 하나 선택
-        return `예: ${examples[Math.floor(Math.random() * examples.length)]}`;
+        return `${t("aiWrite.example")}: ${examples[Math.floor(Math.random() * examples.length)]}`;
       }
     }
     return getPlaceholderText();
@@ -488,16 +527,16 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
 
   const handleSelectImage = () => {
     Alert.alert(
-      "사진 선택",
-      "어떤 방법으로 사진을 선택하시겠어요?",
+      t("aiWrite.photo.select.title"),
+      t("aiWrite.photo.select.message"),
       [
-        { text: "취소", style: "cancel" },
+        { text: t("alerts.buttons.cancel"), style: "cancel" },
         {
-          text: "카메라로 촬영",
+          text: t("aiWrite.photo.select.camera"),
           onPress: () => openCamera(),
         },
         {
-          text: "갤러리에서 선택",
+          text: t("aiWrite.photo.select.gallery"),
           onPress: () => openImageLibrary(),
         },
       ],
@@ -518,10 +557,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
 
         if (sizeInMB > 4) {
           Alert.alert(
-            "알림",
-            "이미지가 너무 큽니다. 더 작은 이미지를 선택해주세요."
+            t("aiWrite.alerts.imageTooBig.title"),
+            t("aiWrite.alerts.imageTooBig.message")
           );
-          setImageAnalysis("이미지가 너무 큽니다.");
+          setImageAnalysis(t("aiWrite.alerts.imageTooBig.analysisResult"));
           setIsAnalyzingImage(false);
           return null;
         }
@@ -553,25 +592,25 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           setImageAnalysisResult(analysis);
         } else {
           console.log("[AIWriteScreen] Invalid analysis format");
-          setImageAnalysis("사진 분석에 실패했습니다. 다시 시도해주세요.");
+          setImageAnalysis(t("aiWrite.analysis.failed"));
         }
       } else {
         console.log("[AIWriteScreen] Analysis is null or undefined");
-        setImageAnalysis("사진 분석에 실패했습니다. 다시 시도해주세요.");
+        setImageAnalysis(t("aiWrite.analysis.failed"));
       }
 
       setIsAnalyzingImage(false);
       return analysis;
     } catch (error) {
       console.error("Image analysis failed:", error);
-      setImageAnalysis("사진 분석 중 오류가 발생했습니다.");
+      setImageAnalysis(t("aiWrite.analysis.error"));
 
       // 오류 시 기본 메시지 제공
       const fallbackAnalysis = {
-        description: "멋진 사진이네요! 어떤 이야기를 담아볼까요?",
+        description: t("aiWrite.analysis.fallback.description"),
         objects: [],
         mood: "positive",
-        suggestedContent: ["오늘의사진", "일상기록", "특별한순간"],
+        suggestedContent: t("aiWrite.analysis.fallback.suggestedContent", { returnObjects: true }),
       };
 
       setImageAnalysis(fallbackAnalysis.description);
@@ -694,13 +733,13 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   const handleGenerate = async () => {
     if (!prompt.trim() && writeMode !== "photo") {
       soundManager.playError(); // 빈 입력 에러음
-      Alert.alert("포스티 알림", "무엇에 대해 쓸지 알려주세요! 🤔");
+      Alert.alert("Posty", t("aiWrite.alerts.noPrompt"));
       return;
     }
 
     if (writeMode === "photo" && !selectedImage) {
       soundManager.playError(); // 사진 없음 에러음
-      Alert.alert("포스티 알림", "사진을 먼저 선택해주세요! 📸");
+      Alert.alert("Posty", t("aiWrite.alerts.noPhoto"));
       return;
     }
 
@@ -785,13 +824,13 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
 
         // 분석 중이거나 분석 결과가 없는 경우 체크
         if (isAnalyzingImage) {
-          Alert.alert("포스티 알림", "사진 분석이 완료될 때까지 기다려주세요.");
+          Alert.alert("Posty", t("aiWrite.alerts.waitAnalysis"));
           setIsGenerating(false);
           return;
         }
 
         if (!imageAnalysis || imageAnalysis.trim() === "") {
-          Alert.alert("포스티 알림", "사진 분석을 먼저 완료해주세요.");
+          Alert.alert("Posty", t("aiWrite.alerts.completeAnalysis"));
           setIsGenerating(false);
           return;
         }
@@ -914,11 +953,11 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         if (missionResult.rewardsEarned > 0) {
           timer.setTimeout(() => {
             Alert.alert(
-              "미션 완료! 🎯",
-              `콘텐츠 생성 미션을 완료하여 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`,
+              t("missions.completed.title"),
+              t("missions.completed.message", { tokens: missionResult.rewardsEarned }),
               [
                 {
-                  text: "확인",
+                  text: t("alerts.buttons.ok"),
                   onPress: () => handleEarnTokens(missionResult.rewardsEarned),
                 },
               ]
@@ -930,8 +969,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
       console.error("Generation error:", error);
       soundManager.playError(); // 생성 실패음
       Alert.alert(
-        "포스티 알림",
-        "앗! 뭔가 문제가 생겼어요. 다시 시도해주세요 🥺"
+        "Posty",
+        t("aiWrite.alerts.error")
       );
       // 에러 발생 시에만 로딩 해제
       setIsGenerating(false);
@@ -994,7 +1033,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                 <View style={styles.mollyBadge}>
                   <Text style={styles.mollyBadgeText}>P</Text>
                 </View>
-                <Text style={styles.headerTitle}>포스티와 글쓰기</Text>
+                <Text style={styles.headerTitle}>{t("aiWrite.title")}</Text>
                 {/* 토큰 표시 - TokenBadge 사용 */}
                 <TokenBadge
                   tokens={currentTokens}
@@ -1003,10 +1042,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
               </View>
               <Text style={styles.headerSubtitle}>
                 {writeMode === "text"
-                  ? "어떤 이야기를 써볼까요? 제가 도와드릴게요!"
+                  ? t("aiWrite.subtitle.text")
                   : writeMode === "polish"
-                  ? "작성하신 글을 더 멋지게 다듬어드릴게요!"
-                  : "사진을 보여주시면 어울리는 글을 만들어드려요!"}
+                  ? t("aiWrite.subtitle.polish")
+                  : t("aiWrite.subtitle.photo")}
               </Text>
             </View>
           </FadeInView>
@@ -1109,7 +1148,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       writeMode === "text" && styles.modeButtonTextActive,
                     ]}
                   >
-                    새글 쓰기
+                    {t("aiWrite.modes.text")}
                   </Text>
                 </ScaleButton>
                 <ScaleButton
@@ -1140,7 +1179,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       writeMode === "polish" && styles.modeButtonTextActive,
                     ]}
                   >
-                    문장 정리
+                    {t("aiWrite.modes.polish")}
                   </Text>
                 </ScaleButton>
                 <ScaleButton
@@ -1171,7 +1210,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       writeMode === "photo" && styles.modeButtonTextActive,
                     ]}
                   >
-                    사진 글쓰기
+                    {t("aiWrite.modes.photo")}
                   </Text>
                 </ScaleButton>
               </View>
@@ -1184,7 +1223,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
               <SlideInView direction="left" delay={200}>
                 <View style={styles.inputSection}>
                   <View style={styles.sectionHeader}>
-                    <Text style={styles.sectionTitle}>무엇에 대해 쓸까요?</Text>
+                    <Text style={styles.sectionTitle}>{t("aiWrite.prompt.title")}</Text>
                     <TouchableOpacity
                       style={styles.refreshButton}
                       onPress={async () => {
@@ -1192,13 +1231,13 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         console.log("[AIWriteScreen] Manual refresh triggered");
                         await loadTrendingData(true);
                         Alert.alert(
-                          "트렌드 업데이트",
-                          "최신 트렌드를 불러왔어요!"
+                          t("aiWrite.prompt.trendUpdate.title"),
+                          t("aiWrite.prompt.trendUpdate.message")
                         );
                       }}
                     >
                       <SafeIcon name="refresh" size={16} color={colors.primary} />
-                      <Text style={styles.refreshButtonText}>새로고침</Text>
+                      <Text style={styles.refreshButtonText}>{t("aiWrite.prompt.refresh")}</Text>
                     </TouchableOpacity>
                   </View>
                   <View style={styles.inputContainer}>
@@ -1214,7 +1253,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     <CharacterCount current={prompt.length} max={100} />
                   </View>
 
-                  {/* 빠른 주제 선택 */}
+                  {/* {t("aiWrite.sections.quickTopic")} */}
                   <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -1262,7 +1301,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
               <SlideInView direction="right" delay={200}>
                 <View style={styles.inputSection}>
                   <Text style={styles.sectionTitle}>
-                    정리하고 싶은 글을 입력해주세요
+                    {t("aiWrite.prompts.polish")}
                   </Text>
                   <View style={styles.inputContainer}>
                     <TextInput
@@ -1280,7 +1319,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                   {/* 정리 옵션 */}
                   <View style={styles.polishOptions}>
                     <Text style={styles.polishOptionTitle}>
-                      원하는 변환 방향
+                      {t("aiWrite.sections.polishOptions")}
                     </Text>
                     {/* 첫 번째 줄: 3개 */}
                     <View style={styles.polishOptionButtons}>
@@ -1305,7 +1344,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   : "Pro"
                               } 플랜 이상에서 사용 가능해요.`,
                               [
-                                { text: "나중에", style: "cancel" },
+                                { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
                                   text: "플랜 보기",
                                   onPress: () => onNavigate?.("subscription"),
@@ -1337,7 +1376,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               styles.lockedItemText,
                           ]}
                         >
-                          요약하기
+                          {t("aiWrite.polishOptions.summarize")}
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
@@ -1361,7 +1400,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   : "Pro"
                               } 플랜 이상에서 사용 가능해요.`,
                               [
-                                { text: "나중에", style: "cancel" },
+                                { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
                                   text: "플랜 보기",
                                   onPress: () => onNavigate?.("subscription"),
@@ -1393,7 +1432,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               styles.lockedItemText,
                           ]}
                         >
-                          쉽게 풀어쓰기
+                          {t("aiWrite.polishOptions.simple")}
                         </Text>
                       </TouchableOpacity>
                       <TouchableOpacity
@@ -1417,7 +1456,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   : "Pro"
                               } 플랜 이상에서 사용 가능해요.`,
                               [
-                                { text: "나중에", style: "cancel" },
+                                { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
                                   text: "플랜 보기",
                                   onPress: () => onNavigate?.("subscription"),
@@ -1449,7 +1488,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               styles.lockedItemText,
                           ]}
                         >
-                          격식체 변환
+                          {t("aiWrite.polishOptions.formal")}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -1482,7 +1521,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   : "Pro"
                               } 플랜 이상에서 사용 가능해요.`,
                               [
-                                { text: "나중에", style: "cancel" },
+                                { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
                                   text: "플랜 보기",
                                   onPress: () => onNavigate?.("subscription"),
@@ -1514,7 +1553,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               styles.lockedItemText,
                           ]}
                         >
-                          감정 강화
+                          {t("aiWrite.polishOptions.emotion")}
                         </Text>
                       </TouchableOpacity>
 
@@ -1541,7 +1580,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   : "Pro"
                               } 플랜 이상에서 사용 가능해요.`,
                               [
-                                { text: "나중에", style: "cancel" },
+                                { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
                                   text: "플랜 보기",
                                   onPress: () => onNavigate?.("subscription"),
@@ -1573,7 +1612,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               styles.lockedItemText,
                           ]}
                         >
-                          스토리텔링
+                          {t("aiWrite.polishOptions.storytelling")}
                         </Text>
                       </TouchableOpacity>
 
@@ -1598,7 +1637,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   : "Pro"
                               } 플랜 이상에서 사용 가능해요.`,
                               [
-                                { text: "나중에", style: "cancel" },
+                                { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
                                   text: "플랜 보기",
                                   onPress: () => onNavigate?.("subscription"),
@@ -1630,7 +1669,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               styles.lockedItemText,
                           ]}
                         >
-                          매력적으로
+                          {t("aiWrite.polishOptions.engaging")}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -1663,7 +1702,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   : "Pro"
                               } 플랜 이상에서 사용 가능해요.`,
                               [
-                                { text: "나중에", style: "cancel" },
+                                { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
                                   text: "플랜 보기",
                                   onPress: () => onNavigate?.("subscription"),
@@ -1695,7 +1734,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               styles.lockedItemText,
                           ]}
                         >
-                          해시태그 추출
+                          {t("aiWrite.polishOptions.hashtag")}
                         </Text>
                       </TouchableOpacity>
 
@@ -1720,7 +1759,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   : "Pro"
                               } 플랜 이상에서 사용 가능해요.`,
                               [
-                                { text: "나중에", style: "cancel" },
+                                { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
                                   text: "플랜 보기",
                                   onPress: () => onNavigate?.("subscription"),
@@ -1752,7 +1791,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               styles.lockedItemText,
                           ]}
                         >
-                          이모지 추가
+                          {t("aiWrite.polishOptions.emoji")}
                         </Text>
                       </TouchableOpacity>
 
@@ -1777,7 +1816,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   : "Pro"
                               } 플랜 이상에서 사용 가능해요.`,
                               [
-                                { text: "나중에", style: "cancel" },
+                                { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
                                   text: "플랜 보기",
                                   onPress: () => onNavigate?.("subscription"),
@@ -1809,7 +1848,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               styles.lockedItemText,
                           ]}
                         >
-                          질문형 변환
+                          {t("aiWrite.polishOptions.question")}
                         </Text>
                       </TouchableOpacity>
                     </View>
@@ -1822,7 +1861,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
               {/* 사진 모드 */}
               <SlideInView direction="right" delay={200}>
                 <View style={styles.photoSection}>
-                  <Text style={styles.sectionTitle}>사진을 보여주세요!</Text>
+                  <Text style={styles.sectionTitle}>{t("aiWrite.sections.photoSelect")}</Text>
                   <ScaleButton
                     style={styles.photoUploadArea}
                     onPress={handleSelectImage}
@@ -1848,7 +1887,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           }}
                         >
                           <SafeIcon name="camera" size={16} color="#FFFFFF" />
-                          <Text style={styles.changePhotoText}>변경</Text>
+                          <Text style={styles.changePhotoText}>{t("aiWrite.photo.upload.change")}</Text>
                         </TouchableOpacity>
                       </View>
                     ) : (
@@ -1862,14 +1901,14 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           />
                         </View>
                         <Text style={styles.uploadTitle}>
-                          사진을 선택해주세요
+                          {t("aiWrite.photo.upload.title")}
                         </Text>
                         <Text style={styles.uploadSubtitle}>
-                          갤러리에서 선택하거나 직접 촬영하세요
+                          {t("aiWrite.photo.upload.subtitle")}
                         </Text>
                         <View style={styles.uploadButton}>
                           <SafeIcon name="add" size={20} color="#FFFFFF" />
-                          <Text style={styles.uploadButtonText}>사진 선택</Text>
+                          <Text style={styles.uploadButtonText}>{t("aiWrite.photo.upload.button")}</Text>
                         </View>
                       </View>
                     )}
@@ -1883,7 +1922,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           {isAnalyzingImage ? (
                             <>
                               <ActivityIndicator size="small" color="#7C3AED" />{" "}
-                              사진을 분석하는 중...
+                              {t("aiWrite.analysis.analyzing")}
                             </>
                           ) : (
                             <>
@@ -1904,7 +1943,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           {writeMode !== "polish" && (
             <SlideInView direction="up" delay={600}>
               <View style={styles.optionSection}>
-                <Text style={styles.sectionTitle}>어떤 느낌으로 쓸까요?</Text>
+                <Text style={styles.sectionTitle}>{t("aiWrite.sections.selectTone")}</Text>
                 <View style={styles.toneGrid}>
                   {tones.map((tone, index) => (
                     <TouchableOpacity
@@ -1982,7 +2021,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           {/* 길이 선택 */}
           <SlideInView direction="up" delay={900}>
             <View style={styles.optionSection}>
-              <Text style={styles.sectionTitle}>얼마나 길게 쓸까요?</Text>
+              <Text style={styles.sectionTitle}>{t("aiWrite.sections.selectLength")}</Text>
               <View style={styles.lengthOptions}>
                 {lengths.map((length, index) => (
                   <TouchableOpacity
@@ -2065,7 +2104,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
             <SlideInView direction="up" delay={1100}>
               <View style={styles.selectedHashtagsSection}>
                 <Text style={styles.selectedHashtagsTitle}>
-                  선택된 해시태그 ({selectedHashtags.length})
+                  {t("aiWrite.sections.selectedHashtags")} ({selectedHashtags.length})
                 </Text>
                 <View style={styles.selectedHashtagsContainer}>
                   {selectedHashtags.map((hashtag, index) => (
@@ -2133,10 +2172,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       ]}
                     >
                       {isGenerating
-                        ? "포스티가 쓰는 중..."
+                        ? t("aiWrite.buttons.generating")
                         : writeMode === "photo" && isAnalyzingImage
                         ? "사진 분석 중..."
-                        : "포스티에게 부탁하기"}
+                        : t("aiWrite.buttons.generate")}
                     </Text>
                     {!isGenerating &&
                       currentTokens > 0 &&
@@ -2162,7 +2201,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                   onPress={() => onNavigate?.("subscription")}
                 >
                   <Text style={styles.subscribeHintText}>
-                    토큰이 부족해요. 구독하시겠어요?
+                    {t("tokens.subscribe")}
                   </Text>
                 </TouchableOpacity>
               )}
@@ -2174,7 +2213,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
             <SlideInView direction="up" delay={0}>
               <View style={styles.resultSection}>
                 <View style={styles.resultHeader}>
-                  <Text style={styles.resultTitle}>짠! 완성됐어요 🎉</Text>
+                  <Text style={styles.resultTitle}>{t("aiWrite.sections.resultTitle")}</Text>
                   <ScaleButton onPress={handleGenerate}>
                     <SafeIcon name="refresh" size={20} color={COLORS.primary} />
                   </ScaleButton>
@@ -2567,6 +2606,7 @@ const createStyles = (
       flexWrap: "wrap",
       justifyContent: "space-between",
       marginHorizontal: -4,
+      marginTop: SPACING.md,
     },
     toneCard: {
       width: "31%",
@@ -2602,6 +2642,7 @@ const createStyles = (
     lengthOptions: {
       flexDirection: "row",
       gap: 8,
+      marginTop: SPACING.md,
     },
     lengthCard: {
       flex: 1,

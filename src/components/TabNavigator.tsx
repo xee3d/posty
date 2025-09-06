@@ -17,6 +17,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { COLORS, FONTS, SPACING } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
+import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
 const TAB_WIDTH = width / 5;
@@ -39,33 +40,34 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({
   onTabPress,
 }) => {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
 
   const tabs: TabConfig[] = [
-    { key: "home", icon: "home-outline", activeIcon: "home", label: "홈" },
+    { key: "home", icon: "home-outline", activeIcon: "home", label: t("navigation.home") },
     {
       key: "ai-write",
       icon: "create-outline",
       activeIcon: "create",
-      label: "글쓰기",
+      label: t("navigation.write"),
     },
     {
       key: "trend",
       icon: "trending-up-outline",
       activeIcon: "trending-up",
-      label: "트렌드",
+      label: t("navigation.trend"),
     },
     {
       key: "my-style",
       icon: "palette",
       activeIcon: "palette",
-      label: "내 스타일",
+      label: t("navigation.myStyle"),
       isMaterial: true,
     },
     {
       key: "settings",
       icon: "settings-outline",
       activeIcon: "settings",
-      label: "설정",
+      label: t("navigation.settings"),
     },
   ];
 

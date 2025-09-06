@@ -5,6 +5,11 @@
       "maxDuration": 30
     }
   },
+  "build": {
+    "env": {
+      "GENERATE_SOURCEMAP": "true"
+    }
+  },
   "crons": [
     {
       "path": "/api/notifications/schedule?type=daily",

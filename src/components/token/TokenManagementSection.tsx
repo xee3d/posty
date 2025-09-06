@@ -18,6 +18,7 @@ import {
   selectSubscriptionPlan,
 } from "../../store/slices/userSlice";
 import { Alert } from "../../utils/customAlert";
+import { useTranslation } from "react-i18next";
 
 interface TokenManagementSectionProps {
   onNavigateToSubscription: () => void;
@@ -29,6 +30,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
   onTokensUpdated,
 }) => {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const currentTokens = useAppSelector(selectCurrentTokens);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
   const [loading, setLoading] = useState(false);
@@ -36,10 +38,10 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
 
   // Redux에서 직접 토큰 정보 계산
   const tokenInfo = {
-    current: subscriptionPlan === "pro" ? "무제한" : currentTokens.toString(),
+    current: subscriptionPlan === "pro" ? t("tokens.unlimited") : currentTokens.toString(),
     total:
       subscriptionPlan === "pro"
-        ? "무제한"
+        ? t("tokens.unlimited")
         : subscriptionPlan === "premium"
         ? "500"
         : subscriptionPlan === "starter"
@@ -107,7 +109,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
       case "starter":
         return "STARTER";
       default:
-        return "FREE";
+        return t("subscription.plans.free");
     }
   };
 
@@ -129,7 +131,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
           <View style={styles.tokenInfo}>
             <SafeIcon name="flash" size={24} color={getPlanColor()} />
             <View>
-              <Text style={styles.tokenLabel}>보유 토큰</Text>
+              <Text style={styles.tokenLabel}>{t("tokens.current")}</Text>
               <View style={styles.tokenCount}>
                 <Text style={[styles.tokenNumber, { color: getPlanColor() }]}>
                   {tokenInfo.current}
@@ -168,7 +170,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
               />
             </View>
             <Text style={styles.usageText}>
-              오늘 {tokenInfo.todayUsed}개 사용
+              {t("tokens.usage.today", { count: tokenInfo.todayUsed })}
             </Text>
           </View>
         )}
@@ -188,7 +190,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
             >
               <SafeIcon name="gift" size={18} color="#10B981" />
               <Text style={[styles.actionButtonText, { color: "#10B981" }]}>
-                무료 토큰 받기
+                {t("tokens.actions.getFree")}
               </Text>
             </TouchableOpacity>
           )}
@@ -199,9 +201,9 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
               if (tokenInfo.plan === "pro") {
                 // MAX 플랜 사용자에게 안내 메시지 표시
                 Alert.alert(
-                  "PRO 플랜 사용 중",
-                  "현재 PRO 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. 🚀",
-                  [{ text: "확인" }]
+                  t("tokens.alerts.proTitle"),
+                  t("tokens.alerts.proMessage"),
+                  [{ text: t("alerts.buttons.ok") }]
                 );
               } else {
                 onNavigateToSubscription();
@@ -210,7 +212,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
           >
             <SafeIcon name="add-circle" size={18} color={colors.primary} />
             <Text style={[styles.actionButtonText, { color: colors.primary }]}>
-              토큰 충전하기
+              {t("tokens.actions.charge")}
             </Text>
           </TouchableOpacity>
         </View>
@@ -225,12 +227,12 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
         />
         <Text style={styles.quickInfoText}>
           {tokenInfo.plan === "free"
-            ? "매일 자정에 10개의 무료 토큰이 충전됩니다"
+            ? t("tokens.info.free")
             : tokenInfo.plan === "starter"
-            ? "STARTER 플랜으로 매월 200개의 토큰을 사용할 수 있습니다"
+            ? t("tokens.info.starter")
             : tokenInfo.plan === "premium"
-            ? "PREMIUM 플랜으로 매월 500개의 토큰을 사용할 수 있습니다"
-            : "PRO 플랜으로 무제한 토큰을 사용 중입니다"}
+            ? t("tokens.info.premium")
+            : t("tokens.info.pro")}
         </Text>
       </View>
     </View>

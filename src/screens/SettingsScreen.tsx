@@ -1131,6 +1131,9 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
           <LanguageSettings 
             onLanguageChange={(language) => {
               console.log('[SettingsScreen] Language changed to:', language);
+              // 언어 변경 후 강제 리렌더링을 위해 상태 업데이트
+              setLoading(true);
+              setTimeout(() => setLoading(false), 100);
             }}
           />
           <View style={styles.settingItem}>
