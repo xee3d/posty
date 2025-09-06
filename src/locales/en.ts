@@ -286,27 +286,26 @@ export default {
 
   // User Profile & Tones
   userProfile: {
-    tones: {
-      ageGroups: {
-        "10s": {
-          default: "Energetic and vibrant",
-          baby_photo: "So cute!! Such an angel baby ㅠㅠ",
-        },
-        "20s": {
-          default: "Trendy and casual",
-          baby_photo: "Baby is so adorable 🥺 heart melting",
-        },
-        "30s": {
-          default: "Comfortable and empathetic",
-          baby_photo: "Such a lovely little one. Hope they grow up healthy",
-        },
-        "40s": {
-          default: "Sincere and warm",
-          baby_photo: "The child looks so blessed. Parents must be happy",
-        },
-        "50s": {
-          default: "Mature and wise",
-          baby_photo: "Such a beautiful baby. Seems like a blessed family",
+    ageGroups: {
+      "10s": {
+        default: "Energetic and vibrant",
+        baby_photo: "So cute!! Such an angel baby ㅠㅠ",
+      },
+      "20s": {
+        default: "Trendy and casual",
+        baby_photo: "Baby is so adorable 🥺 heart melting",
+      },
+      "30s": {
+        default: "Comfortable and empathetic",
+        baby_photo: "Such a lovely little one. Hope they grow up healthy",
+      },
+      "40s": {
+        default: "Sincere and warm",
+        baby_photo: "The child looks so blessed. Parents must be happy",
+      },
+      "50s": {
+        default: "Mature and wise",
+        baby_photo: "Such a beautiful baby. Seems like a blessed family",
         },
         "60s+": {
           default: "Experienced and warm",

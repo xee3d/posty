@@ -286,8 +286,7 @@ export default {
 
   // 사용자 프로필 및 톤
   userProfile: {
-    tones: {
-      ageGroups: {
+    ageGroups: {
         "10s": {
           default: "신나고 활기찬",
           baby_photo: "귀여워요!! 완전 천사 아기다 ㅠㅠ",

@@ -35,7 +35,6 @@ i18next
     resources,
     lng: getDeviceLanguage(),
     fallbackLng: 'ko',
-    returnObjects: true, // 객체 형태의 번역 키 지원
     interpolation: {
       escapeValue: false,
     },
