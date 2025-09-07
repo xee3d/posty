@@ -121,6 +121,18 @@ const AppContent: React.FC = () => {
   // 앱 초기화
   useEffect(() => {
     console.log("[App] App initialization started");
+    
+    // 언어 디버깅
+    import('./src/utils/deviceLanguage').then(({ getDeviceLanguage, isKorean }) => {
+      const deviceLang = getDeviceLanguage();
+      const isKoreanLang = isKorean();
+      console.log("[App] Device language detected:", deviceLang);
+      console.log("[App] Is Korean language:", isKoreanLang);
+    });
+    
+    import('i18next').then((i18next) => {
+      console.log("[App] i18next current language:", i18next.default.language);
+    });
 
     const initializeServices = async () => {
       try {

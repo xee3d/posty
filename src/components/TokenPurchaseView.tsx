@@ -11,6 +11,16 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
+import { useTranslation } from "react-i18next";
+import { 
+  getDefaultCurrency, 
+  convertPrice, 
+  formatPrice, 
+  getLocalizedPrice,
+  getCurrentCurrencyInfo,
+  type SupportedCurrency 
+} from "../utils/currencyConverter";
+import pricingService from "../services/pricingService";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -34,22 +44,32 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
   colors,
   isDark,
 }) => {
+  const { t } = useTranslation();
   const subscription = useAppSelector((state) => state.user.subscription);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
   const userPlan = getUserPlan(subscription as any);
   const planBonus = TOKEN_PURCHASE_CONFIG.planBonuses[userPlan];
+
+  // 통화 설정
+  const currentCurrency = getDefaultCurrency();
+  const currencyInfo = getCurrentCurrencyInfo(currentCurrency);
 
   // 첫 구매 여부 확인 (실제로는 서버에서 가져와야 함)
   const isFirstPurchase = false; // TODO: 실제 첫 구매 여부 체크
   // 플랜별 보너스 및 할인 적용
   const applyPlanBenefits = (pkg: any) => {
     if (userPlan === "pro") {
+      const regionallyAdjustedBasePrice = pricingService.getLocalizedPrice(pkg.basePrice, currentCurrency);
+      const regionallyAdjustedOriginalPrice = pricingService.getLocalizedPrice(pkg.originalPrice, currentCurrency);
+      
       return {
         amount: pkg.baseAmount,
-        price: pkg.basePrice,
-        originalPrice: pkg.originalPrice,
+        price: convertPrice(regionallyAdjustedBasePrice, currentCurrency),
+        originalPrice: convertPrice(regionallyAdjustedOriginalPrice, currentCurrency),
         bonus: 0,
         discount: pkg.baseDiscount,
+        formattedPrice: formatPrice(convertPrice(regionallyAdjustedBasePrice, currentCurrency), currentCurrency),
+        formattedOriginalPrice: formatPrice(convertPrice(regionallyAdjustedOriginalPrice, currentCurrency), currentCurrency),
       };
     }
 
@@ -57,9 +77,12 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
     const planDiscount = planBonus?.priceDiscount || 0;
     const totalDiscount = pkg.baseDiscount + planDiscount;
 
-    // 가격 계산 (원가에서 총 할인율 적용)
+    // 지역별 가격 조정 적용
+    const regionallyAdjustedPrice = pricingService.getLocalizedPrice(pkg.originalPrice, currentCurrency);
+    
+    // 가격 계산 (조정된 가격에서 총 할인율 적용)
     const discountedPrice = Math.floor(
-      pkg.originalPrice * (1 - totalDiscount / 100)
+      regionallyAdjustedPrice * (1 - totalDiscount / 100)
     );
 
     // 보너스 토큰
@@ -78,7 +101,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       const firstPurchaseDiscount =
         TOKEN_PURCHASE_CONFIG.promotions.firstPurchase.discount;
       finalPrice = Math.floor(
-        pkg.originalPrice * (1 - (totalDiscount + firstPurchaseDiscount) / 100)
+        regionallyAdjustedPrice * (1 - (totalDiscount + firstPurchaseDiscount) / 100)
       );
       finalDiscount = totalDiscount + firstPurchaseDiscount;
     }
@@ -86,16 +109,18 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
     return {
       amount: pkg.baseAmount,
       bonus: bonusAmount,
-      price: finalPrice,
-      originalPrice: pkg.originalPrice,
+      price: convertPrice(finalPrice, currentCurrency),
+      originalPrice: convertPrice(regionallyAdjustedPrice, currentCurrency),
       discount: finalDiscount,
+      formattedPrice: formatPrice(convertPrice(finalPrice, currentCurrency), currentCurrency),
+      formattedOriginalPrice: formatPrice(convertPrice(regionallyAdjustedPrice, currentCurrency), currentCurrency),
     };
   };
 
   const basePackages = [
     {
       id: "30",
-      name: "라이트 팩",
+      name: t("tokenPurchase.packages.light.name"),
       baseAmount: 30,
       basePrice: 1900, // ₩63/개 - STARTER 한달치와 동일 가격
       originalPrice: 2400,
@@ -104,11 +129,11 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       accentColor: "#8B5CF6",
       popular: false,
       icon: "✨",
-      tagline: "부담없이 시작하기",
+      tagline: t("tokenPurchase.packages.light.tagline"),
     },
     {
       id: "100",
-      name: "베스트 밸류",
+      name: t("tokenPurchase.packages.bestValue.name"),
       baseAmount: 100,
       basePrice: 4900, // ₩49/개 - PREMIUM 한달치와 동일 가격
       originalPrice: 6500,
@@ -117,11 +142,11 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       accentColor: "#EC4899",
       popular: true,
       icon: "🔥",
-      tagline: "가장 인기 있는 선택",
+      tagline: t("tokenPurchase.packages.bestValue.tagline"),
     },
     {
       id: "300",
-      name: "메가 팩",
+      name: t("tokenPurchase.packages.mega.name"),
       baseAmount: 300,
       basePrice: 9900, // ₩33/개 - 대량 구매 혜택
       originalPrice: 15000,
@@ -130,11 +155,11 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       accentColor: "#6366F1",
       popular: false,
       icon: "💎",
-      tagline: "헤비 유저를 위한 선택",
+      tagline: t("tokenPurchase.packages.mega.tagline"),
     },
     {
       id: "1000",
-      name: "울트라 팩",
+      name: t("tokenPurchase.packages.ultra.name"),
       baseAmount: 1000,
       basePrice: 19900, // ₩20/개 - 최고 할인율
       originalPrice: 40000,
@@ -143,7 +168,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       accentColor: "#EC4899",
       popular: false,
       icon: "🚀",
-      tagline: "프로페셔널을 위한 최강 패키지",
+      tagline: t("tokenPurchase.packages.ultra.tagline"),
     },
   ];
 
@@ -165,9 +190,9 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
   const handlePackagePurchase = (packageId: string) => {
     if (subscriptionPlan === "pro") {
       Alert.alert(
-        "MAX 플랜 사용 중",
-        "현재 MAX 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. \n\n추가 토큰 구매가 필요하지 않습니다. 🚀",
-        [{ text: "확인" }]
+        t("tokenPurchase.alerts.maxPlanTitle"),
+        t("tokenPurchase.alerts.maxPlanMessage"),
+        [{ text: t("tokenPurchase.alerts.confirm") }]
       );
     } else {
       onPurchase(packageId);
@@ -309,15 +334,15 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
 
                 <View style={styles.priceSection}>
                   <View style={styles.priceRow}>
-                    <Text style={styles.currency}>₩</Text>
+                    <Text style={styles.currency}>{currencyInfo.symbol}</Text>
                     <Text style={styles.price}>
-                      {pkg.price.toLocaleString()}
+                      {pkg.formattedPrice?.replace(currencyInfo.symbol, '') || pkg.price.toLocaleString()}
                     </Text>
                   </View>
                   {pkg.originalPrice && (
                     <View style={styles.discountRow}>
                       <Text style={styles.originalPrice}>
-                        ₩{pkg.originalPrice.toLocaleString()}
+{pkg.formattedOriginalPrice || `${currencyInfo.symbol}${pkg.originalPrice.toLocaleString()}`}
                       </Text>
                       <LinearGradient
                         colors={[
@@ -343,8 +368,9 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                     color="#FFFFFF"
                   />
                   <Text style={styles.unitPriceText}>
-                    토큰당 ₩
-                    {Math.round(pkg.price / (pkg.amount + (pkg.bonus || 0)))}
+                    {t("tokenPurchase.pricing.perToken", { 
+                      price: formatPrice(pkg.price / pkg.amount, currentCurrency)
+                    })}
                   </Text>
                 </View>
 

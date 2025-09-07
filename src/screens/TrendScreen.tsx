@@ -51,7 +51,22 @@ interface TrendScreenProps {
 const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   console.log("[TrendScreen] ===== Component Mounted/Rendered =====");
   const { colors, isDark } = useAppTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  
+  // i18n 디버깅
+  console.log("[TrendScreen] Current language:", i18n.language);
+  console.log("[TrendScreen] trends.categories.all:", t("trends.categories.all"));
+  console.log("[TrendScreen] trends.categories.news:", t("trends.categories.news"));
+  console.log("[TrendScreen] trends.categories.social:", t("trends.categories.social"));
+  console.log("[TrendScreen] trends.categories.keywords:", t("trends.categories.keywords"));
+  
+  // 강제 캐시 클리어 및 새로고침
+  const forceClearAndRefresh = async () => {
+    console.log("[TrendScreen] FORCE CLEAR AND REFRESH TRIGGERED");
+    await trendService.clearCache();
+    trendCache.clear();
+    await loadTrends(true);
+  };
 
   // 구독 플랜 정보
   const subscription = useAppSelector((state) => state.user.subscription);
@@ -228,6 +243,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
       trendCache.clear();
       await trendService.clearCache();
       console.log("[TrendScreen] All caches cleared, fetching fresh data...");
+      console.log("[TrendScreen] Current language during refresh:", i18n.language);
       await loadTrends(true); // forceRefresh = true
     } catch (error) {
       console.error("[TrendScreen] Refresh error:", error);

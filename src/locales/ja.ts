@@ -145,6 +145,9 @@ export default {
       polish: "整理したい文章を入力してください",
       photo: "写真を見せてください！",
     },
+    placeholderExamples: {
+      polish: "例：今日カフェで友達とコーヒーを飲みながら長時間話していたら、とても楽しかった...",
+    },
     prompt: {
       title: "何について書きましょうか？",
       refresh: "更新",
@@ -152,6 +155,31 @@ export default {
         title: "トレンド更新",
         message: "最新のトレンドを取得しました！"
       }
+    },
+    placeholders: {
+      morning: "今朝はどのように始めましたか？",
+      lunch: "昼食は美味しくいただけましたか？",
+      afternoon: "午後のひとときを楽しんでいますか？",
+      evening: "今日一日はいかがでしたか？",
+      night: "夜更け、何を考えていますか？"
+    },
+    timeBasedPrompts: {
+      morning: ["今朝のコーヒー", "通勤風景", "モーニングルーティン", "朝の運動", "早朝の感性", "朝食メニュー"],
+      lunch: ["昼食メニュー", "午後のコーヒータイム", "昼休みの余裕", "今日のランチ", "カフェ巡り", "午後の仕事"],
+      afternoon: ["午後の余裕", "カフェタイム", "退勤準備", "午後の運動", "一日の整理", "夕方の計画"],
+      evening: ["夕食メニュー", "帰り道の風景", "夕方の運動", "一日の終わり", "夜景鑑賞", "夕方の余暇"],
+      night: ["夜食タイム", "深夜の感性", "不眠症の日常", "早朝の考え", "夜勤作業", "夜の散歩"]
+    },
+    categories: {
+      casual: "日常",
+      professional: "ビジネス", 
+      humorous: "ユーモア",
+      emotional: "感情",
+      genz: "トレンド",
+      millennial: "ライフスタイル",
+      minimalist: "ミニマル",
+      storytelling: "ストーリー",
+      motivational: "モチベーション"
     },
     
     tones: {
@@ -358,17 +386,60 @@ export default {
   trends: {
     title: "リアルタイムトレンド",
     subtitle: "リアルタイムの人気トレンドとキーワード",
+    refresh: "更新",
+    lastUpdated: "最終更新: {{time}}",
+    categories: {
+      all: "すべて",
+      news: "ニュース", 
+      social: "ソーシャル",
+      keywords: "キーワード"
+    },
+    categoryTitles: {
+      all: "すべてのトレンド",
+      news: "ニュース",
+      social: "コミュニティ",
+      keywords: "人気キーワード"
+    },
+    sources: {
+      news: "ニュース",
+      social: "コミュニティ",
+      naver: "Naver",
+      keywords: "キーワード"
+    },
+    loading: {
+      initial: "トレンドを読み込んでいます...",
+      refresh: "更新中..."
+    },
     errors: {
-      loadFailed: "トレンドの読み込みに失敗しました",
-      refreshFailed: "トレンドの更新に失敗しました"
+      loadFailed: "トレンドの読み込みでエラーが発生しました。",
+      refreshFailed: "更新でエラーが発生しました。",
+      cannotLoad: "トレンドを読み込めません",
+      tryAgain: "しばらくしてから再度お試しください",
+      networkError: "ネットワーク接続をご確認ください",
+      retryButton: "再試行"
     },
     premium: {
       title: "プレミアム機能",
-      subtitle: "リアルタイムトレンドはプレミアムプランでご利用いただけます",
-      upgradeButton: "プランをアップグレード",
+      subtitle: "リアルタイムトレンドはPROプランからご利用いただけます。",
+      upgradeButton: "アップグレード",
       preview: {
-        title: "トレンドプレビュー"
+        title: "トレンドプレビュー",
+        subtitle: "トレンドを分析してトラフィックを増やし、\nリアルタイムの話題に合わせてコンテンツを作成してみましょう。"
       }
+    },
+    tips: {
+      title: "トレンド活用のコツ",
+      content: "トレンドをクリックすると、AIがその話題で記事を書いてくれます。キーワードを使って自分のスタイルに修正してみましょう！",
+      writeWithTrend: "このトレンドで書く"
+    },
+    updates: {
+      daily: "トレンドは毎日更新されます",
+      realtime: "リアルタイムトレンド更新"
+    },
+    actions: {
+      viewMore: "もっと見る",
+      writePost: "記事を書く",
+      share: "共有"
     }
   },
 
@@ -830,5 +901,79 @@ export default {
     selectLanguage: "言語を選択",
     resetToSystem: "システム言語にリセット",
     note: "言語を変更するとアプリが再起動します"
+  },
+
+  // Token Purchase
+  tokenPurchase: {
+    title: "トークン購入",
+    packages: {
+      light: {
+        name: "ライトパック",
+        tagline: "気軽に始める"
+      },
+      bestValue: {
+        name: "ベストバリュー",
+        tagline: "最も人気の選択"
+      },
+      mega: {
+        name: "メガパック",
+        tagline: "ヘビーユーザー向け"
+      },
+      ultra: {
+        name: "ウルトラパック",
+        tagline: "プロフェッショナル向け最強パッケージ"
+      }
+    },
+    pricing: {
+      tokens: "{{count}}個のトークン",
+      bonus: "+{{count}}個ボーナス",
+      price: "¥{{price:number}}",
+      originalPrice: "¥{{price:number}}",
+      discount: "{{percent}}%オフ",
+      perToken: "1個あたり¥{{price:number}}"
+    },
+    alerts: {
+      maxPlanTitle: "MAXプラン利用中",
+      maxPlanMessage: "現在MAXプランを使用中のため、無制限でトークンをご利用いただけます。\n\n追加のトークン購入は不要です。🚀",
+      confirm: "OK"
+    },
+    currency: {
+      krw: "₩",
+      usd: "$",
+      jpy: "¥",
+      cny: "¥"
+    }
+  },
+
+  // マイスタイル
+  myStyle: {
+    access: {
+      freeMessage: "マイスタイル分析はSTARTERプランから利用できます。",
+    },
+    tabs: {
+      overview: "概要",
+      analysis: "分析", 
+      templates: "テンプレート"
+    },
+    brand: {
+      title: "ブランド",
+      styleAnalysis: "スタイル分析",
+      tagline: "{{count}}つのストーリーで作られた私だけのスタイル"
+    },
+    keywords: {
+      title: "キーワード"
+    },
+    challenge: {
+      progress: "進捗: {{current}}/{{total}}"
+    },
+    analytics: {
+      growth: "📈 成長分析",
+      totalPosts: "総投稿数",
+      toneAnalysis: "🎨 トーン使用分析"
+    },
+    templates: {
+      recommended: "推奨",
+      usageCount: "{{count}}回使用"
+    }
   }
 };

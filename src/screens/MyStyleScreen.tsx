@@ -606,17 +606,17 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                     (t) => t.id === styleAnalysis.dominantStyle
                   )?.name
                 : ""}{" "}
-              브랜드
+              {t('myStyle.brand.title')}
             </Text>
             <Text style={styles.brandTagline}>
-              {stats?.totalPosts || 0}개의 스토리로 만든 나만의 스타일
+              {t('myStyle.brand.tagline', '{{count}}개의 스토리로 만든 나만의 스타일', { count: stats?.totalPosts || 0 })}
             </Text>
           </View>
         </View>
 
         {/* 스타일 점수 */}
         <View style={styles.styleScoresContainer}>
-          <Text style={styles.sectionLabel}>스타일 분석</Text>
+          <Text style={styles.sectionLabel}>{t('myStyle.brand.styleAnalysis')}</Text>
           <View style={styles.styleScores}>
             {styleAnalysis &&
               Object.entries(styleAnalysis.styleScore)
@@ -645,7 +645,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
         {/* 핵심 키워드 */}
         <View style={styles.keywordsContainer}>
-          <Text style={styles.sectionLabel}>핵심 키워드</Text>
+          <Text style={styles.sectionLabel}>{t('myStyle.keywords.title')}</Text>
           <View style={styles.keywordsList}>
             {stats?.favoriteHashtags
               ?.slice(0, 5)
@@ -799,7 +799,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               <Text style={styles.challengeTitle}>{activeChallenge.name}</Text>
             </View>
             <Text style={styles.challengeProgress}>
-              진행도: {activeChallenge.progress || 0}/{activeChallenge.duration}
+              {t('myStyle.challenge.progress', '진행도: {{current}}/{{total}}', { current: activeChallenge.progress || 0, total: activeChallenge.duration })}
               일
             </Text>
           </View>
@@ -835,14 +835,14 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       <View>
         {/* 성장 그래프 */}
         <View style={[styles.growthSection, cardTheme.default]}>
-          <Text style={styles.sectionTitle}>📈 성장 분석</Text>
+          <Text style={styles.sectionTitle}>{t('myStyle.analytics.growth', '📈 성장 분석')}</Text>
 
           {/* 주요 지표 */}
           <View style={styles.metricsGrid}>
             <View style={styles.metricItem}>
               <SafeIcon name="create-outline" size={24} color={colors.primary} />
               <Text style={styles.metricValue}>{stats?.totalPosts || 0}</Text>
-              <Text style={styles.metricLabel}>총 게시물</Text>
+              <Text style={styles.metricLabel}>{t('myStyle.analytics.totalPosts', '총 게시물')}</Text>
             </View>
             <View style={styles.metricItem}>
               <SafeIcon name="calendar-outline" size={24} color={colors.accent} />
@@ -889,7 +889,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
         {/* 톤 분석 */}
         <View style={[styles.toneAnalysis, cardTheme.default]}>
-          <Text style={styles.sectionTitle}>🎨 톤 사용 분석</Text>
+          <Text style={styles.sectionTitle}>{t('myStyle.analytics.toneAnalysis', '🎨 톤 사용 분석')}</Text>
           <View style={styles.toneGrid}>
             {Object.entries(stats?.byTone || {}).map(([tone, count]) => (
               <TouchableOpacity
@@ -1023,7 +1023,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                   ]}
                 >
                   <SafeIcon name="star" size={12} color="#fff" />
-                  <Text style={styles.recommendedText}>추천</Text>
+                  <Text style={styles.recommendedText}>{t('myStyle.templates.recommended', '추천')}</Text>
                 </Animated.View>
               )}
 
@@ -1069,7 +1069,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
                   {templateUsageData && templateUsageData.count > 0 && (
                     <Text style={styles.templateUsageCount}>
-                      사용 {templateUsageData.count}회
+                      {t('myStyle.templates.usageCount', '사용 {{count}}회', { count: templateUsageData.count })}
                     </Text>
                   )}
                 </View>
@@ -1237,7 +1237,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 selectedTab === "overview" && styles.tabTextActive,
               ]}
             >
-              개요
+              {t('myStyle.tabs.overview')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
@@ -1253,7 +1253,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 selectedTab === "analytics" && styles.tabTextActive,
               ]}
             >
-              분석
+              {t('myStyle.tabs.analysis')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity

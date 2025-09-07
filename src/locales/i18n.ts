@@ -1,6 +1,7 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as RNLocalize from 'react-native-localize';
+import { getDeviceLanguage as getDeviceLanguageUtil } from '../utils/deviceLanguage';
 import en from './en';
 import ko from './ko';
 import ja from './ja';
@@ -14,19 +15,18 @@ const resources = {
 };
 
 const getDeviceLanguage = () => {
-  const locales = RNLocalize.getLocales();
-  if (Array.isArray(locales) && locales.length > 0) {
-    const systemLanguage = locales[0].languageCode;
-    const countryCode = locales[0].countryCode;
-    
-    if (systemLanguage === 'zh') {
-      return 'zh-CN';
-    }
-    
-    const supportedLanguages = ['ko', 'en', 'ja', 'zh-CN'];
-    return supportedLanguages.includes(systemLanguage) ? systemLanguage : 'ko';
+  // deviceLanguage.ts의 함수를 사용하여 FORCE_ENGLISH 설정을 적용
+  const deviceLang = getDeviceLanguageUtil();
+  console.log('🌍 [i18n] Device language from deviceLanguage.ts:', deviceLang);
+  
+  if (deviceLang === 'zh') {
+    return 'zh-CN';
   }
-  return 'ko';
+  
+  const supportedLanguages = ['ko', 'en', 'ja', 'zh-CN'];
+  const finalLang = supportedLanguages.includes(deviceLang) ? deviceLang : 'ko';
+  console.log('🌍 [i18n] Final language for i18n:', finalLang);
+  return finalLang;
 };
 
 i18next

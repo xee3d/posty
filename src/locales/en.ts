@@ -43,6 +43,9 @@ export default {
       polish: "Enter the text you'd like to polish",
       photo: "Select a photo!",
     },
+    placeholderExamples: {
+      polish: "Example: Today I had coffee with a friend at a cafe and we talked for a long time, it was so nice...",
+    },
     prompt: {
       title: "What would you like to write about?",
       refresh: "Refresh",
@@ -50,6 +53,31 @@ export default {
         title: "Trend Update",
         message: "Latest trends have been loaded!"
       }
+    },
+    placeholders: {
+      morning: "How did you start your morning today?",
+      lunch: "Did you enjoy your lunch?",
+      afternoon: "Are you enjoying your afternoon leisure?",
+      evening: "How was your day today?",
+      night: "What are you thinking about late at night?"
+    },
+    timeBasedPrompts: {
+      morning: ["Morning Coffee", "Commute Scenery", "Morning Routine", "Morning Exercise", "Dawn Vibes", "Breakfast Menu"],
+      lunch: ["Lunch Recommendations", "Afternoon Coffee Time", "Lunch Break", "Today's Lunch", "Cafe Hopping", "Afternoon Work"],
+      afternoon: ["Afternoon Leisure", "Cafe Time", "Preparing to Leave Work", "Afternoon Exercise", "Daily Summary", "Evening Plans"],
+      evening: ["Dinner Menu", "Evening Commute", "Evening Exercise", "End of Day", "Night View", "Evening Leisure"],
+      night: ["Late Night Snacks", "Late Night Vibes", "Insomnia Daily", "Dawn Thoughts", "Night Work", "Night Walk"]
+    },
+    categories: {
+      casual: "Daily",
+      professional: "Business", 
+      humorous: "Humor",
+      emotional: "Emotional",
+      genz: "Trend",
+      millennial: "Lifestyle",
+      minimalist: "Minimal",
+      storytelling: "Story",
+      motivational: "Motivation"
     },
     tones: {
       casual: "Casual",
@@ -306,17 +334,16 @@ export default {
       "50s": {
         default: "Mature and wise",
         baby_photo: "Such a beautiful baby. Seems like a blessed family",
-        },
-        "60s+": {
-          default: "Experienced and warm",
-          baby_photo: "What a blessing. Hope they grow up healthy",
-        },
       },
-      familyRoles: {
-        mother: "With a loving mother's heart",
-        father: "With a proud father's heart", 
-        grandparent: "With warm grandparent's heart looking at grandchild",
+      "60s+": {
+        default: "Experienced and warm",
+        baby_photo: "What a blessing. Hope they grow up healthy",
       },
+    },
+    familyRoles: {
+      mother: "With a loving mother's heart",
+      father: "With a proud father's heart", 
+      grandparent: "With warm grandparent's heart looking at grandchild",
     },
     interests: [
       "Travel", "Food", "Cafe", "Cooking", "Baking", "Exercise", "Fitness", "Yoga", "Running", "Hiking",
@@ -1204,11 +1231,78 @@ export default {
     access: {
       freeMessage: "My Style analysis is available from STARTER plan.",
     },
+    tabs: {
+      overview: "Overview",
+      analysis: "Analysis", 
+      templates: "Templates"
+    },
+    brand: {
+      title: "Brand",
+      styleAnalysis: "Style Analysis",
+      tagline: "My unique style created from {{count}} stories"
+    },
+    keywords: {
+      title: "Key Keywords"
+    },
+    challenge: {
+      progress: "Progress: {{current}}/{{total}}"
+    },
+    analytics: {
+      growth: "📈 Growth Analysis",
+      totalPosts: "Total Posts",
+      toneAnalysis: "🎨 Tone Usage Analysis"
+    },
+    templates: {
+      recommended: "Recommended",
+      usageCount: "Used {{count}} times"
+    }
   },
   plans: {
     free: {
       name: "Free",
       priceDisplay: "Free",
     },
+  },
+
+  // Token Purchase
+  tokenPurchase: {
+    title: "Token Purchase",
+    packages: {
+      light: {
+        name: "Light Pack",
+        tagline: "Easy to start"
+      },
+      bestValue: {
+        name: "Best Value",
+        tagline: "Most popular choice"
+      },
+      mega: {
+        name: "Mega Pack",
+        tagline: "For heavy users"
+      },
+      ultra: {
+        name: "Ultra Pack",
+        tagline: "Ultimate package for professionals"
+      }
+    },
+    pricing: {
+      tokens: "{{count}} tokens",
+      bonus: "+{{count}} bonus",
+      price: "${{price:number}}",
+      originalPrice: "${{price:number}}",
+      discount: "{{percent}}% off",
+      perToken: "${{price:number}} per token"
+    },
+    alerts: {
+      maxPlanTitle: "MAX Plan Active",
+      maxPlanMessage: "You're currently using MAX plan with unlimited tokens.\n\nNo additional token purchase needed. 🚀",
+      confirm: "OK"
+    },
+    currency: {
+      krw: "₩",
+      usd: "$",
+      jpy: "¥",
+      cny: "¥"
+    }
   }
 };

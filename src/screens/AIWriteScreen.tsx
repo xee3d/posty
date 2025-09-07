@@ -1306,7 +1306,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                   <View style={styles.inputContainer}>
                     <TextInput
                       style={[styles.input, styles.polishInput]}
-                      placeholder="예: 오늘 카페에서 친구랑 커피마시면서 오럫동안 이야기했더니 너무 좋았다..."
+                      placeholder={t("aiWrite.placeholderExamples.polish")}
                       placeholderTextColor={colors.text.tertiary}
                       value={prompt}
                       onChangeText={setPrompt}

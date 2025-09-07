@@ -31,26 +31,154 @@ interface NewsItem {
 class TrendService {
   private readonly CACHE_KEY = "TREND_CACHE";
   private readonly CACHE_VERSION_KEY = "TREND_CACHE_VERSION";
-  private readonly CACHE_VERSION = "2.5"; // shuffleArray 수정 및 Google 트렌드 디버그 추가
+  private readonly CACHE_VERSION = "4.1"; // 지역별 특화 채널 구현 - 각국 맞춤 트렌드 소스
   private readonly CACHE_DURATION = 1000 * 60 * 30; // 30분마다 업데이트 (더 자주 새로고침)
 
   // NewsAPI 키 (무료 플랜)
   private readonly NEWS_API_KEY = NEWS_API_KEY || "";
 
-  // 실시간 API 설정 - 뉴스/검색어는 별도 처리
-  private USE_REAL_API = false; // 서버 API 비활성화 (소셜 트렌드만)
-  private USE_NEWS_API = false; // 뉴스 API 비활성화 (샘플 데이터 사용)
+  // 실시간 API 설정 - 언어/지역별 특화 채널 사용
+  private USE_REAL_API = true; // 각 API 직접 호출 (언어별 데이터) - 실제 API 활성화
+  private USE_NEWS_API = true; // 뉴스 API 활성화 (실제 뉴스 데이터)
   private USE_GOOGLE_TRENDS = true; // Google 트렌드 활성화
   private API_BASE_URL = "https://posty-api.vercel.app/api"; // 새 API URL
 
+  // 각 나라별 특화 채널 설정
+  private REGIONAL_CHANNELS = {
+    'ko': {
+      name: '한국',
+      channels: ['naver', 'daum', 'news_api_kr'],
+      social: ['reddit_korea', 'twitter_kr'],
+      search: ['naver_trends', 'google_trends_kr']
+    },
+    'en': {
+      name: 'English',
+      channels: ['news_api_us', 'reddit', 'twitter'],
+      social: ['reddit_popular', 'twitter_trending'],
+      search: ['google_trends_us', 'bing_trends']
+    },
+    'ja': {
+      name: '日本',
+      channels: ['yahoo_jp', 'news_api_jp', 'twitter_jp'],
+      social: ['reddit_japan', '2ch', 'twitter_jp'],
+      search: ['yahoo_realtime_jp', 'google_trends_jp']
+    },
+    'zh-CN': {
+      name: '中国',
+      channels: ['baidu_news', 'sina', 'tencent'],
+      social: ['weibo', 'zhihu'],
+      search: ['baidu_trends', 'weibo_trends']
+    }
+  };
+
   /**
-   * 모든 소스에서 트렌드 가져오기
+   * 언어별 특화 채널 정보 반환
+   */
+  private getRegionalChannels(language: string) {
+    const lang = language === 'zh' ? 'zh-CN' : language;
+    return this.REGIONAL_CHANNELS[lang as keyof typeof this.REGIONAL_CHANNELS] || this.REGIONAL_CHANNELS['en'];
+  }
+
+  /**
+   * 언어별 맞춤 트렌드 소스 선택
+   */
+  private async getRegionalTrends(language: string): Promise<TrendItem[]> {
+    const channels = this.getRegionalChannels(language);
+    const trends: TrendItem[] = [];
+    
+    console.log(`🌍 [TrendService] Using regional channels for ${language}:`, channels.name);
+    console.log(`📺 [TrendService] Available channels:`, channels.channels);
+    
+    // 언어별 특화 처리
+    if (language === 'ko') {
+      // 한국: 네이버, 다음, 한국 뉴스
+      const naverTrends = await this.getNaverTrends();
+      trends.push(...naverTrends);
+      
+      const koreanNews = await this.getNewsTrends();
+      trends.push(...koreanNews);
+    } else if (language === 'ja') {
+      // 일본: Yahoo Japan, 일본 뉴스
+      const japaneseNews = await this.getRegionalNews('jp');
+      trends.push(...japaneseNews);
+      
+      const googleTrendsJp = this.getGoogleTrends();
+      trends.push(...googleTrendsJp);
+    } else if (language === 'zh-CN' || language === 'zh') {
+      // 중국: 바이두, 웨이보, 중국 뉴스 (실제로는 제한적)
+      const chineseNews = await this.getRegionalNews('cn');
+      trends.push(...chineseNews);
+      
+      const googleTrendsCn = this.getGoogleTrends();
+      trends.push(...googleTrendsCn);
+    } else {
+      // 영어/기타: 국제 뉴스, Reddit, Google Trends
+      const internationalNews = await this.getNewsTrends();
+      trends.push(...internationalNews);
+      
+      const redditTrends = await this.getRedditTrends();
+      trends.push(...redditTrends);
+      
+      const googleTrends = this.getGoogleTrends();
+      trends.push(...googleTrends);
+    }
+    
+    return trends;
+  }
+
+  /**
+   * 지역별 뉴스 가져오기
+   */
+  private async getRegionalNews(country: string): Promise<TrendItem[]> {
+    if (!this.USE_NEWS_API || !this.NEWS_API_KEY || this.NEWS_API_KEY === "development-key") {
+      console.log(`[TrendService] NewsAPI not available for ${country}, using sample data`);
+      const isKoreanDevice = country === 'kr';
+      return this.getSampleNewsTrends(isKoreanDevice);
+    }
+    
+    try {
+      const response = await axios.get("https://newsapi.org/v2/top-headlines", {
+        params: {
+          country: country,
+          apiKey: this.NEWS_API_KEY,
+          pageSize: 8,
+        },
+      });
+      
+      const articles: NewsItem[] = response.data.articles || [];
+      if (articles.length === 0) {
+        const isKoreanDevice = country === 'kr';
+        return this.getSampleNewsTrends(isKoreanDevice);
+      }
+      
+      return articles.slice(0, 8).map((article, index) => ({
+        id: `news-${country}-${index}-${Date.now()}`,
+        title: article.title,
+        category: "news",
+        source: "news" as const,
+        timestamp: article.publishedAt,
+        hashtags: this.extractHashtags(article.title),
+      }));
+    } catch (error) {
+      console.error(`NewsAPI error for ${country}:`, error);
+      const isKoreanDevice = country === 'kr';
+      return this.getSampleNewsTrends(isKoreanDevice);
+    }
+  }
+
+  /**
+   * 모든 소스에서 트렌드 가져오기 (언어별 특화 채널 사용)
    */
   async getAllTrends(): Promise<TrendItem[]> {
     try {
       // 디버깅을 위한 언어 확인
       const deviceLang = getDeviceLanguage();
       const isKoreanLang = isKorean();
+      // 디버깅 로그 (지역별 채널 시스템)
+      console.log("🔧 [TrendService] === REGIONAL CHANNEL SYSTEM START ===");
+      console.log("🔧 [TrendService] Language:", deviceLang, "| Korean:", isKoreanLang);
+      console.log("🔧 [TrendService] USE_REAL_API:", this.USE_REAL_API);
+      console.log("🔧 [TrendService] Cache version:", this.CACHE_VERSION);
 
       // 캐시 확인 (실시간 API 사용 시 캐시 시간 단축)
       const cached = await this.getCachedTrends();
@@ -90,8 +218,9 @@ class TrendService {
       let allTrends: TrendItem[] = [];
 
       if (this.USE_REAL_API) {
-        // 실시간 API 사용
-        allTrends = await this.fetchRealTimeTrends();
+        // 언어별 특화 채널 사용
+        console.log(`[TrendService] Using regional specialized channels for ${deviceLang}`);
+        allTrends = await this.getRegionalTrends(deviceLang);
       } else {
         // 기존 로직 사용 - 모든 소스 포함
         // 병렬로 여러 소스에서 트렌드 가져오기 (타임아웃 적용)
@@ -177,7 +306,9 @@ class TrendService {
     if (
       !this.USE_NEWS_API ||
       !this.NEWS_API_KEY ||
-      this.NEWS_API_KEY === "test-news-api-key"
+      this.NEWS_API_KEY === "test-news-api-key" ||
+      this.NEWS_API_KEY === "your-newsapi-key-here" ||
+      this.NEWS_API_KEY === "development-key"
     ) {
       console.log(
         "[TrendService] Using sample news data (API disabled or no key)"
@@ -201,7 +332,7 @@ class TrendService {
       }
 
       return articles.slice(0, 10).map((article, index) => ({
-        id: `news-${index}`,
+        id: `news-api-${index}-${Date.now()}`,
         title: article.title,
         category: "news",
         source: "news" as const,
@@ -219,6 +350,7 @@ class TrendService {
    * 샘플 뉴스 트렌드 (언어별) - 시간대별 실시간 뉴스
    */
   private getSampleNewsTrends(isKorean: boolean): TrendItem[] {
+    
     const now = new Date();
     const month = now.getMonth() + 1;
     const hour = now.getHours();
@@ -450,7 +582,7 @@ class TrendService {
       ];
 
       return sampleNews.map((news, index) => ({
-        id: `news-${index}`,
+        id: `news-sample-${index}-${Date.now()}`,
         title: news.title,
         category: "news",
         source: "news" as const,
@@ -1353,7 +1485,7 @@ class TrendService {
             return null;
           }
           return {
-            id: `google-${index}`,
+            id: `google-en-${index}-${Date.now()}`,
             title: trend.title,
             category: trend.category,
             source: "google" as const,

@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18n from '../../locales/i18n';
 import { store } from '../../store';
 import { updateSettings } from '../../store/slices/userSlice';
+import { getDeviceLanguage } from '../../utils/deviceLanguage';
 
 // 지원하는 언어 목록
 export type SupportedLanguage = 'ko' | 'en' | 'ja' | 'zh-CN';
@@ -61,11 +62,11 @@ class LanguageService {
    */
   async initialize(): Promise<SupportedLanguage> {
     try {
+      // 시스템 언어 감지
+      const systemLanguage = this.detectSystemLanguage();
+      
       // 저장된 언어 설정 확인
       const storedLanguage = await AsyncStorage.getItem(STORAGE_KEY);
-      
-      // 시스템 언어 감지 (우선순위를 시스템 언어로)
-      const systemLanguage = this.detectSystemLanguage();
       
       if (storedLanguage && this.isSupportedLanguage(storedLanguage)) {
         // 저장된 언어 설정이 있으면 우선 사용
@@ -94,30 +95,22 @@ class LanguageService {
    */
   private detectSystemLanguage(): SupportedLanguage {
     try {
-      const locales = RNLocalize.getLocales();
-      console.log('[LanguageService] System locales:', locales);
+      // deviceLanguage.ts의 getDeviceLanguage 함수 사용
+      const deviceLang = getDeviceLanguage();
+      console.log('[LanguageService] Device language from deviceLanguage.ts:', deviceLang);
       
-      for (const locale of locales) {
-        const languageCode = locale.languageCode;
-        const countryCode = locale.countryCode;
-        
-        // 정확한 매칭 (언어-국가)
-        const fullCode = `${languageCode}-${countryCode}` as SupportedLanguage;
-        if (this.isSupportedLanguage(fullCode)) {
-          return fullCode;
-        }
-        
-        // 언어 코드만 매칭
-        if (this.isSupportedLanguage(languageCode)) {
-          // 중국어의 경우 간체로 기본 설정
-          if (languageCode === 'zh') {
-            return 'zh-CN';
-          }
-          return languageCode as SupportedLanguage;
-        }
+      // 지원되는 언어인지 확인
+      if (this.isSupportedLanguage(deviceLang)) {
+        return deviceLang as SupportedLanguage;
+      }
+      
+      // 중국어 특별 처리
+      if (deviceLang === 'zh') {
+        return 'zh-CN';
       }
       
       // 기본값: 한국어
+      console.log('[LanguageService] Using fallback language: ko');
       return 'ko';
     } catch (error) {
       console.error('[LanguageService] System language detection failed:', error);
@@ -179,6 +172,24 @@ class LanguageService {
       
     } catch (error) {
       console.error('[LanguageService] Failed to set language:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * 언어 설정 초기화 (시스템 언어로 재설정)
+   */
+  async resetToSystemLanguage(): Promise<void> {
+    try {
+      // 저장된 언어 설정 삭제
+      await AsyncStorage.removeItem(STORAGE_KEY);
+      console.log('[LanguageService] Stored language setting removed');
+      
+      // 시스템 언어로 재설정
+      await this.initialize();
+      console.log('[LanguageService] Language reset to system language:', this.currentLanguage);
+    } catch (error) {
+      console.error('[LanguageService] Failed to reset language:', error);
       throw error;
     }
   }

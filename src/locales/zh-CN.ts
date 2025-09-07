@@ -128,6 +128,9 @@ export default {
     title: "用Posty写作",
     subtitle: "想写什么故事呢？",
     placeholder: "在这里输入文本...",
+    placeholderExamples: {
+      polish: "例如：今天在咖啡厅和朋友喝咖啡时聊了很久，感觉非常愉快...",
+    },
     errors: {
       imageSelection: "选择图像时发生错误。",
       cameraAccess: "使用相机时发生错误。"
@@ -200,6 +203,32 @@ export default {
       write: "写作",
       improve: "改进",
       translate: "翻译"
+    },
+    
+    placeholders: {
+      morning: "今天早上过得怎么样？",
+      lunch: "午餐吃得开心吗？",
+      afternoon: "正在享受下午的悠闲时光吗？",
+      evening: "今天过得怎么样？",
+      night: "深夜了，在想什么呢？"
+    },
+    timeBasedPrompts: {
+      morning: ["今日早咖啡", "通勤风景", "晨间例程", "晨练", "清晨感触", "早餐菜单"],
+      lunch: ["午餐推荐", "下午咖啡时光", "午休时光", "今日午餐", "咖啡店探访", "下午工作"],
+      afternoon: ["下午悠闲", "咖啡时间", "准备下班", "下午运动", "一天总结", "晚上计划"],
+      evening: ["晚餐菜单", "下班路上", "晚间运动", "一天结束", "夜景欣赏", "晚间休闲"],
+      night: ["夜宵时间", "深夜感触", "失眠日常", "凌晨思绪", "夜间工作", "夜间散步"]
+    },
+    categories: {
+      casual: "日常",
+      professional: "商务", 
+      humorous: "幽默",
+      emotional: "情感",
+      genz: "潮流",
+      millennial: "生活方式",
+      minimalist: "极简",
+      storytelling: "故事",
+      motivational: "励志"
     },
     
     photoUpload: {
@@ -350,17 +379,60 @@ export default {
   trends: {
     title: "实时趋势",
     subtitle: "实时热门趋势和关键词",
+    refresh: "刷新",
+    lastUpdated: "最后更新: {{time}}",
+    categories: {
+      all: "全部",
+      news: "新闻", 
+      social: "社交",
+      keywords: "关键词"
+    },
+    categoryTitles: {
+      all: "全部趋势",
+      news: "新闻",
+      social: "社区",
+      keywords: "热门关键词"
+    },
+    sources: {
+      news: "新闻",
+      social: "社区",
+      naver: "Naver",
+      keywords: "关键词"
+    },
+    loading: {
+      initial: "正在加载趋势...",
+      refresh: "刷新中..."
+    },
     errors: {
-      loadFailed: "加载趋势失败",
-      refreshFailed: "刷新趋势失败"
+      loadFailed: "加载趋势时发生错误。",
+      refreshFailed: "刷新时发生错误。",
+      cannotLoad: "无法加载趋势",
+      tryAgain: "请稍后再试",
+      networkError: "请检查网络连接",
+      retryButton: "重试"
     },
     premium: {
       title: "高级功能",
-      subtitle: "实时趋势需要高级计划",
-      upgradeButton: "升级计划",
+      subtitle: "PRO套餐开始提供实时趋势功能。",
+      upgradeButton: "升级",
       preview: {
-        title: "趋势预览"
+        title: "趋势预览",
+        subtitle: "分析趋势提高流量，\n根据实时话题创建内容。"
       }
+    },
+    tips: {
+      title: "趋势使用技巧",
+      content: "点击趋势，AI会为您写该主题的文章。使用关键词修改成您的风格！",
+      writeWithTrend: "用这个趋势写作"
+    },
+    updates: {
+      daily: "趋势每日更新",
+      realtime: "实时趋势更新"
+    },
+    actions: {
+      viewMore: "查看更多",
+      writePost: "写文章",
+      share: "分享"
     }
   },
 
@@ -761,5 +833,79 @@ export default {
     selectLanguage: "选择语言",
     resetToSystem: "重置为系统语言",
     note: "更改语言时应用将重启"
+  },
+
+  // Token Purchase
+  tokenPurchase: {
+    title: "购买代币",
+    packages: {
+      light: {
+        name: "轻量包",
+        tagline: "轻松开始"
+      },
+      bestValue: {
+        name: "最佳价值",
+        tagline: "最受欢迎的选择"
+      },
+      mega: {
+        name: "大型包",
+        tagline: "重度用户首选"
+      },
+      ultra: {
+        name: "超级包",
+        tagline: "专业人士终极套餐"
+      }
+    },
+    pricing: {
+      tokens: "{{count}}个代币",
+      bonus: "+{{count}}个奖励",
+      price: "¥{{price:number}}",
+      originalPrice: "¥{{price:number}}",
+      discount: "{{percent}}%折扣",
+      perToken: "每个¥{{price:number}}"
+    },
+    alerts: {
+      maxPlanTitle: "MAX计划使用中",
+      maxPlanMessage: "您目前正在使用MAX计划，可以无限制使用代币。\n\n无需购买额外代币。🚀",
+      confirm: "确认"
+    },
+    currency: {
+      krw: "₩",
+      usd: "$",
+      jpy: "¥",
+      cny: "¥"
+    }
+  },
+
+  // 我的风格
+  myStyle: {
+    access: {
+      freeMessage: "我的风格分析功能从STARTER计划开始提供。",
+    },
+    tabs: {
+      overview: "概览",
+      analysis: "分析", 
+      templates: "模板"
+    },
+    brand: {
+      title: "品牌",
+      styleAnalysis: "风格分析",
+      tagline: "由{{count}}个故事创建的我的独特风格"
+    },
+    keywords: {
+      title: "核心关键词"
+    },
+    challenge: {
+      progress: "进度: {{current}}/{{total}}"
+    },
+    analytics: {
+      growth: "📈 成长分析",
+      totalPosts: "总帖子数",
+      toneAnalysis: "🎨 语调使用分析"
+    },
+    templates: {
+      recommended: "推荐",
+      usageCount: "使用{{count}}次"
+    }
   }
 };

@@ -43,6 +43,9 @@ export default {
       polish: "정리하고 싶은 글을 입력해주세요",
       photo: "사진을 보여주세요!",
     },
+    placeholderExamples: {
+      polish: "예: 오늘 카페에서 친구랑 커피마시면서 오랫동안 이야기했더니 너무 좋았다...",
+    },
     prompt: {
       title: "무엇에 대해 쓸까요?",
       refresh: "새로고침",
@@ -50,6 +53,31 @@ export default {
         title: "트렌드 업데이트",
         message: "최신 트렌드를 불러왔어요!"
       }
+    },
+    placeholders: {
+      morning: "오늘 아침은 어떻게 시작하셨나요?",
+      lunch: "점심은 맛있게 드셨나요?",
+      afternoon: "오후의 여유를 즐기고 계신가요?",
+      evening: "오늘 하루는 어떠셨나요?",
+      night: "늦은 밤, 무슨 생각을 하고 계신가요?"
+    },
+    timeBasedPrompts: {
+      morning: ["오늘 아침 커피", "출근길 풍경", "모닝루틴", "아침 운동", "새벽 감성", "아침 메뉴"],
+      lunch: ["점심 메뉴 추천", "오후 커피타임", "점심시간 여유", "오늘의 런치", "카페 탐방", "오후 일과"],
+      afternoon: ["오후의 여유", "카페 타임", "퇴근 준비", "오후 운동", "하루 정리", "저녁 계획"],
+      evening: ["저녁 메뉴", "퇴근길 풍경", "저녁 운동", "하루 마무리", "야경 구경", "저녁 여가"],
+      night: ["야식 타임", "늦은 밤 감성", "불면증 일상", "새벽 생각", "야간 작업", "밤 산책"]
+    },
+    categories: {
+      casual: "일상",
+      professional: "비즈니스", 
+      humorous: "유머",
+      emotional: "감성",
+      genz: "트렌드",
+      millennial: "라이프스타일",
+      minimalist: "미니멀",
+      storytelling: "스토리",
+      motivational: "동기부여"
     },
     tones: {
       casual: "캐주얼",
@@ -307,16 +335,15 @@ export default {
           default: "성숙하고 지혜로운",
           baby_photo: "정말 예쁜 아기네요. 축복받은 가정이신 것 같아요",
         },
-        "60s+": {
-          default: "경험 많고 따뜻한",
-          baby_photo: "복덩이네요. 건강하게 잘 자라길 바랍니다",
-        },
+      "60s+": {
+        default: "경험 많고 따뜻한",
+        baby_photo: "복덩이네요. 건강하게 잘 자라길 바랍니다",
       },
-      familyRoles: {
-        mother: "사랑이 넘치는 엄마의 마음으로",
-        father: "자랑스러운 아빠의 마음으로",
-        grandparent: "손주를 바라보는 따뜻한 조부모의 마음으로",
-      },
+    },
+    familyRoles: {
+      mother: "사랑이 넘치는 엄마의 마음으로",
+      father: "자랑스러운 아빠의 마음으로",
+      grandparent: "손주를 바라보는 따뜻한 조부모의 마음으로",
     },
     interests: [
       "여행", "맛집", "카페", "요리", "베이킹", "운동", "헬스", "요가", "러닝", "등산",
@@ -1245,11 +1272,78 @@ export default {
     access: {
       freeMessage: "STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.",
     },
+    tabs: {
+      overview: "개요",
+      analysis: "분석", 
+      templates: "템플릿"
+    },
+    brand: {
+      title: "브랜드",
+      styleAnalysis: "스타일 분석",
+      tagline: "{{count}}개의 스토리로 만든 나만의 스타일"
+    },
+    keywords: {
+      title: "핵심 키워드"
+    },
+    challenge: {
+      progress: "진행도: {{current}}/{{total}}"
+    },
+    analytics: {
+      growth: "📈 성장 분석",
+      totalPosts: "총 게시물",
+      toneAnalysis: "🎨 톤 사용 분석"
+    },
+    templates: {
+      recommended: "추천",
+      usageCount: "사용 {{count}}회"
+    }
   },
   plans: {
     free: {
       name: "무료",
       priceDisplay: "무료",
     },
+  },
+
+  // 토큰 구매
+  tokenPurchase: {
+    title: "토큰 구매",
+    packages: {
+      light: {
+        name: "라이트 팩",
+        tagline: "부담없이 시작하기"
+      },
+      bestValue: {
+        name: "베스트 밸류",
+        tagline: "가장 인기 있는 선택"
+      },
+      mega: {
+        name: "메가 팩",
+        tagline: "헤비 유저를 위한 선택"
+      },
+      ultra: {
+        name: "울트라 팩",
+        tagline: "프로페셔널을 위한 최강 패키지"
+      }
+    },
+    pricing: {
+      tokens: "{{count}}개 토큰",
+      bonus: "+{{count}}개 보너스",
+      price: "₩{{price:number}}",
+      originalPrice: "₩{{price:number}}",
+      discount: "{{percent}}% 할인",
+      perToken: "개당 ₩{{price:number}}"
+    },
+    alerts: {
+      maxPlanTitle: "MAX 플랜 사용 중",
+      maxPlanMessage: "현재 MAX 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다.\n\n추가 토큰 구매가 필요하지 않습니다. 🚀",
+      confirm: "확인"
+    },
+    currency: {
+      krw: "₩",
+      usd: "$",
+      jpy: "¥",
+      cny: "¥"
+    }
   }
 };

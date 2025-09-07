@@ -572,7 +572,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 <AppLogo size={40} showText={false} variant="white" />
                 <View style={styles.logoTextContainer}>
                   <Text style={styles.appTitle}>{BRAND.name}</Text>
-                  <Text style={styles.appSubtitle}>{BRAND.tagline}</Text>
+                  <Text style={styles.appSubtitle}>{t('app.slogan')}</Text>
                 </View>
               </TouchableOpacity>
 
