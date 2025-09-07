@@ -1675,7 +1675,7 @@ const createStyles = (colors: any, cardTheme: any) => {
       gap: 6,
     },
     themeButtonActive: {
-      backgroundColor: cardTheme.molly.background,
+      backgroundColor: cardTheme.posty.background,
       borderWidth: 2,
       borderColor: colors.primary,
     },

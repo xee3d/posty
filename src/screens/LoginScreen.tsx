@@ -222,7 +222,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                     </Text>
                   )}
                   {provider === "kakao" && (
-                    <SafeIcon name="chat-bubble" size={20} color={textColor} />
+                    <SafeIcon name="chatbubble" size={20} color={textColor} />
                   )}
                   {provider === "facebook" && (
                     <SafeIcon name="facebook" size={20} color={textColor} />
@@ -295,7 +295,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                   ) : (
                     <>
                       <View style={styles.socialIconContainer}>
-                        <SafeIcon name="chat-bubble" size={20} color="#191919" />
+                        <SafeIcon name="chatbubble" size={20} color="#191919" />
                       </View>
                       <Text
                         style={[styles.socialButtonText, { color: "#191919" }]}

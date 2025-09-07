@@ -2220,8 +2220,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                 </View>
 
                 <FadeInView delay={100}>
-                  <View style={styles.mollyComment}>
-                    <Text style={styles.mollyCommentText}>
+                  <View style={styles.postyComment}>
+                    <Text style={styles.postyCommentText}>
                       {getRandomEncouragement()}
                     </Text>
                   </View>
@@ -2736,16 +2736,16 @@ const createStyles = (
       fontWeight: "600",
       color: colors.text.primary,
     },
-    mollyComment: {
+    postyComment: {
       marginHorizontal: SPACING.lg,
       marginBottom: SPACING.md,
       backgroundColor: isDark
         ? colors.primary + "20"
-        : cardTheme.molly.background,
+        : cardTheme.posty.background,
       borderRadius: 12,
       padding: SPACING.md,
     },
-    mollyCommentText: {
+    postyCommentText: {
       fontSize: 14,
       color: colors.text.primary,
       fontWeight: "500",
@@ -2761,7 +2761,7 @@ const createStyles = (
       marginBottom: SPACING.md,
       backgroundColor: isDark
         ? colors.primary + "20"
-        : cardTheme.molly.background,
+        : cardTheme.posty.background,
       borderRadius: 12,
       padding: SPACING.md,
       flexDirection: "row",

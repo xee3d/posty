@@ -46,7 +46,6 @@ import { ThemeProvider } from "./src/contexts/ThemeContext";
 // Import screens
 import HomeScreen from "./src/screens/HomeScreen";
 import AIWriteScreen from "./src/screens/AIWriteScreen";
-import TrendScreen from "./src/screens/TrendScreen";
 import MyStyleScreen from "./src/screens/MyStyleScreen";
 import SettingsScreen from "./src/screens/SettingsScreen";
 import ModernSubscriptionScreen from "./src/screens/subscription/ModernSubscriptionScreen";
@@ -77,7 +76,6 @@ import tokenService from "./src/services/subscription/tokenService";
 import offlineSyncService from "./src/services/offline/offlineSyncService";
 import analyticsService from "./src/services/analytics/analyticsService";
 import notificationService from "./src/services/notification/notificationService";
-import trendService from "./src/services/trendService";
 import {
   restoreTokenData,
   setupTokenPersistence,
@@ -318,7 +316,6 @@ const AppContent: React.FC = () => {
               tokenService.initialize(),
               analyticsService.initialize(),
               notificationService.initialize(),
-              trendService.initialize(), // 트렌드 서비스 초기화
             ]);
 
             console.log("✅ Services initialized successfully");
@@ -580,8 +577,6 @@ const AppContent: React.FC = () => {
             tips={navigationData?.tips}
           />
         );
-      case "trend":
-        return <TrendScreen key="trend" onNavigate={handleTabPress} />;
       case "my-style":
         return <MyStyleScreen key="my-style" onNavigate={handleTabPress} />;
       case "settings":

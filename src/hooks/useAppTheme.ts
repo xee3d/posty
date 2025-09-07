@@ -29,6 +29,7 @@ export const useAppTheme = () => {
         primary: newColors.accent,
         background: newColors.background,
         surface: newColors.surface,
+        primaryWriteCardBg: newColors.primaryWriteCardBg || (isDark ? newColors.surface : '#F0EEFF'), // 첫 글쓰기 카드 전용
         cardBackground: newColors.cardBackground || newColors.surface,
         border: newColors.border,
         lightGray: newColors.lightGray || (isDark ? "#404040" : "#F5F5F5"),
@@ -59,7 +60,7 @@ export const useAppTheme = () => {
   // 기존 cardTheme (하위 호환성을 위해 유지, memoized)
   const cardTheme = useMemo(
     () => ({
-      molly: {
+      posty: {
         background: isDark ? newColors.surface : colors.accentLight,
         iconBackground: colors.primary,
         iconColor: colors.white,

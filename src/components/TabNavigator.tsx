@@ -20,7 +20,7 @@ import { useAppTheme } from "../hooks/useAppTheme";
 import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
-const TAB_WIDTH = width / 5;
+const TAB_WIDTH = width / 4;
 
 interface TabNavigatorProps {
   activeTab: string;
@@ -51,12 +51,6 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({
       label: t("navigation.write"),
     },
     {
-      key: "trend",
-      icon: "trending-up-outline",
-      activeIcon: "trending-up",
-      label: t("navigation.trend"),
-    },
-    {
       key: "my-style",
       icon: "palette",
       activeIcon: "palette",
@@ -73,13 +67,12 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({
 
   // Shared value for indicator animation
   const indicatorPosition = useSharedValue(0);
-  const indicatorWidth = useSharedValue(TAB_WIDTH);
+  const indicatorWidth = useSharedValue(TAB_WIDTH * 0.4);
 
   // 탭별 개별 애니메이션 값 - Hook Rules 준수
   const tabScales = {
     home: useSharedValue(1),
     'ai-write': useSharedValue(1),
-    trend: useSharedValue(1),
     'my-style': useSharedValue(1),
     settings: useSharedValue(1),
   };
@@ -87,7 +80,6 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({
   const tabOpacities = {
     home: useSharedValue(activeTab === 'home' ? 1 : 0.7),
     'ai-write': useSharedValue(activeTab === 'ai-write' ? 1 : 0.7),
-    trend: useSharedValue(activeTab === 'trend' ? 1 : 0.7),
     'my-style': useSharedValue(activeTab === 'my-style' ? 1 : 0.7),
     settings: useSharedValue(activeTab === 'settings' ? 1 : 0.7),
   };
@@ -96,8 +88,8 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({
   useEffect(() => {
     const tabIndex = tabs.findIndex((tab) => tab.key === activeTab);
 
-    // 부드러운 spring 애니메이션
-    indicatorPosition.value = withSpring(tabIndex * TAB_WIDTH, {
+    // 부드러운 spring 애니메이션 (아이콘 중앙에 정렬된 짧은 indicator)
+    indicatorPosition.value = withSpring(tabIndex * TAB_WIDTH + TAB_WIDTH * 0.3, {
       damping: 20,
       stiffness: 200,
       mass: 0.8,
@@ -177,13 +169,13 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({
                 <IconComponent
                   name={iconName}
                   size={24}
-                  color={isActive ? colors.primary : colors.text.tertiary}
+                  color={isActive ? colors.primary : colors.text.secondary}
                 />
               </Animated.View>
               <Text
                 style={[
                   styles.tabText,
-                  { color: isActive ? colors.primary : colors.text.tertiary },
+                  { color: isActive ? colors.primary : colors.text.secondary },
                   isActive && styles.tabTextActive,
                 ]}
               >
@@ -233,7 +225,7 @@ const createStyles = (colors: typeof COLORS) =>
       fontSize: 10,
       textAlign: "center",
       lineHeight: 12,
-      opacity: 0.7,
+      opacity: 0.9,
     },
     tabTextActive: {
       fontWeight: "600",
@@ -241,13 +233,13 @@ const createStyles = (colors: typeof COLORS) =>
     },
     indicator: {
       position: "absolute",
-      bottom: 0,
-      left: 0,
-      width: TAB_WIDTH,
+      top: 0,
+      left: 0, // 애니메이션에서 위치 계산
+      width: TAB_WIDTH * 0.2, // 탭 너비의 20%만 사용 (절반으로 축소)
       height: 3,
       backgroundColor: colors.primary,
-      borderTopLeftRadius: 3,
-      borderTopRightRadius: 3,
+      borderBottomLeftRadius: 3,
+      borderBottomRightRadius: 3,
     },
   });
 

@@ -17,7 +17,7 @@ import {
   SPACING,
   BORDER_RADIUS,
   PLATFORMS,
-  MOLLY_MESSAGES,
+  POSTY_MESSAGES,
   BRAND,
   CARD_THEME,
   DARK_COLORS,
@@ -62,12 +62,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import NewUserWelcome from "../components/NewUserWelcome";
 import improvedStyleService from "../services/improvedStyleService";
 import { soundManager } from "../utils/soundManager";
-import {
-  BannerCarousel,
-  AdaptiveNativeAd,
-  SmartAdPlacement,
-} from "../components/ads";
-import AdIntegrationService from "../services/AdIntegrationService";
 import AppLogo from "../components/AppLogo";
 import NotificationBadge from "../components/NotificationBadge";
 import NotificationTestButtons from "../components/NotificationTestButtons";
@@ -482,7 +476,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     }
   };
 
-  const styles = createStyles(colors, cardTheme, theme);
+  const styles = createStyles(colors, cardTheme, theme, isDark);
 
   // 온보딩 완료 처리
   const handleWelcomeComplete = async () => {
@@ -615,17 +609,17 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
         {/* 개인화된 인사 배너 */}
         <FadeInView delay={50} duration={200}>
-          <View style={styles.mollyBanner}>
-            <View style={styles.mollyAvatar}>
-              <Text style={styles.mollyAvatarText}>
+          <View style={styles.postyBanner}>
+            <View style={styles.postyAvatar}>
+              <Text style={styles.postyAvatarText}>
                 {getPersonalizedGreeting().emoji}
               </Text>
             </View>
-            <View style={styles.mollyBannerContent}>
-              <Text style={styles.mollyBannerTitle}>
+            <View style={styles.postyBannerContent}>
+              <Text style={styles.postyBannerTitle}>
                 {getPersonalizedGreeting().title}
               </Text>
-              <Text style={styles.mollyBannerSubtitle}>
+              <Text style={styles.postyBannerSubtitle}>
                 {getPersonalizedGreeting().message}
               </Text>
             </View>
@@ -723,7 +717,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
             {userLevel !== "new" && (
               <View style={styles.mainActions}>
                 <ScaleButton
-                  style={styles.mainActionCard}
+                  style={styles.primaryWriteCard}
                   onPress={() =>
                     handleQuickAction(
                       getPersonalizedGreeting().action ||
@@ -803,19 +797,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </View>
         </FadeInView>
 
-        {/* 작은 배너 광고 - 해시태그 아래 배치 */}
-        {Date.now() % 2 === 0 && (
-          <SlideInView delay={600}>
-            <View style={styles.smallBannerContainer}>
-              <BannerCarousel
-                autoPlay={true}
-                autoPlayInterval={8000}
-                showIndicators={false}
-                style={styles.smallBanner}
-              />
-            </View>
-          </SlideInView>
-        )}
 
         {/* 나의 글쓰기 스타일 */}
         {styleAnalysis && stats?.totalPosts > 3 && (
@@ -1198,7 +1179,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </SlideInView>
         )}
 
-        {/* 하단 인라인 광고 - 개발 모드에서만 표시 */}
 
         <View style={styles.bottomSpace} />
       </ScrollView>
@@ -1234,9 +1214,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 const createStyles = (
   colors: typeof COLORS,
   cardTheme: typeof CARD_THEME,
-  theme?: any
+  theme?: any,
+  isDark?: boolean
 ) => {
-  const isDark = colors.background === "#1A202C"; // 하위 호환성을 위해 유지
 
   return StyleSheet.create({
     container: {
@@ -1353,22 +1333,24 @@ const createStyles = (
       fontSize: 10,
       fontWeight: "700",
     },
-    // Molly 배너
-    mollyBanner: {
-      backgroundColor: cardTheme.molly.background,
+    // Posty 배너
+    postyBanner: {
+      backgroundColor: isDark ? cardTheme.posty.background : '#F0EEFF', // 라이트 모드에서 연한 보라색
       marginHorizontal: SPACING.lg,
       marginTop: -70,
       borderRadius: 16,
       padding: SPACING.lg,
       flexDirection: "row",
       alignItems: "center",
+      borderWidth: 3, // 테두리 추가
+      borderColor: isDark ? 'transparent' : '#D0C7FF', // 라이트 모드에서 보라 테두리
       shadowColor: colors.primary,
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: isDark ? 0.3 : 0.15,
       shadowRadius: 12,
       elevation: 8,
     },
-    mollyAvatar: {
+    postyAvatar: {
       width: 48,
       height: 48,
       borderRadius: 24,
@@ -1377,20 +1359,20 @@ const createStyles = (
       alignItems: "center",
       marginRight: SPACING.md,
     },
-    mollyAvatarText: {
+    postyAvatarText: {
       fontSize: 28,
       color: colors.white,
     },
-    mollyBannerContent: {
+    postyBannerContent: {
       flex: 1,
     },
-    mollyBannerTitle: {
+    postyBannerTitle: {
       fontSize: 16,
       fontWeight: "700",
       color: colors.primary,
       letterSpacing: -0.3,
     },
-    mollyBannerSubtitle: {
+    postyBannerSubtitle: {
       fontSize: 14,
       color: theme?.colors.text.primary || colors.text.primary,
       marginTop: 4,
@@ -1417,6 +1399,21 @@ const createStyles = (
       shadowOpacity: 0.1,
       shadowRadius: 4,
       elevation: 3,
+    },
+    // 첫 글쓰기 카드 - 최상위 프라이머리 액션
+    primaryWriteCard: {
+      backgroundColor: '#F0EEFF', // 강제 보라색 적용
+      borderRadius: 16,
+      paddingVertical: 24,
+      paddingHorizontal: 24,
+      marginBottom: 16,
+      borderWidth: 5, // 매우 두껌운 테두리로 시인성 강화
+      borderColor: '#C8B5FF', // 강제 진한 보라 테두리
+      shadowColor: '#8B5CF6',
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.3,
+      shadowRadius: 24,
+      elevation: 15,
     },
     mainActionRow: {
       flexDirection: "row",
@@ -1508,7 +1505,7 @@ const createStyles = (
       letterSpacing: -0.3,
     },
     coachingCard: {
-      backgroundColor: cardTheme.molly.background,
+      backgroundColor: cardTheme.posty.background,
       borderRadius: 16,
       padding: SPACING.lg,
       flexDirection: "row",
@@ -1529,12 +1526,12 @@ const createStyles = (
     coachingTitle: {
       fontSize: 15,
       fontWeight: "600",
-      color: cardTheme.molly.titleColor,
+      color: cardTheme.posty.titleColor,
       marginBottom: SPACING.xs,
     },
     coachingText: {
       fontSize: 14,
-      color: cardTheme.molly.textColor,
+      color: cardTheme.posty.textColor,
       lineHeight: 20,
     },
     // 추천 섹션
@@ -1636,7 +1633,7 @@ const createStyles = (
       borderRadius: 24,
     },
     writeButtonText: {
-      color: cardTheme.molly.button.text,
+      color: cardTheme.posty.button.text,
       fontSize: 14,
       fontWeight: "600",
       letterSpacing: -0.2,
@@ -1737,16 +1734,6 @@ const createStyles = (
       fontSize: 14,
       color: colors.text.primary,
       fontWeight: "500",
-    },
-    smallBannerContainer: {
-      marginTop: SPACING.lg,
-      marginHorizontal: SPACING.lg,
-      marginBottom: SPACING.md,
-    },
-    smallBanner: {
-      height: 100, // 기존 160px에서 100px로 축소
-      borderRadius: 12,
-      overflow: "hidden",
     },
     syncIndicatorContainer: {
       position: "absolute",

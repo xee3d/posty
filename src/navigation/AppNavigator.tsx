@@ -4,7 +4,6 @@ import HomeScreen from "../screens/HomeScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import MyStyleScreen from "../screens/MyStyleScreen";
 import AIWriteScreen from "../screens/AIWriteScreen";
-import TrendScreen from "../screens/TrendScreen";
 // import FeedWithAdsExample from "../screens/FeedWithAdsExample";
 import ModernSubscriptionScreen from "../screens/subscription/ModernSubscriptionScreen";
 import CostMonitorScreen from "../screens/CostMonitorScreen";
@@ -94,8 +93,6 @@ const AppNavigator: React.FC = () => {
         return <CostMonitorScreen key="cost-monitor" />;
       case "settings":
         return <SettingsScreen key="settings" />;
-      case "trend":
-        return <TrendScreen key="trend" onNavigate={handleNavigate} />;
       case "feed-ads":
         return <HomeScreen key="feed-ads" onNavigate={handleNavigate} />;
       case "subscription":

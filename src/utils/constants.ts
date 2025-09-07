@@ -98,7 +98,7 @@ export const COLORS = LIGHT_COLORS; // 기본값은 라이트 테마
 
 // 카드 테마 - 한 곳에서 관리
 export const CARD_THEME = {
-  molly: {
+  posty: {
     background: COLORS.accentLight,
     iconBackground: COLORS.primary,
     iconColor: COLORS.white,
@@ -268,8 +268,8 @@ export const PLATFORMS = {
   },
 };
 
-// 몰리 메시지
-export const MOLLY_MESSAGES = {
+// 포스티 메시지
+export const POSTY_MESSAGES = {
   greetings: [
     "안녕! 포스티예요 👋",
     "오늘도 멋진 하루 보내고 있나요?",

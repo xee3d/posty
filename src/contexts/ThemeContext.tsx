@@ -17,6 +17,7 @@ export type ThemeMode = "light" | "dark" | "system";
 interface ThemeColors {
   background: string;
   surface: string;
+  primaryWriteCardBg: string; // 첫 글쓰기 카드 전용
   surfaceVariant: string;
   cardBackground: string;
   text: string;
@@ -170,6 +171,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         // 다크 테마 - TodayLucky 스타일 개선된 색상
         background: "#0F0F0F", // 부드러운 검정 (완전한 검정보다 눈에 편함)
         surface: "#1F1F1F", // 카드나 모달 배경 (더 밝게)
+        primaryWriteCardBg: "#1F1F1F", // 첫 글쓰기 카드 - 다크 모드에서는 surface와 동일
         surfaceVariant: "#2A2A2A", // 입력 필드, 버튼 배경 (더 밝게)
         cardBackground: "#1A1A1A", // 카드 배경 (약간 밝게)
         text: "#FFFFFF", // 기본 텍스트
@@ -194,6 +196,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         // 라이트 테마 - TodayLucky 스타일 개선된 색상
         background: "#F2F2F7", // 시스템 배경
         surface: "#FFFFFF", // 카드나 모달 배경
+        primaryWriteCardBg: "#F0EEFF", // 첫 글쓰기 카드 전용 배경
         surfaceVariant: "#F2F2F7", // 입력 필드, 버튼 배경
         cardBackground: "#FFFFFF", // 카드 배경
         text: "#1D1D1F", // 기본 텍스트
@@ -258,7 +261,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Legacy card theme compatibility (memoized)
   const cardTheme = useMemo(
     () => ({
-      molly: {
+      posty: {
         background: colors.accentLight,
         iconBackground: colors.primary,
         iconColor: colors.white,
