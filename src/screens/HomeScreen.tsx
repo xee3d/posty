@@ -947,14 +947,14 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     </View>
                     <View style={styles.recommendBadge}>
                       <Text style={styles.recommendBadgeText}>
-                        {card.badgeKey ? t(card.badgeKey) : card.badge}
+{card.badgeKey ? t(card.badgeKey) : (card.badge || "🎯 기본")}
                       </Text>
                     </View>
                     <Text style={styles.recommendTitle}>
-                      {card.titleKey ? t(card.titleKey) : card.title}
+{card.titleKey ? t(card.titleKey) : (card.title || "추천 제목")}
                     </Text>
                     <Text style={styles.recommendContent}>
-                      {card.contentKey ? t(card.contentKey) : card.content}
+{card.contentKey ? t(card.contentKey) : (card.content || "추천 내용")}
                     </Text>
                     <View style={styles.recommendFooter}>
                       <View style={styles.recommendMeta}>
@@ -964,7 +964,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                           color={colors.text.secondary}
                         />
                         <Text style={styles.recommendMetaText}>
-                          {card.meta.textKey ? t(card.meta.textKey) : card.meta.text}
+{card.meta.textKey ? t(card.meta.textKey) : (card.meta.text || "기본 메타")}
                         </Text>
                       </View>
                       <ScaleButton
@@ -981,7 +981,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                         }}
                       >
                         <Text style={styles.writeButtonText}>
-                          {card.actionTextKey ? t(card.actionTextKey) : card.actionText}
+{card.actionTextKey ? t(card.actionTextKey) : (card.actionText || "시작하기")}
                         </Text>
                       </ScaleButton>
                     </View>
