@@ -951,7 +951,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                       </Text>
                     </View>
                     <Text style={styles.recommendTitle}>
-{card.titleKey ? t(card.titleKey) : (card.title || "추천 제목")}
+{card.titleKey ? (console.log(`[DEBUG] Translating: ${card.titleKey} -> ${t(card.titleKey)}`), t(card.titleKey)) : (card.title || "추천 제목")}
                     </Text>
                     <Text style={styles.recommendContent}>
 {card.contentKey ? t(card.contentKey) : (card.content || "추천 내용")}

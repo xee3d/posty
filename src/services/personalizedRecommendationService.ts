@@ -469,21 +469,21 @@ class PersonalizedRecommendationService {
       type: "trending",
       icon: "trending-up",
       iconColor: "#F44336",
-      badge: null, // 번역 키로 대체
+      badge: "🔥 트렌드",
       badgeEmoji: "🔥",
-      title: null, // 번역 키로 대체
-      content: null, // 번역 키로 대체
-      // 번역 키 사용
+      title: "지금 뜨고 있는 주제",
+      content: "많은 사람들이 관심을 가지는\n트렌딩 주제로 글을 써보세요",
+      // 번역 키 추가
       titleKey: "recommendations.trendingTopic.title",
       contentKey: "recommendations.trendingTopic.content",
       badgeKey: "recommendations.trendingTopic.badge",
       actionTextKey: "recommendations.trendingTopic.action",
       meta: {
         icon: "whatshot",
-        text: null, // 번역 키로 대체
+        text: "인기 주제",
         textKey: "recommendations.trendingTopic.meta",
       },
-      actionText: null, // 번역 키로 대체
+      actionText: "트렌드 보기",
       actionPayload: {
         prompt: "최신 트렌드 참여하기",
         category: "trend",
@@ -611,21 +611,21 @@ class PersonalizedRecommendationService {
       type: "photo",
       icon: "pet-friendly",
       iconColor: "#795548",
-      badge: null, // 번역 키로 대체
+      badge: "🐾 반려동물",
       badgeEmoji: "🐕",
-      title: null, // 번역 키로 대체
-      content: null, // 번역 키로 대체
-      // 번역 키 사용
+      title: "귀여운 반려동물 자랑",
+      content: "우리 집 반려동물의 귀여운 모습을\n모두와 함께 나누어 보세요",
+      // 번역 키 추가
       titleKey: "recommendations.petPhoto.title",
       contentKey: "recommendations.petPhoto.content",
       badgeKey: "recommendations.petPhoto.badge",
       actionTextKey: "recommendations.petPhoto.action",
       meta: {
         icon: "star",
-        text: null, // 번역 키로 대체
+        text: "힐링 콘텐츠",
         textKey: "recommendations.petPhoto.meta",
       },
-      actionText: null, // 번역 키로 대체
+      actionText: "자랑하기",
       actionPayload: {
         mode: "photo",
         prompt: "우리집 반려동물",
