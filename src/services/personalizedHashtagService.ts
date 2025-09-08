@@ -2,6 +2,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import trendService from "./trendService";
 import simplePostService from "./simplePostService";
+import { t } from "../locales/i18n";
 
 interface HashtagHistory {
   tag: string;
@@ -183,11 +184,34 @@ class PersonalizedHashtagService {
         }
       });
 
+      // 트렌드가 부족한 경우 다국어 인기 해시태그 추가
+      if (hashtags.size < 10) {
+        const popularHashtags = [
+          // 영어 인기 해시태그
+          "instagood", "photooftheday", "beautiful", "happy", "love", "fashion", "style", "art", "nature", "selfie",
+          // 한국어 인기 해시태그  
+          "일상", "데일리", "오늘", "좋아요", "팔로우", "소통", "맛집", "카페", "여행", "운동",
+          // 일본어 인기 해시태그
+          "今日", "日常", "写真", "可愛い", "美味しい", "旅行", "カフェ", "ファッション", "自撮り", "綺麗",
+          // 중국어 인기 해시태그
+          "今天", "日常", "美食", "旅行", "时尚", "自拍", "美丽", "生活", "心情", "记录"
+        ];
+        
+        popularHashtags.forEach(tag => hashtags.add(tag));
+      }
+
       // 트렌딩 해시태그도 랜덤하게 섞어서 반환
-      return this.shuffleArray(Array.from(hashtags)).slice(0, 20);
+      return this.shuffleArray(Array.from(hashtags)).slice(0, 25);
     } catch (error) {
       console.error("Failed to get trending hashtags:", error);
-      return [];
+      // 에러 시 기본 다국어 해시태그 반환
+      return [
+        "daily", "일상", "日常", "生活",
+        "today", "오늘", "今日", "今天", 
+        "mood", "기분", "気分", "心情",
+        "happy", "행복", "幸せ", "快乐",
+        "photo", "사진", "写真", "照片"
+      ];
     }
   }
 
@@ -222,55 +246,113 @@ class PersonalizedHashtagService {
     const day = now.getDay();
     const month = now.getMonth();
 
-    const tags: string[] = [];
+    let tags: string[] = [];
 
-    // 시간대별
+    // 시간대별 다국어 해시태그
     if (hour >= 5 && hour < 9) {
+      // 아침 (5-9시)
       tags.push(
-        ...["굿모닝", "아침스타그램", "모닝커피", "출근길", "아침운동"]
+        "morning", "아침", "朝", "早晨",
+        "goodmorning", "굿모닝", "おはよう", "早上好",
+        "sunrise", "일출", "日の出", "日出"
       );
     } else if (hour >= 9 && hour < 12) {
+      // 늦은 아침/오전 (9-12시)
       tags.push(
-        ...["오전일상", "브런치", "카페투어", "일상기록", "오늘의커피"]
+        "work", "일", "仕事", "工作",
+        "coffee", "커피", "コーヒー", "咖啡",
+        "productive", "생산적", "生産的", "高效"
       );
     } else if (hour >= 12 && hour < 14) {
+      // 점심 (12-14시)
       tags.push(
-        ...["점심스타그램", "런치타임", "맛점", "오늘의메뉴", "점심추천"]
+        "lunch", "점심", "昼食", "午餐",
+        "food", "음식", "食べ物", "食物",
+        "delicious", "맛있는", "美味しい", "美味"
       );
     } else if (hour >= 14 && hour < 18) {
+      // 오후 (14-18시)
       tags.push(
-        ...["오후티타임", "카페일상", "디저트", "휴식시간", "오후의여유"]
+        "afternoon", "오후", "午後", "下午",
+        "work", "일", "仕事", "工作",
+        "energy", "에너지", "エネルギー", "精力"
       );
     } else if (hour >= 18 && hour < 21) {
-      tags.push(...["저녁스타그램", "퇴근", "저녁메뉴", "홈쿡", "오늘하루"]);
+      // 저녁 (18-21시)
+      tags.push(
+        "evening", "저녁", "夕方", "傍晚",
+        "dinner", "저녁식사", "夕食", "晚餐",
+        "relax", "휴식", "リラックス", "放松"
+      );
     } else if (hour >= 21 && hour < 24) {
+      // 밤 (21-24시)
       tags.push(
-        ...["굿나잇", "야식타임", "넷플릭스", "힐링타임", "하루마무리"]
+        "night", "밤", "夜", "夜晚",
+        "goodnight", "굿나잇", "おやすみ", "晚安",
+        "peaceful", "평화로운", "平和な", "平静"
       );
     } else {
+      // 새벽 (0-5시)
       tags.push(
-        ...["새벽감성", "불면증", "새벽일상", "못자는밤", "새벽스타그램"]
+        "latenight", "늦은밤", "深夜", "深夜",
+        "insomnia", "불면증", "不眠症", "失眠",
+        "quiet", "조용한", "静かな", "安静"
       );
     }
 
-    // 요일별
+    // 요일별 다국어 해시태그
     if (day === 0 || day === 6) {
-      tags.push(...["주말스타그램", "주말나들이", "주말일상", "휴일"]);
+      // 주말
+      tags.push(
+        "weekend", "주말", "週末", "周末",
+        "relax", "휴식", "リラックス", "放松",
+        "rest", "쉬는날", "休み", "休息"
+      );
     } else if (day === 1) {
-      tags.push(...["월요병", "월요일", "한주시작", "월요팅"]);
+      // 월요일
+      tags.push(
+        "monday", "월요일", "月曜日", "星期一",
+        "newweek", "새로운주", "新しい週", "新一周",
+        "motivation", "동기부여", "やる気", "动力"
+      );
     } else if (day === 5) {
-      tags.push(...["불금", "금요일", "주말계획", "TGIF"]);
+      // 금요일
+      tags.push(
+        "friday", "금요일", "金曜日", "星期五",
+        "tgif", "불금", "花金", "感谢星期五",
+        "weekend", "주말앞둔", "週末前", "周末前"
+      );
     }
 
-    // 계절별
-    if (month >= 3 && month <= 5) {
-      tags.push(...["봄스타그램", "봄날씨", "벚꽃", "봄나들이"]);
-    } else if (month >= 6 && month <= 8) {
-      tags.push(...["여름스타그램", "여름휴가", "시원한", "여름날"]);
-    } else if (month >= 9 && month <= 11) {
-      tags.push(...["가을스타그램", "단풍", "가을감성", "선선한날씨"]);
+    // 계절별 다국어 해시태그
+    if (month >= 2 && month <= 4) {
+      // 봄 (3-5월)
+      tags.push(
+        "spring", "봄", "春", "春天",
+        "blossom", "꽃", "桜", "花朵",
+        "renewal", "새출발", "新しい", "新开始"
+      );
+    } else if (month >= 5 && month <= 7) {
+      // 여름 (6-8월)
+      tags.push(
+        "summer", "여름", "夏", "夏天",
+        "hot", "더위", "暑い", "炎热",
+        "vacation", "휴가", "バケーション", "假期"
+      );
+    } else if (month >= 8 && month <= 10) {
+      // 가을 (9-11월)
+      tags.push(
+        "autumn", "가을", "秋", "秋天",
+        "fall", "단풍", "紅葉", "落叶",
+        "cozy", "포근한", "暖かい", "温馨"
+      );
     } else {
-      tags.push(...["겨울스타그램", "따뜻한", "겨울감성", "크리스마스"]);
+      // 겨울 (12-2월)
+      tags.push(
+        "winter", "겨울", "冬", "冬天",
+        "cold", "추위", "寒い", "寒冷",
+        "warm", "따뜻한", "暖かい", "温暖"
+      );
     }
 
     // 시간대별 태그도 랜덤하게 섞어서 반환
@@ -449,31 +531,63 @@ class PersonalizedHashtagService {
     return shuffled;
   }
 
-  // 기본 해시태그 (fallback) - 랜덤 순서로 반환
+  // 기본 해시태그 (fallback) - 번역된 기본 해시태그를 사용
   private getDefaultHashtags(count: number): string[] {
-    const defaults = [
-      "일상",
-      "데일리",
-      "오늘",
-      "주말",
-      "카페",
-      "맛집",
-      "행복",
-      "감사",
-      "힐링",
-      "추억",
-      "좋아요",
-      "팔로우",
-      "소통",
-      "일상스타그램",
-      "데일리룩",
-      "맞팔",
-      "선팔",
-      "소확행",
-    ];
+    try {
+      // 현재 언어 가져오기
+      const currentLanguage = t("language") || 'ko';
+      
+      // 다국어 기본 해시태그 풀
+      const multilanguageHashtags = [
+        // 현재 언어 번역
+        t("home.topics.daily"),
+        t("home.topics.weekend"),
+        t("home.topics.cafe"),
+        t("home.topics.food"),
+        t("home.topics.travel"),
+        t("home.topics.exercise"),
+        t("home.topics.bookstagram"),
+        
+        // 영어 기본값 (국제적 사용을 위해)
+        "daily",
+        "lifestyle", 
+        "mood",
+        "today",
+        "blessed",
+        "grateful",
+        "moments",
+        
+        // 일본어 해시태그 (일본어 사용자용)
+        "日常",
+        "今日",
+        "ライフスタイル",
+        "日記",
+        "思い出",
+        
+        // 중국어 해시태그 (중국어 사용자용) 
+        "日常",
+        "生活",
+        "今天",
+        "心情",
+        "记录"
+      ].filter((item): item is string => typeof item === 'string' && item.length > 0);
 
-    // 랜덤하게 섞어서 반환
-    return this.shuffleArray(defaults).slice(0, count);
+      // 랜덤하게 섞어서 반환 (더 다양성 있게)
+      return this.shuffleArray(multilanguageHashtags).slice(0, Math.min(count, multilanguageHashtags.length));
+    } catch (error) {
+      console.error("Failed to get translated default hashtags:", error);
+      // 최후의 폴백: 하드코딩된 다국어 해시태그
+      const fallbackDefaults = [
+        "daily", "일상", "日常", "生活",
+        "weekend", "주말", "週末", "周末", 
+        "cafe", "카페", "カフェ", "咖啡厅",
+        "food", "맛집", "グルメ", "美食",
+        "travel", "여행", "旅行", "旅游",
+        "exercise", "운동", "運動", "运动",
+        "today", "오늘", "今日", "今天"
+      ];
+      return this.shuffleArray(fallbackDefaults).slice(0, count);
+    }
   }
 
   // 사용자 선호도 초기화

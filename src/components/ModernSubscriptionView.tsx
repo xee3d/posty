@@ -13,6 +13,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { SafeIcon } from "../utils/SafeIcon";
 // import { BlurView } from "@react-native-community/blur"; // Module not installed
 import { SUBSCRIPTION_PLANS } from "../utils/adConfig";
+import { useTranslation } from "react-i18next";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -33,15 +34,17 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
   colors,
   isDark,
 }) => {
+  const { t } = useTranslation();
+  
   const plans = [
     {
       key: "free" as const,
       icon: "🎯",
       gradient: ["#9CA3AF", "#6B7280"],
       features: [
-        { icon: "flash", text: "매일 10개 토큰 무료 충전" },
-        { icon: "create", text: "기본 AI 글쓰기 기능" },
-        { icon: "image", text: "이미지 분석 기능" },
+        { icon: "flash", text: t("subscription.plans.freeDetails.features.0") },
+        { icon: "create", text: t("subscription.plans.freeDetails.features.1") },
+        { icon: "image", text: t("subscription.plans.freeDetails.features.2") },
       ],
       highlight: false,
     },

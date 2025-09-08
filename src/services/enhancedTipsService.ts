@@ -283,164 +283,59 @@ class EnhancedTipsService {
   }
 }
 
-// 트렌드 해시태그 서비스
+// 트렌드 해시태그 서비스 (PersonalizedHashtagService를 사용하도록 리팩토링됨)
 class TrendingHashtagService {
-  // 기본 카테고리별 해시태그
-  private categoryHashtags: { [key: string]: string[] } = {
-    daily: ["일상", "데일리", "오늘", "하루", "일상스타그램"],
-    food: ["맛집", "먹스타그램", "푸드스타그램", "카페", "브런치"],
-    travel: ["여행", "여행스타그램", "국내여행", "해외여행", "여행일기"],
-    fashion: ["패션", "ootd", "데일리룩", "코디", "패션스타그램"],
-    fitness: ["운동", "헬스", "다이어트", "건강", "운동스타그램"],
-    beauty: ["뷰티", "메이크업", "스킨케어", "화장품", "뷰티스타그램"],
-    pet: ["펫스타그램", "강아지", "고양이", "반려동물", "멍스타그램"],
-    book: ["책", "독서", "책스타그램", "북스타그램", "독서기록"],
-    art: ["그림", "아트", "전시회", "예술", "아트스타그램"],
-    music: ["음악", "플레이리스트", "음악추천", "뮤직", "음악스타그램"],
-  };
+  // 하드코딩된 해시태그 제거 - PersonalizedHashtagService 사용
 
-  // 시간대별 추천 해시태그
-  private timeBasedHashtags: { [key: string]: string[] } = {
-    morning: ["굿모닝", "아침", "모닝커피", "출근", "아침루틴"],
-    afternoon: ["점심", "런치", "오후", "브레이크타임", "점심시간"],
-    evening: ["저녁", "퇴근", "저녁시간", "불금", "휴식"],
-    night: ["굿나잇", "밤", "야식", "수면", "하루끝"],
-  };
-
-  // 계절별 해시태그
-  private seasonalHashtags: { [key: string]: string[] } = {
-    spring: ["봄", "봄스타그램", "벚꽃", "봄날", "봄꽃"],
-    summer: ["여름", "여름휴가", "바다", "여름스타그램", "시원한"],
-    fall: ["가을", "단풍", "가을스타그램", "가을날씨", "선선한"],
-    winter: ["겨울", "크리스마스", "눈", "겨울스타그램", "따뜻한"],
-  };
-
-  // 요일별 해시태그
-  private dayOfWeekHashtags: { [key: number]: string[] } = {
-    0: ["일요일", "주말", "휴일", "일요일스타그램", "주말스타그램"],
-    1: ["월요일", "월요병", "한주시작", "월요일화이팅", "새로운한주"],
-    2: ["화요일", "화이팅", "이번주도", "화요일스타그램"],
-    3: ["수요일", "주중", "수요일스타그램", "한주의중간"],
-    4: ["목요일", "목요일스타그램", "거의금요일", "하루만더"],
-    5: ["금요일", "불금", "한주마무리", "금요일스타그램", "TGIF"],
-    6: ["토요일", "주말", "토요일스타그램", "휴일", "주말시작"],
-  };
-
-  // 이벤트/기념일 해시태그
-  private eventHashtags: { [key: string]: string[] } = {
-    "1-1": ["새해", "신년", "새해첫날", "새해인사", "해피뉴이어"],
-    "2-14": ["발렌타인데이", "초콜릿", "사랑", "발렌타인", "연인"],
-    "3-14": ["화이트데이", "사탕", "답례품", "화이트데이선물"],
-    "5-5": ["어린이날", "가족", "나들이", "어린이날선물"],
-    "5-8": ["어버이날", "부모님", "감사", "카네이션", "효도"],
-    "12-25": ["크리스마스", "메리크리스마스", "산타", "크리스마스트리", "선물"],
-  };
-
-  // 사용자 맞춤 해시태그 추천
+  // 사용자 맞춤 해시태그 추천 - PersonalizedHashtagService로 위임
   async getRecommendedHashtags(userContext: {
     recentCategories?: string[];
     currentLocation?: string;
     recentHashtags?: string[];
   }): Promise<string[]> {
-    const currentTime = new Date();
-    const hour = currentTime.getHours();
-    const day = currentTime.getDay();
-    const month = currentTime.getMonth() + 1;
-    const date = currentTime.getDate();
-    const season = this.getCurrentSeason();
-    const timeOfDay = this.getTimeOfDay(hour);
-
-    let recommendedTags: string[] = [];
-
-    // 1. 시간대별 해시태그
-    if (this.timeBasedHashtags[timeOfDay]) {
-      recommendedTags.push(
-        ...this.pickRandom(this.timeBasedHashtags[timeOfDay], 2)
-      );
-    }
-
-    // 2. 요일별 해시태그
-    if (this.dayOfWeekHashtags[day]) {
-      recommendedTags.push(...this.pickRandom(this.dayOfWeekHashtags[day], 1));
-    }
-
-    // 3. 계절별 해시태그
-    if (this.seasonalHashtags[season]) {
-      recommendedTags.push(
-        ...this.pickRandom(this.seasonalHashtags[season], 1)
-      );
-    }
-
-    // 4. 이벤트/기념일 해시태그
-    const eventKey = `${month}-${date}`;
-    if (this.eventHashtags[eventKey]) {
-      recommendedTags.push(...this.pickRandom(this.eventHashtags[eventKey], 2));
-    }
-
-    // 5. 사용자 선호 카테고리 해시태그
-    if (
-      userContext.recentCategories &&
-      userContext.recentCategories.length > 0
-    ) {
-      for (const category of userContext.recentCategories) {
-        if (this.categoryHashtags[category]) {
-          recommendedTags.push(
-            ...this.pickRandom(this.categoryHashtags[category], 1)
-          );
-        }
+    try {
+      // PersonalizedHashtagService 인스턴스 가져오기 (이미 인스턴스로 export됨)
+      const service = require('./personalizedHashtagService').default;
+      
+      // 카테고리 정보를 프롬프트로 변환
+      let prompt = '';
+      if (userContext.recentCategories && userContext.recentCategories.length > 0) {
+        prompt = userContext.recentCategories.join(' ');
+      } else {
+        prompt = '일상'; // 기본 카테고리
       }
-    } else {
-      // 기본 카테고리에서 랜덤 선택
-      const defaultCategories = ["daily", "food"];
-      for (const category of defaultCategories) {
-        recommendedTags.push(
-          ...this.pickRandom(this.categoryHashtags[category], 1)
+      
+      // 개인화된 해시태그 가져오기 (최대 7개)
+      const personalizedTags = await service.getPersonalizedHashtags(prompt, 7);
+      
+      // 최근 사용 해시태그 제외
+      let recommendedTags = personalizedTags;
+      if (userContext.recentHashtags && userContext.recentHashtags.length > 0) {
+        recommendedTags = personalizedTags.filter(
+          (tag) => !userContext.recentHashtags!.includes(tag)
         );
       }
+      
+      return recommendedTags.slice(0, 7);
+    } catch (error) {
+      console.error('Failed to get personalized hashtags:', error);
+      // 폴백: 기본 해시태그 몇 개만 반환 (번역된 것들로)
+      const { t } = require('../locales/i18n');
+      try {
+        return [
+          t("home.topics.daily"),
+          t("home.topics.weekend"),
+          t("home.topics.cafe"),
+          t("home.topics.food"),
+          t("home.topics.travel")
+        ];
+      } catch {
+        return ["일상", "데일리", "오늘", "좋아요", "행복"];
+      }
     }
-
-    // 6. 최근 사용 해시태그 제외
-    if (userContext.recentHashtags) {
-      recommendedTags = recommendedTags.filter(
-        (tag) => !userContext.recentHashtags!.includes(tag)
-      );
-    }
-
-    // 중복 제거 및 최대 7개 반환
-    return [...new Set(recommendedTags)].slice(0, 7);
   }
-
-  private getCurrentSeason(): string {
-    const month = new Date().getMonth() + 1;
-    if (month >= 3 && month <= 5) {
-      return "spring";
-    }
-    if (month >= 6 && month <= 8) {
-      return "summer";
-    }
-    if (month >= 9 && month <= 11) {
-      return "fall";
-    }
-    return "winter";
-  }
-
-  private getTimeOfDay(hour: number): string {
-    if (hour >= 5 && hour < 12) {
-      return "morning";
-    }
-    if (hour >= 12 && hour < 17) {
-      return "afternoon";
-    }
-    if (hour >= 17 && hour < 21) {
-      return "evening";
-    }
-    return "night";
-  }
-
-  private pickRandom<T>(array: T[], count: number): T[] {
-    const shuffled = [...array].sort(() => 0.5 - Math.random());
-    return shuffled.slice(0, count);
-  }
+  
+  // 모든 헬퍼 메서드 제거됨 - PersonalizedHashtagService에서 처리
 }
 
 export const enhancedTipsService = new EnhancedTipsService();

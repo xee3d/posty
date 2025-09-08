@@ -12,6 +12,7 @@ import LinearGradient from "react-native-linear-gradient";
 import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
+import i18n from "../locales/i18n";
 import { 
   getDefaultCurrency, 
   convertPrice, 
@@ -56,6 +57,21 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
 
   // 첫 구매 여부 확인 (실제로는 서버에서 가져와야 함)
   const isFirstPurchase = false; // TODO: 실제 첫 구매 여부 체크
+  
+  // 현재 언어에 따른 기본 가격 설정
+  const getPriceForLanguage = (krwPrice: number): number => {
+    const lang = i18n.language || 'ko';
+    switch (lang) {
+      case 'zh-CN':
+        return Math.round(krwPrice * 0.054); // KRW to CNY 예시 환율
+      case 'en':
+        return Math.round(krwPrice * 0.00075 * 100) / 100; // KRW to USD 환율
+      case 'ja':
+        return Math.round(krwPrice * 0.11); // KRW to JPY 환율
+      default:
+        return krwPrice; // 한국어는 원래 가격
+    }
+  };
   // 플랜별 보너스 및 할인 적용
   const applyPlanBenefits = (pkg: any) => {
     if (userPlan === "pro") {
@@ -122,8 +138,8 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       id: "30",
       name: t("tokenPurchase.packages.light.name"),
       baseAmount: 30,
-      basePrice: 1900, // ₩63/개 - STARTER 한달치와 동일 가격
-      originalPrice: 2400,
+      basePrice: getPriceForLanguage(1900),
+      originalPrice: getPriceForLanguage(2400),
       baseDiscount: 20, // 기본 20% 할인
       gradient: ["#6366F1", "#4F46E5"], // 인디고 그라데이션
       accentColor: "#8B5CF6",
@@ -135,8 +151,8 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       id: "100",
       name: t("tokenPurchase.packages.bestValue.name"),
       baseAmount: 100,
-      basePrice: 4900, // ₩49/개 - PREMIUM 한달치와 동일 가격
-      originalPrice: 6500,
+      basePrice: getPriceForLanguage(4900),
+      originalPrice: getPriceForLanguage(6500),
       baseDiscount: 25, // 기본 25% 할인
       gradient: ["#F59E0B", "#DC2626"], // 주황색-빨간색 그라데이션
       accentColor: "#EC4899",
@@ -148,8 +164,8 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       id: "300",
       name: t("tokenPurchase.packages.mega.name"),
       baseAmount: 300,
-      basePrice: 9900, // ₩33/개 - 대량 구매 혜택
-      originalPrice: 15000,
+      basePrice: getPriceForLanguage(9900),
+      originalPrice: getPriceForLanguage(15000),
       baseDiscount: 35, // 기본 35% 할인
       gradient: ["#10B981", "#059669"], // 민트 귷린 그라데이션
       accentColor: "#6366F1",
@@ -161,8 +177,8 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       id: "1000",
       name: t("tokenPurchase.packages.ultra.name"),
       baseAmount: 1000,
-      basePrice: 19900, // ₩20/개 - 최고 할인율
-      originalPrice: 40000,
+      basePrice: getPriceForLanguage(19900),
+      originalPrice: getPriceForLanguage(40000),
       baseDiscount: 50, // 기본 50% 할인
       gradient: ["#7C3AED", "#5B21B6"], // 진한 보라색 그라데이션
       accentColor: "#EC4899",
@@ -182,6 +198,8 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       originalPrice: benefits.originalPrice,
       discount: benefits.discount,
       bonus: benefits.bonus > 0 ? benefits.bonus : null,
+      formattedPrice: formatPrice(benefits.price, currentCurrency),
+      formattedOriginalPrice: formatPrice(benefits.originalPrice, currentCurrency),
     };
   });
 
@@ -314,7 +332,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                 <View style={styles.tokenSection}>
                   <View style={styles.tokenAmount}>
                     <Text style={styles.tokenNumber}>{pkg.amount}</Text>
-                    <Text style={styles.tokenLabel}>토큰</Text>
+                    <Text style={styles.tokenLabel}>{t("tokens.label", { defaultValue: "토큰" })}</Text>
                   </View>
                   {pkg.bonus && (
                     <LinearGradient
@@ -336,13 +354,13 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                   <View style={styles.priceRow}>
                     <Text style={styles.currency}>{currencyInfo.symbol}</Text>
                     <Text style={styles.price}>
-                      {pkg.formattedPrice?.replace(currencyInfo.symbol, '') || pkg.price.toLocaleString()}
+                      {typeof pkg.price === 'number' ? pkg.price.toLocaleString() : pkg.price}
                     </Text>
                   </View>
                   {pkg.originalPrice && (
                     <View style={styles.discountRow}>
                       <Text style={styles.originalPrice}>
-{pkg.formattedOriginalPrice || `${currencyInfo.symbol}${pkg.originalPrice.toLocaleString()}`}
+                        {currencyInfo.symbol}{typeof pkg.originalPrice === 'number' ? pkg.originalPrice.toLocaleString() : pkg.originalPrice}
                       </Text>
                       <LinearGradient
                         colors={[
@@ -354,7 +372,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                         end={{ x: 1, y: 0 }}
                       >
                         <Text style={styles.discountText}>
-                          {pkg.discount}% 할인
+                          {t("tokenPurchase.pricing.discount", { percent: pkg.discount })}
                         </Text>
                       </LinearGradient>
                     </View>
@@ -380,7 +398,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                 >
-                  <Text style={styles.purchaseButtonText}>구매하기</Text>
+                  <Text style={styles.purchaseButtonText}>{t("common.purchase", { defaultValue: "구매하기" })}</Text>
                   <SafeIcon name="arrow-forward" size={18} color="#FFFFFF" />
                 </LinearGradient>
               </LinearGradient>

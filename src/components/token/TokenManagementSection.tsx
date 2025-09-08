@@ -109,7 +109,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
       case "starter":
         return "STARTER";
       default:
-        return t("subscription.plans.free");
+        return t("subscription.plans.free.name");
     }
   };
 

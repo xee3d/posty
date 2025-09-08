@@ -93,16 +93,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     canShowEarnButton,
   } = useTokenManagement({ onNavigate });
 
-  // 디버깅용 - Redux 상태 확인
+  // Redux 상태 - 디버깅 코드 제거로 무한 렌더 방지
   const reduxState = useAppSelector((state) => state.user);
-  useEffect(() => {
-    console.log("=== Token Debug Info ===");
-    console.log("currentTokens from hook:", currentTokens);
-    console.log("Redux user.currentTokens:", reduxState.currentTokens);
-    console.log("Redux user.tokens:", reduxState.tokens);
-    console.log("Redux user.freeTokens:", reduxState.freeTokens);
-    console.log("Redux user.purchasedTokens:", reduxState.purchasedTokens);
-  }, [currentTokens, reduxState]);
 
   const [refreshing, setRefreshing] = useState(false);
   const [coachingTip, setCoachingTip] = useState<any>(null);
@@ -302,9 +294,23 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     }
   };
 
-  // 맞춤 추천 가져오기
-  const loadRecommendations = async () => {
+  // 맞춤 추천 가져오기 (6시간 캐싱)
+  const loadRecommendations = async (forceRefresh = false) => {
     try {
+      // 30분 내에 로드된 추천이 있고 강제 새로고침이 아니면 스킵
+      const lastRecommendationTime = await AsyncStorage.getItem('@last_recommendation_time');
+      const now = Date.now();
+      
+      if (!forceRefresh && lastRecommendationTime && recommendations.length > 0) {
+        const timeDiff = now - parseInt(lastRecommendationTime);
+        const sixHours = 6 * 60 * 60 * 1000; // 6시간으로 변경
+        
+        if (timeDiff < sixHours) {
+          console.log('🎯 Using cached recommendations (valid for 6 hours)');
+          return;
+        }
+      }
+      
       setIsLoading(true);
       const userContext = {
         currentHour: new Date().getHours(),
@@ -324,6 +330,10 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           userContext
         );
       setRecommendations(cards);
+      
+      // 캐시 시간 저장
+      await AsyncStorage.setItem('@last_recommendation_time', now.toString());
+      console.log('🎯 Recommendations updated and cached');
     } catch (error) {
       console.error("Failed to load recommendations:", error);
     } finally {
@@ -397,7 +407,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       await loadUserStats();
       await loadCoachingTip();
       await loadTrendingHashtags();
-      await loadRecommendations();
+      await loadRecommendations(true); // 새로고침 시 강제 업데이트
       // 로그인 상태에 따라 적절히 새로고침
       // if (!auth().currentUser) {
       await loadRecentPosts();
@@ -492,11 +502,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     loadCoachingTip();
   }, []);
 
-  // 사용자 통계가 로드되면 해시태그와 추천만 로드 (팁은 제외)
+  // 사용자 통계가 로드되면 해시태그와 추천을 로드
   useEffect(() => {
     if (stats && stats.totalPosts >= 0) {
       loadTrendingHashtags();
-      loadRecommendations();
+      loadRecommendations(); // 추천 로딩 복원
       loadStyleAnalysis();
 
       // stats 로드 후 팁을 한 번 더 로드 (더 정확한 개인화)
@@ -543,7 +553,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     );
   }
 
-  console.log("🏠 [HomeScreen] Starting render");
+  // console.log("🏠 [HomeScreen] Starting render"); // 무한 렌더 방지를 위해 제거
   
   return (
     <SafeAreaView style={styles.container}>
@@ -876,67 +886,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
               showsHorizontalScrollIndicator={false}
               style={styles.recommendScroll}
             >
-              {recommendations.length > 0 ? (
-                recommendations.map((card, index) => (
-                  <AnimatedCard
-                    key={card.id}
-                    delay={700 + index * 50}
-                    style={[
-                      styles.recommendCard,
-                      index > 0 && { marginLeft: SPACING.sm },
-                    ] as any}
-                  >
-                    <View
-                      style={[
-                        styles.recommendIconContainer,
-                        { backgroundColor: card.iconColor },
-                      ]}
-                    >
-                      <SafeIcon
-                        name={card.icon}
-                        size={24}
-                        color={colors.white}
-                      />
-                    </View>
-                    <View style={styles.recommendBadge}>
-                      <Text style={styles.recommendBadgeText}>
-                        {card.badge}
-                      </Text>
-                    </View>
-                    <Text style={styles.recommendTitle}>{card.title}</Text>
-                    <Text style={styles.recommendContent}>{card.content}</Text>
-                    <View style={styles.recommendFooter}>
-                      <View style={styles.recommendMeta}>
-                        <SafeIcon
-                          name={card.meta.icon}
-                          size={14}
-                          color={colors.text.secondary}
-                        />
-                        <Text style={styles.recommendMetaText}>
-                          {card.meta.text}
-                        </Text>
-                      </View>
-                      <ScaleButton
-                        style={styles.writeButton}
-                        onPress={async () => {
-                          // 추천 클릭 기록 (개인화를 위해)
-                          await userBehaviorAnalytics.recordRecommendationClick(
-                            card.id
-                          );
-                          personalizedRecommendationService.saveRecommendationShown(
-                            card.id
-                          );
-                          onNavigate("ai-write", card.actionPayload);
-                        }}
-                      >
-                        <Text style={styles.writeButtonText}>
-                          {card.actionText}
-                        </Text>
-                      </ScaleButton>
-                    </View>
-                  </AnimatedCard>
-                ))
-              ) : (
+              {isLoading ? (
                 // 로딩 중일 때 스켈레톤 표시
                 <>
                   {Array.from({ length: 3 }).map((_, index) => (
@@ -973,8 +923,71 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     </View>
                   ))}
                 </>
-              )}
-              {recommendations.length === 0 && !isLoading && (
+              ) : recommendations.length > 0 ? (
+                recommendations.map((card, index) => (
+                  <AnimatedCard
+                    key={card.id}
+                    delay={700 + index * 50}
+                    style={[
+                      styles.recommendCard,
+                      index > 0 && { marginLeft: SPACING.sm },
+                    ] as any}
+                  >
+                    <View
+                      style={[
+                        styles.recommendIconContainer,
+                        { backgroundColor: card.iconColor },
+                      ]}
+                    >
+                      <SafeIcon
+                        name={card.icon}
+                        size={24}
+                        color={colors.white}
+                      />
+                    </View>
+                    <View style={styles.recommendBadge}>
+                      <Text style={styles.recommendBadgeText}>
+                        {card.badgeKey ? t(card.badgeKey) : card.badge}
+                      </Text>
+                    </View>
+                    <Text style={styles.recommendTitle}>
+                      {card.titleKey ? t(card.titleKey) : card.title}
+                    </Text>
+                    <Text style={styles.recommendContent}>
+                      {card.contentKey ? t(card.contentKey) : card.content}
+                    </Text>
+                    <View style={styles.recommendFooter}>
+                      <View style={styles.recommendMeta}>
+                        <SafeIcon
+                          name={card.meta.icon}
+                          size={14}
+                          color={colors.text.secondary}
+                        />
+                        <Text style={styles.recommendMetaText}>
+                          {card.meta.textKey ? t(card.meta.textKey) : card.meta.text}
+                        </Text>
+                      </View>
+                      <ScaleButton
+                        style={styles.writeButton}
+                        onPress={async () => {
+                          // 추천 클릭 기록 (개인화를 위해)
+                          await userBehaviorAnalytics.recordRecommendationClick(
+                            card.id
+                          );
+                          personalizedRecommendationService.saveRecommendationShown(
+                            card.id
+                          );
+                          onNavigate("ai-write", card.actionPayload);
+                        }}
+                      >
+                        <Text style={styles.writeButtonText}>
+                          {card.actionTextKey ? t(card.actionTextKey) : card.actionText}
+                        </Text>
+                      </ScaleButton>
+                    </View>
+                  </AnimatedCard>
+                ))
+              ) : (
                 // 데이터가 없을 때만 기본 카드 표시
                 <>
                   <AnimatedCard delay={700} style={styles.recommendCard}>

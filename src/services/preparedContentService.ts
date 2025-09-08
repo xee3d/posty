@@ -1,5 +1,6 @@
 // 포스티가 준비한 글 서비스
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import personalizedHashtagService from "./personalizedHashtagService";
 
 interface PreparedContent {
   id: string;
@@ -154,7 +155,7 @@ class PreparedContentService {
       title: "주말 아침",
       content:
         "여유로운 주말 아침의 시작 🌞 평일엔 바빠서 놓쳤던 작은 행복들을 천천히 즐겨보는 시간. 오늘은 어떤 하루가 될까요?",
-      hashtags: ["주말", "주말스타그램", "여유", "힐링", "주말아침"],
+      hashtags: [], // 하드코딩된 해시태그 제거 - PersonalizedHashtagService 사용
       platform: "instagram",
       mood: "casual",
       isPersonalized: true,
@@ -411,7 +412,10 @@ class PreparedContentService {
       ...nonSeasonalContents,
     ];
 
-    return prioritized.slice(0, count);
+    const selectedContents = prioritized.slice(0, count);
+    
+    // 빈 해시태그 배열을 가진 콘텐츠에 동적 해시태그 추가
+    return await this.enrichContentWithHashtags(selectedContents);
   }
 
   // 카테고리별 콘텐츠 가져오기
@@ -514,6 +518,38 @@ class PreparedContentService {
     return "겨울";
   }
 
+  // 빈 해시태그 배열을 가진 콘텐츠에 동적 해시태그 추가
+  private async enrichContentWithHashtags(contents: PreparedContent[]): Promise<PreparedContent[]> {
+    const enrichedContents = await Promise.all(
+      contents.map(async (content) => {
+        // 이미 해시태그가 있다면 그대로 반환
+        if (content.hashtags.length > 0) {
+          return content;
+        }
+
+        try {
+          // 콘텐츠의 내용을 기반으로 개인화된 해시태그 생성
+          const prompt = `${content.title} ${content.content}`;
+          const suggestedHashtags = await personalizedHashtagService.getPersonalizedHashtags(prompt, 5);
+          
+          return {
+            ...content,
+            hashtags: suggestedHashtags.slice(0, 5), // 최대 5개만 사용
+          };
+        } catch (error) {
+          console.error(`Failed to enrich hashtags for content ${content.id}:`, error);
+          // 에러 발생 시 기본값 반환
+          return {
+            ...content,
+            hashtags: ["일상", "데일리", "소통"], // 최소한의 기본 해시태그
+          };
+        }
+      })
+    );
+
+    return enrichedContents;
+  }
+
   // 콘텐츠 저장 (사용 기록)
   async saveUsedContent(contentId: string): Promise<void> {
     try {
@@ -549,8 +585,10 @@ class PreparedContentService {
       const today = new Date();
       const dayOfYear = this.getDayOfYear(today);
       const shuffled = this.shuffleArray(unusedContents, dayOfYear);
+      const selectedContents = shuffled.slice(0, count);
 
-      return shuffled.slice(0, count);
+      // 빈 해시태그 배열을 가진 콘텐츠에 동적 해시태그 추가
+      return await this.enrichContentWithHashtags(selectedContents);
     } catch (error) {
       console.error("Error getting unused contents:", error);
       return this.getTodayContents(count);

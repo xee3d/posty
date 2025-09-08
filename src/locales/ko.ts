@@ -177,13 +177,41 @@ export default {
         subtitle: "갤러리에서 선택하거나 직접 촬영하세요",
         button: "사진 선택",
         change: "변경",
-      }
+      },
+      defaultPrompt: "사진과 어울리는 자연스러운 SNS 글을 작성해주세요.",
+    },
+    ads: {
+      watching: {
+        title: "광고 시청 중",
+        message: "광고를 시청하고 있습니다. 잠시만 기다려 주세요.",
+      },
+      complete: {
+        title: "광고 시청 완료",
+        messageStyle: "프리미엄 스타일을 1회 사용할 수 있습니다!",
+        messageLength: "프리미엄 길이를 1회 사용할 수 있습니다!",
+      },
+      error: "광고 시청에 실패했습니다. 다시 시도해 주세요.",
+    },
+    premium: {
+      title: "프리미엄 기능 🌟",
+      styleTitle: "프리미엄 스타일",
+      lengthTitle: "프리미엄 길이",
+      viewPlans: "플랜 보기",
+      watchAd: "광고보기 (1회 사용)",
+      upgrade: "업그레이드",
+      oneTimeUse: "1회사용",
+    },
+    tokenUsage: {
+      photoWrite: "사진 글쓰기",
+      polish: "문장 정리",
+      newPost: "새글 생성",
     },
   },
 
   // 토큰 시스템
   tokens: {
     badge: "토큰",
+    label: "토큰",
     noTokens: "토큰이 부족해요",
     earnTokens: "무료 토큰 받기",
     subscribe: "토큰이 부족해요. 구독하시겠어요?",
@@ -530,7 +558,36 @@ export default {
     formality: "격식",
     emotiveness: "감정 표현",
     humor: "유머",
-    saveProfile: "프로필 저장하기"
+    saveProfile: "프로필 저장하기",
+    
+    access: {
+      freeMessage: "STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.",
+    },
+    tabs: {
+      overview: "개요",
+      analysis: "분석", 
+      templates: "템플릿"
+    },
+    brand: {
+      title: "브랜드",
+      styleAnalysis: "스타일 분석",
+      tagline: "{{count}}개의 스토리로 만든 나만의 스타일"
+    },
+    keywords: {
+      title: "핵심 키워드"
+    },
+    challenge: {
+      progress: "진행도: {{current}}/{{total}}"
+    },
+    analytics: {
+      growth: "📈 성장 분석",
+      totalPosts: "총 게시물",
+      toneAnalysis: "🎨 톤 사용 분석"
+    },
+    templates: {
+      recommended: "추천",
+      usageCount: "사용 {{count}}회"
+    }
   },
 
   // Settings
@@ -811,7 +868,213 @@ export default {
     start: "시작하기",
     skip: "건너뛰기",
     loading: "로딩 중...",
-    later: "나중에"
+    later: "나중에",
+    confirm: "확인",
+    purchase: "구매하기"
+  },
+
+  // Recommendations
+  recommendations: {
+    // 첫 포스팅 카드 추가
+    firstPost: {
+      title: "첫 번째 포스팅을 해보세요!",
+      content: "간단한 자기소개나 인사말로\n포스티 여행을 시작해보세요",
+      badge: "🌟 첫 시작",
+      action: "시작하기",
+      meta: "첫 걸음",
+    },
+    // 셀카 카드 (이미 추가됨)
+    selfie: {
+      title: "셀카 한 장이면 충분해!",
+      content: "오늘의 내 모습을 한 장 찍고\n간단한 인사말만 써도 멋진 글이 돼요",
+      badge: "🤳 쉬운 시작",
+      action: "시작하기",
+      meta: "부담 제로",
+    },
+    // 음식 카드
+    easyFood: {
+      title: "뭐 먹었어? 이거면 끝!",
+      content: '음식 사진 하나만 있으면 돼요\n"맛있다" 한 마디면 충분해요',
+      badge: "🍜 쉬운 포스팅",
+      action: "음식 사진",
+      meta: "1분 완성",
+    },
+    // 아침 루틴
+    morningRoutine: {
+      title: "모닝 커피 타임",
+      content: "아침 커피와 함께 하루 시작을\n기록해보는 건 어떨까요?",
+      badge: "🌅 아침 루틴",
+      action: "글쓰기",
+      meta: "아침 7-9시 추천",
+    },
+    // 점심시간
+    lunchTime: {
+      title: "오늘의 점심 메뉴",
+      content: "맛있는 점심 식사하셨나요?\n음식 사진과 함께 공유해보세요!",
+      badge: "🍽️ 점심시간",
+      action: "사진 올리기",
+      meta: "점심시간 추천",
+    },
+    // 골든아워
+    goldenHour: {
+      title: "황금빛 사진 타임",
+      content: "해질녘 황금빛이 가장 예쁜 시간!\n감성 사진 찍기 좋은 때예요",
+      badge: "📸 골든아워",
+      action: "사진 팁 보기",
+      meta: "일몰 1시간 전",
+    },
+    // 월요일 동기부여
+    mondayMotivation: {
+      title: "한 주의 시작, 월요일!",
+      content: "이번 주 목표나 계획을\n공유해보는 건 어떨까요?",
+      badge: "💪 월요일",
+      action: "글쓰기",
+      meta: "동기부여 콘텐츠",
+    },
+    // 금요일 분위기
+    fridayMood: {
+      title: "불타는 금요일!",
+      content: "한 주 수고한 나를 위한\n주말 계획을 공유해보세요",
+      badge: "🎉 불금",
+      action: "글쓰기",
+      meta: "주말 시작",
+    },
+    // 주말 분위기
+    weekendVibes: {
+      title: "여유로운 주말",
+      content: "주말 나들이나 휴식 시간을\n기록해보는 건 어떨까요?",
+      badge: "🌈 주말",
+      action: "글쓰기",
+      meta: "주말 활동",
+    },
+    // 비 오는 날
+    rainyDay: {
+      title: "비 오는 감성적인 하루",
+      content: "빗소리와 함께하는 실내 활동이나\n감성적인 생각을 공유해보세요",
+      badge: "🌧️ 감성 타임",
+      action: "글쓰기",
+      meta: "실내 활동 추천",
+    },
+    // 맑은 날
+    sunnyDay: {
+      title: "화창한 날씨",
+      content: "맑은 하늘 아래 야외 활동이나\n산책 이야기를 들려주세요",
+      badge: "☀️ 맑음",
+      action: "글쓰기",
+      meta: "야외 활동 추천",
+    },
+    // 첫 포스팅
+    firstPost: {
+      title: "첫 번째 포스팅을 해보세요!",
+      content: "간단한 자기소개나 인사말로\n포스티 여행을 시작해보세요",
+      badge: "🌟 첫 시작",
+      action: "시작하기",
+      meta: "신규 사용자",
+    },
+    // 10개 포스팅 달성
+    milestone10: {
+      title: "벌써 10개째 글이에요!",
+      content: "꾸준히 글쓰기 하시는 모습이 멋져요!\n지금까지의 경험을 공유해보세요",
+      badge: "🏆 달성",
+      action: "경험 공유",
+      meta: "글쓰기 꾸준함",
+    },
+    // 최근 사진들
+    recentPhotos: {
+      title: "최근 사진들을 활용해보세요",
+      content: "갤러리에 있는 사진 중 하나를 선택해서\n멋진 이야기를 만들어보세요",
+      badge: "📱 사진 활용",
+      action: "사진 선택",
+      meta: "갤러리 사진 활용",
+    },
+    // 트렌딩 주제
+    trendingTopic: {
+      title: "지금 뜨고 있는 주제",
+      content: "많은 사람들이 관심을 가지는\n트렌딩 주제로 글을 써보세요",
+      badge: "🔥 트렌딩",
+      action: "트렌드 보기",
+      meta: "인기 주제",
+    },
+    // 간단한 일상
+    simpleDaily: {
+      title: "소소한 일상 이야기",
+      content: "오늘 있었던 작은 일들도\n소중한 기록이 될 수 있어요",
+      badge: "☕ 일상",
+      action: "일상 기록",
+      meta: "소소한 행복",
+    },
+    // 글 다듬기
+    polishText: {
+      title: "작성한 글을 다듬어보세요",
+      content: "이미 써둔 글이 있다면\nAI가 더 멋지게 다듬어줄게요",
+      badge: "✨ 다듬기",
+      action: "글 다듬기",
+      meta: "글 개선",
+    },
+    // 글쓰기 실력 향상
+    improveWriting: {
+      title: "글쓰기 실력을 늘려보세요",
+      content: "평소보다 조금 더 긴 글에\n도전해보는 건 어떨까요?",
+      badge: "📚 성장",
+      action: "도전하기",
+      meta: "실력 향상",
+    },
+    // 반려동물 사진
+    petPhoto: {
+      title: "귀여운 반려동물 자랑",
+      content: "우리 집 반려동물의 귀여운 모습을\n모두와 함께 나누어 보세요",
+      badge: "🐾 반려동물",
+      action: "자랑하기",
+      meta: "힐링 콘텐츠",
+    },
+    // 날씨 이야기
+    weatherTalk: {
+      title: "오늘 날씨 어때요?",
+      content: "날씨에 따른 기분이나 계획을\n이야기해보는 건 어떨까요?",
+      badge: "🌤️ 날씨",
+      action: "날씨 이야기",
+      meta: "일상 대화",
+    },
+    // 주말 휴식
+    weekendRest: {
+      title: "주말엔 푹 쉬어요",
+      content: "바쁜 일주일을 보낸 후\n여유로운 휴식을 즐겨보세요",
+      badge: "😴 휴식",
+      action: "휴식 기록",
+      meta: "재충전 시간",
+    },
+    // 커피 타임
+    coffeeTime: {
+      title: "커피 한 잔의 여유",
+      content: "좋아하는 카페나 집에서 마시는\n커피 한 잔의 순간을 기록해보세요",
+      badge: "☕ 커피",
+      action: "커피 이야기",
+      meta: "카페 문화",
+    },
+    // 월요일 동기부여
+    mondayMotivation: {
+      title: "한 주의 시작, 월요일!",
+      content: "이번 주 목표나 계획을\n공유해보는 건 어떨까요?",
+      badge: "💪 월요일",
+      action: "글쓰기",
+      meta: "동기부여 콘텐츠",
+    },
+    // 비오는 날
+    rainyDay: {
+      title: "감성 비 오는 날",
+      content: "빗소리와 함께하는 감성적인\n순간을 기록해보세요",
+      badge: "🌧️ 비오는 날",
+      action: "글쓰기",
+      meta: "비 예보",
+    },
+    // 맑은 날
+    sunnyDay: {
+      title: "화창한 날씨",
+      content: "맑은 날씨를 만끽할 수 있는\n야외 활동 어떠세요?",
+      badge: "☀️ 맑은 날",
+      action: "글쓰기",
+      meta: "맑음",
+    },
   },
 
   // Analytics
@@ -928,6 +1191,7 @@ export default {
     subscriptionFailedMessage: "구독 처리 중 문제가 발생했습니다. 다시 시도해주세요.",
     downgradeNotAllowed: "다운그레이드 불가",
     downgradeNotAllowedMessage: "하위 플랜으로 변경할 수 없습니다.\n\n현재 구독을 취소하고 만료 후 새로 가입해주세요.",
+    confirmSubscriptionMessage: "{{planName}} 플랜을 구독하시겠습니까?\n\n{{description}}\n현재 토큰: {{currentTokens}}개\n변경 후: {{afterTokens}}개",
     // 추가 번역 키들
     alerts: {
       adWatch: {
@@ -974,6 +1238,28 @@ export default {
       premium: "PRO 회원은 가입 시 500개 + 매일 20개씩 추가 토큰을 받습니다",
       pro: "MAX 회원은 무제한 토큰을 사용할 수 있습니다"
     },
+    benefits: {
+      title: "프리미엄 혜택",
+      moreTokens: {
+        title: "더 많은 토큰",
+        description: "STARTER는 총 600개(초기 300 + 일일 10x30), PRO는 총 1,100개(초기 500 + 일일 20x30), MAX는 무제한 토큰을 제공합니다"
+      },
+      advancedAI: {
+        title: "고급 AI 모델",
+        description: "플랜별 차별화된 AI 모델 제공 (GPT-4o, GPT-4 Turbo)"
+      },
+      noAds: {
+        title: "광고 제거",
+        description: "방해받지 않고 콘텐츠 제작에만 집중할 수 있습니다"
+      }
+    },
+    management: {
+      title: "구독 관리",
+      currentPlan: "현재 플랜",
+      monthlyFee: "월 요금",
+      nextBilling: "다음 결제일",
+      cancelButton: "구독 취소"
+    },
     planDescriptions: {
       free: "매일 10개 무료 충전",
       starter: "가입 시 300개 + 매일 10개", 
@@ -996,7 +1282,18 @@ export default {
       starterDowngrade: "경고: 무료 토큰이 300개로 제한됩니다"
     },
     plans: {
-      free: "무료",
+      free: {
+        name: "무료"
+      },
+      starter: {
+        name: "스타터"
+      },
+      premium: {
+        name: "프리미엄"
+      },
+      pro: {
+        name: "프로"
+      },
       freeDetails: {
         name: "무료",
         priceDisplay: "무료",
@@ -1268,36 +1565,6 @@ export default {
       proMessage: "현재 PRO 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. 🚀"
     }
   },
-  myStyle: {
-    access: {
-      freeMessage: "STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.",
-    },
-    tabs: {
-      overview: "개요",
-      analysis: "분석", 
-      templates: "템플릿"
-    },
-    brand: {
-      title: "브랜드",
-      styleAnalysis: "스타일 분석",
-      tagline: "{{count}}개의 스토리로 만든 나만의 스타일"
-    },
-    keywords: {
-      title: "핵심 키워드"
-    },
-    challenge: {
-      progress: "진행도: {{current}}/{{total}}"
-    },
-    analytics: {
-      growth: "📈 성장 분석",
-      totalPosts: "총 게시물",
-      toneAnalysis: "🎨 톤 사용 분석"
-    },
-    templates: {
-      recommended: "추천",
-      usageCount: "사용 {{count}}회"
-    }
-  },
   plans: {
     free: {
       name: "무료",
@@ -1344,6 +1611,204 @@ export default {
       usd: "$",
       jpy: "¥",
       cny: "¥"
+    }
+  },
+
+  // 시간대별 해시태그
+  hashtags: {
+    timeBased: {
+      morning: ["굿모닝", "아침스타그램", "모닝커피", "출근길", "아침운동"],
+      morningLate: ["오전일상", "브런치", "카페투어", "일상기록", "오늘의커피"],
+      lunch: ["점심스타그램", "런치타임", "맛점", "오늘의메뉴", "점심추천"],
+      afternoon: ["오후티타임", "카페일상", "디저트", "휴식시간", "오후의여유"],
+      evening: ["저녁스타그램", "퇴근", "저녁메뉴", "홈쿡", "오늘하루"],
+      night: ["굿나잇", "야식타임", "넷플릭스", "힐링타임", "하루마무리"],
+      lateNight: ["새벽감성", "불면증", "야간작업", "조용한시간", "혼자만의시간"]
+    },
+    dayOfWeek: {
+      weekend: ["주말스타그램", "주말나들이", "주말일상", "휴일"],
+      monday: ["월요병", "월요일", "한주시작", "월요팅"],
+      friday: ["불금", "금요일", "주말계획", "TGIF"]
+    },
+    seasonal: {
+      spring: ["봄스타그램", "봄날씨", "벚꽃", "봄나들이"],
+      summer: ["여름스타그램", "여름휴가", "시원한", "여름날"],
+      autumn: ["가을스타그램", "단풍", "가을감성", "선선한날씨"],
+      winter: ["겨울스타그램", "따뜻한", "겨울감성", "크리스마스"]
+    }
+  },
+
+  // 업적
+  achievements: {
+    title: "업적",
+    headerTitle: "업적",
+    overallProgress: "전체 진행도",
+    categories: {
+      all: "전체",
+      writing: "글쓰기",
+      style: "스타일",
+      social: "소셜",
+      special: "특별"
+    },
+    categoryNames: {
+      writing: "글쓰기",
+      style: "스타일", 
+      social: "소셜",
+      special: "특별"
+    },
+    rarity: {
+      common: "일반",
+      rare: "희귀",
+      epic: "영웅",
+      legendary: "전설"
+    },
+    modal: {
+      category: "카테고리",
+      rarity: "희귀도",
+      progress: "진행도",
+      unlockedAt: "획득일",
+      selectBadge: "대표 업적으로 설정"
+    },
+    status: {
+      completed: "획득 완료",
+      empty: "아직 획득한 업적이 없습니다"
+    },
+    items: {
+      // 글쓰기 관련
+      first_post: {
+        name: "첫 발걸음",
+        description: "첫 게시물을 작성했어요"
+      },
+      post_3: {
+        name: "새내기 작가",
+        description: "3개의 게시물을 작성했어요"
+      },
+      post_7: {
+        name: "일주일 작가",
+        description: "7개의 게시물을 작성했어요"
+      },
+      post_15: {
+        name: "꾸준한 작가",
+        description: "15개의 게시물을 작성했어요"
+      },
+      post_30: {
+        name: "한 달 작가",
+        description: "30개의 게시물을 작성했어요"
+      },
+      post_50: {
+        name: "열정 가득",
+        description: "50개의 게시물을 작성했어요"
+      },
+      post_100: {
+        name: "백전백승",
+        description: "100개의 게시물을 작성했어요"
+      },
+      post_200: {
+        name: "프로 작가",
+        description: "200개의 게시물을 작성했어요"
+      },
+      post_365: {
+        name: "매일 작가",
+        description: "365개의 게시물을 작성했어요"
+      },
+      post_500: {
+        name: "전설의 작가",
+        description: "500개의 게시물을 작성했어요"
+      },
+      post_1000: {
+        name: "천 개의 이야기",
+        description: "1000개의 게시물을 작성했어요"
+      },
+
+      // 스타일 관련
+      minimal_master: {
+        name: "미니멀 마스터",
+        description: "미니멀 위크 챌린지를 완료했어요"
+      },
+      story_teller: {
+        name: "이야기꾼",
+        description: "스토리 먼스 챌린지를 완료했어요"
+      },
+      trend_hunter: {
+        name: "트렌드 헌터",
+        description: "트렌드 헌터 챌린지를 완료했어요"
+      },
+      all_style_master: {
+        name: "올라운드 스타일리스트",
+        description: "모든 스타일을 마스터했어요"
+      },
+
+      // 소셜 관련
+      first_share: {
+        name: "첫 공유",
+        description: "SNS에 게시물을 공유했어요"
+      },
+      share_10: {
+        name: "공유 달인",
+        description: "10번 공유했어요"
+      },
+      invite_friend: {
+        name: "첫 초대",
+        description: "친구를 초대했어요"
+      },
+      influencer: {
+        name: "인플루언서",
+        description: "10명의 친구를 초대했어요"
+      },
+
+      // 특별 업적
+      early_bird: {
+        name: "얼리버드",
+        description: "새벽 5시에 글을 작성했어요"
+      },
+      night_owl: {
+        name: "올빼미",
+        description: "새벽 2시에 글을 작성했어요"
+      },
+      lunch_writer: {
+        name: "점심 작가",
+        description: "점심시간에 글을 작성했어요"
+      },
+      weekend_warrior: {
+        name: "주말 전사",
+        description: "주말에 5개 이상 글을 작성했어요"
+      },
+      streak_7: {
+        name: "일주일 연속",
+        description: "7일 연속 글을 작성했어요"
+      },
+      streak_30: {
+        name: "한 달 연속",
+        description: "30일 연속 글을 작성했어요"
+      },
+      streak_100: {
+        name: "백일 연속",
+        description: "100일 연속 글을 작성했어요"
+      },
+      new_year: {
+        name: "새해 첫 글",
+        description: "1월 1일에 글을 작성했어요"
+      },
+      birthday_post: {
+        name: "생일 글",
+        description: "생일에 글을 작성했어요"
+      },
+      christmas_post: {
+        name: "크리스마스",
+        description: "크리스마스에 글을 작성했어요"
+      },
+      perfect_week: {
+        name: "완벽한 한 주",
+        description: "한 주 동안 매일 글을 작성했어요"
+      },
+      comeback: {
+        name: "돌아온 작가",
+        description: "휴식 후 다시 글을 작성했어요"
+      },
+      posty_veteran: {
+        name: "Posty 베테랑",
+        description: "Posty를 1년 이상 사용했어요"
+      }
     }
   }
 };

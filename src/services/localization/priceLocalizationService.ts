@@ -71,7 +71,7 @@ class PriceLocalizationService {
       return price.toFixed(2);
     }
     
-    // 정수인 경우 천단위 구분자 사용
+    // 정수인 경우 - 중국어는 천단위 구분자 없이 표시
     switch (lang) {
       case 'ko':
         return price.toLocaleString('ko-KR');
@@ -80,7 +80,7 @@ class PriceLocalizationService {
       case 'ja':
         return price.toLocaleString('ja-JP');
       case 'zh-CN':
-        return price.toLocaleString('zh-CN');
+        return price.toString(); // 중국어는 간단히 숫자만 표시
       default:
         return price.toLocaleString();
     }

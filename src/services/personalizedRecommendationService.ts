@@ -19,9 +19,15 @@ export interface RecommendationCard {
   badgeEmoji: string;
   title: string;
   content: string;
+  // 번역 키 추가
+  titleKey?: string;
+  contentKey?: string;
+  badgeKey?: string;
+  actionTextKey?: string;
   meta: {
     icon: string;
     text: string;
+    textKey?: string;
   };
   actionText: string;
   actionPayload: {
@@ -68,20 +74,25 @@ class PersonalizedRecommendationService {
       title: "셀카 한 장이면 충분해!",
       content:
         "오늘의 내 모습을 한 장 찍고\n간단한 인사말만 써도 멋진 글이 돼요",
+      // 번역 키 추가
+      titleKey: "recommendations.selfie.title",
+      contentKey: "recommendations.selfie.content",
+      badgeKey: "recommendations.selfie.badge",
+      actionTextKey: "recommendations.selfie.action",
       meta: {
         icon: "psychology",
         text: "부담 제로",
+        textKey: "recommendations.selfie.meta",
       },
       actionText: "시작하기",
       actionPayload: {
+        mode: "photo",
         prompt: "오늘의 나는",
         category: "daily",
-        hashtags: ["셀카", "일상", "오늘의나"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 10,
-      conditions: {
-        maxPosts: 3,
-      },
+      // 조건 제거: 항상 표시되도록
     },
     {
       id: "easy-food",
@@ -92,20 +103,27 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🍜",
       title: "뭐 먹었어? 이거면 끝!",
       content: '음식 사진 하나만 있으면 돼요\n"맛있다" 한 마디면 충분해요',
+      // 번역 키 추가
+      titleKey: "recommendations.easyFood.title",
+      contentKey: "recommendations.easyFood.content",
+      badgeKey: "recommendations.easyFood.badge",
+      actionTextKey: "recommendations.easyFood.action",
       meta: {
         icon: "restaurant",
         text: "1분 완성",
+        textKey: "recommendations.easyFood.meta",
       },
       actionText: "음식 사진",
       actionPayload: {
         mode: "photo",
         prompt: "오늘 먹은 음식",
         category: "food",
-        hashtags: ["먹스타그램", "맛있다", "오늘뭐먹지"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 9,
+      // 조건 완화: 더 넓은 시간대
       conditions: {
-        hour: [11, 12, 13, 18, 19, 20],
+        hour: [10, 11, 12, 13, 14, 17, 18, 19, 20, 21],
       },
     },
     // 시간대 기반 추천
@@ -118,15 +136,21 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🌅",
       title: "모닝 커피 타임",
       content: "아침 커피와 함께 하루 시작을\n기록해보는 건 어떨까요?",
+      // 번역 키 추가
+      titleKey: "recommendations.morningRoutine.title",
+      contentKey: "recommendations.morningRoutine.content",
+      badgeKey: "recommendations.morningRoutine.badge",
+      actionTextKey: "recommendations.morningRoutine.action",
       meta: {
         icon: "access-time",
         text: "아침 7-9시 추천",
+        textKey: "recommendations.morningRoutine.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
         prompt: "오늘 아침 커피와 함께 시작하는 하루",
         category: "daily",
-        hashtags: ["모닝커피", "아침루틴", "굿모닝"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 8,
       conditions: {
@@ -142,16 +166,22 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🍽️",
       title: "오늘의 점심 메뉴",
       content: "맛있는 점심 식사하셨나요?\n음식 사진과 함께 공유해보세요!",
+      // 번역 키 추가
+      titleKey: "recommendations.lunchTime.title",
+      contentKey: "recommendations.lunchTime.content",
+      badgeKey: "recommendations.lunchTime.badge",
+      actionTextKey: "recommendations.lunchTime.action",
       meta: {
         icon: "access-time",
         text: "점심시간 추천",
+        textKey: "recommendations.lunchTime.meta",
       },
       actionText: "사진 올리기",
       actionPayload: {
         mode: "photo",
         prompt: "오늘의 점심 메뉴 소개",
         category: "food",
-        hashtags: ["점심스타그램", "맛집", "먹스타그램"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 9,
       conditions: {
@@ -167,15 +197,21 @@ class PersonalizedRecommendationService {
       badgeEmoji: "📸",
       title: "황금빛 사진 타임",
       content: "해질녘 황금빛이 가장 예쁜 시간!\n감성 사진 찍기 좋은 때예요",
+      // 번역 키 추가
+      titleKey: "recommendations.goldenHour.title",
+      contentKey: "recommendations.goldenHour.content",
+      badgeKey: "recommendations.goldenHour.badge",
+      actionTextKey: "recommendations.goldenHour.action",
       meta: {
         icon: "sunny",
         text: "일몰 1시간 전",
+        textKey: "recommendations.goldenHour.meta",
       },
       actionText: "사진 팁 보기",
       actionPayload: {
         mode: "photo",
         prompt: "황금빛 감성 사진과 함께하는 저녁",
-        hashtags: ["골든아워", "일몰", "감성사진"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 7,
       conditions: {
@@ -193,15 +229,21 @@ class PersonalizedRecommendationService {
       badgeEmoji: "💪",
       title: "한 주의 시작, 월요일!",
       content: "이번 주 목표나 계획을\n공유해보는 건 어떨까요?",
+      // 번역 키 추가
+      titleKey: "recommendations.mondayMotivation.title",
+      contentKey: "recommendations.mondayMotivation.content",
+      badgeKey: "recommendations.mondayMotivation.badge",
+      actionTextKey: "recommendations.mondayMotivation.action",
       meta: {
         icon: "trending-up",
         text: "동기부여 콘텐츠",
+        textKey: "recommendations.mondayMotivation.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
         prompt: "이번 주 나의 목표와 다짐",
         category: "motivation",
-        hashtags: ["월요일", "한주시작", "동기부여"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 8,
       conditions: {
@@ -217,14 +259,20 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🎉",
       title: "불타는 금요일!",
       content: "한 주 수고한 나를 위한\n주말 계획을 공유해보세요",
+      // 번역 키 추가
+      titleKey: "recommendations.fridayMood.title",
+      contentKey: "recommendations.fridayMood.content",
+      badgeKey: "recommendations.fridayMood.badge",
+      actionTextKey: "recommendations.fridayMood.action",
       meta: {
         icon: "happy",
         text: "주말 시작",
+        textKey: "recommendations.fridayMood.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
         prompt: "한 주를 마무리하며, 주말 계획은?",
-        hashtags: ["불금", "주말계획", "TGIF"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 9,
       conditions: {
@@ -240,14 +288,20 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🌈",
       title: "여유로운 주말",
       content: "주말 나들이나 휴식 시간을\n기록해보는 건 어떨까요?",
+      // 번역 키 추가
+      titleKey: "recommendations.weekendVibes.title",
+      contentKey: "recommendations.weekendVibes.content",
+      badgeKey: "recommendations.weekendVibes.badge",
+      actionTextKey: "recommendations.weekendVibes.action",
       meta: {
         icon: "flower-outline",
         text: "주말 활동",
+        textKey: "recommendations.weekendVibes.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
         prompt: "여유로운 주말 일상",
-        hashtags: ["주말스타그램", "주말일상", "휴식"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 7,
       conditions: {
@@ -265,14 +319,20 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🌧️",
       title: "감성 비 오는 날",
       content: "빗소리와 함께하는 감성적인\n순간을 기록해보세요",
+      // 번역 키 추가
+      titleKey: "recommendations.rainyDay.title",
+      contentKey: "recommendations.rainyDay.content",
+      badgeKey: "recommendations.rainyDay.badge",
+      actionTextKey: "recommendations.rainyDay.action",
       meta: {
         icon: "water-outline",
         text: "비 예보",
+        textKey: "recommendations.rainyDay.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
         prompt: "비 오는 날의 감성",
-        hashtags: ["비오는날", "감성글", "빗소리"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 8,
       conditions: {
@@ -288,14 +348,20 @@ class PersonalizedRecommendationService {
       badgeEmoji: "☀️",
       title: "화창한 날씨",
       content: "맑은 날씨를 만끽할 수 있는\n야외 활동 어떠세요?",
+      // 번역 키 추가
+      titleKey: "recommendations.sunnyDay.title",
+      contentKey: "recommendations.sunnyDay.content",
+      badgeKey: "recommendations.sunnyDay.badge",
+      actionTextKey: "recommendations.sunnyDay.action",
       meta: {
         icon: "sunny",
         text: "맑음",
+        textKey: "recommendations.sunnyDay.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
         prompt: "화창한 날씨와 함께하는 일상",
-        hashtags: ["맑은날", "야외활동", "화창한날씨"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 7,
       conditions: {
@@ -313,15 +379,21 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🎯",
       title: "첫 포스팅 도전!",
       content: "포스티와 함께하는 첫 포스팅,\n부담없이 시작해보세요!",
+      // 번역 키 추가
+      titleKey: "recommendations.firstPost.title",
+      contentKey: "recommendations.firstPost.content",
+      badgeKey: "recommendations.firstPost.badge",
+      actionTextKey: "recommendations.firstPost.action",
       meta: {
         icon: "rocket-outline",
         text: "시작이 반",
+        textKey: "recommendations.firstPost.meta",
       },
       actionText: "첫 글쓰기",
       actionPayload: {
         prompt: "나의 첫 포스팅, 간단한 자기소개",
         category: "introduction",
-        hashtags: ["첫포스팅", "시작", "안녕하세요"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 10,
       conditions: {
@@ -338,14 +410,20 @@ class PersonalizedRecommendationService {
       title: "10번째 포스팅!",
       content:
         "벌써 10개의 이야기를 남기셨네요!\n특별한 회고를 해보는 건 어떨까요?",
+      // 번역 키 추가
+      titleKey: "recommendations.milestone10.title",
+      contentKey: "recommendations.milestone10.content",
+      badgeKey: "recommendations.milestone10.badge",
+      actionTextKey: "recommendations.milestone10.action",
       meta: {
         icon: "star",
         text: "축하해요!",
+        textKey: "recommendations.milestone10.meta",
       },
       actionText: "회고 쓰기",
       actionPayload: {
         prompt: "10번째 포스팅 기념, 그동안의 이야기",
-        hashtags: ["10번째포스팅", "회고", "기념"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 9,
       conditions: {
@@ -364,9 +442,15 @@ class PersonalizedRecommendationService {
       badgeEmoji: "📷",
       title: "갤러리의 숨은 사진들",
       content: "최근 찍은 사진들이 있네요!\n이야기를 더해 공유해보세요",
+      // 번역 키 추가
+      titleKey: "recommendations.recentPhotos.title",
+      contentKey: "recommendations.recentPhotos.content",
+      badgeKey: "recommendations.recentPhotos.badge",
+      actionTextKey: "recommendations.recentPhotos.action",
       meta: {
         icon: "collections",
         text: "사진 발견",
+        textKey: "recommendations.recentPhotos.meta",
       },
       actionText: "사진 선택",
       actionPayload: {
@@ -389,9 +473,15 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🔥",
       title: "지금 핫한 주제",
       content: "최근 인기 있는 챌린지나\n트렌드에 참여해보세요!",
+      // 번역 키 추가
+      titleKey: "recommendations.trendingTopic.title",
+      contentKey: "recommendations.trendingTopic.content",
+      badgeKey: "recommendations.trendingTopic.badge",
+      actionTextKey: "recommendations.trendingTopic.action",
       meta: {
         icon: "whatshot",
         text: "인기 급상승",
+        textKey: "recommendations.trendingTopic.meta",
       },
       actionText: "트렌드 보기",
       actionPayload: {
@@ -432,15 +522,21 @@ class PersonalizedRecommendationService {
       badgeEmoji: "✍️",
       title: "오늘 하루 한 줄 일기",
       content: "긴 글 필요 없어요!\n오늘 있었던 일 한 줄만 써보세요",
+      // 번역 키 추가
+      titleKey: "recommendations.simpleDaily.title",
+      contentKey: "recommendations.simpleDaily.content",
+      badgeKey: "recommendations.simpleDaily.badge",
+      actionTextKey: "recommendations.simpleDaily.action",
       meta: {
         icon: "timer",
         text: "30초 완성",
+        textKey: "recommendations.simpleDaily.meta",
       },
       actionText: "한 줄 쓰기",
       actionPayload: {
         prompt: "오늘 하루를 한 줄로 표현하면",
         category: "daily",
-        hashtags: ["한줄일기", "오늘하루", "일상"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 9,
       conditions: {
@@ -458,9 +554,15 @@ class PersonalizedRecommendationService {
       badgeEmoji: "✨",
       title: "어색한 문장 다듬기",
       content: "써놓은 글이 어색해요?\nAI가 자연스럽게 다듬어드릴게요",
+      // 번역 키 추가
+      titleKey: "recommendations.polishText.title",
+      contentKey: "recommendations.polishText.content",
+      badgeKey: "recommendations.polishText.badge",
+      actionTextKey: "recommendations.polishText.action",
       meta: {
         icon: "auto-fix-high",
         text: "AI 문장 교정",
+        textKey: "recommendations.polishText.meta",
       },
       actionText: "문장 다듬기",
       actionPayload: {
@@ -482,9 +584,15 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🎨",
       title: "초안을 멋진 글로!",
       content: "대충 쓴 메모도\n완성도 높은 포스팅으로 변신!",
+      // 번역 키 추가
+      titleKey: "recommendations.improveWriting.title",
+      contentKey: "recommendations.improveWriting.content",
+      badgeKey: "recommendations.improveWriting.badge",
+      actionTextKey: "recommendations.improveWriting.action",
       meta: {
         icon: "trending-up",
         text: "글 퀄리티 UP",
+        textKey: "recommendations.improveWriting.meta",
       },
       actionText: "AI로 완성하기",
       actionPayload: {
@@ -507,16 +615,22 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🐕",
       title: "우리 아이 자랑하기",
       content: "귀여운 반려동물 사진 하나면\n충분해요! 이름만 써도 OK",
+      // 번역 키 추가
+      titleKey: "recommendations.petPhoto.title",
+      contentKey: "recommendations.petPhoto.content",
+      badgeKey: "recommendations.petPhoto.badge",
+      actionTextKey: "recommendations.petPhoto.action",
       meta: {
         icon: "star",
         text: "쉽고 간단",
+        textKey: "recommendations.petPhoto.meta",
       },
       actionText: "사진 올리기",
       actionPayload: {
         mode: "photo",
         prompt: "우리집 반려동물",
         category: "pet",
-        hashtags: ["반려동물", "펫스타그램", "우리아이"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 7,
     },
@@ -529,15 +643,21 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🌤️",
       title: "오늘 날씨 어때?",
       content: '날씨 얘기는 언제나 쉬워요\n"덥다", "춥다"만 써도 OK!',
+      // 번역 키 추가
+      titleKey: "recommendations.weatherTalk.title",
+      contentKey: "recommendations.weatherTalk.content",
+      badgeKey: "recommendations.weatherTalk.badge",
+      actionTextKey: "recommendations.weatherTalk.action",
       meta: {
         icon: "thermostat",
         text: "부담없이",
+        textKey: "recommendations.weatherTalk.meta",
       },
       actionText: "날씨 얘기",
       actionPayload: {
         prompt: "오늘 날씨는",
         category: "daily",
-        hashtags: ["날씨", "오늘날씨", "일상"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 6,
       conditions: {
@@ -553,15 +673,21 @@ class PersonalizedRecommendationService {
       badgeEmoji: "😴",
       title: "주말엔 쉬어도 돼!",
       content: "침대에서 뒹굴거리는 것도\n멋진 주말 일상이에요",
+      // 번역 키 추가
+      titleKey: "recommendations.weekendRest.title",
+      contentKey: "recommendations.weekendRest.content",
+      badgeKey: "recommendations.weekendRest.badge",
+      actionTextKey: "recommendations.weekendRest.action",
       meta: {
         icon: "hotel",
         text: "휴식 중",
+        textKey: "recommendations.weekendRest.meta",
       },
       actionText: "휴식 기록",
       actionPayload: {
         prompt: "오늘은 쉬는 날",
         category: "daily",
-        hashtags: ["주말", "휴식", "힐링"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 8,
       conditions: {
@@ -578,21 +704,106 @@ class PersonalizedRecommendationService {
       badgeEmoji: "☕",
       title: "카페에서 한 컷?",
       content: "예쁜 카페 사진 하나면\n오늘의 포스팅 완성!",
+      // 번역 키 추가
+      titleKey: "recommendations.coffeeTime.title",
+      contentKey: "recommendations.coffeeTime.content",
+      badgeKey: "recommendations.coffeeTime.badge",
+      actionTextKey: "recommendations.coffeeTime.action",
       meta: {
         icon: "photo-camera",
         text: "분위기 있게",
+        textKey: "recommendations.coffeeTime.meta",
       },
       actionText: "카페 사진",
       actionPayload: {
         mode: "photo",
         prompt: "카페에서의 여유로운 시간",
         category: "cafe",
-        hashtags: ["카페", "카페스타그램", "커피"],
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
       },
       priority: 7,
       conditions: {
         hour: [14, 15, 16, 17],
       },
+    },
+    // 항상 표시되는 기본 추천 카드들 (조건 없음)
+    {
+      id: "daily-moment",
+      type: "photo",
+      icon: "today",
+      iconColor: "#2196F3",
+      badge: "📝 일상 기록",
+      badgeEmoji: "📝",
+      title: "지금 이 순간을 기록해보세요",
+      content: "특별할 필요 없어요\n일상의 소소한 순간이 가장 소중해요",
+      titleKey: "recommendations.dailyMoment.title",
+      contentKey: "recommendations.dailyMoment.content", 
+      badgeKey: "recommendations.dailyMoment.badge",
+      actionTextKey: "recommendations.dailyMoment.action",
+      meta: {
+        icon: "schedule",
+        text: "언제든지",
+        textKey: "recommendations.dailyMoment.meta",
+      },
+      actionText: "기록하기",
+      actionPayload: {
+        prompt: "지금 이 순간",
+        category: "daily",
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
+      },
+      priority: 8,
+    },
+    {
+      id: "simple-thoughts",
+      type: "completion",
+      icon: "lightbulb",
+      iconColor: "#FF9800",
+      badge: "💭 간단한 생각",
+      badgeEmoji: "💭", 
+      title: "오늘 든 생각 하나만",
+      content: "복잡하게 생각할 필요 없어요\n떠오른 생각 하나만 적어보세요",
+      titleKey: "recommendations.simple.title",
+      contentKey: "recommendations.simple.content",
+      badgeKey: "recommendations.simple.badge", 
+      actionTextKey: "recommendations.simple.action",
+      meta: {
+        icon: "edit",
+        text: "간단하게",
+        textKey: "recommendations.simple.meta",
+      },
+      actionText: "생각 적기",
+      actionPayload: {
+        prompt: "오늘 든 생각",
+        category: "thoughts",
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
+      },
+      priority: 7,
+    },
+    {
+      id: "gratitude-moment", 
+      type: "completion",
+      icon: "favorite",
+      iconColor: "#E91E63",
+      badge: "🙏 감사 인사",
+      badgeEmoji: "🙏",
+      title: "오늘 감사한 일이 있나요?",
+      content: "작은 것이라도 좋아요\n감사한 마음을 표현해보세요",
+      titleKey: "recommendations.gratitude.title",
+      contentKey: "recommendations.gratitude.content",
+      badgeKey: "recommendations.gratitude.badge",
+      actionTextKey: "recommendations.gratitude.action", 
+      meta: {
+        icon: "sentiment-satisfied",
+        text: "마음 편안",
+        textKey: "recommendations.gratitude.meta",
+      },
+      actionText: "감사 표현",
+      actionPayload: {
+        prompt: "오늘 감사한 일",
+        category: "gratitude", 
+        hashtags: [], // PersonalizedHashtagService에서 동적 생성
+      },
+      priority: 6,
     },
   ];
 
@@ -634,7 +845,7 @@ class PersonalizedRecommendationService {
     }
 
     // 2. 기존 템플릿 기반 추천 (개인화 추천이 부족할 때 보완)
-    if (recommendations.length < 3) {
+    if (recommendations.length < 6) { // 최대 6개로 늘림
       for (const template of this.recommendationTemplates) {
         if (this.checkConditions(template, userContext, now)) {
           // 동적 데이터로 템플릿 업데이트
@@ -644,10 +855,24 @@ class PersonalizedRecommendationService {
           );
           recommendations.push(personalizedCard);
         }
+        
+        // 최대 6개까지만
+        if (recommendations.length >= 6) break;
       }
     }
 
-    // 우선순위로 정렬하고 상위 3개 반환
+    // 3. 여전히 추천이 부족하면 항상 표시되는 기본 카드들 추가
+    if (recommendations.length === 0) {
+      console.log('⚠️ No recommendations found, adding fallback cards');
+      // 조건이 없는 카드들만 필터링해서 추가
+      const fallbackCards = this.recommendationTemplates.filter(template => !template.conditions);
+      for (const template of fallbackCards.slice(0, 3)) {
+        const personalizedCard = await this.personalizeCard(template, userContext);
+        recommendations.push(personalizedCard);
+      }
+    }
+
+    // 우선순위로 정렬하고 상위 6개 반환
     recommendations.sort((a, b) => {
       // 개인화 점수가 있으면 우선 고려
       const aPersonality = (a as any).personalityScore || 0;
@@ -660,7 +885,7 @@ class PersonalizedRecommendationService {
       return b.priority - a.priority;
     });
 
-    return recommendations.slice(0, 3);
+    return recommendations.slice(0, 6); // 6개로 변경
   }
 
   // 조건 확인
@@ -770,22 +995,61 @@ class PersonalizedRecommendationService {
     return card;
   }
 
-  // 카테고리별 해시태그
+  // 카테고리별 해시태그 (번역 기반)
   private getCategoryHashtags(category: string): string[] {
-    const categoryMap: { [key: string]: string[] } = {
-      daily: ["일상", "데일리", "오늘"],
-      food: ["맛집", "먹스타그램", "푸드"],
-      travel: ["여행", "여행스타그램", "여행일기"],
-      fashion: ["패션", "ootd", "데일리룩"],
-      fitness: ["운동", "헬스", "건강"],
-      beauty: ["뷰티", "메이크업", "스킨케어"],
-      pet: ["펫스타그램", "반려동물", "반려견"],
-      book: ["책", "독서", "책스타그램"],
-      motivation: ["동기부여", "긍정", "다짐"],
-      trend: ["트렌드", "챌린지", "핫이슈"],
-    };
-
-    return categoryMap[category] || [];
+    try {
+      const { t } = require('../locales/i18n');
+      
+      // 카테고리에 따른 번역 키 매핑
+      const categoryKeyMap: { [key: string]: string[] } = {
+        daily: ["home.topics.daily", "home.topics.weekend", "home.topics.today"],
+        food: ["home.topics.food", "home.topics.cafe", "home.topics.restaurant"],
+        travel: ["home.topics.travel", "home.topics.trip", "home.topics.vacation"],
+        fashion: ["home.topics.fashion", "home.topics.style", "home.topics.ootd"],
+        fitness: ["home.topics.workout", "home.topics.health", "home.topics.fitness"],
+        beauty: ["home.topics.beauty", "home.topics.makeup", "home.topics.skincare"],
+        pet: ["home.topics.pet", "home.topics.dog", "home.topics.cat"],
+        book: ["home.topics.book", "home.topics.reading", "home.topics.bookstagram"],
+        motivation: ["home.topics.motivation", "home.topics.positive", "home.topics.goals"],
+        trend: ["home.topics.trend", "home.topics.challenge", "home.topics.viral"],
+      };
+      
+      const translationKeys = categoryKeyMap[category];
+      if (!translationKeys) {
+        return [];
+      }
+      
+      // 번역 키를 실제 번역된 값으로 변환
+      const translatedHashtags = translationKeys.map(key => {
+        try {
+          return t(key);
+        } catch (error) {
+          console.warn(`Translation key ${key} not found, using fallback`);
+          return key; // 번역이 없으면 키 자체를 반환
+        }
+      }).filter(tag => tag && tag !== key); // 빈 값이나 키 자체는 필터링
+      
+      return translatedHashtags;
+      
+    } catch (error) {
+      console.error('Failed to get translated hashtags for category:', category, error);
+      
+      // 폴백: 기본 해시태그 (하드코딩)
+      const fallbackCategoryMap: { [key: string]: string[] } = {
+        daily: ["일상", "데일리", "오늘"],
+        food: ["맛집", "먹스타그램", "푸드"],
+        travel: ["여행", "여행스타그램", "여행일기"],
+        fashion: ["패션", "ootd", "데일리룩"],
+        fitness: ["운동", "헬스", "건강"],
+        beauty: ["뷰티", "메이크업", "스킨케어"],
+        pet: ["펫스타그램", "반려동물", "반려견"],
+        book: ["책", "독서", "책스타그램"],
+        motivation: ["동기부여", "긍정", "다짐"],
+        trend: ["트렌드", "챌린지", "핫이슈"],
+      };
+      
+      return fallbackCategoryMap[category] || [];
+    }
   }
 
   // 추천 기록 저장

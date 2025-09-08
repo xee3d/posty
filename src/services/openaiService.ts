@@ -959,48 +959,53 @@ ${platformInstruction}
         `Hashtags needed: ${targetCount}, found: ${uniqueTags.length}`
       );
 
-      // 기본 추가 태그
-      const additionalTags = [
-        "일상",
-        "데일리",
-        "오늘",
-        "추천",
-        "소통",
-        "맞팔",
-        "좋아요",
-        "팔로우",
-        "일상스타그램",
-        "인스타그램",
-        "스타그램",
-        "감성",
-        "행복",
-        "공유",
-        "기록",
-        "추억",
-        "순간",
-        "하루",
-        "감사",
-      ];
-
-      // 콘텐츠 기반 추가 태그
-      if (content.includes("아침") || content.includes("출근")) {
-        additionalTags.push("아침", "출근", "모닝", "굿모닝", "아침스타그램");
-      }
-      if (content.includes("커피")) {
-        additionalTags.push("커피", "카페", "커피스타그램", "카페스타그램");
-      }
-      if (content.includes("맛") || content.includes("음식")) {
-        additionalTags.push("맛집", "먹스타그램", "맛스타그램", "JMT");
-      }
-
-      // 부족한 만큼 추가
-      while (uniqueTags.length < targetCount && additionalTags.length > 0) {
-        const randomIndex = Math.floor(Math.random() * additionalTags.length);
-        const newTag = additionalTags[randomIndex];
-        if (!uniqueTags.includes(newTag)) {
-          uniqueTags.push(newTag);
+      // PersonalizedHashtagService로부터 개인화된 해시태그 가져오기 (하드코딩 제거)
+      try {
+        const personalizedHashtagService = require('./personalizedHashtagService').default;
+        const neededCount = targetCount - uniqueTags.length;
+        const personalizedTags = await personalizedHashtagService.getPersonalizedHashtags(content, neededCount * 2);
+        
+        // 중복 제거 후 기본 추가 태그로 사용
+        const additionalTags = personalizedTags.filter(tag => !uniqueTags.includes(tag));
+        
+        // 부족한 만큼 추가
+        while (uniqueTags.length < targetCount && additionalTags.length > 0) {
+          const randomIndex = Math.floor(Math.random() * additionalTags.length);
+          const newTag = additionalTags[randomIndex];
+          if (!uniqueTags.includes(newTag)) {
+            uniqueTags.push(newTag);
+          }
+          additionalTags.splice(randomIndex, 1);
         }
-        additionalTags.splice(randomIndex, 1);
+      } catch (error) {
+        console.error('Failed to get personalized hashtags, using fallback:', error);
+        // 폴백: 번역된 기본 태그 사용
+        try {
+          const { t } = require('../locales/i18n');
+          const fallbackTags = [
+            t("home.topics.daily"),
+            t("home.topics.weekend"), 
+            t("home.topics.cafe"),
+            t("home.topics.food"),
+            t("home.topics.travel")
+          ];
+          
+          for (const tag of fallbackTags) {
+            if (!uniqueTags.includes(tag) && uniqueTags.length < targetCount) {
+              uniqueTags.push(tag);
+            }
+          }
+        } catch (translationError) {
+          console.error('Translation fallback failed:', translationError);
+          // 최후의 폴백: 하드코딩된 태그
+          const hardcodedFallbackTags = ["일상", "데일리", "오늘", "좋아요", "행복"];
+          
+          for (const tag of hardcodedFallbackTags) {
+            if (!uniqueTags.includes(tag) && uniqueTags.length < targetCount) {
+              uniqueTags.push(tag);
+            }
+          }
+        }
       }
     }
 

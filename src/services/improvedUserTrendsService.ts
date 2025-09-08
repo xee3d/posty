@@ -1,6 +1,7 @@
 // 개선된 사용자 기반 트렌드 분석 서비스
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import simplePostService from "./simplePostService";
+import personalizedHashtagService from "./personalizedHashtagService";
 
 // 사전 정의된 트렌드 데이터
 const PRESET_TRENDS = {
@@ -30,22 +31,22 @@ const PRESET_TRENDS = {
   timeOfDay: {
     morning: {
       // 6-12
-      hashtags: ["출근", "모닝커피", "아침루틴", "굿모닝", "출근길"],
+      hashtags: [], // 하드코딩된 해시태그 제거 - PersonalizedHashtagService 사용
       engagement: 75,
     },
     afternoon: {
       // 12-18
-      hashtags: ["점심뭐먹지", "오후의여유", "카페타임", "낮잠", "오후"],
+      hashtags: [], // 하드코딩된 해시태그 제거 - PersonalizedHashtagService 사용
       engagement: 60,
     },
     evening: {
       // 18-22
-      hashtags: ["퇴근", "저녁맛집", "휴식", "저녁노을", "홈스윗홈"],
+      hashtags: [], // 하드코딩된 해시태그 제거 - PersonalizedHashtagService 사용
       engagement: 95,
     },
     night: {
       // 22-6
-      hashtags: ["야식", "불면증", "새벽감성", "심야", "꿈"],
+      hashtags: [], // 하드코딩된 해시태그 제거 - PersonalizedHashtagService 사용
       engagement: 40,
     },
   },
@@ -198,7 +199,7 @@ class ImprovedUserTrendsService {
       );
 
       // 5. 인사이트 생성
-      const insights = this.generateEnhancedInsights(mergedTrends, period);
+      const insights = await this.generateEnhancedInsights(mergedTrends, period);
 
       // 6. 통계 계산
       const stats = this.calculateStats(
@@ -292,15 +293,8 @@ class ImprovedUserTrendsService {
         source: "seasonal",
         score: 90 - index * 5,
       })),
-      ...timeData.hashtags.map((tag: string, index: number) => ({
-        hashtag: tag,
-        count: 80 - index * 8,
-        growth: timeData.engagement - 50,
-        lastUsed: new Date(),
-        relatedHashtags: [],
-        source: "timeOfDay",
-        score: timeData.engagement,
-      })),
+      // timeData.hashtags는 이제 빈 배열이므로 PersonalizedHashtagService 사용 필요
+      // (하드코딩된 해시태그 제거됨)
     ];
 
     return {
@@ -400,10 +394,10 @@ class ImprovedUserTrendsService {
   }
 
   // 향상된 인사이트 생성
-  private generateEnhancedInsights(
+  private async generateEnhancedInsights(
     trends: any,
     period: string
-  ): TrendInsight[] {
+  ): Promise<TrendInsight[]> {
     const insights: TrendInsight[] = [];
 
     // 1. 시간대별 최적화 인사이트
@@ -412,16 +406,36 @@ class ImprovedUserTrendsService {
     const timeData =
       PRESET_TRENDS.timeOfDay[timeSlot as keyof typeof PRESET_TRENDS.timeOfDay];
 
-    insights.push({
-      type: "time",
-      title: "⏰ 지금이 포스팅 타이밍!",
-      message: `${timeData.engagement}%의 참여율을 보이는 시간대입니다.`,
-      emoji: "⏰",
-      action: {
-        text: "지금 글쓰기",
-        data: { hashtags: timeData.hashtags.slice(0, 3) },
-      },
-    });
+    // PersonalizedHashtagService에서 시간대별 해시태그 가져오기
+    try {
+      const timeBasedHashtags = await personalizedHashtagService.getPersonalizedHashtags(
+        `현재 시간 ${timeSlot} 시간대`,
+        5
+      );
+      
+      insights.push({
+        type: "time",
+        title: "⏰ 지금이 포스팅 타이밍!",
+        message: `${timeData.engagement}%의 참여율을 보이는 시간대입니다.`,
+        emoji: "⏰",
+        action: {
+          text: "지금 글쓰기",
+          data: { hashtags: timeBasedHashtags.slice(0, 3) }, // 상위 3개 해시태그 사용
+        },
+      });
+    } catch (error) {
+      console.error("Failed to get time-based hashtags:", error);
+      insights.push({
+        type: "time",
+        title: "⏰ 지금이 포스팅 타이밍!",
+        message: `${timeData.engagement}%의 참여율을 보이는 시간대입니다.`,
+        emoji: "⏰",
+        action: {
+          text: "지금 글쓰기",
+          data: { hashtags: ["일상", "데일리", "지금"] }, // 기본값
+        },
+      });
+    }
 
     // 2. 주간 챌린지 인사이트
     const todayChallenge =
@@ -952,14 +966,7 @@ class ImprovedUserTrendsService {
           relatedHashtags: seasonData.hashtags.slice(1, 4),
           source: "seasonal",
         },
-        {
-          hashtag: timeData.hashtags[0],
-          count: 40,
-          growth: 5,
-          lastUsed: new Date(),
-          relatedHashtags: timeData.hashtags.slice(1, 4),
-          source: "timeOfDay",
-        },
+        // timeData.hashtags 제거됨 - 하드코딩된 해시태그 대신 PersonalizedHashtagService 사용
       ],
       categories: [
         {
@@ -1019,7 +1026,7 @@ class ImprovedUserTrendsService {
     const popular = trends.hashtags.slice(0, 5).map((trend) => trend.hashtag);
 
     // 중복 제거하고 반환
-    return [...new Set([...seasonalTags, ...related, ...popular])].slice(0, 10);
+    return Array.from(new Set([...seasonalTags, ...related, ...popular])).slice(0, 10);
   }
 }
 

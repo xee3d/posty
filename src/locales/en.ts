@@ -177,7 +177,34 @@ export default {
         subtitle: "Choose from gallery or take a new one",
         button: "Select Photo",
         change: "Change",
-      }
+      },
+      defaultPrompt: "Please write a natural SNS post that goes well with the photo.",
+    },
+    ads: {
+      watching: {
+        title: "Watching Ad",
+        message: "Please wait while watching the advertisement.",
+      },
+      complete: {
+        title: "Ad Completed",
+        messageStyle: "You can now use premium style once for free!",
+        messageLength: "You can now use premium length once for free!",
+      },
+      error: "Failed to watch advertisement. Please try again.",
+    },
+    premium: {
+      title: "Premium Feature 🌟",
+      styleTitle: "Premium Style",
+      lengthTitle: "Premium Length",
+      viewPlans: "View Plans",
+      watchAd: "Watch Ad (1-time use)",
+      upgrade: "Upgrade",
+      oneTimeUse: "1-time use",
+    },
+    tokenUsage: {
+      photoWrite: "Photo Writing",
+      polish: "Text Polish",
+      newPost: "New Post",
     },
   },
 
@@ -536,7 +563,62 @@ export default {
       premiumUpgrade: "You'll receive an additional 500 tokens in full",
       proUpgrade: "You'll have access to unlimited tokens",
       starterDowngrade: "Warning: Free tokens will be limited to 300"
-    }
+    },
+    plans: {
+      free: {
+        name: "Free"
+      },
+      starter: {
+        name: "Starter"
+      },
+      premium: {
+        name: "Premium"  
+      },
+      pro: {
+        name: "Pro"
+      },
+      freeDetails: {
+        name: "Free",
+        priceDisplay: "Free",
+        features: [
+          "10 daily tokens",
+          "3 tone styles",
+          "Short/medium length",
+          "Ads included",
+        ],
+      },
+      starter: {
+        features: [
+          "300 tokens immediately upon signup",
+          "Additional 10 tokens daily",
+          "4 tone styles",
+          "Long content creation available",
+          "Ad-free experience",
+          "MyStyle analysis",
+        ],
+      },
+      premium: {
+        features: [
+          "500 tokens immediately upon signup",
+          "Additional 20 tokens daily",
+          "6 tone styles",
+          "All content lengths",
+          "Ad-free experience",
+          "MyStyle analysis",
+          "Priority processing",
+        ],
+      },
+      pro: {
+        features: [
+          "500 tokens immediately upon signup",
+          "Unlimited tokens (Fair Use)",
+          "All tone styles",
+          "Priority processing",
+          "Completely ad-free",
+        ],
+      },
+    },
+    confirmSubscriptionMessage: "Do you want to subscribe to the {{planName}} plan?\n\n{{description}}\nCurrent tokens: {{currentTokens}}\nAfter change: {{afterTokens}}"
   },
 
   // Home Screen
@@ -691,7 +773,36 @@ export default {
     formality: "Formality",
     emotiveness: "Emotional expression",
     humor: "Humor",
-    saveProfile: "Save Profile"
+    saveProfile: "Save Profile",
+    
+    access: {
+      freeMessage: "My Style analysis is available from STARTER plan.",
+    },
+    tabs: {
+      overview: "Overview",
+      analysis: "Analysis", 
+      templates: "Templates"
+    },
+    brand: {
+      title: "Brand",
+      styleAnalysis: "Style Analysis",
+      tagline: "My unique style created from {{count}} stories"
+    },
+    keywords: {
+      title: "Key Keywords"
+    },
+    challenge: {
+      progress: "Progress: {{current}}/{{total}}"
+    },
+    analytics: {
+      growth: "📈 Growth Analysis",
+      totalPosts: "Total Posts",
+      toneAnalysis: "🎨 Tone Usage Analysis"
+    },
+    templates: {
+      recommended: "Recommended",
+      usageCount: "Used {{count}} times"
+    }
   },
 
   // Settings
@@ -970,7 +1081,212 @@ export default {
     start: "Start",
     skip: "Skip",
     loading: "Loading...",
-    later: "Later"
+    later: "Later",
+    confirm: "Confirm"
+  },
+
+  // Recommendations
+  recommendations: {
+    // First post card
+    firstPost: {
+      title: "Try Your First Post!",
+      content: "Start your Posty journey with\na simple introduction or greeting",
+      badge: "🌟 First Step",
+      action: "Get Started",
+      meta: "First Step",
+    },
+    // Selfie card
+    selfie: {
+      title: "Just One Selfie is Enough!",
+      content: "Take a photo of yourself today\nand write a simple greeting to make a great post",
+      badge: "🤳 Easy Start",
+      action: "Get Started",
+      meta: "Zero Pressure",
+    },
+    // Food card
+    easyFood: {
+      title: "What Did You Eat? That's It!",
+      content: 'All you need is one food photo\nJust saying "delicious" is enough',
+      badge: "🍜 Easy Posting",
+      action: "Food Photo",
+      meta: "1 Min Complete",
+    },
+    // Morning routine
+    morningRoutine: {
+      title: "Morning Coffee Time",
+      content: "How about recording the start of your day\nwith morning coffee?",
+      badge: "🌅 Morning Routine",
+      action: "Write",
+      meta: "Recommended 7-9 AM",
+    },
+    // Lunch time
+    lunchTime: {
+      title: "Today's Lunch Menu",
+      content: "Did you have a delicious lunch?\nShare it with a food photo!",
+      badge: "🍽️ Lunch Time",
+      action: "Upload Photo",
+      meta: "Lunch Time Recommended",
+    },
+    // Golden hour
+    goldenHour: {
+      title: "Golden Hour Photo Time",
+      content: "The golden light at sunset is the most beautiful!\nIt's a great time for emotional photos",
+      badge: "📸 Golden Hour",
+      action: "See Photo Tips",
+      meta: "1 Hour Before Sunset",
+    },
+    // Monday motivation
+    mondayMotivation: {
+      title: "Start of the Week, Monday!",
+      content: "How about sharing your goals\nand plans for this week?",
+      badge: "💪 Monday",
+      action: "Write",
+      meta: "Motivational Content",
+    },
+    // Friday mood
+    fridayMood: {
+      title: "It's Friday!",
+      content: "Share your weekend plans\nto reward yourself for a hard week",
+      badge: "🎉 TGIF",
+      action: "Write",
+      meta: "Weekend Start",
+    },
+    // Weekend vibes
+    weekendVibes: {
+      title: "Relaxing Weekend",
+      content: "How about recording your weekend\noutings or rest time?",
+      badge: "🌈 Weekend",
+      action: "Write",
+      meta: "Weekend Activities",
+    },
+    // Rainy day
+    rainyDay: {
+      title: "Emotional Rainy Day",
+      content: "Share indoor activities with the sound of rain\nor emotional thoughts",
+      badge: "🌧️ Emotional Time",
+      action: "Write",
+      meta: "Indoor Activities Recommended",
+    },
+    // Sunny day
+    sunnyDay: {
+      title: "Beautiful Weather",
+      content: "Tell us about outdoor activities\nor walk stories under the clear sky",
+      badge: "☀️ Sunny",
+      action: "Write",
+      meta: "Outdoor Activities Recommended",
+    },
+    // First post
+    firstPost: {
+      title: "Try Your First Post!",
+      content: "Start your Posty journey\nwith a simple introduction or greeting",
+      badge: "🌟 First Start",
+      action: "Get Started",
+      meta: "New User",
+    },
+    // 10 posts milestone
+    milestone10: {
+      title: "This is Your 10th Post!",
+      content: "Your consistent writing is awesome!\nShare your experience so far",
+      badge: "🏆 Achievement",
+      action: "Share Experience",
+      meta: "Writing Consistency",
+    },
+    // Recent photos
+    recentPhotos: {
+      title: "Use Your Recent Photos",
+      content: "Select one of the photos in your gallery\nand create a wonderful story",
+      badge: "📱 Photo Utilization",
+      action: "Select Photo",
+      meta: "Gallery Photo Utilization",
+    },
+    // Trending topic
+    trendingTopic: {
+      title: "Hot Topic Right Now",
+      content: "Write about trending topics\nthat many people are interested in",
+      badge: "🔥 Trending",
+      action: "See Trends",
+      meta: "Popular Topics",
+    },
+    // Simple daily
+    simpleDaily: {
+      title: "Simple Daily Stories",
+      content: "Even small things that happened today\ncan become precious records",
+      badge: "☕ Daily",
+      action: "Record Daily Life",
+      meta: "Small Happiness",
+    },
+    // Polish text
+    polishText: {
+      title: "Polish Your Written Text",
+      content: "If you have already written text,\nAI will make it more beautiful",
+      badge: "✨ Polish",
+      action: "Polish Text",
+      meta: "Text Improvement",
+    },
+    // Improve writing
+    improveWriting: {
+      title: "Improve Your Writing Skills",
+      content: "How about challenging yourself\nto write a bit longer than usual?",
+      badge: "📚 Growth",
+      action: "Take Challenge",
+      meta: "Skill Improvement",
+    },
+    // Pet photo
+    petPhoto: {
+      title: "Show Off Your Cute Pet",
+      content: "Share the cute appearance of your pet\nwith everyone",
+      badge: "🐾 Pet",
+      action: "Show Off",
+      meta: "Healing Content",
+    },
+    // Weather talk
+    weatherTalk: {
+      title: "How's the Weather Today?",
+      content: "How about talking about your mood\nor plans according to the weather?",
+      badge: "🌤️ Weather",
+      action: "Weather Talk",
+      meta: "Daily Conversation",
+    },
+    // Weekend rest
+    weekendRest: {
+      title: "Rest Well on Weekends",
+      content: "After a busy week,\nenjoy a relaxing rest",
+      badge: "😴 Rest",
+      action: "Record Rest",
+      meta: "Recharge Time",
+    },
+    // Coffee time
+    coffeeTime: {
+      title: "Leisure of a Cup of Coffee",
+      content: "Record the moment of drinking coffee\nat your favorite cafe or at home",
+      badge: "☕ Coffee",
+      action: "Coffee Story",
+      meta: "Cafe Culture",
+    },
+    // Monday motivation
+    mondayMotivation: {
+      title: "Start of the Week, Monday!",
+      content: "How about sharing this week's\ngoals or plans?",
+      badge: "💪 Monday",
+      action: "Write",
+      meta: "Motivational Content",
+    },
+    // Rainy day
+    rainyDay: {
+      title: "Emotional Rainy Day",
+      content: "Record the emotional moments\naccompanied by the sound of rain",
+      badge: "🌧️ Rainy Day",
+      action: "Write",
+      meta: "Rain Forecast",
+    },
+    // Sunny day
+    sunnyDay: {
+      title: "Beautiful Sunny Weather",
+      content: "How about outdoor activities\nto enjoy the sunny weather?",
+      badge: "☀️ Sunny Day",
+      action: "Write",
+      meta: "Clear",
+    },
   },
 
   // Analytics
@@ -1227,36 +1543,6 @@ export default {
       proMessage: "You're currently using PRO plan with unlimited tokens. 🚀"
     }
   },
-  myStyle: {
-    access: {
-      freeMessage: "My Style analysis is available from STARTER plan.",
-    },
-    tabs: {
-      overview: "Overview",
-      analysis: "Analysis", 
-      templates: "Templates"
-    },
-    brand: {
-      title: "Brand",
-      styleAnalysis: "Style Analysis",
-      tagline: "My unique style created from {{count}} stories"
-    },
-    keywords: {
-      title: "Key Keywords"
-    },
-    challenge: {
-      progress: "Progress: {{current}}/{{total}}"
-    },
-    analytics: {
-      growth: "📈 Growth Analysis",
-      totalPosts: "Total Posts",
-      toneAnalysis: "🎨 Tone Usage Analysis"
-    },
-    templates: {
-      recommended: "Recommended",
-      usageCount: "Used {{count}} times"
-    }
-  },
   plans: {
     free: {
       name: "Free",
@@ -1303,6 +1589,204 @@ export default {
       usd: "$",
       jpy: "¥",
       cny: "¥"
+    }
+  },
+
+  // 시간대별 해시태그
+  hashtags: {
+    timeBased: {
+      morning: ["goodmorning", "morninggram", "morningcoffee", "commute", "morningworkout"],
+      morningLate: ["morninglife", "brunch", "cafetour", "dailyrecord", "todayscoffee"],
+      lunch: ["lunchgram", "lunchtime", "deliciouslunch", "todaysmenu", "lunchrecommendation"],
+      afternoon: ["afternoontea", "cafelife", "dessert", "breaktime", "afternoonrelax"],
+      evening: ["dinnergram", "afterwork", "dinnermenu", "homecooking", "todaysday"],
+      night: ["goodnight", "latenightsnack", "netflix", "healingtime", "dayend"],
+      lateNight: ["dawnvibes", "insomnia", "nightwork", "quiettime", "metime"]
+    },
+    dayOfWeek: {
+      weekend: ["weekendvibes", "weekendlife", "saturdayfeeling", "sundaychill"],
+      monday: ["mondayblues", "mondaymotion", "weekstart", "mondayfeeling"],
+      friday: ["fridayfeeling", "fridaynight", "weekendplans", "TGIF"]
+    },
+    seasonal: {
+      spring: ["springvibes", "springtime", "cherryblossoms", "springoutfit"],
+      summer: ["summervibes", "summertime", "refreshing", "summerdays"],
+      autumn: ["autumnvibes", "fallcolors", "autumnleaves", "cozyweather"],
+      winter: ["wintervibes", "cozy", "winterfeeling", "christmas"]
+    }
+  },
+
+  // Achievements
+  achievements: {
+    title: "Achievements",
+    headerTitle: "Achievements",
+    overallProgress: "Overall Progress",
+    categories: {
+      all: "All",
+      writing: "Writing",
+      style: "Style",
+      social: "Social",
+      special: "Special"
+    },
+    categoryNames: {
+      writing: "Writing",
+      style: "Style",
+      social: "Social",
+      special: "Special"
+    },
+    rarity: {
+      common: "Common",
+      rare: "Rare",
+      epic: "Epic",
+      legendary: "Legendary"
+    },
+    modal: {
+      category: "Category",
+      rarity: "Rarity",
+      progress: "Progress",
+      unlockedAt: "Unlocked At",
+      selectBadge: "Set as Representative Badge"
+    },
+    status: {
+      completed: "Completed",
+      empty: "No achievements unlocked yet"
+    },
+    items: {
+      // Writing achievements
+      first_post: {
+        name: "First Steps",
+        description: "Posted your first content"
+      },
+      post_3: {
+        name: "Rookie Writer",
+        description: "Posted 3 contents"
+      },
+      post_7: {
+        name: "Weekly Writer",
+        description: "Posted 7 contents"
+      },
+      post_15: {
+        name: "Consistent Writer",
+        description: "Posted 15 contents"
+      },
+      post_30: {
+        name: "Monthly Writer",
+        description: "Posted 30 contents"
+      },
+      post_50: {
+        name: "Passionate",
+        description: "Posted 50 contents"
+      },
+      post_100: {
+        name: "Hundred Victories",
+        description: "Posted 100 contents"
+      },
+      post_200: {
+        name: "Professional Writer",
+        description: "Posted 200 contents"
+      },
+      post_365: {
+        name: "Daily Writer",
+        description: "Posted 365 contents"
+      },
+      post_500: {
+        name: "Legendary Writer",
+        description: "Posted 500 contents"
+      },
+      post_1000: {
+        name: "Thousand Stories",
+        description: "Posted 1000 contents"
+      },
+
+      // Style achievements
+      minimal_master: {
+        name: "Minimal Master",
+        description: "Completed Minimal Week challenge"
+      },
+      story_teller: {
+        name: "Storyteller",
+        description: "Completed Story Month challenge"
+      },
+      trend_hunter: {
+        name: "Trend Hunter",
+        description: "Completed Trend Hunter challenge"
+      },
+      all_style_master: {
+        name: "All-Round Stylist",
+        description: "Mastered all styles"
+      },
+
+      // Social achievements
+      first_share: {
+        name: "First Share",
+        description: "Shared content to SNS"
+      },
+      share_10: {
+        name: "Share Master",
+        description: "Shared 10 times"
+      },
+      invite_friend: {
+        name: "First Invite",
+        description: "Invited a friend"
+      },
+      influencer: {
+        name: "Influencer",
+        description: "Invited 10 friends"
+      },
+
+      // Special achievements
+      early_bird: {
+        name: "Early Bird",
+        description: "Posted at 5 AM"
+      },
+      night_owl: {
+        name: "Night Owl",
+        description: "Posted at 2 AM"
+      },
+      lunch_writer: {
+        name: "Lunch Writer",
+        description: "Posted during lunch time"
+      },
+      weekend_warrior: {
+        name: "Weekend Warrior",
+        description: "Posted 5+ times on weekend"
+      },
+      streak_7: {
+        name: "Week Streak",
+        description: "Posted 7 days in a row"
+      },
+      streak_30: {
+        name: "Month Streak",
+        description: "Posted 30 days in a row"
+      },
+      streak_100: {
+        name: "Hundred Day Streak",
+        description: "Posted 100 days in a row"
+      },
+      new_year: {
+        name: "New Year's First",
+        description: "Posted on January 1st"
+      },
+      birthday_post: {
+        name: "Birthday Post",
+        description: "Posted on your birthday"
+      },
+      christmas_post: {
+        name: "Christmas",
+        description: "Posted on Christmas"
+      },
+      perfect_week: {
+        name: "Perfect Week",
+        description: "Posted every day for a week"
+      },
+      comeback: {
+        name: "The Return",
+        description: "Posted again after a break"
+      },
+      posty_veteran: {
+        name: "Posty Veteran",
+        description: "Used Posty for over a year"
+      }
     }
   }
 };

@@ -35,6 +35,7 @@ i18next
     resources,
     lng: getDeviceLanguage(),
     fallbackLng: 'ko',
+    returnObjects: false, // 기본적으로 문자열 반환, 필요시 개별 호출에서 returnObjects: true 사용
     interpolation: {
       escapeValue: false,
     },

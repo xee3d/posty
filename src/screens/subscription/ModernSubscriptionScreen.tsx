@@ -222,7 +222,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 setTimeout(() => {
                   Alert.alert(
                     t("subscription.alerts.mission.complete"),
-                    `광고 시청 미션을 완료하여 추가로 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`,
+                    t("subscription.earnTokensMessage", { tokens: missionResult.rewardsEarned }),
                     [
                       {
                         text: t("alerts.buttons.ok"),
@@ -260,7 +260,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     if (result.rewardsEarned > 0) {
       Alert.alert(
         t("subscription.alerts.mission.complete"),
-        `출석 미션을 완료하여 추가로 ${result.rewardsEarned}개의 토큰을 받았습니다!`
+        t("subscription.earnTokensMessage", { tokens: result.rewardsEarned })
       );
       await handleEarnTokens(result.rewardsEarned);
     }
@@ -285,7 +285,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           if (missionResult.rewardsEarned > 0) {
             Alert.alert(
               t("subscription.alerts.mission.complete"),
-              `공유 미션을 완료하여 추가로 ${missionResult.rewardsEarned}개의 토큰을 받았습니다!`
+              t("subscription.earnTokensMessage", { tokens: missionResult.rewardsEarned })
             );
             await handleEarnTokens(missionResult.rewardsEarned);
           }
@@ -307,7 +307,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       const inviteLink = `https://posty.app/invite/${inviteCode}`;
 
       const result = await Share.share({
-        message: `Posty로 친구를 초대하세요! 초대 코드: ${inviteCode}\n${inviteLink}`,
+        message: t("subscription.alerts.share.invitation.message"),
         title: t("subscription.alerts.share.invitation.title"),
       });
 
@@ -394,7 +394,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   const handleCancelSubscription = () => {
     Alert.alert(
       t("subscription.cancelSubscription"),
-      t("subscription.cancelSubscriptionMessage", { planName: SUBSCRIPTION_PLANS[subscriptionPlan].name }),
+      t("subscription.cancelSubscriptionMessage", { planName: t(`subscription.plans.${subscriptionPlan}.name`, { defaultValue: subscriptionPlan }) }),
       [
         { text: t("alerts.buttons.cancel"), style: "cancel" },
         {
@@ -498,11 +498,12 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         ? currentTokens + 500
         : currentTokens;
 
-    const message = `${
-      SUBSCRIPTION_PLANS[targetPlan].name
-    } 플랜을 구독하시겠습니까?\n\n${description}\n현재 토큰: ${currentTokens}개\n변경 후: ${
-      targetPlan === "pro" ? t("subscription.status.unlimited") : t("tokens.count", { count: afterTokens })
-    }`;
+    const message = t("subscription.confirmSubscriptionMessage", {
+      planName: t(`subscription.plans.${targetPlan}.name`, { defaultValue: targetPlan }),
+      description: description,
+      currentTokens: currentTokens,
+      afterTokens: targetPlan === "pro" ? t("subscription.status.unlimited") : afterTokens
+    });
 
     Alert.alert(t("subscription.confirmSubscription"), message, [
       { text: t("alerts.buttons.cancel"), style: "cancel" },
@@ -585,12 +586,12 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               style={{ marginRight: 8 }}
             />
             <Text
-              style={[
-                styles.planName,
-                { color: isSelected ? planColor : colors.text.primary },
-              ]}
+            style={[
+            styles.planName,
+            { color: isSelected ? planColor : colors.text.primary },
+            ]}
             >
-              {plan.name}
+            {t(`subscription.plans.${planKey}.name`, { defaultValue: plan.name })}
             </Text>
             {isCurrent && (
               <View style={styles.currentBadge}>
@@ -609,7 +610,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
         <View style={styles.priceContainer}>
           <Text style={[styles.price, isSelected && { color: planColor }]}>
-            {priceLocalizationService.formatPrice(plan.id as "free" | "starter" | "premium" | "pro")}
+            {t(`subscription.plans.${planKey}.priceDisplay`, { defaultValue: priceLocalizationService.formatPrice(plan.id as "free" | "starter" | "premium" | "pro") })}
           </Text>
           <Text style={styles.priceUnit}>{t("subscription.perMonth")}</Text>
         </View>
@@ -819,7 +820,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             </View>
 
             <View style={styles.benefitsSection}>
-              <Text style={styles.sectionTitle}>프리미엄 혜택</Text>
+              <Text style={styles.sectionTitle}>{t("subscription.benefits.title")}</Text>
 
               <View style={styles.benefitCard}>
                 <View
@@ -831,11 +832,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   <SafeIcon name="flash" size={24} color="#8B5CF6" />
                 </View>
                 <View style={styles.benefitContent}>
-                  <Text style={styles.benefitTitle}>더 많은 토큰</Text>
+                  <Text style={styles.benefitTitle}>{t("subscription.benefits.moreTokens.title")}</Text>
                   <Text style={styles.benefitDesc}>
-                    STARTER는 총 600개(초기 300 + 일일 10x30), PRO는 총
-                    1,100개(초기 500 + 일일 20x30), MAX는 무제한 토큰을
-                    제공합니다
+                    {t("subscription.benefits.moreTokens.description")}
                   </Text>
                 </View>
               </View>
@@ -850,9 +849,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   <MaterialIcon name="auto-awesome" size={24} color="#EC4899" />
                 </View>
                 <View style={styles.benefitContent}>
-                  <Text style={styles.benefitTitle}>고급 AI 모델</Text>
+                  <Text style={styles.benefitTitle}>{t("subscription.benefits.advancedAI.title")}</Text>
                   <Text style={styles.benefitDesc}>
-                    플랜별 차별화된 AI 모델 제공 (GPT-4o, GPT-4 Turbo)
+                    {t("subscription.benefits.advancedAI.description")}
                   </Text>
                 </View>
               </View>
@@ -867,9 +866,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   <MaterialIcon name="block" size={24} color="#10B981" />
                 </View>
                 <View style={styles.benefitContent}>
-                  <Text style={styles.benefitTitle}>광고 제거</Text>
+                  <Text style={styles.benefitTitle}>{t("subscription.benefits.noAds.title")}</Text>
                   <Text style={styles.benefitDesc}>
-                    방해받지 않고 콘텐츠 제작에만 집중할 수 있습니다
+                    {t("subscription.benefits.noAds.description")}
                   </Text>
                 </View>
               </View>
@@ -878,19 +877,19 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
             {/* 구독 관리 섹션 */}
             {subscriptionPlan !== "free" && (
               <View style={styles.subscriptionManagement}>
-                <Text style={styles.sectionTitle}>구독 관리</Text>
+                <Text style={styles.sectionTitle}>{t("subscription.management.title")}</Text>
 
                 <View style={styles.subscriptionInfoCard}>
                   <View style={styles.planInfoRow}>
                     <View style={styles.planInfoItem}>
-                      <Text style={styles.planInfoLabel}>현재 플랜</Text>
+                      <Text style={styles.planInfoLabel}>{t("subscription.management.currentPlan")}</Text>
                       <Text style={styles.planInfoValue}>
-                        {SUBSCRIPTION_PLANS[subscriptionPlan].name}
+                        {t(`subscription.plans.${subscriptionPlan}.name`, { defaultValue: subscriptionPlan })}
                       </Text>
                     </View>
                     <View style={styles.planInfoDivider} />
                     <View style={styles.planInfoItem}>
-                      <Text style={styles.planInfoLabel}>월 요금</Text>
+                      <Text style={styles.planInfoLabel}>{t("subscription.management.monthlyFee")}</Text>
                       <Text style={styles.planInfoValue}>
                         {SUBSCRIPTION_PLANS[subscriptionPlan].priceDisplay}
                       </Text>
@@ -904,13 +903,14 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                       color={colors.primary}
                     />
                     <View style={styles.expiryTextContainer}>
-                      <Text style={styles.expiryLabel}>다음 결제일</Text>
+                      <Text style={styles.expiryLabel}>{t("subscription.management.nextBilling")}</Text>
                       <Text style={styles.expiryDate}>
                         {formatExpiryDate(getSubscriptionExpiryDate())}
                       </Text>
                       <Text style={styles.daysRemaining}>
-                        {calculateDaysRemaining(getSubscriptionExpiryDate())}일
-                        남음
+                        {t("subscription.management.daysRemaining", { 
+                          days: calculateDaysRemaining(getSubscriptionExpiryDate()) 
+                        })}
                       </Text>
                     </View>
                   </View>
@@ -950,18 +950,18 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                       size={20}
                       color={colors.error || "#FF3B30"}
                     />
-                    <Text style={styles.cancelButtonText}>구독 취소</Text>
+                    <Text style={styles.cancelButtonText}>{t("subscription.management.cancelButton")}</Text>
                   </TouchableOpacity>
                 )}
 
                 <Text style={styles.cancelInfo}>
                   {subscriptionAutoRenew
-                    ? `구독을 취소해도 ${formatExpiryDate(
-                        getSubscriptionExpiryDate()
-                      )}까지 현재 플랜을 계속 이용할 수 있습니다.`
-                    : `구독이 취소되었으며, ${formatExpiryDate(
-                        getSubscriptionExpiryDate()
-                      )}에 만료됩니다.`}
+                    ? t("subscription.management.activeUntil", { 
+                        date: formatExpiryDate(getSubscriptionExpiryDate()) 
+                      })
+                    : t("subscription.management.canceledUntil", { 
+                        date: formatExpiryDate(getSubscriptionExpiryDate()) 
+                      })}
                 </Text>
               </View>
             )}
@@ -981,9 +981,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         ) : activeTab === "manage" ? (
           <>
             <View style={styles.heroSection}>
-              <Text style={styles.heroTitle}>무료 토큰 받기</Text>
+              <Text style={styles.heroTitle}>{t("subscription.earnTokensSection.title")}</Text>
               <Text style={styles.heroSubtitle}>
-                다양한 활동으로 무료 토큰을 획득하세요
+                {t("subscription.earnTokensSection.subtitle")}
               </Text>
             </View>
 
@@ -994,7 +994,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 color={colors.text.secondary}
               />
               <Text style={styles.tokenInfoText}>
-                현재 {stats.totalTokens}개의 토큰을 보유하고 있습니다
+                {t("subscription.earnTokensSection.currentTokens", { tokens: stats.totalTokens })}
               </Text>
             </View>
 
@@ -1017,10 +1017,12 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     />
                   </View>
                   <View style={styles.earnTokenInfo}>
-                    <Text style={styles.earnTokenTitle}>광고 보기</Text>
+                    <Text style={styles.earnTokenTitle}>{t("subscription.earnTokensSection.watchAd.title")}</Text>
                     <Text style={styles.earnTokenDesc}>
-                      +2 토큰 ({adStats.remainingToday}/
-                      {adStats.dailyLimit || 10}회 남음)
+                      {t("subscription.earnTokensSection.watchAd.description", {
+                        remaining: adStats.remainingToday,
+                        limit: adStats.dailyLimit || 10
+                      })}
                     </Text>
                   </View>
                   <Icon
@@ -1047,9 +1049,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     />
                   </View>
                   <View style={styles.earnTokenInfo}>
-                    <Text style={styles.earnTokenTitle}>일일 출석</Text>
+                    <Text style={styles.earnTokenTitle}>{t("subscription.earnTokensSection.dailyCheckin.title")}</Text>
                     <Text style={styles.earnTokenDesc}>
-                      +1 토큰 (오늘 가능)
+                      {t("subscription.earnTokensSection.dailyCheckin.description")}
                     </Text>
                   </View>
                   <Icon
@@ -1076,9 +1078,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     />
                   </View>
                   <View style={styles.earnTokenInfo}>
-                    <Text style={styles.earnTokenTitle}>SNS 공유</Text>
+                    <Text style={styles.earnTokenTitle}>{t("subscription.earnTokensSection.socialShare.title")}</Text>
                     <Text style={styles.earnTokenDesc}>
-                      +3 토큰 (1/1회 남음)
+                      {t("subscription.earnTokensSection.socialShare.description")}
                     </Text>
                   </View>
                   <Icon
@@ -1101,8 +1103,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     <SafeIcon name="person-add-outline" size={24} color="#F59E0B" />
                   </View>
                   <View style={styles.earnTokenInfo}>
-                    <Text style={styles.earnTokenTitle}>친구 초대</Text>
-                    <Text style={styles.earnTokenDesc}>+5 토큰 (친구당)</Text>
+                    <Text style={styles.earnTokenTitle}>{t("subscription.earnTokensSection.inviteFriend.title")}</Text>
+                    <Text style={styles.earnTokenDesc}>{t("subscription.earnTokensSection.inviteFriend.description")}</Text>
                   </View>
                   <Icon
                     name="chevron-forward-outline"
@@ -1124,8 +1126,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     <SafeIcon name="star-outline" size={24} color="#6366F1" />
                   </View>
                   <View style={styles.earnTokenInfo}>
-                    <Text style={styles.earnTokenTitle}>앱 평가하기</Text>
-                    <Text style={styles.earnTokenDesc}>+10 토큰 (1회)</Text>
+                    <Text style={styles.earnTokenTitle}>{t("subscription.earnTokensSection.rateApp.title")}</Text>
+                    <Text style={styles.earnTokenDesc}>{t("subscription.earnTokensSection.rateApp.description")}</Text>
                   </View>
                   <Icon
                     name="chevron-forward-outline"
@@ -1147,9 +1149,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     <MaterialIcon name="task-alt" size={24} color="#14B8A6" />
                   </View>
                   <View style={styles.earnTokenInfo}>
-                    <Text style={styles.earnTokenTitle}>미션 완료</Text>
+                    <Text style={styles.earnTokenTitle}>{t("subscription.earnTokensSection.dailyMission.title")}</Text>
                     <Text style={styles.earnTokenDesc}>
-                      +3 토큰 (일일 미션)
+                      {t("subscription.earnTokensSection.dailyMission.description")}
                     </Text>
                   </View>
                   <Icon
@@ -1163,7 +1165,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               <View style={styles.earnTokenTip}>
                 <SafeIcon name="bulb-outline" size={20} color={colors.primary} />
                 <Text style={styles.earnTokenTipText}>
-                  무료 플랜 사용자는 매일 자정에 10개의 토큰이 자동 충전됩니다
+                  {t("subscription.earnTokensSection.autoRefill")}
                 </Text>
               </View>
 

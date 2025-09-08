@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { Achievement } from "../types/achievement";
 import { SafeIcon } from "../utils/SafeIcon";
+import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - 45) / 2; // 화면 너비에서 패딩을 뺀 후 2로 나눔
@@ -22,6 +23,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
   achievement,
   onPress,
 }) => {
+  const { t } = useTranslation();
   const progress = achievement.requirement.current || 0;
   const target = achievement.requirement.target || 1;
   const progressPercentage = Math.min((progress / target) * 100, 100);
@@ -80,7 +82,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
             numberOfLines={2}
             ellipsizeMode="tail"
           >
-            {achievement.name}
+            {t(`achievements.items.${achievement.id}.name`)}
           </Text>
 
           <Text
@@ -91,7 +93,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
             numberOfLines={2}
             ellipsizeMode="tail"
           >
-            {achievement.description}
+            {t(`achievements.items.${achievement.id}.description`)}
           </Text>
         </View>
 
@@ -119,7 +121,7 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
           {achievement.isUnlocked && (
             <View style={styles.unlockedInfo}>
               <SafeIcon name="checkmark-circle" size={16} color="#4CAF50" />
-              <Text style={styles.unlockedText}>획득 완료</Text>
+              <Text style={styles.unlockedText}>{t('achievements.status.completed')}</Text>
             </View>
           )}
         </View>

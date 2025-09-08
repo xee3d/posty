@@ -41,15 +41,43 @@ export default {
   },
 
   subscription: {
-    title: "プレミアムプラン",
-    subtitle: "すべての機能をアンロック",
+    watchVideo: "視聴する",
+    alreadyCheckedIn: "今日はすでに出席チェックをしました！",
+    alreadyShared: "今日はすでにSNS共有をしました！",
+    alreadyRated: "すでにアプリを評価いただきました。ありがとうございます！",
+    title: "購読プラン",
+    tokenPurchase: "トークン購入",
+    freeTokens: "無料トークン",
     popular: "人気",
+    perMonth: "/月",
+    hero: {
+      title: "Postyと一緒に\nもっと多くのコンテンツを作ってみてください",
+      subtitle: "AIがあなたのクリエイティブパートナーになります"
+    },
+    earnTokens: "トークン獲得！ 🎉",
+    earnTokensMessage: "{{tokens}}個のトークンを獲得しました！",
+    watchAd: "広告視聴",
+    watchAdMessage: "30秒の広告を見て2個のトークンを獲得しますか？",
+    inviteFriends: "招待送信",
+    inviteFriendsMessage: "友達が登録すると5個のトークンを獲得できます！",
+    cancelSubscription: "購読キャンセル",
+    cancelSubscriptionMessage: "{{planName}}プランの購読をキャンセルしますか？\n\nキャンセルしても次回請求日まで現在のプランを利用できます。",
+    cancelSubscriptionAction: "購読キャンセル",
+    cancelSubscriptionSuccess: "購読キャンセル完了",
+    cancelSubscriptionSuccessMessage: "購読がキャンセルされました。次回請求日まで現在のプランを引き続き利用できます。",
+    cancelSubscriptionFailed: "購読キャンセル失敗",
+    cancelSubscriptionFailedMessage: "購読キャンセル中に問題が発生しました。再度お試しください。",
+    confirmSubscription: "購読確認",
+    confirmSubscriptionAction: "購読する",
+    subscriptionFailed: "購読失敗",
+    subscriptionFailedMessage: "購読処理中に問題が発生しました。再度お試しください。",
+    downgradeNotAllowed: "ダウングレード不可",
+    downgradeNotAllowedMessage: "下位プランに変更できません。\n\n現在の購読をキャンセルして期限後に新しく登録してください。",
+    subtitle: "すべての機能をアンロック",
     currentPlan: "現在のプラン",
     upgradeNow: "今すぐアップグレード",
     manageSubscription: "サブスクリプション管理",
-    cancelSubscription: "サブスクリプション解除",
     renewalDate: "更新日",
-    perMonth: "/月",
     perYear: "/年",
     monthly: "月額",
     yearly: "年額",
@@ -121,7 +149,122 @@ export default {
         description: "App Storeでレビューして{{tokens}}トークン獲得",
         button: "レビューする ({{tokens}}トークン)"
       }
-    }
+    },
+    alerts: {
+      adWatch: {
+        unavailable: "広告視聴不可",
+        defaultMessage: "しばらくしてから再度お試しください。"
+      },
+      mission: {
+        complete: "ミッション完了！ 🎯",
+        failed: "広告視聴失敗"
+      },
+      rating: {
+        title: "アプリを評価する",
+        message: "Postyはお役に立ちましたか？評価をお聞かせください！",
+        cancel: "キャンセル",
+        rate: "評価しに行く",
+        error: "ストアを開けません。"
+      },
+      share: {
+        invitation: {
+          title: "Postyを招待する",
+          message: "PostyでAIが作るSNSコンテンツ！今すぐ使ってみてください 🚀\nhttps://posty.app"
+        }
+      }
+    },
+    status: {
+      free: "無料",
+      unlimited: "無制限",
+      currentPlan: "現在利用中",
+      cannotPurchase: "購入不可",
+      subscribeAction: "購読する",
+      autoRenewActive: "自動更新有効",
+      autoRenewCanceled: "自動更新キャンセル"
+    },
+    descriptions: {
+      signup300: "登録と同時に300個のトークンを受け取ります",
+      signup500: "登録と同時に500個のトークンを受け取ります",
+      unlimitedAccess: "無制限のトークンを使用できます",
+      upgrade500: "合計500個のトークンを追加で受け取ります",
+      downgradeWarning: "警告: 無料トークンが300個に制限されます"
+    },
+    membershipNotices: {
+      free: "無料会員は毎日10個のトークンが自動チャージされます",
+      starter: "STARTERメンバーは登録時に300個+毎日10個ずつ追加トークンを受け取ります",
+      premium: "PROメンバーは登録時に500個+毎日20個ずつ追加トークンを受け取ります",
+      pro: "MAXメンバーは無制限のトークンを使用できます"
+    },
+    planDescriptions: {
+      free: "毎日10個無料チャージ",
+      starter: "登録時300個+毎日10個",
+      premium: "登録時500個+毎日20個",
+      pro: "無制限トークン",
+      downgradeBlocked: "下位プランへの変更不可"
+    },
+    upgradeDescriptions: {
+      starterImmediate: "登録と同時に300個のトークンを受け取ります",
+      premiumImmediate: "登録と同時に500個のトークンを受け取ります",
+      proImmediate: "無制限のトークンを使用できます",
+      premiumUpgrade: "合計500個のトークンを追加で受け取ります",
+      proUpgrade: "無制限のトークンを使用できます",
+      starterDowngrade: "警告: 無料トークンが300個に制限されます"
+    },
+    plans: {
+      free: {
+        name: "無料"
+      },
+      starter: {
+        name: "スターター"
+      },
+      premium: {
+        name: "プレミアム"
+      },
+      pro: {
+        name: "プロ"
+      },
+      freeDetails: {
+        name: "無料",
+        priceDisplay: "無料",
+        features: [
+          "毎日10個のトークン",
+          "3つのトーンスタイル",
+          "短い/中程度の長さ",
+          "広告あり"
+        ]
+      },
+      starter: {
+        features: [
+          "登録時に300個のトークン即時支給",
+          "毎日10個ずつ追加チャージ",
+          "4つのトーンスタイル",
+          "長い文章作成可能",
+          "広告削除",
+          "MyStyle分析"
+        ]
+      },
+      premium: {
+        features: [
+          "登録時に500個のトークン即時支給",
+          "毎日20個ずつ追加チャージ",
+          "6つのトーンスタイル",
+          "すべての文章の長さ",
+          "広告削除",
+          "MyStyle分析",
+          "優先処理"
+        ]
+      },
+      pro: {
+        features: [
+          "登録時に500個のトークン即時支給",
+          "無制限トークン（Fair Use）",
+          "すべてのトーンスタイル",
+          "優先処理",
+          "広告完全削除"
+        ]
+      }
+    },
+    confirmSubscriptionMessage: "{{planName}}プランを購読しますか？\n\n{{description}}\n現在のトークン: {{currentTokens}}個\n変更後: {{afterTokens}}個"
   },
 
   aiWrite: {
@@ -218,7 +361,34 @@ export default {
         subtitle: "ギャラリーから選択するか直接撮影してください",
         button: "写真選択",
         change: "変更",
-      }
+      },
+      defaultPrompt: "写真に合う自然なSNSの投稿を書いてください。",
+    },
+    ads: {
+      watching: {
+        title: "広告視聴中",
+        message: "広告を視聴しています。しばらくお待ちください。",
+      },
+      complete: {
+        title: "広告視聴完了",
+        messageStyle: "プレミアムスタイルを1回無料で使用できます！",
+        messageLength: "プレミアム長さを1回無料で使用できます！",
+      },
+      error: "広告の視聴に失敗しました。もう一度お試しください。",
+    },
+    premium: {
+      title: "プレミアム機能 🌟",
+      styleTitle: "プレミアムスタイル",
+      lengthTitle: "プレミアム長さ",
+      viewPlans: "プラン表示",
+      watchAd: "広告視聴（1回使用）",
+      upgrade: "アップグレード",
+      oneTimeUse: "1回使用",
+    },
+    tokenUsage: {
+      photoWrite: "写真投稿",
+      polish: "文章整理",
+      newPost: "新規投稿",
     },
     alerts: {
       noPrompt: "何について書くか教えてください！🤔",
@@ -342,7 +512,7 @@ export default {
     saveProfile: "プロフィール保存",
     
     access: {
-      freeMessage: "STARTERプランからマイスタイル機能をご利用いただけます",
+      freeMessage: "マイスタイル分析はSTARTERプランから利用できます。",
       upgradeButton: "プランをアップグレード"
     },
     
@@ -353,12 +523,40 @@ export default {
       noData: "分析するデータがありません"
     },
     
+    tabs: {
+      overview: "概要",
+      analysis: "分析", 
+      templates: "テンプレート"
+    },
+    
+    brand: {
+      title: "ブランド",
+      styleAnalysis: "スタイル分析",
+      tagline: "{{count}}つのストーリーで作られた私だけのスタイル"
+    },
+    
+    keywords: {
+      title: "キーワード"
+    },
+    
+    challenge: {
+      progress: "進捗: {{current}}/{{total}}"
+    },
+    
+    analytics: {
+      growth: "📈 成長分析",
+      totalPosts: "総投稿数",
+      toneAnalysis: "🎨 トーン使用分析"
+    },
+    
     templates: {
       title: "マイテンプレート",
       create: "テンプレート作成",
       edit: "編集",
       delete: "削除",
-      duplicate: "複製"
+      duplicate: "複製",
+      recommended: "推奨",
+      usageCount: "{{count}}回使用"
     }
   },
 
@@ -461,25 +659,72 @@ export default {
     }
   },
   
+  // トークン関連
   tokens: {
-    title: "トークン",
-    balance: "残高",
-    purchase: "購入",
-    earn: "獲得",
-    history: "履歴",
-    packages: {
-      title: "トークンパッケージ",
-      small: "30トークン",
-      medium: "100トークン",
-      large: "300トークン",
-      xlarge: "1000トークン"
+    count: "{{count}}個",
+    current: "保有トークン",
+    unlimited: "無制限",
+    usage: {
+      today: "今日 {{count}}個使用",
     },
-    earn: {
-      title: "無料でトークンを獲得",
-      dailyBonus: "デイリーボーナス",
-      watchAd: "広告視聴",
-      shareApp: "アプリ共有",
-      rateApp: "アプリ評価"
+    actions: {
+      getFree: "無料トークン受け取り",
+      charge: "トークン追加購入"
+    },
+    info: {
+      free: "毎日深夜0時に10個の無料トークンが補充されます",
+      starter: "STARTERプランで月200個のトークンをご利用いただけます",
+      premium: "PREMIUMプランで月500個のトークンをご利用いただけます",
+      pro: "PROプランで無制限トークンをご利用中です"
+    },
+    alerts: {
+      proTitle: "PROプラン利用中",
+      proMessage: "現在PROプランをご利用中のため、無制限でトークンをご利用いただけます。🚀"
+    }
+  },
+
+  // ユーザープロフィール・トーン  
+  userProfile: {
+    ageGroups: {
+      "10s": {
+        default: "元気で活発な",
+        baby_photo: "かわいい！完全に天使の赤ちゃんだ😭"
+      },
+      "20s": {
+        default: "トレンディでカジュアルな",
+        baby_photo: "赤ちゃんとても愛らしい🥺 心が溶ける"
+      },
+      "30s": {
+        default: "親しみやすく共感できる",
+        baby_photo: "本当に愛らしい赤ちゃんですね。健やかに育ちますように"
+      },
+      "40s": {
+        default: "誠実で温かい",
+        baby_photo: "お子さんがとても福々しく見えますね。ご両親が幸せでしょうね"
+      },
+      "50s": {
+        default: "成熟で賢明な",
+        baby_photo: "本当に美しい赤ちゃんですね。恵まれたご家庭のようです"
+      },
+      "60s+": {
+        default: "経験豊かで温かい",
+        baby_photo: "福の神ですね。健康に育ちますように"
+      }
+    },
+    familyRoles: {
+      mother: "愛に満ちた母の心で",
+      father: "誇らしい父の心で",
+      grandparent: "孫を見守る温かい祖父母の心で"
+    },
+    interests: [
+      "旅行", "グルメ", "カフェ", "料理", "ベーキング", "運動", "フィットネス", "ヨガ", "ランニング", "登山",
+      "育児", "教育", "読書", "映画", "ドラマ", "音楽", "コンサート", "展示会", "写真", "絵画",
+      "ファッション", "美容", "インテリア", "ガーデニング", "ペット", "ゲーム", "IT", "株式", "不動産", "自己啓発"
+    ],
+    completion: {
+      low: "プロフィールを設定すると、あなただけのカスタマイズされたAI文章作成を体験できます ✨",
+      medium: "もう少しです！AIがあなたのスタイルをより正確に把握できます 🎯",
+      high: "ほぼ完成！パーソナライズされたAIライティングサービスにもうすぐ出会えます 🚀"
     }
   },
 
@@ -798,7 +1043,8 @@ export default {
     start: "開始",
     skip: "スキップ",
     loading: "読み込み中...",
-    later: "後で"
+    later: "後で",
+    confirm: "確認"
   },
 
   // Alerts
@@ -945,35 +1191,391 @@ export default {
     }
   },
 
-  // マイスタイル
-  myStyle: {
-    access: {
-      freeMessage: "マイスタイル分析はSTARTERプランから利用できます。",
+
+  // Recommendations
+  recommendations: {
+    firstPost: {
+      title: "初めての投稿をしてみましょう！",
+      content: "簡単な自己紹介や挨拶で\nPostyの旅を始めてみてください",
+      badge: "🌟 初投稿",
+      action: "始める",
+      meta: "初めの一歩"
     },
-    tabs: {
-      overview: "概要",
-      analysis: "分析", 
-      templates: "テンプレート"
+    selfie: {
+      title: "セルフィー一枚で十分！",
+      content: "今日の自分の写真を一枚撮って\n簡単な挨拶を書くだけで素敵な投稿になります",
+      badge: "🤳 簡単スタート",
+      action: "始める",
+      meta: "プレッシャーゼロ"
     },
-    brand: {
-      title: "ブランド",
-      styleAnalysis: "スタイル分析",
-      tagline: "{{count}}つのストーリーで作られた私だけのスタイル"
+    easyFood: {
+      title: "何食べた？これで終わり！",
+      content: "料理の写真一枚があれば十分です\n「美味しい」一言で完璧です",
+      badge: "🍽️ 1分完成",
+      action: "始める",
+      meta: "1分完成"
     },
-    keywords: {
-      title: "キーワード"
+    weatherTalk: {
+      title: "天気の話、みんな大好き！",
+      content: "今日の天気をちょっと書いてみてください\n共感を得られる魔法の話題です",
+      badge: "☀️ 共感保証",
+      action: "始める", 
+      meta: "共感保証"
+    },
+    lunchTime: {
+      title: "今日のランチメニュー",
+      content: "美味しいランチを食べましたか？\n料理の写真と一緒にシェアしてみませんか！",
+      badge: "🍽️ ランチタイム",
+      action: "写真をアップ",
+      meta: "ランチタイム推薦",
+    },
+    dailyMoment: {
+      title: "今、この瞬間を記録",
+      content: "特別なことがなくても大丈夫\n日常の小さな瞬間が一番貴重です",
+      badge: "📝 日常記録",
+      action: "始める",
+      meta: "日常記録"
+    },
+    gratitude: {
+      title: "今日感謝したいことは？",
+      content: "小さなことでも感謝の気持ちを\n表現してみてください。心が軽くなります",
+      badge: "🙏 感謝表現",
+      action: "始める",
+      meta: "感謝表現"
+    },
+    workLife: {
+      title: "仕事の話、してみませんか？",
+      content: "今日の仕事の一コマを\n簡単に共有してみてください",
+      badge: "💼 仕事日常",
+      action: "始める",
+      meta: "仕事日常"
+    },
+    weekendPlan: {
+      title: "週末の計画は？",
+      content: "週末にしたいことや\n計画について書いてみてください",
+      badge: "🌈 週末計画",
+      action: "始める", 
+      meta: "週末計画"
+    },
+    bookReview: {
+      title: "読んだ本、どうでした？",
+      content: "最近読んだ本について\n感想を簡単に共有してみてください",
+      badge: "📚 読書感想",
+      action: "始める",
+      meta: "読書感想"
+    },
+    travel: {
+      title: "旅行の思い出を共有",
+      content: "最近行った場所や\n旅行の思い出を書いてみてください",
+      badge: "✈️ 旅行記録",
+      action: "始める",
+      meta: "旅行記録"
+    },
+    hobby: {
+      title: "趣味の話をしませんか？",
+      content: "あなたの趣味や好きなことについて\n自由に書いてみてください",
+      badge: "🎨 趣味共有",
+      action: "始める",
+      meta: "趣味共有"
+    },
+    exercise: {
+      title: "今日の運動はいかがでした？",
+      content: "運動や健康に関する\n今日の経験を共有してみてください",
+      badge: "💪 運動記録",
+      action: "始める",
+      meta: "運動記録"
+    },
+    mood: {
+      title: "今の気分は？",
+      content: "今の気持ちや感情を\n素直に表現してみてください",
+      badge: "💭 気分表現",
+      action: "始める",
+      meta: "気分表現"
+    },
+    learning: {
+      title: "今日学んだことは？",
+      content: "新しく学んだことや\n気づいたことを共有してみてください",
+      badge: "🎓 学習共有",
+      action: "始める",
+      meta: "学習共有"
+    },
+    music: {
+      title: "最近聴いている音楽は？",
+      content: "好きな音楽や\n最近聴いている曲について書いてみてください",
+      badge: "🎵 音楽共有",
+      action: "始める",
+      meta: "音楽共有"
+    },
+    family: {
+      title: "家族との時間はどうでした？",
+      content: "家族との大切な時間や\n出来事を共有してみてください",
+      badge: "👨‍👩‍👧‍👦 家族時間",
+      action: "始める",
+      meta: "家族時間"
     },
     challenge: {
-      progress: "進捗: {{current}}/{{total}}"
+      title: "新しいチャレンジを始める",
+      content: "挑戦したいことや\n新しく始めたことについて書いてみてください",
+      badge: "🚀 チャレンジ",
+      action: "始める",
+      meta: "チャレンジ"
     },
-    analytics: {
-      growth: "📈 成長分析",
-      totalPosts: "総投稿数",
-      toneAnalysis: "🎨 トーン使用分析"
+    reflection: {
+      title: "今日を振り返ってみると？",
+      content: "今日一日を振り返って\n感じたことを書いてみてください",
+      badge: "🤔 振り返り",
+      action: "始める",
+      meta: "振り返り"
     },
-    templates: {
-      recommended: "推奨",
-      usageCount: "{{count}}回使用"
+    dream: {
+      title: "夢や目標について",
+      content: "将来の夢や目標について\n思いを書いてみてください",
+      badge: "⭐ 夢・目標",
+      action: "始める",
+      meta: "夢・目標"
+    },
+    friendship: {
+      title: "友達との時間",
+      content: "友達との楽しい時間や\n思い出を共有してみてください",
+      badge: "👥 友情",
+      action: "始める",
+      meta: "友情"
+    },
+    simple: {
+      title: "簡単な一言から",
+      content: "複雑に考える必要はありません\n今感じていることを一言で表現してみてください",
+      badge: "💬 シンプル",
+      action: "始める",
+      meta: "シンプル"
+    },
+    inspiration: {
+      title: "今日のインスピレーション",
+      content: "今日受けたインスピレーションや\n心に響いたことを書いてみてください",
+      badge: "💡 インスピレーション",
+      action: "始める",
+      meta: "インスピレーション"
+    },
+    // 月曜日のモチベーション
+    mondayMotivation: {
+      title: "一週間の始まり、月曜日！",
+      content: "今週の目標や計画を\n共有してみませんか？",
+      badge: "💪 月曜日",
+      action: "書く",
+      meta: "モチベーションコンテンツ"
+    },
+    // 雨の日
+    rainyDay: {
+      title: "感性的な雨の日",
+      content: "雨音と共にする感性的な\n瞬間を記録してみてください",
+      badge: "🌧️ 雨の日",
+      action: "書く",
+      meta: "雨予報"
+    },
+    // 晴れの日
+    sunnyDay: {
+      title: "晴れやかな天気",
+      content: "晴れた天気を満喫できる\nアウトドア活動はいかがですか？",
+      badge: "☀️ 晴れの日",
+      action: "書く",
+      meta: "晴れ"
+    }
+  },
+
+  // 時間帯別ハッシュタグ
+  hashtags: {
+    timeBased: {
+      morning: ["おはよう", "朝活", "モーニング", "通勤", "朝の運動"],
+      morningLate: ["午前中", "ブランチ", "カフェ巡り", "日常記録", "今日のコーヒー"],
+      lunch: ["ランチ", "昼食", "お昼ご飯", "今日のメニュー", "ランチ推薦"],
+      afternoon: ["午後のティータイム", "カフェ", "デザート", "休憩時間", "午後のくつろぎ"],
+      evening: ["夕食", "帰宅", "晩ご飯", "ホームクッキング", "今日一日"],
+      night: ["おやすみ", "夜食", "ネットフリックス", "ヒーリングタイム", "一日の終わり"],
+      lateNight: ["深夜の感性", "不眠症", "夜勤", "静かな時間", "一人の時間"]
+    },
+    dayOfWeek: {
+      weekend: ["週末", "休日", "土日", "週末時間"],
+      monday: ["月曜日", "一週間のスタート", "月曜の朝", "週明け"],
+      friday: ["金曜日", "週末前", "お疲れ様", "TGIF"]
+    },
+    seasonal: {
+      spring: ["春", "桜", "新緑", "春の日"],
+      summer: ["夏", "暑い日", "涼しい", "夏祭り"],
+      autumn: ["秋", "紅葉", "秋の空", "涼しい天気"],
+      winter: ["冬", "暖かい", "雪", "クリスマス"]
+    }
+  },
+
+  // 実績
+  achievements: {
+    title: "実績",
+    headerTitle: "実績",
+    overallProgress: "全体進行度",
+    categories: {
+      all: "全て",
+      writing: "投稿",
+      style: "スタイル",
+      social: "ソーシャル",
+      special: "特別"
+    },
+    categoryNames: {
+      writing: "投稿",
+      style: "スタイル",
+      social: "ソーシャル",
+      special: "特別"
+    },
+    rarity: {
+      common: "一般",
+      rare: "レア",
+      epic: "エピック",
+      legendary: "レジェンダリー"
+    },
+    modal: {
+      category: "カテゴリ",
+      rarity: "レアリティ",
+      progress: "進行度",
+      unlockedAt: "取得日",
+      selectBadge: "代表実績に設定"
+    },
+    status: {
+      completed: "取得完了",
+      empty: "まだ取得した実績がありません"
+    },
+    items: {
+      // 投稿関連
+      first_post: {
+        name: "初めの一歩",
+        description: "初めての投稿をしました"
+      },
+      post_3: {
+        name: "新米ライター",
+        description: "3個の投稿をしました"
+      },
+      post_7: {
+        name: "週間ライター",
+        description: "7個の投稿をしました"
+      },
+      post_15: {
+        name: "継続ライター",
+        description: "15個の投稿をしました"
+      },
+      post_30: {
+        name: "月間ライター",
+        description: "30個の投稿をしました"
+      },
+      post_50: {
+        name: "情熱いっぱい",
+        description: "50個の投稿をしました"
+      },
+      post_100: {
+        name: "百戦百勝",
+        description: "100個の投稿をしました"
+      },
+      post_200: {
+        name: "プロライター",
+        description: "200個の投稿をしました"
+      },
+      post_365: {
+        name: "毎日ライター",
+        description: "365個の投稿をしました"
+      },
+      post_500: {
+        name: "伝説のライター",
+        description: "500個の投稿をしました"
+      },
+      post_1000: {
+        name: "千の物語",
+        description: "1000個の投稿をしました"
+      },
+
+      // スタイル関連
+      minimal_master: {
+        name: "ミニマルマスター",
+        description: "ミニマルウィークチャレンジを完了しました"
+      },
+      story_teller: {
+        name: "ストーリーテラー",
+        description: "ストーリーマンスチャレンジを完了しました"
+      },
+      trend_hunter: {
+        name: "トレンドハンター",
+        description: "トレンドハンターチャレンジを完了しました"
+      },
+      all_style_master: {
+        name: "オールラウンドスタイリスト",
+        description: "全てのスタイルをマスターしました"
+      },
+
+      // ソーシャル関連
+      first_share: {
+        name: "初シェア",
+        description: "SNSに投稿をシェアしました"
+      },
+      share_10: {
+        name: "シェア達人",
+        description: "10回シェアしました"
+      },
+      invite_friend: {
+        name: "初招待",
+        description: "友達を招待しました"
+      },
+      influencer: {
+        name: "インフルエンサー",
+        description: "10人の友達を招待しました"
+      },
+
+      // 特別実績
+      early_bird: {
+        name: "早起き鳥",
+        description: "朝5時に投稿しました"
+      },
+      night_owl: {
+        name: "夜更かし梟",
+        description: "深夜2時に投稿しました"
+      },
+      lunch_writer: {
+        name: "ランチライター",
+        description: "ランチタイムに投稿しました"
+      },
+      weekend_warrior: {
+        name: "週末戦士",
+        description: "週末に5個以上投稿しました"
+      },
+      streak_7: {
+        name: "一週間連続",
+        description: "7日連続で投稿しました"
+      },
+      streak_30: {
+        name: "一ヶ月連続",
+        description: "30日連続で投稿しました"
+      },
+      streak_100: {
+        name: "百日連続",
+        description: "100日連続で投稿しました"
+      },
+      new_year: {
+        name: "新年初投稿",
+        description: "1月1日に投稿しました"
+      },
+      birthday_post: {
+        name: "誕生日投稿",
+        description: "誕生日に投稿しました"
+      },
+      christmas_post: {
+        name: "クリスマス",
+        description: "クリスマスに投稿しました"
+      },
+      perfect_week: {
+        name: "完璧な一週間",
+        description: "一週間毎日投稿しました"
+      },
+      comeback: {
+        name: "復帰ライター",
+        description: "休憩後に再び投稿しました"
+      },
+      posty_veteran: {
+        name: "Postyベテラン",
+        description: "Postyを1年以上使用しました"
+      }
     }
   }
 };

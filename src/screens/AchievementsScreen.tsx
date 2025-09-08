@@ -19,6 +19,7 @@ import {
 } from "../types/achievement";
 import AchievementCard from "../components/AchievementCard";
 import ProgressBar from "../components/ProgressBar";
+import { useTranslation } from "react-i18next";
 
 import { Alert } from "../utils/customAlert";
 const { width } = Dimensions.get("window");
@@ -30,6 +31,7 @@ interface CategorySummary {
 }
 
 const AchievementsScreen: React.FC = () => {
+  const { t } = useTranslation();
   const [achievements, setAchievements] = useState<Achievement[]>(ACHIEVEMENTS);
   const [selectedCategory, setSelectedCategory] = useState<
     "all" | "writing" | "style" | "social" | "special"
@@ -162,21 +164,21 @@ const AchievementsScreen: React.FC = () => {
               />
             </View>
 
-            <Text style={styles.modalTitle}>{selectedAchievement.name}</Text>
+            <Text style={styles.modalTitle}>{t(`achievements.items.${selectedAchievement.id}.name`)}</Text>
             <Text style={styles.modalDescription}>
-              {selectedAchievement.description}
+              {t(`achievements.items.${selectedAchievement.id}.description`)}
             </Text>
 
             <View style={styles.modalInfoContainer}>
               <View style={styles.modalInfoRow}>
-                <Text style={styles.modalInfoLabel}>카테고리</Text>
+                <Text style={styles.modalInfoLabel}>{t('achievements.modal.category')}</Text>
                 <Text style={styles.modalInfoValue}>
-                  {ACHIEVEMENT_CATEGORIES[selectedAchievement.category].name}
+                  {t(`achievements.categoryNames.${selectedAchievement.category}`)}
                 </Text>
               </View>
 
               <View style={styles.modalInfoRow}>
-                <Text style={styles.modalInfoLabel}>희귀도</Text>
+                <Text style={styles.modalInfoLabel}>{t('achievements.modal.rarity')}</Text>
                 <Text
                   style={[
                     styles.modalInfoValue,
@@ -188,7 +190,7 @@ const AchievementsScreen: React.FC = () => {
               </View>
 
               <View style={styles.modalInfoRow}>
-                <Text style={styles.modalInfoLabel}>진행도</Text>
+                <Text style={styles.modalInfoLabel}>{t('achievements.modal.progress')}</Text>
                 <Text style={styles.modalInfoValue}>
                   {selectedAchievement.requirement.current || 0} /{" "}
                   {selectedAchievement.requirement.target}
@@ -198,7 +200,7 @@ const AchievementsScreen: React.FC = () => {
               {selectedAchievement.isUnlocked &&
                 selectedAchievement.unlockedAt && (
                   <View style={styles.modalInfoRow}>
-                    <Text style={styles.modalInfoLabel}>획득일</Text>
+                    <Text style={styles.modalInfoLabel}>{t('achievements.modal.unlockedAt')}</Text>
                     <Text style={styles.modalInfoValue}>
                       {new Date(
                         selectedAchievement.unlockedAt
@@ -211,7 +213,7 @@ const AchievementsScreen: React.FC = () => {
             {selectedAchievement.isUnlocked && (
               <TouchableOpacity style={styles.selectBadgeButton}>
                 <Text style={styles.selectBadgeButtonText}>
-                  대표 업적으로 설정
+                  {t('achievements.modal.selectBadge')}
                 </Text>
               </TouchableOpacity>
             )}
@@ -232,22 +234,16 @@ const AchievementsScreen: React.FC = () => {
   };
 
   const getRarityName = (rarity: string) => {
-    const names = {
-      common: "일반",
-      rare: "희귀",
-      epic: "영웅",
-      legendary: "전설",
-    };
-    return names[rarity as keyof typeof names] || rarity;
+    return t(`achievements.rarity.${rarity}` as const) || rarity;
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>업적</Text>
+        <Text style={styles.headerTitle}>{t('achievements.headerTitle')}</Text>
         <View style={styles.summaryContainer}>
           <View style={styles.summaryRow}>
-            <Text style={styles.summaryLabel}>전체 진행도</Text>
+            <Text style={styles.summaryLabel}>{t('achievements.overallProgress')}</Text>
             <Text style={styles.summaryValue}>
               {categorySummaries.all?.unlocked || 0} /{" "}
               {categorySummaries.all?.total || 0}
@@ -268,11 +264,11 @@ const AchievementsScreen: React.FC = () => {
         style={styles.categoryTabs}
         contentContainerStyle={styles.categoryTabsContent}
       >
-        {renderCategoryTab("all", "전체")}
-        {renderCategoryTab("writing", "글쓰기", "create-outline")}
-        {renderCategoryTab("style", "스타일", "color-palette-outline")}
-        {renderCategoryTab("social", "소셜", "people-outline")}
-        {renderCategoryTab("special", "특별", "star-outline")}
+        {renderCategoryTab("all", t('achievements.categories.all'))}
+        {renderCategoryTab("writing", t('achievements.categories.writing'), "create-outline")}
+        {renderCategoryTab("style", t('achievements.categories.style'), "color-palette-outline")}
+        {renderCategoryTab("social", t('achievements.categories.social'), "people-outline")}
+        {renderCategoryTab("special", t('achievements.categories.special'), "star-outline")}
       </ScrollView>
 
       <FlatList
@@ -293,7 +289,7 @@ const AchievementsScreen: React.FC = () => {
         ListEmptyComponent={
           <View style={styles.emptyState}>
             <SafeIcon name="trophy-outline" size={64} color="#CCCCCC" />
-            <Text style={styles.emptyText}>아직 획득한 업적이 없습니다</Text>
+            <Text style={styles.emptyText}>{t('achievements.status.empty')}</Text>
           </View>
         }
       />

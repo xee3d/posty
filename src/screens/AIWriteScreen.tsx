@@ -40,15 +40,12 @@ import { saveContent } from "../utils/storage";
 import contentSaveService from "../services/contentSaveService";
 import userBehaviorAnalytics from "../services/userBehaviorAnalytics";
 import { soundManager } from "../utils/soundManager";
-import trendService from "../services/trendService";
-import personalizedHashtagService from "../services/personalizedHashtagService";
 import { Alert } from "../utils/customAlert";
 import { imageAnalysisCache } from "../utils/imageAnalysisCache";
 import {
   getPlaceholderText,
   getTimeBasedPrompts,
   getCategoryFromTone,
-  extractHashtags,
 } from "../utils/promptUtils";
 import {
   launchImageLibrary,
@@ -63,7 +60,6 @@ import {
   PLATFORM_STYLES,
   getRandomEndingStyle,
   transformContentForPlatform,
-  generateHashtags,
 } from "../utils/platformStyles";
 import missionService from "../services/missionService";
 import improvedStyleService, {
@@ -87,7 +83,6 @@ import {
   PlanType,
   canAccessPolishOption,
 } from "../config/adConfig";
-import { trendCacheUtils } from "../utils/trendCacheUtils";
 
 type WriteMode = "text" | "photo" | "polish";
 
@@ -95,7 +90,6 @@ interface AIWriteScreenProps {
   onNavigate?: (tab: string) => void;
   initialMode?: WriteMode;
   initialText?: string;
-  initialHashtags?: string[];
   initialTitle?: string;
   initialTone?: string;
   style?: string;
@@ -106,13 +100,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   onNavigate,
   initialMode = "text",
   initialText,
-  initialHashtags,
   initialTitle,
   initialTone,
   style,
   tips,
 }) => {
-  // console.log('AIWriteScreen mounted with:', { initialText, initialHashtags, initialTitle });
+  // console.log('AIWriteScreen mounted with:', { initialText, initialTitle });
   const { colors, cardTheme, isDark } = useAppTheme();
   const { t } = useTranslation();
   const timer = useTimer();
@@ -156,30 +149,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     }
   }, [initialMode]);
 
-  // 프롬프트 변경 시 개인화된 해시태그 업데이트
-  useEffect(() => {
-    const updatePersonalizedHashtags = async () => {
-      if (prompt.trim().length > 2) {
-        // 최소 3글자 이상 입력했을 때
-        try {
-          console.log("[AIWriteScreen] Updating hashtags for prompt:", prompt);
-          const personalizedTags =
-            await personalizedHashtagService.getPersonalizedHashtags(
-              prompt.trim(),
-              10
-            );
-          setTrendingHashtags(personalizedTags);
-          console.log("[AIWriteScreen] Updated hashtags:", personalizedTags);
-        } catch (error) {
-          console.error("Failed to update personalized hashtags:", error);
-        }
-      }
-    };
-
-    // 디바운스: 사용자가 타이핑을 멈춘 후 1초 뒤에 실행
-    const timeoutId = setTimeout(updatePersonalizedHashtags, 1000);
-    return () => clearTimeout(timeoutId);
-  }, [prompt]);
 
   // 스타일 정보 로드
   useEffect(() => {
@@ -208,20 +177,17 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     | "emotion"
     | "storytelling"
     | "engaging"
-    | "hashtag"
     | "emoji"
     | "question"
   >("engaging");
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
-  const [initialHashtagsList, setInitialHashtagsList] = useState<string[]>(
-    initialHashtags || []
-  );
   const [imageAnalysis, setImageAnalysis] = useState<string>("");
   const [imageAnalysisResult, setImageAnalysisResult] = useState<any>(null);
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
-  const [trendingHashtags, setTrendingHashtags] = useState<string[]>([]);
-  const [selectedHashtags, setSelectedHashtags] = useState<string[]>([]);
-  const [trendingPrompts, setTrendingPrompts] = useState<string[]>([]);
+  
+  // 광고 시청으로 얻은 일회성 프리미엄 액세스 상태 관리
+  const [adWatchedTones, setAdWatchedTones] = useState<Set<string>>(new Set());
+  const [adWatchedLengths, setAdWatchedLengths] = useState<Set<string>>(new Set());
 
   // 구독 플랜 정보 가져오기
   const subscriptionPlan = useAppSelector(
@@ -277,66 +243,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     }
   }, [initialTone, style, userPlan]);
 
-  // 트렌드 해시태그 및 주제 로드
-  useEffect(() => {
-    // 즉시 로드
-    loadTrendingData();
 
-    // 5분마다 업데이트 (트렌드 서비스는 4시간 캐시 사용)
-    const interval = setInterval(() => {
-      console.log("[AIWriteScreen] Refreshing trending data...");
-      loadTrendingData();
-    }, 5 * 60 * 1000); // 5분
-
-    return () => clearInterval(interval);
-  }, []);
-
-  const loadTrendingData = async (forceRefresh = false) => {
-    try {
-      console.log(
-        "[AIWriteScreen] Loading trending data...",
-        forceRefresh ? "(force refresh)" : ""
-      );
-
-      // 강제 새로고침 시 캐시 삭제
-      if (forceRefresh) {
-        await trendCacheUtils.clearCache();
-      }
-
-      // 개인화된 해시태그 로드 (새로운 시스템)
-      const personalizedTags =
-        await personalizedHashtagService.getPersonalizedHashtags(
-          prompt || undefined, // 현재 입력된 프롬프트 반영
-          12 // 12개 추천
-        );
-      console.log("[AIWriteScreen] Personalized hashtags:", personalizedTags);
-      setTrendingHashtags(personalizedTags);
-
-      const trends = await trendService.getAllTrends();
-      console.log("[AIWriteScreen] Received trends:", trends.length, "items");
-
-      // 트렌드 제목을 그대로 주제로 사용 (최대 8개)
-      const prompts = trends
-        .slice(0, 8)
-        .map((trend) => trend.title)
-        .filter((title) => title && title.length > 0);
-
-      console.log("[AIWriteScreen] Extracted prompts:", prompts);
-      setTrendingPrompts(prompts);
-
-      // 부족하면 기본 키워드 추가
-      if (prompts.length < 6) {
-        const defaultWords = getDefaultKeywords();
-        prompts.push(...defaultWords.slice(0, 6 - prompts.length));
-        setTrendingPrompts(prompts);
-      }
-    } catch (error) {
-      console.error("[AIWriteScreen] Failed to load trending data:", error);
-      // 오류 시 기본 키워드 사용
-      setTrendingPrompts(getDefaultKeywords());
-      setTrendingHashtags(getDefaultKeywords());
-    }
-  };
 
   // 모든 톤 정의
   const allTones = [
@@ -497,23 +404,11 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     return getPlaceholderText();
   };
 
-  // 스타일에 맞는 빠른 주제 생성 (트렌드 우선)
-  const getStyleBasedPrompts = () => {
-    // 트렌드 주제가 있으면 우선 사용
-    if (trendingPrompts.length > 0) {
-      return trendingPrompts;
-    }
-
-    return getDefaultKeywords();
-  };
-
-  const quickPrompts = getStyleBasedPrompts();
 
   // 모드 전환 시 상태 초기화 함수
   const resetAllStates = () => {
     setGeneratedContent(""); // 생성된 콘텐츠 초기화
     setPrompt(""); // 입력 내용 초기화
-    setSelectedHashtags([]); // 선택된 해시태그 초기화
     setSelectedImage(null); // 사진 초기화
     setSelectedImageUri(null);
     setImageAnalysis("");
@@ -523,6 +418,76 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     // 스타일 가이드는 초기화
     setStyleInfo(null);
     setShowStyleGuide(false);
+  };
+
+  // 광고 시청 후 프리미엄 스타일 일회성 액세스 처리
+  const handleWatchAdForTone = async (toneId: string) => {
+    try {
+      // 광고 시청 로직 (실제로는 광고 SDK 연동 필요)
+      Alert.alert(
+        t("aiWrite.ads.watching.title"),
+        t("aiWrite.ads.watching.message"),
+        [],
+        { cancelable: false }
+      );
+      
+      // 임시로 2초 딜레이 (실제로는 광고 완료 콜백)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // 광고 시청 완료 후 해당 톤에 대한 일회성 액세스 부여
+      setAdWatchedTones(prev => new Set(prev).add(toneId));
+      
+      Alert.alert(
+        t("aiWrite.ads.complete.title"),
+        t("aiWrite.ads.complete.messageStyle"),
+        [{ text: t("common.confirm"), onPress: () => {} }]
+      );
+      
+      soundManager.playSuccess();
+    } catch (error) {
+      console.error('광고 시청 실패:', error);
+      Alert.alert(t("common.error"), t("aiWrite.ads.error"));
+    }
+  };
+
+  // 프리미엄 톤 액세스 체크 함수 (구독 + 광고 시청 고려)
+  const canAccessToneWithAd = (toneId: string): boolean => {
+    return canAccessTone(userPlan, toneId) || adWatchedTones.has(toneId);
+  };
+
+  // 프리미엄 길이 액세스 체크 함수 (구독 + 광고 시청 고려)
+  const canAccessLengthWithAd = (lengthId: string): boolean => {
+    return canAccessLength(userPlan, lengthId) || adWatchedLengths.has(lengthId);
+  };
+
+  // 광고 시청 후 프리미엄 길이 일회성 액세스 처리
+  const handleWatchAdForLength = async (lengthId: string) => {
+    try {
+      // 광고 시청 로직 (실제로는 광고 SDK 연동 필요)
+      Alert.alert(
+        t("aiWrite.ads.watching.title"),
+        t("aiWrite.ads.watching.message"),
+        [],
+        { cancelable: false }
+      );
+      
+      // 임시로 2초 딜레이 (실제로는 광고 완료 콜백)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // 광고 시청 완료 후 해당 길이에 대한 일회성 액세스 부여
+      setAdWatchedLengths(prev => new Set(prev).add(lengthId));
+      
+      Alert.alert(
+        t("aiWrite.ads.complete.title"),
+        t("aiWrite.ads.complete.messageLength"),
+        [{ text: t("common.confirm"), onPress: () => {} }]
+      );
+      
+      soundManager.playSuccess();
+    } catch (error) {
+      console.error('광고 시청 실패:', error);
+      Alert.alert(t("common.error"), t("aiWrite.ads.error"));
+    }
   };
 
   const handleSelectImage = () => {
@@ -641,7 +606,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
       });
 
       if (response.didCancel) {
-        console.log("사용자가 이미지 선택을 취소했습니다");
+        console.log("User cancelled image selection");
       } else if (response.errorMessage) {
         console.error("ImagePicker Error: ", response.errorMessage);
         Alert.alert(t("common.error"), t("aiWrite.errors.imageSelection"));
@@ -695,7 +660,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
       });
 
       if (response.didCancel) {
-        console.log("사용자가 카메라 촬영을 취소했습니다");
+        console.log("User cancelled camera capture");
       } else if (response.errorMessage) {
         console.error("Camera Error: ", response.errorMessage);
         Alert.alert(t("common.error"), t("aiWrite.errors.cameraAccess"));
@@ -757,10 +722,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
       // 토큰 사용
       const tokenDescription =
         writeMode === "photo"
-          ? "사진 글쓰기"
+          ? t("aiWrite.tokenUsage.photoWrite")
           : writeMode === "polish"
-          ? "문장 정리"
-          : prompt || "새글 생성";
+          ? t("aiWrite.tokenUsage.polish")
+          : prompt || t("aiWrite.tokenUsage.newPost");
 
       consumeTokens(requiredTokens, tokenDescription);
 
@@ -786,12 +751,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           tone: selectedTone as any,
           length: selectedLength as any,
           platform: "instagram", // 기본 플랫폼 추가
-          hashtags:
-            selectedHashtags.length > 0
-              ? selectedHashtags
-              : initialHashtagsList.length > 0
-              ? initialHashtagsList
-              : undefined,
           includeEmojis: true, // 기본값으로 이모지 포함하여 생성
           generatePlatformVersions: true,
         });
@@ -836,7 +795,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         }
 
         // 더 자연스러운 프롬프트 구성
-        if (imageAnalysis && imageAnalysis !== "이미지를 분석하는 중...") {
+        if (imageAnalysis && imageAnalysis !== t("aiWrite.analysis.analyzing")) {
           // 사용자 입력이 있으면 자연스럽게 연결
           if (prompt.trim()) {
             photoPrompt = `${imageAnalysis} 이 사진과 함께 "${prompt.trim()}"이라는 내용을 포함해서 SNS 글을 작성해주세요.`;
@@ -847,7 +806,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           // 분석 결과가 없으면 기본 프롬프트
           photoPrompt =
             prompt.trim() ||
-            "사진과 어울리는 자연스러운 SNS 글을 작성해주세요.";
+            t("aiWrite.photo.defaultPrompt");
         }
 
         console.log("Generating photo content with prompt:", photoPrompt);
@@ -857,12 +816,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           tone: selectedTone as any,
           length: selectedLength as any,
           platform: "instagram", // 기본 플랫폼 추가
-          hashtags:
-            selectedHashtags.length > 0
-              ? selectedHashtags
-              : imageAnalysisResult?.suggestedContent ||
-                initialHashtagsList ||
-                undefined,
           includeEmojis: true, // 기본값으로 이모지 포함하여 생성
           generatePlatformVersions: true,
         });
@@ -884,24 +837,29 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
 
       soundManager.playSuccess(); // 생성 성공음
 
+      // 광고로 얻은 프리미엄 스타일 일회성 액세스 사용 완료 처리
+      if (adWatchedTones.has(selectedTone) && !canAccessTone(userPlan, selectedTone)) {
+        setAdWatchedTones(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(selectedTone);
+          return newSet;
+        });
+      }
+
+      // 광고로 얻은 프리미엄 길이 일회성 액세스 사용 완료 처리
+      if (adWatchedLengths.has(selectedLength) && !canAccessLength(userPlan, selectedLength)) {
+        setAdWatchedLengths(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(selectedLength);
+          return newSet;
+        });
+      }
+
       // 로딩 상태를 먼저 해제
       setIsGenerating(false);
 
       // 데이터 자동 저장
       if (result) {
-        const hashtags = extractHashtags(result);
-
-        // 해시태그 사용 기록 저장 (개인화 시스템)
-        if (hashtags.length > 0) {
-          await personalizedHashtagService.saveHashtagUsage(hashtags);
-          console.log("Hashtag usage saved for personalization:", hashtags);
-        }
-
-        // 검색 쿼리 저장 (프롬프트가 검색어 역할)
-        if (prompt.trim()) {
-          await personalizedHashtagService.saveSearchQuery(prompt.trim());
-          console.log("Search query saved for personalization:", prompt.trim());
-        }
 
         // 플랫폼 결정 로직
         const determinePlatform = () => {
@@ -930,17 +888,15 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         // storage.ts의 saveContent 호출
         await saveContent({
           content: result,
-          hashtags: hashtags,
           tone: selectedTone,
           length: selectedLength as any,
           platform: platformToSave,
-          prompt: writeMode === "photo" ? "사진 글쓰기" : prompt,
+          prompt: writeMode === "photo" ? t("aiWrite.modes.photo") : prompt,
         });
 
         // simplePostService에도 저장 (MyStyleScreen 분석용)
         await simplePostService.savePost({
           content: result,
-          hashtags: hashtags,
           platform: platformToSave,
           category: getCategoryFromTone(selectedTone),
           tone: selectedTone,
@@ -977,9 +933,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     }
   };
 
-  const handleQuickPrompt = (quickPrompt: string) => {
-    setPrompt(quickPrompt);
-  };
 
   const getRandomEncouragement = () => {
     const encouragements = MOLLY_MESSAGES.encouragements;
@@ -996,7 +949,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
       platform,
       tone: selectedTone,
       length: selectedLength,
-      prompt: writeMode === "photo" ? "사진 글쓰기" : prompt,
+      prompt: writeMode === "photo" ? t("aiWrite.modes.photo") : prompt,
     });
 
     // 사용자 행동 패턴 업데이트 (개인화를 위해)
@@ -1224,21 +1177,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                 <View style={styles.inputSection}>
                   <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>{t("aiWrite.prompt.title")}</Text>
-                    <TouchableOpacity
-                      style={styles.refreshButton}
-                      onPress={async () => {
-                        soundManager.playRefresh(); // 새로고침 사운드
-                        console.log("[AIWriteScreen] Manual refresh triggered");
-                        await loadTrendingData(true);
-                        Alert.alert(
-                          t("aiWrite.prompt.trendUpdate.title"),
-                          t("aiWrite.prompt.trendUpdate.message")
-                        );
-                      }}
-                    >
-                      <SafeIcon name="refresh" size={16} color={colors.primary} />
-                      <Text style={styles.refreshButtonText}>{t("aiWrite.prompt.refresh")}</Text>
-                    </TouchableOpacity>
                   </View>
                   <View style={styles.inputContainer}>
                     <TextInput
@@ -1253,45 +1191,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     <CharacterCount current={prompt.length} max={100} />
                   </View>
 
-                  {/* {t("aiWrite.sections.quickTopic")} */}
-                  <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    style={styles.quickPromptsScroll}
-                  >
-                    {quickPrompts.map((quickPrompt, index) => (
-                      <TouchableOpacity
-                        key={index}
-                        style={[
-                          styles.hashtagChip,
-                          trendingPrompts.includes(quickPrompt) &&
-                            styles.hashtagChipActive,
-                        ]}
-                        onPress={() => {
-                          soundManager.haptic("light"); // 빠른 주제 선택 햄틱
-                          handleQuickPrompt(quickPrompt);
-                        }}
-                      >
-                        {trendingPrompts.includes(quickPrompt) && (
-                          <SafeIcon
-                            name="trending-up-outline"
-                            size={12}
-                            color={colors.primary}
-                            style={{ marginRight: 4 }}
-                          />
-                        )}
-                        <Text
-                          style={[
-                            styles.hashtagText,
-                            trendingPrompts.includes(quickPrompt) &&
-                              styles.hashtagTextActive,
-                          ]}
-                        >
-                          {quickPrompt}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </ScrollView>
                 </View>
               </SlideInView>
             </>
@@ -1335,7 +1234,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           if (!canAccessPolishOption(userPlan, "summarize")) {
                             soundManager.playError();
                             Alert.alert(
-                              "프리미엄 기능 🌟",
+                              t("aiWrite.premium.title"),
                               `요약하기 기능은 ${
                                 userPlan === "free"
                                   ? "Starter"
@@ -1346,7 +1245,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               [
                                 { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
-                                  text: "플랜 보기",
+                                  text: t("aiWrite.premium.viewPlans"),
                                   onPress: () => onNavigate?.("subscription"),
                                 },
                               ]
@@ -1391,7 +1290,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           if (!canAccessPolishOption(userPlan, "simple")) {
                             soundManager.playError();
                             Alert.alert(
-                              "프리미엄 기능 🌟",
+                              t("aiWrite.premium.title"),
                               `쉽게 풀어쓰기 기능은 ${
                                 userPlan === "free"
                                   ? "Starter"
@@ -1402,7 +1301,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               [
                                 { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
-                                  text: "플랜 보기",
+                                  text: t("aiWrite.premium.viewPlans"),
                                   onPress: () => onNavigate?.("subscription"),
                                 },
                               ]
@@ -1447,7 +1346,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           if (!canAccessPolishOption(userPlan, "formal")) {
                             soundManager.playError();
                             Alert.alert(
-                              "프리미엄 기능 🌟",
+                              t("aiWrite.premium.title"),
                               `격식체 변환 기능은 ${
                                 userPlan === "free"
                                   ? "Starter"
@@ -1458,7 +1357,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               [
                                 { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
-                                  text: "플랜 보기",
+                                  text: t("aiWrite.premium.viewPlans"),
                                   onPress: () => onNavigate?.("subscription"),
                                 },
                               ]
@@ -1512,7 +1411,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           if (!canAccessPolishOption(userPlan, "emotion")) {
                             soundManager.playError();
                             Alert.alert(
-                              "프리미엄 기능 🌟",
+                              t("aiWrite.premium.title"),
                               `감정 강화 기능은 ${
                                 userPlan === "free"
                                   ? "Starter"
@@ -1523,7 +1422,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               [
                                 { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
-                                  text: "플랜 보기",
+                                  text: t("aiWrite.premium.viewPlans"),
                                   onPress: () => onNavigate?.("subscription"),
                                 },
                               ]
@@ -1571,7 +1470,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           ) {
                             soundManager.playError();
                             Alert.alert(
-                              "프리미엄 기능 🌟",
+                              t("aiWrite.premium.title"),
                               `스토리텔링 기능은 ${
                                 userPlan === "free"
                                   ? "Starter"
@@ -1582,7 +1481,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               [
                                 { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
-                                  text: "플랜 보기",
+                                  text: t("aiWrite.premium.viewPlans"),
                                   onPress: () => onNavigate?.("subscription"),
                                 },
                               ]
@@ -1628,7 +1527,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           if (!canAccessPolishOption(userPlan, "engaging")) {
                             soundManager.playError();
                             Alert.alert(
-                              "프리미엄 기능 🌟",
+                              t("aiWrite.premium.title"),
                               `매력적으로 기능은 ${
                                 userPlan === "free"
                                   ? "Starter"
@@ -1639,7 +1538,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               [
                                 { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
-                                  text: "플랜 보기",
+                                  text: t("aiWrite.premium.viewPlans"),
                                   onPress: () => onNavigate?.("subscription"),
                                 },
                               ]
@@ -1681,62 +1580,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         { marginTop: SPACING.sm },
                       ]}
                     >
-                      <TouchableOpacity
-                        style={[
-                          styles.polishOptionButton,
-                          selectedPolishOption === "hashtag" &&
-                            styles.polishOptionButtonActive,
-                          !canAccessPolishOption(userPlan, "hashtag") &&
-                            styles.lockedItem,
-                        ]}
-                        onPress={() => {
-                          if (!canAccessPolishOption(userPlan, "hashtag")) {
-                            soundManager.playError();
-                            Alert.alert(
-                              "프리미엄 기능 🌟",
-                              `해시태그 추출 기능은 ${
-                                userPlan === "free"
-                                  ? "Starter"
-                                  : userPlan === "starter"
-                                  ? "Premium"
-                                  : "Pro"
-                              } 플랜 이상에서 사용 가능해요.`,
-                              [
-                                { text: t("alerts.buttons.later"), style: "cancel" },
-                                {
-                                  text: "플랜 보기",
-                                  onPress: () => onNavigate?.("subscription"),
-                                },
-                              ]
-                            );
-                            return;
-                          }
-                          setSelectedPolishOption("hashtag");
-                        }}
-                      >
-                        <SafeIcon
-                          name="pricetag-outline"
-                          size={18}
-                          color={
-                            selectedPolishOption === "hashtag"
-                              ? colors.primary
-                              : !canAccessPolishOption(userPlan, "hashtag")
-                              ? colors.text.tertiary
-                              : colors.text.secondary
-                          }
-                        />
-                        <Text
-                          style={[
-                            styles.polishOptionText,
-                            selectedPolishOption === "hashtag" &&
-                              styles.polishOptionTextActive,
-                            !canAccessPolishOption(userPlan, "hashtag") &&
-                              styles.lockedItemText,
-                          ]}
-                        >
-                          {t("aiWrite.polishOptions.hashtag")}
-                        </Text>
-                      </TouchableOpacity>
 
                       <TouchableOpacity
                         style={[
@@ -1750,7 +1593,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           if (!canAccessPolishOption(userPlan, "emoji")) {
                             soundManager.playError();
                             Alert.alert(
-                              "프리미엄 기능 🌟",
+                              t("aiWrite.premium.title"),
                               `이모지 추가 기능은 ${
                                 userPlan === "free"
                                   ? "Starter"
@@ -1761,7 +1604,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               [
                                 { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
-                                  text: "플랜 보기",
+                                  text: t("aiWrite.premium.viewPlans"),
                                   onPress: () => onNavigate?.("subscription"),
                                 },
                               ]
@@ -1807,7 +1650,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           if (!canAccessPolishOption(userPlan, "question")) {
                             soundManager.playError();
                             Alert.alert(
-                              "프리미엄 기능 🌟",
+                              t("aiWrite.premium.title"),
                               `질문형 변환 기능은 ${
                                 userPlan === "free"
                                   ? "Starter"
@@ -1818,7 +1661,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               [
                                 { text: t("alerts.buttons.later"), style: "cancel" },
                                 {
-                                  text: "플랜 보기",
+                                  text: t("aiWrite.premium.viewPlans"),
                                   onPress: () => onNavigate?.("subscription"),
                                 },
                               ]
@@ -1960,24 +1803,23 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           shadowOpacity: 0.2,
                           elevation: 3,
                         },
-                        !canAccessTone(userPlan, tone.id) && styles.lockedItem,
+                        !canAccessToneWithAd(tone.id) && styles.lockedItem,
                       ]}
                       onPress={() => {
-                        if (!canAccessTone(userPlan, tone.id)) {
+                        if (!canAccessToneWithAd(tone.id)) {
                           soundManager.playError(); // 잠긴 톤 선택 시 에러음
                           Alert.alert(
-                            "프리미엄 스타일 🌟",
-                            `${tone.label} 스타일은 ${
-                              userPlan === "free"
-                                ? "Starter"
-                                : userPlan === "starter"
-                                ? "Premium"
-                                : "Pro"
-                            } 플랜 이상에서 사용 가능해요.\n\n업그레이드하면 더 다양한 스타일로 글을 작성할 수 있어요!`,
+                            t("aiWrite.premium.styleTitle"),
+                            `${tone.label} 스타일을 사용하려면 업그레이드하거나 광고를 시청하세요.\n\n광고 시청 시 1회 무료로 사용할 수 있습니다!`,
                             [
                               { text: t("common.later"), style: "cancel" },
                               {
-                                text: "플랜 보기",
+                                text: t("aiWrite.premium.watchAd"),
+                                onPress: () => handleWatchAdForTone(tone.id),
+                                style: "default"
+                              },
+                              {
+                                text: t("aiWrite.premium.upgrade"),
                                 onPress: () => onNavigate?.("subscription"),
                               },
                             ]
@@ -1995,7 +1837,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         color={
                           selectedTone === tone.id
                             ? tone.color
-                            : !canAccessTone(userPlan, tone.id)
+                            : !canAccessToneWithAd(tone.id)
                             ? colors.text.tertiary
                             : colors.text.secondary
                         }
@@ -2005,12 +1847,23 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           styles.toneLabel,
                           selectedTone === tone.id && styles.toneLabelActive,
                           selectedTone === tone.id && { color: tone.color },
-                          !canAccessTone(userPlan, tone.id) &&
+                          !canAccessToneWithAd(tone.id) &&
                             styles.lockedItemText,
                         ]}
                       >
                         {tone.label}
                       </Text>
+                      {adWatchedTones.has(tone.id) && !canAccessTone(userPlan, tone.id) && (
+                        <View style={styles.adUnlockedBadge}>
+                          <SafeIcon 
+                            name="play-circle" 
+                            size={12} 
+                            color={colors.primary}
+                            style={styles.adUnlockedIcon}
+                          />
+                          <Text style={styles.adUnlockedText}>{t("aiWrite.premium.oneTimeUse")}</Text>
+                        </View>
+                      )}
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -2029,24 +1882,23 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     style={[
                       styles.lengthCard,
                       selectedLength === length.id && styles.lengthCardActive,
-                      !canAccessLength(userPlan, length.id) &&
+                      !canAccessLengthWithAd(length.id) &&
                         styles.lockedItem,
                     ]}
                     onPress={() => {
-                      if (!canAccessLength(userPlan, length.id)) {
+                      if (!canAccessLengthWithAd(length.id)) {
                         Alert.alert(
-                          "프리미엄 길이 📏",
-                          `${length.count} 길이는 ${
-                            userPlan === "free"
-                              ? "Starter"
-                              : userPlan === "starter"
-                              ? "Premium"
-                              : "Pro"
-                          } 플랜 이상에서 사용 가능해요.\n\n더 긴 글을 작성하면 더 풍부한 콘텐츠를 만들 수 있어요!`,
+                          t("aiWrite.premium.lengthTitle"),
+                          `${length.count} 길이를 사용하려면 업그레이드하거나 광고를 시청하세요.\n\n광고 시청 시 1회 무료로 사용할 수 있습니다!`,
                           [
                             { text: t("common.later"), style: "cancel" },
                             {
-                              text: "플랜 보기",
+                              text: "광고보기 (1회 사용)",
+                              onPress: () => handleWatchAdForLength(length.id),
+                              style: "default"
+                            },
+                            {
+                              text: "업그레이드",
                               onPress: () => onNavigate?.("subscription"),
                             },
                           ]
@@ -2063,7 +1915,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       color={
                         selectedLength === length.id
                           ? colors.primary
-                          : !canAccessLength(userPlan, length.id)
+                          : !canAccessLengthWithAd(length.id)
                           ? colors.text.tertiary
                           : colors.text.secondary
                       }
@@ -2077,7 +1929,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         styles.lengthCount,
                         selectedLength === length.id &&
                           styles.lengthCountActive,
-                        !canAccessLength(userPlan, length.id) &&
+                        !canAccessLengthWithAd(length.id) &&
                           styles.lockedItemText,
                       ]}
                     >
@@ -2087,48 +1939,29 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       style={[
                         styles.lengthDesc,
                         selectedLength === length.id && styles.lengthDescActive,
-                        !canAccessLength(userPlan, length.id) &&
+                        !canAccessLengthWithAd(length.id) &&
                           styles.lockedItemText,
                       ]}
                     >
                       {length.desc}
                     </Text>
+                    {adWatchedLengths.has(length.id) && !canAccessLength(userPlan, length.id) && (
+                      <View style={styles.adUnlockedBadge}>
+                        <SafeIcon 
+                          name="play-circle" 
+                          size={12} 
+                          color={colors.primary}
+                          style={styles.adUnlockedIcon}
+                        />
+                        <Text style={styles.adUnlockedText}>{t("aiWrite.premium.oneTimeUse")}</Text>
+                      </View>
+                    )}
                   </TouchableOpacity>
                 ))}
               </View>
             </View>
           </SlideInView>
 
-          {/* 선택된 해시태그 표시 */}
-          {selectedHashtags.length > 0 && (
-            <SlideInView direction="up" delay={1100}>
-              <View style={styles.selectedHashtagsSection}>
-                <Text style={styles.selectedHashtagsTitle}>
-                  {t("aiWrite.sections.selectedHashtags")} ({selectedHashtags.length})
-                </Text>
-                <View style={styles.selectedHashtagsContainer}>
-                  {selectedHashtags.map((hashtag, index) => (
-                    <TouchableOpacity
-                      key={index}
-                      style={styles.selectedHashtagChip}
-                      onPress={() => {
-                        setSelectedHashtags((prev) =>
-                          prev.filter((h) => h !== hashtag)
-                        );
-                      }}
-                    >
-                      <Text style={styles.selectedHashtagText}>#{hashtag}</Text>
-                      <SafeIcon
-                        name="close-circle"
-                        size={16}
-                        color={colors.white}
-                      />
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            </SlideInView>
-          )}
 
           {/* 생성 버튼 */}
           <FadeInView delay={1200}>
@@ -2174,7 +2007,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       {isGenerating
                         ? t("aiWrite.buttons.generating")
                         : writeMode === "photo" && isAnalyzingImage
-                        ? "사진 분석 중..."
+                        ? t("aiWrite.analysis.analyzing")
                         : t("aiWrite.buttons.generate")}
                     </Text>
                     {!isGenerating &&
@@ -2394,22 +2227,6 @@ const createStyles = (
       color: colors.text.primary,
       letterSpacing: -0.3,
     },
-    refreshButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      backgroundColor: isDark ? colors.primary + "20" : "#F3E8FF",
-      borderRadius: 16,
-      borderWidth: 1,
-      borderColor: colors.primary + "30",
-    },
-    refreshButtonText: {
-      fontSize: 12,
-      fontWeight: "600",
-      color: colors.primary,
-    },
     inputContainer: {
       backgroundColor: isDark ? "#1C1C1E" : "#FFFFFF",
       borderRadius: 20,
@@ -2475,9 +2292,6 @@ const createStyles = (
     polishOptionTextActive: {
       color: colors.primary,
       fontWeight: "700",
-    },
-    quickPromptsScroll: {
-      marginTop: 12,
     },
     photoSection: {
       paddingHorizontal: SPACING.lg,
@@ -2817,77 +2631,6 @@ const createStyles = (
       color: colors.primary,
       textDecorationLine: "underline",
     },
-    hashtagSection: {
-      marginTop: SPACING.lg,
-    },
-    hashtagTitle: {
-      fontSize: 14,
-      fontWeight: "600",
-      color: colors.text.secondary,
-      marginBottom: SPACING.sm,
-    },
-    hashtagScroll: {
-      flexDirection: "row",
-    },
-    hashtagChip: {
-      flexDirection: "row",
-      alignItems: "center",
-      backgroundColor: isDark ? "#1C1C1E" : "#FFFFFF",
-      paddingHorizontal: 14,
-      paddingVertical: 8,
-      borderRadius: 16,
-      marginRight: 8,
-      borderWidth: 1,
-      borderColor: isDark ? "#3A3A3C" : "#F3F4F6",
-      maxWidth: 200,
-      elevation: isDark ? 0 : 1,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: isDark ? 0 : 0.03,
-      shadowRadius: 2,
-    },
-    hashtagChipActive: {
-      backgroundColor: isDark ? colors.primary + "20" : "#F3E8FF",
-      borderColor: colors.primary,
-      borderWidth: 1.5,
-    },
-    hashtagText: {
-      fontSize: 13,
-      color: colors.text.secondary,
-      fontWeight: "600",
-    },
-    hashtagTextActive: {
-      color: colors.primary,
-    },
-    selectedHashtagsSection: {
-      paddingHorizontal: SPACING.lg,
-      marginBottom: SPACING.md,
-    },
-    selectedHashtagsTitle: {
-      fontSize: 13,
-      fontWeight: "600",
-      color: colors.text.secondary,
-      marginBottom: SPACING.sm,
-    },
-    selectedHashtagsContainer: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: SPACING.xs,
-    },
-    selectedHashtagChip: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-      backgroundColor: colors.primary,
-      paddingHorizontal: SPACING.sm,
-      paddingVertical: 6,
-      borderRadius: 16,
-    },
-    selectedHashtagText: {
-      fontSize: 12,
-      color: colors.white,
-      fontWeight: "500",
-    },
     tokenCostBadge: {
       flexDirection: "row",
       alignItems: "center",
@@ -2984,6 +2727,23 @@ const createStyles = (
       fontSize: 11,
       fontWeight: "600",
       color: colors.primary,
+    },
+    adUnlockedBadge: {
+      flexDirection: "row",
+      alignItems: "center",
+      backgroundColor: colors.primary + "15",
+      borderRadius: 8,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
+      marginTop: 4,
+    },
+    adUnlockedIcon: {
+      marginRight: 3,
+    },
+    adUnlockedText: {
+      fontSize: 9,
+      color: colors.primary,
+      fontWeight: "600",
     },
   });
 
