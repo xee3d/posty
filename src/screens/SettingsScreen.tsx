@@ -1033,8 +1033,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               ]}
               onPress={async () => {
                 if (onNavigate) {
-                  onNavigate("profile");
-                  // 프로필에서 돌아온 후 데이터 새로고침을 위해 타이머 설정
+                  onNavigate("achievements");
+                  // 업적 화면에서 돌아온 후 데이터 새로고침을 위해 타이머 설정
                   timer.setTimeout(async () => {
                     const profile = await achievementService.getUserProfile();
                     const achievements =

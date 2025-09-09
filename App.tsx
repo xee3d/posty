@@ -56,6 +56,7 @@ import {
 } from "./src/screens/documents";
 import TabNavigator from "./src/components/TabNavigator";
 import ProfileScreen from "./src/screens/ProfileScreen";
+import AchievementsScreen from "./src/screens/AchievementsScreen";
 import AchievementNotification from "./src/components/AchievementNotification";
 import ThemeTestScreen from "./src/screens/ThemeTestScreen";
 
@@ -611,6 +612,13 @@ const AppContent: React.FC = () => {
         return (
           <ProfileScreen
             key="profile"
+            navigation={{ goBack: () => handleTabPress("settings") }}
+          />
+        );
+      case "achievements":
+        return (
+          <AchievementsScreen
+            key="achievements"
             navigation={{ goBack: () => handleTabPress("settings") }}
           />
         );
