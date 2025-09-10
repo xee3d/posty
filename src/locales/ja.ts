@@ -588,6 +588,25 @@ export default {
     },
     coaching: {
       title: "🤖 Postyのスタイルコーチング"
+    },
+    timeSlots: {
+      morning: "朝 (6-9時)",
+      afternoon: "午後 (15-18時)", 
+      evening: "夕方 (18-21時)",
+      night: "夜 (21-24時)",
+      morningLabel: "朝",
+      afternoonLabel: "午後",
+      eveningLabel: "夕方", 
+      nightLabel: "夜"
+    },
+    weekdays: {
+      monday: "月",
+      tuesday: "火", 
+      wednesday: "水",
+      thursday: "木",
+      friday: "金",
+      saturday: "土",
+      sunday: "日"
     }
   },
 
