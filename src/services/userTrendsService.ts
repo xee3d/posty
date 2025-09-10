@@ -214,7 +214,8 @@ class UserTrendsService {
 
     posts.forEach((post) => {
       const postDate = new Date(post.createdAt);
-      post.hashtags.forEach((tag: string) => {
+      if (post.hashtags && Array.isArray(post.hashtags)) {
+        post.hashtags.forEach((tag: string) => {
         if (!hashtags[tag]) {
           hashtags[tag] = { count: 0, lastUsed: postDate };
         }
@@ -222,7 +223,8 @@ class UserTrendsService {
         if (postDate > hashtags[tag].lastUsed) {
           hashtags[tag].lastUsed = postDate;
         }
-      });
+        });
+      }
     });
 
     return hashtags;
@@ -233,7 +235,7 @@ class UserTrendsService {
     const relatedTags: Record<string, number> = {};
 
     posts.forEach((post) => {
-      if (post.hashtags.includes(targetHashtag)) {
+      if (post.hashtags && Array.isArray(post.hashtags) && post.hashtags.includes(targetHashtag)) {
         post.hashtags.forEach((tag: string) => {
           if (tag !== targetHashtag) {
             relatedTags[tag] = (relatedTags[tag] || 0) + 1;
@@ -294,10 +296,12 @@ class UserTrendsService {
       }
       categories[category].count++;
 
-      post.hashtags.forEach((tag: string) => {
-        categories[category].hashtagCount[tag] =
-          (categories[category].hashtagCount[tag] || 0) + 1;
-      });
+      if (post.hashtags && Array.isArray(post.hashtags)) {
+        post.hashtags.forEach((tag: string) => {
+          categories[category].hashtagCount[tag] =
+            (categories[category].hashtagCount[tag] || 0) + 1;
+        });
+      }
     });
 
     // 해시태그 정렬

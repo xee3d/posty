@@ -66,4 +66,27 @@ export const changeLanguage = async (language: string) => {
   }
 };
 
+// 리소스 새로고침 함수
+export const refreshResources = () => {
+  try {
+    const newResources = {
+      en: { translation: en },
+      ko: { translation: ko },
+      ja: { translation: ja },
+      'zh-CN': { translation: zhCN },
+    };
+    
+    i18next.addResourceBundle('en', 'translation', en, true, true);
+    i18next.addResourceBundle('ko', 'translation', ko, true, true);
+    i18next.addResourceBundle('ja', 'translation', ja, true, true);
+    i18next.addResourceBundle('zh-CN', 'translation', zhCN, true, true);
+    
+    console.log('🌍 [i18n] Resources refreshed successfully');
+    return true;
+  } catch (error) {
+    console.error('❌ [i18n] Failed to refresh resources:', error);
+    return false;
+  }
+};
+
 export default i18next;

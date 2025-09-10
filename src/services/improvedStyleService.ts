@@ -280,10 +280,10 @@ class ImprovedStyleService {
         }
 
         // 해시태그 패턴
-        if (template.id === "trendsetter" && post.hashtags.length >= 5) {
+        if (template.id === "trendsetter" && (post.hashtags?.length || 0) >= 5) {
           score += 5;
         }
-        if (template.id === "minimalist" && post.hashtags.length <= 3) {
+        if (template.id === "minimalist" && (post.hashtags?.length || 0) <= 3) {
           score += 5;
         }
       });
@@ -434,7 +434,7 @@ class ImprovedStyleService {
       if (score >= 70) {
         const template = STYLE_TEMPLATES.find((t) => t.id === style);
         if (template) {
-          strengths.push(`${template.name} 스타일을 잘 활용하고 있어요`);
+          strengths.push(`${template.id} 스타일을 잘 활용하고 있어요`);
         }
       }
     });
@@ -458,7 +458,7 @@ class ImprovedStyleService {
 
     // 해시태그 활용
     const avgHashtags =
-      posts.reduce((sum, p) => sum + p.hashtags.length, 0) / posts.length;
+      posts.reduce((sum, p) => sum + (p.hashtags?.length || 0), 0) / posts.length;
     if (avgHashtags >= 3 && avgHashtags <= 7) {
       strengths.push("해시태그를 적절히 활용하고 있어요");
     } else if (avgHashtags < 3) {
@@ -534,7 +534,7 @@ class ImprovedStyleService {
         return (
           post.content.length <= 50 &&
           (post.content.match(/[\u{1F300}-\u{1F9FF}]/gu) || []).length <= 2 &&
-          post.hashtags.length <= 3
+          (post.hashtags?.length || 0) <= 3
         );
 
       case "story-month":
@@ -542,7 +542,9 @@ class ImprovedStyleService {
 
       case "trend-hunter":
         // 새로운 해시태그 체크 로직
-        return post.hashtags.some((tag: string) => !this.isCommonHashtag(tag));
+        return post.hashtags && Array.isArray(post.hashtags) 
+          ? post.hashtags.some((tag: string) => !this.isCommonHashtag(tag))
+          : false;
 
       default:
         return false;

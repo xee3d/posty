@@ -76,8 +76,8 @@ export default {
       genz: "트렌드",
       millennial: "라이프스타일",
       minimalist: "미니멀",
-      storytelling: "스토리",
-      motivational: "동기부여"
+      storytelling: "문어체",
+      motivational: "명언"
     },
     tones: {
       casual: "캐주얼",
@@ -87,8 +87,8 @@ export default {
       genz: "GenZ",
       millennial: "밀레니얼",
       minimalist: "미니멀",
-      storytelling: "스토리텔링",
-      motivational: "동기부여",
+      storytelling: "문어체",
+      motivational: "명언",
     },
     lengths: {
       short: "짧게",
@@ -159,11 +159,9 @@ export default {
       simple: "쉽게 풀어쓰기", 
       formal: "격식체 변환",
       emotion: "감정 강화",
-      storytelling: "스토리텔링",
+      storytelling: "문어체",
       engaging: "매력적으로",
       hashtag: "해시태그 추출",
-      emoji: "이모지 추가",
-      question: "질문형 변환",
     },
     photo: {
       select: {
@@ -206,6 +204,83 @@ export default {
       polish: "문장 정리",
       newPost: "새글 생성",
     },
+  },
+
+  // AI 프롬프트 
+  aiPrompts: {
+    length: {
+      short: "[길이: 50자 이내로 짧고 간결하게 작성해주세요]",
+      medium: "[길이: 100-150자 사이로 적당한 길이로 작성해주세요]",
+      long: "[길이: 200-300자로 자세하고 풍부하게 작성해주세요]"
+    },
+    enhanced: {
+      personaIntro: "당신의 페르소나:",
+      toneLabel: "글쓰기 톤:",
+      topic: "주제:",
+      imageContext: "이미지 컨텍스트:",
+      guidelines: "작성 지침:",
+      guideline1: "위 페르소나와 톤을 일관되게 유지하세요",
+      guideline2: "실제 {{ageGroup}} {{gender}}이(가) 쓴 것처럼 자연스럽게",
+      guideline5: "관심사 반영:",
+      specialInstructions: "특별 지침:",
+      ageGroups: {
+        "10s": "10대",
+        "20s": "20대",
+        "30s": "30대", 
+        "40s": "40대",
+        "50s": "50대",
+        "60s+": "60대 이상"
+      },
+      genders: {
+        male: "남성",
+        female: "여성",
+        other: "기타"
+      },
+      familyRoles: {
+        mother: "엄마",
+        father: "아빠",
+        grandparent: "조부모"
+      },
+      parentLove: "아이를 사랑하는 {{parentType}}의 마음으로 글을 씁니다.",
+      grandparentLove: "손주를 사랑하는 조부모의 따뜻한 시선으로 글을 씁니다.",
+      occupation: "직업은 {{occupation}}입니다.",
+      interests: "주요 관심사는 {{interests}} 등입니다."
+    },
+    platforms: {
+      instagram: {
+        name: "Instagram",
+        characteristics: [
+          "시각적이고 감성적인 톤",
+          "이모지 사용 권장", 
+          "스토리텔링 중심",
+          "해시태그 적극 활용",
+          "짧은 문단으로 구성"
+        ],
+        prompt: "인스타그램에 적합한 감성적이고 시각적인 포스팅을 작성해주세요. 이모지를 적절히 사용하고, 스토리텔링을 통해 공감대를 형성해주세요."
+      },
+      facebook: {
+        name: "Facebook",
+        characteristics: [
+          "정보성과 친근함의 균형",
+          "긴 글도 가능",
+          "대화체 톤",
+          "커뮤니티 중심", 
+          "링크 공유 가능"
+        ],
+        prompt: "페이스북에 적합한 친근하고 대화체의 포스팅을 작성해주세요. 정보를 전달하면서도 친구와 대화하는 듯한 톤으로 작성해주세요."
+      },
+      twitter: {
+        name: "X (Twitter)",
+        characteristics: [
+          "간결하고 임팩트 있는 표현",
+          "트렌드와 시의성",
+          "위트와 유머",
+          "적은 해시태그",
+          "리트윗 유도"
+        ],
+        prompt: "X(트위터)에 적합한 간결하고 임팩트 있는 포스팅을 작성해주세요. 280자 이내로 핵심만 전달하되, 위트있게 표현해주세요."
+      }
+    }
   },
 
   // 토큰 시스템
@@ -553,13 +628,6 @@ export default {
 
   // My Style Screen
   myStyle: {
-    profileCompletion: "프로필 완성도 {{completeness}}%",
-    interests: "관심사 (복수 선택 가능)",
-    formality: "격식",
-    emotiveness: "감정 표현",
-    humor: "유머",
-    saveProfile: "프로필 저장하기",
-    
     access: {
       freeMessage: "STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.",
     },
@@ -582,11 +650,42 @@ export default {
     analytics: {
       growth: "📈 성장 분석",
       totalPosts: "총 게시물",
-      toneAnalysis: "🎨 톤 사용 분석"
+      toneAnalysis: "🎨 톤 사용 분석",
+      categoryDistribution: "카테고리별 분포"
     },
     templates: {
       recommended: "추천",
       usageCount: "사용 {{count}}회"
+    },
+    metrics: {
+      title: "📊 나의 스타일 지표",
+      consistency: "일관성",
+      diversity: "다양성",
+      preferredTime: "선호 시간"
+    },
+    challenges: {
+      title: "스타일 챌린지",
+      subtitle: "챌린지를 통해 새로운 스타일을 마스터해보세요",
+      inProgress: "진행 중",
+      emojiPrefix: "🏆",
+      minimalWeek: {
+        name: "미니멀 위크",
+        description: "일주일간 50자 이내로만 작성하기",
+        rules: ["모든 게시물 50자 이내", "이모지 최대 2개", "해시태그 3개 이하"]
+      },
+      storyMonth: {
+        name: "스토리 먼스", 
+        description: "한 달간 매일 하나의 이야기 쓰기",
+        rules: ["매일 200자 이상 작성", "기승전결 구조", "감정 표현 필수"]
+      },
+      trendHunter: {
+        name: "트렌드 헌터",
+        description: "최신 트렌드 10개 발굴하기", 
+        rules: ["새로운 해시태그 발굴", "트렌드 분석 포함", "다른 사용자와 공유"]
+      }
+    },
+    coaching: {
+      title: "🤖 포스티의 스타일 코칭"
     }
   },
 
@@ -626,8 +725,8 @@ export default {
       genz: "GenZ",
       millennial: "밀레니얼",
       minimalist: "미니멀",
-      storytelling: "스토리텔링",
-      motivational: "동기부여"
+      storytelling: "문어체",
+      motivational: "명언"
     },
     categories: {
       daily: "일상",
@@ -642,6 +741,10 @@ export default {
     time: {
       today: "오늘",
       yesterday: "어제",
+      justNow: "방금 전",
+      minutesAgo: "{{minutes}}분 전",
+      hoursAgo: "{{hours}}시간 전",
+      daysAgo: "{{days}}일 전",
       weeksAgo: "{{weeks}}주 전",
       monthsAgo: "{{months}}개월 전"
     },
@@ -870,7 +973,13 @@ export default {
     loading: "로딩 중...",
     later: "나중에",
     confirm: "확인",
-    purchase: "구매하기"
+    purchase: "구매하기",
+    categories: {
+      all: "전체",
+      casual: "캐주얼",
+      serious: "진지함",
+      special: "특별"
+    }
   },
 
   // Recommendations
@@ -1419,11 +1528,9 @@ export default {
     title: "내 스타일",
     subtitle: "나만의 콘텐츠 브랜드를 만들어가세요",
     loading: "스타일 분석 중...",
-    refresh: "새로고침",
     empty: {
       title: "아직 작성한 콘텐츠가 없어요",
-      subtitle: "포스티와 함께 첫 콘텐츠를 만들어보세요!",
-      startWriting: "첫 글 쓰기"
+      subtitle: "포스티와 함께 첫 콘텐츠를 만들어보세요!"
     },
     tabs: {
       templates: "템플릿"
@@ -1431,8 +1538,18 @@ export default {
     templates: {
       title: "스타일 템플릿",
       subtitle: "다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요",
-      starterLimit: "STARTER 플랜: {{limit}}개 템플릿만 사용 가능"
+      starterLimit: "STARTER 플랜: {{limit}}개 템플릿만 사용 가능",
+      emojiPrefix: "📝",
+      bulletPoint: "•",
+      averageLength: "평균 길이",
+      keywords: "키워드",
+      emojis: "이모지"
     },
+    challenge: {
+      dayUnit: "일"
+    },
+    defaultTime: "19시",
+    hashtagPrefix: "#",
     insights: {
       title: "스타일 인사이트",
       styleTitle: "{{name}} 스타일",
@@ -1667,7 +1784,11 @@ export default {
       rarity: "희귀도",
       progress: "진행도",
       unlockedAt: "획득일",
-      selectBadge: "대표 업적으로 설정"
+      selectBadge: "대표 업적으로 설정",
+      success: "성공",
+      setBadgeSuccess: "대표 업적이 설정되었습니다!",
+      error: "오류",
+      setBadgeError: "대표 업적 설정에 실패했습니다."
     },
     status: {
       completed: "획득 완료",
@@ -1809,6 +1930,59 @@ export default {
         name: "Posty 베테랑",
         description: "Posty를 1년 이상 사용했어요"
       }
+    }
+  },
+
+  // Style Selector
+  styleSelector: {
+    title: "어떤 스타일로 쓸까요?"
+  },
+
+  // Unified Styles
+  styles: {
+    minimalist: {
+      name: "미니멀리스트",
+      description: "간결하고 깔끔한 스타일"
+    },
+    storytelling: {
+      name: "문어체", 
+      description: "격식있는 서면 표현"
+    },
+    humorous: {
+      name: "유머러스",
+      description: "재치있고 유쾌한 표현"
+    },
+    trendsetter: {
+      name: "트렌드세터",
+      description: "최신 트렌드를 반영하는 스타일"
+    },
+    philosopher: {
+      name: "철학가",
+      description: "깊이 있는 생각을 담은 스타일"
+    },
+    casual: {
+      name: "캐주얼",
+      description: "친근하고 편안한 일상 대화체"
+    },
+    professional: {
+      name: "전문적",
+      description: "격식있고 신뢰감 있는 비즈니스 톤"
+    },
+    emotional: {
+      name: "감성적",
+      description: "감정을 담은 따뜻한 표현"
+    },
+    genz: {
+      name: "Gen Z",
+      description: "MZ세대 특유의 트렌디한 표현"
+    },
+    millennial: {
+      name: "밀레니얼",
+      description: "밀레니얼 세대의 감성적 표현"
+    },
+    motivational: {
+      name: "명언",
+      description: "시처럼 아름답고 깊이 있는 철학적 통찰"
     }
   }
 };

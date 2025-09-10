@@ -177,7 +177,7 @@ class PersonalizedHashtagService {
         keywords.forEach((keyword) => hashtags.add(keyword));
 
         // 기존 해시태그 추가
-        if (trend.hashtags) {
+        if (trend.hashtags && Array.isArray(trend.hashtags)) {
           trend.hashtags.forEach((tag) =>
             hashtags.add(tag.replace("#", "").trim())
           );

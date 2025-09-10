@@ -284,3 +284,9 @@ export const POSTY_MESSAGES = {
     "수정하실 부분이 있으면 알려주세요! ✏️",
   ],
 };
+
+// constants 객체로 통합 접근 지원
+export const constants = {
+  POSTY_MESSAGES,
+  MOLLY_MESSAGES: POSTY_MESSAGES, // 기존 MOLLY_MESSAGES 호환성 유지
+};

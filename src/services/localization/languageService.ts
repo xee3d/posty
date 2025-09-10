@@ -15,6 +15,7 @@ export interface LanguageConfig {
   name: string;
   nativeName: string;
   flag: string;
+  flagCode: string;
   isRTL: boolean;
 }
 
@@ -25,6 +26,7 @@ export const SUPPORTED_LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     name: 'Korean',
     nativeName: '한국어',
     flag: '🇰🇷',
+    flagCode: 'KR',
     isRTL: false,
   },
   'en': {
@@ -32,6 +34,7 @@ export const SUPPORTED_LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     name: 'English',
     nativeName: 'English',
     flag: '🇺🇸',
+    flagCode: 'EN',
     isRTL: false,
   },
   'ja': {
@@ -39,6 +42,7 @@ export const SUPPORTED_LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     name: 'Japanese',
     nativeName: '日本語',
     flag: '🇯🇵',
+    flagCode: 'JP',
     isRTL: false,
   },
   'zh-CN': {
@@ -46,6 +50,7 @@ export const SUPPORTED_LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
     name: 'Chinese (Simplified)',
     nativeName: '中文(简体)',
     flag: '🇨🇳',
+    flagCode: 'CN',
     isRTL: false,
   },
 };

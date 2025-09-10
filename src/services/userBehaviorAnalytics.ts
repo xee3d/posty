@@ -173,10 +173,12 @@ class UserBehaviorAnalytics {
           (platformFrequency[post.platform] || 0) + 1;
 
         // 해시태그 기반 주제 분석
-        post.hashtags.forEach((hashtag) => {
-          const topic = this.categorizeHashtag(hashtag);
-          topicFrequency[topic] = (topicFrequency[topic] || 0) + 1;
-        });
+        if (post.hashtags && Array.isArray(post.hashtags)) {
+          post.hashtags.forEach((hashtag) => {
+            const topic = this.categorizeHashtag(hashtag);
+            topicFrequency[topic] = (topicFrequency[topic] || 0) + 1;
+          });
+        }
       });
 
       // 선호도 업데이트

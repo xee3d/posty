@@ -17,11 +17,13 @@ const CARD_HEIGHT = 220; // 카드 높이를 250 -> 220으로 조정하여 더 �
 interface AchievementCardProps {
   achievement: Achievement;
   onPress: () => void;
+  colors?: any;
 }
 
 const AchievementCard: React.FC<AchievementCardProps> = ({
   achievement,
   onPress,
+  colors,
 }) => {
   const { t } = useTranslation();
   const progress = achievement.requirement.current || 0;
@@ -53,8 +55,8 @@ const AchievementCard: React.FC<AchievementCardProps> = ({
       activeOpacity={0.8}
     >
       {achievement.isNew && (
-        <View style={styles.newBadge}>
-          <Text style={styles.newBadgeText}>NEW</Text>
+        <View style={[styles.newBadge, { backgroundColor: colors?.warning || "#FF3B30" }]}>
+          <Text style={[styles.newBadgeText, { color: colors?.white || "#FFFFFF" }]}>NEW</Text>
         </View>
       )}
 
@@ -164,14 +166,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -5,
     right: -5,
-    backgroundColor: "#FF3B30",
     borderRadius: 12,
     paddingHorizontal: 8,
     paddingVertical: 4,
     zIndex: 1,
   },
   newBadgeText: {
-    color: "#FFFFFF",
     fontSize: 10,
     fontWeight: "bold",
   },

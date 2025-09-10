@@ -12,6 +12,8 @@ import {
   THEME_COLORS,
   type ThemeMode,
 } from "../contexts/ThemeContext";
+import { SafeIcon } from "../utils/SafeIcon";
+import Icon from "react-native-vector-icons/Ionicons";
 
 const { width } = Dimensions.get("window");
 
@@ -35,13 +37,13 @@ export default function ThemeDialog({ visible, onClose }: ThemeDialogProps) {
   const getModeIcon = (mode: ThemeMode) => {
     switch (mode) {
       case "light":
-        return "☀️";
+        return "sunny";
       case "dark":
-        return "🌙";
+        return "moon";
       case "system":
-        return "📱";
+        return "phone-portrait";
       default:
-        return "📱";
+        return "phone-portrait";
     }
   };
 
@@ -75,9 +77,11 @@ export default function ThemeDialog({ visible, onClose }: ThemeDialogProps) {
               테마 설정
             </Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Text style={[styles.closeText, { color: colors.textSecondary }]}>
-                ✕
-              </Text>
+              <SafeIcon
+                name="close"
+                size={20}
+                color={colors.textSecondary}
+              />
             </TouchableOpacity>
           </View>
 
@@ -101,17 +105,14 @@ export default function ThemeDialog({ visible, onClose }: ThemeDialogProps) {
                 ]}
                 onPress={() => handleModeSelect(mode)}
               >
-                <Text
-                  style={[
-                    styles.modeIcon,
-                    {
-                      color:
-                        themeMode === mode ? themeColor : colors.textSecondary,
-                    },
-                  ]}
-                >
-                  {getModeIcon(mode)}
-                </Text>
+                <Icon
+                  name={getModeIcon(mode)}
+                  size={20}
+                  color={
+                    themeMode === mode ? themeColor : colors.textSecondary
+                  }
+                  style={styles.modeIcon}
+                />
                 <Text
                   style={[styles.optionText, { color: colors.textPrimary }]}
                 >
@@ -138,7 +139,11 @@ export default function ThemeDialog({ visible, onClose }: ThemeDialogProps) {
                   onPress={() => handleColorSelect(color)}
                 >
                   {themeColor === color && (
-                    <Text style={styles.checkMark}>✓</Text>
+                    <SafeIcon
+                      name="checkmark"
+                      size={18}
+                      color="#FFFFFF"
+                    />
                   )}
                 </TouchableOpacity>
               ))}
@@ -202,10 +207,6 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 4,
   },
-  closeText: {
-    fontSize: 20,
-    fontWeight: "600",
-  },
   section: {
     marginBottom: 24,
   },
@@ -223,7 +224,6 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   modeIcon: {
-    fontSize: 20,
     marginRight: 12,
   },
   optionText: {
@@ -250,11 +250,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
-  },
-  checkMark: {
-    color: "#FFFFFF",
-    fontSize: 18,
-    fontWeight: "bold",
   },
   buttons: {
     flexDirection: "row",

@@ -351,8 +351,8 @@ export default {
       genz: "Z世代",
       millennial: "千禧一代",
       minimalist: "极简",
-      storytelling: "叙事",
-      motivational: "励志"
+      storytelling: "文言体",
+      motivational: "名言"
     },
     
     lengths: {
@@ -423,8 +423,8 @@ export default {
       genz: "潮流",
       millennial: "生活方式",
       minimalist: "极简",
-      storytelling: "故事",
-      motivational: "励志"
+      formal: "正式",
+      motivational: "名言"
     },
     
     keywords: {
@@ -474,14 +474,6 @@ export default {
       hashtag: {
         name: "标签",
         description: "添加相关标签"
-      },
-      emoji: {
-        name: "表情",
-        description: "添加合适的表情"
-      },
-      question: {
-        name: "问题",
-        description: "问题形式"
       }
     },
     
@@ -559,17 +551,16 @@ export default {
     }
   },
 
+  // AI 提示
+  aiPrompts: {
+    length: {
+      short: "[长度：请简洁地在50字内写作]",
+      medium: "[长度：请在100-150字之间适中地写作]",
+      long: "[长度：请详细丰富地在200-300字写作]"
+    }
+  },
+
   myStyle: {
-    title: "我的风格",
-    subtitle: "分析您的写作风格",
-    description: "分析过往投稿，学习您独特的文体",
-    profileCompletion: "个人资料完成度 {{completeness}}%",
-    interests: "兴趣（多选）",
-    formality: "正式程度",
-    emotiveness: "情感表达",
-    humor: "幽默感",
-    saveProfile: "保存个人资料",
-    
     access: {
       freeMessage: "我的风格分析功能从STARTER计划开始提供。",
       upgradeButton: "升级计划"
@@ -605,7 +596,8 @@ export default {
     analytics: {
       growth: "📈 成长分析",
       totalPosts: "总帖子数",
-      toneAnalysis: "🎨 语调使用分析"
+      toneAnalysis: "🎨 语调使用分析",
+      categoryDistribution: "分类分布"
     },
     
     templates: {
@@ -616,6 +608,36 @@ export default {
       duplicate: "复制",
       recommended: "推荐",
       usageCount: "使用{{count}}次"
+    },
+    metrics: {
+      title: "📊 我的风格指标",
+      consistency: "一致性",
+      diversity: "多样性",
+      preferredTime: "偏好时间"
+    },
+    challenges: {
+      title: "🏆 风格挑战",
+      subtitle: "通过挑战掌握新风格",
+      inProgress: "进行中",
+      emojiPrefix: "🏆",
+      minimalWeek: {
+        name: "极简周",
+        description: "一周内只写50字以内的内容",
+        rules: ["所有帖子50字以内", "最多2个表情符号", "最多3个标签"]
+      },
+      storyMonth: {
+        name: "故事月",
+        description: "一个月内每天写一个故事",
+        rules: ["每天写200字以上", "起承转合结构", "必须表达情感"]
+      },
+      trendHunter: {
+        name: "潮流猎手",
+        description: "发现10个最新潮流",
+        rules: ["发现新标签", "包含潮流分析", "与其他用户分享"]
+      }
+    },
+    coaching: {
+      title: "🤖 Posty的风格指导"
     }
   },
 
@@ -624,11 +646,9 @@ export default {
     title: "我的风格",
     subtitle: "建立你自己的内容品牌",
     loading: "分析风格中...",
-    refresh: "刷新",
     empty: {
       title: "还没有创建内容",
-      subtitle: "用Posty创建你的第一个内容！",
-      startWriting: "开始写作"
+      subtitle: "用Posty创建你的第一个内容！"
     },
     tabs: {
       templates: "模板"
@@ -638,6 +658,105 @@ export default {
       subtitle: "尝试各种风格，找到你自己的风格",
       starterLimit: "STARTER计划：仅可使用{{limit}}个模板"
     },
+    insights: {
+      title: "风格洞察",
+      styleTitle: "{{name}}风格",
+      styleDescription: "您拥有{{description}}。",
+      styleAction: "用这种风格继续成长",
+      consistentTitle: "一致的风格",
+      consistentDescription: "保持着{{percentage}}%的高度一致性！",
+      improvementTitle: "风格一致性",
+      improvementDescription: "尝试更一致地保持文章长度和语调。",
+      improvementAction: "查看风格指南",
+      diverseTitle: "多样化内容",
+      diverseDescription: "正在尝试各种主题和风格！",
+      challengeTitle: "新挑战",
+      challengeDescription: "来挑战{{name}}吧！",
+      challengeAction: "开始挑战"
+    },
+    analysis: {
+      title: "写作分析",
+      totalPosts: "总共{{count}}篇文章",
+      averageLength: "平均字数",
+      mostUsedTone: "主要语调",
+      consistency: "一致性",
+      improvement: "改进建议"
+    },
+    timeSlots: {
+      title: "活动时间段",
+      morning: "早晨",
+      afternoon: "下午",
+      evening: "傍晚",
+      night: "夜晚",
+      morningLabel: "6-12点",
+      afternoonLabel: "12-18点",
+      eveningLabel: "18-22点",
+      nightLabel: "22-6点"
+    },
+    templates: {
+      title: "我的专属模板",
+      subtitle: "将常用的模式保存为模板",
+      bestStyle: {
+        name: "我的最佳风格",
+        description: "反应最好的文章结构",
+        opening: "充满情感的问候",
+        body: "具体经验分享",
+        closing: "引起共鸣的问题"
+      },
+      toneMaster: {
+        name: "{{tone}}大师",
+        description: "最常使用的语调",
+        tips: "发挥这种语调的特点来创作"
+      },
+      growthStory: {
+        name: "成长故事",
+        description: "包含挑战与成就的文章",
+        hook: "有趣的开头",
+        challenge: "遇到的困难",
+        solution: "解决过程",
+        lesson: "学到的经验"
+      },
+      saveTemplate: "保存模板",
+      useTemplate: "使用模板"
+    },
+    premium: {
+      title: "高级功能",
+      subtitle: "使用更详细的分析和模板",
+      upgradeButton: "升级"
+    },
+    alerts: {
+      challengeStart: "挑战开始！",
+      challengeStarted: "{{name}}挑战已开始！",
+      templateSaved: "模板已保存",
+      templateUsed: "模板已应用",
+      premiumTemplate: "高级模板",
+      premiumTemplateMessage: "PRO套餐可使用所有模板。",
+      cancel: "取消",
+      upgrade: "升级",
+      confirm: "确认"
+    },
+    metrics: {
+      title: "统计",
+      mostActiveDay: "最活跃的星期",
+      averageWordsPerPost: "每篇文章平均字数",
+      totalWritingTime: "总写作时间",
+      improvementTip: "改进提示"
+    },
+    weekdays: {
+      monday: "星期一",
+      tuesday: "星期二",
+      wednesday: "星期三",
+      thursday: "星期四",
+      friday: "星期五",
+      saturday: "星期六",
+      sunday: "星期日"
+    },
+    actions: {
+      analyze: "分析",
+      viewDetails: "查看详情",
+      shareInsights: "分享洞察",
+      exportData: "导出数据"
+    }
   },
   
   trends: {
@@ -1028,7 +1147,13 @@ export default {
     skip: "跳过",
     loading: "加载中...",
     later: "稍后",
-    confirm: "确认"
+    confirm: "确认",
+    categories: {
+      all: "全部",
+      casual: "随意",
+      serious: "严肃",
+      special: "特别"
+    }
   },
 
   // Alerts
@@ -1433,7 +1558,11 @@ export default {
       rarity: "稀有度",
       progress: "进度",
       unlockedAt: "获得日期",
-      selectBadge: "设为代表成就"
+      selectBadge: "设为代表成就",
+      success: "成功",
+      setBadgeSuccess: "代表成就已设置！",
+      error: "错误",
+      setBadgeError: "设置代表成就失败。"
     },
     status: {
       completed: "已获得",
@@ -1492,8 +1621,8 @@ export default {
         description: "完成了极简周挑战"
       },
       story_teller: {
-        name: "故事大师",
-        description: "完成了故事月挑战"
+        name: "正式大师",
+        description: "完成了正式风格挑战"
       },
       trend_hunter: {
         name: "趋势猎手",
@@ -1575,6 +1704,59 @@ export default {
         name: "Posty老手",
         description: "使用Posty超过一年"
       }
+    }
+  },
+
+  // Style Selector
+  styleSelector: {
+    title: "用什么风格写作？"
+  },
+
+  // Unified Styles
+  styles: {
+    minimalist: {
+      name: "极简主义",
+      description: "简洁清晰的风格"
+    },
+    storytelling: {
+      name: "书面语", 
+      description: "优雅的书面表达"
+    },
+    humorous: {
+      name: "幽默",
+      description: "机智愉快的表达"
+    },
+    trendsetter: {
+      name: "潮流引领者",
+      description: "反映最新潮流的风格"
+    },
+    philosopher: {
+      name: "哲学家",
+      description: "充满深度思考的风格"
+    },
+    casual: {
+      name: "休闲",
+      description: "亲切舒适的日常对話語調"
+    },
+    professional: {
+      name: "专业",
+      description: "正式可靠的商务語調"
+    },
+    emotional: {
+      name: "情感",
+      description: "充满情感的温暖表达"
+    },
+    genz: {
+      name: "Gen Z",
+      description: "Gen Z特有的潮流表达"
+    },
+    millennial: {
+      name: "千禧一代",
+      description: "千禧一代的情感表达"
+    },
+    motivational: {
+      name: "名言",
+      description: "像詩一样美丽深刻的哲学洞察"
     }
   }
 };

@@ -213,7 +213,7 @@ const userSlice = createSlice({
               serverVerified: action.payload.isServerVerified,
             }
           );
-          return; // 업그레이드 차단
+          // return; // 개발 환경에서 업그레이드 허용
         }
       }
 

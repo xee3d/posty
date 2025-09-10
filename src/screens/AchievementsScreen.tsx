@@ -16,8 +16,8 @@ import Icon from "react-native-vector-icons/Ionicons";
 import {
   Achievement,
   ACHIEVEMENT_CATEGORIES,
-  ACHIEVEMENTS,
 } from "../types/achievement";
+import achievementService from "../services/achievementService";
 import AchievementCard from "../components/AchievementCard";
 import ProgressBar from "../components/ProgressBar";
 import { useTranslation } from "react-i18next";
@@ -42,7 +42,7 @@ interface AchievementsScreenProps {
 const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) => {
   const { t } = useTranslation();
   const { colors, isDark } = useAppTheme();
-  const [achievements, setAchievements] = useState<Achievement[]>(ACHIEVEMENTS);
+  const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [refreshing, setRefreshing] = useState(false);
   const [selectedAchievement, setSelectedAchievement] =
     useState<Achievement | null>(null);
@@ -52,8 +52,21 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) =
   >({});
 
   useEffect(() => {
+    loadAchievements();
+  }, []);
+
+  useEffect(() => {
     calculateCategorySummaries();
   }, [achievements]);
+
+  const loadAchievements = async () => {
+    try {
+      const data = await achievementService.getAchievements();
+      setAchievements(data);
+    } catch (error) {
+      console.error("Failed to load achievements:", error);
+    }
+  };
 
   const calculateCategorySummaries = () => {
     const summaries: Record<string, CategorySummary> = {};
@@ -89,15 +102,43 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) =
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    // 여기서 실제 데이터 새로고침 로직 구현
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
+    try {
+      await loadAchievements();
+    } catch (error) {
+      console.error("Failed to refresh achievements:", error);
+    }
+    setRefreshing(false);
   };
 
   const handleAchievementPress = (achievement: Achievement) => {
     setSelectedAchievement(achievement);
     setShowDetailModal(true);
+  };
+
+  const handleSetRepresentativeAchievement = async () => {
+    if (!selectedAchievement || !selectedAchievement.isUnlocked) {
+      return;
+    }
+
+    try {
+      await achievementService.setSelectedBadge(selectedAchievement.id);
+      await achievementService.setSelectedTitle(t(`achievements.items.${selectedAchievement.id}.name`));
+      
+      Alert.alert(
+        t('achievements.modal.success'),
+        t('achievements.modal.setBadgeSuccess'),
+        [{ text: t('common.ok') }]
+      );
+      
+      setShowDetailModal(false);
+    } catch (error) {
+      console.error('Failed to set representative achievement:', error);
+      Alert.alert(
+        t('achievements.modal.error'),
+        t('achievements.modal.setBadgeError'),
+        [{ text: t('common.ok') }]
+      );
+    }
   };
 
   const getFilteredAchievements = () => {
@@ -139,8 +180,20 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) =
               />
             </View>
 
-            <Text style={styles.modalTitle}>{t(`achievements.items.${selectedAchievement.id}.name`)}</Text>
-            <Text style={styles.modalDescription}>
+            <Text 
+              style={styles.modalTitle}
+              adjustsFontSizeToFit={true}
+              numberOfLines={2}
+              minimumFontScale={0.8}
+            >
+              {t(`achievements.items.${selectedAchievement.id}.name`)}
+            </Text>
+            <Text 
+              style={styles.modalDescription}
+              adjustsFontSizeToFit={true}
+              numberOfLines={4}
+              minimumFontScale={0.75}
+            >
               {t(`achievements.items.${selectedAchievement.id}.description`)}
             </Text>
 
@@ -166,7 +219,12 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) =
 
               <View style={styles.modalInfoRow}>
                 <Text style={styles.modalInfoLabel}>{t('achievements.modal.progress')}</Text>
-                <Text style={styles.modalInfoValue}>
+                <Text 
+                  style={styles.modalInfoValue}
+                  adjustsFontSizeToFit={true}
+                  numberOfLines={1}
+                  minimumFontScale={0.8}
+                >
                   {selectedAchievement.requirement.current || 0} /{" "}
                   {selectedAchievement.requirement.target}
                 </Text>
@@ -186,7 +244,10 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) =
             </View>
 
             {selectedAchievement.isUnlocked && (
-              <TouchableOpacity style={styles.selectBadgeButton}>
+              <TouchableOpacity 
+                style={styles.selectBadgeButton}
+                onPress={handleSetRepresentativeAchievement}
+              >
                 <Text style={styles.selectBadgeButtonText}>
                   {t('achievements.modal.selectBadge')}
                 </Text>
@@ -252,7 +313,12 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) =
                 ]}
               />
             </View>
-            <Text style={styles.progressSubtext}>
+            <Text 
+              style={styles.progressSubtext}
+              adjustsFontSizeToFit={true}
+              numberOfLines={1}
+              minimumFontScale={0.85}
+            >
               전체 {totalCount}개 중 {unlockedCount}개 달성
             </Text>
           </View>
@@ -299,6 +365,9 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) =
                     styles.achievementName,
                     !achievement.isUnlocked && styles.achievementNameLocked,
                   ]}
+                  adjustsFontSizeToFit={true}
+                  numberOfLines={2}
+                  minimumFontScale={0.8}
                 >
                   {t(`achievements.items.${achievement.id}.name`)}
                 </Text>
@@ -308,6 +377,9 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) =
                     styles.achievementDesc,
                     !achievement.isUnlocked && styles.achievementDescLocked,
                   ]}
+                  adjustsFontSizeToFit={true}
+                  numberOfLines={3}
+                  minimumFontScale={0.75}
                 >
                   {t(`achievements.items.${achievement.id}.description`)}
                 </Text>
@@ -329,7 +401,12 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) =
                         ]}
                       />
                     </View>
-                    <Text style={styles.achievementProgressText}>
+                    <Text 
+                      style={styles.achievementProgressText}
+                      adjustsFontSizeToFit={true}
+                      numberOfLines={1}
+                      minimumFontScale={0.8}
+                    >
                       {achievement.requirement.current || 0}/
                       {achievement.requirement.target}
                     </Text>
@@ -429,7 +506,7 @@ const createStyles = (colors: any, isDark: boolean) =>
     },
     achievementCard: {
       width: (width - SPACING.md * 2 - SPACING.sm) / 2,
-      height: 180,
+      height: 190,
       backgroundColor: colors.surface,
       borderRadius: 12,
       padding: SPACING.md,
@@ -455,21 +532,21 @@ const createStyles = (colors: any, isDark: boolean) =>
       marginTop: SPACING.xs,
     },
     achievementName: {
-      fontSize: FONT_SIZES.small,
+      fontSize: FONT_SIZES.medium,
       fontWeight: "600",
       color: colors.text.primary,
       textAlign: "center",
       marginBottom: 6,
-      lineHeight: 18,
+      lineHeight: 20,
     },
     achievementNameLocked: {
       color: colors.text.tertiary,
     },
     achievementDesc: {
-      fontSize: 11,
+      fontSize: 12,
       color: colors.text.secondary,
       textAlign: "center",
-      lineHeight: 16,
+      lineHeight: 18,
       marginBottom: SPACING.xs,
     },
     achievementDescLocked: {
@@ -493,10 +570,11 @@ const createStyles = (colors: any, isDark: boolean) =>
       borderRadius: 2,
     },
     achievementProgressText: {
-      fontSize: 10,
+      fontSize: 11,
       color: colors.text.tertiary,
       textAlign: "center",
       marginTop: 2,
+      fontWeight: "500",
     },
     newBadge: {
       position: "absolute",

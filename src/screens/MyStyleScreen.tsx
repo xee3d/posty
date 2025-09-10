@@ -30,6 +30,7 @@ import {
 } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { useTranslation } from "react-i18next";
+import { refreshResources } from "../locales/i18n";
 import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
@@ -83,7 +84,15 @@ interface TemplateUsage {
 
 const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  
+  // 리소스 새로고침 및 디버깅을 위한 언어 확인
+  React.useEffect(() => {
+    refreshResources();
+    console.log('[MyStyleScreen] Current language:', i18n.language);
+    console.log('[MyStyleScreen] Coaching title:', t('mystyle.coaching.title'));
+    console.log('[MyStyleScreen] Metrics title:', t('mystyle.metrics.title'));
+  }, []);
   const styles = createStyles(colors, cardTheme, isDark);
   const headerStyles = createHeaderStyles(colors);
 
@@ -318,7 +327,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       insights.push({
         type: "strength",
         icon: dominantTemplate.icon,
-        title: t("mystyle.insights.styleTitle", { name: dominantTemplate.name }),
+        title: t("mystyle.insights.styleTitle", { name: t(`styles.${dominantTemplate.id}.name`, dominantTemplate.name) }),
         description: t("mystyle.insights.styleDescription", { description: dominantTemplate.description }),
         action: t("mystyle.insights.styleAction"),
       });
@@ -363,7 +372,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         type: "trend",
         icon: "trophy",
         title: t("mystyle.insights.challengeTitle"),
-        description: t("mystyle.insights.challengeDescription", { name: recommendedChallenge.name }),
+        description: t("mystyle.insights.challengeDescription", { name: t(`mystyle.challenges.${recommendedChallenge.id}.name`, recommendedChallenge.name) }),
         action: t("mystyle.insights.challengeAction"),
       });
     }
@@ -485,7 +494,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       setActiveChallenge(challenge);
       Alert.alert(
         t("mystyle.alerts.challengeStart"),
-        t("mystyle.alerts.challengeStarted", { name: challenge?.name })
+        t("mystyle.alerts.challengeStarted", { name: challenge ? t(`mystyle.challenges.${challenge.id}.name`, challenge.name) : "" })
       );
     }
   };
@@ -518,7 +527,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       const template = getStyleById(styleAnalysis.dominantStyle);
       if (template) {
         onNavigate("ai-write", {
-          title: `${template.name} 스타일`,
+          title: `${t(`styles.${template.id}.name`, template.name)} 스타일`,
           content: template.characteristics.examples[0],
           style: template.id,
           initialTone: template.aiTone, // AI 톤 추가
@@ -554,7 +563,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       onNavigate("ai-write", {
         initialText: content,
         initialTone: tone,
-        title: template.name,
+        title: t(`styles.${template.id}.name`, template.name),
         style: template.id,
         tips: template.tips,
       });
@@ -602,14 +611,13 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <View style={styles.brandInfo}>
             <Text style={styles.brandName}>
               {styleAnalysis
-                ? STYLE_TEMPLATES.find(
-                    (t) => t.id === styleAnalysis.dominantStyle
-                  )?.name
+                ? t(`styles.${styleAnalysis.dominantStyle}.name`, 
+                    STYLE_TEMPLATES.find(t => t.id === styleAnalysis.dominantStyle)?.name || "")
                 : ""}{" "}
               {t('myStyle.brand.title')}
             </Text>
             <Text style={styles.brandTagline}>
-              {t('myStyle.brand.tagline', '{{count}}개의 스토리로 만든 나만의 스타일', { count: stats?.totalPosts || 0 })}
+              {t('myStyle.brand.tagline', { count: stats?.totalPosts || 0 })}
             </Text>
           </View>
         </View>
@@ -634,7 +642,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                         color={template?.color || colors.primary}
                       />
                       <Text style={styles.styleScoreName}>
-                        {template?.name}
+                        {t(`styles.${styleId}.name`, template?.name || styleId)}
                       </Text>
                       <Text style={styles.styleScoreValue}>{Number(score) || 0}%</Text>
                     </View>
@@ -667,9 +675,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                     }
                   }}
                 >
-                  <Text style={[styles.keywordText, { color: colors.primary }]}>
-                    #{tag}
-                  </Text>
+            <Text style={[styles.keywordText, { color: colors.primary }]}>
+              {t('mystyle.hashtagPrefix', '#')}{tag}
+            </Text>
                 </TouchableOpacity>
               ))}
           </View>
@@ -678,7 +686,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
       {/* AI 인사이트 */}
       <View style={styles.insightsSection}>
-        <Text style={styles.sectionTitle}>🤖 포스티의 스타일 코칭</Text>
+        <Text style={styles.sectionTitle}>{t('mystyle.coaching.title', '🤖 포스티의 스타일 코칭')}</Text>
         {insights.map((insight, index) => (
           <TouchableOpacity
             key={index}
@@ -729,7 +737,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
       {/* 스타일 지표 */}
       <View style={styles.patternsSection}>
-        <Text style={styles.sectionTitle}>📊 나의 스타일 지표</Text>
+        <Text style={styles.sectionTitle}>{t('mystyle.metrics.title', '📊 나의 스타일 지표')}</Text>
         <View style={styles.metricsContainer}>
           <View
             style={[
@@ -741,7 +749,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           >
             <View style={styles.metricHeader}>
               <SafeIcon name="sync" size={24} color={colors.primary} />
-              <Text style={styles.metricLabel}>일관성</Text>
+              <Text style={styles.metricLabel}>{t('mystyle.metrics.consistency', '일관성')}</Text>
             </View>
             <Text style={styles.metricValue}>
               {styleAnalysis?.consistency || 0}%
@@ -772,7 +780,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           >
             <View style={styles.metricHeader}>
               <SafeIcon name="color-palette" size={24} color={colors.accent} />
-              <Text style={styles.metricLabel}>다양성</Text>
+              <Text style={styles.metricLabel}>{t('mystyle.metrics.diversity', '다양성')}</Text>
             </View>
             <Text style={styles.metricValue}>
               {styleAnalysis?.diversity || 0}%
@@ -796,11 +804,11 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <View style={styles.activeChallengeCard}>
             <View style={styles.challengeHeader}>
               <SafeIcon name="trophy" size={20} color={colors.warning} />
-              <Text style={styles.challengeTitle}>{activeChallenge.name}</Text>
+              <Text style={styles.challengeTitle}>{t(`mystyle.challenges.${activeChallenge.id}.name`, activeChallenge.name)}</Text>
             </View>
             <Text style={styles.challengeProgress}>
               {t('myStyle.challenge.progress', '진행도: {{current}}/{{total}}', { current: activeChallenge.progress || 0, total: activeChallenge.duration })}
-              일
+              {t('mystyle.challenge.dayUnit', '일')}
             </Text>
           </View>
         )}
@@ -853,16 +861,16 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             </View>
             <View style={styles.metricItem}>
               <SafeIcon name="time-outline" size={24} color={colors.success} />
-              <Text style={styles.metricValue}>
-                {stats?.postingPatterns?.mostActiveTime || "19시"}
-              </Text>
-              <Text style={styles.metricLabel}>선호 시간</Text>
+            <Text style={styles.metricValue}>
+              {stats?.postingPatterns?.mostActiveTime || t('mystyle.defaultTime', '19시')}
+            </Text>
+              <Text style={styles.metricLabel}>{t('mystyle.metrics.preferredTime', '선호 시간')}</Text>
             </View>
           </View>
 
           {/* 카테고리 분포 */}
           <View style={styles.categoryDistribution}>
-            <Text style={styles.subsectionTitle}>카테고리별 분포</Text>
+            <Text style={styles.subsectionTitle}>{t('mystyle.analytics.categoryDistribution', '카테고리별 분포')}</Text>
             {Object.entries(stats?.byCategory || {}).map(
               ([category, count]) => (
                 <View key={category} style={styles.categoryBar}>
@@ -947,7 +955,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             transform: [{ translateY: Animated.multiply(slideAnim, 0.5) }],
           }}
         >
-          <Text style={styles.sectionTitle}>📝 {t("mystyle.templates.title", "스타일 템플릿")}</Text>
+            <Text style={styles.sectionTitle}>{t('mystyle.templates.emojiPrefix', '📝')} {t("mystyle.templates.title", "스타일 템플릿")}</Text>
           <Text style={styles.sectionSubtitle}>
             {t("mystyle.templates.subtitle", "다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요")}
           </Text>
@@ -1047,22 +1055,22 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               </View>
 
               <View style={styles.templateContent}>
-                <Text style={styles.templateName}>{template.name}</Text>
+                <Text style={styles.templateName}>{t(`styles.${template.id}.name`, template.name)}</Text>
                 <Text style={styles.templateDescription}>
-                  {template.description}
+                  {t(`styles.${template.id}.description`, template.description)}
                 </Text>
 
                 <View style={styles.templateDetails}>
                   <View style={styles.templateStructure}>
+            <Text style={styles.templateStructureItem}>
+              {t('mystyle.templates.bulletPoint', '•')} {t('mystyle.templates.averageLength', '평균 길이')}: {template.characteristics.avgLength}
+            </Text>
                     <Text style={styles.templateStructureItem}>
-                      • 평균 길이: {template.characteristics.avgLength}
-                    </Text>
-                    <Text style={styles.templateStructureItem}>
-                      • 키워드:{" "}
+                      {t('mystyle.templates.bulletPoint', '•')} {t('mystyle.templates.keywords', '키워드')}:{" "}
                       {template.characteristics.keywords.slice(0, 3).join(", ")}
                     </Text>
                     <Text style={styles.templateStructureItem}>
-                      • 이모지:{" "}
+                      {t('mystyle.templates.bulletPoint', '•')} {t('mystyle.templates.emojis', '이모지')}:{" "}
                       {template.characteristics.emojis.slice(0, 3).join(" ")}
                     </Text>
                   </View>
@@ -1092,9 +1100,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
         {/* 스타일 챌린지 */}
         <View style={styles.challengeSection}>
-          <Text style={styles.sectionTitle}>🏆 스타일 챌린지</Text>
+          <Text style={styles.sectionTitle}>{t('mystyle.challenges.emojiPrefix', '🏆')} {t('mystyle.challenges.title', '스타일 챌린지')}</Text>
           <Text style={styles.sectionSubtitle}>
-            챌린지를 통해 새로운 스타일을 마스터해보세요
+            {t('mystyle.challenges.subtitle', '챌린지를 통해 새로운 스타일을 마스터해보세요')}
           </Text>
 
           {STYLE_CHALLENGES.map((challenge) => (
@@ -1126,14 +1134,14 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 </View>
               </View>
               <View style={styles.challengeContent}>
-                <Text style={styles.challengeName}>{challenge.name}</Text>
+                <Text style={styles.challengeName}>{t(`mystyle.challenges.${challenge.id}.name`, challenge.name)}</Text>
                 <Text style={styles.challengeDescription}>
-                  {challenge.description}
+                  {t(`mystyle.challenges.${challenge.id}.description`, challenge.description)}
                 </Text>
                 <View style={styles.challengeRules}>
                   {challenge.rules.slice(0, 2).map((rule, index) => (
                     <Text key={index} style={styles.challengeRule}>
-                      • {rule}
+                      {t('mystyle.templates.bulletPoint', '•')} {t(`mystyle.challenges.${challenge.id}.rules.${index}`, rule)}
                     </Text>
                   ))}
                 </View>
@@ -1156,7 +1164,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               </View>
               {activeChallenge?.id === challenge.id ? (
                 <View style={styles.challengeStatus}>
-                  <Text style={styles.challengeStatusText}>진행 중</Text>
+                  <Text style={styles.challengeStatusText}>{t('mystyle.challenges.inProgress', '진행 중')}</Text>
                 </View>
               ) : (
                 <SafeIcon name="arrow-forward" size={20} color={colors.primary} />

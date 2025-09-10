@@ -9,6 +9,7 @@ import {
   RefreshControl,
   Clipboard,
   Share,
+  Dimensions,
 } from "react-native";
 import { Post, Platform } from "../types";
 import {
@@ -51,7 +52,7 @@ import {
 import userBehaviorAnalytics from "../services/userBehaviorAnalytics";
 import simplePostService from "../services/simplePostService";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
-import { resetDailyTokens } from "../store/slices/userSlice";
+import { resetDailyTokens, setTokens, setSubscriptionPlan } from "../store/slices/userSlice";
 import { useTokenManagement } from "../hooks/useTokenManagement";
 import EarnTokenModal from "../components/EarnTokenModal";
 import { LowTokenPrompt } from "../components/LowTokenPrompt";
@@ -1065,6 +1066,102 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </View>
         </SlideInView>
 
+        {/* 개발용 구독 테스트 카드 */}
+        {__DEV__ && (
+          <SlideInView direction="right" delay={600}>
+            <View style={styles.devTestSection}>
+              <View style={styles.sectionHeader}>
+                <View style={styles.sectionTitleContainer}>
+                  <SafeIcon name="construct" size={18} color={colors.warning} />
+                  <Text style={styles.sectionTitle}>개발용 구독 테스트</Text>
+                </View>
+              </View>
+              
+              <View style={styles.devTestCard}>
+                <Text style={styles.devTestTitle}>현재 구독 상태</Text>
+                <Text style={styles.devTestCurrentPlan}>
+                  {subscriptionPlan} • {currentTokens}개 토큰
+                </Text>
+                
+                <View style={styles.devTestButtonsContainer}>
+                  <TouchableOpacity
+                    style={[styles.devTestButton, { backgroundColor: '#E5E5EA' }]}
+                    onPress={() => {
+                      // 무료 플랜으로 변경
+                      dispatch(setSubscriptionPlan('free'));
+                      dispatch(setTokens(10));
+                    }}
+                  >
+                    <Text style={[styles.devTestButtonText, { color: '#333' }]}>무료</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    style={[styles.devTestButton, { backgroundColor: '#34C759' }]}
+                    onPress={() => {
+                      // STARTER 플랜으로 변경
+                      dispatch(setSubscriptionPlan('starter'));
+                      dispatch(setTokens(300));
+                    }}
+                  >
+                    <Text style={styles.devTestButtonText}>STARTER</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    style={[styles.devTestButton, { backgroundColor: '#007AFF' }]}
+                    onPress={() => {
+                      // PREMIUM 플랜으로 변경
+                      dispatch(setSubscriptionPlan('premium'));
+                      dispatch(setTokens(500));
+                    }}
+                  >
+                    <Text style={styles.devTestButtonText}>PREMIUM</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    style={[styles.devTestButton, { backgroundColor: '#FF3B30' }]}
+                    onPress={() => {
+                      // PRO 플랜으로 변경
+                      dispatch(setSubscriptionPlan('pro'));
+                      dispatch(setTokens(9999));
+                    }}
+                  >
+                    <Text style={styles.devTestButtonText}>PRO</Text>
+                  </TouchableOpacity>
+                </View>
+                
+                <View style={styles.devTestTokenControls}>
+                  <TouchableOpacity
+                    style={[styles.devTestButton, styles.devTestTokenButton]}
+                    onPress={() => {
+                      dispatch(setTokens(0));
+                    }}
+                  >
+                    <Text style={[styles.devTestButtonText, { fontSize: 12 }]}>토큰 0개</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    style={[styles.devTestButton, styles.devTestTokenButton]}
+                    onPress={() => {
+                      dispatch(setTokens(5));
+                    }}
+                  >
+                    <Text style={[styles.devTestButtonText, { fontSize: 12 }]}>토큰 5개</Text>
+                  </TouchableOpacity>
+                  
+                  <TouchableOpacity
+                    style={[styles.devTestButton, styles.devTestTokenButton]}
+                    onPress={() => {
+                      dispatch(setTokens(currentTokens + 10));
+                    }}
+                  >
+                    <Text style={[styles.devTestButtonText, { fontSize: 12 }]}>+10개</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </SlideInView>
+        )}
+
         {/* 최근 게시물 섹션 */}
         {recentPosts.length > 0 && (
           <SlideInView direction="up" delay={650}>
@@ -1230,6 +1327,8 @@ const createStyles = (
   theme?: any,
   isDark?: boolean
 ) => {
+  const { width: screenWidth } = Dimensions.get('window');
+  const cardWidth = Math.min(screenWidth * 0.8, 300); // 화면 너비의 80% 또는 최대 300px
 
   return StyleSheet.create({
     container: {
@@ -1415,18 +1514,18 @@ const createStyles = (
     },
     // 첫 글쓰기 카드 - 최상위 프라이머리 액션
     primaryWriteCard: {
-      backgroundColor: '#F0EEFF', // 강제 보라색 적용
+      backgroundColor: isDark ? '#1F1F1F' : colors.surface, // 사진 카드와 동일한 배경
       borderRadius: 16,
       paddingVertical: 24,
       paddingHorizontal: 24,
       marginBottom: 16,
-      borderWidth: 5, // 매우 두껌운 테두리로 시인성 강화
-      borderColor: '#C8B5FF', // 강제 진한 보라 테두리
-      shadowColor: '#8B5CF6',
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.3,
-      shadowRadius: 24,
-      elevation: 15,
+      borderWidth: isDark ? 1 : 0, // 사진 카드와 동일한 테두리
+      borderColor: isDark ? '#333333' : 'transparent',
+      shadowColor: isDark ? '#000000' : "#000",
+      shadowOffset: { width: 0, height: isDark ? 3 : 2 },
+      shadowOpacity: isDark ? 0.3 : 0.1,
+      shadowRadius: isDark ? 6 : 4,
+      elevation: isDark ? 5 : 3,
     },
     mainActionRow: {
       flexDirection: "row",
@@ -1469,8 +1568,10 @@ const createStyles = (
     },
     subActionCard: {
       flex: 1,
-      backgroundColor: colors.lightGray,
+      backgroundColor: isDark ? '#1F1F1F' : colors.lightGray, // 다크모드에서 카드와 일관된 색상
       borderRadius: 12,
+      borderWidth: isDark ? 1 : 0,
+      borderColor: isDark ? '#333333' : 'transparent',
     },
     subActionContent: {
       paddingVertical: SPACING.md,
@@ -1487,7 +1588,7 @@ const createStyles = (
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: SPACING.md,
+      marginBottom: SPACING.md - 4, // 원래보다 살짝만 줄임 (16px에서 12px)
       paddingHorizontal: SPACING.lg,
     },
     refreshText: {
@@ -1516,6 +1617,7 @@ const createStyles = (
       color: theme?.colors.text.primary || colors.text.primary,
       marginLeft: SPACING.xs,
       letterSpacing: -0.3,
+      marginBottom: 12,
     },
     coachingCard: {
       backgroundColor: cardTheme.posty.background,
@@ -1556,15 +1658,17 @@ const createStyles = (
       paddingBottom: SPACING.xs,
     },
     recommendCard: {
-      backgroundColor: colors.surface,
+      backgroundColor: isDark ? '#1F1F1F' : colors.surface, // 다크: 진한 회색, 라이트: 기본
       borderRadius: 16,
       padding: SPACING.lg,
-      width: 280,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
+      width: cardWidth,
+      borderWidth: isDark ? 1 : 0, // 다크모드에서 경계선 추가
+      borderColor: isDark ? '#333333' : 'transparent',
+      shadowColor: isDark ? '#000000' : "#000",
+      shadowOffset: { width: 0, height: isDark ? 3 : 2 },
+      shadowOpacity: isDark ? 0.3 : 0.1,
+      shadowRadius: isDark ? 6 : 4,
+      elevation: isDark ? 5 : 3,
     },
     recommendIconContainer: {
       width: 48,
@@ -1582,12 +1686,14 @@ const createStyles = (
       marginBottom: SPACING.xs,
     },
     recommendBadge: {
-      backgroundColor: colors.lightGray,
+      backgroundColor: isDark ? '#2A2A2A' : colors.lightGray, // 다크모드에서 더 밝은 회색
       paddingHorizontal: 12,
       paddingVertical: 6,
       borderRadius: 20,
       alignSelf: "flex-start",
       marginBottom: SPACING.sm,
+      borderWidth: isDark ? 1 : 0,
+      borderColor: isDark ? '#404040' : 'transparent',
     },
     recommendBadgeText: {
       fontSize: 12,
@@ -1908,6 +2014,64 @@ const createStyles = (
       fontSize: 12,
       color: colors.text.secondary,
       textAlign: "center",
+    },
+    
+    // 개발용 테스트 스타일
+    devTestSection: {
+      marginHorizontal: SPACING.lg,
+      marginTop: SPACING.lg,
+    },
+    devTestCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      padding: SPACING.lg,
+      borderWidth: 2,
+      borderColor: colors.warning + '40',
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    devTestTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.text.primary,
+      marginBottom: SPACING.xs,
+    },
+    devTestCurrentPlan: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginBottom: SPACING.md,
+      fontWeight: "500",
+    },
+    devTestButtonsContainer: {
+      flexDirection: "row",
+      gap: SPACING.sm,
+      marginBottom: SPACING.md,
+    },
+    devTestButton: {
+      flex: 1,
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    devTestButtonText: {
+      color: colors.white,
+      fontSize: 14,
+      fontWeight: "600",
+    },
+    devTestTokenControls: {
+      flexDirection: "row",
+      gap: SPACING.sm,
+      marginTop: SPACING.sm,
+    },
+    devTestTokenButton: {
+      backgroundColor: colors.primary + '80',
+      flex: 1,
+      paddingVertical: 8,
     },
   });
 };

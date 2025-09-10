@@ -19,6 +19,7 @@ import { selectSubscriptionPlan } from "../store/slices/userSlice";
 import { enhancedAI } from "./ai/enhancedAIService";
 import { SUBSCRIPTION_PLANS } from "../utils/adConfig";
 import { imageAnalysisCache } from "../utils/imageAnalysisCache";
+import i18n from "../locales/i18n";
 
 class AIServiceWrapper {
   // 사용자 구독 플랜 가져오기
@@ -95,15 +96,13 @@ class AIServiceWrapper {
         // 길이 조정 추가
         switch (params.length) {
           case "short":
-            finalPrompt += "\n[길이: 50자 이내로 짧고 간결하게 작성해주세요]";
+            finalPrompt += `\n${i18n.t('aiPrompts.length.short', '[길이: 50자 이내로 짧고 간결하게 작성해주세요]')}`;
             break;
           case "medium":
-            finalPrompt +=
-              "\n[길이: 100-150자 사이로 적당한 길이로 작성해주세요]";
+            finalPrompt += `\n${i18n.t('aiPrompts.length.medium', '[길이: 100-150자 사이로 적당한 길이로 작성해주세요]')}`;
             break;
           case "long":
-            finalPrompt +=
-              "\n[길이: 200-300자로 자세하고 풍부하게 작성해주세요]";
+            finalPrompt += `\n${i18n.t('aiPrompts.length.long', '[길이: 200-300자로 자세하고 풍부하게 작성해주세요]')}`;
             break;
         }
       } else {
@@ -119,16 +118,13 @@ class AIServiceWrapper {
         let lengthInstruction = "";
         switch (params.length) {
           case "short":
-            lengthInstruction =
-              "\n[길이: 50자 이내로 짧고 간결하게 작성해주세요]";
+            lengthInstruction = `\n${i18n.t('aiPrompts.length.short', '[길이: 50자 이내로 짧고 간결하게 작성해주세요]')}`;
             break;
           case "medium":
-            lengthInstruction =
-              "\n[길이: 100-150자 사이로 적당한 길이로 작성해주세요]";
+            lengthInstruction = `\n${i18n.t('aiPrompts.length.medium', '[길이: 100-150자 사이로 적당한 길이로 작성해주세요]')}`;
             break;
           case "long":
-            lengthInstruction =
-              "\n[길이: 200-300자로 자세하고 풍부하게 작성해주세요]";
+            lengthInstruction = `\n${i18n.t('aiPrompts.length.long', '[길이: 200-300자로 자세하고 풍부하게 작성해주세요]')}`;
             break;
         }
 

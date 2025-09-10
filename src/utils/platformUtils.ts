@@ -1,4 +1,5 @@
 // 플랫폼별 콘텐츠 특성 정의
+import i18n from "../locales/i18n";
 export const PLATFORM_CHARACTERISTICS = {
   instagram: {
     name: "Instagram",
@@ -11,8 +12,7 @@ export const PLATFORM_CHARACTERISTICS = {
       "해시태그 적극 활용",
       "짧은 문단으로 구성",
     ],
-    prompt:
-      "인스타그램에 적합한 감성적이고 시각적인 포스팅을 작성해주세요. 이모지를 적절히 사용하고, 스토리텔링을 통해 공감대를 형성해주세요.",
+    getPrompt: () => i18n.t('aiPrompts.platforms.instagram.prompt', '인스타그램에 적합한 감성적이고 시각적인 포스팅을 작성해주세요. 이모지를 적절히 사용하고, 스토리텔링을 통해 공감대를 형성해주세요.'),
   },
   facebook: {
     name: "Facebook",
@@ -25,8 +25,7 @@ export const PLATFORM_CHARACTERISTICS = {
       "커뮤니티 중심",
       "링크 공유 가능",
     ],
-    prompt:
-      "페이스북에 적합한 친근하고 대화체의 포스팅을 작성해주세요. 정보를 전달하면서도 친구와 대화하는 듯한 톤으로 작성해주세요.",
+    getPrompt: () => i18n.t('aiPrompts.platforms.facebook.prompt', '페이스북에 적합한 친근하고 대화체의 포스팅을 작성해주세요. 정보를 전달하면서도 친구와 대화하는 듯한 톤으로 작성해주세요.'),
   },
   twitter: {
     name: "X (Twitter)",
@@ -39,8 +38,7 @@ export const PLATFORM_CHARACTERISTICS = {
       "적은 해시태그",
       "리트윗 유도",
     ],
-    prompt:
-      "X(트위터)에 적합한 간결하고 임팩트 있는 포스팅을 작성해주세요. 280자 이내로 핵심만 전달하되, 위트있게 표현해주세요.",
+    getPrompt: () => i18n.t('aiPrompts.platforms.twitter.prompt', 'X(트위터)에 적합한 간결하고 임팩트 있는 포스팅을 작성해주세요. 280자 이내로 핵심만 전달하되, 위트있게 표현해주세요.'),
   },
   threads: {
     name: "Threads",
@@ -157,8 +155,8 @@ export function enhancePromptForPlatform(
     return basePrompt;
   }
 
-  let enhancedPrompt = `${basePrompt}\n\n[플랫폼: ${platformInfo.name}]\n`;
-  enhancedPrompt += `${platformInfo.prompt}\n`;
+  let enhancedPrompt = `${basePrompt}\n\n[Platform: ${platformInfo.name}]\n`;
+  enhancedPrompt += `${(platformInfo as any).getPrompt()}\n`;
 
   // 플랫폼별 특별 지시사항
   switch (platform) {

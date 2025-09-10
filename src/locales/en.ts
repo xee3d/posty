@@ -76,7 +76,7 @@ export default {
       genz: "Trend",
       millennial: "Lifestyle",
       minimalist: "Minimal",
-      storytelling: "Story",
+      storytelling: "Formal",
       motivational: "Motivation"
     },
     tones: {
@@ -87,8 +87,8 @@ export default {
       genz: "Gen Z",
       millennial: "Millennial",
       minimalist: "Minimalist",
-      storytelling: "Storytelling",
-      motivational: "Motivational",
+      storytelling: "Formal",
+      motivational: "Quotes",
     },
     lengths: {
       short: "Short",
@@ -159,11 +159,9 @@ export default {
       simple: "Simplify", 
       formal: "Make Formal",
       emotion: "Add Emotion",
-      storytelling: "Storytelling",
+      storytelling: "Formal",
       engaging: "Make Engaging",
       hashtag: "Extract Hashtags",
-      emoji: "Add Emojis",
-      question: "Make Questions",
     },
     photo: {
       select: {
@@ -206,6 +204,83 @@ export default {
       polish: "Text Polish",
       newPost: "New Post",
     },
+  },
+
+  // AI Prompts
+  aiPrompts: {
+    length: {
+      short: "[Length: Please write concisely within 50 characters]",
+      medium: "[Length: Please write moderately between 100-150 characters]",
+      long: "[Length: Please write in detail and richly between 200-300 characters]"
+    },
+    enhanced: {
+      personaIntro: "Your persona:",
+      toneLabel: "Writing tone:",
+      topic: "Topic:",
+      imageContext: "Image context:",
+      guidelines: "Writing guidelines:",
+      guideline1: "Maintain the above persona and tone consistently",
+      guideline2: "Write naturally as if written by a real {{ageGroup}} {{gender}}",
+      guideline5: "Reflect interests:",
+      specialInstructions: "Special instructions:",
+      ageGroups: {
+        "10s": "teenager",
+        "20s": "person in their 20s",
+        "30s": "person in their 30s",
+        "40s": "person in their 40s", 
+        "50s": "person in their 50s",
+        "60s+": "person in their 60s or older"
+      },
+      genders: {
+        male: "male",
+        female: "female",
+        other: "person"
+      },
+      familyRoles: {
+        mother: "mother",
+        father: "father", 
+        grandparent: "grandparent"
+      },
+      parentLove: "Write with the loving heart of a {{parentType}} who loves their child.",
+      grandparentLove: "Write with the warm perspective of grandparents who love their grandchildren.",
+      occupation: "Their profession is {{occupation}}.",
+      interests: "Their main interests include {{interests}} and more."
+    },
+    platforms: {
+      instagram: {
+        name: "Instagram",
+        characteristics: [
+          "Visual and emotional tone",
+          "Use of emojis recommended",
+          "Storytelling-focused",
+          "Active use of hashtags",
+          "Composed of short paragraphs"
+        ],
+        prompt: "Please write an emotional and visual post suitable for Instagram. Use emojis appropriately and create empathy through storytelling."
+      },
+      facebook: {
+        name: "Facebook", 
+        characteristics: [
+          "Balance of informative and friendly",
+          "Long posts possible",
+          "Conversational tone",
+          "Community-centered",
+          "Link sharing possible"
+        ],
+        prompt: "Please write a friendly and conversational post suitable for Facebook. Deliver information while maintaining a tone as if talking with friends."
+      },
+      twitter: {
+        name: "X (Twitter)",
+        characteristics: [
+          "Concise and impactful expression",
+          "Trends and timeliness",
+          "Wit and humor",
+          "Few hashtags",
+          "Retweet inducing"
+        ],
+        prompt: "Please write a concise and impactful post suitable for X (Twitter). Deliver only the essence within 280 characters, but express it wittily."
+      }
+    }
   },
 
   // Token System
@@ -768,13 +843,6 @@ export default {
 
   // My Style Screen
   myStyle: {
-    profileCompletion: "Profile completion {{completeness}}%",
-    interests: "Interests (multiple selection)",
-    formality: "Formality",
-    emotiveness: "Emotional expression",
-    humor: "Humor",
-    saveProfile: "Save Profile",
-    
     access: {
       freeMessage: "My Style analysis is available from STARTER plan.",
     },
@@ -797,11 +865,42 @@ export default {
     analytics: {
       growth: "📈 Growth Analysis",
       totalPosts: "Total Posts",
-      toneAnalysis: "🎨 Tone Usage Analysis"
+      toneAnalysis: "🎨 Tone Usage Analysis",
+      categoryDistribution: "Category Distribution"
     },
     templates: {
       recommended: "Recommended",
       usageCount: "Used {{count}} times"
+    },
+    metrics: {
+      title: "📊 My Style Metrics",
+      consistency: "Consistency",
+      diversity: "Diversity",
+      preferredTime: "Preferred Time"
+    },
+    challenges: {
+      title: "🏆 Style Challenges",
+      subtitle: "Master new styles through challenges",
+      inProgress: "In Progress",
+      emojiPrefix: "🏆",
+      minimalWeek: {
+        name: "Minimal Week",
+        description: "Write only within 50 characters for a week",
+        rules: ["All posts within 50 characters", "Maximum 2 emojis", "Maximum 3 hashtags"]
+      },
+      storyMonth: {
+        name: "Story Month",
+        description: "Write one story every day for a month", 
+        rules: ["Write 200+ characters daily", "Beginning-middle-end structure", "Emotional expression required"]
+      },
+      trendHunter: {
+        name: "Trend Hunter",
+        description: "Discover 10 latest trends",
+        rules: ["Discover new hashtags", "Include trend analysis", "Share with other users"]
+      }
+    },
+    coaching: {
+      title: "🤖 Posty's Style Coaching"
     }
   },
 
@@ -841,7 +940,7 @@ export default {
       genz: "Gen Z",
       millennial: "Millennial",
       minimalist: "Minimalist",
-      storytelling: "Storytelling",
+      storytelling: "Formal",
       motivational: "Motivational"
     },
     categories: {
@@ -856,7 +955,13 @@ export default {
     },
     time: {
       today: "Today",
-      yesterday: "Yesterday"
+      yesterday: "Yesterday",
+      justNow: "Just now",
+      minutesAgo: "{{minutes}} minutes ago",
+      hoursAgo: "{{hours}} hours ago",
+      daysAgo: "{{days}} days ago",
+      weeksAgo: "{{weeks}} weeks ago",
+      monthsAgo: "{{months}} months ago"
     },
     actions: {
       copy: "Copy",
@@ -1082,7 +1187,13 @@ export default {
     skip: "Skip",
     loading: "Loading...",
     later: "Later",
-    confirm: "Confirm"
+    confirm: "Confirm",
+    categories: {
+      all: "All",
+      casual: "Casual",
+      serious: "Serious",
+      special: "Special"
+    }
   },
 
   // Recommendations
@@ -1397,11 +1508,9 @@ export default {
     title: "My Style",
     subtitle: "Build your own content brand",
     loading: "Analyzing style...",
-    refresh: "Refresh",
     empty: {
       title: "No content created yet",
-      subtitle: "Create your first content with Posty!",
-      startWriting: "Start Writing"
+      subtitle: "Create your first content with Posty!"
     },
     tabs: {
       templates: "Templates"
@@ -1409,8 +1518,18 @@ export default {
     templates: {
       title: "Style Templates",
       subtitle: "Try various styles and find your own style",
-      starterLimit: "STARTER Plan: Only {{limit}} templates available"
+      starterLimit: "STARTER Plan: Only {{limit}} templates available",
+      emojiPrefix: "📝",
+      bulletPoint: "•",
+      averageLength: "Average Length",
+      keywords: "Keywords",
+      emojis: "Emojis"
     },
+    challenge: {
+      dayUnit: "days"
+    },
+    defaultTime: "7 PM",
+    hashtagPrefix: "#",
     insights: {
       title: "Style Insights",
       styleTitle: "{{name}} Style",
@@ -1645,7 +1764,11 @@ export default {
       rarity: "Rarity",
       progress: "Progress",
       unlockedAt: "Unlocked At",
-      selectBadge: "Set as Representative Badge"
+      selectBadge: "Set as Representative Badge",
+      success: "Success",
+      setBadgeSuccess: "Representative achievement has been set!",
+      error: "Error",
+      setBadgeError: "Failed to set representative achievement."
     },
     status: {
       completed: "Completed",
@@ -1787,6 +1910,59 @@ export default {
         name: "Posty Veteran",
         description: "Used Posty for over a year"
       }
+    }
+  },
+
+  // Style Selector
+  styleSelector: {
+    title: "Which style would you like to write?"
+  },
+
+  // Unified Styles
+  styles: {
+    minimalist: {
+      name: "Minimalist",
+      description: "Clean and simple style"
+    },
+    storytelling: {
+      name: "Formal", 
+      description: "Elegant written expression"
+    },
+    humorous: {
+      name: "Humorous",
+      description: "Witty and cheerful expression"
+    },
+    trendsetter: {
+      name: "Trendsetter",
+      description: "Style reflecting latest trends"
+    },
+    philosopher: {
+      name: "Philosopher",
+      description: "Deep and thoughtful style"
+    },
+    casual: {
+      name: "Casual",
+      description: "Friendly and comfortable everyday tone"
+    },
+    professional: {
+      name: "Professional",
+      description: "Formal and trustworthy business tone"
+    },
+    emotional: {
+      name: "Emotional",
+      description: "Warm expression with feelings"
+    },
+    genz: {
+      name: "Gen Z",
+      description: "Trendy expression unique to Gen Z"
+    },
+    millennial: {
+      name: "Millennial",
+      description: "Emotional expression of millennials"
+    },
+    motivational: {
+      name: "Quotes",
+      description: "Beautiful and profound philosophical insights"
     }
   }
 };

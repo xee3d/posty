@@ -15,7 +15,7 @@ import {
 import {
   COLORS,
   SPACING,
-  MOLLY_MESSAGES,
+  POSTY_MESSAGES,
   CARD_THEME,
 } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
@@ -177,8 +177,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     | "emotion"
     | "storytelling"
     | "engaging"
-    | "emoji"
-    | "question"
   >("engaging");
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
   const [imageAnalysis, setImageAnalysis] = useState<string>("");
@@ -894,12 +892,21 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           prompt: writeMode === "photo" ? t("aiWrite.modes.photo") : prompt,
         });
 
+        // hashtags 추출 함수
+        const extractHashtags = (text: string): string[] => {
+          const hashtagRegex = /#[\w가-힣]+/g;
+          return text.match(hashtagRegex) || [];
+        };
+
+        const extractedHashtags = extractHashtags(result);
+
         // simplePostService에도 저장 (MyStyleScreen 분석용)
         await simplePostService.savePost({
           content: result,
           platform: platformToSave,
           category: getCategoryFromTone(selectedTone),
           tone: selectedTone,
+          hashtags: extractedHashtags,
         });
 
         console.log("Content saved successfully");
@@ -935,7 +942,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
 
 
   const getRandomEncouragement = () => {
-    const encouragements = MOLLY_MESSAGES.encouragements;
+    const encouragements = POSTY_MESSAGES.encouragements;
     return encouragements[Math.floor(Math.random() * encouragements.length)];
   };
 
@@ -1199,9 +1206,11 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
               {/* 문장 정리 모드 */}
               <SlideInView direction="right" delay={200}>
                 <View style={styles.inputSection}>
-                  <Text style={styles.sectionTitle}>
-                    {t("aiWrite.prompts.polish")}
-                  </Text>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>
+                      {t("aiWrite.prompts.polish")}
+                    </Text>
+                  </View>
                   <View style={styles.inputContainer}>
                     <TextInput
                       style={[styles.input, styles.polishInput]}
@@ -1581,119 +1590,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       ]}
                     >
 
-                      <TouchableOpacity
-                        style={[
-                          styles.polishOptionButton,
-                          selectedPolishOption === "emoji" &&
-                            styles.polishOptionButtonActive,
-                          !canAccessPolishOption(userPlan, "emoji") &&
-                            styles.lockedItem,
-                        ]}
-                        onPress={() => {
-                          if (!canAccessPolishOption(userPlan, "emoji")) {
-                            soundManager.playError();
-                            Alert.alert(
-                              t("aiWrite.premium.title"),
-                              `이모지 추가 기능은 ${
-                                userPlan === "free"
-                                  ? "Starter"
-                                  : userPlan === "starter"
-                                  ? "Premium"
-                                  : "Pro"
-                              } 플랜 이상에서 사용 가능해요.`,
-                              [
-                                { text: t("alerts.buttons.later"), style: "cancel" },
-                                {
-                                  text: t("aiWrite.premium.viewPlans"),
-                                  onPress: () => onNavigate?.("subscription"),
-                                },
-                              ]
-                            );
-                            return;
-                          }
-                          setSelectedPolishOption("emoji");
-                        }}
-                      >
-                        <SafeIcon
-                          name="happy"
-                          size={18}
-                          color={
-                            selectedPolishOption === "emoji"
-                              ? colors.primary
-                              : !canAccessPolishOption(userPlan, "emoji")
-                              ? colors.text.tertiary
-                              : colors.text.secondary
-                          }
-                        />
-                        <Text
-                          style={[
-                            styles.polishOptionText,
-                            selectedPolishOption === "emoji" &&
-                              styles.polishOptionTextActive,
-                            !canAccessPolishOption(userPlan, "emoji") &&
-                              styles.lockedItemText,
-                          ]}
-                        >
-                          {t("aiWrite.polishOptions.emoji")}
-                        </Text>
-                      </TouchableOpacity>
 
-                      <TouchableOpacity
-                        style={[
-                          styles.polishOptionButton,
-                          selectedPolishOption === "question" &&
-                            styles.polishOptionButtonActive,
-                          !canAccessPolishOption(userPlan, "question") &&
-                            styles.lockedItem,
-                        ]}
-                        onPress={() => {
-                          if (!canAccessPolishOption(userPlan, "question")) {
-                            soundManager.playError();
-                            Alert.alert(
-                              t("aiWrite.premium.title"),
-                              `질문형 변환 기능은 ${
-                                userPlan === "free"
-                                  ? "Starter"
-                                  : userPlan === "starter"
-                                  ? "Premium"
-                                  : "Pro"
-                              } 플랜 이상에서 사용 가능해요.`,
-                              [
-                                { text: t("alerts.buttons.later"), style: "cancel" },
-                                {
-                                  text: t("aiWrite.premium.viewPlans"),
-                                  onPress: () => onNavigate?.("subscription"),
-                                },
-                              ]
-                            );
-                            return;
-                          }
-                          setSelectedPolishOption("question");
-                        }}
-                      >
-                        <SafeIcon
-                          name="help-circle-outline"
-                          size={18}
-                          color={
-                            selectedPolishOption === "question"
-                              ? colors.primary
-                              : !canAccessPolishOption(userPlan, "question")
-                              ? colors.text.tertiary
-                              : colors.text.secondary
-                          }
-                        />
-                        <Text
-                          style={[
-                            styles.polishOptionText,
-                            selectedPolishOption === "question" &&
-                              styles.polishOptionTextActive,
-                            !canAccessPolishOption(userPlan, "question") &&
-                              styles.lockedItemText,
-                          ]}
-                        >
-                          {t("aiWrite.polishOptions.question")}
-                        </Text>
-                      </TouchableOpacity>
                     </View>
                   </View>
                 </View>
@@ -1704,7 +1601,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
               {/* 사진 모드 */}
               <SlideInView direction="right" delay={200}>
                 <View style={styles.photoSection}>
-                  <Text style={styles.sectionTitle}>{t("aiWrite.sections.photoSelect")}</Text>
+                  <View style={styles.sectionHeader}>
+                    <Text style={styles.sectionTitle}>{t("aiWrite.sections.photoSelect")}</Text>
+                  </View>
                   <ScaleButton
                     style={styles.photoUploadArea}
                     onPress={handleSelectImage}
@@ -2302,7 +2201,6 @@ const createStyles = (
       borderRadius: 20,
       borderWidth: 2,
       borderColor: isDark ? "#3A3A3C" : "#E5E7EB",
-      borderStyle: "dashed",
       overflow: "hidden",
       elevation: isDark ? 0 : 1,
       shadowColor: "#000",

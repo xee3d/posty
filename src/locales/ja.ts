@@ -321,8 +321,8 @@ export default {
       genz: "トレンド",
       millennial: "ライフスタイル",
       minimalist: "ミニマル",
-      storytelling: "ストーリー",
-      motivational: "モチベーション"
+      formal: "フォーマル",
+      motivational: "名言"
     },
     
     tones: {
@@ -333,8 +333,8 @@ export default {
       genz: "Z世代",
       millennial: "ミレニアル世代",
       minimalist: "ミニマル",
-      storytelling: "ストーリーテリング",
-      motivational: "やる気を起こす",
+      storytelling: "文語体",
+      motivational: "名言",
     },
     
     lengths: {
@@ -452,11 +452,9 @@ export default {
       simple: "シンプル",
       formal: "フォーマル",
       emotion: "感情",
-      storytelling: "ストーリー",
+      formal: "フォーマル",
       engaging: "魅力的",
       hashtag: "ハッシュタグ",
-      emoji: "絵文字",
-      question: "質問",
     },
     
     actions: {
@@ -500,17 +498,16 @@ export default {
     }
   },
 
+  // AI プロンプト
+  aiPrompts: {
+    length: {
+      short: "[長さ: 50文字以内で短く簡潔に書いてください]",
+      medium: "[長さ: 100-150文字の間で適度な長さに書いてください]",
+      long: "[長さ: 200-300文字で詳細で豊かに書いてください]"
+    }
+  },
+
   myStyle: {
-    title: "マイスタイル",
-    subtitle: "あなたの書き方スタイルを分析",
-    description: "過去の投稿を分析してあなただけの文体を学習します",
-    profileCompletion: "プロフィール完成度 {{completeness}}%",
-    interests: "興味（複数選択可能）",
-    formality: "形式",
-    emotiveness: "感情表現",
-    humor: "ユーモア",
-    saveProfile: "プロフィール保存",
-    
     access: {
       freeMessage: "マイスタイル分析はSTARTERプランから利用できます。",
       upgradeButton: "プランをアップグレード"
@@ -546,7 +543,8 @@ export default {
     analytics: {
       growth: "📈 成長分析",
       totalPosts: "総投稿数",
-      toneAnalysis: "🎨 トーン使用分析"
+      toneAnalysis: "🎨 トーン使用分析",
+      categoryDistribution: "カテゴリ別分布"
     },
     
     templates: {
@@ -557,6 +555,36 @@ export default {
       duplicate: "複製",
       recommended: "推奨",
       usageCount: "{{count}}回使用"
+    },
+    metrics: {
+      title: "📊 マイスタイル指標",
+      consistency: "一貫性",
+      diversity: "多様性",
+      preferredTime: "好ましい時間"
+    },
+    challenges: {
+      title: "🏆 スタイルチャレンジ",
+      subtitle: "チャレンジを通じて新しいスタイルをマスターしよう",
+      inProgress: "進行中",
+      emojiPrefix: "🏆",
+      minimalWeek: {
+        name: "ミニマルウィーク",
+        description: "1週間50文字以内で投稿する",
+        rules: ["すべての投稿50文字以内", "絵文字最大2個", "ハッシュタグ3個以下"]
+      },
+      storyMonth: {
+        name: "ストーリーマンス",
+        description: "1ヶ月間毎日1つのストーリーを書く",
+        rules: ["毎日200文字以上記述", "起承転結構造", "感情表現必須"]
+      },
+      trendHunter: {
+        name: "トレンドハンター",
+        description: "最新トレンド10個を発見する",
+        rules: ["新しいハッシュタグ発見", "トレンド分析含む", "他のユーザーと共有"]
+      }
+    },
+    coaching: {
+      title: "🤖 Postyのスタイルコーチング"
     }
   },
 
@@ -565,11 +593,9 @@ export default {
     title: "マイスタイル",
     subtitle: "あなただけのコンテンツブランドを構築",
     loading: "スタイルを分析中...",
-    refresh: "更新",
     empty: {
       title: "まだコンテンツが作成されていません",
-      subtitle: "Postyで最初のコンテンツを作成しましょう！",
-      startWriting: "執筆を開始"
+      subtitle: "Postyで最初のコンテンツを作成しましょう！"
     },
     tabs: {
       templates: "テンプレート"
@@ -579,6 +605,105 @@ export default {
       subtitle: "様々なスタイルを試して、あなただけのスタイルを見つけましょう",
       starterLimit: "STARTERプラン：{{limit}}個のテンプレートのみ利用可能"
     },
+    insights: {
+      title: "スタイルインサイト",
+      styleTitle: "{{name}}スタイル",
+      styleDescription: "あなたは{{description}}を持っています。",
+      styleAction: "このスタイルで続けて成長する",
+      consistentTitle: "一貫したスタイル",
+      consistentDescription: "{{percentage}}%の高い一貫性を保っています！",
+      improvementTitle: "スタイル一貫性",
+      improvementDescription: "文章の長さとトーンをより一貫して保ってみてください。",
+      improvementAction: "スタイルガイドを見る",
+      diverseTitle: "多様なコンテンツ",
+      diverseDescription: "様々なテーマとスタイルを試しています！",
+      challengeTitle: "新しいチャレンジ",
+      challengeDescription: "{{name}}チャレンジに挑戦してみてください！",
+      challengeAction: "チャレンジを開始"
+    },
+    analysis: {
+      title: "執筆分析",
+      totalPosts: "総{{count}}個の記事",
+      averageLength: "平均文字数",
+      mostUsedTone: "主要トーン",
+      consistency: "一貫性",
+      improvement: "改善提案"
+    },
+    timeSlots: {
+      title: "活動時間帯",
+      morning: "朝",
+      afternoon: "午後",
+      evening: "夕方",
+      night: "夜",
+      morningLabel: "6-12時",
+      afternoonLabel: "12-18時",
+      eveningLabel: "18-22時",
+      nightLabel: "22-6時"
+    },
+    templates: {
+      title: "私だけのテンプレート",
+      subtitle: "よく使用するパターンをテンプレートに保存してください",
+      bestStyle: {
+        name: "私のベストスタイル",
+        description: "最も反応が良かった記事の構造",
+        opening: "感情を込めた挨拶",
+        body: "具体的な経験共有",
+        closing: "共感を誘う質問"
+      },
+      toneMaster: {
+        name: "{{tone}}マスター",
+        description: "最もよく使用するトーン",
+        tips: "このトーンの特徴を活かして作成してください"
+      },
+      growthStory: {
+        name: "成長ストーリー",
+        description: "挑戦と成就を込めた記事",
+        hook: "興味深い導入",
+        challenge: "経験した困難",
+        solution: "解決過程",
+        lesson: "学んだこと"
+      },
+      saveTemplate: "テンプレート保存",
+      useTemplate: "テンプレート使用"
+    },
+    premium: {
+      title: "プレミアム機能",
+      subtitle: "より詳細な分析とテンプレートをご利用ください",
+      upgradeButton: "アップグレード"
+    },
+    alerts: {
+      challengeStart: "チャレンジ開始！",
+      challengeStarted: "{{name}}チャレンジが開始されました！",
+      templateSaved: "テンプレートが保存されました",
+      templateUsed: "テンプレートが適用されました",
+      premiumTemplate: "プレミアムテンプレート",
+      premiumTemplateMessage: "PROプランですべてのテンプレートを使用できます。",
+      cancel: "キャンセル",
+      upgrade: "アップグレード",
+      confirm: "確認"
+    },
+    metrics: {
+      title: "統計",
+      mostActiveDay: "最多作成曜日",
+      averageWordsPerPost: "記事あたり平均単語数",
+      totalWritingTime: "総執筆時間",
+      improvementTip: "改善ヒント"
+    },
+    weekdays: {
+      monday: "月曜日",
+      tuesday: "火曜日",
+      wednesday: "水曜日",
+      thursday: "木曜日",
+      friday: "金曜日",
+      saturday: "土曜日",
+      sunday: "日曜日"
+    },
+    actions: {
+      analyze: "分析する",
+      viewDetails: "詳細を見る",
+      shareInsights: "インサイトを共有",
+      exportData: "データをエクスポート"
+    }
   },
   
   trends: {
@@ -1044,7 +1169,13 @@ export default {
     skip: "スキップ",
     loading: "読み込み中...",
     later: "後で",
-    confirm: "確認"
+    confirm: "確認",
+    categories: {
+      all: "すべて",
+      casual: "カジュアル",
+      serious: "シリアス",
+      special: "特別"
+    }
   },
 
   // Alerts
@@ -1434,7 +1565,11 @@ export default {
       rarity: "レアリティ",
       progress: "進行度",
       unlockedAt: "取得日",
-      selectBadge: "代表実績に設定"
+      selectBadge: "代表実績に設定",
+      success: "成功",
+      setBadgeSuccess: "代表実績が設定されました！",
+      error: "エラー",
+      setBadgeError: "代表実績の設定に失敗しました。"
     },
     status: {
       completed: "取得完了",
@@ -1493,8 +1628,8 @@ export default {
         description: "ミニマルウィークチャレンジを完了しました"
       },
       story_teller: {
-        name: "ストーリーテラー",
-        description: "ストーリーマンスチャレンジを完了しました"
+        name: "フォーマルマスター",
+        description: "フォーマルスタイルチャレンジを完了しました"
       },
       trend_hunter: {
         name: "トレンドハンター",
@@ -1576,6 +1711,59 @@ export default {
         name: "Postyベテラン",
         description: "Postyを1年以上使用しました"
       }
+    }
+  },
+
+  // Style Selector
+  styleSelector: {
+    title: "どのスタイルで書きますか？"
+  },
+
+  // Unified Styles
+  styles: {
+    minimalist: {
+      name: "ミニマリスト",
+      description: "シンプルですっきりしたスタイル"
+    },
+    storytelling: {
+      name: "文語体", 
+      description: "格式ある書面表現"
+    },
+    humorous: {
+      name: "ユーモラス",
+      description: "機智に富んだ愉快な表現"
+    },
+    trendsetter: {
+      name: "トレンドセッター",
+      description: "最新トレンドを反映したスタイル"
+    },
+    philosopher: {
+      name: "哲学者",
+      description: "深い思考を込めたスタイル"
+    },
+    casual: {
+      name: "カジュアル",
+      description: "親しみやすく快適な日常会話体"
+    },
+    professional: {
+      name: "プロフェッショナル",
+      description: "格式ある信頼感のあるビジネストーン"
+    },
+    emotional: {
+      name: "感情的",
+      description: "感情を込めた温かい表現"
+    },
+    genz: {
+      name: "Gen Z",
+      description: "Gen Z特有のトレンディな表現"
+    },
+    millennial: {
+      name: "ミレニアル",
+      description: "ミレニアル世代の感情的表現"
+    },
+    motivational: {
+      name: "名言",
+      description: "詩のように美しく深い哲学的洞察"
     }
   }
 };

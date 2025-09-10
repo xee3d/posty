@@ -513,7 +513,8 @@ class ImprovedUserTrendsService {
         return;
       }
 
-      source.hashtags.forEach((tag: TrendData) => {
+      if (source.hashtags && Array.isArray(source.hashtags)) {
+        source.hashtags.forEach((tag: TrendData) => {
         const key = tag.hashtag;
         const existing = mergedHashtags.get(key);
 
@@ -526,7 +527,8 @@ class ImprovedUserTrendsService {
         } else {
           mergedHashtags.set(key, { ...tag });
         }
-      });
+        });
+      }
     });
 
     // 스코어 기준 정렬
@@ -667,7 +669,8 @@ class ImprovedUserTrendsService {
 
     posts.forEach((post) => {
       const postDate = new Date(post.createdAt);
-      post.hashtags.forEach((tag: string) => {
+      if (post.hashtags && Array.isArray(post.hashtags)) {
+        post.hashtags.forEach((tag: string) => {
         if (!hashtags[tag]) {
           hashtags[tag] = { count: 0, lastUsed: postDate };
         }
@@ -675,7 +678,8 @@ class ImprovedUserTrendsService {
         if (postDate > hashtags[tag].lastUsed) {
           hashtags[tag].lastUsed = postDate;
         }
-      });
+        });
+      }
     });
 
     return hashtags;
@@ -686,7 +690,7 @@ class ImprovedUserTrendsService {
     const relatedTags: Record<string, number> = {};
 
     posts.forEach((post) => {
-      if (post.hashtags.includes(targetHashtag)) {
+      if (post.hashtags && Array.isArray(post.hashtags) && post.hashtags.includes(targetHashtag)) {
         post.hashtags.forEach((tag: string) => {
           if (tag !== targetHashtag) {
             relatedTags[tag] = (relatedTags[tag] || 0) + 1;
@@ -747,10 +751,12 @@ class ImprovedUserTrendsService {
       }
       categories[category].count++;
 
-      post.hashtags.forEach((tag: string) => {
-        categories[category].hashtagCount[tag] =
-          (categories[category].hashtagCount[tag] || 0) + 1;
-      });
+      if (post.hashtags && Array.isArray(post.hashtags)) {
+        post.hashtags.forEach((tag: string) => {
+          categories[category].hashtagCount[tag] =
+            (categories[category].hashtagCount[tag] || 0) + 1;
+        });
+      }
     });
 
     const result: Record<string, { count: number; hashtags: string[] }> = {};

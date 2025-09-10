@@ -13,6 +13,7 @@ import { SafeIcon } from "../utils/SafeIcon";
 import { UNIFIED_STYLES } from "../utils/unifiedStyleConstants";
 import { COLORS, SPACING } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
+import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
 const CARD_WIDTH = (width - SPACING.lg * 2 - SPACING.sm * 2) / 3;
@@ -31,15 +32,16 @@ const StyleSelectorModal: React.FC<StyleSelectorModalProps> = ({
   currentStyle,
 }) => {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<
     "all" | "fun" | "serious" | "special"
   >("all");
 
   const categories = [
-    { id: "all", label: "전체", icon: "apps-outline" },
-    { id: "fun", label: "캐주얼", icon: "happy-outline" },
-    { id: "serious", label: "진지함", icon: "briefcase-outline" },
-    { id: "special", label: "특별", icon: "star-outline" },
+    { id: "all", label: t("common.categories.all", "전체"), icon: "apps-outline" },
+    { id: "fun", label: t("common.categories.casual", "캐주얼"), icon: "happy-outline" },
+    { id: "serious", label: t("common.categories.serious", "진지함"), icon: "briefcase-outline" },
+    { id: "special", label: t("common.categories.special", "특별"), icon: "star-outline" },
   ];
 
   const getFilteredStyles = () => {
@@ -82,7 +84,7 @@ const StyleSelectorModal: React.FC<StyleSelectorModalProps> = ({
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>어떤 스타일로 쓸까요?</Text>
+            <Text style={styles.modalTitle}>{t("styleSelector.title", "어떤 스타일로 쓸까요?")}</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <SafeIcon name="close" size={24} color={colors.text.primary} />
             </TouchableOpacity>

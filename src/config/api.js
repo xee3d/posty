@@ -25,7 +25,7 @@ const API_CONFIG = {
   APP_SECRET:
     process.env.POSTY_APP_SECRET ||
     (__DEV__
-      ? "dev-posty-secret-key-2025"
+      ? "posty-secret-key-change-this-in-production"
       : (() => {
           console.error(
             "🚨 POSTY_APP_SECRET 환경변수가 프로덕션에서 설정되지 않았습니다!"

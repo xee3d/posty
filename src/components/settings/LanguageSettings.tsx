@@ -103,7 +103,9 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
         activeOpacity={0.7}
       >
         <View style={styles.languageInfo}>
-          <Text style={styles.languageFlag}>{item.flag}</Text>
+          <View style={[styles.languageCodeBadge, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '30' }]}>
+            <Text style={[styles.languageCodeText, { color: colors.primary }]}>{item.flagCode}</Text>
+          </View>
           <View style={styles.languageNames}>
             <Text style={[
               styles.languageName, 
@@ -149,9 +151,9 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
           </Text>
         </View>
         <View style={styles.settingRight}>
-          <Text style={[styles.currentValue, { color: colors.text.secondary }]}>
-            {currentConfig.flag}
-          </Text>
+          <View style={[styles.currentLanguageCodeBadge, { backgroundColor: colors.primary + '15', borderColor: colors.primary + '30' }]}>
+            <Text style={[styles.currentLanguageCodeText, { color: colors.primary }]}>{currentConfig.flagCode}</Text>
+          </View>
           <Icon
             name="chevron-forward"
             size={20}
@@ -257,8 +259,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  currentValue: {
-    fontSize: 20,
+  currentLanguageCodeBadge: {
+    width: 28,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+  },
+  currentLanguageCodeText: {
+    fontSize: 10,
+    fontWeight: '600',
   },
   modalContainer: {
     flex: 1,
@@ -306,9 +318,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
   },
-  languageFlag: {
-    fontSize: 32,
+  languageCodeBadge: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginRight: 16,
+  },
+  languageCodeText: {
+    fontSize: 12,
+    fontWeight: '700',
   },
   languageNames: {
     flex: 1,

@@ -468,7 +468,7 @@ class PreparedContentService {
   searchByHashtag(hashtag: string): PreparedContent[] {
     const normalizedTag = hashtag.replace("#", "").toLowerCase();
     return this.getAllContents().filter((content) =>
-      content.hashtags.some((tag) => tag.toLowerCase().includes(normalizedTag))
+      content.hashtags && Array.isArray(content.hashtags) && content.hashtags.some((tag) => tag.toLowerCase().includes(normalizedTag))
     );
   }
 
@@ -523,7 +523,7 @@ class PreparedContentService {
     const enrichedContents = await Promise.all(
       contents.map(async (content) => {
         // 이미 해시태그가 있다면 그대로 반환
-        if (content.hashtags.length > 0) {
+        if (content.hashtags && content.hashtags.length > 0) {
           return content;
         }
 
