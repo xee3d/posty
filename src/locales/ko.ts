@@ -631,6 +631,9 @@ export default {
     access: {
       freeMessage: "STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.",
     },
+    brand: {
+      title: "브랜드"
+    },
     tabs: {
       overview: "개요",
       analysis: "분석", 

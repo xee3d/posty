@@ -565,6 +565,9 @@ export default {
       freeMessage: "我的风格分析功能从STARTER计划开始提供。",
       upgradeButton: "升级计划"
     },
+    brand: {
+      title: "品牌"
+    },
     
     analysis: {
       title: "风格分析",

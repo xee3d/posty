@@ -512,6 +512,9 @@ export default {
       freeMessage: "マイスタイル分析はSTARTERプランから利用できます。",
       upgradeButton: "プランをアップグレード"
     },
+    brand: {
+      title: "ブランド"
+    },
     
     analysis: {
       title: "スタイル分析",

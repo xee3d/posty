@@ -846,6 +846,9 @@ export default {
     access: {
       freeMessage: "My Style analysis is available from STARTER plan.",
     },
+    brand: {
+      title: "Brand"
+    },
     tabs: {
       overview: "Overview",
       analysis: "Analysis", 
