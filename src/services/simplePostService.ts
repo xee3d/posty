@@ -1,6 +1,6 @@
 // 단순화된 포스트 기록 서비스
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import i18n from "../locales/i18n";
+import i18next from "../locales/i18n";
 import { SimplePost, PostStats } from "./types/postTypes";
 
 import vercelAuthService from "./auth/vercelAuthService";
@@ -159,7 +159,7 @@ class SimplePostService {
 
     posts.forEach((post) => {
       const date = new Date(post.createdAt);
-      const day = (i18n.t("time.days", { returnObjects: true }) as string[])[date.getDay()];
+      const day = (i18next.t("time.days", { returnObjects: true }) as string[])[date.getDay()];
       const hour = date.getHours();
 
       dayCount[day] = (dayCount[day] || 0) + 1;
@@ -167,12 +167,12 @@ class SimplePostService {
     });
 
     const mostActiveDay =
-      Object.entries(dayCount).sort(([, a], [, b]) => b - a)[0]?.[0] || i18n.t("time.none");
+      Object.entries(dayCount).sort(([, a], [, b]) => b - a)[0]?.[0] || i18next.t("time.none");
 
     const mostActiveHour =
       Object.entries(hourCount).sort(([, a], [, b]) => b - a)[0]?.[0] || "0";
 
-    const mostActiveTime = `${mostActiveHour}${i18n.t("time.hour")}`;
+    const mostActiveTime = `${mostActiveHour}${i18next.t("time.hour")}`;
 
     return {
       totalPosts: posts.length,

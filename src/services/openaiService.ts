@@ -4,6 +4,7 @@
 // 환경변수에서 API 키 가져오기
 // @ts-ignore
 import { OPENAI_API_KEY } from "@env";
+import { getCurrentLanguage } from "./localization/languageService";
 
 // API 키가 없을 경우 기본값
 const API_KEY = OPENAI_API_KEY || "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";
@@ -175,7 +176,50 @@ class OpenAIService {
 - 과도한 마케팅 문구는 피하세요
 - 따뜻하고 진솔한 느낌을 담아주세요`;
 
-    return basePrompt + enhancement;
+    return baseInstructions + "\n\n" + basePrompt + enhancement;
+  }
+  
+  private getBaseInstructionsByLanguage(language: string): string {
+    switch (language) {
+      case 'ja':
+        return `あなたは${platform || 'ソーシャルメディア'}プラットフォーム向けの専門的なコンテンツライターです。
+以下の指示に従って、自然で魅力的なコンテンツを作成してください。
+
+重要な指示:
+1. 提供されたトピックを中心に書いてください
+2. 自然で本物らしい内容にしてください
+3. 過度なマーケティング表現は避けてください
+4. 適切な長さで書いてください（長すぎず短すぎず）
+5. 日本語の自然な表現を使用してください
+
+応答には生成されたコンテンツのみを含め、追加の説明やメタデータは含めないでください。`;
+        
+      case 'en':
+        return `You are a professional content writer for ${platform || 'social media'} platforms.
+Please create natural and engaging content following the instructions below.
+
+Important instructions:
+1. Write centered around the provided topic
+2. Make it natural and authentic
+3. Avoid excessive marketing language
+4. Write at an appropriate length (not too long or too short)
+5. Use natural expressions in English
+
+Include only the generated content in your response, without additional explanations or metadata.`;
+        
+      default: // Korean
+        return `당신은 ${platform || '소셜미디어'} 플랫폼을 위한 전문적인 콘텐츠 작성자입니다.
+아래 지시사항에 따라 자연스럽고 매력적인 콘텐츠를 작성해주세요.
+
+중요한 지시사항:
+1. 제공된 주제를 중심으로 작성하세요
+2. 자연스럽고 진정성 있는 내용으로 작성하세요
+3. 과도한 마케팅 문구는 피하세요
+4. 적절한 길이로 작성하세요 (너무 길거나 짧지 않게)
+5. 해당 언어의 자연스러운 표현을 사용하세요
+
+응답은 오직 생성된 콘텐츠만 포함하고, 추가 설명이나 메타데이터는 포함하지 마세요.`;
+    }
   }
 
   // 콘텐츠 정리 및 플랫폼별 최적화 - 통합 메서드
@@ -584,6 +628,12 @@ ${guide.name} 작업을 수행해주세요.
 
   // 프롬프트 생성 헬퍼 함수들
   private createSystemPrompt(tone: string, platform?: string): string {
+    const currentLanguage = getCurrentLanguage();
+    console.log('[OpenAI Service] Creating system prompt for language:', currentLanguage);
+    
+    // 언어별 기본 지시사항
+    const baseInstructions = this.getBaseInstructionsByLanguage(currentLanguage);
+    
     const toneGuides = {
       casual: `친근하고 편안한 일상 대화체로 작성하세요.
 특징:

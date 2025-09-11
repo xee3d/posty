@@ -439,7 +439,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
             ) : userTrends && userTrends.hashtags?.length > 0 ? (
               <SlideInView direction="right" delay={200}>
                 <View style={styles.myTrendsSection}>
-                  <Text style={sectionStyles.sectionTitle}>{t("mystyle.insights.title")}</Text>
+                  <Text style={sectionStyles.sectionTitle}>{t("myStyle.insights.title")}</Text>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     {userTrends.hashtags
                       .slice(0, 5)

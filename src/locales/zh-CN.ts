@@ -518,6 +518,36 @@ export default {
       short: "[长度：请简洁地在50字内写作]",
       medium: "[长度：请在100-150字之间适中地写作]",
       long: "[长度：请详细丰富地在200-300字写作]"
+    },
+    platforms: {
+      instagram: {
+        prompt: "请创作适合Instagram的情感丰富且视觉化的帖子。适当使用表情符号，通过讲故事创造共鸣。",
+        instruction1: "利用换行提高可读性",
+        instruction2: "在句末或重要点使用表情符号",
+        instruction3: "将标签集中在帖子末尾"
+      },
+      facebook: {
+        prompt: "请创作适合Facebook的友好对话式帖子。在传达信息的同时，用像和朋友聊天的语调来写作。",
+        instruction1: "使用像和朋友聊天般舒适的语调",
+        instruction2: "以问题结尾来鼓励评论参与"
+      },
+      twitter: {
+        prompt: "请创作适合X(Twitter)的简洁有力的帖子。在280字内只传达精髓，用机智的方式表达。",
+        instruction1: "必须在280字以内创作",
+        instruction2: "将核心信息放在前面部分",
+        instruction3: "只使用1-2个标签"
+      },
+      threads: {
+        prompt: "请创作适合Threads的对话式帖子。用真诚的语调写作，能够引发讨论。",
+        instruction1: "以开始对话的感觉来写作",
+        instruction2: "包含个人观点或经验"
+      },
+      linkedin: {
+        prompt: "请创作适合LinkedIn的专业正式帖子。用分享行业洞察或专业经验的语调来写作。",
+        instruction1: "适当使用专业术语",
+        instruction2: "如有具体成果或数字请包含",
+        instruction3: "以教训或洞察作为结尾"
+      }
     }
   },
 
@@ -953,7 +983,9 @@ export default {
       food: "美食",
       travel: "旅行",
       exercise: "运动",
-      bookstagram: "读书"
+      bookstagram: "读书",
+      trends: "趋势",
+      trendy: "潮流"
     },
     quickTemplates: {
       lunch: ["今天的午餐✨", "发现宝藏！", "这给了我能量"],

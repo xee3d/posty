@@ -2,6 +2,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { SavedContent } from "../utils/storage";
 import { userBehaviorAnalytics } from "./userBehaviorAnalytics";
+import i18next from "../locales/i18n";
 
 export interface RecommendationCard {
   id: string;
@@ -998,7 +999,7 @@ class PersonalizedRecommendationService {
   // 카테고리별 해시태그 (번역 기반)
   private getCategoryHashtags(category: string): string[] {
     try {
-      const { t } = require('../locales/i18n');
+      // i18next를 사용하여 번역
       
       // 카테고리에 따른 번역 키 매핑
       const categoryKeyMap: { [key: string]: string[] } = {
@@ -1022,12 +1023,12 @@ class PersonalizedRecommendationService {
       // 번역 키를 실제 번역된 값으로 변환
       const translatedHashtags = translationKeys.map(key => {
         try {
-          return t(key);
+          return i18next.t(key);
         } catch (error) {
           console.warn(`Translation key ${key} not found, using fallback`);
           return key; // 번역이 없으면 키 자체를 반환
         }
-      }).filter(tag => tag && tag !== key); // 빈 값이나 키 자체는 필터링
+      }).filter(tag => tag && typeof tag === 'string'); // 빈 값이나 무효한 값은 필터링
       
       return translatedHashtags;
       

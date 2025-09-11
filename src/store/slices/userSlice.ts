@@ -4,7 +4,7 @@ import {
   DetailedUserProfile,
   calculateProfileCompleteness,
 } from "../../types/userProfile";
-import i18n from "../../locales/i18n";
+import i18next from "../../locales/i18n";
 
 // 토큰 히스토리를 별도 타입으로 분리
 interface TokenHistory {
@@ -441,7 +441,7 @@ const userSlice = createSlice({
             date: new Date().toISOString(),
             type: "earn",
             amount: 10,
-            description: i18n.t("tokens.descriptions.dailyFree"),
+            description: i18next.t("tokens.descriptions.dailyFree"),
             balance: state.currentTokens,
           };
           state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];

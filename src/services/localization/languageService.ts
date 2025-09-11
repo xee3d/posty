@@ -2,7 +2,7 @@
 import { NativeModules, Platform } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import i18n from '../../locales/i18n';
+import i18next from '../../locales/i18n';
 import { store } from '../../store';
 import { updateSettings } from '../../store/slices/userSlice';
 import { getDeviceLanguage } from '../../utils/deviceLanguage';
@@ -138,6 +138,18 @@ class LanguageService {
       console.warn('[LanguageService] Service not initialized, using Korean');
       return 'ko';
     }
+    
+    // i18next의 실제 현재 언어를 반환
+    const i18nLanguage = i18next.language;
+    console.log('[LanguageService] Current i18n language:', i18nLanguage);
+    
+    // i18next 언어가 지원되는 언어인지 확인
+    if (this.isSupportedLanguage(i18nLanguage as SupportedLanguage)) {
+      return i18nLanguage as SupportedLanguage;
+    }
+    
+    // 지원되지 않는 언어면 기본값 반환
+    console.warn('[LanguageService] Unsupported i18n language:', i18nLanguage, 'falling back to:', this.currentLanguage);
     return this.currentLanguage;
   }
 
@@ -155,7 +167,7 @@ class LanguageService {
       
       // i18n 시스템과 연동
       try {
-        await i18n.changeLanguage(language);
+        await i18next.changeLanguage(language);
         console.log('[LanguageService] i18n language changed successfully to:', language);
       } catch (error) {
         console.warn('[LanguageService] i18n language change failed:', error);

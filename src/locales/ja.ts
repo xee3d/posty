@@ -481,6 +481,36 @@ export default {
       short: "[長さ: 50文字以内で短く簡潔に書いてください]",
       medium: "[長さ: 100-150文字の間で適度な長さに書いてください]",
       long: "[長さ: 200-300文字で詳細で豊かに書いてください]"
+    },
+    platforms: {
+      instagram: {
+        prompt: "Instagramに適した感情的で視覚的な投稿を書いてください。絵文字を適切に使い、ストーリーテリングで共感を得てください。",
+        instruction1: "改行を活用して読みやすさを高めてください",
+        instruction2: "絵文字は文末や重要なポイントで使用してください",
+        instruction3: "ハッシュタグは本文の最後にまとめて記載してください"
+      },
+      facebook: {
+        prompt: "Facebookに適したフレンドリーで会話的な投稿を書いてください。情報を伝えながら友達と話すような口調で書いてください。",
+        instruction1: "友達に話すような快適な口調を使ってください",
+        instruction2: "質問で終わってコメント参加を促してください"
+      },
+      twitter: {
+        prompt: "X(Twitter)に適した簡潔でインパクトのある投稿を書いてください。280文字以内でエッセンスのみを伝え、ウィットに富んで表現してください。",
+        instruction1: "必ず280文字以内で作成してください",
+        instruction2: "核心メッセージを前の部分に配置してください",
+        instruction3: "ハッシュタグは1-2個のみ使用してください"
+      },
+      threads: {
+        prompt: "Threadsに適した会話的な投稿を書いてください。議論を引き起こすことができる真摯な口調で書いてください。",
+        instruction1: "会話を始める感じで書いてください",
+        instruction2: "個人的な意見や経験を含めてください"
+      },
+      linkedin: {
+        prompt: "LinkedInに適したプロフェッショナルで格式のある投稿を書いてください。業界のインサイトや専門的な経験を共有する口調で書いてください。",
+        instruction1: "専門用語を適切に使用してください",
+        instruction2: "具体的な成果や数字があれば含めてください",
+        instruction3: "教訓やインサイトで締めくくってください"
+      }
     }
   },
 
@@ -523,7 +553,8 @@ export default {
       title: "キーワード"
     },
     challenge: {
-      progress: "進捗: {{current}}/{{total}}"
+      progress: "進捗: {{current}}/{{total}}",
+      dayUnit: "日"
     },
     insights: {
       title: "スタイルインサイト",
@@ -931,7 +962,9 @@ export default {
       food: "グルメ",
       travel: "旅行",
       exercise: "運動",
-      bookstagram: "読書"
+      bookstagram: "読書",
+      trends: "トレンド",
+      trendy: "トレンディ"
     },
     quickTemplates: {
       lunch: ["今日のランチ✨", "隠れた名店発見！", "これで元気が出ました"],

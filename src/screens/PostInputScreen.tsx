@@ -40,7 +40,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
   const [platform, setPlatform] = useState<
     "instagram" | "facebook" | "twitter"
   >("instagram");
-  const [category, setCategory] = useState<string>(t('posts.categories.daily'));
+  const [category, setCategory] = useState<string>(t('myStyle.categories.daily', '일상'));
   const [metrics, setMetrics] = useState({
     likes: "",
     comments: "",
@@ -50,14 +50,14 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
   const [isSaving, setIsSaving] = useState(false);
 
   const categories = [
-    t('posts.categories.cafe'),
-    t('posts.categories.food'),
-    t('posts.categories.daily'),
-    t('posts.categories.exercise'),
-    t('posts.categories.travel'),
-    t('posts.categories.fashion'),
-    t('posts.categories.beauty'),
-    t('posts.categories.other'),
+    t('myStyle.categories.cafe', '카페'),
+    t('myStyle.categories.food', '맛집'),
+    t('myStyle.categories.daily', '일상'),
+    t('myStyle.categories.exercise', '운동'),
+    t('myStyle.categories.travel', '여행'),
+    t('myStyle.categories.business', '비즈니스'),
+    t('myStyle.categories.emotional', '감성'),
+    t('myStyle.categories.storytelling', '문어체'),
   ];
   const platforms = [
     {

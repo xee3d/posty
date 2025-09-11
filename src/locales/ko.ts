@@ -89,6 +89,18 @@ export default {
       minimalist: "미니멀",
       storytelling: "문어체",
       motivational: "명언",
+      clean: "깔끔",
+      structured: "정돈",
+      enthusiastic: "대새",
+      trendy: "힙",
+      elegant: "세련",
+      modern: "모던",
+      vintage: "빈티지",
+      minimal: "미니멀",
+      friendly: "따뜻",
+      cool: "차가운",
+      energetic: "밝은",
+      mysterious: "어두운",
     },
     lengths: {
       short: "짧게",
@@ -240,37 +252,32 @@ export default {
     },
     platforms: {
       instagram: {
-        name: "Instagram",
-        characteristics: [
-          "시각적이고 감성적인 톤",
-          "이모지 사용 권장", 
-          "스토리텔링 중심",
-          "해시태그 적극 활용",
-          "짧은 문단으로 구성"
-        ],
-        prompt: "인스타그램에 적합한 감성적이고 시각적인 포스팅을 작성해주세요. 이모지를 적절히 사용하고, 스토리텔링을 통해 공감대를 형성해주세요."
+        prompt: "인스타그램에 적합한 감성적이고 시각적인 포스팅을 작성해주세요. 이모지를 적절히 사용하고, 스토리텔링을 통해 공감대를 형성해주세요.",
+        instruction1: "줄바꿈을 활용해 가독성을 높여주세요",
+        instruction2: "이모지는 문장 끝이나 중요 포인트에 사용해주세요",
+        instruction3: "해시태그는 본문 끝에 모아서 작성해주세요"
       },
       facebook: {
-        name: "Facebook",
-        characteristics: [
-          "정보성과 친근함의 균형",
-          "긴 글도 가능",
-          "대화체 톤",
-          "커뮤니티 중심", 
-          "링크 공유 가능"
-        ],
-        prompt: "페이스북에 적합한 친근하고 대화체의 포스팅을 작성해주세요. 정보를 전달하면서도 친구와 대화하는 듯한 톤으로 작성해주세요."
+        prompt: "페이스북에 적합한 친근하고 대화체의 포스팅을 작성해주세요. 정보를 전달하면서도 친구와 대화하는 듯한 톤으로 작성해주세요.",
+        instruction1: "친구에게 이야기하듯 편안한 어조를 사용해주세요",
+        instruction2: "질문으로 끝내 댓글 참여를 유도해주세요"
       },
       twitter: {
-        name: "X (Twitter)",
-        characteristics: [
-          "간결하고 임팩트 있는 표현",
-          "트렌드와 시의성",
-          "위트와 유머",
-          "적은 해시태그",
-          "리트윗 유도"
-        ],
-        prompt: "X(트위터)에 적합한 간결하고 임팩트 있는 포스팅을 작성해주세요. 280자 이내로 핵심만 전달하되, 위트있게 표현해주세요."
+        prompt: "X(트위터)에 적합한 간결하고 임팩트 있는 포스팅을 작성해주세요. 280자 이내로 핵심만 전달하되, 위트있게 표현해주세요.",
+        instruction1: "반드시 280자 이내로 작성해주세요",
+        instruction2: "핵심 메시지를 앞부분에 배치해주세요",
+        instruction3: "해시태그는 1-2개만 사용해주세요"
+      },
+      threads: {
+        prompt: "스레드에 적합한 대화형 포스팅을 작성해주세요. 진솔하고 토론을 유도할 수 있는 내용으로 작성해주세요.",
+        instruction1: "대화를 시작하는 느낌으로 작성해주세요",
+        instruction2: "개인적인 의견이나 경험을 포함해주세요"
+      },
+      linkedin: {
+        prompt: "링크드인에 적합한 전문적이고 격식있는 포스팅을 작성해주세요. 업계 인사이트나 전문적인 경험을 공유하는 톤으로 작성해주세요.",
+        instruction1: "전문 용어를 적절히 사용해주세요",
+        instruction2: "구체적인 성과나 수치가 있다면 포함해주세요",
+        instruction3: "교훈이나 인사이트로 마무리해주세요"
       }
     }
   },
@@ -515,7 +522,9 @@ export default {
       food: "맛집",
       travel: "여행",
       exercise: "운동",
-      bookstagram: "책스타그램"
+      bookstagram: "책스타그램",
+      trends: "트렌드",
+      trendy: "핫플"
     },
     quickTemplates: {
       lunch: ["오늘 점심 ✨", "JMT 발견!", "이거 먹고 힘내자"],
@@ -825,16 +834,6 @@ export default {
       storytelling: "문어체",
       motivational: "명언"
     },
-    categories: {
-      daily: "일상",
-      cafe: "카페",
-      food: "맛집",
-      exercise: "운동",
-      travel: "여행",
-      fashion: "패션",
-      beauty: "뷰티",
-      other: "기타"
-    },
     time: {
       today: "오늘",
       yesterday: "어제",
@@ -871,6 +870,38 @@ export default {
       comments: "댓글",
       shares: "공유",
       reach: "도달"
+    },
+    categories: {
+      // 기본 카테고리
+      cafe: "카페",
+      food: "맛집",
+      daily: "일상",
+      exercise: "운동",
+      travel: "여행",
+      weekend: "주말",
+      bookstagram: "책스타그램",
+      trends: "트렌드",
+      // 톤/감정 카테고리
+      motivational: "명언",
+      business: "비즈니스",
+      emotional: "감성",
+      storytelling: "문어체",
+      // 스타일 카테고리
+      simple: "심플",
+      clean: "깔끔",
+      organized: "정돈",
+      hotplace: "핫플",
+      trendy: "요즘",
+      awesome: "대새",
+      hip: "힙",
+      sophisticated: "세련",
+      modern: "모던",
+      vintage: "빈티지",
+      minimal: "미니멀",
+      warm: "따뜻",
+      cool: "차가운",
+      bright: "밝은",
+      dark: "어두운",
     }
   },
 

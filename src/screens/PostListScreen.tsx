@@ -63,7 +63,7 @@ const getCategoryFromTone = (tone: string, t: any): string => {
     motivational: t('posts.styles.motivational'),
   };
 
-  return toneToCategory[tone] || t('posts.categories.daily');
+  return toneToCategory[tone] || t('myStyle.categories.daily', '일상');
 };
 
 // 날짜 포맷 함수 (t 함수는 컴포넌트 내부에서 정의)
@@ -264,7 +264,7 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
       // 에러 시에도 최대 10개만 표시
       setPosts(localPosts.slice(0, 10).map(post => ({
         ...post,
-        category: post.category || t('posts.categories.daily'),
+        category: post.category || t('myStyle.categories.daily', '일상'),
         tone: post.tone || 'casual' // tone이 없으면 기본값 설정
       })));
     } finally {

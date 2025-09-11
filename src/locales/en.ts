@@ -1155,6 +1155,43 @@ export default {
         message: "{{tokens}} tokens granted"
       }
     },
+    aiPrompts: {
+      length: {
+        short: "[Length: Write concisely within 50 characters]",
+        medium: "[Length: Write moderately in 100-150 characters]", 
+        long: "[Length: Write in detail with 200-300 characters]"
+      },
+      platforms: {
+        instagram: {
+          prompt: "Please write an emotional and visual post suitable for Instagram. Use emojis appropriately and create empathy through storytelling.",
+          instruction1: "Use line breaks to improve readability",
+          instruction2: "Use emojis at the end of sentences or at important points",
+          instruction3: "Group hashtags together at the end of the post"
+        },
+        facebook: {
+          prompt: "Please write a friendly, conversational post suitable for Facebook. Write in a tone like talking to a friend while conveying information.",
+          instruction1: "Use a comfortable tone as if talking to a friend",
+          instruction2: "End with a question to encourage comment participation"
+        },
+        twitter: {
+          prompt: "Please write a concise and impactful post suitable for X (Twitter). Deliver only the essence within 280 characters, expressed wittily.",
+          instruction1: "Must write within 280 characters",
+          instruction2: "Place the core message at the beginning",
+          instruction3: "Use only 1-2 hashtags"
+        },
+        threads: {
+          prompt: "Please write a conversational post suitable for Threads. Write in a sincere tone that can spark discussion.",
+          instruction1: "Write as if starting a conversation",
+          instruction2: "Include personal opinions or experiences"
+        },
+        linkedin: {
+          prompt: "Please write a professional and formal post suitable for LinkedIn. Write in a tone that shares industry insights or professional experiences.",
+          instruction1: "Use professional terminology appropriately",
+          instruction2: "Include specific achievements or numbers if available",
+          instruction3: "End with lessons learned or insights"
+        }
+      }
+    },
     buttons: {
       ok: "OK",
       cancel: "Cancel",

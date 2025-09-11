@@ -1,5 +1,5 @@
 // 플랫폼별 콘텐츠 특성 정의
-import i18n from "../locales/i18n";
+import i18next from "../locales/i18n";
 export const PLATFORM_CHARACTERISTICS = {
   instagram: {
     name: "Instagram",
@@ -12,7 +12,7 @@ export const PLATFORM_CHARACTERISTICS = {
       "해시태그 적극 활용",
       "짧은 문단으로 구성",
     ],
-    getPrompt: () => i18n.t('aiPrompts.platforms.instagram.prompt', '인스타그램에 적합한 감성적이고 시각적인 포스팅을 작성해주세요. 이모지를 적절히 사용하고, 스토리텔링을 통해 공감대를 형성해주세요.'),
+    getPrompt: () => i18next.t('aiPrompts.platforms.instagram.prompt', '인스타그램에 적합한 감성적이고 시각적인 포스팅을 작성해주세요. 이모지를 적절히 사용하고, 스토리텔링을 통해 공감대를 형성해주세요.'),
   },
   facebook: {
     name: "Facebook",
@@ -25,7 +25,7 @@ export const PLATFORM_CHARACTERISTICS = {
       "커뮤니티 중심",
       "링크 공유 가능",
     ],
-    getPrompt: () => i18n.t('aiPrompts.platforms.facebook.prompt', '페이스북에 적합한 친근하고 대화체의 포스팅을 작성해주세요. 정보를 전달하면서도 친구와 대화하는 듯한 톤으로 작성해주세요.'),
+    getPrompt: () => i18next.t('aiPrompts.platforms.facebook.prompt', '페이스북에 적합한 친근하고 대화체의 포스팅을 작성해주세요. 정보를 전달하면서도 친구와 대화하는 듯한 톤으로 작성해주세요.'),
   },
   twitter: {
     name: "X (Twitter)",
@@ -38,7 +38,7 @@ export const PLATFORM_CHARACTERISTICS = {
       "적은 해시태그",
       "리트윗 유도",
     ],
-    getPrompt: () => i18n.t('aiPrompts.platforms.twitter.prompt', 'X(트위터)에 적합한 간결하고 임팩트 있는 포스팅을 작성해주세요. 280자 이내로 핵심만 전달하되, 위트있게 표현해주세요.'),
+    getPrompt: () => i18next.t('aiPrompts.platforms.twitter.prompt', 'X(트위터)에 적합한 간결하고 임팩트 있는 포스팅을 작성해주세요. 280자 이내로 핵심만 전달하되, 위트있게 표현해주세요.'),
   },
   threads: {
     name: "Threads",
@@ -152,40 +152,53 @@ export function enhancePromptForPlatform(
   const platformInfo = PLATFORM_CHARACTERISTICS[platform];
 
   if (!platformInfo) {
+    console.log('🔧 [PlatformUtils] No platform info found for:', platform);
     return basePrompt;
   }
 
   let enhancedPrompt = `${basePrompt}\n\n[Platform: ${platformInfo.name}]\n`;
-  enhancedPrompt += `${(platformInfo as any).getPrompt()}\n`;
+  const platformPrompt = (platformInfo as any).getPrompt();
+  enhancedPrompt += `${platformPrompt}\n`;
+  
+  console.log('🔧 [PlatformUtils] Base prompt generated:', {
+    platform,
+    baseLength: basePrompt.length,
+    platformPrompt: platformPrompt.substring(0, 50) + '...',
+    currentLanguage: i18next.language
+  });
 
   // 플랫폼별 특별 지시사항
   switch (platform) {
     case "instagram":
-      enhancedPrompt += "- 줄바꿈을 활용해 가독성을 높여주세요\n";
-      enhancedPrompt += "- 이모지는 문장 끝이나 중요 포인트에 사용해주세요\n";
-      enhancedPrompt += "- 해시태그는 본문 끝에 모아서 작성해주세요\n";
+      const inst1 = i18next.t('aiPrompts.platforms.instagram.instruction1', { defaultValue: '줄바꿈을 활용해 가독성을 높여주세요' });
+      const inst2 = i18next.t('aiPrompts.platforms.instagram.instruction2', { defaultValue: '이모지는 문장 끝이나 중요 포인트에 사용해주세요' });
+      const inst3 = i18next.t('aiPrompts.platforms.instagram.instruction3', { defaultValue: '해시태그는 본문 끝에 모아서 작성해주세요' });
+      console.log('🔧 [PlatformUtils] Instagram instructions:', { inst1, inst2, inst3, lang: i18next.language });
+      enhancedPrompt += `- ${inst1}\n`;
+      enhancedPrompt += `- ${inst2}\n`;
+      enhancedPrompt += `- ${inst3}\n`;
       break;
 
     case "facebook":
-      enhancedPrompt += "- 친구에게 이야기하듯 편안한 어조를 사용해주세요\n";
-      enhancedPrompt += "- 질문으로 끝내 댓글 참여를 유도해주세요\n";
+      enhancedPrompt += `- ${i18next.t('aiPrompts.platforms.facebook.instruction1', '친구에게 이야기하듯 편안한 어조를 사용해주세요')}\n`;
+      enhancedPrompt += `- ${i18next.t('aiPrompts.platforms.facebook.instruction2', '질문으로 끝내 댓글 참여를 유도해주세요')}\n`;
       break;
 
     case "twitter":
-      enhancedPrompt += "- 반드시 280자 이내로 작성해주세요\n";
-      enhancedPrompt += "- 핵심 메시지를 앞부분에 배치해주세요\n";
-      enhancedPrompt += "- 해시태그는 1-2개만 사용해주세요\n";
+      enhancedPrompt += `- ${i18next.t('aiPrompts.platforms.twitter.instruction1', '반드시 280자 이내로 작성해주세요')}\n`;
+      enhancedPrompt += `- ${i18next.t('aiPrompts.platforms.twitter.instruction2', '핵심 메시지를 앞부분에 배치해주세요')}\n`;
+      enhancedPrompt += `- ${i18next.t('aiPrompts.platforms.twitter.instruction3', '해시태그는 1-2개만 사용해주세요')}\n`;
       break;
 
     case "threads":
-      enhancedPrompt += "- 대화를 시작하는 느낌으로 작성해주세요\n";
-      enhancedPrompt += "- 개인적인 의견이나 경험을 포함해주세요\n";
+      enhancedPrompt += `- ${i18next.t('aiPrompts.platforms.threads.instruction1', '대화를 시작하는 느낌으로 작성해주세요')}\n`;
+      enhancedPrompt += `- ${i18next.t('aiPrompts.platforms.threads.instruction2', '개인적인 의견이나 경험을 포함해주세요')}\n`;
       break;
 
     case "linkedin":
-      enhancedPrompt += "- 전문 용어를 적절히 사용해주세요\n";
-      enhancedPrompt += "- 구체적인 성과나 수치가 있다면 포함해주세요\n";
-      enhancedPrompt += "- 교훈이나 인사이트로 마무리해주세요\n";
+      enhancedPrompt += `- ${i18next.t('aiPrompts.platforms.linkedin.instruction1', '전문 용어를 적절히 사용해주세요')}\n`;
+      enhancedPrompt += `- ${i18next.t('aiPrompts.platforms.linkedin.instruction2', '구체적인 성과나 수치가 있다면 포함해주세요')}\n`;
+      enhancedPrompt += `- ${i18next.t('aiPrompts.platforms.linkedin.instruction3', '교훈이나 인사이트로 마무리해주세요')}\n`;
       break;
   }
 
@@ -200,6 +213,17 @@ export function enhancePromptForPlatform(
     });
   }
 
+  console.log('🔧 [PlatformUtils] Final enhanced prompt:', enhancedPrompt.substring(0, 200) + '...');
+  console.log('🔧 [PlatformUtils] Total prompt length:', enhancedPrompt.length);
+  
+  // 프롬프트가 너무 길면 축약
+  if (enhancedPrompt.length > 900) {
+    console.warn('⚠️ [PlatformUtils] Prompt too long, truncating...');
+    const truncated = enhancedPrompt.substring(0, 900) + '...';
+    console.log('🔧 [PlatformUtils] Truncated to length:', truncated.length);
+    return truncated;
+  }
+  
   return enhancedPrompt;
 }
 

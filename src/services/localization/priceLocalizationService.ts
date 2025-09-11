@@ -1,4 +1,4 @@
-import i18n from '../../locales/i18n';
+import i18next from '../../locales/i18n';
 
 interface PriceConfig {
   currency: string;
@@ -47,12 +47,12 @@ class PriceLocalizationService {
    * 현재 언어에 따라 가격을 포맷팅합니다
    */
   formatPrice(planType: 'free' | 'starter' | 'premium' | 'pro'): string {
-    const currentLang = i18n.language || 'ko';
+    const currentLang = i18next.language || 'ko';
     const prices = LOCALIZED_PRICING[currentLang] || LOCALIZED_PRICING.ko;
     const priceConfig = prices[planType];
 
     if (priceConfig.price === 0) {
-      return i18n.t('subscription.status.free');
+      return i18next.t('subscription.status.free');
     }
 
     const formattedPrice = this.formatNumber(priceConfig.price, currentLang);
@@ -90,7 +90,7 @@ class PriceLocalizationService {
    * 가격 정보를 가져옵니다
    */
   getPriceConfig(planType: 'free' | 'starter' | 'premium' | 'pro'): PriceConfig {
-    const currentLang = i18n.language || 'ko';
+    const currentLang = i18next.language || 'ko';
     const prices = LOCALIZED_PRICING[currentLang] || LOCALIZED_PRICING.ko;
     return prices[planType];
   }
@@ -99,7 +99,7 @@ class PriceLocalizationService {
    * 모든 가격 정보를 가져옵니다
    */
   getAllPrices(): LocalizedPrices {
-    const currentLang = i18n.language || 'ko';
+    const currentLang = i18next.language || 'ko';
     return LOCALIZED_PRICING[currentLang] || LOCALIZED_PRICING.ko;
   }
 
@@ -116,7 +116,7 @@ class PriceLocalizationService {
 const priceLocalizationService = new PriceLocalizationService();
 
 // i18n 언어 변경 이벤트 구독
-i18n.on('languageChanged', () => {
+i18next.on('languageChanged', () => {
   priceLocalizationService.onLanguageChanged();
 });
 

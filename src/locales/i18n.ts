@@ -52,8 +52,7 @@ i18next
     console.error('❌ [i18n] Initialization failed:', error);
   });
 
-// 호환성을 위한 export들
-export const t = (key: string, options?: any) => i18next.t(key, options);
+// 유틸리티 함수들
 export const getCurrentLanguage = () => i18next.language;
 export const changeLanguage = async (language: string) => {
   try {

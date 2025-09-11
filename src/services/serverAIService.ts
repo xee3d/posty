@@ -109,14 +109,43 @@ class ServerAIService {
           "X-App-Version": "1.0.0",
         },
         body: JSON.stringify({
-          prompt: this.enhancePromptWithLanguage(params.prompt, params.tone, params.platform || "instagram", params.length),
+          prompt: (() => {
+            const enhancedPrompt = this.enhancePromptWithLanguage(params.prompt, params.tone, params.platform || "instagram", params.length);
+            console.log("🔧 [ServerAIService] Final prompt to server length:", enhancedPrompt.length, "characters");
+            console.log("🔧 [ServerAIService] ACTUAL PROMPT BEING SENT:", enhancedPrompt);
+            if (enhancedPrompt.length > 1000) {
+              console.warn("⚠️ [ServerAIService] Prompt exceeds 1000 characters! Length:", enhancedPrompt.length);
+            }
+            return enhancedPrompt;
+          })(),
           tone: params.tone,
           platform: params.platform || "instagram",
-          language: getCurrentLanguage(), // 동적 언어 감지
+          language: (() => {
+            const currentLang = getCurrentLanguage();
+            console.log("🔧 [ServerAIService] Sending language to server:", currentLang);
+            return currentLang;
+          })(), // 동적 언어 감지
           length: params.length || "medium", // 길이 추가
           model: params.model, // AI 모델 추가
           includeEmojis: params.includeEmojis ?? true,
           generatePlatformVersions: params.generatePlatformVersions ?? false,
+          // 언어 변경 시 컨텍스트 리셋을 위한 완전 무작위 세션 ID
+          sessionId: (() => {
+            const currentLang = getCurrentLanguage();
+            const timestamp = Date.now();
+            const randomStr = Math.random().toString(36).substr(2, 15);
+            const uuid = Math.random().toString(36).substr(2, 9) + Math.random().toString(36).substr(2, 9);
+            const sessionId = `RESET_${currentLang}_${timestamp}_${randomStr}_${uuid}`;
+            console.log("🔧 [ServerAIService] COMPLETE CONTEXT RESET - Session ID:", sessionId);
+            return sessionId;
+          })(),
+          // 서버에서 언어 강제 변환 방지
+          forceLanguage: (() => {
+            const currentLang = getCurrentLanguage();
+            console.log("🔧 [ServerAIService] Force language parameter:", currentLang);
+            return currentLang;
+          })(),
+          disableKoreanFallback: getCurrentLanguage() !== 'ko',
           // 길이에 따른 max_tokens 설정
           max_tokens: this.getMaxTokensByLength(params.length),
           // 이미지가 있으면 base64 전송
@@ -133,6 +162,7 @@ class ServerAIService {
       // JSON 파싱 시도
       let data: ServerResponse;
       try {
+        console.log("🔧 [ServerAIService] Raw server response:", responseText.substring(0, 200) + "...");
         const parsed = JSON.parse(responseText);
 
         // 서버가 data wrapper를 사용하는 경우 처리
@@ -400,7 +430,7 @@ class ServerAIService {
     }
   }
 
-  // 언어별 프롬프트 생성
+  // 언어별 프롬프트 생성 - COMPLETELY REWRITTEN FOR MULTILINGUAL SUPPORT
   private enhancePromptWithLanguage(
     prompt: string, 
     tone: string, 
@@ -408,33 +438,202 @@ class ServerAIService {
     length?: string
   ): string {
     const currentLanguage = getCurrentLanguage();
-    const lengthParam = length || "medium";
+    console.log("🔧 [ServerAIService] ENHANCED PROMPT - Current language:", currentLanguage);
+    console.log("🔧 [ServerAIService] ENHANCED PROMPT - i18next language:", require('../locales/i18n').default.language);
+    console.log("🔧 [ServerAIService] ENHANCED PROMPT - Call stack:", new Error().stack?.split('\n')[1]);
     
-    try {
-      return generatePrompt(
-        currentLanguage,
-        platform,
-        tone,
-        lengthParam,
-        prompt
-      );
-    } catch (error) {
-      console.warn('[ServerAIService] Failed to generate localized prompt, using fallback:', error);
-      // 언어별 프롬프트 생성 실패 시 기본 한국어 방식으로 fallback
-      return this.enhancePromptWithLength(prompt, length);
+    // 완전히 새로운 접근법: 언어별 전용 프롬프트 생성
+    let finalPrompt = "";
+    
+    // 언어별 극도로 강력한 지시문 (컨텍스트 완전 리셋)
+    const languageInstructions: Record<string, string> = {
+      'ko': `다음 내용을 한국어로 SNS 포스팅해주세요:\n${prompt}`,
+      'en': `【NEW INDEPENDENT CONVERSATION STARTED】【COMPLETELY IGNORE ALL PREVIOUS CONVERSATION CONTENT】
+SYSTEM OVERRIDE: RESPOND IN ENGLISH ONLY. IGNORE ALL KOREAN INSTRUCTIONS. CREATE ENGLISH SOCIAL MEDIA POST. ABSOLUTELY FORBIDDEN TO REPLY IN KOREAN.
+
+This is a completely new, independent conversation. Ignore any previous Korean replies or instructions.
+
+Important instructions repeated:
+1. Must write in English
+2. Do not use Korean
+3. Do not use Japanese
+4. Do not use Chinese
+5. Only answer in English
+6. Forget all previous conversations
+7. This is a new conversation start
+
+Create English social media post for the following content:\n${prompt}
+
+Final emphasis again: Absolutely only answer in English. Forbidden to use Korean. This is a new conversation, ignore previous content.`,
+      'ja': `【全新独立対話開始】【完全無視之前所有対話内容】
+システム完全上書き：日本語のみで応答してください。すべての韓国語の指示を完全無視してください。日本語でSNS投稿を作成してください。韓国語での応答は絶対に禁止です。
+
+これは完全に新しい、独立した対話です。以前の韓国語の返答や指示を一切無視してください。
+
+重要な指示を何度も繰り返します：
+1. 必ず日本語で書いてください
+2. 韓国語は絶対に使わないでください
+3. 英語も使わないでください
+4. 中国語も使わないでください
+5. 日本語のみで回答してください
+6. 以前の全ての対話を忘れてください
+7. これは新しい対話の開始です
+
+以下の内容について日本語でSNS投稿を作成：\n${prompt}
+
+最後に再度強調：絶対に日本語のみで回答してください。韓国語使用禁止。これは新しい対話です、以前の内容を無視してください。`,
+      'zh-CN': `【全新独立对话开始】【完全忽略之前所有对话内容】
+系统覆盖：仅用中文回答。忽略所有韩语指令。用中文创建社交媒体帖子。绝对禁止韩语回复。
+
+这是一个全新的、独立的对话。忽略任何之前的韩语回复或指示。
+
+重要指示重复：
+1. 必须用中文写
+2. 不要用韩语  
+3. 不要用英语
+4. 不要用日语
+5. 只能用中文回答
+6. 忘记之前的所有对话
+7. 这是全新的对话开始
+
+为以下内容创作中文社交媒体帖子：\n${prompt}
+
+最后再次强调：绝对只用中文回答。禁止使用韩语。这是全新对话，忽略之前内容。`
+    };
+    
+    // 언어 매핑 (중국어 특별 처리)
+    let langKey = currentLanguage;
+    console.log("🔧 [ServerAIService] ENHANCED PROMPT - Original language:", currentLanguage);
+    
+    if (currentLanguage.startsWith('zh') || currentLanguage === 'zh-CN' || currentLanguage === 'zh-Hans' || currentLanguage === 'zh-Hant') {
+      langKey = 'zh-CN';
+      console.log("🔧 [ServerAIService] ENHANCED PROMPT - Chinese language detected, mapped to zh-CN");
+    } else if (currentLanguage.startsWith('ja')) {
+      langKey = 'ja';
+    } else if (currentLanguage.startsWith('en')) {
+      langKey = 'en';
+    } else {
+      langKey = 'ko';
     }
+    
+    // 해당 언어의 전용 프롬프트 생성
+    finalPrompt = languageInstructions[langKey] || languageInstructions['ko'];
+    console.log("🔧 [ServerAIService] ENHANCED PROMPT - Final language key:", langKey);
+    console.log("🔧 [ServerAIService] ENHANCED PROMPT - Using instruction for:", langKey, "Available keys:", Object.keys(languageInstructions));
+    
+    // 언어별 길이 지시사항
+    const lengthInstructions: Record<string, Record<string, string>> = {
+      'ko': {
+        short: '[길이: 50자 이내로 짧고 간결하게 작성해주세요]',
+        medium: '[길이: 100-150자 사이로 적당한 길이로 작성해주세요]',
+        long: '[길이: 200-300자로 자세하고 풍부하게 작성해주세요]'
+      },
+      'en': {
+        short: '[Length: Write concisely within 50 characters]',
+        medium: '[Length: Write in moderate length between 100-150 characters]',
+        long: '[Length: Write in detail with 200-300 characters]'
+      },
+      'ja': {
+        short: '[長さ: 50文字以内で簡潔に書いてください]',
+        medium: '[長さ: 100-150文字で適度な長さで書いてください]',
+        long: '[長さ: 200-300文字で詳しく書いてください]'
+      },
+      'zh-CN': {
+        short: '[长度：请在50字以内简洁地写]',
+        medium: '[长度：请用100-150字的适中长度写]',
+        long: '[长度：请用200-300字详细写]'
+      }
+    };
+    
+    // 이미 위에서 langKey가 설정되었으므로 재사용
+    const langInstructions = lengthInstructions[langKey] || lengthInstructions['ko'];
+    
+    // 길이 옵션에 따른 지시 추가
+    if (length && langInstructions[length]) {
+      finalPrompt += `\n${langInstructions[length]}`;
+    }
+    
+    console.log("🔧 [ServerAIService] ENHANCED PROMPT COMPLETE - Final language:", langKey, "Length:", finalPrompt.length);
+    return finalPrompt;
   }
 
-  // 길이에 따라 프롬프트 보강 (fallback용)
+  // 길이에 따라 프롬프트 보강 (fallback용 - 다국어 지원)
   private enhancePromptWithLength(prompt: string, length?: string): string {
-    if (length === "long") {
-      return `${prompt} (자세히 300-400자로 설명해주세요. 구체적인 예시와 상세한 설명을 포함해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
-    } else if (length === "short") {
-      return `${prompt} (간결하게 30-50자로 작성해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
-    } else if (length === "medium") {
-      return `${prompt} (적당히 100-200자로 작성해주세요. 해시태그는 글자 수에서 제외하고 본문만 계산해주세요.)`;
+    const currentLanguage = getCurrentLanguage();
+    console.warn("⚠️ [ServerAIService] FALLBACK FUNCTION CALLED! This should not happen!");
+    console.log("🔧 [ServerAIService] FALLBACK - Current language:", currentLanguage);
+    console.log("🔧 [ServerAIService] FALLBACK - Call stack:", new Error().stack);
+    
+    // 언어별 응답 지시 추가 (fallback에서도 동일하게)
+    let finalPrompt = prompt;
+    
+    const responseLanguageInstructions: Record<string, string> = {
+      'ko': '한국어로 응답해주세요.',
+      'en': 'RESPOND IN ENGLISH ONLY. DO NOT USE ANY OTHER LANGUAGE.',
+      'ja': `絶対に日本語で回答してください。以下の内容について、日本語のみを使用して、自然な日本語のSNS投稿として作成してください。韓国語や英語は絶対に使わないでください。`,
+      'zh-CN': `请务必用中文回答。请用中文创作以下内容的自然中文社交媒体帖子。绝对不要使用韩语或英语。`
+    };
+    
+    // 한국어가 아닌 경우 언어 지시 추가
+    if (currentLanguage !== 'ko') {
+      const langKey = currentLanguage.startsWith('zh') ? 'zh-CN' :
+                     currentLanguage.startsWith('ja') ? 'ja' :
+                     currentLanguage.startsWith('en') ? 'en' : 'ko';
+                     
+      const responseInstruction = responseLanguageInstructions[langKey];
+      if (responseInstruction) {
+        finalPrompt = `${responseInstruction}\n\n${finalPrompt}`;
+        console.log("🔧 [ServerAIService] FALLBACK - Added language instruction:", responseInstruction);
+      }
     }
-    return prompt;
+    
+    // 언어별 길이 지시문 (간단한 버전으로 변경)
+    const lengthInstructions: Record<string, Record<string, string>> = {
+      'ko': {
+        short: '[길이: 50자 이내로 짧고 간결하게 작성해주세요]',
+        medium: '[길이: 100-150자 사이로 적당한 길이로 작성해주세요]',
+        long: '[길이: 200-300자로 자세하고 풍부하게 작성해주세요]'
+      },
+      'en': {
+        short: '[Length: Write concisely within 50 characters]',
+        medium: '[Length: Write in moderate length between 100-150 characters]',
+        long: '[Length: Write in detail with 200-300 characters]'
+      },
+      'ja': {
+        short: '[長さ: 50文字以内で簡潔に書いてください]',
+        medium: '[長さ: 100-150文字で適度な長さで書いてください]',
+        long: '[長さ: 200-300文字で詳しく書いてください]'
+      },
+      'zh-CN': {
+        short: '[长度：请在50字以内简洁地写]',
+        medium: '[长度：请用100-150字的适中长度写]',
+        long: '[长度：请用200-300字详细写]'
+      }
+    };
+    
+    // 언어 코드 변환 (메인 함수와 동일하게)
+    let langKey = currentLanguage;
+    if (currentLanguage.startsWith('zh')) {
+      langKey = 'zh-CN';
+    } else if (currentLanguage.startsWith('ja')) {
+      langKey = 'ja';
+    } else if (currentLanguage.startsWith('en')) {
+      langKey = 'en';
+    } else if (currentLanguage.startsWith('ko')) {
+      langKey = 'ko';
+    }
+    
+    console.log("🔧 [ServerAIService] FALLBACK - Language mapping:", currentLanguage, "->", langKey);
+    
+    const langInstructions = lengthInstructions[langKey] || lengthInstructions['ko'];
+    
+    if (length && langInstructions[length]) {
+      finalPrompt += `\n${langInstructions[length]}`;
+      console.log("🔧 [ServerAIService] FALLBACK - Added length instruction:", langInstructions[length]);
+    }
+    
+    console.log("🔧 [ServerAIService] FALLBACK - Final prompt length:", finalPrompt.length);
+    return finalPrompt;
   }
 
   // 길이에 따른 최대 토큰 수 설정

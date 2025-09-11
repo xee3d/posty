@@ -320,14 +320,14 @@ class TrendingHashtagService {
     } catch (error) {
       console.error('Failed to get personalized hashtags:', error);
       // 폴백: 기본 해시태그 몇 개만 반환 (번역된 것들로)
-      const { t } = require('../locales/i18n');
+      const i18next = require('../locales/i18n').default;
       try {
         return [
-          t("home.topics.daily"),
-          t("home.topics.weekend"),
-          t("home.topics.cafe"),
-          t("home.topics.food"),
-          t("home.topics.travel")
+          i18next.t("home.topics.daily"),
+          i18next.t("home.topics.weekend"),
+          i18next.t("home.topics.cafe"),
+          i18next.t("home.topics.food"),
+          i18next.t("home.topics.travel")
         ];
       } catch {
         return ["일상", "데일리", "오늘", "좋아요", "행복"];

@@ -1,6 +1,6 @@
 // 개인화된 AI 서비스 - 세부 프로필 기반
 import { DetailedUserProfile, getToneByProfile } from "../../types/userProfile";
-import i18n from "../../locales/i18n";
+import i18next from "../../locales/i18n";
 
 export interface PersonalizedPromptConfig {
   userProfile: DetailedUserProfile;
@@ -27,31 +27,31 @@ export class EnhancedAIService {
     // 관심사 기반 해시태그 추천
     const hashtagStrategy = this.getHashtagStrategy(userProfile, platform);
 
-    const ageGroup = i18n.t(`aiPrompts.enhanced.ageGroups.${userProfile.ageGroup}`, this.getAgeGroupDescription(userProfile.ageGroup));
-    const gender = i18n.t(`aiPrompts.enhanced.genders.${userProfile.gender}`, this.getGenderDescription(userProfile.gender));
-    const interests = userProfile.interests?.join(", ") || i18n.t('aiPrompts.enhanced.generalTopics', '일반적인 주제');
+    const ageGroup = i18next.t(`aiPrompts.enhanced.ageGroups.${userProfile.ageGroup}`, this.getAgeGroupDescription(userProfile.ageGroup));
+    const gender = i18next.t(`aiPrompts.enhanced.genders.${userProfile.gender}`, this.getGenderDescription(userProfile.gender));
+    const interests = userProfile.interests?.join(", ") || i18next.t('aiPrompts.enhanced.generalTopics', '일반적인 주제');
 
     return `
-${i18n.t('aiPrompts.enhanced.personaIntro', '당신의 페르소나:')}
+${i18next.t('aiPrompts.enhanced.personaIntro', '당신의 페르소나:')}
 ${persona}
 
-${i18n.t('aiPrompts.enhanced.toneLabel', '글쓰기 톤:')} ${tone}
+${i18next.t('aiPrompts.enhanced.toneLabel', '글쓰기 톤:')} ${tone}
 
 ${styleGuide}
 
-${i18n.t('aiPrompts.enhanced.topic', '주제:')} ${content}
-${imageContext ? `${i18n.t('aiPrompts.enhanced.imageContext', '이미지 컨텍스트:')} ${imageContext}` : ""}
+${i18next.t('aiPrompts.enhanced.topic', '주제:')} ${content}
+${imageContext ? `${i18next.t('aiPrompts.enhanced.imageContext', '이미지 컨텍스트:')} ${imageContext}` : ""}
 
-${i18n.t('aiPrompts.enhanced.guidelines', '작성 지침:')}
-1. ${i18n.t('aiPrompts.enhanced.guideline1', '위 페르소나와 톤을 일관되게 유지하세요')}
-2. ${i18n.t('aiPrompts.enhanced.guideline2', '실제 {{ageGroup}} {{gender}}이(가) 쓴 것처럼 자연스럽게', { ageGroup, gender })}
+${i18next.t('aiPrompts.enhanced.guidelines', '작성 지침:')}
+1. ${i18next.t('aiPrompts.enhanced.guideline1', '위 페르소나와 톤을 일관되게 유지하세요')}
+2. ${i18next.t('aiPrompts.enhanced.guideline2', '실제 {{ageGroup}} {{gender}}이(가) 쓴 것처럼 자연스럽게', { ageGroup, gender })}
 3. ${this.getFamilyContextPrompt(userProfile, imageContext)}
 4. ${this.getOccupationContextPrompt(userProfile)}
-5. ${i18n.t('aiPrompts.enhanced.guideline5', '관심사 반영:')} ${interests}
+5. ${i18next.t('aiPrompts.enhanced.guideline5', '관심사 반영:')} ${interests}
 
 ${hashtagStrategy}
 
-${i18n.t('aiPrompts.enhanced.specialInstructions', '특별 지침:')}
+${i18next.t('aiPrompts.enhanced.specialInstructions', '특별 지침:')}
 ${this.getSpecialInstructions(userProfile, imageContext)}
 `;
   }
@@ -61,8 +61,8 @@ ${this.getSpecialInstructions(userProfile, imageContext)}
     profile: DetailedUserProfile,
     imageContext?: string
   ): string {
-    const age = i18n.t(`aiPrompts.enhanced.ageGroups.${profile.ageGroup}`, this.getAgeGroupDescription(profile.ageGroup));
-    const gender = i18n.t(`aiPrompts.enhanced.genders.${profile.gender}`, this.getGenderDescription(profile.gender));
+    const age = i18next.t(`aiPrompts.enhanced.ageGroups.${profile.ageGroup}`, this.getAgeGroupDescription(profile.ageGroup));
+    const gender = i18next.t(`aiPrompts.enhanced.genders.${profile.gender}`, this.getGenderDescription(profile.gender));
     const family = this.getFamilyDescription(profile);
     const occupation = this.getOccupationDescription(profile);
 
@@ -73,23 +73,23 @@ ${this.getSpecialInstructions(userProfile, imageContext)}
     }
 
     if (occupation) {
-      persona += ` ${i18n.t('aiPrompts.enhanced.occupation', 'Their profession is {{occupation}}.', { occupation })}`;
+      persona += ` ${i18next.t('aiPrompts.enhanced.occupation', 'Their profession is {{occupation}}.', { occupation })}`;
     }
 
     if (profile.interests && profile.interests.length > 0) {
       const interests = profile.interests.slice(0, 3).join(", ");
-      persona += ` ${i18n.t('aiPrompts.enhanced.interests', 'Their main interests include {{interests}} and more.', { interests })}`;
+      persona += ` ${i18next.t('aiPrompts.enhanced.interests', 'Their main interests include {{interests}} and more.', { interests })}`;
     }
 
     // 특별한 컨텍스트 추가
     if (imageContext === "baby_photo" && profile.parentType) {
-      const parentType = i18n.t(`aiPrompts.enhanced.familyRoles.${profile.parentType}`, profile.parentType);
-      persona += ` ${i18n.t('aiPrompts.enhanced.parentLove', 'Write with the loving heart of a {{parentType}} who loves their child.', { parentType })}`;
+      const parentType = i18next.t(`aiPrompts.enhanced.familyRoles.${profile.parentType}`, profile.parentType);
+      persona += ` ${i18next.t('aiPrompts.enhanced.parentLove', 'Write with the loving heart of a {{parentType}} who loves their child.', { parentType })}`;
     } else if (
       imageContext === "baby_photo" &&
       profile.familyRole === "grandparent"
     ) {
-      persona += ` ${i18n.t('aiPrompts.enhanced.grandparentLove', 'Write with the warm perspective of grandparents who love their grandchildren.')}`;
+      persona += ` ${i18next.t('aiPrompts.enhanced.grandparentLove', 'Write with the warm perspective of grandparents who love their grandchildren.')}`;
     }
 
     return persona;

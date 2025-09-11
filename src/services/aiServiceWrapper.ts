@@ -19,7 +19,7 @@ import { selectSubscriptionPlan } from "../store/slices/userSlice";
 import { enhancedAI } from "./ai/enhancedAIService";
 import { SUBSCRIPTION_PLANS } from "../utils/adConfig";
 import { imageAnalysisCache } from "../utils/imageAnalysisCache";
-import i18n from "../locales/i18n";
+import i18next from "../locales/i18n";
 
 class AIServiceWrapper {
   // 사용자 구독 플랜 가져오기
@@ -96,42 +96,36 @@ class AIServiceWrapper {
         // 길이 조정 추가
         switch (params.length) {
           case "short":
-            finalPrompt += `\n${i18n.t('aiPrompts.length.short', '[길이: 50자 이내로 짧고 간결하게 작성해주세요]')}`;
+            finalPrompt += `\n${i18next.t('aiPrompts.length.short', '[길이: 50자 이내로 짧고 간결하게 작성해주세요]')}`;
             break;
           case "medium":
-            finalPrompt += `\n${i18n.t('aiPrompts.length.medium', '[길이: 100-150자 사이로 적당한 길이로 작성해주세요]')}`;
+            finalPrompt += `\n${i18next.t('aiPrompts.length.medium', '[길이: 100-150자 사이로 적당한 길이로 작성해주세요]')}`;
             break;
           case "long":
-            finalPrompt += `\n${i18n.t('aiPrompts.length.long', '[길이: 200-300자로 자세하고 풍부하게 작성해주세요]')}`;
+            finalPrompt += `\n${i18next.t('aiPrompts.length.long', '[길이: 200-300자로 자세하고 풍부하게 작성해주세요]')}`;
             break;
         }
       } else {
-        // 기존 방식 (프로필 정보가 없는 경우)
+        // 기존 방식 (프로필 정보가 없는 경우) - 간단한 프롬프트 사용
         console.log("Using standard AI prompt (no profile data)");
-        const enhancedPrompt = enhancePromptForPlatform(
-          params.prompt || "",
-          platform as any,
-          params.tone
-        );
+        finalPrompt = params.prompt || "";
 
         // 길이 옵션에 따른 추가 지시
-        let lengthInstruction = "";
         switch (params.length) {
           case "short":
-            lengthInstruction = `\n${i18n.t('aiPrompts.length.short', '[길이: 50자 이내로 짧고 간결하게 작성해주세요]')}`;
+            finalPrompt += `\n${i18next.t('aiPrompts.length.short', '[길이: 50자 이내로 짧고 간결하게 작성해주세요]')}`;
             break;
           case "medium":
-            lengthInstruction = `\n${i18n.t('aiPrompts.length.medium', '[길이: 100-150자 사이로 적당한 길이로 작성해주세요]')}`;
+            finalPrompt += `\n${i18next.t('aiPrompts.length.medium', '[길이: 100-150자 사이로 적당한 길이로 작성해주세요]')}`;
             break;
           case "long":
-            lengthInstruction = `\n${i18n.t('aiPrompts.length.long', '[길이: 200-300자로 자세하고 풍부하게 작성해주세요]')}`;
+            finalPrompt += `\n${i18next.t('aiPrompts.length.long', '[길이: 200-300자로 자세하고 풍부하게 작성해주세요]')}`;
             break;
         }
-
-        finalPrompt = enhancedPrompt + lengthInstruction;
       }
 
       console.log("Enhanced prompt for platform:", platform, finalPrompt);
+      console.log("🔧 [AIServiceWrapper] Final prompt length:", finalPrompt.length, "characters");
 
       // 사용자의 구독 플랜에 따른 AI 모델 결정
       const userPlan = await this.getUserPlan();
@@ -162,6 +156,8 @@ class AIServiceWrapper {
             platformPrompt +=
               "\n\n[Twitter 스타일로 작성: 내 경험을 1인칭으로 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그는 핵심 키워드 1-2개만 포함해주세요]";
           }
+          
+          console.log(`🔧 [AIServiceWrapper] Platform ${platformId} prompt length:`, platformPrompt.length, "characters");
 
           const platformResponse = await serverAIService.generateContent({
             prompt: platformPrompt,

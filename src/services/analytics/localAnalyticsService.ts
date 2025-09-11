@@ -1,6 +1,6 @@
 // 로컬 분석 서비스 - 백엔드 없이 기본 분석 기능 제공
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import i18n from "../../locales/i18n";
+import i18next from "../../locales/i18n";
 
 interface PostRecord {
   id: string;
@@ -330,10 +330,10 @@ class LocalAnalyticsService {
 
     // 성장률 인사이트
     if (changes.likes > 50) {
-      insights.push(i18n.t("analytics.insights.likesIncrease"));
+      insights.push(i18next.t("analytics.insights.likesIncrease"));
     }
     if (changes.reach > 80) {
-      insights.push(i18n.t("analytics.insights.reachGrowth"));
+      insights.push(i18next.t("analytics.insights.reachGrowth"));
     }
 
     // 카테고리 인사이트
@@ -348,14 +348,14 @@ class LocalAnalyticsService {
     )[0];
 
     if (topCategory) {
-      insights.push(i18n.t("analytics.insights.topCategory", { category: topCategory[0] }));
+      insights.push(i18next.t("analytics.insights.topCategory", { category: topCategory[0] }));
     }
 
     // 게시 빈도 인사이트
     if (posts.length > 10) {
-      insights.push(i18n.t("analytics.insights.highActivity"));
+      insights.push(i18next.t("analytics.insights.highActivity"));
     } else if (posts.length < 3) {
-      insights.push(i18n.t("analytics.insights.lowActivity"));
+      insights.push(i18next.t("analytics.insights.lowActivity"));
     }
 
     return insights;
@@ -418,24 +418,24 @@ class LocalAnalyticsService {
 
   private getTimeSlot(hour: number): string {
     if (hour >= 6 && hour < 9) {
-      return i18n.t("analytics.timeSlots.morning");
+      return i18next.t("analytics.timeSlots.morning");
     }
     if (hour >= 9 && hour < 12) {
-      return i18n.t("analytics.timeSlots.forenoon");
+      return i18next.t("analytics.timeSlots.forenoon");
     }
     if (hour >= 12 && hour < 15) {
-      return i18n.t("analytics.timeSlots.lunch");
+      return i18next.t("analytics.timeSlots.lunch");
     }
     if (hour >= 15 && hour < 18) {
-      return i18n.t("analytics.timeSlots.afternoon");
+      return i18next.t("analytics.timeSlots.afternoon");
     }
     if (hour >= 18 && hour < 21) {
-      return i18n.t("analytics.timeSlots.evening");
+      return i18next.t("analytics.timeSlots.evening");
     }
     if (hour >= 21 && hour < 24) {
-      return i18n.t("analytics.timeSlots.night");
+      return i18next.t("analytics.timeSlots.night");
     }
-    return i18n.t("analytics.timeSlots.dawn");
+    return i18next.t("analytics.timeSlots.dawn");
   }
 
   private getStartOfWeek(date: Date, weekOffset: number = 0): Date {
@@ -484,7 +484,7 @@ class LocalAnalyticsService {
 
   // 샘플 데이터 생성 (테스트용)
   async generateSampleData(): Promise<void> {
-    const categories = i18n.t("analytics.sampleData.categories", { returnObjects: true }) as string[];
+    const categories = i18next.t("analytics.sampleData.categories", { returnObjects: true }) as string[];
     const platforms = ["instagram", "facebook", "twitter"] as const;
 
     // 최근 2주간의 샘플 데이터 생성
@@ -497,9 +497,9 @@ class LocalAnalyticsService {
         date.setHours(Math.floor(Math.random() * 24));
 
         const post: Omit<PostRecord, "id" | "createdAt"> = {
-          content: `${i18n.t("analytics.sampleData.postContent")} ${i}-${j}`,
+          content: `${i18next.t("analytics.sampleData.postContent")} ${i}-${j}`,
           hashtags: [
-            ...(i18n.t("analytics.sampleData.hashtags", { returnObjects: true }) as string[]),
+            ...(i18next.t("analytics.sampleData.hashtags", { returnObjects: true }) as string[]),
             categories[Math.floor(Math.random() * categories.length)],
           ],
           platform: platforms[Math.floor(Math.random() * platforms.length)],

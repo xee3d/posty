@@ -2,7 +2,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import trendService from "./trendService";
 import simplePostService from "./simplePostService";
-import { t } from "../locales/i18n";
+import i18next from "../locales/i18n";
 
 interface HashtagHistory {
   tag: string;
@@ -535,18 +535,18 @@ class PersonalizedHashtagService {
   private getDefaultHashtags(count: number): string[] {
     try {
       // 현재 언어 가져오기
-      const currentLanguage = t("language") || 'ko';
+      const currentLanguage = i18next.t("language") || 'ko';
       
       // 다국어 기본 해시태그 풀
       const multilanguageHashtags = [
         // 현재 언어 번역
-        t("home.topics.daily"),
-        t("home.topics.weekend"),
-        t("home.topics.cafe"),
-        t("home.topics.food"),
-        t("home.topics.travel"),
-        t("home.topics.exercise"),
-        t("home.topics.bookstagram"),
+        i18next.t("home.topics.daily"),
+        i18next.t("home.topics.weekend"),
+        i18next.t("home.topics.cafe"),
+        i18next.t("home.topics.food"),
+        i18next.t("home.topics.travel"),
+        i18next.t("home.topics.exercise"),
+        i18next.t("home.topics.bookstagram"),
         
         // 영어 기본값 (국제적 사용을 위해)
         "daily",
