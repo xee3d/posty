@@ -89,6 +89,18 @@ export default {
       minimalist: "Minimalist",
       storytelling: "Formal",
       motivational: "Quotes",
+      clean: "Clean",
+      structured: "Organized",
+      enthusiastic: "Awesome",
+      trendy: "Hip",
+      elegant: "Sophisticated",
+      modern: "Modern",
+      vintage: "Vintage",
+      minimal: "Minimal",
+      friendly: "Warm",
+      cool: "Cool",
+      energetic: "Bright",
+      mysterious: "Dark",
     },
     lengths: {
       short: "Short",
@@ -718,7 +730,9 @@ export default {
       food: "Food",
       travel: "Travel",
       exercise: "Exercise",
-      bookstagram: "Bookstagram"
+      bookstagram: "Bookstagram",
+      trends: "Trends",
+      trendy: "Trendy"
     },
     quickTemplates: {
       lunch: ["Today's lunch ✨", "Found a gem!", "This gave me energy"],
@@ -883,7 +897,7 @@ export default {
       title: "Style Templates",
       subtitle: "Try various styles and find your own style",
       recommended: "Recommended",
-      usageCount: "Used {{count}} times",
+      usageCount: "{{count}} used",
       starterLimit: "STARTER Plan: Only {{limit}} templates available",
       emojiPrefix: "📝",
       bulletPoint: "•",
@@ -1025,16 +1039,6 @@ export default {
       minimalist: "Minimalist",
       storytelling: "Formal",
       motivational: "Motivational"
-    },
-    categories: {
-      daily: "Daily",
-      cafe: "Café",
-      food: "Food",
-      exercise: "Exercise",
-      travel: "Travel",
-      fashion: "Fashion",
-      beauty: "Beauty",
-      other: "Other"
     },
     time: {
       today: "Today",

@@ -97,6 +97,194 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     };
     return lengthMappings[koreanValue] || koreanValue;
   };
+
+  // 🎯 개선된 단순 번역 시스템 - 다른 페이지와 동일한 방식
+  // 카테고리 번역 매핑 (공통 사용)
+  const categoryTranslations: { [key: string]: { [lang: string]: string } } = {
+      // === 기본 카테고리 ===
+      "카페": { ko: "카페", en: "Cafe", ja: "カフェ", "zh-CN": "咖啡厅" },
+      "맛집": { ko: "맛집", en: "Restaurant", ja: "グルメ", "zh-CN": "美食" },
+      "일상": { ko: "일상", en: "Daily Life", ja: "日常", "zh-CN": "日常" },
+      "운동": { ko: "운동", en: "Exercise", ja: "運動", "zh-CN": "运动" },
+      "여행": { ko: "여행", en: "Travel", ja: "旅行", "zh-CN": "旅行" },
+      "주말": { ko: "주말", en: "Weekend", ja: "週末", "zh-CN": "周末" },
+      "책스타그램": { ko: "책스타그램", en: "Bookstagram", ja: "本スタグラム", "zh-CN": "读书分享" },
+      "명언": { ko: "명언", en: "Quotes", ja: "名言", "zh-CN": "名言" },
+      "명상": { ko: "명상", en: "Meditation", ja: "瞑想", "zh-CN": "冥想" },
+      "트렌드": { ko: "트렌드", en: "Trends", ja: "トレンド", "zh-CN": "趋势" },
+      "비즈니스": { ko: "비즈니스", en: "Business", ja: "ビジネス", "zh-CN": "商务" },
+      "감성": { ko: "감성", en: "Emotional", ja: "感情的", "zh-CN": "情감" },
+      "문어체": { ko: "문어체", en: "Formal Writing", ja: "文語", "zh-CN": "正式文体" },
+      "유머": { ko: "유머", en: "Humor", ja: "ユーモア", "zh-CN": "幽默" },
+      "해시태그": { ko: "해시태그", en: "Hashtag", ja: "ハッシュタグ", "zh-CN": "标签" },
+
+      // === 스타일 키워드 ===
+      "심플": { ko: "심플", en: "Simple", ja: "シンプル", "zh-CN": "简约" },
+      "깔끔": { ko: "깔끔", en: "Clean", ja: "きれい", "zh-CN": "整洁" },
+      "정돈": { ko: "정돈", en: "Organized", ja: "整理", "zh-CN": "整理" },
+      "핫플": { ko: "핫플", en: "Hot Place", ja: "話題の場所", "zh-CN": "热门地点" },
+      "요즘": { ko: "요즘", en: "These Days", ja: "最近", "zh-CN": "最近" },
+      "대세": { ko: "대세", en: "Trend", ja: "トレンド", "zh-CN": "大势" },
+      "모던": { ko: "모던", en: "Modern", ja: "モダン", "zh-CN": "现代" },
+      "미니멀": { ko: "미니멀", en: "Minimal", ja: "ミニマル", "zh-CN": "极简" },
+      
+      // === 추가 누락 카테고리들 ===
+      "드립": { ko: "드립", en: "Joke", ja: "ジョーク", "zh-CN": "玩笑" },
+      "개그": { ko: "개그", en: "Comedy", ja: "コメディ", "zh-CN": "喜剧" },
+      "ㅋㅋㅋ": { ko: "ㅋㅋㅋ", en: "Laughter", ja: "笑い", "zh-CN": "笑声" },
+      "여백": { ko: "여백", en: "White Space", ja: "余白", "zh-CN": "留白" },
+      "단순": { ko: "단순", en: "Simplicity", ja: "シンプル", "zh-CN": "简单" },
+      "TMI": { ko: "TMI", en: "TMI", ja: "TMI", "zh-CN": "TMI" },
+      "생각": { ko: "생각", en: "Thought", ja: "思考", "zh-CN": "思考" },
+      "의미": { ko: "의미", en: "Meaning", ja: "意味", "zh-CN": "意义" },
+      "본질": { ko: "본질", en: "Essence", ja: "本質", "zh-CN": "本质" },
+      "성찰": { ko: "성찰", en: "Reflection", ja: "反省", "zh-CN": "反思" },
+      "깨달음": { ko: "깨달음", en: "Realization", ja: "悟り", "zh-CN": "觉悟" },
+      "하였다": { ko: "하였다", en: "Formal Past", ja: "丁寧語", "zh-CN": "正式过去式" },
+      "되었다": { ko: "되었다", en: "Became", ja: "になった", "zh-CN": "变成了" },
+      "있었다": { ko: "있었다", en: "There was", ja: "あった", "zh-CN": "有过" },
+      "것이다": { ko: "것이다", en: "It is", ja: "ものだ", "zh-CN": "是" },
+      "바이다": { ko: "바이다", en: "Should be", ja: "べきだ", "zh-CN": "应该" },
+    };
+
+  const getTranslatedCategory = (categoryName: string): string => {
+    console.warn(`🔧 [TRANSLATE] "${categoryName}" (${i18n.language})`);
+    
+    // 입력값 정규화 (오타 수정 및 다국어 매핑)
+    const normalizeInput = (input: string): string => {
+      const inputMap: { [key: string]: string } = {
+        // 오타 수정
+        "비스니스": "비즈니스",
+        "그—토구": "해시태그",
+        "대새": "대세",
+        
+        // 영어 입력
+        "daily": "일상", "Daily": "일상",
+        "cafe": "카페", "Cafe": "카페", 
+        "food": "맛집", "Food": "맛집",
+        "exercise": "운동", "Exercise": "운동",
+        "travel": "여행", "Travel": "여행",
+        "weekend": "주말", "Weekend": "주말",
+        "business": "비즈니스", "Business": "비즈니스",
+        "motivational": "명언", "Motivational": "명언",
+        "emotional": "감성", "Emotional": "감성",
+        "storytelling": "문어체", "Storytelling": "문어체",
+        "simple": "심플", "Simple": "심플",
+        "clean": "깔끔", "Clean": "깔끔",
+        "modern": "모던", "Modern": "모던",
+        "minimal": "미니멀", "Minimal": "미니멀",
+
+        // 일본어 입력
+        "ユーモア": "유머",
+        "ビジネス": "비즈니스", 
+        "名言": "명언",
+        "日常": "일상",
+        "カジュアル": "일상", 
+        "感情的": "감성",
+        "シンプル": "심플",
+        "モダン": "모던",
+
+        // 중국어 입력
+        "商务": "비즈니스",
+        "幽默": "유머",
+        "情感": "감성",
+        "简约": "심플",
+        "现代": "모던",
+        
+        // 추가 영어 매핑 (로그에서 확인된 항목들)
+        "quotes": "명언", "Quotes": "명언",
+        "trend": "트렌드", "Trend": "트렌드", 
+        "humor": "유머", "Humor": "유머",
+      };
+      return inputMap[input] || input;
+    };
+
+    const normalizedCategory = normalizeInput(categoryName);
+    const translations = categoryTranslations[normalizedCategory];
+    
+    if (translations) {
+      return translations[i18n.language] || translations.ko;
+    }
+    
+    return normalizedCategory; // 매핑되지 않은 경우 원본 반환
+  };
+
+  // 카테고리별 아이콘 매핑 - 다국어 지원
+  const getCategoryIcon = (categoryName: string): string => {
+    // 먼저 한국어 키로 정규화
+    const findKoreanKey = (name: string): string => {
+      // 이미 한국어인 경우
+      if (categoryTranslations[name]) return name;
+      
+      // 다른 언어에서 한국어 키 찾기
+      for (const [koreanKey, translations] of Object.entries(categoryTranslations)) {
+        if (Object.values(translations).includes(name)) {
+          return koreanKey;
+        }
+      }
+      return name;
+    };
+
+    const koreanKey = findKoreanKey(categoryName);
+    
+    const iconMap: { [key: string]: string } = {
+      "카페": "cafe-outline",
+      "맛집": "restaurant-outline",
+      "일상": "book-outline",
+      "운동": "fitness-outline",
+      "여행": "airplane-outline",
+      "주말": "sunny-outline",
+      "책스타그램": "library-outline",
+      "명언": "bulb-outline",
+      "명상": "leaf-outline",
+      "트렌드": "trending-up-outline",
+      "비즈니스": "briefcase-outline",
+      "감성": "heart-outline",
+      "문어체": "document-text-outline",
+      "유머": "happy-outline",
+      "해시태그": "pricetag-outline",
+      // 스타일 키워드
+      "심플": "remove-circle-outline",
+      "깔끔": "checkmark-circle-outline",
+      "정돈": "albums-outline",
+      // 추가 카테고리
+      "드립": "chatbubble-outline",
+      "개그": "happy-outline",
+      "ㅋㅋㅋ": "happy-outline",
+      "여백": "square-outline",
+      "단순": "remove-circle-outline",
+      "TMI": "information-circle-outline",
+      "생각": "bulb-outline",
+      "의미": "book-outline",
+      "본질": "diamond-outline",
+      "성찰": "eye-outline",
+      "깨달음": "flash-outline",
+    };
+    return iconMap[koreanKey] || "ellipse-outline";
+  };
+
+  // Helper function to map tone names to translation keys
+  const translateTone = (toneName: string): string => {
+    const toneMappings: { [key: string]: string } = {
+      // 한국어 매핑
+      "캐주얼": t('aiWrite.tones.casual', '캐주얼'),
+      "전문적": t('aiWrite.tones.professional', '전문적'),
+      "유머러스": t('aiWrite.tones.humorous', '유머러스'), 
+      "감성적": t('aiWrite.tones.emotional', '감성적'),
+      "문어체": t('aiWrite.tones.storytelling', '문어체'),
+      "명언": t('aiWrite.tones.motivational', '명언'),
+      "미니멀": t('aiWrite.tones.minimalist', '미니멀'),
+      // 영어 키도 처리
+      "casual": t('aiWrite.tones.casual', '캐주얼'),
+      "professional": t('aiWrite.tones.professional', '전문적'),
+      "humorous": t('aiWrite.tones.humorous', '유머러스'),
+      "emotional": t('aiWrite.tones.emotional', '감성적'),
+      "storytelling": t('aiWrite.tones.storytelling', '문어체'),
+      "motivational": t('aiWrite.tones.motivational', '명언'),
+      "minimalist": t('aiWrite.tones.minimalist', '미니멀'),
+    };
+    return toneMappings[toneName] || toneName;
+  };
   
   // 리소스 새로고침 및 디버깅을 위한 언어 확인
   React.useEffect(() => {
@@ -340,7 +528,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         type: "strength",
         icon: dominantTemplate.icon,
         title: t("myStyle.insights.styleTitle", { name: t(`styleTemplates.${dominantTemplate.id}.name`, dominantTemplate.name) }),
-        description: t("myStyle.insights.styleDescription", { description: dominantTemplate.description }),
+        description: t("myStyle.insights.styleDescription", { description: t(`styleTemplates.${dominantTemplate.id}.description`, dominantTemplate.description) }),
         action: t("myStyle.insights.styleAction"),
       });
     }
@@ -883,27 +1071,45 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           {/* 카테고리 분포 */}
           <View style={styles.categoryDistribution}>
             <Text style={styles.subsectionTitle}>{t('myStyle.analytics.categoryDistribution', '카테고리별 분포')}</Text>
-            {Object.entries(stats?.byCategory || {}).map(
-              ([category, count]) => (
-                <View key={category} style={styles.categoryBar}>
-                  <Text style={styles.categoryName}>{category}</Text>
+            {(() => {              
+              // 카테고리를 번역된 이름으로 그룹화하여 중복 제거
+              const groupedCategories: { [translatedName: string]: number } = {};
+              
+              Object.entries(stats?.byCategory || {}).forEach(([category, count]) => {
+                const translatedCategory = getTranslatedCategory(category);
+                
+                // 키 중복 방지를 위해 정규화된 카테고리로 그룹화
+                groupedCategories[translatedCategory] = (groupedCategories[translatedCategory] || 0) + (count as number);
+              });
+
+              return Object.entries(groupedCategories).map(([translatedName, totalCount]) => (
+                <View key={translatedName} style={styles.categoryBar}>
+                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                    <Icon 
+                      name={getCategoryIcon(translatedName) as any} 
+                      size={16} 
+                      color={colors.primary} 
+                      style={{ marginRight: 6 }}
+                    />
+                    <Text style={styles.categoryName}>{translatedName}</Text>
+                  </View>
                   <View style={styles.categoryProgress}>
                     <View
                       style={[
                         styles.categoryFill,
                         {
                           width: `${
-                            ((count as number) / stats.totalPosts) * 100
+                            (totalCount / stats.totalPosts) * 100
                           }%`,
                           backgroundColor: colors.primary,
                         },
                       ]}
                     />
                   </View>
-                  <Text style={styles.categoryCount}>{count as number}</Text>
+                  <Text style={styles.categoryCount}>{totalCount}</Text>
                 </View>
-              )
-            )}
+              ));
+            })()}
           </View>
         </View>
 
@@ -927,7 +1133,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 >
                   <Text style={styles.toneCount}>{count as number}</Text>
                 </View>
-                <Text style={styles.toneName}>{tone}</Text>
+                <Text style={styles.toneName}>{translateTone(tone)}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -1079,7 +1285,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             </Text>
                     <Text style={styles.templateStructureItem}>
                       {t('myStyle.templates.bulletPoint', '•')} {t('myStyle.templates.keywords', '키워드')}:{" "}
-                      {template.characteristics.keywords.slice(0, 3).join(", ")}
+                      {template.characteristics.keywords.slice(0, 3).map(keyword => getTranslatedCategory(keyword)).join(", ")}
                     </Text>
                     <Text style={styles.templateStructureItem}>
                       {t('myStyle.templates.bulletPoint', '•')} {t('myStyle.templates.emojis', '이모지')}:{" "}
@@ -1723,6 +1929,8 @@ const createStyles = (
       fontSize: 11,
       color: colors.primary,
       fontWeight: "600",
+      flexWrap: 'wrap',
+      maxWidth: '100%',
     },
 
     styleScoresContainer: {
