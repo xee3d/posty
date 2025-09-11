@@ -86,12 +86,24 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
   const { t, i18n } = useTranslation();
   
+  // Helper function to translate avgLength values from Korean to translation keys
+  const translateAvgLength = (koreanValue: string): string => {
+    const lengthMappings: { [key: string]: string } = {
+      "50자 이하": t('myStyle.lengths.under50', '50자 이하'),
+      "200자 이상": t('myStyle.lengths.over200', '200자 이상'),
+      "100-150자": t('myStyle.lengths.medium100', '100-150자'),
+      "150-200자": t('myStyle.lengths.medium150', '150-200자'),
+      "80-120자": t('myStyle.lengths.short80', '80-120자'),
+    };
+    return lengthMappings[koreanValue] || koreanValue;
+  };
+  
   // 리소스 새로고침 및 디버깅을 위한 언어 확인
   React.useEffect(() => {
     refreshResources();
     console.log('[MyStyleScreen] Current language:', i18n.language);
-    console.log('[MyStyleScreen] Coaching title:', t('mystyle.coaching.title'));
-    console.log('[MyStyleScreen] Metrics title:', t('mystyle.metrics.title'));
+    console.log('[MyStyleScreen] Coaching title:', t('myStyle.coaching.title'));
+    console.log('[MyStyleScreen] Metrics title:', t('myStyle.metrics.title'));
   }, []);
   const styles = createStyles(colors, cardTheme, isDark);
   const headerStyles = createHeaderStyles(colors);
@@ -327,9 +339,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       insights.push({
         type: "strength",
         icon: dominantTemplate.icon,
-        title: t("mystyle.insights.styleTitle", { name: t(`styles.${dominantTemplate.id}.name`, dominantTemplate.name) }),
-        description: t("mystyle.insights.styleDescription", { description: dominantTemplate.description }),
-        action: t("mystyle.insights.styleAction"),
+        title: t("myStyle.insights.styleTitle", { name: t(`styleTemplates.${dominantTemplate.id}.name`, dominantTemplate.name) }),
+        description: t("myStyle.insights.styleDescription", { description: dominantTemplate.description }),
+        action: t("myStyle.insights.styleAction"),
       });
     }
 
@@ -338,16 +350,16 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       insights.push({
         type: "strength",
         icon: "checkmark-circle",
-        title: t("mystyle.insights.consistentTitle"),
-        description: t("mystyle.insights.consistentDescription", { percentage: analysis.consistency }),
+        title: t("myStyle.insights.consistentTitle"),
+        description: t("myStyle.insights.consistentDescription", { percentage: analysis.consistency }),
       });
     } else if (analysis.consistency < 50) {
       insights.push({
         type: "improvement",
         icon: "sync",
-        title: t("mystyle.insights.improvementTitle"),
-        description: t("mystyle.insights.improvementDescription"),
-        action: t("mystyle.insights.improvementAction"),
+        title: t("myStyle.insights.improvementTitle"),
+        description: t("myStyle.insights.improvementDescription"),
+        action: t("myStyle.insights.improvementAction"),
       });
     }
 
@@ -356,8 +368,8 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       insights.push({
         type: "strength",
         icon: "color-palette",
-        title: t("mystyle.insights.diverseTitle"),
-        description: t("mystyle.insights.diverseDescription"),
+        title: t("myStyle.insights.diverseTitle"),
+        description: t("myStyle.insights.diverseDescription"),
       });
     }
 
@@ -371,9 +383,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       insights.push({
         type: "trend",
         icon: "trophy",
-        title: t("mystyle.insights.challengeTitle"),
-        description: t("mystyle.insights.challengeDescription", { name: t(`mystyle.challenges.${recommendedChallenge.id}.name`, recommendedChallenge.name) }),
-        action: t("mystyle.insights.challengeAction"),
+        title: t("myStyle.insights.challengeTitle"),
+        description: t("myStyle.insights.challengeDescription", { name: t(`myStyle.challenges.${recommendedChallenge.id}.name`, recommendedChallenge.name) }),
+        action: t("myStyle.insights.challengeAction"),
       });
     }
 
@@ -384,19 +396,19 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const analyzeWritingPatterns = (posts: any[]) => {
     if (posts.length === 0) {
       setWritingPatterns([
-        { time: t("mystyle.timeSlots.morning"), percentage: 25, label: t("mystyle.timeSlots.morningLabel") },
-        { time: t("mystyle.timeSlots.afternoon"), percentage: 35, label: t("mystyle.timeSlots.afternoonLabel") },
-        { time: t("mystyle.timeSlots.evening"), percentage: 30, label: t("mystyle.timeSlots.eveningLabel") },
-        { time: t("mystyle.timeSlots.night"), percentage: 10, label: t("mystyle.timeSlots.nightLabel") },
+        { time: t("myStyle.timeSlots.morning"), percentage: 25, label: t("myStyle.timeSlots.morningLabel") },
+        { time: t("myStyle.timeSlots.afternoon"), percentage: 35, label: t("myStyle.timeSlots.afternoonLabel") },
+        { time: t("myStyle.timeSlots.evening"), percentage: 30, label: t("myStyle.timeSlots.eveningLabel") },
+        { time: t("myStyle.timeSlots.night"), percentage: 10, label: t("myStyle.timeSlots.nightLabel") },
       ]);
       return;
     }
 
     const timeSlots = {
-      morning: { count: 0, label: t("mystyle.timeSlots.morningLabel"), name: t("mystyle.timeSlots.morning") },
-      afternoon: { count: 0, label: t("mystyle.timeSlots.afternoonLabel"), name: t("mystyle.timeSlots.afternoon") },
-      evening: { count: 0, label: t("mystyle.timeSlots.eveningLabel"), name: t("mystyle.timeSlots.evening") },
-      night: { count: 0, label: t("mystyle.timeSlots.nightLabel"), name: t("mystyle.timeSlots.night") },
+      morning: { count: 0, label: t("myStyle.timeSlots.morningLabel"), name: t("myStyle.timeSlots.morning") },
+      afternoon: { count: 0, label: t("myStyle.timeSlots.afternoonLabel"), name: t("myStyle.timeSlots.afternoon") },
+      evening: { count: 0, label: t("myStyle.timeSlots.eveningLabel"), name: t("myStyle.timeSlots.evening") },
+      night: { count: 0, label: t("myStyle.timeSlots.nightLabel"), name: t("myStyle.timeSlots.night") },
     };
 
     posts.forEach((post) => {
@@ -430,14 +442,14 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     if (posts.length > 0) {
       templates.push({
         id: "1",
-        name: t("mystyle.templates.bestStyle.name"),
-        description: t("mystyle.templates.bestStyle.description"),
+        name: t("myStyle.templates.bestStyle.name"),
+        description: t("myStyle.templates.bestStyle.description"),
         icon: "star",
         color: colors.primary,
         structure: {
-          opening: t("mystyle.templates.bestStyle.opening"),
-          body: t("mystyle.templates.bestStyle.body"),
-          closing: t("mystyle.templates.bestStyle.closing"),
+          opening: t("myStyle.templates.bestStyle.opening"),
+          body: t("myStyle.templates.bestStyle.body"),
+          closing: t("myStyle.templates.bestStyle.closing"),
         },
       });
     }
@@ -451,13 +463,13 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       if (topTone) {
         templates.push({
           id: "2",
-          name: t("mystyle.templates.toneMaster.name", { tone: topTone[0] }),
-          description: t("mystyle.templates.toneMaster.description"),
+          name: t("myStyle.templates.toneMaster.name", { tone: topTone[0] }),
+          description: t("myStyle.templates.toneMaster.description"),
           icon: "color-palette",
           color: colors.accent,
           structure: {
             tone: topTone[0],
-            tips: t("mystyle.templates.toneMaster.tips"),
+            tips: t("myStyle.templates.toneMaster.tips"),
           },
         });
       }
@@ -466,15 +478,15 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     // 성장 템플릿
     templates.push({
       id: "3",
-      name: t("mystyle.templates.growthStory.name"),
-      description: t("mystyle.templates.growthStory.description"),
+      name: t("myStyle.templates.growthStory.name"),
+      description: t("myStyle.templates.growthStory.description"),
       icon: "rocket-outline",
       color: colors.success,
       structure: {
-        hook: t("mystyle.templates.growthStory.hook"),
-        challenge: t("mystyle.templates.growthStory.challenge"),
-        solution: t("mystyle.templates.growthStory.solution"),
-        lesson: t("mystyle.templates.growthStory.lesson"),
+        hook: t("myStyle.templates.growthStory.hook"),
+        challenge: t("myStyle.templates.growthStory.challenge"),
+        solution: t("myStyle.templates.growthStory.solution"),
+        lesson: t("myStyle.templates.growthStory.lesson"),
       },
     });
 
@@ -493,8 +505,8 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       const challenge = STYLE_CHALLENGES.find((c) => c.id === challengeId);
       setActiveChallenge(challenge);
       Alert.alert(
-        t("mystyle.alerts.challengeStart"),
-        t("mystyle.alerts.challengeStarted", { name: challenge ? t(`mystyle.challenges.${challenge.id}.name`, challenge.name) : "" })
+        t("myStyle.alerts.challengeStart"),
+        t("myStyle.alerts.challengeStarted", { name: challenge ? t(`myStyle.challenges.${challenge.id}.name`, challenge.name) : "" })
       );
     }
   };
@@ -517,17 +529,17 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const handleInsightAction = (insight: StyleInsight) => {
     soundManager.playTap();
 
-    if (insight.action === t("mystyle.insights.challengeAction")) {
+    if (insight.action === t("myStyle.insights.challengeAction")) {
       const recommendedChallenge =
         STYLE_CHALLENGES.find((c) =>
           c.id.includes(styleAnalysis.dominantStyle.split("ist")[0])
         ) || STYLE_CHALLENGES[0];
       handleStartChallenge(recommendedChallenge.id);
-    } else if (insight.action === t("mystyle.insights.styleAction") && onNavigate) {
+    } else if (insight.action === t("myStyle.insights.styleAction") && onNavigate) {
       const template = getStyleById(styleAnalysis.dominantStyle);
       if (template) {
         onNavigate("ai-write", {
-          title: `${t(`styles.${template.id}.name`, template.name)} 스타일`,
+          title: `${t(`styleTemplates.${template.id}.name`, template.name)} 스타일`,
           content: template.characteristics.examples[0],
           style: template.id,
           initialTone: template.aiTone, // AI 톤 추가
@@ -563,7 +575,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       onNavigate("ai-write", {
         initialText: content,
         initialTone: tone,
-        title: t(`styles.${template.id}.name`, template.name),
+        title: t(`styleTemplates.${template.id}.name`, template.name),
         style: template.id,
         tips: template.tips,
       });
@@ -611,7 +623,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <View style={styles.brandInfo}>
             <Text style={styles.brandName}>
               {styleAnalysis
-                ? t(`styles.${styleAnalysis.dominantStyle}.name`, 
+                ? t(`styleTemplates.${styleAnalysis.dominantStyle}.name`, 
                     STYLE_TEMPLATES.find(t => t.id === styleAnalysis.dominantStyle)?.name || "")
                 : ""}{" "}
               {t('myStyle.brand.title')}
@@ -642,7 +654,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                         color={template?.color || colors.primary}
                       />
                       <Text style={styles.styleScoreName}>
-                        {t(`styles.${styleId}.name`, template?.name || styleId)}
+                        {t(`styleTemplates.${styleId}.name`, template?.name || styleId)}
                       </Text>
                       <Text style={styles.styleScoreValue}>{Number(score) || 0}%</Text>
                     </View>
@@ -676,7 +688,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                   }}
                 >
             <Text style={[styles.keywordText, { color: colors.primary }]}>
-              {t('mystyle.hashtagPrefix', '#')}{tag}
+              {t('myStyle.hashtagPrefix', '#')}{tag}
             </Text>
                 </TouchableOpacity>
               ))}
@@ -686,7 +698,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
       {/* AI 인사이트 */}
       <View style={styles.insightsSection}>
-        <Text style={styles.sectionTitle}>{t('mystyle.coaching.title', '🤖 포스티의 스타일 코칭')}</Text>
+        <Text style={styles.sectionTitle}>{t('myStyle.coaching.title', '🤖 포스티의 스타일 코칭')}</Text>
         {insights.map((insight, index) => (
           <TouchableOpacity
             key={index}
@@ -737,7 +749,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
       {/* 스타일 지표 */}
       <View style={styles.patternsSection}>
-        <Text style={styles.sectionTitle}>{t('mystyle.metrics.title', '📊 나의 스타일 지표')}</Text>
+        <Text style={styles.sectionTitle}>{t('myStyle.metrics.title', '📊 나의 스타일 지표')}</Text>
         <View style={styles.metricsContainer}>
           <View
             style={[
@@ -749,7 +761,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           >
             <View style={styles.metricHeader}>
               <SafeIcon name="sync" size={24} color={colors.primary} />
-              <Text style={styles.metricLabel}>{t('mystyle.metrics.consistency', '일관성')}</Text>
+              <Text style={styles.metricLabel}>{t('myStyle.metrics.consistency', '일관성')}</Text>
             </View>
             <Text style={styles.metricValue}>
               {styleAnalysis?.consistency || 0}%
@@ -780,7 +792,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           >
             <View style={styles.metricHeader}>
               <SafeIcon name="color-palette" size={24} color={colors.accent} />
-              <Text style={styles.metricLabel}>{t('mystyle.metrics.diversity', '다양성')}</Text>
+              <Text style={styles.metricLabel}>{t('myStyle.metrics.diversity', '다양성')}</Text>
             </View>
             <Text style={styles.metricValue}>
               {styleAnalysis?.diversity || 0}%
@@ -804,11 +816,11 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <View style={styles.activeChallengeCard}>
             <View style={styles.challengeHeader}>
               <SafeIcon name="trophy" size={20} color={colors.warning} />
-              <Text style={styles.challengeTitle}>{t(`mystyle.challenges.${activeChallenge.id}.name`, activeChallenge.name)}</Text>
+              <Text style={styles.challengeTitle}>{String(t(`myStyle.challenges.${activeChallenge.id}.name`, activeChallenge.name))}</Text>
             </View>
             <Text style={styles.challengeProgress}>
               {t('myStyle.challenge.progress', '진행도: {{current}}/{{total}}', { current: activeChallenge.progress || 0, total: activeChallenge.duration })}
-              {t('mystyle.challenge.dayUnit', '일')}
+              {t('myStyle.challenge.dayUnit', '일')}
             </Text>
           </View>
         )}
@@ -825,15 +837,15 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <View style={styles.accessDeniedIcon}>
             <SafeIcon name="lock-closed" size={40} color={colors.text.tertiary} />
           </View>
-          <Text style={styles.accessDeniedTitle}>{t("mystyle.premium.title")}</Text>
+          <Text style={styles.accessDeniedTitle}>{t("myStyle.premium.title")}</Text>
           <Text style={styles.accessDeniedSubtitle}>
-            {t("mystyle.premium.subtitle")}
+            {t("myStyle.premium.subtitle")}
           </Text>
           <TouchableOpacity
             style={styles.upgradeButton}
             onPress={() => onNavigate?.("subscription")}
           >
-            <Text style={styles.upgradeButtonText}>{t("mystyle.premium.upgradeButton")}</Text>
+            <Text style={styles.upgradeButtonText}>{t("myStyle.premium.upgradeButton")}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -855,22 +867,22 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             <View style={styles.metricItem}>
               <SafeIcon name="calendar-outline" size={24} color={colors.accent} />
               <Text style={styles.metricValue}>
-                {stats?.postingPatterns?.mostActiveDay || t("mystyle.weekdays.monday")}
+                {stats?.postingPatterns?.mostActiveDay || t("myStyle.weekdays.monday")}
               </Text>
-              <Text style={styles.metricLabel}>{t("mystyle.metrics.mostActiveDay")}</Text>
+              <Text style={styles.metricLabel}>{t("myStyle.metrics.mostActiveDay")}</Text>
             </View>
             <View style={styles.metricItem}>
               <SafeIcon name="time-outline" size={24} color={colors.success} />
             <Text style={styles.metricValue}>
-              {stats?.postingPatterns?.mostActiveTime || t('mystyle.defaultTime', '19시')}
+              {stats?.postingPatterns?.mostActiveTime || t('myStyle.defaultTime', '19시')}
             </Text>
-              <Text style={styles.metricLabel}>{t('mystyle.metrics.preferredTime', '선호 시간')}</Text>
+              <Text style={styles.metricLabel}>{t('myStyle.metrics.preferredTime', '선호 시간')}</Text>
             </View>
           </View>
 
           {/* 카테고리 분포 */}
           <View style={styles.categoryDistribution}>
-            <Text style={styles.subsectionTitle}>{t('mystyle.analytics.categoryDistribution', '카테고리별 분포')}</Text>
+            <Text style={styles.subsectionTitle}>{t('myStyle.analytics.categoryDistribution', '카테고리별 분포')}</Text>
             {Object.entries(stats?.byCategory || {}).map(
               ([category, count]) => (
                 <View key={category} style={styles.categoryBar}>
@@ -933,15 +945,15 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <View style={styles.accessDeniedIcon}>
             <SafeIcon name="lock-closed" size={40} color={colors.text.tertiary} />
           </View>
-          <Text style={styles.accessDeniedTitle}>{t("mystyle.premium.title")}</Text>
+          <Text style={styles.accessDeniedTitle}>{t("myStyle.premium.title")}</Text>
           <Text style={styles.accessDeniedSubtitle}>
-            {t("mystyle.premium.subtitle")}
+            {t("myStyle.premium.subtitle")}
           </Text>
           <TouchableOpacity
             style={styles.upgradeButton}
             onPress={() => onNavigate?.("subscription")}
           >
-            <Text style={styles.upgradeButtonText}>{t("mystyle.premium.upgradeButton")}</Text>
+            <Text style={styles.upgradeButtonText}>{t("myStyle.premium.upgradeButton")}</Text>
           </TouchableOpacity>
         </View>
       );
@@ -955,9 +967,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             transform: [{ translateY: Animated.multiply(slideAnim, 0.5) }],
           }}
         >
-            <Text style={styles.sectionTitle}>{t('mystyle.templates.emojiPrefix', '📝')} {t("mystyle.templates.title", "스타일 템플릿")}</Text>
+            <Text style={styles.sectionTitle}>{t('myStyle.templates.emojiPrefix', '📝')} {t("myStyle.templates.title", "스타일 템플릿")}</Text>
           <Text style={styles.sectionSubtitle}>
-            {t("mystyle.templates.subtitle", "다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요")}
+            {t("myStyle.templates.subtitle", "다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요")}
           </Text>
           {userPlan === "starter" &&
             styleAccess?.templateLimit &&
@@ -969,7 +981,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                   color={colors.primary}
                 />
                 <Text style={styles.templateLimitText}>
-{t("mystyle.templates.starterLimit", "STARTER 플랜: {{limit}}개 템플릿만 사용 가능", { limit: styleAccess.templateLimit })}
+{t("myStyle.templates.starterLimit", "STARTER 플랜: {{limit}}개 템플릿만 사용 가능", { limit: styleAccess.templateLimit })}
                 </Text>
               </View>
             )}
@@ -1005,12 +1017,12 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               onPress={() => {
                 if (isLocked) {
                   Alert.alert(
-                    t("mystyle.alerts.premiumTemplate"),
-                    t("mystyle.alerts.premiumTemplateMessage"),
+                    t("myStyle.alerts.premiumTemplate"),
+                    t("myStyle.alerts.premiumTemplateMessage"),
                     [
-                      { text: t("mystyle.alerts.cancel"), style: "cancel" },
+                      { text: t("myStyle.alerts.cancel"), style: "cancel" },
                       {
-                        text: t("mystyle.alerts.upgrade"),
+                        text: t("myStyle.alerts.upgrade"),
                         onPress: () => onNavigate?.("subscription"),
                       },
                     ]
@@ -1055,22 +1067,22 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               </View>
 
               <View style={styles.templateContent}>
-                <Text style={styles.templateName}>{t(`styles.${template.id}.name`, template.name)}</Text>
+                <Text style={styles.templateName}>{String(t(`styleTemplates.${template.id}.name`, template.name))}</Text>
                 <Text style={styles.templateDescription}>
-                  {t(`styles.${template.id}.description`, template.description)}
+                  {String(t(`styleTemplates.${template.id}.description`, template.description))}
                 </Text>
 
                 <View style={styles.templateDetails}>
                   <View style={styles.templateStructure}>
             <Text style={styles.templateStructureItem}>
-              {t('mystyle.templates.bulletPoint', '•')} {t('mystyle.templates.averageLength', '평균 길이')}: {template.characteristics.avgLength}
+              {t('myStyle.templates.bulletPoint', '•')} {t('myStyle.templates.averageLength', '평균 길이')}: {translateAvgLength(template.characteristics.avgLength)}
             </Text>
                     <Text style={styles.templateStructureItem}>
-                      {t('mystyle.templates.bulletPoint', '•')} {t('mystyle.templates.keywords', '키워드')}:{" "}
+                      {t('myStyle.templates.bulletPoint', '•')} {t('myStyle.templates.keywords', '키워드')}:{" "}
                       {template.characteristics.keywords.slice(0, 3).join(", ")}
                     </Text>
                     <Text style={styles.templateStructureItem}>
-                      {t('mystyle.templates.bulletPoint', '•')} {t('mystyle.templates.emojis', '이모지')}:{" "}
+                      {t('myStyle.templates.bulletPoint', '•')} {t('myStyle.templates.emojis', '이모지')}:{" "}
                       {template.characteristics.emojis.slice(0, 3).join(" ")}
                     </Text>
                   </View>
@@ -1100,9 +1112,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
         {/* 스타일 챌린지 */}
         <View style={styles.challengeSection}>
-          <Text style={styles.sectionTitle}>{t('mystyle.challenges.emojiPrefix', '🏆')} {t('mystyle.challenges.title', '스타일 챌린지')}</Text>
+          <Text style={styles.sectionTitle}>{t('myStyle.challenges.emojiPrefix', '🏆')} {t('myStyle.challenges.title', '스타일 챌린지')}</Text>
           <Text style={styles.sectionSubtitle}>
-            {t('mystyle.challenges.subtitle', '챌린지를 통해 새로운 스타일을 마스터해보세요')}
+            {t('myStyle.challenges.subtitle', '챌린지를 통해 새로운 스타일을 마스터해보세요')}
           </Text>
 
           {STYLE_CHALLENGES.map((challenge) => (
@@ -1134,14 +1146,14 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 </View>
               </View>
               <View style={styles.challengeContent}>
-                <Text style={styles.challengeName}>{t(`mystyle.challenges.${challenge.id}.name`, challenge.name)}</Text>
+                <Text style={styles.challengeName}>{t(`myStyle.challenges.${challenge.id}.name`, challenge.name)}</Text>
                 <Text style={styles.challengeDescription}>
-                  {t(`mystyle.challenges.${challenge.id}.description`, challenge.description)}
+                  {t(`myStyle.challenges.${challenge.id}.description`, challenge.description)}
                 </Text>
                 <View style={styles.challengeRules}>
                   {challenge.rules.slice(0, 2).map((rule, index) => (
                     <Text key={index} style={styles.challengeRule}>
-                      {t('mystyle.templates.bulletPoint', '•')} {t(`mystyle.challenges.${challenge.id}.rules.${index}`, rule)}
+                      {t('myStyle.templates.bulletPoint', '•')} {t(`myStyle.challenges.${challenge.id}.rules.${index}`, rule)}
                     </Text>
                   ))}
                 </View>
@@ -1164,7 +1176,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               </View>
               {activeChallenge?.id === challenge.id ? (
                 <View style={styles.challengeStatus}>
-                  <Text style={styles.challengeStatusText}>{t('mystyle.challenges.inProgress', '진행 중')}</Text>
+                  <Text style={styles.challengeStatusText}>{t('myStyle.challenges.inProgress', '진행 중')}</Text>
                 </View>
               ) : (
                 <SafeIcon name="arrow-forward" size={20} color={colors.primary} />
@@ -1181,7 +1193,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       <SafeAreaView
         style={[styles.container, { backgroundColor: colors.background }]}
       >
-        <LoadingScreen message={t("mystyle.loading")} fullScreen={true} />
+        <LoadingScreen message={t("myStyle.loading")} fullScreen={true} />
       </SafeAreaView>
     );
   }
@@ -1197,16 +1209,16 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             <View style={styles.mollyBadge}>
               <Text style={styles.mollyBadgeText}>P</Text>
             </View>
-            <Text style={headerStyles.headerTitle}>{t("mystyle.title")}</Text>
+            <Text style={headerStyles.headerTitle}>{t("myStyle.title")}</Text>
           </View>
           <Text style={headerStyles.headerSubtitle}>
-            {t("mystyle.subtitle")}
+            {t("myStyle.subtitle")}
           </Text>
         </View>
         <EmptyState
           icon="brush-outline"
-          title={t("mystyle.empty.title")}
-          subtitle={t("mystyle.empty.subtitle")}
+          title={t("myStyle.empty.title")}
+          subtitle={t("myStyle.empty.subtitle")}
         />
       </SafeAreaView>
     );
@@ -1226,10 +1238,10 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             <View style={styles.mollyBadge}>
               <Text style={styles.mollyBadgeText}>P</Text>
             </View>
-            <Text style={headerStyles.headerTitle}>{t("mystyle.title")}</Text>
+            <Text style={headerStyles.headerTitle}>{t("myStyle.title")}</Text>
           </View>
           <Text style={headerStyles.headerSubtitle}>
-            {t("mystyle.subtitle")}
+            {t("myStyle.subtitle")}
           </Text>
         </View>
 
@@ -1277,7 +1289,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 selectedTab === "templates" && styles.tabTextActive,
               ]}
             >
-{t("mystyle.tabs.templates", "템플릿")}
+{t("myStyle.tabs.templates", "템플릿")}
             </Text>
           </TouchableOpacity>
         </View>

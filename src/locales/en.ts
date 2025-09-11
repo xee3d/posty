@@ -102,14 +102,6 @@ export default {
       save: "Save",
       share: "Share",
     },
-    photo: {
-      select: {
-        title: "Select Photo",
-        message: "How would you like to select a photo?",
-        camera: "Take with Camera",
-        gallery: "Choose from Gallery",
-      }
-    },
     alerts: {
       noPrompt: "Tell me what to write about! 🤔",
       noPhoto: "Please select a photo first! 📸",
@@ -281,17 +273,6 @@ export default {
         prompt: "Please write a concise and impactful post suitable for X (Twitter). Deliver only the essence within 280 characters, but express it wittily."
       }
     }
-  },
-
-  // Token System
-  tokens: {
-    badge: "Tokens",
-    noTokens: "No tokens left",
-    earnTokens: "Earn free tokens", 
-    subscribe: "No tokens left. Subscribe?",
-    descriptions: {
-      dailyFree: "Daily free token charge",
-    },
   },
 
   // Tab Navigation
@@ -612,12 +593,6 @@ export default {
       upgrade500: "You will receive an additional 500 tokens in total",
       downgradeWarning: "Warning: Free tokens will be limited to 300"
     },
-    membershipNotices: {
-      free: "Free members get 10 tokens automatically recharged daily",
-      starter: "STARTER members get 300 on signup + 10 additional tokens daily",
-      premium: "PRO members get 500 on signup + 20 additional tokens daily", 
-      pro: "MAX members can use unlimited tokens"
-    },
     planDescriptions: {
       free: "10 free tokens daily",
       starter: "300 on signup + 10 daily", 
@@ -643,15 +618,6 @@ export default {
       free: {
         name: "Free"
       },
-      starter: {
-        name: "Starter"
-      },
-      premium: {
-        name: "Premium"  
-      },
-      pro: {
-        name: "Pro"
-      },
       freeDetails: {
         name: "Free",
         priceDisplay: "Free",
@@ -663,6 +629,7 @@ export default {
         ],
       },
       starter: {
+        name: "Starter",
         features: [
           "300 tokens immediately upon signup",
           "Additional 10 tokens daily",
@@ -673,6 +640,7 @@ export default {
         ],
       },
       premium: {
+        name: "Premium",
         features: [
           "500 tokens immediately upon signup",
           "Additional 20 tokens daily",
@@ -684,6 +652,7 @@ export default {
         ],
       },
       pro: {
+        name: "Pro",
         features: [
           "500 tokens immediately upon signup",
           "Unlimited tokens (Fair Use)",
@@ -843,11 +812,15 @@ export default {
 
   // My Style Screen
   myStyle: {
+    title: "My Style",
+    subtitle: "Build your own content brand",
+    loading: "Analyzing style...",
     access: {
       freeMessage: "My Style analysis is available from STARTER plan.",
     },
-    brand: {
-      title: "Brand"
+    empty: {
+      title: "No content created yet",
+      subtitle: "Create your first content with Posty!"
     },
     tabs: {
       overview: "Overview",
@@ -863,47 +836,154 @@ export default {
       title: "Key Keywords"
     },
     challenge: {
-      progress: "Progress: {{current}}/{{total}}"
+      progress: "Progress: {{current}}/{{total}}",
+      dayUnit: "days"
     },
-    analytics: {
+    defaultTime: "7 PM",
+    hashtagPrefix: "#",
+    insights: {
+      title: "Style Insights",
+      styleTitle: "{{name}} Style",
+      styleDescription: "You have {{description}}.",
+      styleAction: "Continue developing this style",
+      consistentTitle: "Consistent Style",
+      consistentDescription: "You maintain {{percentage}}% high consistency!",
+      improvementTitle: "Style Consistency",
+      improvementDescription: "Try to maintain more consistent length and tone in your writing.",
+      improvementAction: "View Style Guide",
+      diverseTitle: "Diverse Content",
+      diverseDescription: "You're trying various topics and styles!",
+      challengeTitle: "New Challenge",
+      challengeDescription: "Try the {{name}} challenge!",
+      challengeAction: "Start Challenge"
+    },
+    analysis: {
+      title: "Writing Analysis",
+      totalPosts: "Total {{count}} posts",
+      averageLength: "Average word count",
+      mostUsedTone: "Primary tone",
+      consistency: "Consistency",
+      improvement: "Improvement suggestions",
       growth: "📈 Growth Analysis",
-      totalPosts: "Total Posts",
       toneAnalysis: "🎨 Tone Usage Analysis",
       categoryDistribution: "Category Distribution"
     },
+    timeSlots: {
+      title: "Activity Time Slots",
+      morning: "Morning",
+      afternoon: "Afternoon",
+      evening: "Evening",
+      night: "Night",
+      morningLabel: "6-12 AM",
+      afternoonLabel: "12-6 PM",
+      eveningLabel: "6-10 PM",
+      nightLabel: "10 PM-6 AM"
+    },
     templates: {
+      title: "Style Templates",
+      subtitle: "Try various styles and find your own style",
       recommended: "Recommended",
-      usageCount: "Used {{count}} times"
+      usageCount: "Used {{count}} times",
+      starterLimit: "STARTER Plan: Only {{limit}} templates available",
+      emojiPrefix: "📝",
+      bulletPoint: "•",
+      averageLength: "Average Length",
+      keywords: "Keywords",
+      emojis: "Emojis",
+      bestStyle: {
+        name: "My Best Style",
+        description: "Structure of your most engaging posts",
+        opening: "Emotional greeting",
+        body: "Specific experience sharing",
+        closing: "Engaging question"
+      },
+      toneMaster: {
+        name: "{{tone}} Master",
+        description: "Your most frequently used tone",
+        tips: "Write emphasizing the characteristics of this tone"
+      },
+      growthStory: {
+        name: "Growth Story",
+        description: "Posts about challenges and achievements",
+        hook: "Interesting introduction",
+        challenge: "Difficulties faced",
+        solution: "Problem-solving process",
+        lesson: "Lessons learned"
+      },
+      saveTemplate: "Save Template",
+      useTemplate: "Use Template"
     },
     metrics: {
       title: "📊 My Style Metrics",
       consistency: "Consistency",
       diversity: "Diversity",
-      preferredTime: "Preferred Time"
+      preferredTime: "Preferred Time",
+      mostActiveDay: "Most active day",
+      averageWordsPerPost: "Average words per post",
+      totalWritingTime: "Total writing time",
+      improvementTip: "Improvement tip"
     },
     challenges: {
       title: "🏆 Style Challenges",
       subtitle: "Master new styles through challenges",
       inProgress: "In Progress",
       emojiPrefix: "🏆",
-      minimalWeek: {
+      "minimal-week": {
         name: "Minimal Week",
         description: "Write only within 50 characters for a week",
         rules: ["All posts within 50 characters", "Maximum 2 emojis", "Maximum 3 hashtags"]
       },
-      storyMonth: {
+      "story-month": {
         name: "Story Month",
         description: "Write one story every day for a month", 
         rules: ["Write 200+ characters daily", "Beginning-middle-end structure", "Emotional expression required"]
       },
-      trendHunter: {
+      "trend-hunter": {
         name: "Trend Hunter",
         description: "Discover 10 latest trends",
         rules: ["Discover new hashtags", "Include trend analysis", "Share with other users"]
       }
     },
+    premium: {
+      title: "Premium Feature",
+      subtitle: "Use more detailed analysis and templates",
+      upgradeButton: "Upgrade"
+    },
+    alerts: {
+      challengeStart: "Challenge Started!",
+      challengeStarted: "{{name}} challenge has started!",
+      templateSaved: "Template saved successfully",
+      templateUsed: "Template applied",
+      premiumTemplate: "Premium Template",
+      premiumTemplateMessage: "All templates are available in PRO plan.",
+      cancel: "Cancel",
+      upgrade: "Upgrade",
+      confirm: "Confirm"
+    },
+    weekdays: {
+      monday: "Monday",
+      tuesday: "Tuesday",
+      wednesday: "Wednesday",
+      thursday: "Thursday",
+      friday: "Friday",
+      saturday: "Saturday",
+      sunday: "Sunday"
+    },
+    actions: {
+      analyze: "Analyze",
+      viewDetails: "View Details",
+      shareInsights: "Share Insights",
+      exportData: "Export Data"
+    },
     coaching: {
       title: "🤖 Posty's Style Coaching"
+    },
+    lengths: {
+      under50: "Under 50 characters",
+      over200: "Over 200 characters",
+      medium100: "100-150 characters",
+      medium150: "150-200 characters",
+      short80: "80-120 characters"
     }
   },
 
@@ -1289,14 +1369,6 @@ export default {
       action: "Write",
       meta: "Outdoor Activities Recommended",
     },
-    // First post
-    firstPost: {
-      title: "Try Your First Post!",
-      content: "Start your Posty journey\nwith a simple introduction or greeting",
-      badge: "🌟 First Start",
-      action: "Get Started",
-      meta: "New User",
-    },
     // 10 posts milestone
     milestone10: {
       title: "This is Your 10th Post!",
@@ -1376,30 +1448,6 @@ export default {
       badge: "☕ Coffee",
       action: "Coffee Story",
       meta: "Cafe Culture",
-    },
-    // Monday motivation
-    mondayMotivation: {
-      title: "Start of the Week, Monday!",
-      content: "How about sharing this week's\ngoals or plans?",
-      badge: "💪 Monday",
-      action: "Write",
-      meta: "Motivational Content",
-    },
-    // Rainy day
-    rainyDay: {
-      title: "Emotional Rainy Day",
-      content: "Record the emotional moments\naccompanied by the sound of rain",
-      badge: "🌧️ Rainy Day",
-      action: "Write",
-      meta: "Rain Forecast",
-    },
-    // Sunny day
-    sunnyDay: {
-      title: "Beautiful Sunny Weather",
-      content: "How about outdoor activities\nto enjoy the sunny weather?",
-      badge: "☀️ Sunny Day",
-      action: "Write",
-      meta: "Clear",
     },
   },
 
@@ -1506,133 +1554,6 @@ export default {
     }
   },
 
-  // MyStyle Screen
-  mystyle: {
-    title: "My Style",
-    subtitle: "Build your own content brand",
-    loading: "Analyzing style...",
-    empty: {
-      title: "No content created yet",
-      subtitle: "Create your first content with Posty!"
-    },
-    tabs: {
-      templates: "Templates"
-    },
-    templates: {
-      title: "Style Templates",
-      subtitle: "Try various styles and find your own style",
-      starterLimit: "STARTER Plan: Only {{limit}} templates available",
-      emojiPrefix: "📝",
-      bulletPoint: "•",
-      averageLength: "Average Length",
-      keywords: "Keywords",
-      emojis: "Emojis"
-    },
-    challenge: {
-      dayUnit: "days"
-    },
-    defaultTime: "7 PM",
-    hashtagPrefix: "#",
-    insights: {
-      title: "Style Insights",
-      styleTitle: "{{name}} Style",
-      styleDescription: "You have {{description}}.",
-      styleAction: "Continue developing this style",
-      consistentTitle: "Consistent Style",
-      consistentDescription: "You maintain {{percentage}}% high consistency!",
-      improvementTitle: "Style Consistency",
-      improvementDescription: "Try to maintain more consistent length and tone in your writing.",
-      improvementAction: "View Style Guide",
-      diverseTitle: "Diverse Content",
-      diverseDescription: "You're trying various topics and styles!",
-      challengeTitle: "New Challenge",
-      challengeDescription: "Try the {{name}} challenge!",
-      challengeAction: "Start Challenge"
-    },
-    analysis: {
-      title: "Writing Analysis",
-      totalPosts: "Total {{count}} posts",
-      averageLength: "Average word count",
-      mostUsedTone: "Primary tone",
-      consistency: "Consistency",
-      improvement: "Improvement suggestions"
-    },
-    timeSlots: {
-      title: "Activity Time Slots",
-      morning: "Morning",
-      afternoon: "Afternoon",
-      evening: "Evening",
-      night: "Night",
-      morningLabel: "6-12 AM",
-      afternoonLabel: "12-6 PM",
-      eveningLabel: "6-10 PM",
-      nightLabel: "10 PM-6 AM"
-    },
-    templates: {
-      title: "My Templates",
-      subtitle: "Save frequently used patterns as templates",
-      bestStyle: {
-        name: "My Best Style",
-        description: "Structure of your most engaging posts",
-        opening: "Emotional greeting",
-        body: "Specific experience sharing",
-        closing: "Engaging question"
-      },
-      toneMaster: {
-        name: "{{tone}} Master",
-        description: "Your most frequently used tone",
-        tips: "Write emphasizing the characteristics of this tone"
-      },
-      growthStory: {
-        name: "Growth Story",
-        description: "Posts about challenges and achievements",
-        hook: "Interesting introduction",
-        challenge: "Difficulties faced",
-        solution: "Problem-solving process",
-        lesson: "Lessons learned"
-      },
-      saveTemplate: "Save Template",
-      useTemplate: "Use Template"
-    },
-    premium: {
-      title: "Premium Feature",
-      subtitle: "Use more detailed analysis and templates",
-      upgradeButton: "Upgrade"
-    },
-    alerts: {
-      challengeStart: "Challenge Started!",
-      challengeStarted: "{{name}} challenge has started!",
-      templateSaved: "Template saved successfully",
-      templateUsed: "Template applied",
-      premiumTemplate: "Premium Template",
-      premiumTemplateMessage: "All templates are available in PRO plan.",
-      cancel: "Cancel",
-      upgrade: "Upgrade",
-      confirm: "Confirm"
-    },
-    metrics: {
-      title: "Statistics",
-      mostActiveDay: "Most active day",
-      averageWordsPerPost: "Average words per post",
-      totalWritingTime: "Total writing time",
-      improvementTip: "Improvement tip"
-    },
-    weekdays: {
-      monday: "Monday",
-      tuesday: "Tuesday",
-      wednesday: "Wednesday",
-      thursday: "Thursday",
-      friday: "Friday",
-      saturday: "Saturday",
-      sunday: "Sunday"
-    },
-    actions: {
-      analyze: "Analyze",
-      viewDetails: "View Details",
-      shareInsights: "Share Insights",
-      exportData: "Export Data"
-    }
-  },
 
   // Mission System
   missions: {
@@ -1922,7 +1843,7 @@ export default {
   },
 
   // Unified Styles
-  styles: {
+  styleTemplates: {
     minimalist: {
       name: "Minimalist",
       description: "Clean and simple style"

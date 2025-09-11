@@ -102,14 +102,6 @@ export default {
       save: "저장",
       share: "공유",
     },
-    photo: {
-      select: {
-        title: "사진 선택",
-        message: "어떤 방법으로 사진을 선택하시겠어요?",
-        camera: "카메라로 촬영",
-        gallery: "갤러리에서 선택",
-      }
-    },
     alerts: {
       noPrompt: "무엇에 대해 쓸지 알려주세요! 🤔",
       noPhoto: "사진을 먼저 선택해주세요! 📸",
@@ -283,17 +275,6 @@ export default {
     }
   },
 
-  // 토큰 시스템
-  tokens: {
-    badge: "토큰",
-    label: "토큰",
-    noTokens: "토큰이 부족해요",
-    earnTokens: "무료 토큰 받기",
-    subscribe: "토큰이 부족해요. 구독하시겠어요?",
-    descriptions: {
-      dailyFree: "일일 무료 토큰 충전",
-    },
-  },
 
   // 탭 네비게이션
   tabs: {
@@ -631,9 +612,6 @@ export default {
     access: {
       freeMessage: "STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.",
     },
-    brand: {
-      title: "브랜드"
-    },
     tabs: {
       overview: "개요",
       analysis: "분석", 
@@ -656,32 +634,22 @@ export default {
       toneAnalysis: "🎨 톤 사용 분석",
       categoryDistribution: "카테고리별 분포"
     },
-    templates: {
-      recommended: "추천",
-      usageCount: "사용 {{count}}회"
-    },
-    metrics: {
-      title: "📊 나의 스타일 지표",
-      consistency: "일관성",
-      diversity: "다양성",
-      preferredTime: "선호 시간"
-    },
     challenges: {
       title: "스타일 챌린지",
       subtitle: "챌린지를 통해 새로운 스타일을 마스터해보세요",
       inProgress: "진행 중",
       emojiPrefix: "🏆",
-      minimalWeek: {
+      "minimal-week": {
         name: "미니멀 위크",
         description: "일주일간 50자 이내로만 작성하기",
         rules: ["모든 게시물 50자 이내", "이모지 최대 2개", "해시태그 3개 이하"]
       },
-      storyMonth: {
+      "story-month": {
         name: "스토리 먼스", 
         description: "한 달간 매일 하나의 이야기 쓰기",
         rules: ["매일 200자 이상 작성", "기승전결 구조", "감정 표현 필수"]
       },
-      trendHunter: {
+      "trend-hunter": {
         name: "트렌드 헌터",
         description: "최신 트렌드 10개 발굴하기", 
         rules: ["새로운 해시태그 발굴", "트렌드 분석 포함", "다른 사용자와 공유"]
@@ -689,7 +657,133 @@ export default {
     },
     coaching: {
       title: "🤖 포스티의 스타일 코칭"
-    }
+    },
+    insights: {
+      styleTitle: "{{name}} 스타일이 두드러져요",
+      styleDescription: "{{description}} 스타일이 잘 나타나고 있습니다",
+      styleAction: "이 스타일로 더 써보기",
+      consistentTitle: "일관된 스타일을 유지하고 있어요",
+      consistentDescription: "{{percentage}}%의 일관성을 보여주고 있습니다",
+      improvementTitle: "스타일을 더 일관되게 해보세요",
+      improvementDescription: "다양한 템플릿을 시도해서 나만의 스타일을 찾아보세요",
+      improvementAction: "템플릿 둘러보기",
+      diverseTitle: "다양한 스타일을 시도하고 있어요",
+      diverseDescription: "여러 스타일을 시도하며 창의성을 발휘하고 있습니다",
+      challengeTitle: "새로운 챌린지에 도전해보세요",
+      challengeDescription: "{{name}} 챌린지로 스타일을 발전시켜보세요",
+      challengeAction: "챌린지 시작하기"
+    },
+    timeSlots: {
+      morning: "오전",
+      afternoon: "오후", 
+      evening: "저녁",
+      night: "밤",
+      morningLabel: "오전 시간대",
+      afternoonLabel: "오후 시간대",
+      eveningLabel: "저녁 시간대",
+      nightLabel: "밤 시간대"
+    },
+    premium: {
+      title: "프리미엄 기능",
+      subtitle: "더 자세한 분석을 위해 업그레이드하세요",
+      upgradeButton: "업그레이드"
+    },
+    templates: {
+      title: "스타일 템플릿",
+      subtitle: "다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요",
+      emojiPrefix: "📝",
+      starterLimit: "STARTER 플랜: {{limit}}개 템플릿만 사용 가능",
+      bulletPoint: "•",
+      averageLength: "평균 길이",
+      keywords: "키워드",
+      emojis: "이모지",
+      lengths: {
+        under50: "50자 이하",
+        over200: "200자 이상", 
+        medium100: "100-150자",
+        medium150: "150-200자",
+        short80: "80-120자"
+      },
+      recommended: "추천",
+      usageCount: "사용 {{count}}회",
+      bestStyle: {
+        name: "베스트 스타일",
+        description: "가장 잘 어울리는 스타일",
+        opening: "시작 문구",
+        body: "본문 내용",
+        closing: "마무리 문구"
+      },
+      toneMaster: {
+        name: "{{tone}} 마스터",
+        description: "톤 마스터 템플릿",
+        tips: "톤 활용 팁"
+      },
+      growthStory: {
+        name: "성장 스토리",
+        description: "성장 과정을 담은 스토리",
+        hook: "흥미로운 도입",
+        challenge: "겪었던 어려움",
+        solution: "해결 과정",
+        lesson: "얻은 교훈"
+      }
+    },
+    hashtagPrefix: "#",
+    defaultTime: "19시",
+    dayUnit: "일",
+    alerts: {
+      challengeStart: "챌린지 시작!",
+      challengeStarted: "{{name}} 챌린지가 시작되었습니다!",
+      premiumTemplate: "프리미엄 템플릿",
+      premiumTemplateMessage: "이 템플릿은 프리미엄 플랜에서 사용할 수 있습니다",
+      cancel: "취소",
+      upgrade: "업그레이드"
+    },
+    profileCompletion: "프로필 완성도 {{completeness}}%",
+    title: "내 스타일",
+    subtitle: "나만의 콘텐츠 브랜드를 만들어가세요",
+    loading: "스타일 분석 중...",
+    empty: {
+      title: "아직 작성한 콘텐츠가 없어요",
+      subtitle: "포스티와 함께 첫 콘텐츠를 만들어보세요!"
+    },
+    analysis: {
+      title: "글쓰기 분석",
+      totalPosts: "총 {{count}}개 글",
+      averageLength: "평균 글자수",
+      mostUsedTone: "주요 톤",
+      consistency: "일관성",
+      improvement: "개선 제안"
+    },
+    metrics: {
+      title: "📊 나의 스타일 지표",
+      consistency: "일관성",
+      diversity: "다양성",
+      preferredTime: "선호 시간",
+      mostActiveDay: "최다 작성 요일",
+      averageWordsPerPost: "글당 평균 단어수",
+      totalWritingTime: "총 글쓰기 시간",
+      improvementTip: "개선 팁"
+    },
+    weekdays: {
+      monday: "월요일",
+      tuesday: "화요일",
+      wednesday: "수요일",
+      thursday: "목요일",
+      friday: "금요일",
+      saturday: "토요일",
+      sunday: "일요일"
+    },
+    actions: {
+      analyze: "분석하기",
+      viewDetails: "자세히 보기",
+      shareInsights: "인사이트 공유",
+      exportData: "데이터 내보내기"
+    },
+    interests: "관심사 (복수 선택 가능)",
+    formality: "격식",
+    emotiveness: "감정 표현",
+    humor: "유머",
+    saveProfile: "프로필 저장하기"
   },
 
   // Settings
@@ -1075,14 +1169,6 @@ export default {
       action: "글쓰기",
       meta: "야외 활동 추천",
     },
-    // 첫 포스팅
-    firstPost: {
-      title: "첫 번째 포스팅을 해보세요!",
-      content: "간단한 자기소개나 인사말로\n포스티 여행을 시작해보세요",
-      badge: "🌟 첫 시작",
-      action: "시작하기",
-      meta: "신규 사용자",
-    },
     // 10개 포스팅 달성
     milestone10: {
       title: "벌써 10개째 글이에요!",
@@ -1162,30 +1248,6 @@ export default {
       badge: "☕ 커피",
       action: "커피 이야기",
       meta: "카페 문화",
-    },
-    // 월요일 동기부여
-    mondayMotivation: {
-      title: "한 주의 시작, 월요일!",
-      content: "이번 주 목표나 계획을\n공유해보는 건 어떨까요?",
-      badge: "💪 월요일",
-      action: "글쓰기",
-      meta: "동기부여 콘텐츠",
-    },
-    // 비오는 날
-    rainyDay: {
-      title: "감성 비 오는 날",
-      content: "빗소리와 함께하는 감성적인\n순간을 기록해보세요",
-      badge: "🌧️ 비오는 날",
-      action: "글쓰기",
-      meta: "비 예보",
-    },
-    // 맑은 날
-    sunnyDay: {
-      title: "화창한 날씨",
-      content: "맑은 날씨를 만끽할 수 있는\n야외 활동 어떠세요?",
-      badge: "☀️ 맑은 날",
-      action: "글쓰기",
-      meta: "맑음",
     },
   },
 
@@ -1350,40 +1412,12 @@ export default {
       premium: "PRO 회원은 가입 시 500개 + 매일 20개씩 추가 토큰을 받습니다",
       pro: "MAX 회원은 무제한 토큰을 사용할 수 있습니다"
     },
-    benefits: {
-      title: "프리미엄 혜택",
-      moreTokens: {
-        title: "더 많은 토큰",
-        description: "STARTER는 총 600개(초기 300 + 일일 10x30), PRO는 총 1,100개(초기 500 + 일일 20x30), MAX는 무제한 토큰을 제공합니다"
-      },
-      advancedAI: {
-        title: "고급 AI 모델",
-        description: "플랜별 차별화된 AI 모델 제공 (GPT-4o, GPT-4 Turbo)"
-      },
-      noAds: {
-        title: "광고 제거",
-        description: "방해받지 않고 콘텐츠 제작에만 집중할 수 있습니다"
-      }
-    },
-    management: {
-      title: "구독 관리",
-      currentPlan: "현재 플랜",
-      monthlyFee: "월 요금",
-      nextBilling: "다음 결제일",
-      cancelButton: "구독 취소"
-    },
     planDescriptions: {
       free: "매일 10개 무료 충전",
       starter: "가입 시 300개 + 매일 10개", 
       premium: "가입 시 500개 + 매일 20개",
       pro: "무제한 토큰",
       downgradeBlocked: "하위 플랜으로 변경 불가"
-    },
-    membershipNotices: {
-      free: "무료 회원은 매일 10개의 토큰이 자동 충전됩니다",
-      starter: "STARTER 회원은 가입 시 300개 + 매일 10개씩 추가 토큰을 받습니다",
-      premium: "PRO 회원은 가입 시 500개 + 매일 20개씩 추가 토큰을 받습니다", 
-      pro: "MAX 회원은 무제한 토큰을 사용할 수 있습니다"
     },
     upgradeDescriptions: {
       starterImmediate: "가입 즉시 300개 토큰을 받게 됩니다",
@@ -1397,15 +1431,6 @@ export default {
       free: {
         name: "무료"
       },
-      starter: {
-        name: "스타터"
-      },
-      premium: {
-        name: "프리미엄"
-      },
-      pro: {
-        name: "프로"
-      },
       freeDetails: {
         name: "무료",
         priceDisplay: "무료",
@@ -1417,6 +1442,7 @@ export default {
         ],
       },
       starter: {
+        name: "스타터",
         features: [
           "가입 시 300개 토큰 즉시 지급",
           "매일 10개씩 추가 충전",
@@ -1427,6 +1453,7 @@ export default {
         ],
       },
       premium: {
+        name: "프리미엄",
         features: [
           "가입 시 500개 토큰 즉시 지급",
           "매일 20개씩 추가 충전",
@@ -1438,6 +1465,7 @@ export default {
         ],
       },
       pro: {
+        name: "프로",
         features: [
           "가입 시 500개 토큰 즉시 지급",
           "무제한 토큰 (Fair Use)",
@@ -1526,133 +1554,6 @@ export default {
     }
   },
 
-  // MyStyle Screen
-  mystyle: {
-    title: "내 스타일",
-    subtitle: "나만의 콘텐츠 브랜드를 만들어가세요",
-    loading: "스타일 분석 중...",
-    empty: {
-      title: "아직 작성한 콘텐츠가 없어요",
-      subtitle: "포스티와 함께 첫 콘텐츠를 만들어보세요!"
-    },
-    tabs: {
-      templates: "템플릿"
-    },
-    templates: {
-      title: "스타일 템플릿",
-      subtitle: "다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요",
-      starterLimit: "STARTER 플랜: {{limit}}개 템플릿만 사용 가능",
-      emojiPrefix: "📝",
-      bulletPoint: "•",
-      averageLength: "평균 길이",
-      keywords: "키워드",
-      emojis: "이모지"
-    },
-    challenge: {
-      dayUnit: "일"
-    },
-    defaultTime: "19시",
-    hashtagPrefix: "#",
-    insights: {
-      title: "스타일 인사이트",
-      styleTitle: "{{name}} 스타일",
-      styleDescription: "당신은 {{description}}을 가지고 있어요.",
-      styleAction: "이 스타일로 계속 발전하기",
-      consistentTitle: "일관된 스타일",
-      consistentDescription: "{{percentage}}%의 높은 일관성을 유지하고 있어요!",
-      improvementTitle: "스타일 일관성",
-      improvementDescription: "글의 길이와 톤을 더 일관되게 유지해보세요.",
-      improvementAction: "스타일 가이드 보기",
-      diverseTitle: "다양한 콘텐츠",
-      diverseDescription: "다양한 주제와 스타일을 시도하고 있어요!",
-      challengeTitle: "새로운 챌린지",
-      challengeDescription: "{{name}} 챌린지에 도전해보세요!",
-      challengeAction: "챌린지 시작하기"
-    },
-    analysis: {
-      title: "글쓰기 분석",
-      totalPosts: "총 {{count}}개 글",
-      averageLength: "평균 글자수",
-      mostUsedTone: "주요 톤",
-      consistency: "일관성",
-      improvement: "개선 제안"
-    },
-    timeSlots: {
-      title: "활동 시간대",
-      morning: "아침",
-      afternoon: "오후",
-      evening: "저녁",
-      night: "밤",
-      morningLabel: "6-12시",
-      afternoonLabel: "12-18시",
-      eveningLabel: "18-22시",
-      nightLabel: "22-6시"
-    },
-    templates: {
-      title: "나만의 템플릿",
-      subtitle: "자주 사용하는 패턴을 템플릿으로 저장하세요",
-      bestStyle: {
-        name: "나의 베스트 스타일",
-        description: "가장 반응이 좋았던 글의 구조",
-        opening: "감정을 담은 인사",
-        body: "구체적인 경험 공유",
-        closing: "공감 유도 질문"
-      },
-      toneMaster: {
-        name: "{{tone}} 마스터",
-        description: "가장 자주 사용하는 톤",
-        tips: "이 톤의 특징을 살려서 작성하세요"
-      },
-      growthStory: {
-        name: "성장 스토리",
-        description: "도전과 성취를 담은 글",
-        hook: "흥미로운 도입",
-        challenge: "겪었던 어려움",
-        solution: "해결 과정",
-        lesson: "배운 점"
-      },
-      saveTemplate: "템플릿 저장",
-      useTemplate: "템플릿 사용"
-    },
-    premium: {
-      title: "프리미엄 기능",
-      subtitle: "더 자세한 분석과 템플릿을 이용하세요",
-      upgradeButton: "업그레이드"
-    },
-    alerts: {
-      challengeStart: "챌린지 시작!",
-      challengeStarted: "{{name}} 챌린지가 시작되었습니다!",
-      templateSaved: "템플릿이 저장되었습니다",
-      templateUsed: "템플릿을 적용했습니다",
-      premiumTemplate: "프리미엄 템플릿",
-      premiumTemplateMessage: "PRO 플랜에서 모든 템플릿을 사용할 수 있습니다.",
-      cancel: "취소",
-      upgrade: "업그레이드",
-      confirm: "확인"
-    },
-    metrics: {
-      title: "통계",
-      mostActiveDay: "최다 작성 요일",
-      averageWordsPerPost: "글당 평균 단어수",
-      totalWritingTime: "총 글쓰기 시간",
-      improvementTip: "개선 팁"
-    },
-    weekdays: {
-      monday: "월요일",
-      tuesday: "화요일",
-      wednesday: "수요일",
-      thursday: "목요일",
-      friday: "금요일",
-      saturday: "토요일",
-      sunday: "일요일"
-    },
-    actions: {
-      analyze: "분석하기",
-      viewDetails: "자세히 보기",
-      shareInsights: "인사이트 공유",
-      exportData: "데이터 내보내기"
-    }
-  },
 
   // 미션 시스템
   missions: {
@@ -1664,9 +1565,13 @@ export default {
 
   // 토큰 관련
   tokens: {
+    badge: "토큰",
     count: "{{count}}개",
     current: "보유 토큰",
     unlimited: "무제한",
+    noTokens: "토큰이 부족해요",
+    earnTokens: "무료 토큰 받기",
+    subscribe: "토큰이 부족해요. 구독하시겠어요?",
     usage: {
       today: "오늘 {{count}}개 사용",
     },
@@ -1679,6 +1584,9 @@ export default {
       starter: "STARTER 플랜으로 매월 200개의 토큰을 사용할 수 있습니다",
       premium: "PREMIUM 플랜으로 매월 500개의 토큰을 사용할 수 있습니다",
       pro: "PRO 플랜으로 무제한 토큰을 사용 중입니다"
+    },
+    descriptions: {
+      dailyFree: "일일 무료 토큰 충전",
     },
     alerts: {
       proTitle: "PRO 플랜 사용 중",
@@ -1942,7 +1850,7 @@ export default {
   },
 
   // Unified Styles
-  styles: {
+  styleTemplates: {
     minimalist: {
       name: "미니멀리스트",
       description: "간결하고 깔끔한 스타일"
