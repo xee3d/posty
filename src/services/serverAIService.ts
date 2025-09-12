@@ -488,27 +488,27 @@ Requirements: English language only, engaging tone, appropriate hashtags.`,
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Selected instruction preview:", finalPrompt.substring(0, 100) + "...");
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Instruction length:", finalPrompt.length);
     
-    // 언어별 길이 지시사항
+    // 언어별 길이 지시사항 (극단적으로 짧게)
     const lengthInstructions: Record<string, Record<string, string>> = {
       'ko': {
-        short: '[길이: 50자 이내로 짧고 간결하게 작성해주세요]',
-        medium: '[길이: 100-150자 사이로 적당한 길이로 작성해주세요]',
-        long: '[길이: 200-300자로 자세하고 풍부하게 작성해주세요]'
+        short: '짧게',
+        medium: '보통',
+        long: '길게'
       },
       'en': {
-        short: '[Length: Write concisely within 50 characters]',
-        medium: '[Length: Write in moderate length between 100-150 characters]',
-        long: '[Length: Write in detail with 200-300 characters]'
+        short: 'short',
+        medium: 'medium',
+        long: 'long'
       },
       'ja': {
-        short: '[長さ: 50文字以内で簡潔に書いてください]',
-        medium: '[長さ: 100-150文字で適度な長さで書いてください]',
-        long: '[長さ: 200-300文字で詳しく書いてください]'
+        short: '短く',
+        medium: '普通',
+        long: '詳しく'
       },
       'zh-CN': {
-        short: '[长度：请在50字以内简洁地写]',
-        medium: '[长度：请用100-150字的适中长度写]',
-        long: '[长度：请用200-300字详细写]'
+        short: '简短',
+        medium: '适中',
+        long: '详细'
       }
     };
     
@@ -554,27 +554,27 @@ Requirements: English language only, engaging tone, appropriate hashtags.`,
       }
     }
     
-    // 언어별 길이 지시문 (간단한 버전으로 변경)
+    // 언어별 길이 지시문 (극단적으로 짧게)
     const lengthInstructions: Record<string, Record<string, string>> = {
       'ko': {
-        short: '[길이: 50자 이내로 짧고 간결하게 작성해주세요]',
-        medium: '[길이: 100-150자 사이로 적당한 길이로 작성해주세요]',
-        long: '[길이: 200-300자로 자세하고 풍부하게 작성해주세요]'
+        short: '짧게',
+        medium: '보통',
+        long: '길게'
       },
       'en': {
-        short: '[Length: Write concisely within 50 characters]',
-        medium: '[Length: Write in moderate length between 100-150 characters]',
-        long: '[Length: Write in detail with 200-300 characters]'
+        short: 'short',
+        medium: 'medium',
+        long: 'long'
       },
       'ja': {
-        short: '[長さ: 50文字以内で簡潔に書いてください]',
-        medium: '[長さ: 100-150文字で適度な長さで書いてください]',
-        long: '[長さ: 200-300文字で詳しく書いてください]'
+        short: '短く',
+        medium: '普通',
+        long: '詳しく'
       },
       'zh-CN': {
-        short: '[长度：请在50字以内简洁地写]',
-        medium: '[长度：请用100-150字的适中长度写]',
-        long: '[长度：请用200-300字详细写]'
+        short: '简短',
+        medium: '适中',
+        long: '详细'
       }
     };
     
