@@ -86,148 +86,136 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
   const { t, i18n } = useTranslation();
   
-  // Helper function to translate avgLength values from Korean to translation keys
-  const translateAvgLength = (koreanValue: string): string => {
-    const lengthMappings: { [key: string]: string } = {
-      "50자 이하": t('myStyle.lengths.under50', '50자 이하'),
-      "200자 이상": t('myStyle.lengths.over200', '200자 이상'),
-      "100-150자": t('myStyle.lengths.medium100', '100-150자'),
-      "150-200자": t('myStyle.lengths.medium150', '150-200자'),
-      "80-120자": t('myStyle.lengths.short80', '80-120자'),
-    };
-    return lengthMappings[koreanValue] || koreanValue;
-  };
-
-  // 🎯 개선된 단순 번역 시스템 - 다른 페이지와 동일한 방식
-  // 카테고리 번역 매핑 (공통 사용)
-  const categoryTranslations: { [key: string]: { [lang: string]: string } } = {
-      // === 기본 카테고리 ===
-      "카페": { ko: "카페", en: "Cafe", ja: "カフェ", "zh-CN": "咖啡厅" },
-      "맛집": { ko: "맛집", en: "Restaurant", ja: "グルメ", "zh-CN": "美食" },
-      "일상": { ko: "일상", en: "Daily Life", ja: "日常", "zh-CN": "日常" },
-      "운동": { ko: "운동", en: "Exercise", ja: "運動", "zh-CN": "运动" },
-      "여행": { ko: "여행", en: "Travel", ja: "旅行", "zh-CN": "旅行" },
-      "주말": { ko: "주말", en: "Weekend", ja: "週末", "zh-CN": "周末" },
-      "책스타그램": { ko: "책스타그램", en: "Bookstagram", ja: "本スタグラム", "zh-CN": "读书分享" },
-      "명언": { ko: "명언", en: "Quotes", ja: "名言", "zh-CN": "名言" },
-      "명상": { ko: "명상", en: "Meditation", ja: "瞑想", "zh-CN": "冥想" },
-      "트렌드": { ko: "트렌드", en: "Trends", ja: "トレンド", "zh-CN": "趋势" },
-      "비즈니스": { ko: "비즈니스", en: "Business", ja: "ビジネス", "zh-CN": "商务" },
-      "감성": { ko: "감성", en: "Emotional", ja: "感情的", "zh-CN": "情감" },
-      "문어체": { ko: "문어체", en: "Formal Writing", ja: "文語", "zh-CN": "正式文体" },
-      "유머": { ko: "유머", en: "Humor", ja: "ユーモア", "zh-CN": "幽默" },
-      "해시태그": { ko: "해시태그", en: "Hashtag", ja: "ハッシュタグ", "zh-CN": "标签" },
-
-      // === 스타일 키워드 ===
-      "심플": { ko: "심플", en: "Simple", ja: "シンプル", "zh-CN": "简约" },
-      "깔끔": { ko: "깔끔", en: "Clean", ja: "きれい", "zh-CN": "整洁" },
-      "정돈": { ko: "정돈", en: "Organized", ja: "整理", "zh-CN": "整理" },
-      "핫플": { ko: "핫플", en: "Hot Place", ja: "話題の場所", "zh-CN": "热门地点" },
-      "요즘": { ko: "요즘", en: "These Days", ja: "最近", "zh-CN": "最近" },
-      "대세": { ko: "대세", en: "Trend", ja: "トレンド", "zh-CN": "大势" },
-      "모던": { ko: "모던", en: "Modern", ja: "モダン", "zh-CN": "现代" },
-      "미니멀": { ko: "미니멀", en: "Minimal", ja: "ミニマル", "zh-CN": "极简" },
-      
-      // === 추가 누락 카테고리들 ===
-      "드립": { ko: "드립", en: "Joke", ja: "ジョーク", "zh-CN": "玩笑" },
-      "개그": { ko: "개그", en: "Comedy", ja: "コメディ", "zh-CN": "喜剧" },
-      "ㅋㅋㅋ": { ko: "ㅋㅋㅋ", en: "Laughter", ja: "笑い", "zh-CN": "笑声" },
-      "여백": { ko: "여백", en: "White Space", ja: "余白", "zh-CN": "留白" },
-      "단순": { ko: "단순", en: "Simplicity", ja: "シンプル", "zh-CN": "简单" },
-      "TMI": { ko: "TMI", en: "TMI", ja: "TMI", "zh-CN": "TMI" },
-      "생각": { ko: "생각", en: "Thought", ja: "思考", "zh-CN": "思考" },
-      "의미": { ko: "의미", en: "Meaning", ja: "意味", "zh-CN": "意义" },
-      "본질": { ko: "본질", en: "Essence", ja: "本質", "zh-CN": "本质" },
-      "성찰": { ko: "성찰", en: "Reflection", ja: "反省", "zh-CN": "反思" },
-      "깨달음": { ko: "깨달음", en: "Realization", ja: "悟り", "zh-CN": "觉悟" },
-      "하였다": { ko: "하였다", en: "Formal Past", ja: "丁寧語", "zh-CN": "正式过去式" },
-      "되었다": { ko: "되었다", en: "Became", ja: "になった", "zh-CN": "变成了" },
-      "있었다": { ko: "있었다", en: "There was", ja: "あった", "zh-CN": "有过" },
-      "것이다": { ko: "것이다", en: "It is", ja: "ものだ", "zh-CN": "是" },
-      "바이다": { ko: "바이다", en: "Should be", ja: "べきだ", "zh-CN": "应该" },
-    };
-
-  const getTranslatedCategory = (categoryName: string): string => {
-    console.warn(`🔧 [TRANSLATE] "${categoryName}" (${i18n.language})`);
-    
-    // 입력값 정규화 (오타 수정 및 다국어 매핑)
-    const normalizeInput = (input: string): string => {
-      const inputMap: { [key: string]: string } = {
-        // 오타 수정
-        "비스니스": "비즈니스",
-        "그—토구": "해시태그",
-        "대새": "대세",
-        
-        // 영어 입력
-        "daily": "일상", "Daily": "일상",
-        "cafe": "카페", "Cafe": "카페", 
-        "food": "맛집", "Food": "맛집",
-        "exercise": "운동", "Exercise": "운동",
-        "travel": "여행", "Travel": "여행",
-        "weekend": "주말", "Weekend": "주말",
-        "business": "비즈니스", "Business": "비즈니스",
-        "motivational": "명언", "Motivational": "명언",
-        "emotional": "감성", "Emotional": "감성",
-        "storytelling": "문어체", "Storytelling": "문어체",
-        "simple": "심플", "Simple": "심플",
-        "clean": "깔끔", "Clean": "깔끔",
-        "modern": "모던", "Modern": "모던",
-        "minimal": "미니멀", "Minimal": "미니멀",
-
-        // 일본어 입력
-        "ユーモア": "유머",
-        "ビジネス": "비즈니스", 
-        "名言": "명언",
-        "日常": "일상",
-        "カジュアル": "일상", 
-        "感情的": "감성",
-        "シンプル": "심플",
-        "モダン": "모던",
-
-        // 중국어 입력
-        "商务": "비즈니스",
-        "幽默": "유머",
-        "情感": "감성",
-        "简约": "심플",
-        "现代": "모던",
-        
-        // 추가 영어 매핑 (로그에서 확인된 항목들)
-        "quotes": "명언", "Quotes": "명언",
-        "trend": "트렌드", "Trend": "트렌드", 
-        "humor": "유머", "Humor": "유머",
-      };
-      return inputMap[input] || input;
-    };
-
-    const normalizedCategory = normalizeInput(categoryName);
-    const translations = categoryTranslations[normalizedCategory];
-    
-    if (translations) {
-      return translations[i18n.language] || translations.ko;
+  // Helper function to get translated average length - simplified to avoid duplication
+  const getTranslatedAvgLength = (avgLength: string): string => {
+    // If the avgLength is already in Korean, return as is since we're using Korean UI
+    if (avgLength.includes('자')) {
+      return avgLength;
     }
     
-    return normalizedCategory; // 매핑되지 않은 경우 원본 반환
+    // Fallback for English values or other formats
+    const lengthMappings: { [key: string]: string } = {
+      "under50": t('myStyle.lengths.under50'),
+      "over200": t('myStyle.lengths.over200'),
+      "medium100": t('myStyle.lengths.medium100'),
+      "medium150": t('myStyle.lengths.medium150'),
+      "short80": t('myStyle.lengths.short80'),
+    };
+    
+    return lengthMappings[avgLength] || avgLength;
   };
 
-  // 카테고리별 아이콘 매핑 - 다국어 지원
-  const getCategoryIcon = (categoryName: string): string => {
-    // 먼저 한국어 키로 정규화
-    const findKoreanKey = (name: string): string => {
-      // 이미 한국어인 경우
-      if (categoryTranslations[name]) return name;
+  // Translation key mappings for categories - using existing home.topics keys where available
+  const getCategoryTranslationKey = (category: string): string | null => {
+    // Map Korean categories to existing translation keys
+    const categoryToKeyMap: { [key: string]: string } = {
+      // Basic categories using existing home.topics keys
+      "카페": "home.topics.cafe",
+      "맛집": "home.topics.food", 
+      "일상": "home.topics.daily",
+      "운동": "home.topics.exercise",
+      "여행": "home.topics.travel",
+      "주말": "home.topics.weekend",
+      "책스타그램": "home.topics.bookstagram",
+      "트렌드": "home.topics.trends",
+      "핫플": "home.topics.trendy",
       
-      // 다른 언어에서 한국어 키 찾기
-      for (const [koreanKey, translations] of Object.entries(categoryTranslations)) {
-        if (Object.values(translations).includes(name)) {
-          return koreanKey;
-        }
-      }
-      return name;
+      // Categories that need new translation keys (will use fallback for now)
+      "명언": "quotes",
+      "명상": "meditation", 
+      "비즈니스": "business",
+      "감성": "emotional",
+      "문어체": "formal",
+      "유머": "humor",
+      "해시태그": "hashtag",
+      "심플": "simple",
+      "깔끔": "clean",
+      "정돈": "organized",
+      "요즘": "recent",
+      "대세": "trending",
+      "모던": "modern",
+      "미니멀": "minimal",
+      "드립": "joke",
+      "개그": "comedy",
+      "여백": "whitespace",
+      "단순": "simplicity",
+      "생각": "thought",
+      "의미": "meaning",
+      "본질": "essence",
+      "성찰": "reflection",
+      "깨달음": "realization",
     };
-
-    const koreanKey = findKoreanKey(categoryName);
     
+    return categoryToKeyMap[category] || null;
+  };
+
+  const getTranslatedCategory = (categoryName: string): string => {
+    // Try to get translation key for the category
+    const translationKey = getCategoryTranslationKey(categoryName);
+    
+    // If we have a translation key, use the translation system
+    if (translationKey) {
+      // For home.topics keys, use them directly
+      if (translationKey.startsWith('home.topics.')) {
+        return t(translationKey);
+      }
+      // For other keys, return the english fallback for now
+      return translationKey.charAt(0).toUpperCase() + translationKey.slice(1);
+    }
+    
+    // Handle multilingual dynamic data by normalizing to Korean first, then translating
+    const multilingualMap: { [key: string]: string } = {
+      // Japanese to Korean
+      "名言": "명언",
+      "日常": "일상", 
+      "ビジネス": "비즈니스",
+      "ユーモア": "유머",
+      "感情的": "감성",
+      "シンプル": "심플",
+      "モダン": "모던",
+      "トレンド": "트렌드",
+      "ライフスタイル": "일상",
+      
+      // Chinese to Korean
+      "商务": "비즈니스",
+      "幽默": "유머", 
+      "情感": "감성",
+      "简约": "심플",
+      "现代": "모던",
+      "潮流": "트렌드",
+      "生活方式": "일상",
+      "名言": "명언",
+      
+      // English to Korean
+      "Business": "비즈니스",
+      "Daily": "일상",
+      "Humor": "유머",
+      "Emotional": "감성",
+      "Simple": "심플", 
+      "Modern": "모던",
+      "Trend": "트렌드",
+      "Quotes": "명언",
+      "Motivation": "명언",
+      "Lifestyle": "일상",
+    };
+    
+    // First normalize to Korean
+    const normalizedCategory = multilingualMap[categoryName] || categoryName;
+    
+    // Then try to get translation for the normalized Korean category
+    const normalizedTranslationKey = getCategoryTranslationKey(normalizedCategory);
+    if (normalizedTranslationKey && normalizedTranslationKey.startsWith('home.topics.')) {
+      return t(normalizedTranslationKey);
+    }
+    
+    // For unmapped categories, return the original (no console warnings)
+    return categoryName;
+  };
+
+  // Category icon mapping - simplified approach
+  const getCategoryIcon = (categoryName: string): string => {
     const iconMap: { [key: string]: string } = {
+      // Korean categories
       "카페": "cafe-outline",
       "맛집": "restaurant-outline",
       "일상": "book-outline",
@@ -243,45 +231,41 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       "문어체": "document-text-outline",
       "유머": "happy-outline",
       "해시태그": "pricetag-outline",
-      // 스타일 키워드
       "심플": "remove-circle-outline",
       "깔끔": "checkmark-circle-outline",
       "정돈": "albums-outline",
-      // 추가 카테고리
       "드립": "chatbubble-outline",
       "개그": "happy-outline",
-      "ㅋㅋㅋ": "happy-outline",
       "여백": "square-outline",
       "단순": "remove-circle-outline",
-      "TMI": "information-circle-outline",
       "생각": "bulb-outline",
       "의미": "book-outline",
       "본질": "diamond-outline",
       "성찰": "eye-outline",
       "깨달음": "flash-outline",
     };
-    return iconMap[koreanKey] || "ellipse-outline";
+    return iconMap[categoryName] || "ellipse-outline";
   };
 
   // Helper function to map tone names to translation keys
   const translateTone = (toneName: string): string => {
     const toneMappings: { [key: string]: string } = {
-      // 한국어 매핑
-      "캐주얼": t('aiWrite.tones.casual', '캐주얼'),
-      "전문적": t('aiWrite.tones.professional', '전문적'),
-      "유머러스": t('aiWrite.tones.humorous', '유머러스'), 
-      "감성적": t('aiWrite.tones.emotional', '감성적'),
-      "문어체": t('aiWrite.tones.storytelling', '문어체'),
-      "명언": t('aiWrite.tones.motivational', '명언'),
-      "미니멀": t('aiWrite.tones.minimalist', '미니멀'),
+      // 한국어 매핑 - no more Korean fallback text
+      "캐주얼": t('aiWrite.tones.casual'),
+      "전문적": t('aiWrite.tones.professional'),
+      "유머러스": t('aiWrite.tones.humorous'), 
+      "감성적": t('aiWrite.tones.emotional'),
+      "문어체": t('aiWrite.tones.storytelling'),
+      "명언": t('aiWrite.tones.motivational'),
+      "미니멀": t('aiWrite.tones.minimalist'),
       // 영어 키도 처리
-      "casual": t('aiWrite.tones.casual', '캐주얼'),
-      "professional": t('aiWrite.tones.professional', '전문적'),
-      "humorous": t('aiWrite.tones.humorous', '유머러스'),
-      "emotional": t('aiWrite.tones.emotional', '감성적'),
-      "storytelling": t('aiWrite.tones.storytelling', '문어체'),
-      "motivational": t('aiWrite.tones.motivational', '명언'),
-      "minimalist": t('aiWrite.tones.minimalist', '미니멀'),
+      "casual": t('aiWrite.tones.casual'),
+      "professional": t('aiWrite.tones.professional'),
+      "humorous": t('aiWrite.tones.humorous'),
+      "emotional": t('aiWrite.tones.emotional'),
+      "storytelling": t('aiWrite.tones.storytelling'),
+      "motivational": t('aiWrite.tones.motivational'),
+      "minimalist": t('aiWrite.tones.minimalist'),
     };
     return toneMappings[toneName] || toneName;
   };
@@ -319,7 +303,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const [achievements, setAchievements] = useState<any[]>([]);
   const [activeChallenge, setActiveChallenge] = useState<any>(null);
   const [selectedTab, setSelectedTab] = useState<
-    "overview" | "analytics" | "templates"
+    "overview" | "templates"
   >("overview");
   const [templates, setTemplates] = useState<any[]>([]);
   const [templateUsage, setTemplateUsage] = useState<TemplateUsage>({});
@@ -709,7 +693,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     return template?.color || colors.primary;
   };
 
-  const handleTabChange = (tab: "overview" | "analytics" | "templates") => {
+  const handleTabChange = (tab: "overview" | "templates") => {
     soundManager.playTap();
     setSelectedTab(tab);
   };
@@ -727,7 +711,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       const template = getStyleById(styleAnalysis.dominantStyle);
       if (template) {
         onNavigate("ai-write", {
-          title: `${t(`styleTemplates.${template.id}.name`, template.name)} 스타일`,
+          title: `${t(`styleTemplates.${template.id}.name`)} 스타일`,
           content: template.characteristics.examples[0],
           style: template.id,
           initialTone: template.aiTone, // AI 톤 추가
@@ -752,20 +736,17 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       // 통합 스타일에서 aiTone 가져오기
       const tone = template.aiTone || "casual";
 
-      if (template.characteristics?.examples) {
-        content = template.characteristics.examples[0];
-      } else if (template.structure) {
-        content = Object.entries(template.structure)
-          .map(([key, value]) => `[${key}]: ${value}`)
-          .join("\n");
-      }
+      // No auto-fill content - let user write their own content
 
       onNavigate("ai-write", {
         initialText: content,
         initialTone: tone,
-        title: t(`styleTemplates.${template.id}.name`, template.name),
+        title: t(`styleTemplates.${template.id}.name`),
         style: template.id,
-        tips: template.tips,
+        tips: [t(`styleTemplates.${template.id}.detailedDescription`, 
+              template.detailedDescription || 
+              t(`styleTemplates.${template.id}.description`, template.description)
+            )],
       });
     }
   };
@@ -886,7 +867,10 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
       {/* AI 인사이트 */}
       <View style={styles.insightsSection}>
-        <Text style={styles.sectionTitle}>{t('myStyle.coaching.title', '🤖 포스티의 스타일 코칭')}</Text>
+        <View style={styles.sectionTitleWithIcon}>
+          <SafeIcon name="bulb" size={20} color={colors.primary} />
+          <Text style={styles.sectionTitleText}>{t('myStyle.coaching.title', '포스티의 스타일 코칭')}</Text>
+        </View>
         {insights.map((insight, index) => (
           <TouchableOpacity
             key={index}
@@ -935,212 +919,22 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         ))}
       </View>
 
-      {/* 스타일 지표 */}
-      <View style={styles.patternsSection}>
-        <Text style={styles.sectionTitle}>{t('myStyle.metrics.title', '📊 나의 스타일 지표')}</Text>
-        <View style={styles.metricsContainer}>
-          <View
-            style={[
-              styles.metricCard,
-              {
-                backgroundColor: isDark ? colors.surface : colors.lightGray,
-              },
-            ]}
-          >
-            <View style={styles.metricHeader}>
-              <SafeIcon name="sync" size={24} color={colors.primary} />
-              <Text style={styles.metricLabel}>{t('myStyle.metrics.consistency', '일관성')}</Text>
-            </View>
-            <Text style={styles.metricValue}>
-              {styleAnalysis?.consistency || 0}%
-            </Text>
-            <View style={styles.metricBar}>
-              <View
-                style={[
-                  styles.metricFill,
-                  {
-                    width: `${styleAnalysis?.consistency || 0}%`,
-                    backgroundColor:
-                      styleAnalysis?.consistency > 70
-                        ? colors.success
-                        : colors.warning,
-                  },
-                ]}
-              />
-            </View>
+      {/* 활성 챌린지 */}
+      {activeChallenge && (
+        <View style={styles.activeChallengeCard}>
+          <View style={styles.challengeHeader}>
+            <SafeIcon name="trophy" size={20} color={colors.warning} />
+            <Text style={styles.challengeTitle}>{String(t(`myStyle.challenges.${activeChallenge.id}.name`, activeChallenge.name))}</Text>
           </View>
-
-          <View
-            style={[
-              styles.metricCard,
-              {
-                backgroundColor: isDark ? colors.surface : colors.lightGray,
-              },
-            ]}
-          >
-            <View style={styles.metricHeader}>
-              <SafeIcon name="color-palette" size={24} color={colors.accent} />
-              <Text style={styles.metricLabel}>{t('myStyle.metrics.diversity', '다양성')}</Text>
-            </View>
-            <Text style={styles.metricValue}>
-              {styleAnalysis?.diversity || 0}%
-            </Text>
-            <View style={styles.metricBar}>
-              <View
-                style={[
-                  styles.metricFill,
-                  {
-                    width: `${styleAnalysis?.diversity || 0}%`,
-                    backgroundColor: colors.accent,
-                  },
-                ]}
-              />
-            </View>
-          </View>
+          <Text style={styles.challengeProgress}>
+            {t('myStyle.challenge.progress', '진행도: {{current}}/{{total}}', { current: activeChallenge.progress || 0, total: activeChallenge.duration })}
+            {t('myStyle.challenge.dayUnit', '일')}
+          </Text>
         </View>
-
-        {/* 활성 챌린지 */}
-        {activeChallenge && (
-          <View style={styles.activeChallengeCard}>
-            <View style={styles.challengeHeader}>
-              <SafeIcon name="trophy" size={20} color={colors.warning} />
-              <Text style={styles.challengeTitle}>{String(t(`myStyle.challenges.${activeChallenge.id}.name`, activeChallenge.name))}</Text>
-            </View>
-            <Text style={styles.challengeProgress}>
-              {t('myStyle.challenge.progress', '진행도: {{current}}/{{total}}', { current: activeChallenge.progress || 0, total: activeChallenge.duration })}
-              {t('myStyle.challenge.dayUnit', '일')}
-            </Text>
-          </View>
-        )}
-      </View>
+      )}
     </Animated.View>
   );
 
-  const renderAnalyticsTab = () => {
-    // 분석 탭은 구독 권한 확인
-    const hasAccess = styleAccess?.hasAccess ?? false;
-    if (!hasAccess) {
-      return (
-        <View style={styles.accessDeniedContainer}>
-          <View style={styles.accessDeniedIcon}>
-            <SafeIcon name="lock-closed" size={40} color={colors.text.tertiary} />
-          </View>
-          <Text style={styles.accessDeniedTitle}>{t("myStyle.premium.title")}</Text>
-          <Text style={styles.accessDeniedSubtitle}>
-            {t("myStyle.premium.subtitle")}
-          </Text>
-          <TouchableOpacity
-            style={styles.upgradeButton}
-            onPress={() => onNavigate?.("subscription")}
-          >
-            <Text style={styles.upgradeButtonText}>{t("myStyle.premium.upgradeButton")}</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
-
-    return (
-      <View>
-        {/* 성장 그래프 */}
-        <View style={[styles.growthSection, cardTheme.default]}>
-          <Text style={styles.sectionTitle}>{t('myStyle.analytics.growth', '📈 성장 분석')}</Text>
-
-          {/* 주요 지표 */}
-          <View style={styles.metricsGrid}>
-            <View style={styles.metricItem}>
-              <SafeIcon name="create-outline" size={24} color={colors.primary} />
-              <Text style={styles.metricValue}>{stats?.totalPosts || 0}</Text>
-              <Text style={styles.metricLabel}>{t('myStyle.analytics.totalPosts', '총 게시물')}</Text>
-            </View>
-            <View style={styles.metricItem}>
-              <SafeIcon name="calendar-outline" size={24} color={colors.accent} />
-              <Text style={styles.metricValue}>
-                {stats?.postingPatterns?.mostActiveDay || t("myStyle.weekdays.monday")}
-              </Text>
-              <Text style={styles.metricLabel}>{t("myStyle.metrics.mostActiveDay")}</Text>
-            </View>
-            <View style={styles.metricItem}>
-              <SafeIcon name="time-outline" size={24} color={colors.success} />
-            <Text style={styles.metricValue}>
-              {stats?.postingPatterns?.mostActiveTime || t('myStyle.defaultTime', '19시')}
-            </Text>
-              <Text style={styles.metricLabel}>{t('myStyle.metrics.preferredTime', '선호 시간')}</Text>
-            </View>
-          </View>
-
-          {/* 카테고리 분포 */}
-          <View style={styles.categoryDistribution}>
-            <Text style={styles.subsectionTitle}>{t('myStyle.analytics.categoryDistribution', '카테고리별 분포')}</Text>
-            {(() => {              
-              // 카테고리를 번역된 이름으로 그룹화하여 중복 제거
-              const groupedCategories: { [translatedName: string]: number } = {};
-              
-              Object.entries(stats?.byCategory || {}).forEach(([category, count]) => {
-                const translatedCategory = getTranslatedCategory(category);
-                
-                // 키 중복 방지를 위해 정규화된 카테고리로 그룹화
-                groupedCategories[translatedCategory] = (groupedCategories[translatedCategory] || 0) + (count as number);
-              });
-
-              return Object.entries(groupedCategories).map(([translatedName, totalCount]) => (
-                <View key={translatedName} style={styles.categoryBar}>
-                  <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                    <Icon 
-                      name={getCategoryIcon(translatedName) as any} 
-                      size={16} 
-                      color={colors.primary} 
-                      style={{ marginRight: 6 }}
-                    />
-                    <Text style={styles.categoryName}>{translatedName}</Text>
-                  </View>
-                  <View style={styles.categoryProgress}>
-                    <View
-                      style={[
-                        styles.categoryFill,
-                        {
-                          width: `${
-                            (totalCount / stats.totalPosts) * 100
-                          }%`,
-                          backgroundColor: colors.primary,
-                        },
-                      ]}
-                    />
-                  </View>
-                  <Text style={styles.categoryCount}>{totalCount}</Text>
-                </View>
-              ));
-            })()}
-          </View>
-        </View>
-
-        {/* 톤 분석 */}
-        <View style={[styles.toneAnalysis, cardTheme.default]}>
-          <Text style={styles.sectionTitle}>{t('myStyle.analytics.toneAnalysis', '🎨 톤 사용 분석')}</Text>
-          <View style={styles.toneGrid}>
-            {Object.entries(stats?.byTone || {}).map(([tone, count]) => (
-              <TouchableOpacity
-                key={tone}
-                style={styles.toneItem}
-                onPress={() => {
-                  soundManager.playTap();
-                  if (onNavigate) {
-                    onNavigate("ai-write", { tone });
-                  }
-                }}
-              >
-                <View
-                  style={[styles.toneCircle, { borderColor: colors.primary }]}
-                >
-                  <Text style={styles.toneCount}>{count as number}</Text>
-                </View>
-                <Text style={styles.toneName}>{translateTone(tone)}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-      </View>
-    );
-  };
 
   const renderTemplatesTab = () => {
     // 템플릿 탭도 구독 권한 확인
@@ -1173,7 +967,10 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
             transform: [{ translateY: Animated.multiply(slideAnim, 0.5) }],
           }}
         >
-            <Text style={styles.sectionTitle}>{t('myStyle.templates.emojiPrefix', '📝')} {t("myStyle.templates.title", "스타일 템플릿")}</Text>
+            <View style={styles.sectionTitleWithIcon}>
+            <SafeIcon name="document-text" size={20} color={colors.primary} />
+            <Text style={styles.sectionTitleText}>{t("myStyle.templates.title", "스타일 템플릿")}</Text>
+          </View>
           <Text style={styles.sectionSubtitle}>
             {t("myStyle.templates.subtitle", "다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요")}
           </Text>
@@ -1273,25 +1070,18 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               </View>
 
               <View style={styles.templateContent}>
-                <Text style={styles.templateName}>{String(t(`styleTemplates.${template.id}.name`, template.name))}</Text>
+                <Text style={styles.templateName}>{String(t(`styleTemplates.${template.id}.name`))}</Text>
                 <Text style={styles.templateDescription}>
-                  {String(t(`styleTemplates.${template.id}.description`, template.description))}
+                  {String(t(`styleTemplates.${template.id}.description`))}
                 </Text>
 
                 <View style={styles.templateDetails}>
-                  <View style={styles.templateStructure}>
-            <Text style={styles.templateStructureItem}>
-              {t('myStyle.templates.bulletPoint', '•')} {t('myStyle.templates.averageLength', '평균 길이')}: {translateAvgLength(template.characteristics.avgLength)}
-            </Text>
-                    <Text style={styles.templateStructureItem}>
-                      {t('myStyle.templates.bulletPoint', '•')} {t('myStyle.templates.keywords', '키워드')}:{" "}
-                      {template.characteristics.keywords.slice(0, 3).map(keyword => getTranslatedCategory(keyword)).join(", ")}
-                    </Text>
-                    <Text style={styles.templateStructureItem}>
-                      {t('myStyle.templates.bulletPoint', '•')} {t('myStyle.templates.emojis', '이모지')}:{" "}
-                      {template.characteristics.emojis.slice(0, 3).join(" ")}
-                    </Text>
-                  </View>
+                  <Text style={styles.templateDetailedDescription}>
+                    {t(`styleTemplates.${template.id}.detailedDescription`, 
+                      template.detailedDescription || 
+                      t(`styleTemplates.${template.id}.description`, template.description)
+                    )}
+                  </Text>
 
                   {templateUsageData && templateUsageData.count > 0 && (
                     <Text style={styles.templateUsageCount}>
@@ -1318,7 +1108,10 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
         {/* 스타일 챌린지 */}
         <View style={styles.challengeSection}>
-          <Text style={styles.sectionTitle}>{t('myStyle.challenges.emojiPrefix', '🏆')} {t('myStyle.challenges.title', '스타일 챌린지')}</Text>
+          <View style={styles.sectionTitleWithIcon}>
+            <SafeIcon name="trophy" size={20} color={colors.primary} />
+            <Text style={styles.sectionTitleText}>{t('myStyle.challenges.title', '스타일 챌린지')}</Text>
+          </View>
           <Text style={styles.sectionSubtitle}>
             {t('myStyle.challenges.subtitle', '챌린지를 통해 새로운 스타일을 마스터해보세요')}
           </Text>
@@ -1469,22 +1262,6 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <TouchableOpacity
             style={[
               styles.tab,
-              selectedTab === "analytics" && styles.tabActive,
-            ]}
-            onPress={() => handleTabChange("analytics")}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                selectedTab === "analytics" && styles.tabTextActive,
-              ]}
-            >
-              {t('myStyle.tabs.analysis')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[
-              styles.tab,
               selectedTab === "templates" && styles.tabActive,
             ]}
             onPress={() => handleTabChange("templates")}
@@ -1506,7 +1283,6 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         {/* 탭 컨텐츠 */}
         <View style={styles.tabContent}>
           {selectedTab === "overview" && renderOverviewTab()}
-          {selectedTab === "analytics" && renderAnalyticsTab()}
           {selectedTab === "templates" && renderTemplatesTab()}
         </View>
       </ScrollView>
@@ -1613,7 +1389,7 @@ const createStyles = (
     brandTagline: {
       fontSize: 14,
       color: colors.text.secondary,
-      marginTop: 4,
+      marginTop: SPACING.xs,
     },
     keywordsContainer: {
       marginTop: SPACING.md,
@@ -1649,6 +1425,19 @@ const createStyles = (
       marginBottom: SPACING.md,
       letterSpacing: -0.3,
     },
+    sectionTitleWithIcon: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: SPACING.md,
+      gap: SPACING.sm,
+    },
+    sectionTitleText: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.text.primary,
+      letterSpacing: -0.3,
+      marginBottom: 0,
+    },
     insightCard: {
       flexDirection: "row",
       padding: SPACING.md,
@@ -1674,7 +1463,7 @@ const createStyles = (
       fontSize: 16,
       fontWeight: "600",
       color: colors.text.primary,
-      marginBottom: 4,
+      marginBottom: SPACING.xs,
     },
     insightDescription: {
       fontSize: 14,
@@ -1684,7 +1473,7 @@ const createStyles = (
     insightAction: {
       fontSize: 14,
       fontWeight: "600",
-      marginTop: 8,
+      marginTop: SPACING.sm,
     },
     patternsSection: {
       backgroundColor: colors.surface,
@@ -1704,14 +1493,14 @@ const createStyles = (
       fontSize: 14,
       fontWeight: "600",
       color: colors.text.primary,
-      marginBottom: 4,
+      marginBottom: SPACING.xs,
     },
     patternBar: {
       height: 8,
       backgroundColor: colors.border,
       borderRadius: 4,
       overflow: "hidden",
-      marginBottom: 4,
+      marginBottom: SPACING.xs,
     },
     patternFill: {
       height: "100%",
@@ -1729,20 +1518,6 @@ const createStyles = (
       fontSize: 11,
       color: colors.text.tertiary,
     },
-    growthSection: {
-      padding: SPACING.lg,
-      borderRadius: 16,
-      marginBottom: SPACING.lg,
-    },
-    metricsGrid: {
-      flexDirection: "row",
-      justifyContent: "space-around",
-      marginTop: SPACING.lg,
-      marginBottom: SPACING.xl,
-    },
-    metricItem: {
-      alignItems: "center",
-    },
     metricValue: {
       fontSize: 24,
       fontWeight: "700",
@@ -1753,80 +1528,10 @@ const createStyles = (
       fontSize: 12,
       color: colors.text.tertiary,
     },
-    categoryDistribution: {
-      marginTop: SPACING.lg,
-    },
-    subsectionTitle: {
-      fontSize: 16,
-      fontWeight: "600",
-      color: colors.text.primary,
-      marginBottom: SPACING.md,
-    },
-    categoryBar: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: SPACING.sm,
-    },
-    categoryName: {
-      fontSize: 14,
-      color: colors.text.primary,
-      width: 80,
-    },
-    categoryProgress: {
-      flex: 1,
-      height: 6,
-      backgroundColor: colors.border,
-      borderRadius: 3,
-      marginHorizontal: SPACING.sm,
-      overflow: "hidden",
-    },
-    categoryFill: {
-      height: "100%",
-      borderRadius: 3,
-    },
-    categoryCount: {
-      fontSize: 14,
-      color: colors.text.secondary,
-      width: 30,
-      textAlign: "right",
-    },
-    toneAnalysis: {
-      padding: SPACING.lg,
-      borderRadius: 16,
-    },
-    toneGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: SPACING.md,
-      marginTop: SPACING.md,
-    },
-    toneItem: {
-      alignItems: "center",
-      width: (width - SPACING.lg * 2 - SPACING.md * 3) / 4,
-    },
-    toneCircle: {
-      width: 56,
-      height: 56,
-      borderRadius: 28,
-      borderWidth: 2,
-      justifyContent: "center",
-      alignItems: "center",
-      marginBottom: SPACING.xs,
-    },
-    toneCount: {
-      fontSize: 18,
-      fontWeight: "700",
-      color: colors.text.primary,
-    },
-    toneName: {
-      fontSize: 12,
-      color: colors.text.secondary,
-      textAlign: "center",
-    },
     sectionSubtitle: {
       fontSize: 15,
       color: colors.text.primary,
-      marginBottom: SPACING.lg,
+      marginBottom: SPACING.xl,
       opacity: 0.8,
       lineHeight: 22,
     },
@@ -1872,7 +1577,7 @@ const createStyles = (
       fontSize: 17,
       fontWeight: "700",
       color: colors.text.primary,
-      marginBottom: 6,
+      marginBottom: SPACING.xs,
       letterSpacing: -0.3,
     },
     templateDescription: {
@@ -1882,14 +1587,12 @@ const createStyles = (
       lineHeight: 22,
       opacity: 0.85,
     },
-    templateStructure: {
-      marginTop: SPACING.xs,
-    },
-    templateStructureItem: {
-      fontSize: 13,
+    templateDetailedDescription: {
+      fontSize: 12,
       color: colors.text.secondary,
-      marginBottom: 4,
-      lineHeight: 18,
+      lineHeight: 16,
+      opacity: 0.9,
+      marginTop: SPACING.xs,
     },
     recommendedTemplate: {
       borderWidth: 2,
@@ -1899,15 +1602,15 @@ const createStyles = (
     },
     recommendedBadge: {
       position: "absolute",
-      top: 8,
-      right: 8,
+      top: SPACING.sm,
+      right: SPACING.sm,
       flexDirection: "row",
       alignItems: "center",
       backgroundColor: colors.primary,
-      paddingHorizontal: 10,
-      paddingVertical: 5,
+      paddingHorizontal: SPACING.sm,
+      paddingVertical: SPACING.xs,
       borderRadius: 14,
-      gap: 4,
+      gap: SPACING.xs,
       // 그림자 추가
       shadowColor: colors.primary,
       shadowOffset: { width: 0, height: 2 },
@@ -1943,7 +1646,7 @@ const createStyles = (
     },
     styleScoreItem: {
       alignItems: "center",
-      gap: 4,
+      gap: SPACING.xs,
     },
     styleScoreName: {
       fontSize: 12,
@@ -1953,36 +1656,6 @@ const createStyles = (
       fontSize: 16,
       fontWeight: "600",
       color: colors.text.primary,
-    },
-    metricsContainer: {
-      flexDirection: "row",
-      gap: SPACING.md,
-      marginTop: SPACING.md,
-    },
-    metricCard: {
-      flex: 1,
-      backgroundColor: isDark ? colors.surface : "#F9FAFB",
-      padding: SPACING.md,
-      borderRadius: 12,
-      borderWidth: isDark ? 0 : 1,
-      borderColor: isDark ? "transparent" : "#E5E7EB",
-    },
-    metricHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: SPACING.xs,
-      marginBottom: SPACING.sm,
-    },
-    metricBar: {
-      height: 6,
-      backgroundColor: colors.border,
-      borderRadius: 3,
-      marginTop: SPACING.xs,
-      overflow: "hidden",
-    },
-    metricFill: {
-      height: "100%",
-      borderRadius: 3,
     },
     activeChallengeCard: {
       backgroundColor: colors.warning + "10",
@@ -2050,7 +1723,7 @@ const createStyles = (
       fontSize: 16,
       fontWeight: "700",
       color: colors.text.primary,
-      marginBottom: 4,
+      marginBottom: SPACING.xs,
       letterSpacing: -0.2,
     },
     challengeDescription: {
@@ -2066,7 +1739,7 @@ const createStyles = (
     challengeRule: {
       fontSize: 13,
       color: colors.text.secondary,
-      marginBottom: 4,
+      marginBottom: SPACING.xs,
       lineHeight: 18,
     },
     challengeProgressBar: {
@@ -2083,7 +1756,7 @@ const createStyles = (
     challengeStatus: {
       backgroundColor: colors.warning + "30",
       paddingHorizontal: SPACING.md,
-      paddingVertical: 6,
+      paddingVertical: SPACING.xs,
       borderRadius: 14,
     },
     challengeStatusText: {
