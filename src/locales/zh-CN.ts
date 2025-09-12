@@ -28,6 +28,19 @@ export default {
     purchase: "购买"
   },
 
+  // 文档
+  documents: {
+    termsOfService: "服务条款",
+    privacyPolicy: "隐私政策",
+    lastUpdated: "最后更新",
+    syncedFromNotion: "从Notion同步",
+    loadingDocument: "加载文档中...",
+    documentLoadError: "无法加载文档",
+    retry: "重试",
+    contactEmail: "如有疑问请联系",
+    effectiveFrom: "本政策生效日期",
+  },
+
   // Tab Navigation
   tabs: {
     home: "首页",
@@ -292,6 +305,16 @@ export default {
     subtitle_old: "想写什么故事呢？",
     placeholder: "在这里输入文本...",
     placeholderExamples: {
+      text: [
+        "今天美味的午餐菜单",
+        "新发现的咖啡厅评价",
+        "周末去的旅行地",
+        "最近看的电影感想",
+        "最近迷上的爱好活动",
+        "和朋友的愉快时光",
+        "今天的小幸福",
+        "新开始的运动故事"
+      ],
       polish: "例如：今天在咖啡厅和朋友喝咖啡时聊了很久，感觉非常愉快...",
     },
     
@@ -300,7 +323,18 @@ export default {
       selectLength: "写多长？",
       additionalOptions: "附加选项",
       photoUpload: "照片上传",
-      result: "结果",
+      result: {
+        title: "完成了！🎉",
+        completedHint: "🎉 生成完成！点击下方平台标签，转换为各SNS适用格式",
+        platformHint: "点击下方平台标签转换为各SNS适用格式",
+      },
+      encouragements: [
+        "我是这样写的！怎么样？😊",
+        "按您想要的感觉写了！👀",
+        "这种风格如何？🎨",
+        "Posty努力写的！💜",
+        "如果有需要修改的地方请告诉我！✏️"
+      ],
       polish: "润色文本"
     },
     
@@ -502,6 +536,8 @@ export default {
       polish: "文本润色",
       newPost: "新帖子",
     },
+    
+    writingInStyle: "正在用风格写作",
     
     tokens: {
       remaining: "剩余代币: {{count}}",
@@ -725,7 +761,7 @@ export default {
       exportData: "导出数据"
     },
     coaching: {
-      title: "🤖 Posty的风格指导"
+      title: "Posty的风格指导"
     },
     lengths: {
       under50: "50字以下",
@@ -1044,7 +1080,10 @@ export default {
       recommended: "推荐",
       convenient: "方便",
       writeButton: "写作",
-      photoSelectButton: "选择照片"
+      photoSelectButton: "选择照片",
+      defaultBadge: "🎯 默认",
+      defaultTitle: "推荐标题",
+      defaultContent: "推荐内容"
     },
     styleCard: {
       title: "我的写作风格",
@@ -1092,7 +1131,6 @@ export default {
     themeDescription: "主题设置",
     support: "支持",
     language: "语言",
-    userGuide: "用户指南",
     contact: "联系",
     terms: "服务条款",
     privacy: "隐私政策",
@@ -1664,47 +1702,337 @@ export default {
   styleTemplates: {
     minimalist: {
       name: "极简主义",
-      description: "简洁清晰的风格"
+      description: "简洁清晰的风格",
+      detailedDescription: "删除不必要的修饰词。一句话一个信息。不要害怕留白，专注核心内容。"
     },
     storytelling: {
       name: "书面语", 
-      description: "优雅的书面表达"
+      description: "优雅的书面表达",
+      detailedDescription: "使用专业和得体的文体。完整句子明确的结论。正式表达建立信任感。"
     },
     humorous: {
       name: "幽默",
-      description: "机智愉快的表达"
+      description: "机智愉快的表达",
+      detailedDescription: "用笑话和机智让读者开心。用自然的幽默增加亲切感。不勉强保持机智。"
     },
     trendsetter: {
       name: "潮流引领者",
-      description: "反映最新潮流的风格"
+      description: "反映最新潮流的风格",
+      detailedDescription: "使用新词和流行表达。创造新的流行趋势。用新颖内容引领潮流。"
     },
     philosopher: {
       name: "哲学家",
-      description: "充满深度思考的风格"
+      description: "充满深度思考的风格",
+      detailedDescription: "用比喻避免极端思维。提供关于人生本质的思考。用深刻洞察引导反思。"
     },
     casual: {
       name: "休闲",
-      description: "亲切舒适的日常对話語調"
+      description: "亲切舒适的日常对話語調",
+      detailedDescription: "用日常对話語调传达温暖。像朋友聊天一样自然。舒适交流不有义务感。"
     },
     professional: {
       name: "专业",
-      description: "正式可靠的商务語調"
+      description: "正式可靠的商务語調",
+      detailedDescription: "基于准确数据和事实。专业术语加清晰解释。权威交流建立信任。"
     },
     emotional: {
       name: "情感",
-      description: "充满情感的温暖表达"
+      description: "充满情感的温暖表达",
+      detailedDescription: "分享真心的情感和经历。真诚表达情感。在适度范围内引起共鸣。"
     },
     genz: {
       name: "Gen Z",
-      description: "Gen Z特有的潮流表达"
+      description: "Gen Z特有的潮流表达",
+      detailedDescription: "自然使用网络用语和缩写。快节奏和新颖视角。用世代式潮流表达交流。"
     },
     millennial: {
       name: "千禧一代",
-      description: "千禧一代的情感表达"
+      description: "千禧一代的情感表达",
+      detailedDescription: "蓄含怀旧和回忆的情感。营造甜美的氛围。在适度范围内增加独特性。"
     },
     motivational: {
       name: "名言",
-      description: "像詩一样美丽深刻的哲学洞察"
+      description: "像詩一样美丽深刻的哲学洞察",
+      detailedDescription: "用简洁但有力的信息启发。提供思考的内容和动机。用深刻洞察引导行动变化。"
     }
-  }
+  },
+
+
+  // 联系我们
+  contact: {
+    title: "联系我们",
+    email: {
+      title: "通过邮件联系",
+      address: "getposty@gmail.com",
+      actions: {
+        copy: "复制",
+        openApp: "打开邮件应用"
+      }
+    },
+    form: {
+      title: "快速咨询",
+      subtitle: "填写下方表单，可直接通过邮件应用发送",
+      categories: {
+        bug: "错误报告",
+        feature: "功能建议",
+        payment: "付费咨询",
+        other: "其他咨询"
+      },
+      fields: {
+        subject: "主题",
+        content: "内容",
+        subjectPlaceholder: "请输入您的咨询主题",
+        contentPlaceholder: "请输入详细信息"
+      },
+      submit: "通过邮件发送"
+    },
+    info: [
+      "工作日24小时内回复",
+      "支持中文和英文咨询"
+    ],
+    alerts: {
+      copySuccess: {
+        title: "复制成功",
+        message: "getposty@gmail.com已复制到剪贴板！"
+      },
+      emailOpenFailed: {
+        title: "无法打开邮件应用",
+        message: "请复制getposty@gmail.com并直接发送邮件。",
+        actions: {
+          cancel: "取消",
+          copy: "复制邮箱"
+        }
+      },
+      emailOpened: {
+        title: "邮件应用已打开",
+        message: "主题：[{{category}}] {{subject}}\n\n{{content}}\n\n请将上述内容复制并粘贴到您的邮件中。",
+        actions: {
+          copyContent: "复制内容",
+          confirm: "确认"
+        }
+      },
+      contentCopied: {
+        title: "已复制",
+        message: "邮件内容已复制。"
+      },
+      allFieldsRequired: {
+        title: "提示",
+        message: "请填写所有字段。"
+      },
+      fullContentCopy: {
+        title: "已复制",
+        message: "所有邮件信息已复制。"
+      }
+    }
+  },
+
+  // 调试
+  debug: {
+    title: "数据管理",
+    toolsTitle: "调试工具",
+    buttons: {
+      showKeys: "显示已保存的密钥列表",
+      clearCurrentUser: "删除当前用户数据",
+      clearAllData: "删除所有用户数据",
+    },
+    alerts: {
+      clearAll: {
+        title: "删除所有数据",
+        message: "确实要删除所有用户的数据吗？此操作无法撤销。",
+        cancel: "取消",
+        delete: "删除",
+        success: {
+          title: "完成",
+          message: "所有数据已删除。",
+        },
+        error: {
+          title: "错误",
+          message: "删除数据时发生错误。",
+        },
+      },
+      clearCurrentUser: {
+        title: "删除当前用户数据",
+        message: "仅删除当前登录用户的数据吗？",
+        success: {
+          title: "完成",
+          message: "当前用户的成就数据已删除。",
+        },
+      },
+      storageKeys: {
+        title: "已保存的密钥列表",
+        noKeys: "没有相关密钥。",
+        confirm: "确认",
+      },
+    },
+    warnings: {
+      destructive: "⚠️ 注意：数据删除无法撤销！",
+      devOnly: "此页面仅用于开发/调试目的。",
+    },
+  },
+
+  // SNS联动
+  sns: {
+    title: "SNS联动管理",
+    description: "联动SNS账户后，可以自动获取点赞数、评论数等成果数据！",
+    sections: {
+      accounts: "SNS账户联动",
+      sync: "数据同步",
+      notes: "注意事项",
+    },
+    status: {
+      connected: "已联动",
+      disconnected: "未联动",
+    },
+    buttons: {
+      connect: "联动",
+      disconnect: "解除联动",
+      sync: "同步",
+    },
+    features: {
+      instagram: {
+        likes: "点赞数自动更新",
+        comments: "评论数自动更新",
+        insights: "查看触达和保存数",
+      },
+      facebook: {
+        insights: "页面帖子洞察",
+        engagement: "反应、评论、分享数",
+        reach: "触达与参与统计",
+      },
+    },
+    sync: {
+      title: "成果数据同步",
+      description: "获取已联动SNS账户的最新数据",
+      lastSync: "最后同步: {time}",
+    },
+    alerts: {
+      connect: {
+        title: "{platform}联动",
+        message: "联动功能需要应用设置。\n\n需要的内容:\n1. Facebook开发者账户\n2. 应用注册和审查\n3. OAuth设置\n\n详细内容请参考设置指南。",
+        cancel: "取消",
+        guide: "查看指南",
+      },
+      disconnect: {
+        title: "解除联动",
+        message: "确实要解除{platform}联动吗？",
+        cancel: "取消",
+        disconnect: "解除",
+      },
+      sync: {
+        success: {
+          title: "同步完成",
+          message: "SNS数据已成功更新。",
+        },
+        error: {
+          title: "同步失败",
+          message: "获取数据时发生问题。",
+        },
+        confirm: "确认",
+      },
+    },
+    notes: [
+      "需要Instagram商业或创作者账户",
+      "Facebook仅可联动页面账户",
+      "由于API限制，部分数据可能会延迟",
+    ],
+  },
+
+  // 登录
+  login: {
+    title: "便捷登录",
+    moreOptions: "用其他账户连接",
+    buttons: {
+      naver: "用Naver开始",
+      google: "用Google开始",
+      kakao: "用KakaoTalk开始",
+      facebook: "用Facebook开始",
+      apple: "用Apple开始",
+    },
+    errors: {
+      title: "登录失败",
+      default: "登录失败。请重试。",
+      serverAuth: "服务器认证中。请稍后重试。",
+      existingAccount: "已经用其他方式注册的账户。",
+      cancelled: "登录已取消。",
+      timeout: "登录超时。请重试。",
+      bundleId: "请在KakaoTalk开发者控制台中确认Bundle ID设置。\n当前Bundle ID: com.posty",
+      kakaoSetup: "KakaoTalk登录失败\n1. 在KakaoTalk开发者控制台中确认Bundle ID\n2. 确认KakaoTalk应用安装",
+      naverSetup: "Naver登录失败\n1. 在Naver开发者中心确认Bundle ID\n2. 确认URL模式设置",
+    },
+  },
+
+  // 帖子
+  posts: {
+    styles: {
+      casual: "休闲",
+      professional: "专业",
+      humorous: "幽默",
+      emotional: "情感",
+      genz: "GenZ",
+      millennial: "千禧一代",
+      minimalist: "极简主义",
+      storytelling: "叙事体",
+      motivational: "励志"
+    },
+    time: {
+      today: "今天",
+      yesterday: "昨天",
+      justNow: "刚才",
+      minutesAgo: "{{minutes}}分钟前",
+      hoursAgo: "{{hours}}小时前",
+      daysAgo: "{{days}}天前",
+      weeksAgo: "{{weeks}}周前",
+      monthsAgo: "{{months}}个月前"
+    },
+    actions: {
+      copy: "复制",
+      copyMessage: "已复制",
+      save: "保存",
+      saving: "保存中...",
+      saveSuccess: "已保存",
+      saveError: "保存失败",
+      share: "分享"
+    },
+    input: {
+      title: "创作帖子",
+      contentSection: "内容",
+      placeholder: "想写什么呢？",
+      required: "请输入内容",
+      hashtags: "标签",
+      hashtagPlaceholder: "#日常 #咖啡 #周末",
+      platform: "平台",
+      category: "分类",
+      metrics: "成果指标",
+      optional: "（可选）"
+    },
+    metrics: {
+      likes: "点赞",
+      comments: "评论",
+      shares: "分享",
+      reach: "触达"
+    },
+  },
+
+  // 个人资料
+  profile: {
+    title: "个人资料",
+    stats: {
+      posts: "帖子",
+      followers: "粉丝",
+      following: "关注"
+    },
+    actions: {
+      edit: "编辑",
+      settings: "设置"
+    }
+  },
+
+  // 分析
+  analytics: {
+    title: "分析",
+    overview: "概览",
+    engagement: "参与度",
+    growth: "增长",
+    insights: "洞察"
+  },
 };

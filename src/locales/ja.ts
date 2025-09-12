@@ -25,6 +25,19 @@ export default {
     stop: "停止"
   },
 
+  // 文書
+  documents: {
+    termsOfService: "利用規約",
+    privacyPolicy: "プライバシーポリシー",
+    lastUpdated: "最終更新日",
+    syncedFromNotion: "Notionから同期済み",
+    loadingDocument: "文書を読み込み中...",
+    documentLoadError: "文書を読み込めませんでした",
+    retry: "再試行",
+    contactEmail: "お問い合わせは",
+    effectiveFrom: "本方針は",
+  },
+
   navigation: {
     home: "ホーム",
     trending: "トレンド",
@@ -267,6 +280,16 @@ export default {
       photo: "写真を見せてください！",
     },
     placeholderExamples: {
+      text: [
+        "今日の美味しいランチメニュー",
+        "新しく見つけたカフェのレビュー",
+        "週末に行った旅行先",
+        "最近見た映画の感想",
+        "最近ハマっている趣味",
+        "友達との楽しい時間",
+        "今日の小さな幸せ",
+        "新しく始めた運動の話"
+      ],
       polish: "例：今日カフェで友達とコーヒーを飲みながら長時間話していたら、とても楽しかった...",
     },
     prompt: {
@@ -368,6 +391,7 @@ export default {
       polish: "文章整理",
       newPost: "新規投稿",
     },
+    writingInStyle: "スタイルで書いています",
     alerts: {
       noPrompt: "何について書くか教えてください！🤔",
       noPhoto: "まず写真を選択してください！📸",
@@ -411,6 +435,15 @@ export default {
       photoSelect: "写真を見せてください！",
       photoAnalyzing: "写真を分析中...",
       resultTitle: "完成しました！🎉",
+      completedHint: "🎉 生成完了！下のプラットフォームタブをタップして各SNSに合わせて変換してみてください",
+      platformHint: "下のプラットフォームタブをタップして各SNSに合わせて変換してみてください",
+      encouragements: [
+        "こんな風に書いてみました！いかがですか？😊",
+        "ご希望の感じで書いてみました！👀",
+        "このようなスタイルはいかがですか？🎨",
+        "ポスティが一生懸命書きました！💜",
+        "修正したい部分があれば教えてください！✏️"
+      ],
     },
     
     photoUpload: {
@@ -689,7 +722,7 @@ export default {
       exportData: "データをエクスポート"
     },
     coaching: {
-      title: "🤖 Postyのスタイルコーチング"
+      title: "Postyのスタイルコーチング"
     },
     lengths: {
       under50: "50文字以下",
@@ -1023,7 +1056,10 @@ export default {
       recommended: "おすすめ",
       convenient: "便利",
       writeButton: "執筆",
-      photoSelectButton: "写真選択"
+      photoSelectButton: "写真選択",
+      defaultBadge: "🎯 デフォルト",
+      defaultTitle: "おすすめタイトル",
+      defaultContent: "おすすめ内容"
     },
     styleCard: {
       title: "私の執筆スタイル",
@@ -1071,7 +1107,6 @@ export default {
     themeDescription: "テーマ設定",
     support: "サポート",
     language: "言語",
-    userGuide: "ユーザーガイド",
     contact: "お問い合わせ",
     terms: "利用規約",
     privacy: "プライバシーポリシー",
@@ -1625,47 +1660,337 @@ export default {
   styleTemplates: {
     minimalist: {
       name: "ミニマリスト",
-      description: "シンプルですっきりしたスタイル"
+      description: "シンプルですっきりしたスタイル",
+      detailedDescription: "不要な修飾語は削除しましょう。一文に一つのメッセージのみ。余白を恐れず本質だけを伝える。"
     },
     storytelling: {
       name: "文語体", 
-      description: "格式ある書面表現"
+      description: "格式ある書面表現",
+      detailedDescription: "専門的で丁寧な文体を使用。完全な文章で結論まで明確に。格式のある表現で信頼感を構築。"
     },
     humorous: {
       name: "ユーモラス",
-      description: "機智に富んだ愉快な表現"
+      description: "機智に富んだ愉快な表現",
+      detailedDescription: "冗談とウィットで読者を笑わせる。自然なユーモアで親近感をプラス。無理をせず機転を利かせて。"
     },
     trendsetter: {
       name: "トレンドセッター",
-      description: "最新トレンドを反映したスタイル"
+      description: "最新トレンドを反映したスタイル",
+      detailedDescription: "新語や流行の表現を使用。新しい流れを作り出す。斬新な内容でトレンドをリード。"
     },
     philosopher: {
       name: "哲学者",
-      description: "深い思考を込めたスタイル"
+      description: "深い思考を込めたスタイル",
+      detailedDescription: "比喩で極端な思考を避ける。人生の本質について考える材料を提示。深い洞察で内省を導く。"
     },
     casual: {
       name: "カジュアル",
-      description: "親しみやすく快適な日常会話体"
+      description: "親しみやすく快適な日常会話体",
+      detailedDescription: "日常の会話体で温かさを伝える。友人に話すように自然に。義務的でなく快適にコミュニケーション。"
     },
     professional: {
       name: "プロフェッショナル",
-      description: "格式ある信頼感のあるビジネストーン"
+      description: "格式ある信頼感のあるビジネストーン",
+      detailedDescription: "正確なデータと事実に基づく。専門用語には分かりやすい説明を。権威ある交流で信頼感を構築。"
     },
     emotional: {
       name: "感情的",
-      description: "感情を込めた温かい表現"
+      description: "感情を込めた温かい表現",
+      detailedDescription: "素直な気持ちと経験を共有。真心で感情を表現する。過度でない範囲で共感を導く。"
     },
     genz: {
       name: "Gen Z",
-      description: "Gen Z特有のトレンディな表現"
+      description: "Gen Z特有のトレンディな表現",
+      detailedDescription: "インターネット用語や略語を自然に使用。速いテンポで斬新な視点。世代的なトレンディな表現で交流。"
     },
     millennial: {
       name: "ミレニアル",
-      description: "ミレニアル世代の感情的表現"
+      description: "ミレニアル世代の感情的表現",
+      detailedDescription: "ノスタルジアと思い出の感情を込める。甘い雰囲気を演出する。控えめな範囲で独特さをプラス。"
     },
     motivational: {
       name: "名言",
-      description: "詩のように美しく深い哲学的洞察"
+      description: "詩のように美しく深い哲学的洞察",
+      detailedDescription: "簡潔だが力強いメッセージでインスピレーション。考える材料と動機を提供。行動変化を導く深い洞察で。"
     }
-  }
+  },
+
+
+  // お問い合わせ
+  contact: {
+    title: "お問い合わせ",
+    email: {
+      title: "メールでお問い合わせ",
+      address: "getposty@gmail.com",
+      actions: {
+        copy: "コピー",
+        openApp: "メールアプリを開く"
+      }
+    },
+    form: {
+      title: "クイック問い合わせ",
+      subtitle: "以下のフォームに記入すると、メールアプリから直接送信できます",
+      categories: {
+        bug: "バグ報告",
+        feature: "機能提案",
+        payment: "支払いに関する問い合わせ",
+        other: "その他の問い合わせ"
+      },
+      fields: {
+        subject: "件名",
+        content: "内容",
+        subjectPlaceholder: "問い合わせの件名を入力してください",
+        contentPlaceholder: "詳細な内容を入力してください"
+      },
+      submit: "メールで送信"
+    },
+    info: [
+      "平日24時間以内にご返信いたします",
+      "日本語と英語での問い合わせが可能です"
+    ],
+    alerts: {
+      copySuccess: {
+        title: "コピー完了",
+        message: "getposty@gmail.comがクリップボードにコピーされました！"
+      },
+      emailOpenFailed: {
+        title: "メールアプリを開けません",
+        message: "getposty@gmail.comをコピーして直接メールを送信してください。",
+        actions: {
+          cancel: "キャンセル",
+          copy: "メールをコピー"
+        }
+      },
+      emailOpened: {
+        title: "メールアプリが開きました",
+        message: "件名：[{{category}}] {{subject}}\n\n{{content}}\n\n上記の内容をコピーしてメールに貼り付けてください。",
+        actions: {
+          copyContent: "内容をコピー",
+          confirm: "確認"
+        }
+      },
+      contentCopied: {
+        title: "コピーされました",
+        message: "メール内容がコピーされました。"
+      },
+      allFieldsRequired: {
+        title: "お知らせ",
+        message: "すべてのフィールドに入力してください。"
+      },
+      fullContentCopy: {
+        title: "コピーされました",
+        message: "メール情報がすべてコピーされました。"
+      }
+    }
+  },
+
+  // デバッグ
+  debug: {
+    title: "データ管理",
+    toolsTitle: "デバッグツール",
+    buttons: {
+      showKeys: "保存されたキーリストを表示",
+      clearCurrentUser: "現在のユーザーデータを削除",
+      clearAllData: "すべてのユーザーデータを削除",
+    },
+    alerts: {
+      clearAll: {
+        title: "すべてのデータを削除",
+        message: "本当にすべてのユーザーのデータを削除しますか？この操作は元に戻せません。",
+        cancel: "キャンセル",
+        delete: "削除",
+        success: {
+          title: "完了",
+          message: "すべてのデータが削除されました。",
+        },
+        error: {
+          title: "エラー",
+          message: "データ削除中にエラーが発生しました。",
+        },
+      },
+      clearCurrentUser: {
+        title: "現在のユーザーデータを削除",
+        message: "現在ログインしているユーザーのデータのみを削除しますか？",
+        success: {
+          title: "完了",
+          message: "現在のユーザーのアチーブメントデータが削除されました。",
+        },
+      },
+      storageKeys: {
+        title: "保存されたキーリスト",
+        noKeys: "関連するキーがありません。",
+        confirm: "確認",
+      },
+    },
+    warnings: {
+      destructive: "⚠️ 注意：データの削除は元に戻せません！",
+      devOnly: "この画面は開発/デバッグ目的でのみ使用してください。",
+    },
+  },
+
+  // SNS連携
+  sns: {
+    title: "SNS連携管理",
+    description: "SNSアカウントと連携すると、いいね数やコメント数などの成果を自動で取得できます！",
+    sections: {
+      accounts: "SNSアカウント連携",
+      sync: "データ同期",
+      notes: "注意事項",
+    },
+    status: {
+      connected: "連携済み",
+      disconnected: "未連携",
+    },
+    buttons: {
+      connect: "連携する",
+      disconnect: "連携解除",
+      sync: "同期",
+    },
+    features: {
+      instagram: {
+        likes: "いいね数の自動更新",
+        comments: "コメント数の自動更新",
+        insights: "リーチ数と保存数の確認",
+      },
+      facebook: {
+        insights: "ページ投稿のインサイト",
+        engagement: "リアクション、コメント、シェア数",
+        reach: "リーチ・エンゲージメント統計",
+      },
+    },
+    sync: {
+      title: "成果データ同期",
+      description: "連携したSNSアカウントの最新データを取得します",
+      lastSync: "最終同期: {time}",
+    },
+    alerts: {
+      connect: {
+        title: "{platform}連携",
+        message: "連携機能にはアプリ設定が必要です。\n\n必要なもの:\n1. Facebook開発者アカウント\n2. アプリ登録と審査\n3. OAuth設定\n\n詳細は設定ガイドをご参照ください。",
+        cancel: "キャンセル",
+        guide: "ガイドを見る",
+      },
+      disconnect: {
+        title: "連携解除",
+        message: "{platform}の連携を解除しますか？",
+        cancel: "キャンセル",
+        disconnect: "解除",
+      },
+      sync: {
+        success: {
+          title: "同期完了",
+          message: "SNSデータが正常に更新されました。",
+        },
+        error: {
+          title: "同期失敗",
+          message: "データ取得中に問題が発生しました。",
+        },
+        confirm: "確認",
+      },
+    },
+    notes: [
+      "Instagramビジネス・クリエイターアカウントが必要です",
+      "Facebookはページアカウントのみ連携可能です",
+      "API制限により一部データに遅延が生じる場合があります",
+    ],
+  },
+
+  // ログイン
+  login: {
+    title: "簡単ログイン",
+    moreOptions: "他のアカウントで接続",
+    buttons: {
+      naver: "Naverでスタート",
+      google: "Googleでスタート",
+      kakao: "カカオでスタート",
+      facebook: "Facebookでスタート",
+      apple: "Appleでスタート",
+    },
+    errors: {
+      title: "ログイン失敗",
+      default: "ログインに失敗しました。再度お試しください。",
+      serverAuth: "サーバー認証中です。しばらく後に再度お試しください。",
+      existingAccount: "既に他の方法で登録されたアカウントです。",
+      cancelled: "ログインがキャンセルされました。",
+      timeout: "ログイン時間が超過されました。再度お試しください。",
+      bundleId: "カカオデベロッパーコンソールでBundle ID設定をご確認ください。\n現在Bundle ID: com.posty",
+      kakaoSetup: "カカオログイン失敗\n1. カカオデベロッパーコンソールでBundle ID確認\n2. カカオトークアプリのインストール確認",
+      naverSetup: "Naverログイン失敗\n1. NaverデベロッパーセンターでBundle ID確認\n2. URLスキーマ設定確認",
+    },
+  },
+
+  // 投稿
+  posts: {
+    styles: {
+      casual: "カジュアル",
+      professional: "プロフェッショナル",
+      humorous: "ユーモラス",
+      emotional: "エモーショナル",
+      genz: "GenZ",
+      millennial: "ミレニアル",
+      minimalist: "ミニマリスト",
+      storytelling: "ストーリーテリング",
+      motivational: "モチベーショナル"
+    },
+    time: {
+      today: "今日",
+      yesterday: "昨日",
+      justNow: "たった今",
+      minutesAgo: "{{minutes}}分前",
+      hoursAgo: "{{hours}}時間前",
+      daysAgo: "{{days}}日前",
+      weeksAgo: "{{weeks}}週間前",
+      monthsAgo: "{{months}}ヶ月前"
+    },
+    actions: {
+      copy: "コピー",
+      copyMessage: "コピーされました",
+      save: "保存",
+      saving: "保存中...",
+      saveSuccess: "保存されました",
+      saveError: "保存に失敗しました",
+      share: "シェア"
+    },
+    input: {
+      title: "投稿作成",
+      contentSection: "内容",
+      placeholder: "何について書きますか？",
+      required: "内容を入力してください",
+      hashtags: "ハッシュタグ",
+      hashtagPlaceholder: "#日常 #カフェ #週末",
+      platform: "プラットフォーム",
+      category: "カテゴリー",
+      metrics: "成果指標",
+      optional: "（任意）"
+    },
+    metrics: {
+      likes: "いいね",
+      comments: "コメント",
+      shares: "シェア",
+      reach: "リーチ"
+    },
+  },
+
+  // プロフィール
+  profile: {
+    title: "プロフィール",
+    stats: {
+      posts: "投稿",
+      followers: "フォロワー",
+      following: "フォロー中"
+    },
+    actions: {
+      edit: "編集",
+      settings: "設定"
+    }
+  },
+
+  // 分析
+  analytics: {
+    title: "分析",
+    overview: "概要",
+    engagement: "エンゲージメント",
+    growth: "成長",
+    insights: "インサイト"
+  },
 };
