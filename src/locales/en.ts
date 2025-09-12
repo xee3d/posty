@@ -3,12 +3,12 @@ export default {
   app: {
     name: "Posty",
     tagline: "Creative content powered by AI",
-    slogan: "AI writes, I shine",
-    subTagline: "Perfect posting completed in 1 minute",
-    description: "Complete amazing posts with just one photo",
+    slogan: "AI writes, you shine",
+    subTagline: "Complete perfect posts in 1 minute",
+    description: "Create amazing posts with just one photo",
     slogan1: "Share your story\nwith the world.",
     slogan2: "A simple line becomes\na special moment.",
-    slogan3: "Posty will help you.\nBetter writing.",
+    slogan3: "Posty will help you\nwrite better.",
     slogan4: "Shall we start?",
   },
 
@@ -16,16 +16,29 @@ export default {
   navigation: {
     home: "Home",
     write: "Write",
-    trend: "Trend",
+    trend: "Trends",
     myStyle: "My Style",
     settings: "Settings",
+  },
+
+  // Documents
+  documents: {
+    termsOfService: "Terms of Service",
+    privacyPolicy: "Privacy Policy",
+    lastUpdated: "Last updated",
+    syncedFromNotion: "Synced from Notion",
+    loadingDocument: "Loading document...",
+    documentLoadError: "Unable to load document",
+    retry: "Try Again",
+    contactEmail: "For inquiries, please contact",
+    effectiveFrom: "This policy is effective from",
   },
 
   // AI Write Screen
   aiWrite: {
     title: "Write with Posty",
     subtitle: {
-      text: "What story shall we write? I'll help you!",
+      text: "What story would you like to write? I'll help you!",
       polish: "I'll polish your text to make it shine!",
       photo: "Show me a photo and I'll create matching content!",
     },
@@ -44,40 +57,50 @@ export default {
       photo: "Select a photo!",
     },
     placeholderExamples: {
+      text: [
+        "Today's delicious lunch",
+        "Review of a newly discovered cafe",
+        "Weekend travel destination",
+        "Recent movie review",
+        "My latest hobby obsession",
+        "Fun time with friends",
+        "Today's little happiness",
+        "New workout routine story"
+      ],
       polish: "Example: Today I had coffee with a friend at a cafe and we talked for a long time, it was so nice...",
     },
     prompt: {
       title: "What would you like to write about?",
       refresh: "Refresh",
       trendUpdate: {
-        title: "Trend Update",
+        title: "Trends Updated",
         message: "Latest trends have been loaded!"
       }
     },
     placeholders: {
       morning: "How did you start your morning today?",
       lunch: "Did you enjoy your lunch?",
-      afternoon: "Are you enjoying your afternoon leisure?",
+      afternoon: "Are you enjoying your afternoon break?",
       evening: "How was your day today?",
       night: "What are you thinking about late at night?"
     },
     timeBasedPrompts: {
       morning: ["Morning Coffee", "Commute Scenery", "Morning Routine", "Morning Exercise", "Dawn Vibes", "Breakfast Menu"],
       lunch: ["Lunch Recommendations", "Afternoon Coffee Time", "Lunch Break", "Today's Lunch", "Cafe Hopping", "Afternoon Work"],
-      afternoon: ["Afternoon Leisure", "Cafe Time", "Preparing to Leave Work", "Afternoon Exercise", "Daily Summary", "Evening Plans"],
+      afternoon: ["Afternoon Break", "Cafe Time", "Preparing to Leave Work", "Afternoon Exercise", "Daily Summary", "Evening Plans"],
       evening: ["Dinner Menu", "Evening Commute", "Evening Exercise", "End of Day", "Night View", "Evening Leisure"],
-      night: ["Late Night Snacks", "Late Night Vibes", "Insomnia Daily", "Dawn Thoughts", "Night Work", "Night Walk"]
+      night: ["Late Night Snacks", "Late Night Vibes", "Insomnia Diary", "Dawn Thoughts", "Night Work", "Night Walk"]
     },
     categories: {
       casual: "Daily",
       professional: "Business", 
       humorous: "Humor",
       emotional: "Emotional",
-      genz: "Trend",
+      genz: "Trendy",
       millennial: "Lifestyle",
       minimalist: "Minimal",
       storytelling: "Formal",
-      motivational: "Motivation"
+      motivational: "Motivational"
     },
     tones: {
       casual: "Casual",
@@ -91,7 +114,7 @@ export default {
       motivational: "Quotes",
       clean: "Clean",
       structured: "Organized",
-      enthusiastic: "Awesome",
+      enthusiastic: "Enthusiastic",
       trendy: "Hip",
       elegant: "Sophisticated",
       modern: "Modern",
@@ -118,7 +141,7 @@ export default {
       noPrompt: "Tell me what to write about! 🤔",
       noPhoto: "Please select a photo first! 📸",
       success: "Done! Here you go 🎉",
-      error: "Oops! Something went wrong. Please try again 🥺",
+      error: "Something went wrong. Please try again.",
       waitAnalysis: "Please wait for photo analysis to complete.",
       completeAnalysis: "Please complete photo analysis first.",
       imageTooBig: {
@@ -134,9 +157,9 @@ export default {
       night: ["late snack", "netflix", "rest", "daily life", "hobby", "dawn"]
     },
     descriptions: {
-      short: "~50 chars",
-      medium: "~150 chars",
-      long: "~300 chars"
+      short: "~50 characters",
+      medium: "~150 characters",
+      long: "~300 characters"
     },
     example: "e.g.",
     analysis: {
@@ -157,13 +180,22 @@ export default {
       photoSelect: "Show me a photo!",
       photoAnalyzing: "Analyzing photo...",
       resultTitle: "Done! 🎉",
+      completedHint: "🎉 Generation complete! Tap the platform tabs below to convert for each social media platform",
+      platformHint: "Tap the platform tabs below to convert for each social media platform",
+      encouragements: [
+        "Here's what I wrote! How does it look? 😊",
+        "I wrote it with the feeling you wanted! 👀",
+        "How about this style? 🎨",
+        "Posty worked hard on this! 💜",
+        "Let me know if you'd like any changes! ✏️"
+      ],
     },
     polishOptions: {
       summarize: "Summarize",
       simple: "Simplify", 
       formal: "Make Formal",
       emotion: "Add Emotion",
-      storytelling: "Formal",
+      storytelling: "Make Formal",
       engaging: "Make Engaging",
       hashtag: "Extract Hashtags",
     },
@@ -180,19 +212,19 @@ export default {
         button: "Select Photo",
         change: "Change",
       },
-      defaultPrompt: "Please write a natural SNS post that goes well with the photo.",
+      defaultPrompt: "Please write a natural social media post that goes well with the photo.",
     },
     ads: {
       watching: {
         title: "Watching Ad",
-        message: "Please wait while watching the advertisement.",
+        message: "Please wait while the advertisement loads.",
       },
       complete: {
-        title: "Ad Completed",
+        title: "Ad Complete",
         messageStyle: "You can now use premium style once for free!",
         messageLength: "You can now use premium length once for free!",
       },
-      error: "Failed to watch advertisement. Please try again.",
+      error: "Failed to load advertisement. Please try again.",
     },
     premium: {
       title: "Premium Feature 🌟",
@@ -208,6 +240,7 @@ export default {
       polish: "Text Polish",
       newPost: "New Post",
     },
+    writingInStyle: "Writing in Style",
   },
 
   // AI Prompts
@@ -215,7 +248,7 @@ export default {
     length: {
       short: "[Length: Please write concisely within 50 characters]",
       medium: "[Length: Please write moderately between 100-150 characters]",
-      long: "[Length: Please write in detail and richly between 200-300 characters]"
+      long: "[Length: Please write in detail between 200-300 characters]"
     },
     enhanced: {
       personaIntro: "Your persona:",
@@ -291,7 +324,7 @@ export default {
   tabs: {
     home: "Home",
     aiWrite: "AI Write",
-    trend: "Trend",
+    trend: "Trends",
     myStyle: "My Style",
     settings: "Settings",
   },
@@ -322,16 +355,16 @@ export default {
       },
       clearCurrentUser: {
         title: "Delete Current User Data",
-        message: "Do you want to delete only the current logged-in user's data?",
+        message: "Do you want to delete only the current user's data?",
         success: {
           title: "Complete",
-          message: "Current user's achievement data has been deleted.",
+          message: "Current user's data has been deleted.",
         },
       },
       storageKeys: {
         title: "Stored Keys List",
         noKeys: "No related keys found.",
-        confirm: "OK",
+        confirm: "Confirm",
       },
     },
     warnings: {
@@ -340,12 +373,12 @@ export default {
     },
   },
 
-  // SNS Connection Screen
+  // Social Media Connection Screen
   sns: {
-    title: "SNS Connection Management",
-    description: "Connect your SNS accounts to automatically track likes, comments, and other performance metrics!",
+    title: "Social Media Connection Management",
+    description: "Connect your social media accounts to automatically track likes, comments, and other performance metrics!",
     sections: {
-      accounts: "SNS Account Connection",
+      accounts: "Social Media Account Connection",
       sync: "Data Sync",
       notes: "Notes",
     },
@@ -372,7 +405,7 @@ export default {
     },
     sync: {
       title: "Performance Data Sync",
-      description: "Fetch latest data from connected SNS accounts",
+      description: "Fetch latest data from connected social media accounts",
       lastSync: "Last sync: {time}",
     },
     alerts: {
@@ -391,13 +424,13 @@ export default {
       sync: {
         success: {
           title: "Sync Complete",
-          message: "SNS data has been successfully updated.",
+          message: "Social media data has been successfully updated.",
         },
         error: {
           title: "Sync Failed",
           message: "There was a problem fetching data.",
         },
-        confirm: "OK",
+        confirm: "Confirm",
       },
     },
     notes: [
@@ -457,11 +490,11 @@ export default {
     title: "Easy Login",
     moreOptions: "Connect with other account",
     buttons: {
-      naver: "Start with Naver",
-      google: "Start with Google",
-      kakao: "Start with Kakao",
-      facebook: "Start with Facebook",
-      apple: "Start with Apple",
+      naver: "Sign In with Naver",
+      google: "Sign In with Google",
+      kakao: "Sign In with Kakao",
+      facebook: "Sign In with Facebook",
+      apple: "Sign In with Apple",
     },
     errors: {
       title: "Login Failed",
@@ -480,9 +513,9 @@ export default {
   subscription: {
     watchVideo: "Watch Video",
     alreadyCheckedIn: "You've already checked in today!",
-    alreadyShared: "You've already shared on SNS today!",
+    alreadyShared: "You've already shared on social media today!",
     alreadyRated: "You've already rated the app. Thank you!",
-    title: "Subscription Plan",
+    title: "Subscription Plans",
     tokenPurchase: "Token Purchase", 
     freeTokens: "Free Tokens",
     popular: "Popular",
@@ -495,7 +528,7 @@ export default {
       title: "Premium Benefits",
       moreTokens: {
         title: "More Tokens",
-        description: "STARTER provides 600 tokens total (300 initial + 10x30 daily), PRO provides 1,100 tokens total (500 initial + 20x30 daily), MAX provides unlimited tokens"
+        description: "STARTER provides 600 tokens total (300 initial + 10×30 daily), PRO provides 1,100 tokens total (500 initial + 20×30 daily), MAX provides unlimited tokens"
       },
       advancedAI: {
         title: "Advanced AI Models",
@@ -585,7 +618,7 @@ export default {
       share: {
         invitation: {
           title: "Invite to Posty",
-          message: "AI-powered SNS content creation with Posty! Try it now 🚀\nhttps://posty.app"
+          message: "AI-powered social media content creation with Posty! Try it now 🚀\nhttps://posty.app"
         }
       }
     },
@@ -622,7 +655,7 @@ export default {
       starterImmediate: "You'll receive 300 tokens immediately upon signup",
       premiumImmediate: "You'll receive 500 tokens immediately upon signup",
       proImmediate: "You'll have access to unlimited tokens",
-      premiumUpgrade: "You'll receive an additional 500 tokens in full",
+      premiumUpgrade: "You'll receive an additional 500 tokens in total",
       proUpgrade: "You'll have access to unlimited tokens",
       starterDowngrade: "Warning: Free tokens will be limited to 300"
     },
@@ -697,7 +730,7 @@ export default {
         action: "Dawn Writing"
       },
       morning: {
-        title: "Good morning! {{userName}}",
+        title: "Good morning, {{userName}}!",
         message: "What are you posting today? Even a morning coffee photo is great!",
         action: "Morning Share"
       },
@@ -708,7 +741,7 @@ export default {
       },
       afternoon: {
         title: "{{userName}}, let's keep going this afternoon!",
-        message: "Even a short post is fine. Let's record this moment of today",
+        message: "Even a short post is fine. Let's record this moment",
         messageRegular: "You've already written {{postCount}} posts today! Amazing 👍",
         action: "Daily Share"
       },
@@ -726,7 +759,7 @@ export default {
     topics: {
       daily: "Daily",
       weekend: "Weekend",
-      cafe: "Café",
+      cafe: "Cafe",
       food: "Food",
       travel: "Travel",
       exercise: "Exercise",
@@ -746,9 +779,9 @@ export default {
     },
     actions: {
       firstWrite: "Write First Post",
-      writeAssist: "Help me write",
-      photoStart: "Start with photo",
-      polishText: "AI Text Polisher",
+      writeAssist: "Help Me Write",
+      photoStart: "Start with Photo",
+      polishText: "AI Text Polish",
       viewAll: "View All",
       copy: "Copy",
       share: "Share"
@@ -791,7 +824,10 @@ export default {
       recommended: "Recommended",
       convenient: "Convenient",
       writeButton: "Write",
-      photoSelectButton: "Select Photo"
+      photoSelectButton: "Select Photo",
+      defaultBadge: "🎯 Default",
+      defaultTitle: "Recommended Title",
+      defaultContent: "Recommended Content"
     },
     styleCard: {
       title: "My Writing Style",
@@ -806,7 +842,7 @@ export default {
       unique: "🎨 Unique Style"
     },
     mainActions: {
-      polishTool: "AI Text Polishing Tool",
+      polishTool: "AI Text Polish Tool",
       polishDesc: "Polish awkward sentences to make them natural",
       styleGuide: "My Writing Style",
     },
@@ -871,14 +907,9 @@ export default {
       challengeDescription: "Try the {{name}} challenge!",
       challengeAction: "Start Challenge"
     },
-    analysis: {
-      title: "Writing Analysis",
-      totalPosts: "Total {{count}} posts",
-      averageLength: "Average word count",
-      mostUsedTone: "Primary tone",
-      consistency: "Consistency",
-      improvement: "Improvement suggestions",
+    analytics: {
       growth: "📈 Growth Analysis",
+      totalPosts: "Total Posts",
       toneAnalysis: "🎨 Tone Usage Analysis",
       categoryDistribution: "Category Distribution"
     },
@@ -990,7 +1021,7 @@ export default {
       exportData: "Export Data"
     },
     coaching: {
-      title: "🤖 Posty's Style Coaching"
+      title: "Posty's Style Coaching"
     },
     lengths: {
       under50: "Under 50 characters",
@@ -1016,7 +1047,6 @@ export default {
     themeDescription: "Theme settings",
     support: "Support",
     language: "Language",
-    userGuide: "User Guide",
     contact: "Contact",
     terms: "Terms of Service",
     privacy: "Privacy Policy",
@@ -1169,7 +1199,7 @@ export default {
           instruction3: "Group hashtags together at the end of the post"
         },
         facebook: {
-          prompt: "Please write a friendly, conversational post suitable for Facebook. Write in a tone like talking to a friend while conveying information.",
+          prompt: "Please write a friendly and conversational post suitable for Facebook. Deliver information while maintaining a tone as if talking with friends.",
           instruction1: "Use a comfortable tone as if talking to a friend",
           instruction2: "End with a question to encourage comment participation"
         },
@@ -1193,7 +1223,7 @@ export default {
       }
     },
     buttons: {
-      ok: "OK",
+      ok: "Confirm",
       cancel: "Cancel",
       later: "Later",
       delete: "Delete",
@@ -1228,7 +1258,7 @@ export default {
   profile: {
     updateSuccess: "Profile updated successfully! 🎉",
     updateMessage: "Your profile is {completion}% complete.\nNow AI will create content that matches your style!",
-    confirm: "OK",
+    confirm: "Confirm",
     sections: {
       ageGroup: "Age Group",
       gender: "Gender",
@@ -1666,7 +1696,7 @@ export default {
     alerts: {
       maxPlanTitle: "MAX Plan Active",
       maxPlanMessage: "You're currently using MAX plan with unlimited tokens.\n\nNo additional token purchase needed. 🚀",
-      confirm: "OK"
+      confirm: "Confirm"
     },
     currency: {
       krw: "₩",
@@ -1676,7 +1706,7 @@ export default {
     }
   },
 
-  // 시간대별 해시태그
+  // Time-based hashtags
   hashtags: {
     timeBased: {
       morning: ["goodmorning", "morninggram", "morningcoffee", "commute", "morningworkout"],
@@ -1762,7 +1792,7 @@ export default {
         description: "Posted 30 contents"
       },
       post_50: {
-        name: "Passionate",
+        name: "Passionate Writer",
         description: "Posted 50 contents"
       },
       post_100: {
@@ -1807,7 +1837,7 @@ export default {
       // Social achievements
       first_share: {
         name: "First Share",
-        description: "Shared content to SNS"
+        description: "Shared content to social media"
       },
       share_10: {
         name: "Share Master",
@@ -1860,7 +1890,7 @@ export default {
         description: "Posted on your birthday"
       },
       christmas_post: {
-        name: "Christmas",
+        name: "Christmas Post",
         description: "Posted on Christmas"
       },
       perfect_week: {
@@ -1880,54 +1910,134 @@ export default {
 
   // Style Selector
   styleSelector: {
-    title: "Which style would you like to write?"
+    title: "Which style would you like to write in?"
   },
 
   // Unified Styles
   styleTemplates: {
     minimalist: {
       name: "Minimalist",
-      description: "Clean and simple style"
+      description: "Clean and simple style",
+      detailedDescription: "Remove unnecessary adjectives. One message per sentence, don't fear whitespace. Clean writing with only essentials makes it easy for readers to understand."
     },
     storytelling: {
       name: "Formal", 
-      description: "Elegant written expression"
+      description: "Elegant written expression",
+      detailedDescription: "Use professional and polite language. Complete sentences with clear conclusions. Build trust with formal expressions."
     },
     humorous: {
       name: "Humorous",
-      description: "Witty and cheerful expression"
+      description: "Witty and cheerful expression",
+      detailedDescription: "Make readers laugh with jokes and wit. Add warmth with natural humor. Keep it witty without being forced."
     },
     trendsetter: {
       name: "Trendsetter",
-      description: "Style reflecting latest trends"
+      description: "Style reflecting latest trends",
+      detailedDescription: "Use new words and trendy expressions. Create fresh flows and content. Lead trends with innovative ideas."
     },
     philosopher: {
       name: "Philosopher",
-      description: "Deep and thoughtful style"
+      description: "Deep and thoughtful style",
+      detailedDescription: "Use metaphors to avoid extreme thinking. Provide thoughtful content about life's essence. Lead to reflection with deep insights."
     },
     casual: {
       name: "Casual",
-      description: "Friendly and comfortable everyday tone"
+      description: "Friendly and comfortable everyday tone",
+      detailedDescription: "Convey warmth with daily conversational tone. Talk naturally like to a friend. Communicate comfortably without obligation."
     },
     professional: {
       name: "Professional",
-      description: "Formal and trustworthy business tone"
+      description: "Formal and trustworthy business tone",
+      detailedDescription: "Base on accurate data and facts. Add clear explanations to technical terms. Build trust with authoritative communication."
     },
     emotional: {
       name: "Emotional",
-      description: "Warm expression with feelings"
+      description: "Warm expression with feelings",
+      detailedDescription: "Share honest feelings and experiences. Express emotions sincerely. Create empathy within appropriate bounds."
     },
     genz: {
       name: "Gen Z",
-      description: "Trendy expression unique to Gen Z"
+      description: "Trendy expression unique to Gen Z",
+      detailedDescription: "Use internet slang and abbreviations naturally. Fast-paced with fresh perspectives. Communicate with trendy generational expressions."
     },
     millennial: {
       name: "Millennial",
-      description: "Emotional expression of millennials"
+      description: "Emotional expression of millennials",
+      detailedDescription: "Capture nostalgia and memories with emotion. Create sweet atmosphere. Add uniqueness within modest bounds."
     },
     motivational: {
       name: "Quotes",
-      description: "Beautiful and profound philosophical insights"
+      description: "Beautiful and profound philosophical insights",
+      detailedDescription: "Inspire with concise but powerful messages. Provide thoughtful content and motivation. Lead to action with profound insights."
+    }
+  },
+
+
+  // Contact
+  contact: {
+    title: "Contact Us",
+    email: {
+      title: "Contact via Email",
+      address: "getposty@gmail.com",
+      actions: {
+        copy: "Copy",
+        openApp: "Open Email App"
+      }
+    },
+    form: {
+      title: "Quick Inquiry",
+      subtitle: "Fill out the form below to send directly from your email app",
+      categories: {
+        bug: "Bug Report",
+        feature: "Feature Request",
+        payment: "Payment Inquiry",
+        other: "Other Inquiry"
+      },
+      fields: {
+        subject: "Subject",
+        content: "Message",
+        subjectPlaceholder: "Enter your inquiry subject",
+        contentPlaceholder: "Enter detailed information"
+      },
+      submit: "Send via Email"
+    },
+    info: [
+      "We respond within 24 hours on weekdays",
+      "Inquiries available in Korean and English"
+    ],
+    alerts: {
+      copySuccess: {
+        title: "Copied",
+        message: "getposty@gmail.com has been copied to clipboard!"
+      },
+      emailOpenFailed: {
+        title: "Cannot open email app",
+        message: "Please copy getposty@gmail.com and send email directly.",
+        actions: {
+          cancel: "Cancel",
+          copy: "Copy Email"
+        }
+      },
+      emailOpened: {
+        title: "Email app opened",
+        message: "Subject: [{{category}}] {{subject}}\n\n{{content}}\n\nPlease copy the content above and paste it into your email.",
+        actions: {
+          copyContent: "Copy Content",
+          confirm: "Confirm"
+        }
+      },
+      contentCopied: {
+        title: "Copied",
+        message: "Email content has been copied."
+      },
+      allFieldsRequired: {
+        title: "Notice",
+        message: "Please fill in all fields."
+      },
+      fullContentCopy: {
+        title: "Copied",
+        message: "All email information has been copied."
+      }
     }
   }
 };

@@ -205,14 +205,14 @@ export default {
     // 会员通知
     membershipNotices: {
       free: "免费会员每天自动充值10个代币",
-      starter: "STARTER会员注册时获得300个 + 每天额夦10个代币",
-      premium: "PRO会员注册时获得500个 + 每天额夦20个代币",
+      starter: "STARTER会员注册时获得300个 + 每天额外10个代币",
+      premium: "PRO会员注册时获得500个 + 每天额外20个代币",
       pro: "MAX会员可以使用无限代币"
     },
     
     // 计划描述
     planDescriptions: {
-      free: "每天免贩10个代币",
+      free: "每天免费10个代币",
       starter: "注册时300个 + 每天10个",
       premium: "注册时500个 + 每天20个",
       pro: "无限代币",
@@ -346,7 +346,7 @@ export default {
       genz: "Z世代",
       millennial: "千禧一代",
       minimalist: "极简",
-      storytelling: "文言体",
+      storytelling: "叙事体",
       motivational: "名言"
     },
     
@@ -1706,9 +1706,9 @@ export default {
       detailedDescription: "删除不必要的修饰词。一句话一个信息。不要害怕留白，专注核心内容。"
     },
     storytelling: {
-      name: "书面语", 
-      description: "优雅的书面表达",
-      detailedDescription: "使用专业和得体的文体。完整句子明确的结论。正式表达建立信任感。"
+      name: "叙事体", 
+      description: "优雅的叙事表达",
+      detailedDescription: "使用优雅的叙事结构。完整句子明确的结论。正式表达建立信任感。"
     },
     humorous: {
       name: "幽默",
@@ -1727,12 +1727,12 @@ export default {
     },
     casual: {
       name: "休闲",
-      description: "亲切舒适的日常对話語調",
-      detailedDescription: "用日常对話語调传达温暖。像朋友聊天一样自然。舒适交流不有义务感。"
+      description: "亲切舒适的日常对话语调",
+      detailedDescription: "用日常对话语调传达温暖。像朋友聊天一样自然。舒适交流不有义务感。"
     },
     professional: {
       name: "专业",
-      description: "正式可靠的商务語調",
+      description: "正式可靠的商务语调",
       detailedDescription: "基于准确数据和事实。专业术语加清晰解释。权威交流建立信任。"
     },
     emotional: {
@@ -1752,7 +1752,7 @@ export default {
     },
     motivational: {
       name: "名言",
-      description: "像詩一样美丽深刻的哲学洞察",
+      description: "像诗一样美丽深刻的哲学洞察",
       detailedDescription: "用简洁但有力的信息启发。提供思考的内容和动机。用深刻洞察引导行动变化。"
     }
   },
