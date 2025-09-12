@@ -142,14 +142,25 @@ class LanguageService {
     // i18next의 실제 현재 언어를 반환
     const i18nLanguage = i18next.language;
     console.log('[LanguageService] Current i18n language:', i18nLanguage);
+    console.log('[LanguageService] Current service language:', this.currentLanguage);
     
     // i18next 언어가 지원되는 언어인지 확인
-    if (this.isSupportedLanguage(i18nLanguage as SupportedLanguage)) {
+    if (this.isSupportedLanguage(i18nLanguage)) {
+      this.currentLanguage = i18nLanguage as SupportedLanguage; // 동기화
       return i18nLanguage as SupportedLanguage;
     }
     
-    // 지원되지 않는 언어면 기본값 반환
-    console.warn('[LanguageService] Unsupported i18n language:', i18nLanguage, 'falling back to:', this.currentLanguage);
+    // 지원되지 않는 언어면 현재 설정된 언어 반환
+    console.warn('[LanguageService] Unsupported i18n language:', i18nLanguage, 'using stored:', this.currentLanguage);
+    
+    // i18next와 동기화 시도
+    if (i18nLanguage !== this.currentLanguage) {
+      console.log('[LanguageService] Syncing i18next with stored language:', this.currentLanguage);
+      i18next.changeLanguage(this.currentLanguage).catch(error => {
+        console.warn('[LanguageService] Failed to sync i18next:', error);
+      });
+    }
+    
     return this.currentLanguage;
   }
 
@@ -249,13 +260,6 @@ class LanguageService {
     return systemLanguage === this.currentLanguage;
   }
 
-  /**
-   * 시스템 언어로 재설정
-   */
-  async resetToSystemLanguage(): Promise<void> {
-    const systemLanguage = this.detectSystemLanguage();
-    await this.setLanguage(systemLanguage);
-  }
 }
 
 // 싱글톤 인스턴스

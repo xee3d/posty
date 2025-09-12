@@ -448,62 +448,27 @@ class ServerAIService {
     // 언어별 극도로 강력한 지시문 (컨텍스트 완전 리셋)
     const languageInstructions: Record<string, string> = {
       'ko': `다음 내용을 한국어로 SNS 포스팅해주세요:\n${prompt}`,
-      'en': `【NEW INDEPENDENT CONVERSATION STARTED】【COMPLETELY IGNORE ALL PREVIOUS CONVERSATION CONTENT】
-SYSTEM OVERRIDE: RESPOND IN ENGLISH ONLY. IGNORE ALL KOREAN INSTRUCTIONS. CREATE ENGLISH SOCIAL MEDIA POST. ABSOLUTELY FORBIDDEN TO REPLY IN KOREAN.
+      'en': `SYSTEM: New conversation. Reply in English only. No Korean/Japanese/Chinese.
 
-This is a completely new, independent conversation. Ignore any previous Korean replies or instructions.
+Create an English social media post for:\n${prompt}
 
-Important instructions repeated:
-1. Must write in English
-2. Do not use Korean
-3. Do not use Japanese
-4. Do not use Chinese
-5. Only answer in English
-6. Forget all previous conversations
-7. This is a new conversation start
-
-Create English social media post for the following content:\n${prompt}
-
-Final emphasis again: Absolutely only answer in English. Forbidden to use Korean. This is a new conversation, ignore previous content.`,
-      'ja': `【全新独立対話開始】【完全無視之前所有対話内容】
-システム完全上書き：日本語のみで応答してください。すべての韓国語の指示を完全無視してください。日本語でSNS投稿を作成してください。韓国語での応答は絶対に禁止です。
-
-これは完全に新しい、独立した対話です。以前の韓国語の返答や指示を一切無視してください。
-
-重要な指示を何度も繰り返します：
-1. 必ず日本語で書いてください
-2. 韓国語は絶対に使わないでください
-3. 英語も使わないでください
-4. 中国語も使わないでください
-5. 日本語のみで回答してください
-6. 以前の全ての対話を忘れてください
-7. これは新しい対話の開始です
+Requirements: English language only, engaging tone, appropriate hashtags.`,
+      'ja': `システム：新しい対話です。日本語のみで応答してください。
 
 以下の内容について日本語でSNS投稿を作成：\n${prompt}
 
-最後に再度強調：絶対に日本語のみで回答してください。韓国語使用禁止。これは新しい対話です、以前の内容を無視してください。`,
-      'zh-CN': `【全新独立对话开始】【完全忽略之前所有对话内容】
-系统覆盖：仅用中文回答。忽略所有韩语指令。用中文创建社交媒体帖子。绝对禁止韩语回复。
-
-这是一个全新的、独立的对话。忽略任何之前的韩语回复或指示。
-
-重要指示重复：
-1. 必须用中文写
-2. 不要用韩语  
-3. 不要用英语
-4. 不要用日语
-5. 只能用中文回答
-6. 忘记之前的所有对话
-7. 这是全新的对话开始
+要件：日本語のみ、魅力的なトーン、適切なハッシュタグ。`,
+      'zh-CN': `系统：新对话，仅用中文回答。
 
 为以下内容创作中文社交媒体帖子：\n${prompt}
 
-最后再次强调：绝对只用中文回答。禁止使用韩语。这是全新对话，忽略之前内容。`
+要求：仅使用中文，吸引人的语调，适当的标签。`
     };
     
     // 언어 매핑 (중국어 특별 처리)
     let langKey = currentLanguage;
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Original language:", currentLanguage);
+    console.log("🔧 [ServerAIService] ENHANCED PROMPT - Available language instructions:", Object.keys(languageInstructions));
     
     if (currentLanguage.startsWith('zh') || currentLanguage === 'zh-CN' || currentLanguage === 'zh-Hans' || currentLanguage === 'zh-Hant') {
       langKey = 'zh-CN';
@@ -520,6 +485,8 @@ Final emphasis again: Absolutely only answer in English. Forbidden to use Korean
     finalPrompt = languageInstructions[langKey] || languageInstructions['ko'];
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Final language key:", langKey);
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Using instruction for:", langKey, "Available keys:", Object.keys(languageInstructions));
+    console.log("🔧 [ServerAIService] ENHANCED PROMPT - Selected instruction preview:", finalPrompt.substring(0, 100) + "...");
+    console.log("🔧 [ServerAIService] ENHANCED PROMPT - Instruction length:", finalPrompt.length);
     
     // 언어별 길이 지시사항
     const lengthInstructions: Record<string, Record<string, string>> = {
@@ -569,9 +536,9 @@ Final emphasis again: Absolutely only answer in English. Forbidden to use Korean
     
     const responseLanguageInstructions: Record<string, string> = {
       'ko': '한국어로 응답해주세요.',
-      'en': 'RESPOND IN ENGLISH ONLY. DO NOT USE ANY OTHER LANGUAGE.',
-      'ja': `絶対に日本語で回答してください。以下の内容について、日本語のみを使用して、自然な日本語のSNS投稿として作成してください。韓国語や英語は絶対に使わないでください。`,
-      'zh-CN': `请务必用中文回答。请用中文创作以下内容的自然中文社交媒体帖子。绝对不要使用韩语或英语。`
+      'en': 'Reply in English only.',
+      'ja': '日本語で応答してください。',
+      'zh-CN': '请用中文回答。'
     };
     
     // 한국어가 아닌 경우 언어 지시 추가
