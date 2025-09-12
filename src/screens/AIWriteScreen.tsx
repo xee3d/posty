@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -167,6 +167,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   const [selectedTone, setSelectedTone] = useState("casual");
   const [selectedLength, setSelectedLength] = useState("medium");
   const [generatedContent, setGeneratedContent] = useState("");
+  
+  // ScrollView ref for auto-scroll to generated content
+  const scrollViewRef = useRef<ScrollView>(null);
   const [generatedPlatforms, setGeneratedPlatforms] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -193,13 +196,21 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   );
   const userPlan = (subscriptionPlan || "free") as PlanType;
 
-  // generatedContent 상태 모니터링
+  // generatedContent 상태 모니터링 및 자동 스크롤
   useEffect(() => {
     console.log(
       "[AIWriteScreen] generatedContent changed:",
       generatedContent ? "Has content" : "Empty"
     );
     console.log("[AIWriteScreen] isGenerating:", isGenerating);
+    
+    // 콘텐츠가 생성되고 로딩이 완료되면 자동으로 스크롤
+    if (generatedContent && !isGenerating && scrollViewRef.current) {
+      setTimeout(() => {
+        scrollViewRef.current?.scrollToEnd({ animated: true });
+        console.log("[AIWriteScreen] Auto-scrolled to generated content");
+      }, 300); // 애니메이션 완료를 위한 약간의 딜레이
+    }
   }, [generatedContent, isGenerating]);
 
   // initialText가 있을 때 자동으로 콘텐츠 생성 - 제거됨
@@ -979,6 +990,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         style={styles.keyboardView}
       >
         <ScrollView
+          ref={scrollViewRef}
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={[
@@ -1959,16 +1971,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                   </View>
                 </FadeInView>
 
-                {/* 글쓰기 결과 위 광고 배너 - 조건부 표시 */}
-                {generatedContent && Date.now() % 3 === 0 && (
-                  <AnimatedCard delay={150}>
-                    <CompactBanner
-                      size="large"
-                      style={{ marginVertical: 12 }}
-                    />
-                  </AnimatedCard>
-                )}
-
                 {/* 새로운 GeneratedContentDisplay 컴포넌트 사용 */}
                 <AnimatedCard delay={200}>
                   <GeneratedContentDisplay
@@ -1982,6 +1984,16 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                 </AnimatedCard>
               </View>
             </SlideInView>
+          )}
+
+          {/* 글쓰기 결과 하단 광고 배너 - 조건부 표시 */}
+          {generatedContent && Date.now() % 3 === 0 && (
+            <AnimatedCard delay={300}>
+              <CompactBanner
+                size="large"
+                style={{ marginVertical: 16, marginHorizontal: SPACING.md }}
+              />
+            </AnimatedCard>
           )}
 
           <View style={styles.bottomSpace} />
