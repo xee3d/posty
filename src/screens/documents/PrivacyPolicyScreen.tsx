@@ -1,4 +1,8 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
+import PrivacyPolicyScreen_EN from "./PrivacyPolicyScreen_EN";
+import PrivacyPolicyScreen_JA from "./PrivacyPolicyScreen_JA";
+import PrivacyPolicyScreen_ZH from "./PrivacyPolicyScreen_ZH";
 import {
   View,
   Text,
@@ -6,18 +10,17 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
 import { SafeIcon } from "../../utils/SafeIcon";
 import {
   COLORS,
   SPACING,
-  BORDER_RADIUS,
-  TYPOGRAPHY,
   FONT_SIZES,
 } from "../../utils/constants";
-import { APP_TEXT } from "../../utils/textConstants";
 import { useAppTheme } from "../../hooks/useAppTheme";
+import { useNotionDocument } from "../../hooks/useNotionDocument";
 
 interface PrivacyPolicyScreenProps {
   onBack: () => void;
@@ -28,10 +31,162 @@ const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({
   onBack,
   onNavigate,
 }) => {
+  const { i18n } = useTranslation();
+  
+  // 현재 언어에 따라 적절한 컴포넌트 선택
+  const currentLanguage = i18n.language;
+  console.log('📍 Current language for Privacy:', currentLanguage);
+  
+  switch (currentLanguage) {
+    case 'en':
+      return <PrivacyPolicyScreen_EN onBack={onBack} onNavigate={onNavigate} />;
+    case 'ja':
+      return <PrivacyPolicyScreen_JA onBack={onBack} onNavigate={onNavigate} />;
+    case 'zh':
+    case 'zh-CN':
+      return <PrivacyPolicyScreen_ZH onBack={onBack} onNavigate={onNavigate} />;
+    case 'ko':
+    default:
+      // 한국어 또는 기본값은 기존 구현 유지
+      return <KoreanPrivacyPolicyScreen onBack={onBack} onNavigate={onNavigate} />;
+  }
+};
+
+// 한국어 버전을 위한 기존 구현
+const KoreanPrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({
+  onBack,
+  onNavigate,
+}) => {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const styles = createStyles(colors);
+  
+  const { document, loading, error, refresh, isNotionEnabled } = useNotionDocument('privacy');
 
   const lastUpdated = "2024년 1월 1일";
+
+  const renderNotionContent = () => {
+    if (loading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={styles.loadingText}>{t('documents.loadingDocument')}</Text>
+        </View>
+      );
+    }
+
+    if (error || !document) {
+      return (
+        <View style={styles.errorContainer}>
+          <SafeIcon name="warning" size={48} color={colors.text.tertiary} />
+          <Text style={styles.errorText}>
+            {error || t('documents.documentLoadError')}
+          </Text>
+          <TouchableOpacity onPress={refresh} style={styles.retryButton}>
+            <Text style={styles.retryText}>{t('documents.retry')}</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    const content = document.content.split('\n\n').map((paragraph, index) => {
+      if (paragraph.startsWith('#')) {
+        const level = paragraph.match(/^#+/)?.[0].length || 1;
+        const text = paragraph.replace(/^#+\s*/, '');
+        return (
+          <Text 
+            key={index} 
+            style={level === 1 ? styles.sectionTitle : styles.subTitle}
+          >
+            {text}
+          </Text>
+        );
+      } else if (paragraph.startsWith('•') || paragraph.startsWith('-')) {
+        return (
+          <Text key={index} style={styles.listItem}>
+            {paragraph}
+          </Text>
+        );
+      } else if (paragraph.trim()) {
+        return (
+          <Text key={index} style={styles.paragraph}>
+            {paragraph}
+          </Text>
+        );
+      }
+      return null;
+    }).filter(Boolean);
+
+    return content;
+  };
+
+  const renderFallbackContent = () => (
+    <>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>1. 개인정보의 처리 목적</Text>
+        <Text style={styles.paragraph}>
+          틴로봇스튜디오(Tinrobot Studio)(이하 "회사")는 다음의 목적을 위하여 개인정보를 처리합니다.
+          처리하고 있는 개인정보는 다음의 목적 이외의 용도로는 이용되지 않으며,
+          이용 목적이 변경되는 경우에는 개인정보 보호법 제18조에 따라 별도의 동의를 받는 등
+          필요한 조치를 이행할 예정입니다.
+        </Text>
+        <Text style={styles.listItem}>
+          1. AI 기반 SNS 콘텐츠 생성 서비스 제공
+        </Text>
+        <Text style={styles.listItem}>
+          2. 사용자 글쓰기 스타일 분석 및 개인화 서비스 제공
+        </Text>
+        <Text style={styles.listItem}>
+          3. 서비스 이용 통계 분석 및 서비스 개선
+        </Text>
+        <Text style={styles.listItem}>
+          4. 고객지원 서비스 제공
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>2. 개인정보의 처리 및 보유기간</Text>
+        <Text style={styles.paragraph}>
+          회사는 법령에 따른 개인정보 보유·이용기간 또는 정보주체로부터 개인정보를
+          수집 시에 동의받은 개인정보 보유·이용기간 내에서 개인정보를 처리·보유합니다.
+        </Text>
+        <Text style={styles.listItem}>
+          1. 서비스 이용 기록: 서비스 탈퇴 시까지
+        </Text>
+        <Text style={styles.listItem}>
+          2. 글쓰기 스타일 분석 데이터: 서비스 탈퇴 후 즉시 삭제
+        </Text>
+        <Text style={styles.listItem}>
+          3. 고객지원 관련 기록: 처리 완료 후 1년
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>3. 처리하는 개인정보의 항목</Text>
+        <Text style={styles.paragraph}>
+          회사는 다음의 개인정보 항목을 처리하고 있습니다:
+        </Text>
+        <Text style={styles.listItem}>
+          1. 필수항목: 서비스 이용 기록, 접속 로그, 기기정보
+        </Text>
+        <Text style={styles.listItem}>
+          2. 선택항목: 사용자가 작성한 텍스트 콘텐츠(분석 목적)
+        </Text>
+        <Text style={styles.listItem}>
+          3. 자동 수집 항목: IP주소, 쿠키, 서비스 이용 기록
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>4. 개인정보의 제3자 제공</Text>
+        <Text style={styles.paragraph}>
+          회사는 정보주체의 개인정보를 개인정보의 처리 목적에서 명시한 범위 내에서만
+          처리하며, 정보주체의 동의, 법률의 특별한 규정 등 개인정보 보호법
+          제17조에 해당하는 경우에만 개인정보를 제3자에게 제공합니다.
+        </Text>
+      </View>
+    </>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -39,213 +194,49 @@ const PrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
           <SafeIcon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>개인정보 처리방침</Text>
-        <View style={styles.placeholder} />
+        <Text style={styles.headerTitle}>
+          {document?.title || t('documents.privacyPolicy')}
+        </Text>
+        <View style={styles.headerRight}>
+          {isNotionEnabled && (
+            <TouchableOpacity onPress={refresh} style={styles.refreshButton}>
+              <SafeIcon name="refresh" size={20} color={colors.text.secondary} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={refresh}
+            colors={[colors.primary]}
+          />
+        }
       >
-        <Text style={styles.lastUpdated}>최종 수정일: {lastUpdated}</Text>
+        <Text style={styles.lastUpdated}>
+          {t('documents.lastUpdated')}: {document ? new Date(document.lastUpdated).toLocaleDateString('ko-KR') : lastUpdated}
+        </Text>
 
-        <View style={styles.intro}>
-          <Text style={styles.paragraph}>
-            Posty AI(이하 "회사")는 이용자의 개인정보를 매우 중요하게 생각하며,
-            「개인정보 보호법」, 「정보통신망 이용촉진 및 정보보호 등에 관한
-            법률」 등 관련 법령을 준수하고 있습니다.
-          </Text>
-          <Text style={styles.paragraph}>
-            회사는 본 개인정보 처리방침을 통해 이용자가 제공하는 개인정보가
-            어떠한 용도와 방식으로 이용되고 있으며, 개인정보 보호를 위해 어떠한
-            조치가 취해지고 있는지 알려드립니다.
-          </Text>
-        </View>
+        {isNotionEnabled && document ? (
+          <View style={styles.notionBadge}>
+            <SafeIcon name="cloud" size={16} color={colors.primary} />
+            <Text style={styles.notionBadgeText}>{t('documents.syncedFromNotion')}</Text>
+          </View>
+        ) : null}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>1. 수집하는 개인정보 항목</Text>
-          <Text style={styles.paragraph}>
-            회사는 서비스 제공을 위해 다음과 같은 개인정보를 수집합니다:
-          </Text>
-
-          <Text style={styles.subTitle}>필수 수집 항목</Text>
-          <Text style={styles.listItem}>• 회원가입 시: 이름, 이메일 주소</Text>
-          <Text style={styles.listItem}>
-            • SNS 계정 연동 시: SNS 계정 정보, 액세스 토큰
-          </Text>
-          <Text style={styles.listItem}>
-            • 서비스 이용 시: 생성한 콘텐츠, 사용 기록
-          </Text>
-
-          <Text style={styles.subTitle}>자동 수집 항목</Text>
-          <Text style={styles.listItem}>
-            • 기기 정보: 기기 모델, OS 버전, 앱 버전
-          </Text>
-          <Text style={styles.listItem}>
-            • 로그 정보: 서비스 이용 기록, 접속 시간
-          </Text>
-          <Text style={styles.listItem}>• 쿠키 및 유사 기술을 통한 정보</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            2. 개인정보의 수집 및 이용 목적
-          </Text>
-          <Text style={styles.paragraph}>
-            회사는 수집한 개인정보를 다음의 목적을 위해 활용합니다:
-          </Text>
-          <Text style={styles.listItem}>
-            • 회원 관리: 회원제 서비스 이용에 따른 본인확인, 개인식별
-          </Text>
-          <Text style={styles.listItem}>
-            • 서비스 제공: AI 콘텐츠 생성, SNS 계정 연동, 트렌드 분석
-          </Text>
-          <Text style={styles.listItem}>
-            • 서비스 개선: 신규 기능 개발, 사용자 경험 개선
-          </Text>
-          <Text style={styles.listItem}>
-            • 마케팅 및 광고: 이벤트 정보 제공, 맞춤형 서비스 제공
-          </Text>
-          <Text style={styles.listItem}>
-            • 법적 의무 준수: 관련 법령에 따른 의무 이행
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            3. 개인정보의 보유 및 이용 기간
-          </Text>
-          <Text style={styles.listItem}>
-            • 회사는 이용자가 서비스를 이용하는 기간 동안 개인정보를 보유하고
-            이용합니다.
-          </Text>
-          <Text style={styles.listItem}>
-            • 회원 탈퇴 시 지체없이 파기합니다. 단, 관련 법령에 따라 보존할
-            필요가 있는 경우 해당 기간 동안 보관합니다.
-          </Text>
-
-          <Text style={styles.subTitle}>관련 법령에 따른 보존 기간</Text>
-          <Text style={styles.listItem}>
-            • 계약 또는 청약철회 등에 관한 기록: 5년
-          </Text>
-          <Text style={styles.listItem}>
-            • 대금결제 및 재화 등의 공급에 관한 기록: 5년
-          </Text>
-          <Text style={styles.listItem}>
-            • 소비자의 불만 또는 분쟁처리에 관한 기록: 3년
-          </Text>
-          <Text style={styles.listItem}>• 표시·광고에 관한 기록: 6개월</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>4. 개인정보의 제3자 제공</Text>
-          <Text style={styles.listItem}>
-            • 회사는 원칙적으로 이용자의 개인정보를 제3자에게 제공하지 않습니다.
-          </Text>
-          <Text style={styles.listItem}>
-            • 다만, 다음의 경우에는 예외로 합니다:
-          </Text>
-          <Text style={styles.listItem}> - 이용자가 사전에 동의한 경우</Text>
-          <Text style={styles.listItem}> - 법령의 규정에 의한 경우</Text>
-          <Text style={styles.listItem}> - 수사기관의 요청이 있는 경우</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>5. 개인정보의 파기</Text>
-          <Text style={styles.paragraph}>
-            회사는 개인정보 보유기간의 경과, 처리목적 달성 등 개인정보가
-            불필요하게 되었을 때에는 지체없이 해당 개인정보를 파기합니다.
-          </Text>
-
-          <Text style={styles.subTitle}>파기 절차</Text>
-          <Text style={styles.listItem}>
-            • 이용자가 입력한 정보는 목적 달성 후 별도의 DB에 옮겨져 내부 방침
-            및 기타 관련 법령에 따라 일정기간 저장된 후 파기됩니다.
-          </Text>
-
-          <Text style={styles.subTitle}>파기 방법</Text>
-          <Text style={styles.listItem}>
-            • 전자적 파일 형태: 기록을 재생할 수 없는 기술적 방법 사용
-          </Text>
-          <Text style={styles.listItem}>
-            • 종이 문서: 분쇄기로 분쇄하거나 소각
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>6. 이용자의 권리와 행사 방법</Text>
-          <Text style={styles.paragraph}>
-            이용자는 언제든지 다음과 같은 권리를 행사할 수 있습니다:
-          </Text>
-          <Text style={styles.listItem}>• 개인정보 열람 요구</Text>
-          <Text style={styles.listItem}>• 오류 등이 있을 경우 정정 요구</Text>
-          <Text style={styles.listItem}>• 삭제 요구</Text>
-          <Text style={styles.listItem}>• 처리정지 요구</Text>
-
-          <Text style={styles.paragraph}>
-            권리 행사는 앱 내 설정 메뉴 또는 이메일(getposty@gmail.com)을 통해
-            하실 수 있습니다.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>
-            7. 개인정보의 안전성 확보 조치
-          </Text>
-          <Text style={styles.paragraph}>
-            회사는 개인정보 보호를 위해 다음과 같은 조치를 취하고 있습니다:
-          </Text>
-          <Text style={styles.listItem}>
-            • 개인정보의 암호화: 비밀번호 등 중요 정보는 암호화하여 저장
-          </Text>
-          <Text style={styles.listItem}>
-            • 해킹 등에 대비한 기술적 대책: 보안프로그램 설치 및 주기적 갱신
-          </Text>
-          <Text style={styles.listItem}>
-            • 개인정보 접근 제한: 최소한의 인원으로 제한
-          </Text>
-          <Text style={styles.listItem}>
-            • 개인정보 처리 직원의 교육: 정기적인 교육 실시
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>8. 아동의 개인정보 보호</Text>
-          <Text style={styles.paragraph}>
-            회사는 만 14세 미만 아동의 개인정보를 수집하지 않습니다. 만 14세
-            미만 아동의 개인정보가 수집된 사실을 인지한 경우 즉시 해당 정보를
-            파기합니다.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>9. 개인정보 보호책임자</Text>
-          <Text style={styles.paragraph}>
-            회사는 개인정보 처리에 관한 업무를 총괄해서 책임지고, 개인정보
-            처리와 관련한 이용자의 불만처리 및 피해구제 등을 위하여 아래와 같이
-            개인정보 보호책임자를 지정하고 있습니다.
-          </Text>
-          <Text style={styles.listItem}>• 개인정보 보호책임자: [이름]</Text>
-          <Text style={styles.listItem}>• 직책: [직책]</Text>
-          <Text style={styles.listItem}>• 연락처: privacy@getposty.ai</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>10. 개인정보 처리방침 변경</Text>
-          <Text style={styles.paragraph}>
-            이 개인정보 처리방침은 시행일로부터 적용되며, 법령 및 방침에 따른
-            변경내용의 추가, 삭제 및 정정이 있는 경우에는 변경사항의 시행 7일
-            전부터 공지사항을 통하여 고지할 것입니다.
-          </Text>
-        </View>
+        {isNotionEnabled && document ? renderNotionContent() : renderFallbackContent()}
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            본 방침은 {lastUpdated}부터 시행됩니다.
+            본 개인정보처리방침은 {document ? new Date(document.lastUpdated).toLocaleDateString('ko-KR') : lastUpdated}부터 시행됩니다.
           </Text>
           <Text style={styles.footerText}>
-            개인정보 관련 문의사항은 privacy@getposty.ai로 연락해주세요.
+            개인정보 관련 문의: getposty@gmail.com
           </Text>
         </View>
 
@@ -278,9 +269,15 @@ const createStyles = (colors: typeof COLORS) =>
       fontSize: 18,
       fontWeight: "600",
       color: colors.text.primary,
+      flex: 1,
+      textAlign: 'center',
     },
-    placeholder: {
+    headerRight: {
       width: 40,
+      alignItems: 'flex-end',
+    },
+    refreshButton: {
+      padding: SPACING.sm,
     },
     content: {
       flex: 1,
@@ -295,8 +292,51 @@ const createStyles = (colors: typeof COLORS) =>
       marginBottom: SPACING.xl,
       textAlign: "center",
     },
-    intro: {
-      marginBottom: SPACING.xl,
+    notionBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'center',
+      backgroundColor: colors.primary + '20',
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.xs,
+      borderRadius: 16,
+      marginBottom: SPACING.lg,
+    },
+    notionBadgeText: {
+      fontSize: FONT_SIZES.small,
+      color: colors.primary,
+      marginLeft: SPACING.xs,
+    },
+    loadingContainer: {
+      alignItems: 'center',
+      paddingVertical: SPACING.xl,
+    },
+    loadingText: {
+      fontSize: FONT_SIZES.medium,
+      color: colors.text.secondary,
+      marginTop: SPACING.md,
+    },
+    errorContainer: {
+      alignItems: 'center',
+      paddingVertical: SPACING.xl,
+    },
+    errorText: {
+      fontSize: FONT_SIZES.medium,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      marginVertical: SPACING.md,
+    },
+    retryButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.sm,
+      borderRadius: 8,
+      marginTop: SPACING.sm,
+    },
+    retryText: {
+      color: colors.text.inverse,
+      fontSize: FONT_SIZES.medium,
+      fontWeight: '600',
     },
     section: {
       marginBottom: SPACING.xl,
@@ -324,8 +364,8 @@ const createStyles = (colors: typeof COLORS) =>
       fontSize: FONT_SIZES.medium,
       color: colors.text.secondary,
       lineHeight: 22,
-      marginBottom: SPACING.xs,
-      paddingLeft: SPACING.sm,
+      marginBottom: SPACING.sm,
+      paddingLeft: SPACING.md,
     },
     footer: {
       marginTop: SPACING.xxl,

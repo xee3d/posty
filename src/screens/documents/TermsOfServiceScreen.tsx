@@ -1,4 +1,8 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
+import TermsOfServiceScreen_EN from "./TermsOfServiceScreen_EN";
+import TermsOfServiceScreen_JA from "./TermsOfServiceScreen_JA";
+import TermsOfServiceScreen_ZH from "./TermsOfServiceScreen_ZH";
 import {
   View,
   Text,
@@ -6,18 +10,17 @@ import {
   StyleSheet,
   SafeAreaView,
   TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
 } from "react-native";
-import Icon from "react-native-vector-icons/Ionicons";
 import { SafeIcon } from "../../utils/SafeIcon";
 import {
   COLORS,
   SPACING,
-  BORDER_RADIUS,
-  TYPOGRAPHY,
   FONT_SIZES,
 } from "../../utils/constants";
-import { APP_TEXT } from "../../utils/textConstants";
 import { useAppTheme } from "../../hooks/useAppTheme";
+import { useNotionDocument } from "../../hooks/useNotionDocument";
 
 interface TermsOfServiceScreenProps {
   onBack: () => void;
@@ -28,10 +31,163 @@ const TermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({
   onBack,
   onNavigate,
 }) => {
+  const { i18n } = useTranslation();
+  
+  // 현재 언어에 따라 적절한 컴포넌트 선택
+  const currentLanguage = i18n.language;
+  console.log('📍 Current language for Terms:', currentLanguage);
+  
+  switch (currentLanguage) {
+    case 'en':
+      return <TermsOfServiceScreen_EN onBack={onBack} onNavigate={onNavigate} />;
+    case 'ja':
+      return <TermsOfServiceScreen_JA onBack={onBack} onNavigate={onNavigate} />;
+    case 'zh':
+    case 'zh-CN':
+      return <TermsOfServiceScreen_ZH onBack={onBack} onNavigate={onNavigate} />;
+    case 'ko':
+    default:
+      // 한국어 또는 기본값은 기존 구현 유지
+      return <KoreanTermsOfServiceScreen onBack={onBack} onNavigate={onNavigate} />;
+  }
+};
+
+// 한국어 버전을 위한 기존 구현
+const KoreanTermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({
+  onBack,
+  onNavigate,
+}) => {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const styles = createStyles(colors);
+  
+  const { document, loading, error, refresh, isNotionEnabled } = useNotionDocument('terms');
 
   const lastUpdated = "2024년 1월 1일";
+
+  const renderNotionContent = () => {
+    if (loading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={styles.loadingText}>{t('documents.loadingDocument')}</Text>
+        </View>
+      );
+    }
+
+    if (error || !document) {
+      return (
+        <View style={styles.errorContainer}>
+          <SafeIcon name="warning" size={48} color={colors.text.tertiary} />
+          <Text style={styles.errorText}>
+            {error || t('documents.documentLoadError')}
+          </Text>
+          <TouchableOpacity onPress={refresh} style={styles.retryButton}>
+            <Text style={styles.retryText}>{t('documents.retry')}</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    const content = document.content.split('\n\n').map((paragraph, index) => {
+      if (paragraph.startsWith('#')) {
+        const level = paragraph.match(/^#+/)?.[0].length || 1;
+        const text = paragraph.replace(/^#+\s*/, '');
+        return (
+          <Text 
+            key={index} 
+            style={level === 1 ? styles.sectionTitle : styles.subTitle}
+          >
+            {text}
+          </Text>
+        );
+      } else if (paragraph.startsWith('•') || paragraph.startsWith('-')) {
+        return (
+          <Text key={index} style={styles.listItem}>
+            {paragraph}
+          </Text>
+        );
+      } else if (paragraph.trim()) {
+        return (
+          <Text key={index} style={styles.paragraph}>
+            {paragraph}
+          </Text>
+        );
+      }
+      return null;
+    }).filter(Boolean);
+
+    return content;
+  };
+
+  const renderFallbackContent = () => (
+    <>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>제1조 (목적)</Text>
+        <Text style={styles.paragraph}>
+          이 약관은 틴로봇스튜디오(Tinrobot Studio)(이하 "회사")가 제공하는 AI 기반 SNS 콘텐츠 생성
+          서비스 "Posty"(이하 "서비스")의 이용조건 및 절차, 회사와 이용자의
+          권리, 의무, 책임사항과 기타 필요한 사항을 규정함을 목적으로 합니다.
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>제2조 (용어의 정의)</Text>
+        <Text style={styles.paragraph}>
+          이 약관에서 사용하는 용어의 정의는 다음과 같습니다:
+        </Text>
+        <Text style={styles.listItem}>
+          1. "서비스"란 회사가 제공하는 AI 기반 SNS 콘텐츠 생성 및 관리 관련
+          제반 서비스를 의미합니다.
+        </Text>
+        <Text style={styles.listItem}>
+          2. "이용자"란 이 약관에 따라 회사가 제공하는 서비스를 이용하는 자를
+          의미합니다.
+        </Text>
+        <Text style={styles.listItem}>
+          3. "콘텐츠"란 이용자가 서비스를 통해 생성, 저장, 공유하는 모든
+          형태의 정보를 의미합니다.
+        </Text>
+        <Text style={styles.listItem}>
+          4. "AI 생성 콘텐츠"란 서비스의 인공지능 기능을 통해 생성된 텍스트,
+          이미지 분석 결과 등을 의미합니다.
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>제3조 (약관의 효력 및 변경)</Text>
+        <Text style={styles.listItem}>
+          1. 이 약관은 서비스를 이용하고자 하는 모든 이용자에게 그 효력이
+          발생합니다.
+        </Text>
+        <Text style={styles.listItem}>
+          2. 회사는 필요한 경우 관련 법령을 위배하지 않는 범위에서 이 약관을
+          변경할 수 있으며, 변경된 약관은 서비스 내 공지사항을 통해
+          공지합니다.
+        </Text>
+        <Text style={styles.listItem}>
+          3. 이용자가 변경된 약관에 동의하지 않는 경우 서비스 이용을 중단하고
+          탈퇴할 수 있습니다.
+        </Text>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>제4조 (서비스의 제공)</Text>
+        <Text style={styles.paragraph}>
+          회사가 제공하는 서비스는 다음과 같습니다:
+        </Text>
+        <Text style={styles.listItem}>1. AI 기반 SNS 콘텐츠 생성 서비스</Text>
+        <Text style={styles.listItem}>
+          2. SNS 트렌드 분석 및 인사이트 제공
+        </Text>
+        <Text style={styles.listItem}>3. 사용자 글쓰기 스타일 분석</Text>
+        <Text style={styles.listItem}>4. SNS 계정 연동 및 게시물 관리</Text>
+        <Text style={styles.listItem}>
+          5. 기타 회사가 추가로 개발하거나 제휴를 통해 제공하는 서비스
+        </Text>
+      </View>
+    </>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -39,176 +195,49 @@ const TermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({
         <TouchableOpacity onPress={onBack} style={styles.backButton}>
           <SafeIcon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>이용약관</Text>
-        <View style={styles.placeholder} />
+        <Text style={styles.headerTitle}>
+          {document?.title || t('documents.termsOfService')}
+        </Text>
+        <View style={styles.headerRight}>
+          {isNotionEnabled && (
+            <TouchableOpacity onPress={refresh} style={styles.refreshButton}>
+              <SafeIcon name="refresh" size={20} color={colors.text.secondary} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={refresh}
+            colors={[colors.primary]}
+          />
+        }
       >
-        <Text style={styles.lastUpdated}>최종 수정일: {lastUpdated}</Text>
+        <Text style={styles.lastUpdated}>
+          {t('documents.lastUpdated')}: {document ? new Date(document.lastUpdated).toLocaleDateString('ko-KR') : lastUpdated}
+        </Text>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>제1조 (목적)</Text>
-          <Text style={styles.paragraph}>
-            이 약관은 Posty AI(이하 "회사")가 제공하는 AI 기반 SNS 콘텐츠 생성
-            서비스 "Posty"(이하 "서비스")의 이용조건 및 절차, 회사와 이용자의
-            권리, 의무, 책임사항과 기타 필요한 사항을 규정함을 목적으로 합니다.
-          </Text>
-        </View>
+        {isNotionEnabled && document ? (
+          <View style={styles.notionBadge}>
+            <SafeIcon name="cloud" size={16} color={colors.primary} />
+            <Text style={styles.notionBadgeText}>{t('documents.syncedFromNotion')}</Text>
+          </View>
+        ) : null}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>제2조 (용어의 정의)</Text>
-          <Text style={styles.paragraph}>
-            이 약관에서 사용하는 용어의 정의는 다음과 같습니다:
-          </Text>
-          <Text style={styles.listItem}>
-            1. "서비스"란 회사가 제공하는 AI 기반 SNS 콘텐츠 생성 및 관리 관련
-            제반 서비스를 의미합니다.
-          </Text>
-          <Text style={styles.listItem}>
-            2. "이용자"란 이 약관에 따라 회사가 제공하는 서비스를 이용하는 자를
-            의미합니다.
-          </Text>
-          <Text style={styles.listItem}>
-            3. "콘텐츠"란 이용자가 서비스를 통해 생성, 저장, 공유하는 모든
-            형태의 정보를 의미합니다.
-          </Text>
-          <Text style={styles.listItem}>
-            4. "AI 생성 콘텐츠"란 서비스의 인공지능 기능을 통해 생성된 텍스트,
-            이미지 분석 결과 등을 의미합니다.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>제3조 (약관의 효력 및 변경)</Text>
-          <Text style={styles.listItem}>
-            1. 이 약관은 서비스를 이용하고자 하는 모든 이용자에게 그 효력이
-            발생합니다.
-          </Text>
-          <Text style={styles.listItem}>
-            2. 회사는 필요한 경우 관련 법령을 위배하지 않는 범위에서 이 약관을
-            변경할 수 있으며, 변경된 약관은 서비스 내 공지사항을 통해
-            공지합니다.
-          </Text>
-          <Text style={styles.listItem}>
-            3. 이용자가 변경된 약관에 동의하지 않는 경우 서비스 이용을 중단하고
-            탈퇴할 수 있습니다.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>제4조 (서비스의 제공)</Text>
-          <Text style={styles.paragraph}>
-            회사가 제공하는 서비스는 다음과 같습니다:
-          </Text>
-          <Text style={styles.listItem}>1. AI 기반 SNS 콘텐츠 생성 서비스</Text>
-          <Text style={styles.listItem}>
-            2. SNS 트렌드 분석 및 인사이트 제공
-          </Text>
-          <Text style={styles.listItem}>3. 사용자 글쓰기 스타일 분석</Text>
-          <Text style={styles.listItem}>4. SNS 계정 연동 및 게시물 관리</Text>
-          <Text style={styles.listItem}>
-            5. 기타 회사가 추가로 개발하거나 제휴를 통해 제공하는 서비스
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>제5조 (서비스 이용)</Text>
-          <Text style={styles.listItem}>
-            1. 이용자는 회사가 정한 절차에 따라 서비스를 이용할 수 있습니다.
-          </Text>
-          <Text style={styles.listItem}>
-            2. 이용자는 서비스를 이용함에 있어 관련 법령을 준수해야 합니다.
-          </Text>
-          <Text style={styles.listItem}>
-            3. 이용자는 타인의 권리를 침해하거나 공공질서에 반하는 내용의
-            콘텐츠를 생성해서는 안 됩니다.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>제6조 (개인정보보호)</Text>
-          <Text style={styles.listItem}>
-            1. 회사는 이용자의 개인정보를 보호하기 위해 최선을 다합니다.
-          </Text>
-          <Text style={styles.listItem}>
-            2. 개인정보의 수집, 이용, 제공에 관한 사항은 회사의
-            개인정보처리방침에 따릅니다.
-          </Text>
-          <Text style={styles.listItem}>
-            3. 회사는 이용자의 동의 없이 개인정보를 제3자에게 제공하지 않습니다.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>제7조 (콘텐츠의 권리와 책임)</Text>
-          <Text style={styles.listItem}>
-            1. 이용자가 작성한 콘텐츠의 저작권은 이용자에게 있습니다.
-          </Text>
-          <Text style={styles.listItem}>
-            2. AI가 생성한 콘텐츠는 이용자가 자유롭게 사용, 수정, 배포할 수
-            있습니다.
-          </Text>
-          <Text style={styles.listItem}>
-            3. 이용자는 자신이 생성한 콘텐츠에 대한 모든 책임을 집니다.
-          </Text>
-          <Text style={styles.listItem}>
-            4. 회사는 서비스 개선을 위해 이용자의 콘텐츠를 분석할 수 있으나,
-            이는 익명화된 형태로만 사용됩니다.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>제8조 (서비스 이용 제한)</Text>
-          <Text style={styles.paragraph}>
-            회사는 다음의 경우 서비스 이용을 제한할 수 있습니다:
-          </Text>
-          <Text style={styles.listItem}>1. 이 약관을 위반한 경우</Text>
-          <Text style={styles.listItem}>
-            2. 타인의 권리를 침해하는 콘텐츠를 생성한 경우
-          </Text>
-          <Text style={styles.listItem}>
-            3. 서비스의 정상적인 운영을 방해한 경우
-          </Text>
-          <Text style={styles.listItem}>4. 기타 관련 법령을 위반한 경우</Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>제9조 (면책사항)</Text>
-          <Text style={styles.listItem}>
-            1. 회사는 천재지변, 전쟁 등 불가항력으로 인한 서비스 중단에 대해
-            책임지지 않습니다.
-          </Text>
-          <Text style={styles.listItem}>
-            2. 회사는 이용자가 서비스를 통해 얻은 정보나 자료의 정확성에 대해
-            보증하지 않습니다.
-          </Text>
-          <Text style={styles.listItem}>
-            3. 회사는 이용자 상호간 또는 이용자와 제3자 간의 분쟁에 대해
-            관여하지 않습니다.
-          </Text>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>제10조 (준거법 및 관할법원)</Text>
-          <Text style={styles.listItem}>
-            1. 이 약관은 대한민국 법령에 따라 규율되고 해석됩니다.
-          </Text>
-          <Text style={styles.listItem}>
-            2. 서비스 이용과 관련하여 발생한 분쟁은 회사의 본사 소재지를
-            관할하는 법원을 전속관할법원으로 합니다.
-          </Text>
-        </View>
+        {isNotionEnabled && document ? renderNotionContent() : renderFallbackContent()}
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            본 약관은 {lastUpdated}부터 시행됩니다.
+            본 약관은 {document ? new Date(document.lastUpdated).toLocaleDateString('ko-KR') : lastUpdated}부터 시행됩니다.
           </Text>
           <Text style={styles.footerText}>
-            문의사항이 있으시면 getposty@gmail.com로 연락해주세요.
+            {t('documents.contactEmail')} getposty@gmail.com로 연락해주세요.
           </Text>
         </View>
 
@@ -241,9 +270,15 @@ const createStyles = (colors: typeof COLORS) =>
       fontSize: 18,
       fontWeight: "600",
       color: colors.text.primary,
+      flex: 1,
+      textAlign: 'center',
     },
-    placeholder: {
+    headerRight: {
       width: 40,
+      alignItems: 'flex-end',
+    },
+    refreshButton: {
+      padding: SPACING.sm,
     },
     content: {
       flex: 1,
@@ -258,6 +293,52 @@ const createStyles = (colors: typeof COLORS) =>
       marginBottom: SPACING.xl,
       textAlign: "center",
     },
+    notionBadge: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      alignSelf: 'center',
+      backgroundColor: colors.primary + '20',
+      paddingHorizontal: SPACING.md,
+      paddingVertical: SPACING.xs,
+      borderRadius: 16,
+      marginBottom: SPACING.lg,
+    },
+    notionBadgeText: {
+      fontSize: FONT_SIZES.small,
+      color: colors.primary,
+      marginLeft: SPACING.xs,
+    },
+    loadingContainer: {
+      alignItems: 'center',
+      paddingVertical: SPACING.xl,
+    },
+    loadingText: {
+      fontSize: FONT_SIZES.medium,
+      color: colors.text.secondary,
+      marginTop: SPACING.md,
+    },
+    errorContainer: {
+      alignItems: 'center',
+      paddingVertical: SPACING.xl,
+    },
+    errorText: {
+      fontSize: FONT_SIZES.medium,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      marginVertical: SPACING.md,
+    },
+    retryButton: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.sm,
+      borderRadius: 8,
+      marginTop: SPACING.sm,
+    },
+    retryText: {
+      color: colors.text.inverse,
+      fontSize: FONT_SIZES.medium,
+      fontWeight: '600',
+    },
     section: {
       marginBottom: SPACING.xl,
     },
@@ -266,6 +347,13 @@ const createStyles = (colors: typeof COLORS) =>
       fontWeight: "600",
       color: colors.text.primary,
       marginBottom: SPACING.md,
+    },
+    subTitle: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.text.primary,
+      marginTop: SPACING.md,
+      marginBottom: SPACING.sm,
     },
     paragraph: {
       fontSize: FONT_SIZES.medium,

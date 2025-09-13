@@ -15,7 +15,6 @@ import {
 import {
   COLORS,
   SPACING,
-  POSTY_MESSAGES,
   CARD_THEME,
 } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
@@ -499,6 +498,23 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     }
   };
 
+  // 예시 placeholder 가져오기
+  const getRandomPlaceholder = () => {
+    const examples = t("aiWrite.placeholderExamples.text", { returnObjects: true });
+    console.log('📍 getRandomPlaceholder:', typeof examples, examples);
+    
+    if (Array.isArray(examples) && examples.length > 0) {
+      const randomIndex = Math.floor(Math.random() * examples.length);
+      const result = examples[randomIndex];
+      console.log('📍 Returning placeholder:', typeof result, result);
+      return result;
+    }
+    
+    const fallback = t("aiWrite.prompts.text");
+    console.log('📍 Fallback placeholder:', typeof fallback, fallback);
+    return fallback;
+  };
+
   const handleSelectImage = () => {
     Alert.alert(
       t("aiWrite.photo.select.title"),
@@ -746,7 +762,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         // 스타일 템플릿 정보를 프롬프트에 추가
         let enhancedPrompt = prompt.trim();
         if (styleInfo) {
-          enhancedPrompt += `\n\n스타일: ${styleInfo.name} - ${styleInfo.description}`;
+          enhancedPrompt += `\n\n스타일: ${t(`styleTemplates.${styleInfo.id}.name`)} - ${t(`styleTemplates.${styleInfo.id}.description`)}`;
           enhancedPrompt += `\n특징: ${styleInfo.characteristics.structure.join(
             ", "
           )}`;
@@ -953,7 +969,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
 
 
   const getRandomEncouragement = () => {
-    const encouragements = POSTY_MESSAGES.encouragements;
+    const encouragements = t('aiWrite.sections.encouragements', { returnObjects: true }) as string[];
     return encouragements[Math.floor(Math.random() * encouragements.length)];
   };
 
@@ -1050,7 +1066,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         { marginBottom: styleGuideCollapsed ? 0 : 4 },
                       ]}
                     >
-                      {styleInfo.name} 스타일로 작성 중
+                      {t(`styleTemplates.${styleInfo.id}.name`)} {t('aiWrite.writingInStyle')}
                     </Text>
                     <SafeIcon
                       name={styleGuideCollapsed ? "chevron-down" : "chevron-up"}
@@ -1061,7 +1077,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                   {!styleGuideCollapsed && (
                     <>
                       <Text style={styles.styleGuideDescription}>
-                        {styleInfo.description}
+                        {t(`styleTemplates.${styleInfo.id}.description`)}
                       </Text>
                       {tips && tips.length > 0 && (
                         <View style={styles.styleGuideTips}>
@@ -1200,7 +1216,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                   <View style={styles.inputContainer}>
                     <TextInput
                       style={styles.input}
-                      placeholder={getStyleBasedPlaceholder()}
+                      placeholder={getRandomPlaceholder()}
                       placeholderTextColor={colors.text.tertiary}
                       value={prompt}
                       onChangeText={setPrompt}

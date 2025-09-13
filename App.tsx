@@ -16,6 +16,7 @@ import SplashScreen from "react-native-splash-screen";
 (global as any).SafeIcon = SafeIcon;
 (global as any).Icon = IconComponent;
 import AnimatedSplashScreen from "./src/components/AnimatedSplashScreen";
+import { NotionSyncProvider } from "./src/context/NotionSyncContext";
 import {
   View,
   StyleSheet,
@@ -88,6 +89,7 @@ import { AlertManager } from "./src/components/CustomAlert";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import OnboardingScreen from "./src/screens/OnboardingScreen";
 import MinimalWelcome from "./src/components/MinimalWelcome";
+import TextRenderingErrorBoundary from "./src/components/TextRenderingErrorBoundary";
 import { batteryOptimizer } from "./src/utils/batteryOptimization";
 
 const { width } = Dimensions.get("window");
@@ -116,6 +118,9 @@ const AppContent: React.FC = () => {
 
   // 단순화된 Reanimated shared value - opacity만 사용
   const opacity = useSharedValue(1);
+  
+  // 언어 변경 강제 리렌더링을 위한 state
+  const [currentLanguage, setCurrentLanguage] = useState('ko');
 
   // 앱 초기화
   useEffect(() => {
@@ -137,7 +142,8 @@ const AppContent: React.FC = () => {
       try {
         // 언어 서비스 초기화
         console.log("[App] Initializing language service...");
-        await languageService.initialize();
+        const initialLanguage = await languageService.initialize();
+        setCurrentLanguage(initialLanguage);
         
         // 가격 서비스 언어 업데이트
         pricingService.updateLanguage();
@@ -169,6 +175,23 @@ const AppContent: React.FC = () => {
       if (memoryCheckInterval) {
         MemoryOptimizer.clearInterval(memoryCheckInterval);
       }
+    };
+  }, []);
+
+  // 언어 변경 리스너 설정
+  useEffect(() => {
+    const unsubscribe = languageService.addLanguageChangeListener((newLanguage) => {
+      console.log('[App] Language changed to:', newLanguage);
+      setCurrentLanguage(newLanguage);
+      
+      // 강제 리렌더링을 위해 약간의 딜레이 추가
+      setTimeout(() => {
+        console.log('[App] Force re-render triggered for language:', newLanguage);
+      }, 100);
+    });
+    
+    return () => {
+      unsubscribe();
     };
   }, []);
 
@@ -707,7 +730,11 @@ const App: React.FC = () => {
         persistor={persistor}
       >
         <ThemeProvider>
-          <AppContent />
+          <NotionSyncProvider>
+            <TextRenderingErrorBoundary>
+              <AppContent />
+            </TextRenderingErrorBoundary>
+          </NotionSyncProvider>
         </ThemeProvider>
       </PersistGate>
     </Provider>

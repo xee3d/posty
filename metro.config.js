@@ -59,6 +59,7 @@ const config = {
     },
   },
   watchFolders: [],
+  // 소스맵은 기본 설정 사용 (안전성 우선)
   // 메모리 누수 방지를 위한 설정
   maxWorkers: 2,
   resetCache: true,

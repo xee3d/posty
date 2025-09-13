@@ -150,17 +150,31 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   };
 
   const getTranslatedCategory = (categoryName: string): string => {
+    console.log('📍 getTranslatedCategory input:', categoryName, typeof categoryName);
+    
     // Try to get translation key for the category
     const translationKey = getCategoryTranslationKey(categoryName);
+    console.log('📍 translationKey:', translationKey);
     
     // If we have a translation key, use the translation system
     if (translationKey) {
       // For home.topics keys, use them directly
       if (translationKey.startsWith('home.topics.')) {
-        return t(translationKey);
+        const result = t(translationKey);
+        console.log('📍 translation result:', typeof result, result);
+        
+        // 안전 검사 추가
+        if (typeof result !== 'string') {
+          console.warn('🚨 Non-string result from translation:', result);
+          return String(result || categoryName);
+        }
+        
+        return result;
       }
       // For other keys, return the english fallback for now
-      return translationKey.charAt(0).toUpperCase() + translationKey.slice(1);
+      const fallback = translationKey.charAt(0).toUpperCase() + translationKey.slice(1);
+      console.log('📍 fallback result:', typeof fallback, fallback);
+      return fallback;
     }
     
     // Handle multilingual dynamic data by normalizing to Korean first, then translating
@@ -201,14 +215,25 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
     
     // First normalize to Korean
     const normalizedCategory = multilingualMap[categoryName] || categoryName;
+    console.log('📍 normalizedCategory:', normalizedCategory);
     
     // Then try to get translation for the normalized Korean category
     const normalizedTranslationKey = getCategoryTranslationKey(normalizedCategory);
     if (normalizedTranslationKey && normalizedTranslationKey.startsWith('home.topics.')) {
-      return t(normalizedTranslationKey);
+      const normalizedResult = t(normalizedTranslationKey);
+      console.log('📍 normalized translation result:', typeof normalizedResult, normalizedResult);
+      
+      // 안전 검사 추가
+      if (typeof normalizedResult !== 'string') {
+        console.warn('🚨 Non-string result from normalized translation:', normalizedResult);
+        return String(normalizedResult || categoryName);
+      }
+      
+      return normalizedResult;
     }
     
     // For unmapped categories, return the original (no console warnings)
+    console.log('📍 returning original categoryName:', categoryName);
     return categoryName;
   };
 
