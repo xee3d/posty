@@ -33,6 +33,8 @@
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "translations:check": "node scripts/check-translations.js",
+    "translations:watch": "node scripts/translation-watch.js",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
     "type-check": "tsc --noEmit",
     "validate": "npm run lint && npm run type-check && npm test",
