@@ -1832,21 +1832,24 @@ export default {
       }
     },
     form: {
-      title: "快速咨询",
-      subtitle: "填写下方表单，可直接通过邮件应用发送",
+      emailTitle: "通过邮件联系",
+      copy: "复制",
+      openEmail: "打开邮件应用",
+      quickInquiry: "快速咨询",
+      quickInquiryDesc: "填写下方表单，可直接通过邮件应用发送",
       categories: {
         bug: "错误报告",
         feature: "功能建议",
         payment: "付费咨询",
         other: "其他咨询"
       },
-      fields: {
-        subject: "主题",
-        content: "内容",
-        subjectPlaceholder: "请输入您的咨询主题",
-        contentPlaceholder: "请输入详细信息"
-      },
-      submit: "通过邮件发送"
+      subject: "主题",
+      subjectPlaceholder: "请输入您的咨询主题",
+      message: "内容",
+      messagePlaceholder: "请输入详细信息",
+      sendEmail: "通过邮件发送",
+      responseTime: "工作日24小时内回复",
+      languages: "支持中文和英文咨询"
     },
     info: [
       "工作日24小时内回复",

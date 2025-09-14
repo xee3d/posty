@@ -2041,21 +2041,24 @@ export default {
       }
     },
     form: {
-      title: "Quick Inquiry",
-      subtitle: "Fill out the form below to send directly from your email app",
+      emailTitle: "Contact via Email",
+      copy: "Copy",
+      openEmail: "Open Email App",
+      quickInquiry: "Quick Inquiry",
+      quickInquiryDesc: "Fill out the form below to send directly from your email app",
       categories: {
         bug: "Bug Report",
         feature: "Feature Request",
         payment: "Payment Inquiry",
         other: "Other Inquiry"
       },
-      fields: {
-        subject: "Subject",
-        content: "Message",
-        subjectPlaceholder: "Enter your inquiry subject",
-        contentPlaceholder: "Enter detailed information"
-      },
-      submit: "Send via Email"
+      subject: "Subject",
+      subjectPlaceholder: "Enter your inquiry subject",
+      message: "Message",
+      messagePlaceholder: "Enter detailed information",
+      sendEmail: "Send via Email",
+      responseTime: "We respond within 24 hours on weekdays",
+      languages: "Inquiries available in Korean and English"
     },
     info: [
       "We respond within 24 hours on weekdays",

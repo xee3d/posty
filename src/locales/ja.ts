@@ -1806,21 +1806,24 @@ export default {
       }
     },
     form: {
-      title: "クイックお問い合わせ",
-      subtitle: "以下のフォームにご記入いただくと、メールアプリから直接送信できます",
+      emailTitle: "メールでお問い合わせ",
+      copy: "コピー",
+      openEmail: "メールアプリを開く",
+      quickInquiry: "クイックお問い合わせ",
+      quickInquiryDesc: "以下のフォームにご記入いただくと、メールアプリから直接送信できます",
       categories: {
         bug: "バグ報告",
         feature: "機能提案",
         payment: "支払いに関するお問い合わせ",
         other: "その他のお問い合わせ"
       },
-      fields: {
-        subject: "件名",
-        content: "内容",
-        subjectPlaceholder: "お問い合わせの件名をご入力ください",
-        contentPlaceholder: "詳細な内容をご入力ください"
-      },
-      submit: "メールで送信する"
+      subject: "件名",
+      subjectPlaceholder: "お問い合わせの件名をご入力ください",
+      message: "内容",
+      messagePlaceholder: "詳細な内容をご入力ください",
+      sendEmail: "メールで送信する",
+      responseTime: "平日24時間以内にご返信いたします",
+      languages: "日本語と英語でのお問い合わせが可能です"
     },
     info: [
       "平日24時間以内にご返信いたします",

@@ -821,6 +821,66 @@ export default {
     }
   },
 
+  // Contact
+  contact: {
+    title: "문의하기",
+    form: {
+      emailTitle: "이메일로 문의하기",
+      copy: "복사",
+      openEmail: "이메일 앱 열기",
+      quickInquiry: "빠른 문의",
+      quickInquiryDesc: "아래 양식을 작성하면 이메일 앱에서 바로 보낼 수 있어요",
+      subject: "제목",
+      subjectPlaceholder: "문의 제목을 입력해주세요",
+      message: "내용",
+      messagePlaceholder: "자세한 내용을 입력해주세요",
+      sendEmail: "이메일로 보내기",
+      responseTime: "평일 기준 24시간 이내 답변드려요",
+      languages: "한국어와 영어로 문의 가능해요",
+      categories: {
+        bug: "버그 신고",
+        feature: "기능 제안",
+        payment: "결제 문의",
+        other: "기타"
+      }
+    },
+    alerts: {
+      copySuccess: {
+        title: "복사 완료",
+        message: "이메일 주소가 클립보드에 복사되었습니다"
+      },
+      emailOpenFailed: {
+        title: "이메일 앱 열기 실패",
+        message: "이메일 앱을 열 수 없습니다. 이메일 주소를 복사하시겠습니까?",
+        actions: {
+          cancel: "취소",
+          copy: "복사하기"
+        }
+      },
+      allFieldsRequired: {
+        title: "입력 필요",
+        message: "모든 필드를 입력해주세요"
+      },
+      emailOpened: {
+        title: "이메일 앱 열림",
+        message: "카테고리: {{category}}\n제목: {{subject}}\n내용: {{content}}",
+        actions: {
+          copyContent: "내용 복사",
+          confirm: "확인"
+        }
+      },
+      contentCopied: {
+        title: "내용 복사됨",
+        message: "이메일 내용이 클립보드에 복사되었습니다"
+      },
+      fullContentCopy: {
+        title: "전체 내용 복사됨",
+        message: "이메일 전체 내용이 클립보드에 복사되었습니다",
+        action: "전체 내용 복사"
+      }
+    }
+  },
+
   // Posts
   posts: {
     styles: {
