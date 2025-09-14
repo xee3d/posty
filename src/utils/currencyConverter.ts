@@ -27,21 +27,21 @@ export const CURRENCY_CONFIG: Record<SupportedCurrency, CurrencyInfo> = {
     symbol: '$',
     name: 'US Dollar',
     locale: 'en-US',
-    exchangeRate: 0.00075, // 1 KRW = 0.00075 USD (예시 환율)
+    exchangeRate: 0.00075, // 1 KRW = 0.00075 USD (현실적인 환율: 1900 KRW = ~$1.43)
   },
   JPY: {
     code: 'JPY',
     symbol: '¥',
     name: '일본 엔',
     locale: 'ja-JP',
-    exchangeRate: 0.11, // 1 KRW = 0.11 JPY (예시 환율)
+    exchangeRate: 0.11, // 1 KRW = 0.11 JPY (현실적인 환율: 1900 KRW = ~¥209)
   },
   CNY: {
     code: 'CNY',
     symbol: '¥',
     name: '중국 위안',
     locale: 'zh-CN',
-    exchangeRate: 0.0054, // 1 KRW = 0.0054 CNY (예시 환율)
+    exchangeRate: 0.0055, // 1 KRW = 0.0055 CNY (현실적인 환율: 1900 KRW = ~¥10.45)
   },
 };
 

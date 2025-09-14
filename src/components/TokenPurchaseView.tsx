@@ -177,6 +177,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
   // 플랜별 혜택 적용한 최종 패키지
   const packages = basePackages.map((pkg) => {
     const benefits = applyPlanBenefits(pkg);
+    console.log('DEBUG - applyPlanBenefits result for', pkg.id, ':', benefits);
     return {
       ...pkg,
       amount: benefits.amount,
@@ -340,13 +341,21 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                   <View style={styles.priceRow}>
                     <Text style={styles.currency}>{currencyInfo.symbol}</Text>
                     <Text style={styles.price}>
-                      {pkg.price}
+                      {(() => {
+                        // 심볼 제거한 가격 표시
+                        const formattedPrice = pkg.formattedPrice || formatPrice(pkg.price || 0, currentCurrency);
+                        return formattedPrice.replace(/^[₩$¥£€]+/g, '').trim();
+                      })()}
                     </Text>
                   </View>
                   {pkg.originalPrice && (
                     <View style={styles.discountRow}>
                       <Text style={styles.originalPrice}>
-                        {currencyInfo.symbol}{pkg.originalPrice}
+                        {(() => {
+                          // 심볼 제거한 원래 가격 표시
+                          const formattedOriginalPrice = pkg.formattedOriginalPrice || formatPrice(pkg.originalPrice, currentCurrency);
+                          return formattedOriginalPrice;
+                        })()}
                       </Text>
                       <LinearGradient
                         colors={[
@@ -373,9 +382,47 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                   />
                   <Text style={styles.unitPriceText}>
                     {(() => {
-                      const pricePerToken = pkg.price && pkg.amount ? Math.round(pkg.price / pkg.amount) : 0;
-                      console.log('DEBUG - pkg.price:', pkg.price, 'pkg.amount:', pkg.amount, 'pricePerToken:', pricePerToken);
-                      return t("tokenPurchase.pricing.perToken", { price: pricePerToken });
+                      const numericPrice = Number(pkg.price) || 0;
+                      const numericAmount = Number(pkg.amount) || 1;
+                      
+                      if (numericPrice <= 0 || numericAmount <= 0) {
+                        console.log('DEBUG - Invalid price or amount:', { price: pkg.price, amount: pkg.amount });
+                        return "";
+                      }
+                      
+                      const pricePerToken = numericPrice / numericAmount;
+                      
+                      // 통화별로 적절한 형식 적용
+                      let formattedPerTokenPrice;
+                      switch (currentCurrency) {
+                        case 'KRW':
+                        case 'JPY':
+                          formattedPerTokenPrice = Math.round(pricePerToken);
+                          break;
+                        case 'USD':
+                        case 'CNY':
+                          // 소수점 처리 - 0.01 미만이면 3자리까지, 그렇지 않으면 2자리
+                          if (pricePerToken < 0.01) {
+                            formattedPerTokenPrice = pricePerToken.toFixed(3);
+                            // 불필요한 끝자리 0 제거
+                            formattedPerTokenPrice = parseFloat(formattedPerTokenPrice);
+                          } else {
+                            formattedPerTokenPrice = Math.round(pricePerToken * 100) / 100;
+                          }
+                          break;
+                        default:
+                          formattedPerTokenPrice = Math.round(pricePerToken * 100) / 100;
+                      }
+                      
+                      console.log('DEBUG - Per token calculation:', { 
+                        currency: currentCurrency, 
+                        price: numericPrice, 
+                        amount: numericAmount, 
+                        pricePerToken, 
+                        formattedPerTokenPrice 
+                      });
+                      
+                      return formattedPerTokenPrice > 0 ? t("tokenPurchase.pricing.perToken", { price: formattedPerTokenPrice }) : "";
                     })()}
                   </Text>
                 </View>
