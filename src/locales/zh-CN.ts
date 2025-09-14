@@ -111,6 +111,22 @@ export default {
     subscriptionFailedMessage: "处理订阅时出现问题。请重试。",
     downgradeNotAllowed: "不允许降级",
     downgradeNotAllowedMessage: "不能更改为低级计划。\n\n请取消当前订阅，在到期后重新注册。",
+
+    management: {
+      title: "订阅管理",
+      currentPlan: "当前计划",
+      monthlyFee: "月费",
+      nextBilling: "下次计费日",
+      daysRemaining: "剩余{{days}}天",
+      activeUntil: "即使取消订阅，也可以继续使用当前计划直到{{date}}。",
+      canceledUntil: "订阅已取消，将于{{date}}到期。",
+      cancelButton: "取消订阅",
+      managePayment: "管理支付方式",
+      viewInvoices: "查看账单",
+      cancelPlan: "取消计划",
+      upgradePlan: "升级计划"
+    },
+
     features: {
       dailyTokens10: "每日10个代币",
       tones3: "3种语调风格",
@@ -333,8 +349,14 @@ export default {
     },
     
     sections: {
+      quickTopic: "快速主题选择",
       selectTone: "选择什么语调？",
       selectLength: "写多长？",
+      selectedHashtags: "已选择的标签",
+      polishOptions: "期望的转换方向",
+      photoSelect: "请展示照片！",
+      photoAnalyzing: "正在分析照片...",
+      resultTitle: "完成了！🎉",
       additionalOptions: "附加选项",
       photoUpload: "照片上传",
       result: {
