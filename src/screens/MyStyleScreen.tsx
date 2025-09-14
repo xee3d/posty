@@ -857,37 +857,6 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           </View>
         </View>
 
-        {/* 핵심 키워드 */}
-        <View style={styles.keywordsContainer}>
-          <Text style={styles.sectionLabel}>{t('myStyle.keywords.title')}</Text>
-          <View style={styles.keywordsList}>
-            {stats?.favoriteHashtags
-              ?.slice(0, 5)
-              .map((tag: string, index: number) => (
-                <TouchableOpacity
-                  key={index}
-                  style={[
-                    styles.keywordBadge,
-                    {
-                      backgroundColor: colors.primary + (isDark ? "30" : "20"),
-                      borderWidth: isDark ? 1 : 0,
-                      borderColor: colors.primary + "40",
-                    },
-                  ]}
-                  onPress={() => {
-                    soundManager.playTap();
-                    if (onNavigate) {
-                      onNavigate("ai-write", { hashtags: [tag] });
-                    }
-                  }}
-                >
-            <Text style={[styles.keywordText, { color: colors.primary }]}>
-              {t('myStyle.hashtagPrefix', '#')}{tag}
-            </Text>
-                </TouchableOpacity>
-              ))}
-          </View>
-        </View>
       </View>
 
       {/* AI 인사이트 */}
@@ -1416,29 +1385,12 @@ const createStyles = (
       color: colors.text.secondary,
       marginTop: SPACING.xs,
     },
-    keywordsContainer: {
-      marginTop: SPACING.md,
-    },
     sectionLabel: {
       fontSize: 12,
       fontWeight: "600",
       color: colors.text.tertiary,
       textTransform: "uppercase",
       marginBottom: SPACING.sm,
-    },
-    keywordsList: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: SPACING.sm,
-    },
-    keywordBadge: {
-      paddingHorizontal: SPACING.md,
-      paddingVertical: SPACING.xs,
-      borderRadius: 16,
-    },
-    keywordText: {
-      fontSize: 14,
-      fontWeight: "600",
     },
     insightsSection: {
       marginBottom: SPACING.lg,
