@@ -58,20 +58,6 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
   // 첫 구매 여부 확인 (실제로는 서버에서 가져와야 함)
   const isFirstPurchase = false; // TODO: 실제 첫 구매 여부 체크
   
-  // 현재 언어에 따른 기본 가격 설정
-  const getPriceForLanguage = (krwPrice: number): number => {
-    const lang = i18n.language || 'ko';
-    switch (lang) {
-      case 'zh-CN':
-        return Math.round(krwPrice * 0.054); // KRW to CNY 예시 환율
-      case 'en':
-        return Math.round(krwPrice * 0.00075 * 100) / 100; // KRW to USD 환율
-      case 'ja':
-        return Math.round(krwPrice * 0.11); // KRW to JPY 환율
-      default:
-        return krwPrice; // 한국어는 원래 가격
-    }
-  };
   // 플랜별 보너스 및 할인 적용
   const applyPlanBenefits = (pkg: any) => {
     if (userPlan === "pro") {
@@ -138,8 +124,8 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       id: "30",
       name: t("tokenPurchase.packages.light.name"),
       baseAmount: 30,
-      basePrice: getPriceForLanguage(1900),
-      originalPrice: getPriceForLanguage(2400),
+      basePrice: 1900,
+      originalPrice: 2400,
       baseDiscount: 20, // 기본 20% 할인
       gradient: ["#6366F1", "#4F46E5"], // 인디고 그라데이션
       accentColor: "#8B5CF6",
@@ -151,8 +137,8 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       id: "100",
       name: t("tokenPurchase.packages.bestValue.name"),
       baseAmount: 100,
-      basePrice: getPriceForLanguage(4900),
-      originalPrice: getPriceForLanguage(6500),
+      basePrice: 4900,
+      originalPrice: 6500,
       baseDiscount: 25, // 기본 25% 할인
       gradient: ["#F59E0B", "#DC2626"], // 주황색-빨간색 그라데이션
       accentColor: "#EC4899",
@@ -164,8 +150,8 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       id: "300",
       name: t("tokenPurchase.packages.mega.name"),
       baseAmount: 300,
-      basePrice: getPriceForLanguage(9900),
-      originalPrice: getPriceForLanguage(15000),
+      basePrice: 9900,
+      originalPrice: 15000,
       baseDiscount: 35, // 기본 35% 할인
       gradient: ["#10B981", "#059669"], // 민트 귷린 그라데이션
       accentColor: "#6366F1",
@@ -177,8 +163,8 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
       id: "1000",
       name: t("tokenPurchase.packages.ultra.name"),
       baseAmount: 1000,
-      basePrice: getPriceForLanguage(19900),
-      originalPrice: getPriceForLanguage(40000),
+      basePrice: 19900,
+      originalPrice: 40000,
       baseDiscount: 50, // 기본 50% 할인
       gradient: ["#7C3AED", "#5B21B6"], // 진한 보라색 그라데이션
       accentColor: "#EC4899",

@@ -1,59 +1,17 @@
-import React from "react";
-import { useTranslation } from "react-i18next";
-import TermsOfServiceScreen_EN from "./TermsOfServiceScreen_EN";
-import TermsOfServiceScreen_JA from "./TermsOfServiceScreen_JA";
-import TermsOfServiceScreen_ZH from "./TermsOfServiceScreen_ZH";
-import {
-  View,
-  Text,
-  ScrollView,
-  StyleSheet,
-  SafeAreaView,
-  TouchableOpacity,
-  ActivityIndicator,
-  RefreshControl,
-} from "react-native";
-import { SafeIcon } from "../../utils/SafeIcon";
-import {
-  COLORS,
-  SPACING,
-  FONT_SIZES,
-} from "../../utils/constants";
-import { useAppTheme } from "../../hooks/useAppTheme";
-import { useNotionDocument } from "../../hooks/useNotionDocument";
+import React from 'react';
+import { ScrollView, Text, StyleSheet, SafeAreaView, View, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { useTranslation } from 'react-i18next';
+import { SafeIcon } from '../../utils/SafeIcon';
+import { COLORS, SPACING, FONT_SIZES } from '../../utils/constants';
+import { useAppTheme } from '../../hooks/useAppTheme';
+import { useNotionDocument } from '../../hooks/useNotionDocument';
 
-interface TermsOfServiceScreenProps {
+interface PrivacyPolicyScreenJAProps {
   onBack: () => void;
   onNavigate?: (screen: string) => void;
 }
 
-const TermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({
-  onBack,
-  onNavigate,
-}) => {
-  const { i18n } = useTranslation();
-  
-  // 현재 언어에 따라 적절한 컴포넌트 선택
-  const currentLanguage = i18n.language;
-  console.log('📍 Current language for Terms:', currentLanguage);
-  
-  switch (currentLanguage) {
-    case 'en':
-      return <TermsOfServiceScreen_EN onBack={onBack} onNavigate={onNavigate} />;
-    case 'ja':
-      return <TermsOfServiceScreen_JA onBack={onBack} onNavigate={onNavigate} />;
-    case 'zh':
-    case 'zh-CN':
-      return <TermsOfServiceScreen_ZH onBack={onBack} onNavigate={onNavigate} />;
-    case 'ko':
-    default:
-      // 한국어 또는 기본값은 기존 구현 유지
-      return <KoreanTermsOfServiceScreen onBack={onBack} onNavigate={onNavigate} />;
-  }
-};
-
-// 한국어 버전을 위한 기존 구현
-const KoreanTermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({
+const PrivacyPolicyScreen_JA: React.FC<PrivacyPolicyScreenJAProps> = ({
   onBack,
   onNavigate,
 }) => {
@@ -61,9 +19,9 @@ const KoreanTermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({
   const { t } = useTranslation();
   const styles = createStyles(colors);
   
-  const { document, loading, error, refresh, isNotionEnabled } = useNotionDocument('terms-ko');
+  const { document, loading, error, refresh, isNotionEnabled } = useNotionDocument('privacy-ja');
 
-  const lastUpdated = "2024년 1월 1일";
+  const lastUpdated = "2024年1月1日";
 
   const renderNotionContent = () => {
     if (loading) {
@@ -122,70 +80,35 @@ const KoreanTermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({
 
   const renderFallbackContent = () => (
     <>
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>제1조 (목적)</Text>
-        <Text style={styles.paragraph}>
-          이 약관은 틴로봇스튜디오(Tinrobot Studio)(이하 "회사")가 제공하는 AI 기반 SNS 콘텐츠 생성
-          서비스 "Posty"(이하 "서비스")의 이용조건 및 절차, 회사와 이용자의
-          권리, 의무, 책임사항과 기타 필요한 사항을 규정함을 목적으로 합니다.
-        </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>제2조 (용어의 정의)</Text>
-        <Text style={styles.paragraph}>
-          이 약관에서 사용하는 용어의 정의는 다음과 같습니다:
-        </Text>
-        <Text style={styles.listItem}>
-          1. "서비스"란 회사가 제공하는 AI 기반 SNS 콘텐츠 생성 및 관리 관련
-          제반 서비스를 의미합니다.
-        </Text>
-        <Text style={styles.listItem}>
-          2. "이용자"란 이 약관에 따라 회사가 제공하는 서비스를 이용하는 자를
-          의미합니다.
-        </Text>
-        <Text style={styles.listItem}>
-          3. "콘텐츠"란 이용자가 서비스를 통해 생성, 저장, 공유하는 모든
-          형태의 정보를 의미합니다.
-        </Text>
-        <Text style={styles.listItem}>
-          4. "AI 생성 콘텐츠"란 서비스의 인공지능 기능을 통해 생성된 텍스트,
-          이미지 분석 결과 등을 의미합니다.
-        </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>제3조 (약관의 효력 및 변경)</Text>
-        <Text style={styles.listItem}>
-          1. 이 약관은 서비스를 이용하고자 하는 모든 이용자에게 그 효력이
-          발생합니다.
-        </Text>
-        <Text style={styles.listItem}>
-          2. 회사는 필요한 경우 관련 법령을 위배하지 않는 범위에서 이 약관을
-          변경할 수 있으며, 변경된 약관은 서비스 내 공지사항을 통해
-          공지합니다.
-        </Text>
-        <Text style={styles.listItem}>
-          3. 이용자가 변경된 약관에 동의하지 않는 경우 서비스 이용을 중단하고
-          탈퇴할 수 있습니다.
-        </Text>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>제4조 (서비스의 제공)</Text>
-        <Text style={styles.paragraph}>
-          회사가 제공하는 서비스는 다음과 같습니다:
-        </Text>
-        <Text style={styles.listItem}>1. AI 기반 SNS 콘텐츠 생성 서비스</Text>
-        <Text style={styles.listItem}>
-          2. SNS 트렌드 분석 및 인사이트 제공
-        </Text>
-        <Text style={styles.listItem}>3. 사용자 글쓰기 스타일 분석</Text>
-        <Text style={styles.listItem}>4. SNS 계정 연동 및 게시물 관리</Text>
-        <Text style={styles.listItem}>
-          5. 기타 회사가 추가로 개발하거나 제휴를 통해 제공하는 서비스
-        </Text>
-      </View>
+      <Text style={styles.sectionTitle}>1. 収集する情報</Text>
+      <Text style={styles.paragraph}>
+        当社は、アカウントの作成、サービスの利用、サポートへのお問い合わせの際に
+        お客様が直接提供する情報を収集します。
+      </Text>
+      
+      <Text style={styles.sectionTitle}>2. 情報の使用方法</Text>
+      <Text style={styles.paragraph}>
+        収集した情報は、サービスの提供、維持、改善、取引の処理、
+        お客様とのコミュニケーションのために使用します。
+      </Text>
+      
+      <Text style={styles.sectionTitle}>3. 情報の共有</Text>
+      <Text style={styles.paragraph}>
+        このプライバシーポリシーに記載されている場合を除き、
+        お客様の同意なしに個人情報を第三者に販売、取引、または譲渡することはありません。
+      </Text>
+      
+      <Text style={styles.sectionTitle}>4. データセキュリティ</Text>
+      <Text style={styles.paragraph}>
+        お客様の個人情報を不正アクセス、変更、開示、破壊から保護するため、
+        適切なセキュリティ対策を実装しています。
+      </Text>
+      
+      <Text style={styles.sectionTitle}>5. お問い合わせ</Text>
+      <Text style={styles.paragraph}>
+        このプライバシーポリシーについてご質問がございましたら、
+        support@posty.app までお問い合わせください。
+      </Text>
     </>
   );
 
@@ -196,7 +119,7 @@ const KoreanTermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({
           <SafeIcon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {document?.title || t('documents.termsOfService')}
+          {document?.title || 'プライバシーポリシー'}
         </Text>
         <View style={styles.headerRight}>
           {isNotionEnabled && (
@@ -220,13 +143,13 @@ const KoreanTermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({
         }
       >
         <Text style={styles.lastUpdated}>
-          {t('documents.lastUpdated')}: {document ? new Date(document.lastUpdated).toLocaleDateString('ko-KR') : lastUpdated}
+          最終更新日: {document ? new Date(document.lastUpdated).toLocaleDateString('ja-JP') : lastUpdated}
         </Text>
 
         {isNotionEnabled && document ? (
           <View style={styles.notionBadge}>
             <SafeIcon name="cloud" size={16} color={colors.primary} />
-            <Text style={styles.notionBadgeText}>{t('documents.syncedFromNotion')}</Text>
+            <Text style={styles.notionBadgeText}>Notionから同期</Text>
           </View>
         ) : null}
 
@@ -234,10 +157,10 @@ const KoreanTermsOfServiceScreen: React.FC<TermsOfServiceScreenProps> = ({
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            본 약관은 {document ? new Date(document.lastUpdated).toLocaleDateString('ko-KR') : lastUpdated}부터 시행됩니다.
+            このプライバシーポリシーは{document ? new Date(document.lastUpdated).toLocaleDateString('ja-JP') : lastUpdated}から施行されます。
           </Text>
           <Text style={styles.footerText}>
-            {t('documents.contactEmail')} getposty@gmail.com로 연락해주세요.
+            プライバシーに関するお問い合わせ: getposty@gmail.com
           </Text>
         </View>
 
@@ -386,4 +309,4 @@ const createStyles = (colors: typeof COLORS) =>
     },
   });
 
-export default TermsOfServiceScreen;
+export default PrivacyPolicyScreen_JA;

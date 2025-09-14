@@ -32,6 +32,7 @@ const LIGHT_COLORS = {
     primary: "#1F2937",
     secondary: "#6B7280",
     tertiary: "#8E8E93",
+    inverse: "#FFFFFF",  // White text for colored backgrounds
   },
   // 배경색
   highlight: "#FAF5FF", // Violet-50 (이미지의 연한 보라색 배경)
@@ -72,6 +73,7 @@ const DARK_COLORS = {
     primary: "#FFFFFF", // 순백색
     secondary: "#CBD5E0", // 밝은 회색 (기존보다 밝게)
     tertiary: "#A0AEC0", // 중간 회색 (기존보다 밝게)
+    inverse: "#000000",  // Black text for colored backgrounds
   },
 
   highlight: "#1A1A1A", // 매우 어두운 회색 (특별 카드 배경)

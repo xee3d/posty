@@ -61,7 +61,7 @@ const KoreanPrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({
   const { t } = useTranslation();
   const styles = createStyles(colors);
   
-  const { document, loading, error, refresh, isNotionEnabled } = useNotionDocument('privacy');
+  const { document, loading, error, refresh, isNotionEnabled } = useNotionDocument('privacy-ko');
 
   const lastUpdated = "2024년 1월 1일";
 

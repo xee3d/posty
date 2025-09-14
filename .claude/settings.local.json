@@ -67,7 +67,8 @@
       "Bash(echo:*)",
       "Bash(expo start:*)",
       "mcp__playwright__browser_navigate",
-      "Bash(sed:*)"
+      "Bash(sed:*)",
+      "WebFetch(domain:www.notion.so)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

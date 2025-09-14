@@ -39,7 +39,6 @@ import vercelAuthService from "../services/auth/vercelAuthService";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
 import { resetUser } from "../store/slices/userSlice";
 import {
-  UserGuideScreen,
   TermsOfServiceScreen,
   PrivacyPolicyScreen,
   ContactScreen,
@@ -107,7 +106,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
     Record<string, boolean>
   >({});
   const [subscriptionPlan, setSubscriptionPlan] = useState("free");
-  const [showUserGuide, setShowUserGuide] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showContact, setShowContact] = useState(false);
@@ -591,9 +589,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
     ]);
   };
 
-  const handleOpenHelp = () => {
-    setShowUserGuide(true);
-  };
 
   const handleRateApp = () => {
     Alert.alert(t('alerts.rating.title'), t('alerts.rating.message'), [
@@ -848,11 +843,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
     //   onPress: () => setShowTrendSettings(true),
     // },
     {
-      icon: "help-circle-outline",
-      label: t('settings.userGuide'),
-      onPress: handleOpenHelp,
-    },
-    {
       icon: "mail-outline",
       label: t('settings.contact'),
       onPress: () => setShowContact(true),
@@ -873,18 +863,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const styles = useMemo(() => createStyles(colors, cardTheme), [colors, cardTheme]);
   const headerStyles = createHeaderStyles(colors);
 
-  // 문서 화면들 렌더링
-  if (showUserGuide) {
-    return (
-      <UserGuideScreen
-        onBack={() => setShowUserGuide(false)}
-        onContact={() => {
-          setShowUserGuide(false);
-          setShowContact(true);
-        }}
-      />
-    );
-  }
 
   if (showTerms) {
     return (
