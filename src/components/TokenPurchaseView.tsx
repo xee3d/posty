@@ -374,58 +374,6 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                   )}
                 </View>
 
-                <View style={styles.unitPriceWrapper}>
-                  <Icon
-                    name="info-outline"
-                    size={14}
-                    color="#FFFFFF"
-                  />
-                  <Text style={styles.unitPriceText}>
-                    {(() => {
-                      const numericPrice = Number(pkg.price) || 0;
-                      const numericAmount = Number(pkg.amount) || 1;
-                      
-                      if (numericPrice <= 0 || numericAmount <= 0) {
-                        console.log('DEBUG - Invalid price or amount:', { price: pkg.price, amount: pkg.amount });
-                        return "";
-                      }
-                      
-                      const pricePerToken = numericPrice / numericAmount;
-                      
-                      // 통화별로 적절한 형식 적용
-                      let formattedPerTokenPrice;
-                      switch (currentCurrency) {
-                        case 'KRW':
-                        case 'JPY':
-                          formattedPerTokenPrice = Math.round(pricePerToken);
-                          break;
-                        case 'USD':
-                        case 'CNY':
-                          // 소수점 처리 - 0.01 미만이면 3자리까지, 그렇지 않으면 2자리
-                          if (pricePerToken < 0.01) {
-                            formattedPerTokenPrice = pricePerToken.toFixed(3);
-                            // 불필요한 끝자리 0 제거
-                            formattedPerTokenPrice = parseFloat(formattedPerTokenPrice);
-                          } else {
-                            formattedPerTokenPrice = Math.round(pricePerToken * 100) / 100;
-                          }
-                          break;
-                        default:
-                          formattedPerTokenPrice = Math.round(pricePerToken * 100) / 100;
-                      }
-                      
-                      console.log('DEBUG - Per token calculation:', { 
-                        currency: currentCurrency, 
-                        price: numericPrice, 
-                        amount: numericAmount, 
-                        pricePerToken, 
-                        formattedPerTokenPrice 
-                      });
-                      
-                      return formattedPerTokenPrice > 0 ? t("tokenPurchase.pricing.perToken", { price: formattedPerTokenPrice }) : "";
-                    })()}
-                  </Text>
-                </View>
 
                 <LinearGradient
                   colors={["rgba(255,255,255,0.3)", "rgba(255,255,255,0.2)"]}
@@ -822,7 +770,7 @@ const createStyles = (colors: any, isDark: boolean) =>
     },
     trustSection: {
       flexDirection: "row",
-      justifyContent: "center",
+      justifyContent: "space-between",
       alignItems: "center",
       marginTop: 48,
       marginHorizontal: 24,
@@ -832,18 +780,23 @@ const createStyles = (colors: any, isDark: boolean) =>
     trustBadge: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 8,
+      gap: 6,
+      flex: 1,
+      maxWidth: "28%",
     },
     trustDivider: {
       width: 1,
-      height: 20,
+      height: 16,
       backgroundColor: colors.border,
-      marginHorizontal: 16,
+      marginHorizontal: 12,
     },
     trustText: {
-      fontSize: 13,
+      fontSize: 11,
       fontWeight: "600",
       color: colors.text.secondary,
+      textAlign: "center",
+      lineHeight: 14,
+      letterSpacing: 0.3,
     },
     bottomSpace: {
       height: 40,

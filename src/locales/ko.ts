@@ -971,7 +971,7 @@ export default {
       rate: "평가하기",
       error: "평가 페이지를 열 수 없습니다"
     },
-    tokens: {
+    tokenAlerts: {
       dailyLimitExceeded: {
         title: "일일 한도 초과",
         message: "일일 획득 가능한 토큰 한도({{limit}}개)를 초과했습니다"
@@ -1314,7 +1314,8 @@ export default {
     alreadyShared: "오늘은 이미 SNS 공유를 했어요!",
     alreadyRated: "이미 앱을 평가해주셨어요. 감사합니다!",
     title: "구독 플랜",
-    tokenPurchase: "토큰 구매", 
+    tokenPurchase: "토큰 구매",
+    tokenPurchaseTab: "토큰 구매",
     freeTokens: "무료 토큰",
     popular: "인기",
     perMonth: "/월",
@@ -1625,6 +1626,7 @@ export default {
     count: "{{count}}개",
     current: "보유 토큰",
     unlimited: "무제한",
+    label: "토큰",
     noTokens: "토큰이 부족해요",
     earnTokens: "무료 토큰 받기",
     subscribe: "토큰이 부족해요. 구독하시겠어요?",
@@ -1684,7 +1686,7 @@ export default {
       trust: {
         securePayment: "안전한 결제",
         instantRefund: "즉시 환불",
-        support247: "24/7 지원"
+        support247: "24시간 지원"
       }
     },
     packages: {

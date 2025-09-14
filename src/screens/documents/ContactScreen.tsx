@@ -22,6 +22,7 @@ import {
 } from "../../utils/constants";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import Clipboard from "@react-native-clipboard/clipboard";
+import { useTranslation } from "react-i18next";
 
 import { Alert } from "../../utils/customAlert";
 interface ContactScreenProps {
@@ -34,6 +35,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
   onNavigate,
 }) => {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
@@ -42,15 +44,15 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
   const styles = createStyles(colors);
 
   const categories = [
-    { id: "bug", label: "버그 신고", icon: "bug" },
-    { id: "feature", label: "기능 제안", icon: "bulb" },
-    { id: "payment", label: "결제 문의", icon: "card" },
-    { id: "other", label: "기타 문의", icon: "help-circle" },
+    { id: "bug", label: t("contact.form.categories.bug"), icon: "bug" },
+    { id: "feature", label: t("contact.form.categories.feature"), icon: "bulb" },
+    { id: "payment", label: t("contact.form.categories.payment"), icon: "card" },
+    { id: "other", label: t("contact.form.categories.other"), icon: "help-circle" },
   ];
 
   const handleCopyEmail = () => {
     Clipboard.setString("getposty@gmail.com");
-    Alert.alert("복사 완료", "getposty@gmail.com이 클립보드에 복사되었어요!");
+    Alert.alert(t("contact.alerts.copySuccess.title"), t("contact.alerts.copySuccess.message"));
   };
 
   const handleOpenEmail = async () => {
@@ -84,11 +86,11 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
     } catch (error) {
       console.error("All email opening methods failed:", error);
       Alert.alert(
-        "이메일 앱을 열 수 없어요",
-        "getposty@gmail.com 주소를 복사해서 직접 이메일을 보내주세요.",
+        t("contact.alerts.emailOpenFailed.title"),
+        t("contact.alerts.emailOpenFailed.message"),
         [
-          { text: "취소", style: "cancel" },
-          { text: "이메일 복사", onPress: handleCopyEmail },
+          { text: t("contact.alerts.emailOpenFailed.actions.cancel"), style: "cancel" },
+          { text: t("contact.alerts.emailOpenFailed.actions.copy"), onPress: handleCopyEmail },
         ]
       );
     }
@@ -96,7 +98,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
 
   const handleSubmit = async () => {
     if (!subject.trim() || !message.trim() || !selectedCategory) {
-      Alert.alert("알림", "모든 필드를 입력해주세요.");
+      Alert.alert(t("contact.alerts.allFieldsRequired.title"), t("contact.alerts.allFieldsRequired.message"));
       return;
     }
 
@@ -131,18 +133,18 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
 
         // 사용자에게 수동으로 내용 입력하라고 알림
         Alert.alert(
-          "이메일 앱이 열렸습니다",
-          `제목: [${categoryLabel}] ${subject}\n\n${message}\n\n위 내용을 복사해서 이메일에 붙여넣어 주세요.`,
+          t("contact.alerts.emailOpened.title"),
+          t("contact.alerts.emailOpened.message", { category: categoryLabel, subject, content: message }),
           [
             {
-              text: "내용 복사",
+              text: t("contact.alerts.emailOpened.actions.copyContent"),
               onPress: () => {
                 const emailContent = `제목: [${categoryLabel}] ${subject}\n\n${message}`;
                 Clipboard.setString(emailContent);
-                Alert.alert("복사됨", "이메일 내용이 복사되었습니다.");
+                Alert.alert(t("contact.alerts.contentCopied.title"), t("contact.alerts.contentCopied.message"));
               },
             },
-            { text: "확인" },
+            { text: t("contact.alerts.emailOpened.actions.confirm") },
           ]
         );
       }
@@ -150,19 +152,19 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
       console.error("All email methods failed:", error);
       // 모든 방법이 실패하면 복사 옵션 제공
       Alert.alert(
-        "이메일 앱을 열 수 없어요",
-        "이메일 주소와 내용을 복사해서 직접 보내주세요.",
+        t("contact.alerts.emailOpenFailed.title"),
+        t("contact.alerts.emailOpenFailed.message"),
         [
-          { text: "취소", style: "cancel" },
+          { text: t("contact.alerts.emailOpenFailed.actions.cancel"), style: "cancel" },
           {
-            text: "내용 복사",
+            text: t("contact.alerts.fullContentCopy.action"),
             onPress: () => {
               const categoryLabel =
                 categories.find((c) => c.id === selectedCategory)?.label ||
                 "문의";
               const emailContent = `받는 사람: getposty@gmail.com\n제목: [${categoryLabel}] ${subject}\n\n${message}`;
               Clipboard.setString(emailContent);
-              Alert.alert("복사됨", "이메일 정보가 모두 복사되었습니다.");
+              Alert.alert(t("contact.alerts.fullContentCopy.title"), t("contact.alerts.fullContentCopy.message"));
             },
           },
         ]
@@ -181,7 +183,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
           <TouchableOpacity onPress={onBack} style={styles.backButton}>
             <SafeIcon name="chevron-back" size={24} color={colors.text.primary} />
           </TouchableOpacity>
-          <Text style={styles.headerTitle}>문의하기</Text>
+          <Text style={styles.headerTitle}>{t("contact.title")}</Text>
           <View style={styles.placeholder} />
         </View>
 
@@ -195,7 +197,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
           <View style={styles.emailCard}>
             <View style={styles.emailHeader}>
               <SafeIcon name="mail" size={24} color={colors.primary} />
-              <Text style={styles.emailTitle}>이메일로 문의하기</Text>
+              <Text style={styles.emailTitle}>{t("contact.form.emailTitle")}</Text>
             </View>
             <Text style={styles.emailAddress}>getposty@gmail.com</Text>
             <View style={styles.emailActions}>
@@ -204,7 +206,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
                 onPress={handleCopyEmail}
               >
                 <SafeIcon name="copy-outline" size={18} color={colors.primary} />
-                <Text style={styles.emailButtonText}>복사</Text>
+                <Text style={styles.emailButtonText}>{t("contact.form.copy")}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.emailButton, styles.emailButtonPrimary]}
@@ -217,7 +219,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
                     styles.emailButtonTextPrimary,
                   ]}
                 >
-                  이메일 앱 열기
+                  {t("contact.form.openEmail")}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -225,9 +227,9 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
 
           {/* 빠른 문의 양식 */}
           <View style={styles.formSection}>
-            <Text style={styles.formTitle}>빠른 문의</Text>
+            <Text style={styles.formTitle}>{t("contact.form.quickInquiry")}</Text>
             <Text style={styles.formSubtitle}>
-              아래 양식을 작성하면 이메일 앱에서 바로 보낼 수 있어요
+              {t("contact.form.quickInquiryDesc")}
             </Text>
 
             {/* 카테고리 선택 */}
@@ -266,24 +268,24 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
 
             {/* 제목 입력 */}
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>제목</Text>
+              <Text style={styles.inputLabel}>{t("contact.form.subject")}</Text>
               <TextInput
                 style={styles.input}
                 value={subject}
                 onChangeText={setSubject}
-                placeholder="문의 제목을 입력해주세요"
+                placeholder={t("contact.form.subjectPlaceholder")}
                 placeholderTextColor={colors.text.tertiary}
               />
             </View>
 
             {/* 내용 입력 */}
             <View style={styles.inputGroup}>
-              <Text style={styles.inputLabel}>내용</Text>
+              <Text style={styles.inputLabel}>{t("contact.form.message")}</Text>
               <TextInput
                 style={[styles.input, styles.textArea]}
                 value={message}
                 onChangeText={setMessage}
-                placeholder="자세한 내용을 입력해주세요"
+                placeholder={t("contact.form.messagePlaceholder")}
                 placeholderTextColor={colors.text.tertiary}
                 multiline
                 numberOfLines={6}
@@ -296,7 +298,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
               style={styles.submitButton}
               onPress={handleSubmit}
             >
-              <Text style={styles.submitButtonText}>이메일로 보내기</Text>
+              <Text style={styles.submitButtonText}>{t("contact.form.sendEmail")}</Text>
               <SafeIcon name="send" size={18} color={colors.white} />
             </TouchableOpacity>
           </View>
@@ -310,7 +312,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
                 color={colors.text.secondary}
               />
               <Text style={styles.infoText}>
-                평일 기준 24시간 이내 답변드려요
+                {t("contact.form.responseTime")}
               </Text>
             </View>
             <View style={styles.infoItem}>
@@ -319,7 +321,7 @@ const ContactScreen: React.FC<ContactScreenProps> = ({
                 size={20}
                 color={colors.text.secondary}
               />
-              <Text style={styles.infoText}>한국어와 영어로 문의 가능해요</Text>
+              <Text style={styles.infoText}>{t("contact.form.languages")}</Text>
             </View>
           </View>
 

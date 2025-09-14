@@ -22,7 +22,8 @@ export default {
     continue: "続行する",
     finish: "終了する",
     start: "開始する",
-    stop: "停止する"
+    stop: "停止する",
+    purchase: "購入する"
   },
 
   // 文書
@@ -53,6 +54,7 @@ export default {
     alreadyRated: "すでにアプリを評価いただき、ありがとうございます！",
     title: "購読プラン",
     tokenPurchase: "トークン購入",
+    tokenPurchaseTab: "トークン購入",
     freeTokens: "無料トークン",
     popular: "人気",
     perMonth: "/月",
@@ -135,7 +137,12 @@ export default {
     management: {
       title: "サブスクリプション管理",
       currentPlan: "現在のプラン",
+      monthlyFee: "月額料金",
       nextBilling: "次回請求日",
+      daysRemaining: "残り{{days}}日",
+      activeUntil: "解約されても{{date}}まで現在のプランを継続してご利用いただけます。",
+      canceledUntil: "サブスクリプションが解約されており、{{date}}に終了いたします。",
+      cancelButton: "サブスクリプション解約",
       managePayment: "支払い方法を管理する",
       viewInvoices: "請求書を表示する",
       cancelPlan: "プランを解除する",
@@ -143,26 +150,33 @@ export default {
     },
     earnTokensSection: {
       title: "無料でトークンを獲得しましょう",
-      dailyCheckin: {
-        title: "毎日チェックイン",
-        description: "毎日ログインして{{tokens}}トークンを獲得できます",
-        button: "チェックインする ({{tokens}}トークン)"
-      },
+      subtitle: "様々な活動で無料トークンを獲得しましょう",
+      currentTokens: "現在{{tokens}}個のトークンを保有しています",
       watchAd: {
         title: "広告視聴",
-        description: "短い広告をご視聴いただくと{{tokens}}トークンを獲得できます",
-        button: "広告を見る ({{tokens}}トークン)"
+        description: "+2トークン (残り{{remaining}}/{{limit}}回)"
       },
-      shareApp: {
-        title: "アプリ共有",
-        description: "ご友人にアプリをご紹介いただくと{{tokens}}トークンを獲得できます",
-        button: "共有する ({{tokens}}トークン)"
+      dailyCheckin: {
+        title: "毎日チェックイン",
+        description: "+1トークン (本日利用可能)"
       },
-      reviewApp: {
-        title: "アプリレビュー",
-        description: "App Storeでレビューをいただくと{{tokens}}トークンを獲得できます",
-        button: "レビューする ({{tokens}}トークン)"
-      }
+      socialShare: {
+        title: "SNS共有",
+        description: "+3トークン (残り1/1回)"
+      },
+      inviteFriend: {
+        title: "友達招待",
+        description: "+5トークン (友達一人当たり)"
+      },
+      rateApp: {
+        title: "アプリ評価",
+        description: "+10トークン (一回限り)"
+      },
+      dailyMission: {
+        title: "ミッション完了",
+        description: "+3トークン (デイリーミッション)"
+      },
+      autoRefill: "無料プランユーザーは毎日深夜0時に10個のトークンが自動補充されます"
     },
     alerts: {
       adWatch: {
@@ -512,7 +526,7 @@ export default {
       insufficientTokens: "トークンが不足しています"
     },
     
-    tokens: {
+    tokenUsage: {
       remaining: "残りトークン: {{count}}個",
       used: "使用トークン: {{count}}個",
       required: "必要トークン: {{count}}個",
@@ -830,6 +844,7 @@ export default {
     count: "{{count}}個",
     current: "保有トークン",
     unlimited: "無制限",
+    label: "トークン",
     usage: {
       today: "今日 {{count}}個使用",
     },
@@ -1197,7 +1212,7 @@ export default {
       rate: "評価する",
       error: "評価ページを開くことができません"
     },
-    tokens: {
+    tokenAlerts: {
       dailyLimitExceeded: {
         title: "日次制限を超過しました",
         message: "日次トークン制限({{limit}})を超過されました"
@@ -1270,12 +1285,35 @@ export default {
       jpy: "¥",
       cny: "¥"
     },
+    maxPlanNotice: "MAXプランご利用のお客様へ",
+    maxPlanNoticeDesc: "無制限でトークンをご利用いただけるため、追加購入の必要はございません",
     sections: {
+      advantages: "トークン購入のメリット",
+      bulkDiscount: "まとめ購入特典",
+      bulkDiscountDesc: "最大50%基本割引 + プラン別追加割引",
+      flexibleUse: "柔軟な利用",
+      flexibleUseDesc: "必要な時だけ購入 サブスクの負担なし",
+      permanentOwnership: "永久保有",
+      permanentOwnershipDesc: "購入したトークンは期限なしで永続的に使用可能",
+      planBenefits: "プラン特典",
+      planBenefitsDesc: "サブスクリプションプラン別ボーナストークン提供",
+      comparison: "トークン購入 vs サブスクリプションプラン",
+      whenToPurchase: "どのような場合にトークン購入がお得ですか？",
+      whenToPurchaseDesc: "• 不定期にご利用される方 • 特定プロジェクトで集中的にご利用される方 • サブスクの負担なく必要な時だけご利用されたい方",
+      subscriptionAdvantages: "サブスクリプションプランのメリット",
+      subscriptionAdvantagesDesc: "• STARTER: {{starterPrice}}で合計600個 (初回300 + 毎日10) • PREMIUM: {{premiumPrice}}で合計1,100個 (初回500 + 毎日20) • 広告削除 + 高級機能利用可能",
+      trust: {
+        securePayment: "安全な決済",
+        instantRefund: "即時返金",
+        support247: "24/7サポート"
+      },
       planBenefit: "プラン特典",
       planBenefitDesc: "{{bonusRate}}%ボーナストークン",
       planDiscountDesc: "{{discount}}%割引",
       firstPurchase: "初回購入特別割引",
       firstPurchaseDesc: "初回購入時{{discount}}%特別割引",
+      maxPlanNotice: "MAXプランご利用中",
+      maxPlanNoticeDesc: "無制限トークンをご利用いただけるため追加購入は不要です",
       bonusTokens: "ボーナストークン",
       bonusTokensDesc: "追加{{bonusTokens}}個ボーナス",
       mostPopular: "一番人気",
@@ -1819,7 +1857,8 @@ export default {
       },
       fullContentCopy: {
         title: "コピーされました",
-        message: "メール情報がすべてコピーされました。"
+        message: "メール情報がすべてコピーされました。",
+        action: "内容をコピー"
       }
     }
   },

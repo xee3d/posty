@@ -516,7 +516,8 @@ export default {
     alreadyShared: "You've already shared on social media today!",
     alreadyRated: "You've already rated the app. Thank you!",
     title: "Subscription Plans",
-    tokenPurchase: "Token Purchase", 
+    tokenPurchase: "Token Purchase",
+    tokenPurchaseTab: "Token Purchase", 
     freeTokens: "Free Tokens",
     popular: "Popular",
     perMonth: "/month",
@@ -1200,7 +1201,7 @@ export default {
       rate: "Rate",
       error: "Cannot open rating page"
     },
-    tokens: {
+    tokenAlerts: {
       dailyLimitExceeded: {
         title: "Daily Limit Exceeded",
         message: "Daily token limit ({{limit}}) exceeded"
@@ -1367,6 +1368,7 @@ export default {
     loading: "Loading...",
     later: "Later",
     confirm: "Confirm",
+    purchase: "Purchase",
     categories: {
       all: "All",
       casual: "Casual",
@@ -1664,6 +1666,7 @@ export default {
     count: "{{count}}",
     current: "Current Tokens",
     unlimited: "Unlimited",
+    label: "tokens",
     usage: {
       today: "Used {{count}} today",
     },
@@ -1700,24 +1703,24 @@ export default {
       firstPurchaseDesc: "Additional 30% discount for purchases of 30 or more tokens!",
       maxPlanNotice: "MAX Plan Active",
       maxPlanNoticeDesc: "You have unlimited tokens, so no additional purchase needed",
-      advantages: "Benefits of Token Purchase",
-      bulkDiscount: "Bulk Purchase Benefits",
-      bulkDiscountDesc: "Up to 50% basic discount + additional plan discount",
-      flexibleUse: "Flexible Usage",
-      flexibleUseDesc: "Purchase only when needed, no subscription burden",
-      permanentOwnership: "Permanent Ownership",
-      permanentOwnershipDesc: "Purchased tokens are yours forever without expiration",
-      planBenefits: "Plan Benefits",
-      planBenefitsDesc: "Bonus tokens provided according to subscription plan",
-      comparison: "Token Purchase vs Subscription Plans",
-      whenToPurchase: "When is token purchase good?",
-      whenToPurchaseDesc: "• For irregular users • For intensive project-based usage • Want to use only when needed without subscription burden",
-      subscriptionAdvantages: "Subscription Plan Advantages",
-      subscriptionAdvantagesDesc: "• STARTER: {{starterPrice}} for total 600 tokens (300 initial + 10 daily) • PREMIUM: {{premiumPrice}} for total 1,100 tokens (500 initial + 20 daily) • Ad removal + premium features available",
+      advantages: "Token Purchase",
+      bulkDiscount: "Bulk Benefits",
+      bulkDiscountDesc: "Up to 50% off + plan discounts",
+      flexibleUse: "Flexible Use",
+      flexibleUseDesc: "Buy when needed, no subscription",
+      permanentOwnership: "Keep Forever",
+      permanentOwnershipDesc: "No expiration on purchased tokens",
+      planBenefits: "Plan Perks",
+      planBenefitsDesc: "Extra tokens with subscription",
+      comparison: "Tokens vs Subscriptions",
+      whenToPurchase: "Best for occasional users",
+      whenToPurchaseDesc: "• Irregular usage • Project-based work • No subscription commitment",
+      subscriptionAdvantages: "Subscription Benefits",
+      subscriptionAdvantagesDesc: "• STARTER: {{starterPrice}} = 600 tokens • PREMIUM: {{premiumPrice}} = 1,100 tokens • Ad-free + premium features",
       trust: {
-        securePayment: "Secure Payment",
-        instantRefund: "Instant Refund",
-        support247: "24/7 Support"
+        securePayment: "Secure",
+        instantRefund: "Refunds",
+        support247: "24/7"
       }
     },
     packages: {

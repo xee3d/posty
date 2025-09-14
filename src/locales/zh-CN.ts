@@ -87,6 +87,7 @@ export default {
     alreadyShared: "今天已经分享过SNS了！",
     alreadyRated: "已经评价过应用了。谢谢！",
     tokenPurchase: "代币购买",
+    tokenPurchaseTab: "代币购买",
     freeTokens: "免费代币",
     
     earnTokens: "获得代币！🎉",
@@ -552,7 +553,7 @@ export default {
     
     writingInStyle: "正在用风格写作",
     
-    tokens: {
+    tokenUsage: {
       remaining: "剩余代币: {{count}}",
       used: "已用代币: {{count}}",
       required: "需要代币: {{count}}",
@@ -1221,7 +1222,7 @@ export default {
       rate: "评价",
       error: "无法打开评价页面"
     },
-    tokens: {
+    tokenAlerts: {
       dailyLimitExceeded: {
         title: "每日限制超出",
         message: "每日代币限制({{limit}})已超出"
@@ -1313,6 +1314,25 @@ export default {
       cny: "¥"
     },
     sections: {
+      advantages: "代币购买优势",
+      bulkDiscount: "批量购买优惠",
+      bulkDiscountDesc: "最高50%基础折扣 + 套餐额外折扣",
+      flexibleUse: "灵活使用",
+      flexibleUseDesc: "需要时购买 无订阅负担",
+      permanentOwnership: "永久拥有",
+      permanentOwnershipDesc: "购买的代币无期限永久使用",
+      planBenefits: "套餐特权",
+      planBenefitsDesc: "订阅套餐专属奖励代币",
+      comparison: "代币购买 vs 订阅套餐",
+      whenToPurchase: "什么时候代币购买更划算？",
+      whenToPurchaseDesc: "• 不定期使用者 • 特定项目集中使用者 • 无订阅负担按需使用者",
+      subscriptionAdvantages: "订阅套餐优势",
+      subscriptionAdvantagesDesc: "• STARTER：{{starterPrice}}共600个（初次300 + 每日10） • PREMIUM：{{premiumPrice}}共1,100个（初次500 + 每日20） • 去广告 + 高级功能",
+      trust: {
+        securePayment: "安全支付",
+        instantRefund: "即时退款",
+        support247: "24/7客服"
+      },
       planBenefit: "套餐特权",
       planBenefitDesc: "{{bonusRate}}% 奖励代币",
       planDiscountDesc: "{{discount}}% 折扣",
@@ -1333,6 +1353,8 @@ export default {
       limitedOfferDesc: "特价提供",
       upgradeNow: "立即升级",
       freeTokens: "免费代币",
+      maxPlanNotice: "MAX套餐使用中",
+      maxPlanNoticeDesc: "您正在使用无限代币服务，无需额外购买",
       purchaseTokens: "购买代币",
       tokenPackages: "代币套餐",
       selectPackage: "选择套餐",
