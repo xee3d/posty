@@ -1244,7 +1244,7 @@ export default {
       price: "¥{{price:number}}",
       originalPrice: "¥{{price:number}}",
       discount: "{{percent}}%オフ",
-      perToken: "1個あたり¥{{price:number}}"
+      perToken: "1個あたり¥{{price}}"
     },
     alerts: {
       maxPlanTitle: "MAXプランをご利用中",
@@ -1256,6 +1256,33 @@ export default {
       usd: "$",
       jpy: "¥",
       cny: "¥"
+    },
+    sections: {
+      planBenefit: "プラン特典",
+      planBenefitDesc: "{{bonusRate}}%ボーナストークン",
+      planDiscountDesc: "{{discount}}%割引",
+      firstPurchase: "初回購入特別割引",
+      firstPurchaseDesc: "初回購入時{{discount}}%特別割引",
+      bonusTokens: "ボーナストークン",
+      bonusTokensDesc: "追加{{bonusTokens}}個ボーナス",
+      mostPopular: "一番人気",
+      bestValue: "最高の価値",
+      unlimited: "無制限",
+      recommended: "おすすめ",
+      save: "{{percent}}%お得",
+      daily: "毎日",
+      monthly: "毎月",
+      dailyTokens: "毎日{{count}}個のトークン",
+      monthlyTokens: "毎月{{count}}個のトークン",
+      limitedOffer: "期間限定",
+      limitedOfferDesc: "特別価格でのご提供",
+      upgradeNow: "今すぐアップグレード",
+      freeTokens: "無料トークン",
+      purchaseTokens: "トークン購入",
+      tokenPackages: "トークンパッケージ",
+      selectPackage: "パッケージを選択",
+      confirmPurchase: "購入確認",
+      processingPayment: "決済処理中"
     }
   },
 

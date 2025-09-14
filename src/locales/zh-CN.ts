@@ -1298,6 +1298,33 @@ export default {
       usd: "$",
       jpy: "¥",
       cny: "¥"
+    },
+    sections: {
+      planBenefit: "套餐特权",
+      planBenefitDesc: "{{bonusRate}}% 奖励代币",
+      planDiscountDesc: "{{discount}}% 折扣",
+      firstPurchase: "首次购买特别优惠",
+      firstPurchaseDesc: "首次购买享受{{discount}}%特别折扣",
+      bonusTokens: "奖励代币",
+      bonusTokensDesc: "额外{{bonusTokens}}个奖励",
+      mostPopular: "最受欢迎",
+      bestValue: "最优价值",
+      unlimited: "无限制",
+      recommended: "推荐",
+      save: "节省{{percent}}%",
+      daily: "每日",
+      monthly: "每月",
+      dailyTokens: "每日{{count}}个代币",
+      monthlyTokens: "每月{{count}}个代币",
+      limitedOffer: "限时优惠",
+      limitedOfferDesc: "特价提供",
+      upgradeNow: "立即升级",
+      freeTokens: "免费代币",
+      purchaseTokens: "购买代币",
+      tokenPackages: "代币套餐",
+      selectPackage: "选择套餐",
+      confirmPurchase: "确认购买",
+      processingPayment: "正在处理付款"
     }
   },
 

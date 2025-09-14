@@ -241,10 +241,10 @@ export const SUBSCRIPTION_PLANS = {
     dailyTokens: 10,
     monthlyTokens: 0,
     features: [
-      "일일 10개 토큰",
-      "3가지 톤 스타일",
-      "짧은/중간 길이",
-      "광고 포함",
+      "subscription.features.dailyTokens10",
+      "subscription.features.tones3",
+      "subscription.features.lengthShortMedium",
+      "subscription.features.hasAds",
     ],
   },
   starter: {
@@ -257,12 +257,12 @@ export const SUBSCRIPTION_PLANS = {
     dailyTokens: -1, // 일일 제한 없음
     monthlyTokens: 600, // 월 총 600개
     features: [
-      "가입 시 300개 토큰 즉시 지급",
-      "매일 10개씩 추가 충전",
-      "4가지 톤 스타일",
-      "긴 글 작성 가능",
-      "광고 제거",
-      "MyStyle 분석",
+      "subscription.features.signup300",
+      "subscription.features.daily10",
+      "subscription.features.tones4",
+      "subscription.features.longLength",
+      "subscription.features.noAds",
+      "subscription.features.myStyleAnalysis",
     ],
   },
   premium: {
@@ -275,14 +275,14 @@ export const SUBSCRIPTION_PLANS = {
     dailyTokens: -1, // 일일 제한 없음
     monthlyTokens: 1100, // 월 총 1100개
     features: [
-      "가입 시 500개 토큰 즉시 지급",
-      "매일 20개씩 추가 충전",
-      "6가지 톤 스타일",
-      "모든 글 길이",
-      "광고 제거",
-      "MyStyle 분석",
-      "빠른 이미지 분석",
-      "GPT-4 모델",
+      "subscription.features.signup500",
+      "subscription.features.daily20",
+      "subscription.features.tones6",
+      "subscription.features.allLengths",
+      "subscription.features.noAds",
+      "subscription.features.myStyleAnalysis",
+      "subscription.features.fastImageAnalysis",
+      "subscription.features.gpt4Model",
     ],
   },
   pro: {
@@ -295,15 +295,15 @@ export const SUBSCRIPTION_PLANS = {
     dailyTokens: -1, // 무제한
     monthlyTokens: -1, // 무제한
     features: [
-      "무제한 토큰",
-      "모든 톤 스타일",
-      "모든 글 길이",
-      "광고 제거",
-      "MyStyle 분석",
-      "즉시 이미지 분석",
-      "GPT-4 Turbo",
-      "API 액세스",
-      "우선 지원",
+      "subscription.features.unlimitedTokens",
+      "subscription.features.allTones",
+      "subscription.features.allLengths",
+      "subscription.features.noAds",
+      "subscription.features.myStyleAnalysis",
+      "subscription.features.instantImageAnalysis",
+      "subscription.features.gpt4TurboModel",
+      "subscription.features.apiAccess",
+      "subscription.features.prioritySupport",
     ],
   },
 };

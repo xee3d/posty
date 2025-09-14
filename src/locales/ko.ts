@@ -1506,6 +1506,31 @@ export default {
         ],
       },
     },
+    // 플랜별 기능 번역 키
+    features: {
+      dailyTokens10: "일일 10개 토큰",
+      tones3: "3가지 톤 스타일",
+      lengthShortMedium: "짧은/중간 길이",
+      hasAds: "광고 포함",
+      signup300: "가입 시 300개 토큰 즉시 지급",
+      daily10: "매일 10개씩 추가 충전",
+      tones4: "4가지 톤 스타일",
+      longLength: "긴 글 작성 가능",
+      noAds: "광고 제거",
+      myStyleAnalysis: "MyStyle 분석",
+      signup500: "가입 시 500개 토큰 즉시 지급",
+      daily20: "매일 20개씩 추가 충전",
+      tones6: "6가지 톤 스타일",
+      allLengths: "모든 글 길이",
+      fastImageAnalysis: "빠른 이미지 분석",
+      gpt4Model: "GPT-4 모델",
+      unlimitedTokens: "무제한 토큰",
+      allTones: "모든 톤 스타일",
+      instantImageAnalysis: "즉시 이미지 분석",
+      gpt4TurboModel: "GPT-4 Turbo",
+      apiAccess: "API 액세스",
+      prioritySupport: "우선 지원",
+    },
   },
 
   // Time and Date
@@ -1634,6 +1659,34 @@ export default {
   // 토큰 구매
   tokenPurchase: {
     title: "토큰 구매",
+    sections: {
+      planBenefit: "플랜 혜택",
+      planBenefitDesc: "{{bonusRate}}% 보너스 토큰",
+      planDiscountDesc: "{{discount}}% 할인",
+      firstPurchase: "첫 구매 특별 혜택",
+      firstPurchaseDesc: "30개 이상 구매 시 추가 30% 할인!",
+      maxPlanNotice: "MAX 플랜 사용 중",
+      maxPlanNoticeDesc: "무제한 토큰을 사용하실 수 있어 추가 구매가 필요하지 않습니다",
+      advantages: "토큰 구매의 장점",
+      bulkDiscount: "대량 구매 혜택",
+      bulkDiscountDesc: "최대 50% 기본 할인 + 플랜별 추가 할인",
+      flexibleUse: "유연한 사용",
+      flexibleUseDesc: "필요할 때만 구매 구독 부담 없음",
+      permanentOwnership: "영구 소유",
+      permanentOwnershipDesc: "구매한 토큰은 만료 없이 영원히 사용 가능",
+      planBenefits: "플랜 혜택",
+      planBenefitsDesc: "구독 플랜별 보너스 토큰 제공",
+      comparison: "토큰 구매 vs 구독 플랜",
+      whenToPurchase: "어떤 경우 토큰 구매가 좋나요?",
+      whenToPurchaseDesc: "• 불규칙하게 사용하시는 분 • 특정 프로젝트를 위해 집중적으로 사용하시는 분 • 구독 부담 없이 필요할 때만 사용하고 싶으신 분",
+      subscriptionAdvantages: "구독 플랜의 장점",
+      subscriptionAdvantagesDesc: "• STARTER: {{starterPrice}}으로 총 600개 (가입 300 + 매일 10) • PREMIUM: {{premiumPrice}}으로 총 1,100개 (가입 500 + 매일 20) • 광고 제거 + 고급 기능 사용 가능",
+      trust: {
+        securePayment: "안전한 결제",
+        instantRefund: "즉시 환불",
+        support247: "24/7 지원"
+      }
+    },
     packages: {
       light: {
         name: "라이트 팩",
@@ -1658,7 +1711,7 @@ export default {
       price: "₩{{price:number}}",
       originalPrice: "₩{{price:number}}",
       discount: "{{percent}}% 할인",
-      perToken: "개당 ₩{{price:number}}"
+      perToken: "개당 ₩{{price}}"
     },
     alerts: {
       maxPlanTitle: "MAX 플랜 사용 중",

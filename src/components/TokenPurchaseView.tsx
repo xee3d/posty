@@ -227,14 +227,14 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                 : userPlan === "pro"
                 ? "MAX"
                 : (userPlan as string).toUpperCase()}{" "}
-              플랜 혜택
+              {t('tokenPurchase.sections.planBenefit')}
             </Text>
             <Text style={styles.planBenefitDesc}>
               {planBonus.bonusRate > 0 &&
-                `${planBonus.bonusRate * 100}% 보너스 토큰`}
+                t('tokenPurchase.sections.planBenefitDesc', { bonusRate: planBonus.bonusRate * 100 })}
               {planBonus.bonusRate > 0 && planBonus.priceDiscount > 0 && " + "}
               {planBonus.priceDiscount > 0 &&
-                `${planBonus.priceDiscount}% 할인`}
+                t('tokenPurchase.sections.planDiscountDesc', { discount: planBonus.priceDiscount })}
             </Text>
           </View>
         </LinearGradient>
@@ -250,9 +250,9 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
         >
           <SafeIcon name="gift" size={20} color="#FFFFFF" />
           <View style={styles.firstPurchaseContent}>
-            <Text style={styles.firstPurchaseTitle}>첫 구매 특별 혜택</Text>
+            <Text style={styles.firstPurchaseTitle}>{t('tokenPurchase.sections.firstPurchase')}</Text>
             <Text style={styles.firstPurchaseDesc}>
-              30개 이상 구매 시 추가 30% 할인!
+              {t('tokenPurchase.sections.firstPurchaseDesc')}
             </Text>
           </View>
         </LinearGradient>
@@ -268,9 +268,9 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
         >
           <SafeIcon name="stars" size={24} color="#FFFFFF" />
           <View style={styles.proNoticeContent}>
-            <Text style={styles.proNoticeTitle}>MAX 플랜 사용 중</Text>
+            <Text style={styles.proNoticeTitle}>{t('tokenPurchase.sections.maxPlanNotice')}</Text>
             <Text style={styles.proNoticeDesc}>
-              무제한 토큰을 사용하실 수 있어 추가 구매가 필요하지 않습니다
+              {t('tokenPurchase.sections.maxPlanNoticeDesc')}
             </Text>
           </View>
         </LinearGradient>
@@ -340,13 +340,13 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                   <View style={styles.priceRow}>
                     <Text style={styles.currency}>{currencyInfo.symbol}</Text>
                     <Text style={styles.price}>
-                      {typeof pkg.price === 'number' ? pkg.price.toLocaleString() : pkg.price}
+                      {pkg.price}
                     </Text>
                   </View>
                   {pkg.originalPrice && (
                     <View style={styles.discountRow}>
                       <Text style={styles.originalPrice}>
-                        {currencyInfo.symbol}{typeof pkg.originalPrice === 'number' ? pkg.originalPrice.toLocaleString() : pkg.originalPrice}
+                        {currencyInfo.symbol}{pkg.originalPrice}
                       </Text>
                       <LinearGradient
                         colors={[
@@ -372,9 +372,11 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
                     color="#FFFFFF"
                   />
                   <Text style={styles.unitPriceText}>
-                    {t("tokenPurchase.pricing.perToken", { 
-                      price: formatPrice(pkg.price / pkg.amount, currentCurrency)
-                    })}
+                    {(() => {
+                      const pricePerToken = pkg.price && pkg.amount ? Math.round(pkg.price / pkg.amount) : 0;
+                      console.log('DEBUG - pkg.price:', pkg.price, 'pkg.amount:', pkg.amount, 'pricePerToken:', pricePerToken);
+                      return t("tokenPurchase.pricing.perToken", { price: pricePerToken });
+                    })()}
                   </Text>
                 </View>
 
@@ -395,7 +397,7 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
 
       {/* Features Section */}
       <View style={styles.featuresSection}>
-        <Text style={styles.sectionTitle}>토큰 구매의 장점</Text>
+        <Text style={styles.sectionTitle}>{t('tokenPurchase.sections.advantages')}</Text>
 
         <View style={styles.featureCards}>
           <LinearGradient
@@ -412,9 +414,9 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
             >
               <SafeIcon name="trending-up-outline" size={24} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.featureTitle}>대량 구매 혜택</Text>
+            <Text style={styles.featureTitle}>{t('tokenPurchase.sections.bulkDiscount')}</Text>
             <Text style={styles.featureDesc}>
-              최대 50% 기본 할인 + 플랜별 추가 할인
+              {t('tokenPurchase.sections.bulkDiscountDesc')}
             </Text>
           </LinearGradient>
 
@@ -432,9 +434,9 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
             >
               <SafeIcon name="lock-open-outline" size={24} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.featureTitle}>유연한 사용</Text>
+            <Text style={styles.featureTitle}>{t('tokenPurchase.sections.flexibleUse')}</Text>
             <Text style={styles.featureDesc}>
-              필요할 때만 구매 구독 부담 없음
+              {t('tokenPurchase.sections.flexibleUseDesc')}
             </Text>
           </LinearGradient>
 
@@ -452,9 +454,9 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
             >
               <SafeIcon name="rocket-outline" size={24} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.featureTitle}>영구 소유</Text>
+            <Text style={styles.featureTitle}>{t('tokenPurchase.sections.permanentOwnership')}</Text>
             <Text style={styles.featureDesc}>
-              구매한 토큰은 만료 없이 영원히 사용 가능
+              {t('tokenPurchase.sections.permanentOwnershipDesc')}
             </Text>
           </LinearGradient>
 
@@ -472,25 +474,24 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
             >
               <SafeIcon name="star" size={24} color="#FFFFFF" />
             </LinearGradient>
-            <Text style={styles.featureTitle}>플랜 혜택</Text>
-            <Text style={styles.featureDesc}>구독 플랜별 보너스 토큰 제공</Text>
+            <Text style={styles.featureTitle}>{t('tokenPurchase.sections.planBenefits')}</Text>
+            <Text style={styles.featureDesc}>{t('tokenPurchase.sections.planBenefitsDesc')}</Text>
           </LinearGradient>
         </View>
       </View>
 
       {/* 구독 vs 토큰 구매 비교 */}
       <View style={styles.comparisonSection}>
-        <Text style={styles.sectionTitle}>토큰 구매 vs 구독 플랜</Text>
+        <Text style={styles.sectionTitle}>{t('tokenPurchase.sections.comparison')}</Text>
 
         <View style={styles.comparisonCard}>
           <SafeIcon name="help-circle-outline" size={20} color={colors.primary} />
           <View style={styles.comparisonContent}>
             <Text style={styles.comparisonTitle}>
-              어떤 경우 토큰 구매가 좋나요?
+              {t('tokenPurchase.sections.whenToPurchase')}
             </Text>
             <Text style={styles.comparisonDesc}>
-              • 불규칙하게 사용하시는 분 • 특정 프로젝트를 위해 집중적으로
-              사용하시는 분 • 구독 부담 없이 필요할 때만 사용하고 싶으신 분
+              {t('tokenPurchase.sections.whenToPurchaseDesc')}
             </Text>
           </View>
         </View>
@@ -498,11 +499,9 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
         <View style={styles.comparisonCard}>
           <SafeIcon name="diamond-outline" size={20} color={colors.primary} />
           <View style={styles.comparisonContent}>
-            <Text style={styles.comparisonTitle}>구독 플랜의 장점</Text>
+            <Text style={styles.comparisonTitle}>{t('tokenPurchase.sections.subscriptionAdvantages')}</Text>
             <Text style={styles.comparisonDesc}>
-              • STARTER: ₩1,900으로 총 600개 (가입 300 + 매일 10) • PREMIUM:
-              ₩4,900으로 총 1,100개 (가입 500 + 매일 20) • 광고 제거 + 고급 기능
-              사용 가능
+              {t('tokenPurchase.sections.subscriptionAdvantagesDesc', { starterPrice: '₩1,900', premiumPrice: '₩4,900' })}
             </Text>
           </View>
         </View>
@@ -521,17 +520,17 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
             size={20}
             color={colors.primary}
           />
-          <Text style={styles.trustText}>안전한 결제</Text>
+          <Text style={styles.trustText}>{t('tokenPurchase.sections.trust.securePayment')}</Text>
         </View>
         <View style={styles.trustDivider} />
         <View style={styles.trustBadge}>
           <SafeIcon name="refresh-outline" size={20} color={colors.primary} />
-          <Text style={styles.trustText}>즉시 환불</Text>
+          <Text style={styles.trustText}>{t('tokenPurchase.sections.trust.instantRefund')}</Text>
         </View>
         <View style={styles.trustDivider} />
         <View style={styles.trustBadge}>
           <SafeIcon name="headset-outline" size={20} color={colors.primary} />
-          <Text style={styles.trustText}>24/7 지원</Text>
+          <Text style={styles.trustText}>{t('tokenPurchase.sections.trust.support247')}</Text>
         </View>
       </LinearGradient>
 

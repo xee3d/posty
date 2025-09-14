@@ -650,7 +650,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 size={16}
                 color={isSelected ? planColor : "#10B981"}
               />
-              <Text style={styles.featureText}>{feature}</Text>
+              <Text style={styles.featureText}>{t(feature)}</Text>
             </View>
           ))}
         </View>

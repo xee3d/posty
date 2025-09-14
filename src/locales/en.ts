@@ -707,6 +707,31 @@ export default {
         ],
       },
     },
+    // Plan features translation keys
+    features: {
+      dailyTokens10: "10 daily tokens",
+      tones3: "3 tone styles",
+      lengthShortMedium: "Short/medium length",
+      hasAds: "Includes ads",
+      signup300: "300 tokens immediately upon signup",
+      daily10: "10 additional tokens daily",
+      tones4: "4 tone styles",
+      longLength: "Long content creation",
+      noAds: "Ad-free",
+      myStyleAnalysis: "MyStyle analysis",
+      signup500: "500 tokens immediately upon signup",
+      daily20: "20 additional tokens daily",
+      tones6: "6 tone styles",
+      allLengths: "All content lengths",
+      fastImageAnalysis: "Fast image analysis",
+      gpt4Model: "GPT-4 model",
+      unlimitedTokens: "Unlimited tokens",
+      allTones: "All tone styles",
+      instantImageAnalysis: "Instant image analysis",
+      gpt4TurboModel: "GPT-4 Turbo",
+      apiAccess: "API access",
+      prioritySupport: "Priority support",
+    },
     confirmSubscriptionMessage: "Do you want to subscribe to the {{planName}} plan?\n\n{{description}}\nCurrent tokens: {{currentTokens}}\nAfter change: {{afterTokens}}"
   },
 
@@ -1667,6 +1692,34 @@ export default {
   // Token Purchase
   tokenPurchase: {
     title: "Token Purchase",
+    sections: {
+      planBenefit: "Plan Benefit",
+      planBenefitDesc: "{{bonusRate}}% bonus tokens",
+      planDiscountDesc: "{{discount}}% discount",
+      firstPurchase: "First Purchase Special Offer",
+      firstPurchaseDesc: "Additional 30% discount for purchases of 30 or more tokens!",
+      maxPlanNotice: "MAX Plan Active",
+      maxPlanNoticeDesc: "You have unlimited tokens, so no additional purchase needed",
+      advantages: "Benefits of Token Purchase",
+      bulkDiscount: "Bulk Purchase Benefits",
+      bulkDiscountDesc: "Up to 50% basic discount + additional plan discount",
+      flexibleUse: "Flexible Usage",
+      flexibleUseDesc: "Purchase only when needed, no subscription burden",
+      permanentOwnership: "Permanent Ownership",
+      permanentOwnershipDesc: "Purchased tokens are yours forever without expiration",
+      planBenefits: "Plan Benefits",
+      planBenefitsDesc: "Bonus tokens provided according to subscription plan",
+      comparison: "Token Purchase vs Subscription Plans",
+      whenToPurchase: "When is token purchase good?",
+      whenToPurchaseDesc: "• For irregular users • For intensive project-based usage • Want to use only when needed without subscription burden",
+      subscriptionAdvantages: "Subscription Plan Advantages",
+      subscriptionAdvantagesDesc: "• STARTER: {{starterPrice}} for total 600 tokens (300 initial + 10 daily) • PREMIUM: {{premiumPrice}} for total 1,100 tokens (500 initial + 20 daily) • Ad removal + premium features available",
+      trust: {
+        securePayment: "Secure Payment",
+        instantRefund: "Instant Refund",
+        support247: "24/7 Support"
+      }
+    },
     packages: {
       light: {
         name: "Light Pack",
@@ -1691,7 +1744,7 @@ export default {
       price: "${{price:number}}",
       originalPrice: "${{price:number}}",
       discount: "{{percent}}% off",
-      perToken: "${{price:number}} per token"
+      perToken: "${{price}} per token"
     },
     alerts: {
       maxPlanTitle: "MAX Plan Active",
