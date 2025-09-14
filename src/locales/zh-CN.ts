@@ -173,13 +173,6 @@ export default {
         description: "不受干扰，只专注于内容创作"
       }
     },
-    management: {
-      title: "订阅管理",
-      currentPlan: "当前计划",
-      monthlyFee: "月费",
-      nextBilling: "下次计费日期",
-      cancelButton: "取消订阅"
-    },
     earnTokensSection: {
       title: "免费获得代币",
       subtitle: "通过各种活动获得免费代币",
@@ -373,7 +366,31 @@ export default {
       ],
       polish: "润色文本"
     },
-    
+    polishOptions: {
+      summarize: "总结",
+      simple: "简化表达",
+      formal: "正式文体",
+      emotion: "情感增强",
+      storytelling: "叙述体",
+      engaging: "更有吸引力",
+      hashtag: "提取话题标签",
+    },
+    photo: {
+      select: {
+        title: "选择照片",
+        message: "您想如何选择照片？",
+        camera: "拍照",
+        gallery: "从相册选择",
+      },
+      upload: {
+        title: "请选择照片",
+        subtitle: "从相册选择或直接拍摄",
+        button: "选择照片",
+        change: "更改",
+      },
+      defaultPrompt: "请写一篇与照片相配的自然社交媒体帖子。",
+    },
+
     tones: {
       casual: "随意",
       professional: "专业",
@@ -477,37 +494,6 @@ export default {
       noImageSelected: "未选择图片"
     },
     
-    polishOptions: {
-      summarize: {
-        name: "总结",
-        description: "简洁概括要点"
-      },
-      simple: {
-        name: "简化",
-        description: "通俗易懂的表达"
-      },
-      formal: {
-        name: "正式",
-        description: "正式庄重的表达"
-      },
-      emotion: {
-        name: "情感",
-        description: "注入情感"
-      },
-      storytelling: {
-        name: "故事",
-        description: "故事化表达"
-      },
-      engaging: {
-        name: "吸引",
-        description: "引人入胜"
-      },
-      hashtag: {
-        name: "标签",
-        description: "添加相关标签"
-      }
-    },
-    
     actions: {
       generate: "生成",
       regenerate: "重新生成",
@@ -541,6 +527,18 @@ export default {
     },
     
     photo: {
+      select: {
+        title: "选择照片",
+        message: "您想如何选择照片？",
+        camera: "拍照",
+        gallery: "从相册选择",
+      },
+      upload: {
+        title: "请选择照片",
+        subtitle: "从相册选择或直接拍摄",
+        button: "选择照片",
+        change: "更改",
+      },
       defaultPrompt: "请写一篇与照片相配的自然社交媒体帖子。",
     },
     
@@ -571,17 +569,14 @@ export default {
       photoWrite: "照片写作",
       polish: "文本润色",
       newPost: "新帖子",
-    },
-    
-    writingInStyle: "正在用风格写作",
-    
-    tokenUsage: {
       remaining: "剩余代币: {{count}}",
       used: "已用代币: {{count}}",
       required: "需要代币: {{count}}",
       insufficient: "代币不足",
       purchaseMore: "购买更多"
-    }
+    },
+
+    writingInStyle: "正在用风格写作"
   },
 
   // AI 提示
@@ -805,7 +800,8 @@ export default {
       medium100: "100-150字",
       medium150: "150-200字",
       short80: "80-120字"
-    }
+    },
+    profileCompletion: "个人资料完成度 {{completeness}}%"
   },
 
   
@@ -2102,6 +2098,81 @@ export default {
 
   // 个人资料
   profile: {
+    updateSuccess: "个人资料更新完成! 🎉",
+    updateMessage: "个人资料已完成{completion}%。\n现在AI可以为您编写符合您风格的内容！",
+    confirm: "确认",
+    sections: {
+      ageGroup: "年龄段",
+      gender: "性别",
+      maritalStatus: "婚姻状态",
+      familyRole: "家庭角色",
+      parentRole: "父母角色",
+      childAge: "子女年龄",
+      occupation: "职业",
+      writingStyle: "写作风格",
+      emojiUsage: "表情符号使用",
+      tone: "语调"
+    },
+    age: {
+      "10s": "10多岁",
+      "20s": "20多岁",
+      "30s": "30多岁",
+      "40s": "40多岁",
+      "50s": "50多岁",
+      "60s+": "60岁以上"
+    },
+    gender: {
+      male: "男性",
+      female: "女性",
+      other: "其他",
+      private: "不公开"
+    },
+    maritalStatus: {
+      single: "未婚",
+      married: "已婚"
+    },
+    familyRole: {
+      parent: "父母",
+      grandparent: "祖父母"
+    },
+    parentRole: {
+      mother: "妈妈",
+      father: "爸爸"
+    },
+    childAge: {
+      baby: "婴儿",
+      toddler: "幼儿",
+      elementary: "小学",
+      middle_school: "中学",
+      high_school: "高中",
+      adult: "成年"
+    },
+    occupation: {
+      student: "学生",
+      office_worker: "上班族",
+      business_owner: "企业家",
+      freelancer: "自由职业者",
+      homemaker: "家庭主妇/主夫",
+      retired: "退休",
+      custom_placeholder: "请输入具体职业（可选）"
+    },
+    writingStyle: {
+      casual: "随意",
+      professional: "专业",
+      literary: "文艺",
+      minimalist: "极简"
+    },
+    emojiUsage: {
+      none: "不使用",
+      minimal: "少量使用",
+      moderate: "适量使用",
+      frequent: "经常使用"
+    },
+    tone: {
+      serious: "认真",
+      light: "轻松",
+      witty: "幽默"
+    },
     title: "个人资料",
     stats: {
       posts: "帖子",
@@ -2111,6 +2182,185 @@ export default {
     actions: {
       edit: "编辑",
       settings: "设置"
+    }
+  },
+
+  // 成就
+  achievements: {
+    title: "成就",
+    headerTitle: "成就",
+    overallProgress: "总体进度",
+    progressTemplate: "共{{total}}个，已获得{{achieved}}个成就",
+    categories: {
+      all: "全部",
+      writing: "写作",
+      style: "风格",
+      social: "社交",
+      special: "特殊"
+    },
+    categoryNames: {
+      writing: "写作",
+      style: "风格",
+      social: "社交",
+      special: "特殊"
+    },
+    rarity: {
+      common: "普通",
+      rare: "稀有",
+      epic: "史诗",
+      legendary: "传说"
+    },
+    modal: {
+      category: "类别",
+      rarity: "稀有度",
+      progress: "进度",
+      unlockedAt: "获得日期",
+      selectBadge: "设为代表成就",
+      success: "成功",
+      setBadgeSuccess: "代表成就设置成功！",
+      error: "错误",
+      setBadgeError: "设置代表成就失败。"
+    },
+    status: {
+      completed: "已获得",
+      empty: "还未获得任何成就"
+    },
+    items: {
+      // 写作相关
+      first_post: {
+        name: "第一步",
+        description: "发布了第一篇文章"
+      },
+      post_3: {
+        name: "新手作家",
+        description: "发布了3篇文章"
+      },
+      post_7: {
+        name: "一周作家",
+        description: "发布了7篇文章"
+      },
+      post_15: {
+        name: "坚持作家",
+        description: "发布了15篇文章"
+      },
+      post_30: {
+        name: "一月作家",
+        description: "发布了30篇文章"
+      },
+      post_50: {
+        name: "充满热情",
+        description: "发布了50篇文章"
+      },
+      post_100: {
+        name: "百战百胜",
+        description: "发布了100篇文章"
+      },
+      post_200: {
+        name: "专业作家",
+        description: "发布了200篇文章"
+      },
+      post_365: {
+        name: "每日作家",
+        description: "发布了365篇文章"
+      },
+      post_500: {
+        name: "传奇作家",
+        description: "发布了500篇文章"
+      },
+      post_1000: {
+        name: "千篇故事",
+        description: "发布了1000篇文章"
+      },
+
+      // 风格相关
+      minimal_master: {
+        name: "极简大师",
+        description: "完成了极简周挑战"
+      },
+      story_teller: {
+        name: "故事家",
+        description: "完成了故事月挑战"
+      },
+      trend_hunter: {
+        name: "潮流猎手",
+        description: "完成了潮流猎手挑战"
+      },
+      all_style_master: {
+        name: "全能造型师",
+        description: "掌握了所有风格"
+      },
+
+      // 社交相关
+      first_like: {
+        name: "初次点赞",
+        description: "获得了第一个点赞"
+      },
+      like_streak_7: {
+        name: "受欢迎",
+        description: "连续7天获得点赞"
+      },
+      viral_post: {
+        name: "病毒式传播",
+        description: "单篇文章获得超过100个点赞"
+      },
+
+      // 特殊成就
+      early_bird: {
+        name: "早起鸟",
+        description: "在早上6点前发布文章"
+      },
+      night_owl: {
+        name: "夜猫子",
+        description: "在晚上11点后发布文章"
+      },
+      perfectionist: {
+        name: "完美主义者",
+        description: "连续使用文章润色功能10次"
+      },
+      creative_burst: {
+        name: "创意爆发",
+        description: "一天内发布5篇文章"
+      },
+      long_form_writer: {
+        name: "长篇作家",
+        description: "发布超过500字的文章"
+      },
+      hashtag_master: {
+        name: "标签大师",
+        description: "在文章中使用超过10个标签"
+      },
+      emoji_lover: {
+        name: "表情符号爱好者",
+        description: "在文章中使用超过20个表情符号"
+      },
+      consistent_writer: {
+        name: "坚持不懈的作家",
+        description: "连续30天发布文章"
+      },
+      weekend_warrior: {
+        name: "周末战士",
+        description: "连续4个周末发布文章"
+      },
+      photo_storyteller: {
+        name: "图片故事家",
+        description: "发布50篇带照片的文章"
+      },
+      trend_setter: {
+        name: "潮流引领者",
+        description: "使用最新趋势标签发布文章"
+      },
+      community_helper: {
+        name: "社区助手",
+        description: "帮助其他用户改进文章"
+      },
+      beta_tester: {
+        name: "测试版用户",
+        description: "参与了测试版功能测试"
+      },
+      posty_veteran: {
+        name: "Posty老兵",
+        description: "使用Posty超过1年"
+      }
     }
   },
 

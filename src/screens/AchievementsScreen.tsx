@@ -319,7 +319,7 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) =
               numberOfLines={1}
               minimumFontScale={0.85}
             >
-              전체 {totalCount}개 중 {unlockedCount}개 달성
+{t("achievements.progressTemplate", { total: totalCount, achieved: unlockedCount })}
             </Text>
           </View>
         </FadeInView>

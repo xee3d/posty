@@ -314,7 +314,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
               />
             </View>
             <Text style={styles.progressSubtext}>
-              전체 {totalCount}개 중 {unlockedCount}개 달성
+{t("achievements.progressTemplate", { total: totalCount, achieved: unlockedCount })}
             </Text>
           </View>
         </FadeInView>

@@ -1825,6 +1825,7 @@ export default {
       completed: "Completed",
       empty: "No achievements unlocked yet"
     },
+    progressTemplate: "{{achieved}} of {{total}} achievements unlocked",
     items: {
       // Writing achievements
       first_post: {

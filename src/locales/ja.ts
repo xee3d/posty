@@ -1602,6 +1602,7 @@ export default {
       completed: "取得完了",
       empty: "まだ取得した実績がございません"
     },
+    progressTemplate: "全{{total}}個中{{achieved}}個達成",
     items: {
       // 投稿関連
       first_post: {
