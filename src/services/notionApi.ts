@@ -167,8 +167,10 @@ class NotionApiService {
       'terms-ja': '26cdc2bc-e21c-812a-9389-c16f4cdc2814',      // [JA] 利用規約
       'privacy-ja': '26cdc2bc-e21c-817e-9b47-ca211be74d52',    // [JA] プライバシーポリシー
       
-      // 중국어
+      // 중국어 (zh, zh-CN 모두 지원)
+      'terms-zh': '26cdc2bc-e21c-81a2-99a1-f65950bf5124',      // [ZH] 服务条款
       'terms-zh-CN': '26cdc2bc-e21c-81a2-99a1-f65950bf5124',   // [ZH] 服务条款
+      'privacy-zh': '26cdc2bc-e21c-8196-8557-e9a3e9f0f9d5',    // [ZH] 隐私政策
       'privacy-zh-CN': '26cdc2bc-e21c-8196-8557-e9a3e9f0f9d5', // [ZH] 隐私政策
     };
     

@@ -136,6 +136,10 @@ class LanguageService {
   getCurrentLanguage(): SupportedLanguage {
     if (!this.isInitialized) {
       console.warn('[LanguageService] Service not initialized, using Korean');
+      // 비동기 초기화를 시도하되, 즉시 fallback 값을 반환
+      this.initialize().catch(error => {
+        console.error('[LanguageService] Auto-initialization failed:', error);
+      });
       return 'ko';
     }
     

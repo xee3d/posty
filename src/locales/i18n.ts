@@ -29,28 +29,33 @@ const getDeviceLanguage = () => {
   return finalLang;
 };
 
-i18next
-  .use(initReactI18next)
-  .init({
-    resources,
-    lng: getDeviceLanguage(),
-    fallbackLng: 'ko',
-    returnObjects: false, // 기본적으로 문자열 반환, 필요시 개별 호출에서 returnObjects: true 사용
-    interpolation: {
-      escapeValue: false,
-    },
-    react: {
-      useSuspense: false,
-    },
-    debug: __DEV__, // 개발 모드에서만 디버그 로그 활성화
-  })
-  .then(() => {
-    console.log('🌍 [i18n] Initialized successfully with language:', i18next.language);
-    console.log('🌍 [i18n] Available resources:', Object.keys(i18next.options.resources || {}));
-  })
-  .catch((error) => {
-    console.error('❌ [i18n] Initialization failed:', error);
-  });
+// i18next 중복 초기화 방지
+if (!i18next.isInitialized) {
+  i18next
+    .use(initReactI18next)
+    .init({
+      resources,
+      lng: getDeviceLanguage(),
+      fallbackLng: 'ko',
+      returnObjects: false, // 기본적으로 문자열 반환, 필요시 개별 호출에서 returnObjects: true 사용
+      interpolation: {
+        escapeValue: false,
+      },
+      react: {
+        useSuspense: false,
+      },
+      debug: __DEV__, // 개발 모드에서만 디버그 로그 활성화
+    })
+    .then(() => {
+      console.log('🌍 [i18n] Initialized successfully with language:', i18next.language);
+      console.log('🌍 [i18n] Available resources:', Object.keys(i18next.options.resources || {}));
+    })
+    .catch((error) => {
+      console.error('❌ [i18n] Initialization failed:', error);
+    });
+} else {
+  console.log('🌍 [i18n] Already initialized, skipping...');
+}
 
 // 유틸리티 함수들
 export const getCurrentLanguage = () => i18next.language;
