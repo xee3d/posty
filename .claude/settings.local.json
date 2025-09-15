@@ -77,7 +77,8 @@
       "Bash(tail:*)",
       "Bash(do echo \"=== $lang theme test ===\")",
       "Read(///**)",
-      "Read(//Users/ethan_macstudio/Library/Caches/**)"
+      "Read(//Users/ethan_macstudio/Library/Caches/**)",
+      "WebSearch"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

@@ -36,6 +36,13 @@ import { BRAND } from "../utils/constants";
 
 import { Alert } from "../utils/customAlert";
 import { useTranslation } from "react-i18next";
+import {
+  getPrimaryLoginProvider,
+  getSecondaryLoginProviders,
+  getRegionalProviderInfo,
+  getRegionalLoginStats,
+  type SocialProvider
+} from "../services/auth/regionalLoginService";
 
 interface LoginScreenProps {
   onNavigate: (screen: string, data?: any) => void;
@@ -49,6 +56,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
 
+  // 지역별 로그인 설정
+  const primaryProvider = getPrimaryLoginProvider();
+  const secondaryProviders = getSecondaryLoginProviders();
+  const regionalStats = getRegionalLoginStats();
+
   const logoScale = useSharedValue(0.8);
   const logoOpacity = useSharedValue(0);
 
@@ -56,7 +68,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
     // 로고 애니메이션
     logoScale.value = withSpring(1, { damping: 12 });
     logoOpacity.value = withTiming(1, { duration: 1000 });
-  }, []);
+
+    // 지역별 로그인 설정 로그
+    console.log('🌍 [LoginScreen] Regional Login Settings:', {
+      region: regionalStats.region,
+      primaryProvider: primaryProvider,
+      secondaryProviders: secondaryProviders,
+      marketData: regionalStats.marketData
+    });
+  }, [primaryProvider, secondaryProviders, regionalStats]);
 
   const logoAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -66,7 +86,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
   });
 
   const handleSocialLogin = useCallback(
-    async (provider: "google" | "naver" | "kakao" | "facebook" | "apple") => {
+    async (provider: SocialProvider) => {
       setIsLoading(true);
       setLoadingProvider(provider);
 
@@ -184,14 +204,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
   );
 
   const renderSocialButton = useCallback(
-    (
-      provider: "google" | "naver" | "kakao" | "facebook" | "apple",
-      text: string,
-      iconName: string,
-      backgroundColor: string,
-      textColor: string,
-      delay: number
-    ) => {
+    (provider: SocialProvider) => {
+      const providerInfo = getRegionalProviderInfo(provider);
+      const text = t(`login.buttons.${provider}`);
+
+      let iconName: string;
+      switch(provider) {
+        case 'google': iconName = 'mail'; break;
+        case 'naver': iconName = 'naver'; break;
+        case 'kakao': iconName = 'chatbubble'; break;
+        case 'facebook': iconName = 'facebook'; break;
+        case 'apple': iconName = 'apple'; break;
+        default: iconName = 'help-circle'; break;
+      }
       const isThisLoading = loadingProvider === provider;
 
       return (
@@ -199,7 +224,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
           <TouchableOpacity
             style={[
               styles.socialButton,
-              { backgroundColor },
+              { backgroundColor: providerInfo.color },
               provider === "google" && styles.googleButton,
               provider === "apple" && styles.appleButton,
               isLoading && !isThisLoading && styles.disabledButton,
@@ -209,29 +234,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
             activeOpacity={0.8}
           >
             {isThisLoading ? (
-              <ActivityIndicator size="small" color={textColor} />
+              <ActivityIndicator size="small" color={providerInfo.textColor} />
             ) : (
               <>
                 <View style={styles.socialIconContainer}>
-                  {provider === "google" && (
-                    <SafeIcon name="mail" size={20} color={textColor} />
-                  )}
-                  {provider === "naver" && (
-                    <Text style={[styles.naverIcon, { color: textColor }]}>
+                  {provider === "naver" ? (
+                    <Text style={[styles.naverIcon, { color: providerInfo.textColor }]}>
                       N
                     </Text>
-                  )}
-                  {provider === "kakao" && (
-                    <SafeIcon name="chatbubble" size={20} color={textColor} />
-                  )}
-                  {provider === "facebook" && (
-                    <SafeIcon name="facebook" size={20} color={textColor} />
-                  )}
-                  {provider === "apple" && (
-                    <SafeIcon name="apple" size={20} color={textColor} />
+                  ) : (
+                    <SafeIcon name={iconName} size={20} color={providerInfo.textColor} />
                   )}
                 </View>
-                <Text style={[styles.socialButtonText, { color: textColor }]}>
+                <Text style={[styles.socialButtonText, { color: providerInfo.textColor }]}>
                   {text}
                 </Text>
               </>
@@ -240,7 +255,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         </View>
       );
     },
-    [loadingProvider, isLoading, handleSocialLogin]
+    [loadingProvider, isLoading, handleSocialLogin, t]
   );
 
   const styles = createStyles(colors, isDark);
@@ -273,38 +288,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                 <Text style={styles.loginTitle}>{t("login.title")}</Text>
               </Animated.View>
 
-              {/* 카카오 로그인 버튼 */}
+              {/* 지역별 메인 로그인 버튼 */}
               <Animated.View
                 entering={FadeInDown.delay(400).duration(600).springify()}
-                style={styles.socialButtonContainer}
               >
-                <TouchableOpacity
-                  style={[
-                    styles.socialButton,
-                    { backgroundColor: "#FEE500" },
-                    isLoading &&
-                      loadingProvider !== "kakao" &&
-                      styles.disabledButton,
-                  ]}
-                  onPress={() => handleSocialLogin("kakao")}
-                  disabled={isLoading}
-                  activeOpacity={0.8}
-                >
-                  {loadingProvider === "kakao" ? (
-                    <ActivityIndicator size="small" color="#191919" />
-                  ) : (
-                    <>
-                      <View style={styles.socialIconContainer}>
-                        <SafeIcon name="chatbubble" size={20} color="#191919" />
-                      </View>
-                      <Text
-                        style={[styles.socialButtonText, { color: "#191919" }]}
-                      >
-                        {t("login.buttons.kakao")}
-                      </Text>
-                    </>
-                  )}
-                </TouchableOpacity>
+                {renderSocialButton(primaryProvider)}
               </Animated.View>
 
               {/* 다른 계정으로 연결 버튼 - 다른 옵션이 나타나면 숨김 */}
@@ -326,7 +314,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                 </Animated.View>
               )}
 
-              {/* 추가 로그인 옵션들 - 다른 계정으로 연결 클릭 시 표시 */}
+              {/* 지역별 추가 로그인 옵션들 - 다른 계정으로 연결 클릭 시 표시 */}
               {showMoreOptions && (
                 <Animated.View
                   entering={SlideInDown.duration(500)
@@ -336,59 +324,21 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                   exiting={SlideOutDown.duration(300)}
                   style={styles.expandedOptionsContainer}
                 >
-                  <Animated.View
-                    entering={FadeInDown.delay(100).duration(400).springify()}
-                  >
-                    {renderSocialButton(
-                      "google",
-                      t("login.buttons.google"),
-                      "google",
-                      "#FFFFFF",
-                      "#1F1F1F",
-                      0
-                    )}
-                  </Animated.View>
+                  {secondaryProviders.map((provider, index) => {
+                    // Apple은 iOS에서만 표시
+                    if (provider === 'apple' && Platform.OS !== 'ios') {
+                      return null;
+                    }
 
-                  <Animated.View
-                    entering={FadeInDown.delay(200).duration(400).springify()}
-                  >
-                    {renderSocialButton(
-                      "naver",
-                      t("login.buttons.naver"),
-                      "naver",
-                      "#03C75A",
-                      "#FFFFFF",
-                      0
-                    )}
-                  </Animated.View>
-
-                  <Animated.View
-                    entering={FadeInDown.delay(300).duration(400).springify()}
-                  >
-                    {renderSocialButton(
-                      "facebook",
-                      t("login.buttons.facebook"),
-                      "facebook",
-                      "#1877F2",
-                      "#FFFFFF",
-                      0
-                    )}
-                  </Animated.View>
-
-                  {Platform.OS === "ios" && (
-                    <Animated.View
-                      entering={FadeInDown.delay(400).duration(400).springify()}
-                    >
-                      {renderSocialButton(
-                        "apple",
-                        t("login.buttons.apple"),
-                        "apple",
-                        "#000000",
-                        "#FFFFFF",
-                        0
-                      )}
-                    </Animated.View>
-                  )}
+                    return (
+                      <Animated.View
+                        key={provider}
+                        entering={FadeInDown.delay((index + 1) * 100).duration(400).springify()}
+                      >
+                        {renderSocialButton(provider)}
+                      </Animated.View>
+                    );
+                  })}
                 </Animated.View>
               )}
             </View>

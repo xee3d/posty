@@ -2,7 +2,13 @@ import { NativeModules, Platform } from "react-native";
 import * as RNLocalize from "react-native-localize";
 
 export const getDeviceLanguage = (): string => {
-  
+  // 테스트를 위한 강제 언어 설정 (개발 중)
+  const FORCE_LANGUAGE_TEST = null; // 'ko', 'ja', 'zh', 'en' 또는 null
+  if (FORCE_LANGUAGE_TEST) {
+    console.log(`🌍 [DeviceLanguage] Force language test: ${FORCE_LANGUAGE_TEST}`);
+    return FORCE_LANGUAGE_TEST;
+  }
+
   // react-native-localize 사용
   const locales = RNLocalize.getLocales();
   if (locales && locales.length > 0) {
