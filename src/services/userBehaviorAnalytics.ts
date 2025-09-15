@@ -540,28 +540,7 @@ class UserBehaviorAnalytics {
         });
       }
 
-      // 4. 플랫폼 기반 추천
-      if (behaviorData.writingPatterns.favoritePlatforms.length > 0) {
-        const platform = behaviorData.writingPatterns.favoritePlatforms[0];
-        recommendations.push({
-          id: "platform-based-" + platform,
-          type: "dynamic",
-          title: `${platform} 스타일로`,
-          content: `${platform}에 자주 올리시는군요!\n${platform} 스타일의 글은 어떠세요?`,
-          actionText: "작성하기",
-          actionPayload: {
-            platform: platform,
-            tone: this.getPlatformTone(platform),
-          },
-          personalityScore: 0.6,
-          reason: "선호 플랫폼",
-          icon: this.getPlatformIcon(platform),
-          iconColor: this.getPlatformColor(platform),
-          badge: `${this.getPlatformEmoji(platform)} ${platform}`,
-          meta: { icon: "trending-up", text: "플랫폼 맞춤" },
-          priority: 7,
-        });
-      }
+      // 4. 플랫폼 기반 추천 - 제거됨 (사용자 요청)
 
       // 5. 문장 정리 사용자를 위한 특별 추천
       if (behaviorData.interactionPatterns.polishUsageFrequency > 0.2) {

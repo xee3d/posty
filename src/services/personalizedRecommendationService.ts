@@ -76,14 +76,14 @@ class PersonalizedRecommendationService {
       content:
         "오늘의 내 모습을 한 장 찍고\n간단한 인사말만 써도 멋진 글이 돼요",
       // 번역 키 추가
-      titleKey: "recommendations.selfie.title",
-      contentKey: "recommendations.selfie.content",
-      badgeKey: "recommendations.selfie.badge",
-      actionTextKey: "recommendations.selfie.action",
+    titleKey: "recommendations.selfie.title",
+    contentKey: "recommendations.selfie.content",
+    badgeKey: "recommendations.selfie.badge",
+    actionTextKey: "recommendations.selfie.action",
       meta: {
         icon: "psychology",
         text: "부담 제로",
-        textKey: "recommendations.selfie.meta",
+    textKey: "recommendations.selfie.meta",
       },
       actionText: "시작하기",
       actionPayload: {
@@ -105,14 +105,14 @@ class PersonalizedRecommendationService {
       title: "뭐 먹었어? 이거면 끝!",
       content: '음식 사진 하나만 있으면 돼요\n"맛있다" 한 마디면 충분해요',
       // 번역 키 추가
-      titleKey: "recommendations.easyFood.title",
-      contentKey: "recommendations.easyFood.content",
-      badgeKey: "recommendations.easyFood.badge",
-      actionTextKey: "recommendations.easyFood.action",
+    titleKey: "recommendations.easyFood.title",
+    contentKey: "recommendations.easyFood.content",
+    badgeKey: "recommendations.easyFood.badge",
+    actionTextKey: "recommendations.easyFood.action",
       meta: {
         icon: "restaurant",
         text: "1분 완성",
-        textKey: "recommendations.easyFood.meta",
+    textKey: "recommendations.easyFood.meta",
       },
       actionText: "음식 사진",
       actionPayload: {
@@ -138,14 +138,14 @@ class PersonalizedRecommendationService {
       title: "모닝 커피 타임",
       content: "아침 커피와 함께 하루 시작을\n기록해보는 건 어떨까요?",
       // 번역 키 추가
-      titleKey: "recommendations.morningRoutine.title",
-      contentKey: "recommendations.morningRoutine.content",
-      badgeKey: "recommendations.morningRoutine.badge",
-      actionTextKey: "recommendations.morningRoutine.action",
+    titleKey: "recommendations.morningRoutine.title",
+    contentKey: "recommendations.morningRoutine.content",
+    badgeKey: "recommendations.morningRoutine.badge",
+    actionTextKey: "recommendations.morningRoutine.action",
       meta: {
         icon: "access-time",
         text: "아침 7-9시 추천",
-        textKey: "recommendations.morningRoutine.meta",
+    textKey: "recommendations.morningRoutine.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
@@ -168,14 +168,14 @@ class PersonalizedRecommendationService {
       title: "오늘의 점심 메뉴",
       content: "맛있는 점심 식사하셨나요?\n음식 사진과 함께 공유해보세요!",
       // 번역 키 추가
-      titleKey: "recommendations.lunchTime.title",
-      contentKey: "recommendations.lunchTime.content",
-      badgeKey: "recommendations.lunchTime.badge",
-      actionTextKey: "recommendations.lunchTime.action",
+    titleKey: "recommendations.lunchTime.title",
+    contentKey: "recommendations.lunchTime.content",
+    badgeKey: "recommendations.lunchTime.badge",
+    actionTextKey: "recommendations.lunchTime.action",
       meta: {
         icon: "access-time",
         text: "점심시간 추천",
-        textKey: "recommendations.lunchTime.meta",
+    textKey: "recommendations.lunchTime.meta",
       },
       actionText: "사진 올리기",
       actionPayload: {
@@ -199,14 +199,14 @@ class PersonalizedRecommendationService {
       title: "황금빛 사진 타임",
       content: "해질녘 황금빛이 가장 예쁜 시간!\n감성 사진 찍기 좋은 때예요",
       // 번역 키 추가
-      titleKey: "recommendations.goldenHour.title",
-      contentKey: "recommendations.goldenHour.content",
-      badgeKey: "recommendations.goldenHour.badge",
-      actionTextKey: "recommendations.goldenHour.action",
+    titleKey: "recommendations.goldenHour.title",
+    contentKey: "recommendations.goldenHour.content",
+    badgeKey: "recommendations.goldenHour.badge",
+    actionTextKey: "recommendations.goldenHour.action",
       meta: {
         icon: "sunny",
         text: "일몰 1시간 전",
-        textKey: "recommendations.goldenHour.meta",
+    textKey: "recommendations.goldenHour.meta",
       },
       actionText: "사진 팁 보기",
       actionPayload: {
@@ -231,14 +231,14 @@ class PersonalizedRecommendationService {
       title: "한 주의 시작, 월요일!",
       content: "이번 주 목표나 계획을\n공유해보는 건 어떨까요?",
       // 번역 키 추가
-      titleKey: "recommendations.mondayMotivation.title",
-      contentKey: "recommendations.mondayMotivation.content",
-      badgeKey: "recommendations.mondayMotivation.badge",
-      actionTextKey: "recommendations.mondayMotivation.action",
+    titleKey: "recommendations.mondayMotivation.title",
+    contentKey: "recommendations.mondayMotivation.content",
+    badgeKey: "recommendations.mondayMotivation.badge",
+    actionTextKey: "recommendations.mondayMotivation.action",
       meta: {
         icon: "trending-up",
         text: "동기부여 콘텐츠",
-        textKey: "recommendations.mondayMotivation.meta",
+    textKey: "recommendations.mondayMotivation.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
@@ -261,14 +261,14 @@ class PersonalizedRecommendationService {
       title: "불타는 금요일!",
       content: "한 주 수고한 나를 위한\n주말 계획을 공유해보세요",
       // 번역 키 추가
-      titleKey: "recommendations.fridayMood.title",
-      contentKey: "recommendations.fridayMood.content",
-      badgeKey: "recommendations.fridayMood.badge",
-      actionTextKey: "recommendations.fridayMood.action",
+    titleKey: "recommendations.fridayMood.title",
+    contentKey: "recommendations.fridayMood.content",
+    badgeKey: "recommendations.fridayMood.badge",
+    actionTextKey: "recommendations.fridayMood.action",
       meta: {
         icon: "happy",
         text: "주말 시작",
-        textKey: "recommendations.fridayMood.meta",
+    textKey: "recommendations.fridayMood.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
@@ -290,14 +290,14 @@ class PersonalizedRecommendationService {
       title: "여유로운 주말",
       content: "주말 나들이나 휴식 시간을\n기록해보는 건 어떨까요?",
       // 번역 키 추가
-      titleKey: "recommendations.weekendVibes.title",
-      contentKey: "recommendations.weekendVibes.content",
-      badgeKey: "recommendations.weekendVibes.badge",
-      actionTextKey: "recommendations.weekendVibes.action",
+    titleKey: "recommendations.weekendVibes.title",
+    contentKey: "recommendations.weekendVibes.content",
+    badgeKey: "recommendations.weekendVibes.badge",
+    actionTextKey: "recommendations.weekendVibes.action",
       meta: {
         icon: "flower-outline",
         text: "주말 활동",
-        textKey: "recommendations.weekendVibes.meta",
+    textKey: "recommendations.weekendVibes.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
@@ -321,14 +321,14 @@ class PersonalizedRecommendationService {
       title: "감성 비 오는 날",
       content: "빗소리와 함께하는 감성적인\n순간을 기록해보세요",
       // 번역 키 추가
-      titleKey: "recommendations.rainyDay.title",
-      contentKey: "recommendations.rainyDay.content",
-      badgeKey: "recommendations.rainyDay.badge",
-      actionTextKey: "recommendations.rainyDay.action",
+    titleKey: "recommendations.rainyDay.title",
+    contentKey: "recommendations.rainyDay.content",
+    badgeKey: "recommendations.rainyDay.badge",
+    actionTextKey: "recommendations.rainyDay.action",
       meta: {
         icon: "water-outline",
         text: "비 예보",
-        textKey: "recommendations.rainyDay.meta",
+    textKey: "recommendations.rainyDay.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
@@ -350,14 +350,14 @@ class PersonalizedRecommendationService {
       title: "화창한 날씨",
       content: "맑은 날씨를 만끽할 수 있는\n야외 활동 어떠세요?",
       // 번역 키 추가
-      titleKey: "recommendations.sunnyDay.title",
-      contentKey: "recommendations.sunnyDay.content",
-      badgeKey: "recommendations.sunnyDay.badge",
-      actionTextKey: "recommendations.sunnyDay.action",
+    titleKey: "recommendations.sunnyDay.title",
+    contentKey: "recommendations.sunnyDay.content",
+    badgeKey: "recommendations.sunnyDay.badge",
+    actionTextKey: "recommendations.sunnyDay.action",
       meta: {
         icon: "sunny",
         text: "맑음",
-        textKey: "recommendations.sunnyDay.meta",
+    textKey: "recommendations.sunnyDay.meta",
       },
       actionText: "글쓰기",
       actionPayload: {
@@ -381,14 +381,14 @@ class PersonalizedRecommendationService {
       title: "첫 포스팅 도전!",
       content: "포스티와 함께하는 첫 포스팅,\n부담없이 시작해보세요!",
       // 번역 키 추가
-      titleKey: "recommendations.firstPost.title",
-      contentKey: "recommendations.firstPost.content",
-      badgeKey: "recommendations.firstPost.badge",
-      actionTextKey: "recommendations.firstPost.action",
+    titleKey: "recommendations.firstPost.title",
+    contentKey: "recommendations.firstPost.content",
+    badgeKey: "recommendations.firstPost.badge",
+    actionTextKey: "recommendations.firstPost.action",
       meta: {
         icon: "rocket-outline",
         text: "시작이 반",
-        textKey: "recommendations.firstPost.meta",
+    textKey: "recommendations.firstPost.meta",
       },
       actionText: "첫 글쓰기",
       actionPayload: {
@@ -412,14 +412,14 @@ class PersonalizedRecommendationService {
       content:
         "벌써 10개의 이야기를 남기셨네요!\n특별한 회고를 해보는 건 어떨까요?",
       // 번역 키 추가
-      titleKey: "recommendations.milestone10.title",
-      contentKey: "recommendations.milestone10.content",
-      badgeKey: "recommendations.milestone10.badge",
-      actionTextKey: "recommendations.milestone10.action",
+    titleKey: "recommendations.milestone10.title",
+    contentKey: "recommendations.milestone10.content",
+    badgeKey: "recommendations.milestone10.badge",
+    actionTextKey: "recommendations.milestone10.action",
       meta: {
         icon: "star",
         text: "축하해요!",
-        textKey: "recommendations.milestone10.meta",
+    textKey: "recommendations.milestone10.meta",
       },
       actionText: "회고 쓰기",
       actionPayload: {
@@ -444,14 +444,14 @@ class PersonalizedRecommendationService {
       title: "갤러리의 숨은 사진들",
       content: "최근 찍은 사진들이 있네요!\n이야기를 더해 공유해보세요",
       // 번역 키 추가
-      titleKey: "recommendations.recentPhotos.title",
-      contentKey: "recommendations.recentPhotos.content",
-      badgeKey: "recommendations.recentPhotos.badge",
-      actionTextKey: "recommendations.recentPhotos.action",
+    titleKey: "recommendations.recentPhotos.title",
+    contentKey: "recommendations.recentPhotos.content",
+    badgeKey: "recommendations.recentPhotos.badge",
+    actionTextKey: "recommendations.recentPhotos.action",
       meta: {
         icon: "collections",
         text: "사진 발견",
-        textKey: "recommendations.recentPhotos.meta",
+    textKey: "recommendations.recentPhotos.meta",
       },
       actionText: "사진 선택",
       actionPayload: {
@@ -464,33 +464,7 @@ class PersonalizedRecommendationService {
       },
     },
 
-    // 트렌드 기반 추천
-    {
-      id: "trending-topic",
-      type: "trending",
-      icon: "trending-up",
-      iconColor: "#F44336",
-      badge: "🔥 트렌드",
-      badgeEmoji: "🔥",
-      title: "지금 뜨고 있는 주제",
-      content: "많은 사람들이 관심을 가지는\n트렌딩 주제로 글을 써보세요",
-      // 번역 키 추가
-      titleKey: "recommendations.trendingTopic.title",
-      contentKey: "recommendations.trendingTopic.content",
-      badgeKey: "recommendations.trendingTopic.badge",
-      actionTextKey: "recommendations.trendingTopic.action",
-      meta: {
-        icon: "whatshot",
-        text: "인기 주제",
-        textKey: "recommendations.trendingTopic.meta",
-      },
-      actionText: "트렌드 보기",
-      actionPayload: {
-        prompt: "최신 트렌드 참여하기",
-        category: "trend",
-      },
-      priority: 6,
-    },
+    // 트렌드 기반 추천 - 제거됨 (사용자 요청)
 
     // 완성 유도 추천 - 미구현으로 주석 처리
     // {
@@ -524,14 +498,14 @@ class PersonalizedRecommendationService {
       title: "오늘 하루 한 줄 일기",
       content: "긴 글 필요 없어요!\n오늘 있었던 일 한 줄만 써보세요",
       // 번역 키 추가
-      titleKey: "recommendations.simpleDaily.title",
-      contentKey: "recommendations.simpleDaily.content",
-      badgeKey: "recommendations.simpleDaily.badge",
-      actionTextKey: "recommendations.simpleDaily.action",
+    titleKey: "recommendations.simpleDaily.title",
+    contentKey: "recommendations.simpleDaily.content",
+    badgeKey: "recommendations.simpleDaily.badge",
+    actionTextKey: "recommendations.simpleDaily.action",
       meta: {
         icon: "timer",
         text: "30초 완성",
-        textKey: "recommendations.simpleDaily.meta",
+    textKey: "recommendations.simpleDaily.meta",
       },
       actionText: "한 줄 쓰기",
       actionPayload: {
@@ -553,17 +527,17 @@ class PersonalizedRecommendationService {
       iconColor: "#9C27B0",
       badge: "✨ 문장 정리",
       badgeEmoji: "✨",
-      title: "어색한 문장 다듬기",
-      content: "써놓은 글이 어색해요?\nAI가 자연스럽게 다듬어드릴게요",
-      // 번역 키 추가
-      titleKey: "recommendations.polishText.title",
-      contentKey: "recommendations.polishText.content",
-      badgeKey: "recommendations.polishText.badge",
-      actionTextKey: "recommendations.polishText.action",
+      title: "작성한 글을 다듬어보세요",
+      content: "이미 써둔 글이 있다면\nAI가 더 멋지게 다듬어줄게요",
+      // 번역 키 주석 처리 - 하드코딩된 한국어 사용
+    titleKey: "recommendations.polishText.title",
+    contentKey: "recommendations.polishText.content",
+    badgeKey: "recommendations.polishText.badge",
+    actionTextKey: "recommendations.polishText.action",
       meta: {
         icon: "auto-fix-high",
         text: "AI 문장 교정",
-        textKey: "recommendations.polishText.meta",
+    textKey: "recommendations.polishText.meta",
       },
       actionText: "문장 다듬기",
       actionPayload: {
@@ -585,15 +559,15 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🎨",
       title: "초안을 멋진 글로!",
       content: "대충 쓴 메모도\n완성도 높은 포스팅으로 변신!",
-      // 번역 키 추가
-      titleKey: "recommendations.improveWriting.title",
-      contentKey: "recommendations.improveWriting.content",
-      badgeKey: "recommendations.improveWriting.badge",
-      actionTextKey: "recommendations.improveWriting.action",
+      // 번역 키 주석 처리 - 하드코딩된 한국어 사용
+    titleKey: "recommendations.improveWriting.title",
+    contentKey: "recommendations.improveWriting.content",
+    badgeKey: "recommendations.improveWriting.badge",
+    actionTextKey: "recommendations.improveWriting.action",
       meta: {
         icon: "trending-up",
         text: "글 퀄리티 UP",
-        textKey: "recommendations.improveWriting.meta",
+    textKey: "recommendations.improveWriting.meta",
       },
       actionText: "AI로 완성하기",
       actionPayload: {
@@ -617,14 +591,14 @@ class PersonalizedRecommendationService {
       title: "귀여운 반려동물 자랑",
       content: "우리 집 반려동물의 귀여운 모습을\n모두와 함께 나누어 보세요",
       // 번역 키 추가
-      titleKey: "recommendations.petPhoto.title",
-      contentKey: "recommendations.petPhoto.content",
-      badgeKey: "recommendations.petPhoto.badge",
-      actionTextKey: "recommendations.petPhoto.action",
+    titleKey: "recommendations.petPhoto.title",
+    contentKey: "recommendations.petPhoto.content",
+    badgeKey: "recommendations.petPhoto.badge",
+    actionTextKey: "recommendations.petPhoto.action",
       meta: {
         icon: "star",
         text: "힐링 콘텐츠",
-        textKey: "recommendations.petPhoto.meta",
+    textKey: "recommendations.petPhoto.meta",
       },
       actionText: "자랑하기",
       actionPayload: {
@@ -645,14 +619,14 @@ class PersonalizedRecommendationService {
       title: "오늘 날씨 어때?",
       content: '날씨 얘기는 언제나 쉬워요\n"덥다", "춥다"만 써도 OK!',
       // 번역 키 추가
-      titleKey: "recommendations.weatherTalk.title",
-      contentKey: "recommendations.weatherTalk.content",
-      badgeKey: "recommendations.weatherTalk.badge",
-      actionTextKey: "recommendations.weatherTalk.action",
+    titleKey: "recommendations.weatherTalk.title",
+    contentKey: "recommendations.weatherTalk.content",
+    badgeKey: "recommendations.weatherTalk.badge",
+    actionTextKey: "recommendations.weatherTalk.action",
       meta: {
         icon: "thermostat",
         text: "부담없이",
-        textKey: "recommendations.weatherTalk.meta",
+    textKey: "recommendations.weatherTalk.meta",
       },
       actionText: "날씨 얘기",
       actionPayload: {
@@ -675,14 +649,14 @@ class PersonalizedRecommendationService {
       title: "주말엔 쉬어도 돼!",
       content: "침대에서 뒹굴거리는 것도\n멋진 주말 일상이에요",
       // 번역 키 추가
-      titleKey: "recommendations.weekendRest.title",
-      contentKey: "recommendations.weekendRest.content",
-      badgeKey: "recommendations.weekendRest.badge",
-      actionTextKey: "recommendations.weekendRest.action",
+    titleKey: "recommendations.weekendRest.title",
+    contentKey: "recommendations.weekendRest.content",
+    badgeKey: "recommendations.weekendRest.badge",
+    actionTextKey: "recommendations.weekendRest.action",
       meta: {
         icon: "hotel",
         text: "휴식 중",
-        textKey: "recommendations.weekendRest.meta",
+    textKey: "recommendations.weekendRest.meta",
       },
       actionText: "휴식 기록",
       actionPayload: {
@@ -706,14 +680,14 @@ class PersonalizedRecommendationService {
       title: "카페에서 한 컷?",
       content: "예쁜 카페 사진 하나면\n오늘의 포스팅 완성!",
       // 번역 키 추가
-      titleKey: "recommendations.coffeeTime.title",
-      contentKey: "recommendations.coffeeTime.content",
-      badgeKey: "recommendations.coffeeTime.badge",
-      actionTextKey: "recommendations.coffeeTime.action",
+    titleKey: "recommendations.coffeeTime.title",
+    contentKey: "recommendations.coffeeTime.content",
+    badgeKey: "recommendations.coffeeTime.badge",
+    actionTextKey: "recommendations.coffeeTime.action",
       meta: {
         icon: "photo-camera",
         text: "분위기 있게",
-        textKey: "recommendations.coffeeTime.meta",
+    textKey: "recommendations.coffeeTime.meta",
       },
       actionText: "카페 사진",
       actionPayload: {
@@ -737,14 +711,14 @@ class PersonalizedRecommendationService {
       badgeEmoji: "📝",
       title: "지금 이 순간을 기록해보세요",
       content: "특별할 필요 없어요\n일상의 소소한 순간이 가장 소중해요",
-      titleKey: "recommendations.dailyMoment.title",
-      contentKey: "recommendations.dailyMoment.content", 
-      badgeKey: "recommendations.dailyMoment.badge",
-      actionTextKey: "recommendations.dailyMoment.action",
+    titleKey: "recommendations.dailyMoment.title",
+    contentKey: "recommendations.dailyMoment.content", 
+    badgeKey: "recommendations.dailyMoment.badge",
+    actionTextKey: "recommendations.dailyMoment.action",
       meta: {
         icon: "schedule",
         text: "언제든지",
-        textKey: "recommendations.dailyMoment.meta",
+    textKey: "recommendations.dailyMoment.meta",
       },
       actionText: "기록하기",
       actionPayload: {
@@ -763,14 +737,14 @@ class PersonalizedRecommendationService {
       badgeEmoji: "💭", 
       title: "오늘 든 생각 하나만",
       content: "복잡하게 생각할 필요 없어요\n떠오른 생각 하나만 적어보세요",
-      titleKey: "recommendations.simple.title",
-      contentKey: "recommendations.simple.content",
-      badgeKey: "recommendations.simple.badge", 
-      actionTextKey: "recommendations.simple.action",
+    titleKey: "recommendations.simple.title",
+    contentKey: "recommendations.simple.content",
+    badgeKey: "recommendations.simple.badge", 
+    actionTextKey: "recommendations.simple.action",
       meta: {
         icon: "edit",
         text: "간단하게",
-        textKey: "recommendations.simple.meta",
+    textKey: "recommendations.simple.meta",
       },
       actionText: "생각 적기",
       actionPayload: {
@@ -789,14 +763,14 @@ class PersonalizedRecommendationService {
       badgeEmoji: "🙏",
       title: "오늘 감사한 일이 있나요?",
       content: "작은 것이라도 좋아요\n감사한 마음을 표현해보세요",
-      titleKey: "recommendations.gratitude.title",
-      contentKey: "recommendations.gratitude.content",
-      badgeKey: "recommendations.gratitude.badge",
-      actionTextKey: "recommendations.gratitude.action", 
+    titleKey: "recommendations.gratitude.title",
+    contentKey: "recommendations.gratitude.content",
+    badgeKey: "recommendations.gratitude.badge",
+    actionTextKey: "recommendations.gratitude.action", 
       meta: {
         icon: "sentiment-satisfied",
         text: "마음 편안",
-        textKey: "recommendations.gratitude.meta",
+    textKey: "recommendations.gratitude.meta",
       },
       actionText: "감사 표현",
       actionPayload: {

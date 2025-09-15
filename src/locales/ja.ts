@@ -1538,6 +1538,83 @@ const ja = {
       badge: "☀️ 晴れの日",
       action: "書く",
       meta: "晴れ"
+    },
+    morningRoutine: {
+      title: "モーニングコーヒータイム",
+      content: "朝のコーヒーと一緒に一日の始まりを\n記録してみてはいかがでしょうか？",
+      badge: "🌅 朝ルーティン",
+      action: "書く",
+      meta: "朝7-9時推薦"
+    },
+    goldenHour: {
+      title: "黄金色の写真タイム",
+      content: "夕日の黄金色が最も美しい時間！\n感性的な写真を撮るのに良い時です",
+      badge: "📸 ゴールデンアワー",
+      action: "写真のコツを見る",
+      meta: "日没1時間前"
+    },
+    fridayMood: {
+      title: "燃える金曜日！",
+      content: "一週間お疲れ様でした\n週末の計画を共有してみませんか",
+      badge: "🎉 花金",
+      action: "書く",
+      meta: "週末開始"
+    },
+    weekendVibes: {
+      title: "ゆったり週末",
+      content: "週末のお出かけや休憩時間を\n記録してみてはいかがでしょうか？",
+      badge: "🌈 週末",
+      action: "書く",
+      meta: "週末活動"
+    },
+    milestone10: {
+      title: "10回目の投稿！",
+      content: "もう10個のストーリーを残されたのですね！\n特別な振り返りをしてみてはいかがでしょうか？",
+      badge: "🏆 10個達成",
+      action: "振り返りを書く",
+      meta: "おめでとうございます！"
+    },
+    recentPhotos: {
+      title: "ギャラリーの隠れた写真たち",
+      content: "最近撮った写真がありますね！\nストーリーを加えて共有してみてください",
+      badge: "📷 最近の写真",
+      action: "写真を選択",
+      meta: "写真発見"
+    },
+    simpleDaily: {
+      title: "今日一日一行日記",
+      content: "長い文章は必要ありません！\n今日あったことを一行だけ書いてみてください",
+      badge: "✍️ 簡単日記",
+      action: "一行書く",
+      meta: "30秒完成"
+    },
+    improveWriting: {
+      title: "下書きを素敵な文章に！",
+      content: "適当に書いたメモも\n完成度の高い投稿に変身！",
+      badge: "🎨 文章完成ツール",
+      action: "AIで完成させる",
+      meta: "文章クオリティUP"
+    },
+    petPhoto: {
+      title: "可愛いペット自慢",
+      content: "うちのペットの可愛い姿を\nみんなと一緒に分かち合ってみてください",
+      badge: "🐾 ペット",
+      action: "自慢する",
+      meta: "ヒーリングコンテンツ"
+    },
+    weekendRest: {
+      title: "週末は休んでもいい！",
+      content: "ベッドでごろごろするのも\n素敵な週末の日常です",
+      badge: "😴 週末休憩",
+      action: "休憩記録",
+      meta: "休憩中"
+    },
+    coffeeTime: {
+      title: "カフェで一枚？",
+      content: "きれいなカフェの写真一枚で\n今日の投稿完成！",
+      badge: "☕ カフェタイム",
+      action: "カフェ写真",
+      meta: "雰囲気よく"
     }
   },
 

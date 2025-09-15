@@ -1562,6 +1562,83 @@ const zhCN = {
       badge: "☀️ 晴天",
       action: "写作",
       meta: "晴朗"
+    },
+    morningRoutine: {
+      title: "晨间咖啡时光",
+      content: "与晨间咖啡一起记录\n一天的开始如何？",
+      badge: "🌅 晨间例行",
+      action: "写作",
+      meta: "上午7-9点推荐"
+    },
+    goldenHour: {
+      title: "黄金时刻摄影",
+      content: "夕阳的黄金色彩最美丽！\n这是拍摄感性照片的好时机",
+      badge: "📸 黄金时刻",
+      action: "查看摄影技巧",
+      meta: "日落前1小时"
+    },
+    fridayMood: {
+      title: "燃烧的周五！",
+      content: "辛苦了一周的你\n分享一下周末计划吧",
+      badge: "🎉 周五",
+      action: "写作",
+      meta: "周末开始"
+    },
+    weekendVibes: {
+      title: "悠闲周末",
+      content: "记录一下周末出游\n或休息时光如何？",
+      badge: "🌈 周末",
+      action: "写作",
+      meta: "周末活动"
+    },
+    milestone10: {
+      title: "第10篇帖子！",
+      content: "您已经留下了10个故事！\n来写个特别的回顾如何？",
+      badge: "🏆 10篇达成",
+      action: "写回顾",
+      meta: "恭喜您！"
+    },
+    recentPhotos: {
+      title: "相册里的隐藏照片",
+      content: "最近拍的照片就在那里！\n加上故事分享出来吧",
+      badge: "📷 最近照片",
+      action: "选择照片",
+      meta: "发现照片"
+    },
+    simpleDaily: {
+      title: "今日一行日记",
+      content: "不需要长篇大论！\n只写今天发生的一件事就好",
+      badge: "✍️ 简单日记",
+      action: "写一行",
+      meta: "30秒完成"
+    },
+    improveWriting: {
+      title: "草稿变精彩文章！",
+      content: "随便写的备忘录也能\n变成高质量的帖子！",
+      badge: "🎨 文章完善工具",
+      action: "AI完善",
+      meta: "文章质量提升"
+    },
+    petPhoto: {
+      title: "可爱宠物炫耀",
+      content: "我家宠物的可爱模样\n和大家一起分享吧",
+      badge: "🐾 宠物",
+      action: "炫耀",
+      meta: "治愈内容"
+    },
+    weekendRest: {
+      title: "周末可以休息！",
+      content: "在床上滚来滚去也是\n美好的周末日常",
+      badge: "😴 周末休息",
+      action: "记录休息",
+      meta: "休息中"
+    },
+    coffeeTime: {
+      title: "咖啡馆来一张？",
+      content: "漂亮咖啡馆的照片一张\n今天的帖子就完成了！",
+      badge: "☕ 咖啡时光",
+      action: "咖啡馆照片",
+      meta: "有氛围"
     }
   },
 
