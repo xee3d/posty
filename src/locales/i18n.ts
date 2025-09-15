@@ -23,7 +23,7 @@ const getDeviceLanguage = () => {
   }
 
   const supportedLanguages = ['ko', 'en', 'ja', 'zh-CN'];
-  const finalLang = supportedLanguages.includes(deviceLang) ? deviceLang : 'ko';
+  const finalLang = supportedLanguages.includes(deviceLang) ? deviceLang : 'en';
   console.log('🌍 [i18n] Final language for i18n:', finalLang);
   return finalLang;
 };
@@ -51,7 +51,7 @@ if (!i18next.isInitialized) {
     .init({
       resources,
       lng: getDeviceLanguage(),
-      fallbackLng: 'ko',
+      fallbackLng: 'en',
       returnObjects: true, // 객체 반환 허용 - 중국어 polishOptions 등에서 필요
       interpolation: {
         escapeValue: false,

@@ -78,7 +78,12 @@
       "Bash(do echo \"=== $lang theme test ===\")",
       "Read(///**)",
       "Read(//Users/ethan_macstudio/Library/Caches/**)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(./clear-i18n-cache.sh:*)",
+      "Bash(do if ! grep -q \"$key\" /Users/ethan_macstudio/Projects/posty/src/locales/ja.ts)",
+      "Bash(then echo \"  - $key\")",
+      "Bash(fi)",
+      "Bash(do if ! grep -q \"$key\" /Users/ethan_macstudio/Projects/posty/src/locales/zh-CN.ts)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

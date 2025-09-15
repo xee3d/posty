@@ -70,7 +70,7 @@ const ja = {
     inviteFriendsMessage: "ご友人が登録されると5個のトークンを獲得できます！",
     cancelSubscription: "購読キャンセル",
     cancelSubscriptionMessage: "{{planName}}プランの購読をキャンセルされますか？\n\nキャンセルされても次回請求日まで現在のプランをご利用いただけます。",
-    cancelSubscriptionAction: "購読をキャンセルする",
+    cancelSubscriptionAction: "キャンセル",
     cancelSubscriptionSuccess: "購読キャンセルが完了しました",
     cancelSubscriptionSuccessMessage: "購読がキャンセルされました。次回請求日まで現在のプランを引き続きご利用いただけます。",
     cancelSubscriptionFailed: "購読キャンセルに失敗しました",
@@ -83,7 +83,7 @@ const ja = {
     downgradeNotAllowedMessage: "下位プランには変更できません。\n\n現在の購読をキャンセルして期限後に新しくご登録ください。",
     subtitle: "すべての機能をご利用いただけます",
     currentPlan: "現在のプラン",
-    upgradeNow: "今すぐアップグレードする",
+    upgradeNow: "アップグレード",
     manageSubscription: "サブスクリプション管理",
     renewalDate: "更新日",
     perYear: "/年",
@@ -158,7 +158,7 @@ const ja = {
       managePayment: "支払い方法を管理する",
       viewInvoices: "請求書を表示する",
       cancelPlan: "プランを解除する",
-      upgradePlan: "プランをアップグレードする"
+      upgradePlan: "プラン変更"
     },
     earnTokensSection: {
       title: "無料でトークンを獲得しましょう",
@@ -422,7 +422,7 @@ const ja = {
       lengthTitle: "プレミアム長さ",
       viewPlans: "プランを表示する",
       watchAd: "広告視聴（1回使用）",
-      upgrade: "アップグレードする",
+      upgrade: "変更",
       oneTimeUse: "1回使用",
     },
     tokenUsage: {
@@ -724,7 +724,7 @@ const ja = {
     premium: {
       title: "プレミアム機能",
       subtitle: "より詳細な分析とテンプレートをご利用ください",
-      upgradeButton: "アップグレードする"
+      upgradeButton: "変更"
     },
     alerts: {
       challengeStart: "チャレンジを開始します！",
@@ -734,7 +734,7 @@ const ja = {
       premiumTemplate: "プレミアムテンプレート",
       premiumTemplateMessage: "PROプランですべてのテンプレートをご使用いただけます。",
       cancel: "キャンセル",
-      upgrade: "アップグレードする",
+      upgrade: "変更",
       confirm: "確認する"
     },
     weekdays: {
@@ -803,7 +803,7 @@ const ja = {
     premium: {
       title: "プレミアム機能",
       subtitle: "リアルタイムトレンドはPROプランからご利用いただけます。",
-      upgradeButton: "アップグレードする",
+      upgradeButton: "変更",
       preview: {
         title: "トレンドプレビュー",
         subtitle: "トレンドを分析してトラフィックを増やし、\nリアルタイムの話題に合わせてコンテンツを作成してみませんか。"
@@ -853,8 +853,8 @@ const ja = {
       today: "今日 {{count}}個使用",
     },
     actions: {
-      getFree: "無料トークンを受け取る",
-      charge: "トークンを追加購入する"
+      getFree: "無料受け取り",
+      charge: "追加購入"
     },
     info: {
       free: "毎日深夜0時に10個の無料トークンが補充されます",
@@ -1341,7 +1341,7 @@ const ja = {
       monthlyTokens: "毎月{{count}}個のトークン",
       limitedOffer: "期間限定",
       limitedOfferDesc: "特別価格でのご提供",
-      upgradeNow: "今すぐアップグレード",
+      upgradeNow: "変更",
       freeTokens: "無料トークン",
       purchaseTokens: "トークン購入",
       tokenPackages: "トークンパッケージ",
@@ -1366,7 +1366,7 @@ const ja = {
       content: "今日のご自分の写真を一枚撮って\n簡単なご挨拶をお書きいただくだけで素敵な投稿になります",
       badge: "🤳 簡単スタート",
       action: "始める",
-      meta: "プレッシャーゼロ"
+      meta: "気軽"
     },
     easyFood: {
       title: "何を召し上がりましたか？これで終わりです！",
@@ -1387,7 +1387,7 @@ const ja = {
       content: "美味しいランチをお召し上がりになりましたか？\nお料理の写真と一緒にシェアしてみませんか！",
       badge: "🍽️ ランチタイム",
       action: "写真をアップ",
-      meta: "ランチタイム推薦",
+      meta: "ランチ",
     },
     dailyMoment: {
       title: "今、この瞬間を記録しませんか",
@@ -1521,7 +1521,7 @@ const ja = {
       content: "今週の目標やご計画を\n共有してみませんか？",
       badge: "💪 月曜日",
       action: "書く",
-      meta: "モチベーションコンテンツ"
+      meta: "やる気"
     },
     // 雨の日
     rainyDay: {
@@ -1544,14 +1544,14 @@ const ja = {
       content: "朝のコーヒーと一緒に一日の始まりを\n記録してみてはいかがでしょうか？",
       badge: "🌅 朝ルーティン",
       action: "書く",
-      meta: "朝7-9時推薦"
+      meta: "朝"
     },
     goldenHour: {
       title: "黄金色の写真タイム",
       content: "夕日の黄金色が最も美しい時間！\n感性的な写真を撮るのに良い時です",
       badge: "📸 ゴールデンアワー",
       action: "写真のコツを見る",
-      meta: "日没1時間前"
+      meta: "夕方"
     },
     fridayMood: {
       title: "燃える金曜日！",
@@ -1572,7 +1572,7 @@ const ja = {
       content: "もう10個のストーリーを残されたのですね！\n特別な振り返りをしてみてはいかがでしょうか？",
       badge: "🏆 10個達成",
       action: "振り返りを書く",
-      meta: "おめでとうございます！"
+      meta: "祝福"
     },
     recentPhotos: {
       title: "ギャラリーの隠れた写真たち",
@@ -1593,14 +1593,14 @@ const ja = {
       content: "適当に書いたメモも\n完成度の高い投稿に変身！",
       badge: "🎨 文章完成ツール",
       action: "AIで完成させる",
-      meta: "文章クオリティUP"
+      meta: "改善"
     },
     petPhoto: {
       title: "可愛いペット自慢",
       content: "うちのペットの可愛い姿を\nみんなと一緒に分かち合ってみてください",
       badge: "🐾 ペット",
       action: "自慢する",
-      meta: "ヒーリングコンテンツ"
+      meta: "癒し"
     },
     weekendRest: {
       title: "週末は休んでもいい！",
@@ -1615,6 +1615,30 @@ const ja = {
       badge: "☕ カフェタイム",
       action: "カフェ写真",
       meta: "雰囲気よく"
+    },
+    // 日常記録
+    dailyMoment: {
+      title: "今この瞬間を記録してみてください",
+      content: "特別である必要はありません\n日常の小さな瞬間が最も大切です",
+      badge: "📝 日常記録",
+      action: "記録する",
+      meta: "いつでも"
+    },
+    // 簡単な考え
+    simple: {
+      title: "今日浮かんだ考えを一つだけ",
+      content: "複雑に考える必要はありません\n浮かんだ考えを一つだけ書いてみてください",
+      badge: "💭 簡単な考え",
+      action: "考えを書く",
+      meta: "簡単に"
+    },
+    // 感謝の気持ち
+    gratitude: {
+      title: "今日感謝していることはありますか？",
+      content: "小さなことでも大丈夫です\n感謝の気持ちを表現してみてください",
+      badge: "🙏 感謝の気持ち",
+      action: "感謝を表現",
+      meta: "心穏やか"
     }
   },
 
@@ -2074,11 +2098,11 @@ const ja = {
     title: "簡単ログイン",
     moreOptions: "他のアカウントで接続する",
     buttons: {
-      naver: "Naverでスタートする",
-      google: "Googleでスタートする",
-      kakao: "カカオでスタートする",
-      facebook: "Facebookでスタートする",
-      apple: "Appleでスタートする",
+      naver: "Naver",
+      google: "Google",
+      kakao: "カカオ",
+      facebook: "Facebook",
+      apple: "Apple",
     },
     errors: {
       title: "ログインに失敗しました",

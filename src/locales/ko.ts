@@ -1350,6 +1350,30 @@ const ko = {
       action: "커피 이야기",
       meta: "카페 문화",
     },
+    // 일상 기록
+    dailyMoment: {
+      title: "지금 이 순간을 기록해보세요",
+      content: "특별할 필요 없어요\n일상의 소소한 순간이 가장 소중해요",
+      badge: "📝 일상 기록",
+      action: "기록하기",
+      meta: "언제든지",
+    },
+    // 간단한 생각
+    simple: {
+      title: "오늘 든 생각 하나만",
+      content: "복잡하게 생각할 필요 없어요\n떠오른 생각 하나만 적어보세요",
+      badge: "💭 간단한 생각",
+      action: "생각 적기",
+      meta: "간단하게",
+    },
+    // 감사 인사
+    gratitude: {
+      title: "오늘 감사한 일이 있나요?",
+      content: "작은 것이라도 좋아요\n감사한 마음을 표현해보세요",
+      badge: "🙏 감사 인사",
+      action: "감사 표현",
+      meta: "마음 편안",
+    },
   },
 
   // Analytics

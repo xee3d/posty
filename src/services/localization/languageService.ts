@@ -1,5 +1,5 @@
 // 언어 감지 및 설정 서비스
-import { NativeModules, Platform } from 'react-native';
+import { NativeModules, Platform, AppState } from 'react-native';
 import * as RNLocalize from 'react-native-localize';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18next from '../../locales/i18n';
@@ -58,9 +58,10 @@ export const SUPPORTED_LANGUAGES: Record<SupportedLanguage, LanguageConfig> = {
 const STORAGE_KEY = '@posty_app_language';
 
 class LanguageService {
-  private currentLanguage: SupportedLanguage = 'ko';
+  private currentLanguage: SupportedLanguage = 'en';
   private isInitialized = false;
   private listeners: ((language: SupportedLanguage) => void)[] = [];
+  private appStateListener: any = null;
 
   /**
    * 언어 서비스 초기화
@@ -84,12 +85,12 @@ class LanguageService {
       
       // 언어 설정 저장
       await this.setLanguage(this.currentLanguage);
-      
+
       this.isInitialized = true;
       return this.currentLanguage;
     } catch (error) {
       console.error('[LanguageService] Initialization failed:', error);
-      this.currentLanguage = 'ko'; // fallback to Korean
+      this.currentLanguage = 'en'; // fallback to English
       this.isInitialized = true;
       return this.currentLanguage;
     }
@@ -114,12 +115,12 @@ class LanguageService {
         return 'zh-CN';
       }
       
-      // 기본값: 한국어
-      console.log('[LanguageService] Using fallback language: ko');
-      return 'ko';
+      // 기본값: 영어
+      console.log('[LanguageService] Using fallback language: en');
+      return 'en';
     } catch (error) {
       console.error('[LanguageService] System language detection failed:', error);
-      return 'ko';
+      return 'en';
     }
   }
 

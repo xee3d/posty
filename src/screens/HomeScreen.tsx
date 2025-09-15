@@ -52,7 +52,7 @@ import {
 import userBehaviorAnalytics from "../services/userBehaviorAnalytics";
 import simplePostService from "../services/simplePostService";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
-import { resetDailyTokens, setTokens, setSubscriptionPlan } from "../store/slices/userSlice";
+import { resetDailyTokens } from "../store/slices/userSlice";
 import { useTokenManagement } from "../hooks/useTokenManagement";
 import EarnTokenModal from "../components/EarnTokenModal";
 import { LowTokenPrompt } from "../components/LowTokenPrompt";
@@ -898,28 +898,26 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                         index > 0 && { marginLeft: SPACING.sm },
                       ]}
                     >
-                      <View style={{height: 20, backgroundColor: '#E0E0E0', borderRadius: 4, marginBottom: 8}}>
-                        <View
-                          style={[
-                            styles.recommendIconContainer,
-                            { backgroundColor: "#E5E5E5" },
-                          ]}
+                      <View style={styles.recommendCardContent}>
+                        <View style={styles.recommendHeader}>
+                          <View
+                            style={[
+                              styles.recommendIconContainer,
+                              { backgroundColor: "#E5E5E5" },
+                            ]}
+                          />
+                          <View style={{width: 50, height: 16, backgroundColor: '#E0E0E0', borderRadius: 4}} />
+                        </View>
+                        <TextSkeleton
+                          lines={1}
+                          lineHeight={16}
+                          style={{ marginBottom: 6 }}
                         />
-                        <View style={{width: 60, height: 20, backgroundColor: '#E0E0E0', borderRadius: 4}} />
-                      </View>
-                      <TextSkeleton
-                        lines={1}
-                        lineHeight={18}
-                        style={{ marginBottom: 8 }}
-                      />
-                      <TextSkeleton
-                        lines={2}
-                        lineHeight={14}
-                        lastLineWidth="80%"
-                      />
-                      <View style={{flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 8}}>
-                        <View style={{flex: 1, height: 12, backgroundColor: '#E0E0E0', borderRadius: 4}} />
-                        <View style={{width: 60, height: 24, backgroundColor: '#E0E0E0', borderRadius: 4, marginLeft: 8}} />
+                        <TextSkeleton
+                          lines={3}
+                          lineHeight={13}
+                          lastLineWidth="80%"
+                        />
                       </View>
                     </View>
                   ))}
@@ -934,131 +932,125 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                       index > 0 && { marginLeft: SPACING.sm },
                     ] as any}
                   >
-                    <View
-                      style={[
-                        styles.recommendIconContainer,
-                        { backgroundColor: card.iconColor },
-                      ]}
+                    <TouchableOpacity
+                      style={styles.recommendCardTouchable}
+                      onPress={async () => {
+                        // 추천 클릭 기록 (개인화를 위해)
+                        await userBehaviorAnalytics.recordRecommendationClick(
+                          card.id
+                        );
+                        personalizedRecommendationService.saveRecommendationShown(
+                          card.id
+                        );
+                        onNavigate("ai-write", card.actionPayload);
+                      }}
+                      activeOpacity={0.7}
                     >
-                      <SafeIcon
-                        name={card.icon}
-                        size={24}
-                        color={colors.white}
-                      />
-                    </View>
-                    <View style={styles.recommendBadge}>
-                      <Text style={styles.recommendBadgeText}>
-{card.badgeKey ? t(card.badgeKey) : (card.badge || "🎯 기본")}
-                      </Text>
-                    </View>
-                    <Text style={styles.recommendTitle}>
-{card.titleKey ? (console.log(`[DEBUG] Translating: ${card.titleKey} -> ${t(card.titleKey)}`), t(card.titleKey)) : (card.title || "추천 제목")}
-                    </Text>
-                    <Text style={styles.recommendContent}>
-{card.contentKey ? t(card.contentKey) : (card.content || "추천 내용")}
-                    </Text>
-                    <View style={styles.recommendFooter}>
-                      <View style={styles.recommendMeta}>
-                        <SafeIcon
-                          name={card.meta.icon}
-                          size={14}
-                          color={colors.text.secondary}
-                        />
-                        <Text style={styles.recommendMetaText}>
-{card.meta.textKey ? t(card.meta.textKey) : (card.meta.text || "기본 메타")}
+                      <View style={styles.recommendCardContent}>
+                        <View style={styles.recommendHeader}>
+                          <View
+                            style={[
+                              styles.recommendIconContainer,
+                              { backgroundColor: card.iconColor },
+                            ]}
+                          >
+                            <SafeIcon
+                              name={card.icon}
+                              size={24}
+                              color={colors.white}
+                            />
+                          </View>
+                          <View style={styles.recommendBadge}>
+                            <Text style={styles.recommendBadgeText}>
+                              {card.badgeKey ? t(card.badgeKey) : (card.badge || "🎯 기본")}
+                            </Text>
+                          </View>
+                        </View>
+                        <Text style={styles.recommendTitle} numberOfLines={1} ellipsizeMode="tail">
+                          {card.titleKey ? t(card.titleKey) : (card.title || "추천 제목")}
+                        </Text>
+                        <Text 
+                          style={styles.recommendContent} 
+                          numberOfLines={4} 
+                          ellipsizeMode="tail" 
+                          textBreakStrategy="balanced"
+                          allowFontScaling={false}
+                        >
+                          {card.contentKey ? t(card.contentKey) : (card.content || "추천 내용")}
                         </Text>
                       </View>
-                      <ScaleButton
-                        style={styles.writeButton}
-                        onPress={async () => {
-                          // 추천 클릭 기록 (개인화를 위해)
-                          await userBehaviorAnalytics.recordRecommendationClick(
-                            card.id
-                          );
-                          personalizedRecommendationService.saveRecommendationShown(
-                            card.id
-                          );
-                          onNavigate("ai-write", card.actionPayload);
-                        }}
-                      >
-                        <Text style={styles.writeButtonText}>
-{card.actionTextKey ? t(card.actionTextKey) : (card.actionText || "시작하기")}
-                        </Text>
-                      </ScaleButton>
-                    </View>
+                    </TouchableOpacity>
                   </AnimatedCard>
                 ))
               ) : (
                 // 데이터가 없을 때만 기본 카드 표시
                 <>
                   <AnimatedCard delay={700} style={styles.recommendCard}>
-                    <View style={styles.recommendIconContainer}>
-                      <SafeIcon name="create" size={24} color={colors.white} />
-                    </View>
-                    <View style={styles.recommendBadge}>
-                      <Text style={styles.recommendBadgeText}>{t("home.recommend.easy")}</Text>
-                    </View>
-                    <Text style={styles.recommendTitle}>{t("home.recommend.easyTitle")}</Text>
-                    <Text style={styles.recommendContent}>
-                      {t("home.recommend.easyContent")}
-                    </Text>
-                    <View style={styles.recommendFooter}>
-                      <View style={styles.recommendMeta}>
-                        <SafeIcon
-                          name="star"
-                          size={14}
-                          color={colors.text.secondary}
-                        />
-                        <Text style={styles.recommendMetaText}>{t("home.recommend.recommended")}</Text>
+                    <TouchableOpacity
+                      style={styles.recommendCardTouchable}
+                      onPress={() => onNavigate("ai-write")}
+                      activeOpacity={0.7}
+                    >
+                      <View style={styles.recommendCardContent}>
+                        <View style={styles.recommendHeader}>
+                          <View style={styles.recommendIconContainer}>
+                            <SafeIcon name="create" size={24} color={colors.white} />
+                          </View>
+                          <View style={styles.recommendBadge}>
+                            <Text style={styles.recommendBadgeText}>{t("home.recommend.easy")}</Text>
+                          </View>
+                        </View>
+                        <Text style={styles.recommendTitle} numberOfLines={1} ellipsizeMode="tail">{t("home.recommend.easyTitle")}</Text>
+                        <Text 
+                          style={styles.recommendContent} 
+                          numberOfLines={4} 
+                          ellipsizeMode="tail" 
+                          textBreakStrategy="balanced"
+                          allowFontScaling={false}
+                        >
+                          {t("home.recommend.easyContent")}
+                        </Text>
                       </View>
-                      <ScaleButton
-                        style={styles.writeButton}
-                        onPress={() => onNavigate("ai-write")}
-                      >
-                        <Text style={styles.writeButtonText}>{t("home.recommend.writeButton")}</Text>
-                      </ScaleButton>
-                    </View>
+                    </TouchableOpacity>
                   </AnimatedCard>
 
                   <AnimatedCard
                     delay={750}
                     style={[styles.recommendCard, { marginLeft: SPACING.sm }] as any}
                   >
-                    <View
-                      style={[
-                        styles.recommendIconContainer,
-                        { backgroundColor: "#E91E63" },
-                      ]}
+                    <TouchableOpacity
+                      style={styles.recommendCardTouchable}
+                      onPress={() => onNavigate("ai-write", { mode: "photo" })}
+                      activeOpacity={0.7}
                     >
-                      <SafeIcon name="camera" size={24} color={colors.white} />
-                    </View>
-                    <View style={styles.recommendBadge}>
-                      <Text style={styles.recommendBadgeText}>
-                        {t("home.recommend.easierPhoto")}
-                      </Text>
-                    </View>
-                    <Text style={styles.recommendTitle}>{t("home.recommend.photoTitle")}</Text>
-                    <Text style={styles.recommendContent}>
-                      {t("home.recommend.photoContent")}
-                    </Text>
-                    <View style={styles.recommendFooter}>
-                      <View style={styles.recommendMeta}>
-                        <SafeIcon
-                          name="images"
-                          size={14}
-                          color={colors.text.secondary}
-                        />
-                        <Text style={styles.recommendMetaText}>{t("home.recommend.convenient")}</Text>
+                      <View style={styles.recommendCardContent}>
+                        <View style={styles.recommendHeader}>
+                          <View
+                            style={[
+                              styles.recommendIconContainer,
+                              { backgroundColor: "#E91E63" },
+                            ]}
+                          >
+                            <SafeIcon name="camera" size={24} color={colors.white} />
+                          </View>
+                          <View style={styles.recommendBadge}>
+                            <Text style={styles.recommendBadgeText}>
+                              {t("home.recommend.easierPhoto")}
+                            </Text>
+                          </View>
+                        </View>
+                        <Text style={styles.recommendTitle} numberOfLines={1} ellipsizeMode="tail">{t("home.recommend.photoTitle")}</Text>
+                        <Text 
+                          style={styles.recommendContent} 
+                          numberOfLines={4} 
+                          ellipsizeMode="tail" 
+                          textBreakStrategy="balanced"
+                          allowFontScaling={false}
+                        >
+                          {t("home.recommend.photoContent")}
+                        </Text>
                       </View>
-                      <ScaleButton
-                        style={styles.writeButton}
-                        onPress={() =>
-                          onNavigate("ai-write", { mode: "photo" })
-                        }
-                      >
-                        <Text style={styles.writeButtonText}>{t("home.recommend.photoSelectButton")}</Text>
-                      </ScaleButton>
-                    </View>
+                    </TouchableOpacity>
                   </AnimatedCard>
                 </>
               )}
@@ -1066,101 +1058,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </View>
         </SlideInView>
 
-        {/* 개발용 구독 테스트 카드 */}
-        {__DEV__ && (
-          <SlideInView direction="right" delay={600}>
-            <View style={styles.devTestSection}>
-              <View style={styles.sectionHeader}>
-                <View style={styles.sectionTitleContainer}>
-                  <SafeIcon name="construct" size={18} color={colors.warning} />
-                  <Text style={styles.sectionTitle}>개발용 구독 테스트</Text>
-                </View>
-              </View>
-              
-              <View style={styles.devTestCard}>
-                <Text style={styles.devTestTitle}>현재 구독 상태</Text>
-                <Text style={styles.devTestCurrentPlan}>
-                  {subscriptionPlan} • {currentTokens}개 토큰
-                </Text>
-                
-                <View style={styles.devTestButtonsContainer}>
-                  <TouchableOpacity
-                    style={[styles.devTestButton, { backgroundColor: '#E5E5EA' }]}
-                    onPress={() => {
-                      // 무료 플랜으로 변경
-                      dispatch(setSubscriptionPlan('free'));
-                      dispatch(setTokens(10));
-                    }}
-                  >
-                    <Text style={[styles.devTestButtonText, { color: '#333' }]}>무료</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={[styles.devTestButton, { backgroundColor: '#34C759' }]}
-                    onPress={() => {
-                      // STARTER 플랜으로 변경
-                      dispatch(setSubscriptionPlan('starter'));
-                      dispatch(setTokens(300));
-                    }}
-                  >
-                    <Text style={styles.devTestButtonText}>STARTER</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={[styles.devTestButton, { backgroundColor: '#007AFF' }]}
-                    onPress={() => {
-                      // PREMIUM 플랜으로 변경
-                      dispatch(setSubscriptionPlan('premium'));
-                      dispatch(setTokens(500));
-                    }}
-                  >
-                    <Text style={styles.devTestButtonText}>PREMIUM</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={[styles.devTestButton, { backgroundColor: '#FF3B30' }]}
-                    onPress={() => {
-                      // PRO 플랜으로 변경
-                      dispatch(setSubscriptionPlan('pro'));
-                      dispatch(setTokens(9999));
-                    }}
-                  >
-                    <Text style={styles.devTestButtonText}>PRO</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                <View style={styles.devTestTokenControls}>
-                  <TouchableOpacity
-                    style={[styles.devTestButton, styles.devTestTokenButton]}
-                    onPress={() => {
-                      dispatch(setTokens(0));
-                    }}
-                  >
-                    <Text style={[styles.devTestButtonText, { fontSize: 12 }]}>토큰 0개</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={[styles.devTestButton, styles.devTestTokenButton]}
-                    onPress={() => {
-                      dispatch(setTokens(5));
-                    }}
-                  >
-                    <Text style={[styles.devTestButtonText, { fontSize: 12 }]}>토큰 5개</Text>
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={[styles.devTestButton, styles.devTestTokenButton]}
-                    onPress={() => {
-                      dispatch(setTokens(currentTokens + 10));
-                    }}
-                  >
-                    <Text style={[styles.devTestButtonText, { fontSize: 12 }]}>+10개</Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-          </SlideInView>
-        )}
 
         {/* 최근 게시물 섹션 */}
         {recentPosts.length > 0 && (
@@ -1328,7 +1225,7 @@ const createStyles = (
   isDark?: boolean
 ) => {
   const { width: screenWidth } = Dimensions.get('window');
-  const cardWidth = Math.min(screenWidth * 0.8, 300); // 화면 너비의 80% 또는 최대 300px
+  const cardWidth = Math.min(screenWidth * 0.75, 280); // 화면 너비의 75% 또는 최대 280px로 줄임
 
   return StyleSheet.create({
     container: {
@@ -1660,8 +1557,10 @@ const createStyles = (
     recommendCard: {
       backgroundColor: isDark ? '#1F1F1F' : colors.surface, // 다크: 진한 회색, 라이트: 기본
       borderRadius: 16,
-      padding: SPACING.lg,
+      padding: SPACING.md, // lg에서 md로 줄여서 여백 최소화
       width: cardWidth,
+      minHeight: 180, // 내용이 보이도록 높이 조정
+      maxHeight: 220, // 내용이 보이도록 최대 높이 조정
       borderWidth: isDark ? 1 : 0, // 다크모드에서 경계선 추가
       borderColor: isDark ? '#333333' : 'transparent',
       shadowColor: isDark ? '#000000' : "#000",
@@ -1670,28 +1569,43 @@ const createStyles = (
       shadowRadius: isDark ? 6 : 4,
       elevation: isDark ? 5 : 3,
     },
+    recommendCardTouchable: {
+      flex: 1,
+    },
+    recommendCardContent: {
+      flex: 1,
+      justifyContent: 'flex-start',
+      width: '100%', // 전체 너비 사용
+    },
+    recommendHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: SPACING.sm,
+    },
     recommendIconContainer: {
-      width: 48,
-      height: 48,
-      borderRadius: 24,
+      width: 40, // 48에서 40으로 줄여서 더 컴팩트하게
+      height: 40, // 48에서 40으로 줄여서 더 컴팩트하게
+      borderRadius: 20, // 24에서 20으로 줄임
       backgroundColor: colors.primary,
       justifyContent: "center",
       alignItems: "center",
-      marginBottom: SPACING.sm,
+      marginRight: SPACING.sm, // 아이콘과 배지 사이 간격
     },
     recommendTitle: {
-      fontSize: 16,
+      fontSize: 15, // 16에서 15로 줄임
       fontWeight: "600",
       color: colors.text.primary,
       marginBottom: SPACING.xs,
+      lineHeight: 18, // 줄 높이 명시적으로 설정
+      textAlign: 'left', // 텍스트 정렬 명시
+      includeFontPadding: false, // 폰트 패딩 제거
+      maxWidth: '100%', // 최대 너비 제한
     },
     recommendBadge: {
       backgroundColor: isDark ? '#2A2A2A' : colors.lightGray, // 다크모드에서 더 밝은 회색
-      paddingHorizontal: 12,
-      paddingVertical: 6,
-      borderRadius: 20,
-      alignSelf: "flex-start",
-      marginBottom: SPACING.sm,
+      paddingHorizontal: 10, // 12에서 10으로 줄임
+      paddingVertical: 4, // 6에서 4로 줄임
+      borderRadius: 16, // 20에서 16으로 줄임
       borderWidth: isDark ? 1 : 0,
       borderColor: isDark ? '#404040' : 'transparent',
     },
@@ -1717,10 +1631,14 @@ const createStyles = (
       fontWeight: "500",
     },
     recommendContent: {
-      fontSize: 14,
+      fontSize: 13, // 14에서 13으로 줄임
       color: colors.text.primary,
-      lineHeight: 22,
-      marginBottom: SPACING.sm,
+      lineHeight: 18, // 20에서 18로 줄임
+      marginBottom: SPACING.xs, // sm에서 xs로 줄임
+      textAlign: 'left', // 텍스트 정렬 명시
+      includeFontPadding: false, // 폰트 패딩 제거
+      flex: 1, // 남은 공간을 차지하되
+      maxWidth: '100%', // 최대 너비 제한
     },
     recommendHashtags: {
       flexDirection: "row",
@@ -1735,15 +1653,23 @@ const createStyles = (
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+      minHeight: 40, // 48에서 40으로 줄임
+      marginTop: SPACING.xs, // sm에서 xs로 줄임
+      paddingTop: SPACING.xs, // sm에서 xs로 줄임
+      borderTopWidth: 1, // 구분선 추가
+      borderTopColor: isDark ? '#333333' : colors.border,
     },
     recommendMeta: {
       flexDirection: "row",
       alignItems: "center",
       gap: SPACING.xs,
+      flex: 1,
+      minWidth: 0,
     },
     recommendMetaText: {
       fontSize: 12,
       color: colors.text.tertiary,
+      flexShrink: 1,
     },
     writeButton: {
       backgroundColor: colors.primary,
@@ -2009,6 +1935,7 @@ const createStyles = (
       fontWeight: "600",
       color: colors.text.primary,
       marginBottom: 4,
+      textAlign: "center", // 제목도 가운데 정렬
     },
     templateDesc: {
       fontSize: 12,
@@ -2016,63 +1943,6 @@ const createStyles = (
       textAlign: "center",
     },
     
-    // 개발용 테스트 스타일
-    devTestSection: {
-      marginHorizontal: SPACING.lg,
-      marginTop: SPACING.lg,
-    },
-    devTestCard: {
-      backgroundColor: colors.surface,
-      borderRadius: 16,
-      padding: SPACING.lg,
-      borderWidth: 2,
-      borderColor: colors.warning + '40',
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 3,
-    },
-    devTestTitle: {
-      fontSize: 16,
-      fontWeight: "600",
-      color: colors.text.primary,
-      marginBottom: SPACING.xs,
-    },
-    devTestCurrentPlan: {
-      fontSize: 14,
-      color: colors.text.secondary,
-      marginBottom: SPACING.md,
-      fontWeight: "500",
-    },
-    devTestButtonsContainer: {
-      flexDirection: "row",
-      gap: SPACING.sm,
-      marginBottom: SPACING.md,
-    },
-    devTestButton: {
-      flex: 1,
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-      borderRadius: 8,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    devTestButtonText: {
-      color: colors.white,
-      fontSize: 14,
-      fontWeight: "600",
-    },
-    devTestTokenControls: {
-      flexDirection: "row",
-      gap: SPACING.sm,
-      marginTop: SPACING.sm,
-    },
-    devTestTokenButton: {
-      backgroundColor: colors.primary + '80',
-      flex: 1,
-      paddingVertical: 8,
-    },
   });
 };
 

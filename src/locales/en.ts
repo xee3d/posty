@@ -490,11 +490,11 @@ const en = {
     title: "Easy Login",
     moreOptions: "Connect with other account",
     buttons: {
-      naver: "Sign In with Naver",
-      google: "Sign In with Google",
-      kakao: "Sign In with Kakao",
-      facebook: "Sign In with Facebook",
-      apple: "Sign In with Apple",
+      naver: "Naver",
+      google: "Google",
+      kakao: "Kakao",
+      facebook: "Facebook",
+      apple: "Apple",
     },
     errors: {
       title: "Login Failed",
@@ -548,7 +548,7 @@ const en = {
       daysRemaining: "{{days}} days remaining",
       activeUntil: "Even after cancellation, you can continue using the current plan until {{date}}.",
       canceledUntil: "Your subscription has been canceled and will expire on {{date}}.",
-      cancelButton: "Cancel Subscription"
+      cancelButton: "Cancel"
     },
     earnTokensSection: {
       title: "Earn Free Tokens",
@@ -588,7 +588,7 @@ const en = {
     inviteFriendsMessage: "You'll get 5 tokens when your friend signs up!",
     cancelSubscription: "Cancel Subscription",
     cancelSubscriptionMessage: "Are you sure you want to cancel your {{planName}} plan subscription?\n\nYou can continue using the current plan until the next billing date even after cancellation.",
-    cancelSubscriptionAction: "Cancel Subscription",
+    cancelSubscriptionAction: "Cancel",
     cancelSubscriptionSuccess: "Subscription Canceled",
     cancelSubscriptionSuccessMessage: "Your subscription has been canceled. You can continue using the current plan until the next billing date.",
     cancelSubscriptionFailed: "Subscription Cancellation Failed",
@@ -1403,7 +1403,7 @@ const en = {
       content: "Take a photo of yourself today\nand write a simple greeting to make a great post",
       badge: "🤳 Easy Start",
       action: "Get Started",
-      meta: "Zero Pressure",
+      meta: "Easy",
     },
     // Food card
     easyFood: {
@@ -1411,7 +1411,7 @@ const en = {
       content: 'All you need is one food photo\nJust saying "delicious" is enough',
       badge: "🍜 Easy Posting",
       action: "Food Photo",
-      meta: "1 Min Complete",
+      meta: "Quick",
     },
     // Morning routine
     morningRoutine: {
@@ -1419,7 +1419,7 @@ const en = {
       content: "How about recording the start of your day\nwith morning coffee?",
       badge: "🌅 Morning Routine",
       action: "Write",
-      meta: "Recommended 7-9 AM",
+      meta: "Morning",
     },
     // Lunch time
     lunchTime: {
@@ -1427,7 +1427,7 @@ const en = {
       content: "Did you have a delicious lunch?\nShare it with a food photo!",
       badge: "🍽️ Lunch Time",
       action: "Upload Photo",
-      meta: "Lunch Time Recommended",
+      meta: "Lunch Time",
     },
     // Golden hour
     goldenHour: {
@@ -1435,7 +1435,7 @@ const en = {
       content: "The golden light at sunset is the most beautiful!\nIt's a great time for emotional photos",
       badge: "📸 Golden Hour",
       action: "See Photo Tips",
-      meta: "1 Hour Before Sunset",
+      meta: "Golden Hour",
     },
     // Monday motivation
     mondayMotivation: {
@@ -1443,7 +1443,7 @@ const en = {
       content: "How about sharing your goals\nand plans for this week?",
       badge: "💪 Monday",
       action: "Write",
-      meta: "Motivational Content",
+      meta: "Motivation",
     },
     // Friday mood
     fridayMood: {
@@ -1459,7 +1459,7 @@ const en = {
       content: "How about recording your weekend\noutings or rest time?",
       badge: "🌈 Weekend",
       action: "Write",
-      meta: "Weekend Activities",
+      meta: "Weekend",
     },
     // Rainy day
     rainyDay: {
@@ -1467,7 +1467,7 @@ const en = {
       content: "Share indoor activities with the sound of rain\nor emotional thoughts",
       badge: "🌧️ Emotional Time",
       action: "Write",
-      meta: "Indoor Activities Recommended",
+      meta: "Indoor",
     },
     // Sunny day
     sunnyDay: {
@@ -1475,7 +1475,7 @@ const en = {
       content: "Tell us about outdoor activities\nor walk stories under the clear sky",
       badge: "☀️ Sunny",
       action: "Write",
-      meta: "Outdoor Activities Recommended",
+      meta: "Outdoor",
     },
     // 10 posts milestone
     milestone10: {
@@ -1483,7 +1483,7 @@ const en = {
       content: "Your consistent writing is awesome!\nShare your experience so far",
       badge: "🏆 Achievement",
       action: "Share Experience",
-      meta: "Writing Consistency",
+      meta: "Consistency",
     },
     // Recent photos
     recentPhotos: {
@@ -1491,7 +1491,7 @@ const en = {
       content: "Select one of the photos in your gallery\nand create a wonderful story",
       badge: "📱 Photo Utilization",
       action: "Select Photo",
-      meta: "Gallery Photo Utilization",
+      meta: "Gallery",
     },
     // Trending topic
     trendingTopic: {
@@ -1515,7 +1515,7 @@ const en = {
       content: "If you have already written text,\nAI will make it more beautiful",
       badge: "✨ Polish",
       action: "Polish Text",
-      meta: "Text Improvement",
+      meta: "Improve",
     },
     // Improve writing
     improveWriting: {
@@ -1523,7 +1523,7 @@ const en = {
       content: "How about challenging yourself\nto write a bit longer than usual?",
       badge: "📚 Growth",
       action: "Take Challenge",
-      meta: "Skill Improvement",
+      meta: "Skill Up",
     },
     // Pet photo
     petPhoto: {
@@ -1531,7 +1531,7 @@ const en = {
       content: "Share the cute appearance of your pet\nwith everyone",
       badge: "🐾 Pet",
       action: "Show Off",
-      meta: "Healing Content",
+      meta: "Healing",
     },
     // Weather talk
     weatherTalk: {
@@ -1539,7 +1539,7 @@ const en = {
       content: "How about talking about your mood\nor plans according to the weather?",
       badge: "🌤️ Weather",
       action: "Weather Talk",
-      meta: "Daily Conversation",
+      meta: "Daily",
     },
     // Weekend rest
     weekendRest: {
@@ -1556,6 +1556,30 @@ const en = {
       badge: "☕ Coffee",
       action: "Coffee Story",
       meta: "Cafe Culture",
+    },
+    // Daily moment
+    dailyMoment: {
+      title: "Record This Moment",
+      content: "No need to be special\nSmall moments in daily life are the most precious",
+      badge: "📝 Daily Record",
+      action: "Record",
+      meta: "Anytime",
+    },
+    // Simple thoughts
+    simple: {
+      title: "Just One Thought Today",
+      content: "No need to think complicated\nJust write down one thought that comes to mind",
+      badge: "💭 Simple Thought",
+      action: "Write Thought",
+      meta: "Simply",
+    },
+    // Gratitude
+    gratitude: {
+      title: "Is There Something You're Grateful for Today?",
+      content: "Even small things are good\nExpress your gratitude",
+      badge: "🙏 Gratitude",
+      action: "Express Gratitude",
+      meta: "Peaceful Mind",
     },
   },
 
@@ -1681,8 +1705,8 @@ const en = {
       today: "Used {{count}} today",
     },
     actions: {
-      getFree: "Get Free Tokens",
-      charge: "Charge Tokens"
+      getFree: "Get Free",
+      charge: "Buy More"
     },
     info: {
       free: "10 free tokens are recharged daily at midnight",
