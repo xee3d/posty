@@ -1,4 +1,4 @@
-export default {
+const ja = {
   common: {
     confirm: "確認する",
     cancel: "キャンセル",
@@ -536,14 +536,6 @@ export default {
       serverError: "サーバーエラーが発生しました",
       rateLimitExceeded: "利用制限を超えました",
       insufficientTokens: "トークンが不足しています"
-    },
-    
-    tokenUsage: {
-      remaining: "残りトークン: {{count}}個",
-      used: "使用トークン: {{count}}個",
-      required: "必要トークン: {{count}}個",
-      insufficient: "トークンが不足しています",
-      purchaseMore: "追加購入する"
     }
   },
 
@@ -1145,6 +1137,16 @@ export default {
     vibration: "振動",
     themeAndColors: "テーマと色",
     themeDescription: "テーマ設定",
+    theme: {
+      title: "テーマ設定",
+      mode: "モード選択",
+      color: "テーマカラー",
+      light: "ライトモード",
+      dark: "ダークモード",
+      system: "システム設定に従う",
+      cancel: "キャンセル",
+      confirm: "確認",
+    },
     support: "サポート",
     language: "言語",
     contact: "お問い合わせ",
@@ -2089,3 +2091,5 @@ export default {
     insights: "インサイト"
   },
 };
+
+export default ja;

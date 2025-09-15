@@ -11,6 +11,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import { SafeIcon } from "../utils/SafeIcon";
 import { useOptimizedTheme } from "../hooks/useOptimizedTheme";
 import { SPACING, BORDER_RADIUS } from "../utils/constants";
+import { useTranslation } from "react-i18next";
 
 interface ThemeToggleProps {
   style?: any;
@@ -23,6 +24,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
 }) => {
   const { themeMode, isDark, colors, changeTheme, componentStyles } =
     useOptimizedTheme();
+  const { t } = useTranslation();
   const scaleAnim = React.useRef(new Animated.Value(1)).current;
 
   const getIcon = () => {
@@ -39,11 +41,11 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({
   const getLabel = () => {
     switch (themeMode) {
       case "light":
-        return "라이트";
+        return t("theme.light");
       case "dark":
-        return "다크";
+        return t("theme.dark");
       case "system":
-        return "시스템";
+        return t("theme.system");
     }
   };
 

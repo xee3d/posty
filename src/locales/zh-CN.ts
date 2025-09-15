@@ -1,4 +1,4 @@
-export default {
+const zhCN = {
   common: {
     confirm: "确认",
     cancel: "取消",
@@ -524,22 +524,6 @@ export default {
       serverError: "服务器错误",
       rateLimitExceeded: "超过使用限制",
       insufficientTokens: "代币不足"
-    },
-    
-    photo: {
-      select: {
-        title: "选择照片",
-        message: "您想如何选择照片？",
-        camera: "拍照",
-        gallery: "从相册选择",
-      },
-      upload: {
-        title: "请选择照片",
-        subtitle: "从相册选择或直接拍摄",
-        button: "选择照片",
-        change: "更改",
-      },
-      defaultPrompt: "请写一篇与照片相配的自然社交媒体帖子。",
     },
     
     ads: {
@@ -1161,6 +1145,16 @@ export default {
     vibration: "振动",
     themeAndColors: "主题和颜色",
     themeDescription: "主题设置",
+    theme: {
+      title: "主题设置",
+      mode: "模式选择",
+      color: "主题颜色",
+      light: "浅色模式",
+      dark: "深色模式",
+      system: "跟随系统设置",
+      cancel: "取消",
+      confirm: "确认",
+    },
     support: "支持",
     language: "语言",
     contact: "联系",
@@ -2373,3 +2367,5 @@ export default {
     insights: "洞察"
   },
 };
+
+export default zhCN;

@@ -1,4 +1,4 @@
-export default {
+const en = {
   // Common
   app: {
     name: "Posty",
@@ -1071,6 +1071,16 @@ export default {
     vibration: "Vibration",
     themeAndColors: "Theme & Colors",
     themeDescription: "Theme settings",
+    theme: {
+      title: "Theme Settings",
+      mode: "Mode Selection",
+      color: "Theme Color",
+      light: "Light Mode",
+      dark: "Dark Mode",
+      system: "Follow System Settings",
+      cancel: "Cancel",
+      confirm: "Confirm",
+    },
     support: "Support",
     language: "Language",
     contact: "Contact",
@@ -2101,3 +2111,5 @@ export default {
     }
   }
 };
+
+export default en;

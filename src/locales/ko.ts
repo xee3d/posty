@@ -1,4 +1,4 @@
-export default {
+const ko = {
   // 공통
   app: {
     name: "Posty",
@@ -808,6 +808,16 @@ export default {
     vibration: "진동",
     themeAndColors: "테마 및 색상",
     themeDescription: "테마 설정",
+    theme: {
+      title: "테마 설정",
+      mode: "모드 선택",
+      color: "테마 색상",
+      light: "라이트 모드",
+      dark: "다크 모드",
+      system: "시스템 설정 따르기",
+      cancel: "취소",
+      confirm: "확인",
+    },
     support: "고객지원",
     language: "언어",
     userGuide: "사용자 가이드",
@@ -1817,6 +1827,7 @@ export default {
     title: "업적",
     headerTitle: "업적",
     overallProgress: "전체 진행도",
+    progressTemplate: "전체 {{total}}개 중 {{achieved}}개 달성",
     categories: {
       all: "전체",
       writing: "글쓰기",
@@ -2043,3 +2054,5 @@ export default {
     }
   }
 };
+
+export default ko;

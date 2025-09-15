@@ -14,6 +14,7 @@ import {
 } from "../contexts/ThemeContext";
 import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
+import { useTranslation } from "react-i18next";
 
 const { width } = Dimensions.get("window");
 
@@ -25,6 +26,8 @@ interface ThemeDialogProps {
 export default function ThemeDialog({ visible, onClose }: ThemeDialogProps) {
   const { themeMode, themeColor, colors, setThemeMode, setThemeColor } =
     useTheme();
+  const { t, i18n } = useTranslation();
+
 
   const handleModeSelect = (mode: ThemeMode) => {
     setThemeMode(mode);
@@ -50,13 +53,13 @@ export default function ThemeDialog({ visible, onClose }: ThemeDialogProps) {
   const getModeTitle = (mode: ThemeMode) => {
     switch (mode) {
       case "light":
-        return "라이트 모드";
+        return t("settings.theme.light");
       case "dark":
-        return "다크 모드";
+        return t("settings.theme.dark");
       case "system":
-        return "시스템 설정 따르기";
+        return t("settings.theme.system");
       default:
-        return "시스템 설정 따르기";
+        return t("settings.theme.system");
     }
   };
 
@@ -74,7 +77,7 @@ export default function ThemeDialog({ visible, onClose }: ThemeDialogProps) {
           {/* 헤더 */}
           <View style={styles.header}>
             <Text style={[styles.title, { color: colors.textPrimary }]}>
-              테마 설정
+{t("settings.theme.title")}
             </Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <SafeIcon
@@ -88,7 +91,7 @@ export default function ThemeDialog({ visible, onClose }: ThemeDialogProps) {
           {/* 모드 선택 */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-              모드 선택
+              {t("settings.theme.mode")}
             </Text>
 
             {(["light", "dark", "system"] as ThemeMode[]).map((mode) => (
@@ -125,7 +128,7 @@ export default function ThemeDialog({ visible, onClose }: ThemeDialogProps) {
           {/* 테마 색상 */}
           <View style={styles.section}>
             <Text style={[styles.sectionTitle, { color: colors.textPrimary }]}>
-              테마 색상
+              {t("settings.theme.color")}
             </Text>
             <View style={styles.colorPalette}>
               {THEME_COLORS.map((color, index) => (
@@ -159,7 +162,7 @@ export default function ThemeDialog({ visible, onClose }: ThemeDialogProps) {
               <Text
                 style={[styles.buttonCancelText, { color: colors.textPrimary }]}
               >
-                취소
+                {t("settings.theme.cancel")}
               </Text>
             </TouchableOpacity>
 
@@ -167,7 +170,7 @@ export default function ThemeDialog({ visible, onClose }: ThemeDialogProps) {
               style={[styles.buttonConfirm, { backgroundColor: themeColor }]}
               onPress={onClose}
             >
-              <Text style={styles.buttonConfirmText}>확인</Text>
+              <Text style={styles.buttonConfirmText}>{t("settings.theme.confirm")}</Text>
             </TouchableOpacity>
           </View>
         </View>
