@@ -482,7 +482,7 @@ Requirements: English language only, engaging tone, appropriate hashtags.`,
     }
     
     // 해당 언어의 전용 프롬프트 생성
-    finalPrompt = languageInstructions[langKey] || languageInstructions['ko'];
+    finalPrompt = languageInstructions[langKey] || languageInstructions.ko;
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Final language key:", langKey);
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Using instruction for:", langKey, "Available keys:", Object.keys(languageInstructions));
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Selected instruction preview:", finalPrompt.substring(0, 100) + "...");
@@ -513,7 +513,7 @@ Requirements: English language only, engaging tone, appropriate hashtags.`,
     };
     
     // 이미 위에서 langKey가 설정되었으므로 재사용
-    const langInstructions = lengthInstructions[langKey] || lengthInstructions['ko'];
+    const langInstructions = lengthInstructions[langKey] || lengthInstructions.ko;
     
     // 길이 옵션에 따른 지시 추가
     if (length && langInstructions[length]) {
@@ -592,7 +592,7 @@ Requirements: English language only, engaging tone, appropriate hashtags.`,
     
     console.log("🔧 [ServerAIService] FALLBACK - Language mapping:", currentLanguage, "->", langKey);
     
-    const langInstructions = lengthInstructions[langKey] || lengthInstructions['ko'];
+    const langInstructions = lengthInstructions[langKey] || lengthInstructions.ko;
     
     if (length && langInstructions[length]) {
       finalPrompt += `\n${langInstructions[length]}`;

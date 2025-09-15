@@ -288,6 +288,51 @@ const CORE_VALID_IONICONS = [
   "fingerprint-outline",
   "hand-left",
   "hand-right",
+
+  // 소셜 미디어 로고
+  "logo-facebook",
+  "logo-apple",
+  "logo-google",
+  "logo-twitter",
+  "logo-instagram",
+  "logo-linkedin",
+  "logo-youtube",
+  "logo-github",
+  "logo-whatsapp",
+  "logo-snapchat",
+  "logo-tiktok",
+  "logo-discord",
+  "logo-slack",
+  "logo-microsoft",
+  "logo-amazon",
+  "logo-android",
+  "logo-chrome",
+  "logo-firefox",
+  "logo-safari",
+  "logo-edge",
+  "logo-paypal",
+  "logo-venmo",
+  "logo-bitcoin",
+  "logo-buffer",
+  "logo-codepen",
+  "logo-dribbble",
+  "logo-dropbox",
+  "logo-figma",
+  "logo-foursquare",
+  "logo-reddit",
+  "logo-skype",
+  "logo-stackoverflow",
+  "logo-steam",
+  "logo-tumblr",
+  "logo-twitch",
+  "logo-vimeo",
+  "logo-nodejs",
+  "logo-npm",
+  "logo-react",
+  "logo-angular",
+  "logo-vue",
+  "logo-python",
+  "logo-javascript",
 ];
 
 export interface SafeIconProps {
@@ -390,6 +435,16 @@ const ICON_MAPPING: Record<
   "account-balance-wallet": { type: "ionicons", name: "wallet" },
   flower: { type: "ionicons", name: "flower-outline" },
   "flower-outline": { type: "ionicons", name: "flower-outline" },
+
+  // 소셜 미디어 아이콘 매핑
+  facebook: { type: "ionicons", name: "logo-facebook" },
+  apple: { type: "ionicons", name: "logo-apple" },
+  google: { type: "ionicons", name: "logo-google" },
+  twitter: { type: "ionicons", name: "logo-twitter" },
+  instagram: { type: "ionicons", name: "logo-instagram" },
+  linkedin: { type: "ionicons", name: "logo-linkedin" },
+  youtube: { type: "ionicons", name: "logo-youtube" },
+  github: { type: "ionicons", name: "logo-github" },
 
   // Add more mappings as needed
 };
@@ -624,6 +679,32 @@ export const SafeIcon: React.FC<SafeIconProps> = ({
     }
     if (iconName.includes("access") && iconName.includes("time")) {
       return "time-outline";
+    }
+
+    // 소셜 미디어 아이콘
+    if (iconName.includes("facebook") || iconName.includes("fb")) {
+      return "logo-facebook";
+    }
+    if (iconName.includes("apple")) {
+      return "logo-apple";
+    }
+    if (iconName.includes("google")) {
+      return "logo-google";
+    }
+    if (iconName.includes("twitter")) {
+      return "logo-twitter";
+    }
+    if (iconName.includes("instagram") || iconName.includes("insta")) {
+      return "logo-instagram";
+    }
+    if (iconName.includes("youtube")) {
+      return "logo-youtube";
+    }
+    if (iconName.includes("github")) {
+      return "logo-github";
+    }
+    if (iconName.includes("linkedin")) {
+      return "logo-linkedin";
     }
 
     // 기본 폴백

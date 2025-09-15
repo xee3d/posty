@@ -76,7 +76,7 @@ class TrendService {
    */
   private getRegionalChannels(language: string) {
     const lang = language === 'zh' ? 'zh-CN' : language;
-    return this.REGIONAL_CHANNELS[lang as keyof typeof this.REGIONAL_CHANNELS] || this.REGIONAL_CHANNELS['en'];
+    return this.REGIONAL_CHANNELS[lang as keyof typeof this.REGIONAL_CHANNELS] || this.REGIONAL_CHANNELS.en;
   }
 
   /**

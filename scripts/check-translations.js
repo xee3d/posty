@@ -65,7 +65,7 @@ function analyzeTranslations() {
 
   // 각 언어별 분석
   for (const locale of supportedLocales) {
-    if (!translations[locale]) continue;
+    if (!translations[locale]) {continue;}
 
     const localeKeys = new Set(Object.keys(translations[locale]));
     const missing = [];
@@ -120,9 +120,9 @@ function printResults(results) {
     const status = coverage >= 95 ? '🟢' : coverage >= 80 ? '🟡' : '🔴';
 
     console.log(`${status} ${locale.toUpperCase()}: ${coverage}% (${total}개)`);
-    if (missing > 0) console.log(`   📝 누락: ${missing}개`);
-    if (extra > 0) console.log(`   ➕ 추가: ${extra}개`);
-    if (empty > 0) console.log(`   🫗 빈값: ${empty}개`);
+    if (missing > 0) {console.log(`   📝 누락: ${missing}개`);}
+    if (extra > 0) {console.log(`   ➕ 추가: ${extra}개`);}
+    if (empty > 0) {console.log(`   🫗 빈값: ${empty}개`);}
   }
 
   // 상세 분석 출력

@@ -68,7 +68,16 @@
       "Bash(expo start:*)",
       "mcp__playwright__browser_navigate",
       "Bash(sed:*)",
-      "WebFetch(domain:www.notion.so)"
+      "WebFetch(domain:www.notion.so)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(done)",
+      "Bash(xargs:*)",
+      "Bash(do echo \"=== $lang.ts ===\")",
+      "Bash(tail:*)",
+      "Bash(do echo \"=== $lang theme test ===\")",
+      "Read(///**)",
+      "Read(//Users/ethan_macstudio/Library/Caches/**)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

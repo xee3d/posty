@@ -6,7 +6,6 @@ import React, {
   useEffect,
   useMemo,
 } from "react";
-import { DevSettings } from "react-native";
 import { Appearance, ColorSchemeName } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";

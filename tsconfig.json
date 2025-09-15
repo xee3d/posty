@@ -39,6 +39,7 @@
   "include": [
     "src/**/*",
     "src/types/global.d.ts",
+    "src/types/env.d.ts",
     "index.js",
     "App.tsx"
   ],

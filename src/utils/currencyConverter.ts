@@ -71,10 +71,10 @@ export const detectSystemCurrency = (): SupportedCurrency => {
     const countryCode = locales[0].countryCode;
     
     // 국가 코드 기반 통화 매핑
-    if (countryCode === 'KR') return 'KRW';
-    if (countryCode === 'US') return 'USD';
-    if (countryCode === 'JP') return 'JPY';
-    if (countryCode === 'CN') return 'CNY';
+    if (countryCode === 'KR') {return 'KRW';}
+    if (countryCode === 'US') {return 'USD';}
+    if (countryCode === 'JP') {return 'JPY';}
+    if (countryCode === 'CN') {return 'CNY';}
     
     // 언어 코드 기반 폴백
     return LOCALE_TO_CURRENCY[systemLanguage] || 'KRW';

@@ -176,13 +176,14 @@ class OpenAIService {
 - 과도한 마케팅 문구는 피하세요
 - 따뜻하고 진솔한 느낌을 담아주세요`;
 
+    const baseInstructions = this.getBaseInstructionsByLanguage(language);
     return baseInstructions + "\n\n" + basePrompt + enhancement;
   }
   
   private getBaseInstructionsByLanguage(language: string): string {
     switch (language) {
       case 'ja':
-        return `あなたは${platform || 'ソーシャルメディア'}プラットフォーム向けの専門的なコンテンツライターです。
+        return `あなたはソーシャルメディアプラットフォーム向けの専門的なコンテンツライターです。
 以下の指示に従って、自然で魅力的なコンテンツを作成してください。
 
 重要な指示:
@@ -195,7 +196,7 @@ class OpenAIService {
 応答には生成されたコンテンツのみを含め、追加の説明やメタデータは含めないでください。`;
         
       case 'en':
-        return `You are a professional content writer for ${platform || 'social media'} platforms.
+        return `You are a professional content writer for social media platforms.
 Please create natural and engaging content following the instructions below.
 
 Important instructions:
@@ -1013,7 +1014,7 @@ ${platformInstruction}
       try {
         const personalizedHashtagService = require('./personalizedHashtagService').default;
         const neededCount = targetCount - uniqueTags.length;
-        const personalizedTags = await personalizedHashtagService.getPersonalizedHashtags(content, neededCount * 2);
+        const personalizedTags = personalizedHashtagService.getPersonalizedHashtags(content, neededCount * 2);
         
         // 중복 제거 후 기본 추가 태그로 사용
         const additionalTags = personalizedTags.filter(tag => !uniqueTags.includes(tag));

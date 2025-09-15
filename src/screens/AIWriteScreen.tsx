@@ -91,6 +91,7 @@ interface AIWriteScreenProps {
   initialText?: string;
   initialTitle?: string;
   initialTone?: string;
+  initialHashtags?: string[];
   style?: string;
   tips?: string[];
 }
@@ -1616,10 +1617,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         styles.polishOptionButtons,
                         { marginTop: SPACING.sm },
                       ]}
-                    >
-
-
-                    </View>
+                     />
                   </View>
                 </View>
               </SlideInView>

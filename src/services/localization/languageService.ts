@@ -135,36 +135,30 @@ class LanguageService {
    */
   getCurrentLanguage(): SupportedLanguage {
     if (!this.isInitialized) {
-      console.warn('[LanguageService] Service not initialized, using Korean');
+      console.log('[LanguageService] Service initializing, using fallback language');
       // 비동기 초기화를 시도하되, 즉시 fallback 값을 반환
       this.initialize().catch(error => {
         console.error('[LanguageService] Auto-initialization failed:', error);
       });
       return 'ko';
     }
-    
+
     // i18next의 실제 현재 언어를 반환
     const i18nLanguage = i18next.language;
-    console.log('[LanguageService] Current i18n language:', i18nLanguage);
-    console.log('[LanguageService] Current service language:', this.currentLanguage);
-    
+
     // i18next 언어가 지원되는 언어인지 확인
     if (this.isSupportedLanguage(i18nLanguage)) {
       this.currentLanguage = i18nLanguage as SupportedLanguage; // 동기화
       return i18nLanguage as SupportedLanguage;
     }
-    
-    // 지원되지 않는 언어면 현재 설정된 언어 반환
-    console.warn('[LanguageService] Unsupported i18n language:', i18nLanguage, 'using stored:', this.currentLanguage);
-    
+
     // i18next와 동기화 시도
     if (i18nLanguage !== this.currentLanguage) {
-      console.log('[LanguageService] Syncing i18next with stored language:', this.currentLanguage);
       i18next.changeLanguage(this.currentLanguage).catch(error => {
         console.warn('[LanguageService] Failed to sync i18next:', error);
       });
     }
-    
+
     return this.currentLanguage;
   }
 

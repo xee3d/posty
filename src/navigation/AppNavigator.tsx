@@ -4,11 +4,9 @@ import HomeScreen from "../screens/HomeScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import MyStyleScreen from "../screens/MyStyleScreen";
 import AIWriteScreen from "../screens/AIWriteScreen";
-// import FeedWithAdsExample from "../screens/FeedWithAdsExample";
 import ModernSubscriptionScreen from "../screens/subscription/ModernSubscriptionScreen";
 import CostMonitorScreen from "../screens/CostMonitorScreen";
 import MissionScreen from "../screens/MissionScreen";
-// import AnimationExamplesScreen from "../screens/AnimationExamplesScreen";
 import TabNavigator from "../components/TabNavigator";
 import { COLORS } from "../utils/constants";
 
@@ -63,9 +61,6 @@ const AppNavigator: React.FC = () => {
     [handleTabChange]
   );
 
-  // 개발자 모드에서만 애니메이션 예시 화면 접근 가능
-  // 실제 배포시에는 이 부분을 제거하거나 조건을 변경하세요
-  const isDevelopment = __DEV__;
 
   const renderScreen = () => {
     switch (activeTab) {

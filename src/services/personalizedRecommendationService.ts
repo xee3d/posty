@@ -858,7 +858,7 @@ class PersonalizedRecommendationService {
         }
         
         // 최대 6개까지만
-        if (recommendations.length >= 6) break;
+        if (recommendations.length >= 6) {break;}
       }
     }
 
