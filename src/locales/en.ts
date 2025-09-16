@@ -890,6 +890,21 @@ const en = {
     }
   },
 
+  // Ad-related translations
+  ads: {
+    title: "Watch Ads and Earn Rewards",
+    loading: "Loading ad...",
+    loadError: "Unable to load ad",
+    showError: "Unable to show ad. Please try again.",
+    watch: "Watch Ad",
+    reward: {
+      tokens: "Get {{amount}} tokens!",
+      premiumTone: "Use premium tone style!",
+      premiumLength: "Use long writing!",
+      default: "Get your reward!"
+    }
+  },
+
   // My Style Screen
   myStyle: {
     title: "My Style",

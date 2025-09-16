@@ -19,6 +19,7 @@ import { soundManager } from "../utils/soundManager";
 import { Linking, Share } from "react-native";
 import { Alert } from "../utils/customAlert";
 import { tokenSecurityManager } from "../utils/security/tokenSecurity";
+import RewardAdModal from "./RewardAdModal";
 
 interface EarnTokenModalProps {
   visible: boolean;
@@ -48,6 +49,8 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
   const [tasks, setTasks] = useState<TokenTask[]>([]);
   const [loading, setLoading] = useState(false);
   const [processingTask, setProcessingTask] = useState<string | null>(null);
+  const [showRewardAd, setShowRewardAd] = useState(false);
+  const [rewardAdType, setRewardAdType] = useState<'tokens' | 'premium_tone' | 'premium_length'>('tokens');
 
   useEffect(() => {
     if (visible) {
@@ -135,6 +138,36 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
     setTasks(availableTasks);
   };
 
+  // 광고 시청 보상 처리
+  const handleRewardEarned = async (amount: number) => {
+    try {
+      setProcessingTask("watch_ad");
+      
+      // 토큰 지급 처리
+      onTokensEarned(amount);
+      
+      // 작업 완료 처리
+      const today = new Date().toDateString();
+      const savedTasks = await AsyncStorage.getItem(`token_tasks_${today}`);
+      const taskData = savedTasks ? JSON.parse(savedTasks) : {};
+      taskData["watch_ad"] = true;
+      await AsyncStorage.setItem(`token_tasks_${today}`, JSON.stringify(taskData));
+      
+      // UI 업데이트
+      setTasks(prev => prev.map(t => 
+        t.id === "watch_ad" ? { ...t, completed: true } : t
+      ));
+      
+      setShowRewardAd(false);
+      setProcessingTask(null);
+      
+      soundManager.playSuccess();
+    } catch (error) {
+      console.error('보상 처리 실패:', error);
+      setProcessingTask(null);
+    }
+  };
+
   const handleTaskComplete = async (task: TokenTask) => {
     if (
       task.completed ||
@@ -171,9 +204,10 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
 
       switch (task.id) {
         case "watch_ad":
-          // 실제 광고 SDK 연동 필요
-          verified = await watchRewardedAd();
-          break;
+          // 새로운 RewardAdModal 사용
+          setRewardAdType('tokens');
+          setShowRewardAd(true);
+          return; // 비동기 처리로 인해 여기서 return
 
         case "invite_friend":
           // 실제 초대 링크 생성 및 추적
@@ -619,6 +653,16 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
           </View>
         </FadeInView>
       </View>
+      
+      {/* 광고 시청 모달 */}
+      <RewardAdModal
+        visible={showRewardAd}
+        onClose={() => setShowRewardAd(false)}
+        onRewardEarned={handleRewardEarned}
+        rewardType={rewardAdType}
+        rewardAmount={2}
+        rewardDescription="광고 시청 후 2개 토큰을 받으세요!"
+      />
     </Modal>
   );
 };

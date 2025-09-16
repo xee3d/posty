@@ -620,6 +620,21 @@ const ko = {
     }
   },
 
+  // 광고 관련 번역
+  ads: {
+    title: "광고 시청하고 보상받기",
+    loading: "광고를 불러오는 중...",
+    loadError: "광고를 불러올 수 없습니다",
+    showError: "광고를 표시할 수 없습니다. 다시 시도해주세요.",
+    watch: "광고 시청하기",
+    reward: {
+      tokens: "{{amount}}개 토큰을 받으세요!",
+      premiumTone: "프리미엄 톤 스타일을 사용하세요!",
+      premiumLength: "긴 글쓰기를 사용하세요!",
+      default: "보상을 받으세요!"
+    }
+  },
+
   // My Style Screen
   myStyle: {
     access: {
