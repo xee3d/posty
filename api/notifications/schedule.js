@@ -13,10 +13,10 @@ const NOTIFICATION_TEMPLATES = {
     data: { type: "mission", action: "open_mission" },
   },
 
-  inspiration: {
-    title: "✨ 오늘의 창의적 영감",
-    body: "새로운 아이디어로 멋진 콘텐츠를 만들어보세요!",
-    data: { type: "inspiration", action: "open_write" },
+  daily_share: {
+    title: "🌅 오늘 하루는 어땠나요?",
+    body: "Posty가 오늘의 소중한 순간을 멋진 글로 만들어드릴게요!",
+    data: { type: "daily_share", action: "open_write" },
   },
 
   weekly_summary: {
@@ -84,12 +84,12 @@ export default async function handler(req, res) {
           });
         }
 
-        // 매일 오후 6시 - 창의적 영감 알림
+        // 매일 오후 6시 - 일상 공유 알림
         if (currentHour === 18) {
           notificationsToSend.push({
-            ...NOTIFICATION_TEMPLATES.inspiration,
+            ...NOTIFICATION_TEMPLATES.daily_share,
             target: "all",
-            notificationType: "inspiration",
+            notificationType: "daily_share",
           });
         }
         break;

@@ -342,12 +342,12 @@ export class PushNotificationService {
       "09:00"
     );
 
-    // 창의적 영감 알림 (매일 오후 6시)
+    // 일상 공유 알림 (매일 오후 6시)
     this.scheduleNotification(
       {
-        title: "✨ 오늘의 창의적 영감",
-        body: "새로운 아이디어로 멋진 콘텐츠를 만들어보세요!",
-        data: { type: "inspiration" },
+        title: "🌅 오늘 하루는 어땠나요?",
+        body: "Posty가 오늘의 소중한 순간을 멋진 글로 만들어드릴게요!",
+        data: { type: "daily_share" },
       },
       "18:00"
     );
