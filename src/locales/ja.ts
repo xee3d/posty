@@ -1983,6 +1983,12 @@ const ja = {
         message: "メール情報がすべてコピーされました。",
         action: "内容をコピー"
       }
+    },
+    notifications: {
+      dailyShare: {
+        title: "🌅 今日の一日はいかがでしたか？",
+        body: "Postyが今日の大切な瞬間を素敵な投稿に変えてくれます！"
+      }
     }
   },
 

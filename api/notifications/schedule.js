@@ -69,7 +69,7 @@ export default async function handler(req, res) {
     const { type, time } = req.query;
 
     let notificationsToSend = [];
-    const currentHour = new Date().getHours();
+    const currentHour = new Date().getHours(); // 현재 시간
     const currentDay = new Date().getDay(); // 0 = 일요일
 
     // 스케줄 타입별 알림 처리

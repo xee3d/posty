@@ -2447,6 +2447,14 @@ const zhCN = {
     growth: "增长",
     insights: "洞察"
   },
+
+  // 通知
+  notifications: {
+    dailyShare: {
+      title: "🌅 今天过得怎么样？",
+      body: "Posty将帮助您把今天的珍贵时刻变成美丽的帖子！"
+    }
+  }
 };
 
 export default zhCN;

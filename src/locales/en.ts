@@ -2151,6 +2151,12 @@ const en = {
         title: "Copied",
         message: "All email information has been copied."
       }
+    },
+    notifications: {
+      dailyShare: {
+        title: "🌅 How was your day?",
+        body: "Posty will help you turn today's precious moments into beautiful posts!"
+      }
     }
   }
 };

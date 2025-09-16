@@ -1099,6 +1099,12 @@ const ko = {
       achievement: "업적 알림",
       tips: "팁 알림",
       send: "테스트 알림 보내기"
+    },
+    notifications: {
+      dailyShare: {
+        title: "🌅 오늘 하루는 어땠나요?",
+        body: "Posty가 오늘의 소중한 순간을 멋진 글로 만들어드릴게요!"
+      }
     }
   },
 

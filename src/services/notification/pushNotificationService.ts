@@ -345,8 +345,8 @@ export class PushNotificationService {
     // 일상 공유 알림 (매일 오후 6시)
     this.scheduleNotification(
       {
-        title: "🌅 오늘 하루는 어땠나요?",
-        body: "Posty가 오늘의 소중한 순간을 멋진 글로 만들어드릴게요!",
+        title: t("notifications.dailyShare.title", { defaultValue: "🌅 오늘 하루는 어땠나요?" }),
+        body: t("notifications.dailyShare.body", { defaultValue: "Posty가 오늘의 소중한 순간을 멋진 글로 만들어드릴게요!" }),
         data: { type: "daily_share" },
       },
       "18:00"
