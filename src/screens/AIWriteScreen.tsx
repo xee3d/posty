@@ -20,6 +20,7 @@ import {
 import { useAppTheme } from "../hooks/useAppTheme";
 import { useTranslation } from "react-i18next";
 import i18next from "i18next";
+import AdBanner from "../components/AdBanner";
 import { SafeIcon } from "../utils/SafeIcon";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
 import { useTokenManagement } from "../hooks/useTokenManagement";
@@ -2001,13 +2002,20 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           )}
 
           {/* 글쓰기 결과 하단 광고 배너 - 조건부 표시 */}
-          {generatedContent && Date.now() % 3 === 0 && (
-            <AnimatedCard delay={300}>
-              <CompactBanner
-                size="large"
-                style={{ marginVertical: 16, marginHorizontal: SPACING.md }}
-              />
-            </AnimatedCard>
+          {generatedContent && (
+            <SlideInView direction="up" delay={300}>
+              <View style={styles.adBannerContainer}>
+                <AdBanner 
+                  style={styles.adBanner}
+                  onAdLoaded={() => {
+                    console.log('AI Write screen ad banner loaded successfully');
+                  }}
+                  onAdFailedToLoad={(error) => {
+                    console.log('AI Write screen ad banner failed to load:', error);
+                  }}
+                />
+              </View>
+            </SlideInView>
           )}
 
           <View style={styles.bottomSpace} />
@@ -2487,6 +2495,17 @@ const createStyles = (
       fontSize: 14,
       color: colors.text.primary,
       fontWeight: "500",
+    },
+    // 광고 배너 스타일
+    adBannerContainer: {
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.md,
+    },
+    adBanner: {
+      width: '100%',
+      minHeight: 50,
+      borderRadius: 8,
+      overflow: 'hidden',
     },
     bottomSpace: {
       height: SPACING.xxl,
