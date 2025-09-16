@@ -342,12 +342,12 @@ export class PushNotificationService {
       "09:00"
     );
 
-    // 트렌드 업데이트 알림 (매일 오후 6시)
+    // 창의적 영감 알림 (매일 오후 6시)
     this.scheduleNotification(
       {
-        title: "📈 실시간 트렌드 업데이트",
-        body: "지금 뜨고 있는 키워드로 콘텐츠를 만들어보세요!",
-        data: { type: "trend" },
+        title: "✨ 오늘의 창의적 영감",
+        body: "새로운 아이디어로 멋진 콘텐츠를 만들어보세요!",
+        data: { type: "inspiration" },
       },
       "18:00"
     );

@@ -13,10 +13,10 @@ const NOTIFICATION_TEMPLATES = {
     data: { type: "mission", action: "open_mission" },
   },
 
-  trend_update: {
-    title: "📈 실시간 트렌드 업데이트",
-    body: "지금 뜨고 있는 키워드로 콘텐츠를 만들어보세요!",
-    data: { type: "trend", action: "open_trends" },
+  inspiration: {
+    title: "✨ 오늘의 창의적 영감",
+    body: "새로운 아이디어로 멋진 콘텐츠를 만들어보세요!",
+    data: { type: "inspiration", action: "open_write" },
   },
 
   weekly_summary: {
@@ -84,12 +84,12 @@ export default async function handler(req, res) {
           });
         }
 
-        // 매일 오후 6시 - 트렌드 업데이트
+        // 매일 오후 6시 - 창의적 영감 알림
         if (currentHour === 18) {
           notificationsToSend.push({
-            ...NOTIFICATION_TEMPLATES.trend_update,
+            ...NOTIFICATION_TEMPLATES.inspiration,
             target: "all",
-            notificationType: "trend_update",
+            notificationType: "inspiration",
           });
         }
         break;
