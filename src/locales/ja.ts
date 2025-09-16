@@ -1121,6 +1121,10 @@ const ja = {
     weeklyCount: {
       thisWeek: "今週",
       consistency: "一貫性",
+    },
+    banner: {
+      title: "Postyで素晴らしい投稿を書こう",
+      subtitle: "AIがサポートする完璧な投稿",
     }
   },
 

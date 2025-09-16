@@ -28,15 +28,15 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'KRW',
     symbol: '₩',
     tokens: {
-      small: 1500,    // 50 토큰 - 1,500원
-      medium: 4000,   // 150 토큰 - 4,000원  
-      large: 12000,   // 500 토큰 - 12,000원
-      extra: 22000,   // 1000 토큰 - 22,000원
+      small: 1200,    // 50 토큰 - 1,200원 (20% 할인)
+      medium: 3200,   // 150 토큰 - 3,200원 (20% 할인)
+      large: 9500,    // 500 토큰 - 9,500원 (21% 할인)
+      extra: 18000,   // 1000 토큰 - 18,000원 (18% 할인)
     },
     subscription: {
-      starter: 9900,  // 스타터 - 9,900원/월
-      premium: 19900, // 프리미엄 - 19,900원/월
-      pro: 39900,     // 프로 - 39,900원/월
+      starter: 7900,  // 스타터 - 7,900원/월 (20% 할인)
+      premium: 15900, // 프리미엄 - 15,900원/월 (20% 할인)
+      pro: 31900,     // 프로 - 31,900원/월 (20% 할인)
     },
     formatting: {
       position: 'after',
@@ -66,15 +66,15 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'JPY',
     symbol: '¥',
     tokens: {
-      small: 150,     // 50 토큰 - ¥150
-      medium: 420,    // 150 토큰 - ¥420
-      large: 1200,    // 500 토큰 - ¥1,200
-      extra: 2200,    // 1000 토큰 - ¥2,200
+      small: 180,     // 50 토큰 - ¥180 (20% 상향)
+      medium: 500,    // 150 토큰 - ¥500 (19% 상향)
+      large: 1400,    // 500 토큰 - ¥1,400 (17% 상향)
+      extra: 2600,    // 1000 토큰 - ¥2,600 (18% 상향)
     },
     subscription: {
-      starter: 980,   // 스타터 - ¥980/月
-      premium: 1980,  // 프리미엄 - ¥1,980/月
-      pro: 3980,      // 프로 - ¥3,980/月
+      starter: 1200,  // 스타터 - ¥1,200/月 (22% 상향)
+      premium: 2400,  // 프리미엄 - ¥2,400/月 (21% 상향)
+      pro: 4800,      // 프로 - ¥4,800/月 (21% 상향)
     },
     formatting: {
       position: 'before',

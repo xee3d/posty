@@ -14,7 +14,7 @@ import {
 import { SafeIcon } from "../../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import { COLORS, SPACING } from "../../utils/constants";
-import { SUBSCRIPTION_PLANS } from "../../config/adConfig";
+import { getSubscriptionPlans } from "../../services/localization/pricingService";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { useAppSelector } from "../../hooks/redux";
@@ -544,7 +544,10 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   };
 
   const renderPlanCard = (planKey: "free" | "starter" | "premium" | "pro") => {
-    const plan = SUBSCRIPTION_PLANS[planKey];
+    const subscriptionPlans = getSubscriptionPlans();
+    const plan = planKey === "free" 
+      ? { id: "free", name: t("subscription.plans.free.name", { defaultValue: "Free" }), price: 0, priceDisplay: t("subscription.plans.free.priceDisplay", { defaultValue: "Free" }), tokens: 0 }
+      : subscriptionPlans.find(p => p.id === planKey) || subscriptionPlans[0];
     const isSelected = selectedPlan === planKey;
     const isCurrent = subscriptionPlan === planKey;
     const isPopular = planKey === "premium";
@@ -610,7 +613,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
         <View style={styles.priceContainer}>
           <Text style={[styles.price, isSelected && { color: planColor }]}>
-            {t(`subscription.plans.${planKey}.priceDisplay`, { defaultValue: priceLocalizationService.formatPrice(plan.id as "free" | "starter" | "premium" | "pro") })}
+            {plan.priceDisplay || plan.formattedPrice || t("subscription.plans.free.priceDisplay", { defaultValue: "Free" })}
           </Text>
           <Text style={styles.priceUnit}>{t("subscription.perMonth")}</Text>
         </View>
@@ -891,7 +894,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     <View style={styles.planInfoItem}>
                       <Text style={styles.planInfoLabel}>{t("subscription.management.monthlyFee")}</Text>
                       <Text style={styles.planInfoValue}>
-                        {SUBSCRIPTION_PLANS[subscriptionPlan].priceDisplay}
+                        {subscriptionPlan === "free" ? t("subscription.plans.free.priceDisplay", { defaultValue: "Free" }) : 
+                         getSubscriptionPlans().find(p => p.id === subscriptionPlan)?.formattedPrice || t("subscription.plans.free.priceDisplay", { defaultValue: "Free" })}
                       </Text>
                     </View>
                   </View>

@@ -1129,6 +1129,10 @@ const zhCN = {
     weeklyCount: {
       thisWeek: "本周",
       consistency: "一致性",
+    },
+    banner: {
+      title: "用Posty写出精彩内容",
+      subtitle: "AI助力的完美发布",
     }
   },
 

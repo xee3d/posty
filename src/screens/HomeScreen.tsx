@@ -67,6 +67,7 @@ import AppLogo from "../components/AppLogo";
 import NotificationBadge from "../components/NotificationBadge";
 import NotificationTestButtons from "../components/NotificationTestButtons";
 import { useTranslation } from "react-i18next";
+import AdBanner from "../components/AdBanner";
 
 interface HomeScreenProps {
   onNavigate: (tab: string, content?: any) => void;
@@ -1186,6 +1187,20 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </SlideInView>
         )}
 
+        {/* 광고 배너 */}
+        <SlideInView direction="up" delay={700}>
+          <View style={styles.adBannerContainer}>
+            <AdBanner 
+              style={styles.adBanner}
+              onAdLoaded={() => {
+                console.log('Ad banner loaded successfully');
+              }}
+              onAdFailedToLoad={(error) => {
+                console.log('Ad banner failed to load:', error);
+              }}
+            />
+          </View>
+        </SlideInView>
 
         <View style={styles.bottomSpace} />
       </ScrollView>
@@ -1685,6 +1700,17 @@ const createStyles = (
     },
     bottomSpace: {
       height: SPACING.xl,
+    },
+    // 광고 배너 스타일
+    adBannerContainer: {
+      paddingHorizontal: SPACING.lg,
+      paddingVertical: SPACING.md,
+    },
+    adBanner: {
+      width: '100%',
+      minHeight: 50,
+      borderRadius: 8,
+      overflow: 'hidden',
     },
     recentPostsSection: {
       paddingHorizontal: SPACING.lg,

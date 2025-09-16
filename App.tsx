@@ -8,6 +8,7 @@ import React, {
 import languageService from "./src/services/localization/languageService";
 import pricingService from "./src/services/localization/pricingService";
 import "./src/locales/i18n";
+import mobileAds from 'react-native-google-mobile-ads';
 import { SafeIcon } from "./src/utils/SafeIcon";
 import IconComponent from "react-native-vector-icons/Ionicons";
 import SplashScreen from "react-native-splash-screen";
@@ -125,6 +126,17 @@ const AppContent: React.FC = () => {
   // 앱 초기화
   useEffect(() => {
     console.log("[App] App initialization started");
+    
+    // AdMob 초기화
+    mobileAds()
+      .initialize()
+      .then(adapterStatuses => {
+        console.log('[App] AdMob initialized successfully');
+        console.log('[App] Adapter statuses:', adapterStatuses);
+      })
+      .catch(error => {
+        console.warn('[App] AdMob initialization failed:', error);
+      });
     
     // 언어 디버깅
     import('./src/utils/deviceLanguage').then(({ getDeviceLanguage, isKorean }) => {

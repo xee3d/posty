@@ -13,15 +13,7 @@ import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import { useTranslation } from "react-i18next";
 import i18n from "../locales/i18n";
-import { 
-  getDefaultCurrency, 
-  convertPrice, 
-  formatPrice, 
-  getLocalizedPrice,
-  getCurrentCurrencyInfo,
-  type SupportedCurrency 
-} from "../utils/currencyConverter";
-import pricingService from "../services/pricingService";
+import pricingService, { getTokenPackages, formatPrice } from "../services/localization/pricingService";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -51,142 +43,46 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
   const userPlan = getUserPlan(subscription as any);
   const planBonus = TOKEN_PURCHASE_CONFIG.planBonuses[userPlan];
 
-  // 통화 설정
-  const currentCurrency = getDefaultCurrency();
-  const currencyInfo = getCurrentCurrencyInfo(currentCurrency);
-
   // 첫 구매 여부 확인 (실제로는 서버에서 가져와야 함)
   const isFirstPurchase = false; // TODO: 실제 첫 구매 여부 체크
   
-  // 플랜별 보너스 및 할인 적용
-  const applyPlanBenefits = (pkg: any) => {
-    if (userPlan === "pro") {
-      const regionallyAdjustedBasePrice = pricingService.getLocalizedPrice(pkg.basePrice, currentCurrency);
-      const regionallyAdjustedOriginalPrice = pricingService.getLocalizedPrice(pkg.originalPrice, currentCurrency);
-      
-      return {
-        amount: pkg.baseAmount,
-        price: convertPrice(regionallyAdjustedBasePrice, currentCurrency),
-        originalPrice: convertPrice(regionallyAdjustedOriginalPrice, currentCurrency),
-        bonus: 0,
-        discount: pkg.baseDiscount,
-        formattedPrice: formatPrice(convertPrice(regionallyAdjustedBasePrice, currentCurrency), currentCurrency),
-        formattedOriginalPrice: formatPrice(convertPrice(regionallyAdjustedOriginalPrice, currentCurrency), currentCurrency),
-      };
-    }
+  // 새로운 pricingService에서 토큰 패키지 정보 가져오기
+  const tokenPackages = getTokenPackages();
 
-    // 기본 할인 + 플랜 할인
-    const planDiscount = planBonus?.priceDiscount || 0;
-    const totalDiscount = pkg.baseDiscount + planDiscount;
-
-    // 지역별 가격 조정 적용
-    const regionallyAdjustedPrice = pricingService.getLocalizedPrice(pkg.originalPrice, currentCurrency);
+  // 새로운 pricingService의 토큰 패키지를 UI에 맞게 변환
+  const packages = tokenPackages.map((pkg, index) => {
+    const gradients = [
+      ["#6366F1", "#4F46E5"], // 인디고 그라데이션
+      ["#F59E0B", "#DC2626"], // 주황색-빨간색 그라데이션
+      ["#10B981", "#059669"], // 민트 귷린 그라데이션
+      ["#7C3AED", "#5B21B6"], // 진한 보라색 그라데이션
+    ];
     
-    // 가격 계산 (조정된 가격에서 총 할인율 적용)
-    const discountedPrice = Math.floor(
-      regionallyAdjustedPrice * (1 - totalDiscount / 100)
-    );
-
-    // 보너스 토큰
-    const bonusAmount = Math.floor(
-      pkg.baseAmount * (planBonus?.bonusRate || 0)
-    );
-
-    // 첫 구매 프로모션 적용
-    let finalPrice = discountedPrice;
-    let finalDiscount = totalDiscount;
-
-    if (
-      isFirstPurchase &&
-      pkg.baseAmount >= TOKEN_PURCHASE_CONFIG.promotions.firstPurchase.minAmount
-    ) {
-      const firstPurchaseDiscount =
-        TOKEN_PURCHASE_CONFIG.promotions.firstPurchase.discount;
-      finalPrice = Math.floor(
-        regionallyAdjustedPrice * (1 - (totalDiscount + firstPurchaseDiscount) / 100)
-      );
-      finalDiscount = totalDiscount + firstPurchaseDiscount;
-    }
+    const icons = ["✨", "🔥", "💎", "🚀"];
+    const names = [
+      t("tokenPurchase.packages.light.name"),
+      t("tokenPurchase.packages.bestValue.name"),
+      t("tokenPurchase.packages.mega.name"),
+      t("tokenPurchase.packages.ultra.name"),
+    ];
+    const taglines = [
+      t("tokenPurchase.packages.light.tagline"),
+      t("tokenPurchase.packages.bestValue.tagline"),
+      t("tokenPurchase.packages.mega.tagline"),
+      t("tokenPurchase.packages.ultra.tagline"),
+    ];
 
     return {
-      amount: pkg.baseAmount,
-      bonus: bonusAmount,
-      price: convertPrice(finalPrice, currentCurrency),
-      originalPrice: convertPrice(regionallyAdjustedPrice, currentCurrency),
-      discount: finalDiscount,
-      formattedPrice: formatPrice(convertPrice(finalPrice, currentCurrency), currentCurrency),
-      formattedOriginalPrice: formatPrice(convertPrice(regionallyAdjustedPrice, currentCurrency), currentCurrency),
-    };
-  };
-
-  const basePackages = [
-    {
-      id: "30",
-      name: t("tokenPurchase.packages.light.name"),
-      baseAmount: 30,
-      basePrice: 1900,
-      originalPrice: 2400,
-      baseDiscount: 20, // 기본 20% 할인
-      gradient: ["#6366F1", "#4F46E5"], // 인디고 그라데이션
+      id: pkg.id,
+      name: names[index] || pkg.id,
+      baseAmount: pkg.tokens,
+      price: pkg.price,
+      formattedPrice: pkg.formattedPrice,
+      gradient: gradients[index] || ["#6366F1", "#4F46E5"],
       accentColor: "#8B5CF6",
-      popular: false,
-      icon: "✨",
-      tagline: t("tokenPurchase.packages.light.tagline"),
-    },
-    {
-      id: "100",
-      name: t("tokenPurchase.packages.bestValue.name"),
-      baseAmount: 100,
-      basePrice: 4900,
-      originalPrice: 6500,
-      baseDiscount: 25, // 기본 25% 할인
-      gradient: ["#F59E0B", "#DC2626"], // 주황색-빨간색 그라데이션
-      accentColor: "#EC4899",
-      popular: true,
-      icon: "🔥",
-      tagline: t("tokenPurchase.packages.bestValue.tagline"),
-    },
-    {
-      id: "300",
-      name: t("tokenPurchase.packages.mega.name"),
-      baseAmount: 300,
-      basePrice: 9900,
-      originalPrice: 15000,
-      baseDiscount: 35, // 기본 35% 할인
-      gradient: ["#10B981", "#059669"], // 민트 귷린 그라데이션
-      accentColor: "#6366F1",
-      popular: false,
-      icon: "💎",
-      tagline: t("tokenPurchase.packages.mega.tagline"),
-    },
-    {
-      id: "1000",
-      name: t("tokenPurchase.packages.ultra.name"),
-      baseAmount: 1000,
-      basePrice: 19900,
-      originalPrice: 40000,
-      baseDiscount: 50, // 기본 50% 할인
-      gradient: ["#7C3AED", "#5B21B6"], // 진한 보라색 그라데이션
-      accentColor: "#EC4899",
-      popular: false,
-      icon: "🚀",
-      tagline: t("tokenPurchase.packages.ultra.tagline"),
-    },
-  ];
-
-  // 플랜별 혜택 적용한 최종 패키지
-  const packages = basePackages.map((pkg) => {
-    const benefits = applyPlanBenefits(pkg);
-    console.log('DEBUG - applyPlanBenefits result for', pkg.id, ':', benefits);
-    return {
-      ...pkg,
-      amount: benefits.amount,
-      price: benefits.price,
-      originalPrice: benefits.originalPrice,
-      discount: benefits.discount,
-      bonus: benefits.bonus > 0 ? benefits.bonus : null,
-      formattedPrice: formatPrice(benefits.price, currentCurrency),
-      formattedOriginalPrice: formatPrice(benefits.originalPrice, currentCurrency),
+      popular: pkg.popular,
+      icon: icons[index] || "✨",
+      tagline: taglines[index] || "",
     };
   });
 
@@ -318,60 +214,17 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
 
                 <View style={styles.tokenSection}>
                   <View style={styles.tokenAmount}>
-                    <Text style={styles.tokenNumber}>{pkg.amount}</Text>
+                    <Text style={styles.tokenNumber}>{pkg.baseAmount}</Text>
                     <Text style={styles.tokenLabel}>{t("tokens.label", { defaultValue: "토큰" })}</Text>
                   </View>
-                  {pkg.bonus && (
-                    <LinearGradient
-                      colors={[
-                        "rgba(255,255,255,0.4)",
-                        "rgba(255,255,255,0.2)",
-                      ]}
-                      style={styles.bonusBadge}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                    >
-                      <SafeIcon name="gift" size={14} color="#FFFFFF" />
-                      <Text style={styles.bonusText}>+{pkg.bonus} 보너스</Text>
-                    </LinearGradient>
-                  )}
                 </View>
 
                 <View style={styles.priceSection}>
                   <View style={styles.priceRow}>
-                    <Text style={styles.currency}>{currencyInfo.symbol}</Text>
                     <Text style={styles.price}>
-                      {(() => {
-                        // 심볼 제거한 가격 표시
-                        const formattedPrice = pkg.formattedPrice || formatPrice(pkg.price || 0, currentCurrency);
-                        return formattedPrice.replace(/^[₩$¥£€]+/g, '').trim();
-                      })()}
+                      {pkg.formattedPrice}
                     </Text>
                   </View>
-                  {pkg.originalPrice && (
-                    <View style={styles.discountRow}>
-                      <Text style={styles.originalPrice}>
-                        {(() => {
-                          // 심볼 제거한 원래 가격 표시
-                          const formattedOriginalPrice = pkg.formattedOriginalPrice || formatPrice(pkg.originalPrice, currentCurrency);
-                          return formattedOriginalPrice;
-                        })()}
-                      </Text>
-                      <LinearGradient
-                        colors={[
-                          "rgba(255,255,255,0.4)",
-                          "rgba(255,255,255,0.25)",
-                        ]}
-                        style={styles.discountBadge}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                      >
-                        <Text style={styles.discountText}>
-                          {t("tokenPurchase.pricing.discount", { percent: pkg.discount })}
-                        </Text>
-                      </LinearGradient>
-                    </View>
-                  )}
                 </View>
 
 

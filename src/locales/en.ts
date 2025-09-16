@@ -883,6 +883,10 @@ const en = {
     weeklyCount: {
       thisWeek: "This Week",
       consistency: "Consistency",
+    },
+    banner: {
+      title: "Write Amazing Posts with Posty",
+      subtitle: "Perfect posting powered by AI",
     }
   },
 

@@ -613,6 +613,10 @@ const ko = {
     weeklyCount: {
       thisWeek: "이번 주",
       consistency: "일관성",
+    },
+    banner: {
+      title: "Posty로 더 멋진 글을 써보세요",
+      subtitle: "AI가 도와주는 완벽한 포스팅",
     }
   },
 
