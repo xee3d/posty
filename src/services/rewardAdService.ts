@@ -275,6 +275,45 @@ class RewardAdService {
     const currentCount = await this.getDailyAdCount();
     return Math.max(0, this.maxDailyViews - currentCount);
   }
+
+  // 광고 미리 로드 (구독 페이지용)
+  async preloadAd(): Promise<void> {
+    try {
+      console.log("RewardAdService: 광고 미리 로드 시작");
+      await this.loadAd();
+    } catch (error) {
+      console.error("RewardAdService: 광고 미리 로드 실패:", error);
+    }
+  }
+
+  // 광고 통계 조회 (구독 페이지용)
+  async getAdStats(): Promise<{
+    dailyCount: number;
+    remainingDaily: number;
+    limits: {
+      dailyLimit: number;
+      weeklyLimit: number;
+      maxConsecutiveDays: number;
+    };
+  }> {
+    try {
+      const dailyCount = await this.getDailyAdCount();
+      const remainingDaily = await this.getRemainingAdCount();
+      
+      return {
+        dailyCount,
+        remainingDaily,
+        limits: this.adLimits,
+      };
+    } catch (error) {
+      console.error("RewardAdService: 광고 통계 조회 실패:", error);
+      return {
+        dailyCount: 0,
+        remainingDaily: 0,
+        limits: this.adLimits,
+      };
+    }
+  }
 }
 
 // 싱글톤 인스턴스
