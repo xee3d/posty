@@ -54,7 +54,7 @@ class AIAgentService {
           case "gpt-mini":
             return "gpt-4o-mini";
           case "gemini-flash-lite":
-            return "gemini-2.5-flash-lite";
+            return "gemini-2.5-flash"; // 올바른 모델명으로 수정
           default:
             return "gpt-4o-mini";
         }
