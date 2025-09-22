@@ -57,7 +57,7 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
           id: "gemini-flash-lite",
           name: "Gemini 2.5 Flash Lite",
           nativeName: "Gemini 2.5 Flash Lite",
-          description: "Google의 최신 AI 모델",
+          description: "짧은 지연 시간에 최적화된 Google AI 모델",
           icon: "star",
           color: "#4285F4",
           badge: "GEM",

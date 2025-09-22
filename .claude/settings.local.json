@@ -83,7 +83,10 @@
       "Bash(do if ! grep -q \"$key\" /Users/ethan_macstudio/Projects/posty/src/locales/ja.ts)",
       "Bash(then echo \"  - $key\")",
       "Bash(fi)",
-      "Bash(do if ! grep -q \"$key\" /Users/ethan_macstudio/Projects/posty/src/locales/zh-CN.ts)"
+      "Bash(do if ! grep -q \"$key\" /Users/ethan_macstudio/Projects/posty/src/locales/zh-CN.ts)",
+      "Bash(lsof:*)",
+      "Bash(vercel ls:*)",
+      "Read(//Users/ethan_macstudio/Projects/Cheez/src/services/**)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

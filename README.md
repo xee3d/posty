@@ -14,8 +14,8 @@
 
 ## 📱 개요
 
-Posty는 AI(GPT-4o-mini)를 활용하여 매력적인 SNS 콘텐츠를 생성하는 모바일 애플리케이션입니다.
-트렌드를 반영한 창의적인 콘텐츠를 쉽고 빠르게 만들어 Instagram, Facebook, X(Twitter) 등에 공유할 수 있습니다.
+Posty는 AI(GPT-4o-mini, Gemini 2.5 Flash Lite)를 활용하여 매력적인 SNS 콘텐츠를 생성하는 모바일 애플리케이션입니다.
+다양한 AI 모델을 선택할 수 있으며, 트렌드를 반영한 창의적인 콘텐츠를 쉽고 빠르게 만들어 Instagram, Facebook, X(Twitter) 등에 공유할 수 있습니다.
 
 **📅 개발 기간**: 2025년 7월 4일 ~ 현재 (약 1개월)  
 **🚀 현재 상태**: Firebase Auth + 로컬 데이터 + Mock 시스템으로 완전 동작
@@ -24,6 +24,7 @@ Posty는 AI(GPT-4o-mini)를 활용하여 매력적인 SNS 콘텐츠를 생성하
 
 ### 🤖 AI 콘텐츠 생성
 
+- **AI 모델 선택**: GPT-4o-mini, Gemini 2.5 Flash Lite 중 선택 가능
 - **텍스트 생성**: 주제만 입력하면 AI가 창의적인 콘텐츠 작성
 - **이미지 분석**: 사진을 업로드하면 AI가 분석하여 관련 텍스트 생성
 - **문장 다듬기**: 기존 텍스트를 더 매력적으로 개선
@@ -125,8 +126,9 @@ npm run ios
 `.env` 파일 생성:
 
 ```env
-# OpenAI
+# AI API Keys
 OPENAI_API_KEY=your_openai_api_key
+GOOGLE_API_KEY=your_google_ai_studio_api_key
 
 # App Secret
 APP_SECRET=your_app_secret
@@ -143,6 +145,11 @@ NAVER_CONSUMER_KEY=your_naver_key
 NAVER_CONSUMER_SECRET=your_naver_secret
 KAKAO_APP_KEY=your_kakao_key
 ```
+
+**Vercel 환경변수 설정 (배포용):**
+- `OPENAI_API_KEY`: OpenAI API 키
+- `GOOGLE_API_KEY`: Google AI Studio API 키
+- `APP_SECRET`: 앱 보안을 위한 비밀 키
 
 ## 📁 프로젝트 구조
 

@@ -402,67 +402,88 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
 
     // AI 모델에 따른 API 호출 분기
     let response;
-    
-    console.log("🚨 NEW CODE EXECUTING - Model routing check:", {
+
+    console.log("🔍 Model routing check:", {
       apiModel,
       startsWithGemini: apiModel.startsWith('gemini'),
-      equalsGeminiFlash: apiModel === 'gemini-2.5-flash',
-      willUseGemini: apiModel.startsWith('gemini') || apiModel === 'gemini-2.5-flash'
+      includesGemini: apiModel.includes('gemini'),
+      willUseGemini: apiModel.startsWith('gemini') || apiModel.includes('gemini'),
+      exactMatch: apiModel === 'gemini-2.5-flash-lite'
     });
-    
-    // 강제로 Gemini API 사용하도록 수정
-    if (apiModel.startsWith('gemini') || apiModel === 'gemini-2.5-flash' || apiModel.includes('gemini')) {
-      // Gemini API 호출
-      console.log("Calling Gemini API with model:", apiModel);
-      console.log("Gemini API Key exists:", !!process.env.GEMINI_API_KEY);
-      
-      // Gemini API 형식으로 메시지 변환
-      const geminiContents = messages.map(msg => ({
-        role: msg.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: msg.content }]
-      }));
 
-      console.log("Gemini request body:", JSON.stringify({
-        model: apiModel,
-        contents: geminiContents.map(c => ({
-          role: c.role,
-          parts: c.parts.map(p => ({ text: p.text.substring(0, 100) + "..." }))
-        })),
-        generationConfig: {
-          maxOutputTokens: finalMaxTokens,
-          temperature: generatePlatformVersions ? 0.5 : 0.8,
-        }
-      }, null, 2));
+    // 강화된 Gemini API 라우팅 로직
+    const isGeminiModel = apiModel.startsWith('gemini') ||
+                         apiModel.includes('gemini') ||
+                         apiModel === 'gemini-2.5-flash-lite' ||
+                         apiModel === 'gemini-1.5-flash';
+
+    console.log("🎯 Final routing decision:", { apiModel, isGeminiModel });
+
+    if (isGeminiModel) {
+      // Gemini API 호출
+      console.log("🟢 Routing to Gemini API with model:", apiModel);
 
       const geminiApiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
-      
+
       if (!geminiApiKey) {
+        console.error("❌ Gemini API key not found");
         throw new Error("GOOGLE_API_KEY or GEMINI_API_KEY environment variable is not set");
       }
 
-      console.log("Using Gemini API Key:", geminiApiKey.substring(0, 10) + "...");
-      console.log("Gemini API URL:", `https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${geminiApiKey.substring(0, 10)}...`);
-      console.log("Gemini request body:", JSON.stringify({
-        contents: messages.map((m) => ({
-          role: m.role === "user" ? "user" : "model",
-          parts: [{ text: m.content }],
-        })),
-        generationConfig: {
-          maxOutputTokens: finalMaxTokens,
-          temperature: generatePlatformVersions ? 0.5 : 0.8,
-        }
-      }, null, 2));
+      console.log("✅ Gemini API Key found:", geminiApiKey.substring(0, 10) + "...");
 
-      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${geminiApiKey}`, {
+      // Cheez 프로젝트와 동일한 모델명 사용
+      const geminiModel = "gemini-2.5-flash-lite";
+
+      // 이미지가 있는 경우 Gemini Vision API 처리
+      let geminiContents;
+      if (image) {
+        console.log("📸 Processing image for Gemini Vision API");
+        geminiContents = [{
+          parts: [
+            { text: prompt || "이 이미지를 분석하고 SNS 콘텐츠를 만들어주세요." },
+            {
+              inline_data: {
+                mime_type: "image/jpeg",
+                data: image.replace(/^data:image\/[a-z]+;base64,/, "")
+              }
+            }
+          ]
+        }];
+      } else {
+        // 텍스트만 있는 경우 - 시스템 + 사용자 메시지 결합
+        const systemMessage = messages[0]?.content || '';
+        const userMessage = messages[1]?.content || prompt;
+        const combinedPrompt = `${systemMessage}\n\n사용자 요청: ${userMessage}`;
+
+        geminiContents = [{
+          parts: [{
+            text: combinedPrompt
+          }]
+        }];
+      }
+
+      console.log("📤 Gemini API request:", {
+        model: geminiModel,
+        url: `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent`,
+        contentsCount: geminiContents.length,
+        hasImage: !!image
+      });
+
+      // Cheez 방식: X-goog-api-key 헤더 사용
+      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-goog-api-key": geminiApiKey,
         },
         body: JSON.stringify({
           contents: geminiContents,
           generationConfig: {
             maxOutputTokens: finalMaxTokens,
             temperature: generatePlatformVersions ? 0.5 : 0.8,
+            topP: 0.8,
+            topK: 40,
           },
         }),
       });
@@ -509,14 +530,78 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
       });
     }
 
-    console.log("API Response status:", response.status);
-    console.log("API Response headers:", Object.fromEntries(response.headers.entries()));
+    console.log("🔍 API Response Debug:", {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok,
+      url: response.url,
+      headers: Object.fromEntries(response.headers.entries()),
+      apiModel: apiModel
+    });
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("API Error Response:", errorText);
-      console.error("API Error Status:", response.status);
-      console.error("API Error URL:", response.url);
+      console.error("❌ API Error Response:", errorText);
+      console.error("❌ API Error Status:", response.status);
+      console.error("❌ API Error URL:", response.url);
+
+      let errorData;
+      try {
+        errorData = JSON.parse(errorText);
+      } catch {
+        errorData = { error: { message: errorText } };
+      }
+
+      // Gemini API 에러 처리
+      if (apiModel.startsWith('gemini') || apiModel.includes('gemini')) {
+        console.error("❌ Gemini API Error Details:", {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+          headers: Object.fromEntries(response.headers.entries()),
+          errorText: errorText,
+          errorData: errorData
+        });
+
+        // 항상 GPT로 폴백 (디버깅용)
+        console.log("🔄 Falling back to GPT due to Gemini error");
+        const fallbackResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "gpt-4o-mini",
+            messages: messages,
+            max_tokens: finalMaxTokens,
+            temperature: 0.8,
+          }),
+        });
+
+        if (fallbackResponse.ok) {
+          const fallbackData = await fallbackResponse.json();
+          return res.status(200).json({
+            success: true,
+            content: fallbackData.choices[0].message.content,
+            contentLength: fallbackData.choices[0].message.content.length,
+            usage: fallbackData.usage,
+            platforms: null,
+            metadata: {
+              tone,
+              platform,
+              includeEmojis,
+              generatePlatformVersions,
+              timestamp: new Date().toISOString(),
+              model: fallbackData.model,
+              fallback: true,
+              fallbackReason: `Gemini error: ${response.status}`
+            },
+          });
+        }
+
+        throw new Error(`Gemini API error: ${response.status} - ${errorData.error?.message || errorText}`);
+      }
 
       // Vision 모델이 실패하면 다른 모델 시도
       if (image && errorData.error) {
@@ -691,11 +776,28 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
 
     // AI 모델에 따른 응답 처리
     let responseContent;
-    if (apiModel.startsWith('gemini') || apiModel === 'gemini-2.5-flash') {
+
+    // 동일한 isGeminiModel 로직 사용
+    const isGeminiModelForResponse = apiModel.startsWith('gemini') ||
+                                   apiModel.includes('gemini') ||
+                                   apiModel === 'gemini-2.5-flash-lite' ||
+                                   apiModel === 'gemini-1.5-flash';
+
+    console.log("🔍 Response processing:", { apiModel, isGeminiModelForResponse });
+
+    if (isGeminiModelForResponse) {
       // Gemini 응답 처리
-      responseContent = data.candidates[0].content.parts[0].text;
+      console.log("📥 Processing Gemini response:", JSON.stringify(data, null, 2));
+      if (data.candidates && data.candidates.length > 0 && data.candidates[0].content) {
+        responseContent = data.candidates[0].content.parts[0].text;
+        console.log("✅ Gemini content extracted:", responseContent.substring(0, 100) + "...");
+      } else {
+        console.error("❌ Invalid Gemini response structure:", data);
+        throw new Error("Invalid response from Gemini API");
+      }
     } else {
       // OpenAI 응답 처리
+      console.log("📥 Processing OpenAI response");
       responseContent = data.choices[0].message.content;
     }
     

@@ -54,7 +54,7 @@ class AIAgentService {
           case "gpt-mini":
             return "gpt-4o-mini";
           case "gemini-flash-lite":
-            return "gemini-2.5-flash"; // 올바른 모델명으로 수정
+            return "gemini-2.5-flash-lite"; // Cheez 프로젝트와 동일한 모델명
           default:
             return "gpt-4o-mini";
         }
