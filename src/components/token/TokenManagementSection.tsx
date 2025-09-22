@@ -188,8 +188,8 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
                 }, 100);
               }}
             >
-              <SafeIcon name="gift" size={18} color="#10B981" />
-              <Text style={[styles.actionButtonText, { color: "#10B981" }]}>
+              <SafeIcon name="gift" size={18} color={colors.primary} />
+              <Text style={[styles.actionButtonText, { color: colors.primary }]}>
                 {t("tokens.actions.getFree")}
               </Text>
             </TouchableOpacity>
@@ -323,8 +323,8 @@ const createStyles = (colors: any) =>
       borderWidth: 1,
     },
     earnButton: {
-      backgroundColor: "#10B981" + "15",
-      borderColor: "#10B981" + "30",
+      backgroundColor: colors.primary + "15",
+      borderColor: colors.primary + "30",
     },
     chargeButton: {
       backgroundColor: colors.primary + "15",
