@@ -836,6 +836,14 @@ const ko = {
     soundEffects: "사운드 효과",
     vibration: "진동",
     themeAndColors: "테마 및 색상",
+    aiAgent: {
+      title: "AI 에이전트",
+      description: "콘텐츠 생성에 사용할 AI 모델을 선택하세요",
+      selectAgent: "AI 에이전트 선택",
+      note: "AI 에이전트는 콘텐츠 생성 시 사용되는 AI 모델입니다.",
+      gpt: "GPT-4o Mini",
+      gemini: "Gemini 2.5 Flash Lite",
+    },
     themeDescription: "테마 설정",
     theme: {
       title: "테마 설정",
