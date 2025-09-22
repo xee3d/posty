@@ -5,7 +5,8 @@
 #import <RNKakaoLogins/RNKakaoLogins.h>
 #import <KakaoSDKCommon/KakaoSDKCommon.h>
 #import <GoogleMobileAds/GoogleMobileAds.h>
-#import <FBSDKCoreKit/FBSDKCoreKit-Swift.h>
+// Facebook SDK disabled for release
+// #import <FBSDKCoreKit/FBSDKCoreKit-Swift.h>
 #import <UserNotifications/UserNotifications.h>
 #import <RNCPushNotificationIOS.h>
 
@@ -25,8 +26,8 @@
   [[NaverThirdPartyLoginConnection getSharedInstance] setConsumerSecret:@"RND5w7pcJt"];
   [[NaverThirdPartyLoginConnection getSharedInstance] setAppUrlScheme:@"postynaverlogin"];
   
-  // Facebook SDK 초기화
-  [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
+  // Facebook SDK disabled for release
+  // [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
   
   // Push Notifications 초기화
   UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
@@ -53,10 +54,10 @@
     return YES;
   }
   
-  // Facebook URL 처리
-  if ([[FBSDKApplicationDelegate sharedInstance] application:application openURL:url options:options]) {
-    return YES;
-  }
+  // Facebook URL 처리 disabled for release
+  // if ([[FBSDKApplicationDelegate sharedInstance] application:application openURL:url options:options]) {
+  //   return YES;
+  // }
   
   return [super application:application openURL:url options:options];
 }

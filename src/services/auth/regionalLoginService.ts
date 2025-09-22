@@ -1,7 +1,7 @@
 import { getDeviceLanguage } from '../../utils/deviceLanguage';
 
 // 지원하는 소셜 로그인 타입
-export type SocialProvider = 'kakao' | 'naver' | 'google' | 'facebook' | 'apple';
+export type SocialProvider = 'kakao' | 'naver' | 'google'; // Facebook and Apple disabled for release
 
 // 지역별 로그인 설정
 interface RegionalLoginConfig {
@@ -10,34 +10,34 @@ interface RegionalLoginConfig {
   priority: SocialProvider[];        // 전체 우선순위 순서
 }
 
-// 지역별 로그인 구성
+// 지역별 로그인 구성 (Facebook and Apple disabled for release)
 const REGIONAL_LOGIN_CONFIGS: Record<string, RegionalLoginConfig> = {
   // 한국 - 카카오톡 97% 점유율
   ko: {
     primary: 'kakao',
-    secondary: ['naver', 'google', 'apple', 'facebook'],
-    priority: ['kakao', 'naver', 'google', 'apple', 'facebook']
+    secondary: ['naver', 'google'],
+    priority: ['kakao', 'naver', 'google']
   },
 
-  // 일본 - LINE이 주류이지만 현재 미지원, Apple 높은 점유율
+  // 일본 - Google 우선 (Apple disabled)
   ja: {
-    primary: 'apple',
-    secondary: ['google', 'facebook'],
-    priority: ['apple', 'google', 'facebook']
+    primary: 'google',
+    secondary: [],
+    priority: ['google']
   },
 
-  // 중국 - WeChat/Weibo가 주류이지만 현재 미지원, Apple 우선
+  // 중국 - Google 우선 (Apple disabled)
   zh: {
-    primary: 'apple',
-    secondary: ['google'],
-    priority: ['apple', 'google']
+    primary: 'google',
+    secondary: [],
+    priority: ['google']
   },
 
-  // 글로벌 기본값 - Google/Apple 우선
+  // 글로벌 기본값 - Google 우선 (Apple and Facebook disabled)
   default: {
     primary: 'google',
-    secondary: ['apple', 'facebook'],
-    priority: ['google', 'apple', 'facebook']
+    secondary: [],
+    priority: ['google']
   }
 };
 
@@ -111,21 +111,8 @@ export const getRegionalProviderInfo = (provider: SocialProvider) => {
       marketShare: '전 세계 2위',
       color: '#FFFFFF',
       textColor: '#1F1F1F'
-    },
-    apple: {
-      name: 'Apple',
-      region: '글로벌 (iOS)',
-      marketShare: '5% (빠른 성장)',
-      color: '#000000',
-      textColor: '#FFFFFF'
-    },
-    facebook: {
-      name: 'Facebook',
-      region: '글로벌',
-      marketShare: '61% (전 세계 1위)',
-      color: '#1877F2',
-      textColor: '#FFFFFF'
     }
+    // Apple and Facebook disabled for release
   };
 
   return configs[provider];

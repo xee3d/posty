@@ -352,6 +352,8 @@
 				<string>postynaverlogin</string>
 			</array>
 		</dict>
+		<!-- Facebook and Apple login disabled for release -->
+		<!--
 		<dict>
 			<key>CFBundleURLName</key>
 			<string>FACEBOOK</string>
@@ -368,6 +370,7 @@
 				<string>com.posty</string>
 			</array>
 		</dict>
+		-->
 	</array>
 	
 	<!-- 📱 앱 아이콘 배지 권한 -->

@@ -105,12 +105,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
           case "kakao":
             userProfile = await vercelAuthService.signInWithKakao();
             break;
+          // Facebook and Apple login disabled for release
           case "facebook":
-            userProfile = await vercelAuthService.signInWithFacebook();
-            break;
+            throw new Error("Facebook 로그인이 출시 버전에서 비활성화되었습니다");
           case "apple":
-            userProfile = await vercelAuthService.signInWithApple();
-            break;
+            throw new Error("Apple 로그인이 출시 버전에서 비활성화되었습니다");
         }
 
         if (userProfile) {
@@ -213,8 +212,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         case 'google': iconName = 'mail'; break;
         case 'naver': iconName = 'naver'; break;
         case 'kakao': iconName = 'chatbubble'; break;
-        case 'facebook': iconName = 'facebook'; break;
-        case 'apple': iconName = 'apple'; break;
+        // Facebook and Apple disabled for release
         default: iconName = 'help-circle'; break;
       }
       const isThisLoading = loadingProvider === provider;
@@ -325,8 +323,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                   style={styles.expandedOptionsContainer}
                 >
                   {secondaryProviders.map((provider, index) => {
-                    // Apple은 iOS에서만 표시
-                    if (provider === 'apple' && Platform.OS !== 'ios') {
+                    // Facebook and Apple disabled for release
+                    if (provider === 'facebook' || provider === 'apple') {
                       return null;
                     }
 

@@ -7,43 +7,11 @@ import logger from "../../utils/logger";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import NaverLogin from "@react-native-seoul/naver-login";
 import * as KakaoLogin from "@react-native-seoul/kakao-login";
-import { appleAuth } from "@invertase/react-native-apple-authentication";
-// Facebook SDK import with safer loading
-let LoginManager, AccessToken, GraphRequest, GraphRequestManager, Settings;
-let fbSDKAvailable = false;
+// Apple and Facebook login disabled for release
+// import { appleAuth } from "@invertase/react-native-apple-authentication";
 
-try {
-  const fbSDK = require("react-native-fbsdk-next");
-
-  // Check if the SDK modules are properly loaded
-  if (fbSDK && fbSDK.LoginManager && fbSDK.AccessToken && fbSDK.Settings) {
-    LoginManager = fbSDK.LoginManager;
-    AccessToken = fbSDK.AccessToken;
-    GraphRequest = fbSDK.GraphRequest;
-    GraphRequestManager = fbSDK.GraphRequestManager;
-    Settings = fbSDK.Settings;
-
-    // Facebook 앱 정보 설정 (시뮬레이터에서도 웹뷰 로그인 가능하도록)
-    Settings.setAppID("757255383655974");
-    Settings.setClientToken("d8ee82c1aee6b4a49fd02b398354f2b7");
-    Settings.initializeSDK();
-
-    fbSDKAvailable = true;
-    console.log("✅ Facebook SDK 로드 및 초기화 성공");
-  } else {
-    throw new Error("Facebook SDK modules not properly loaded");
-  }
-} catch (error) {
-  console.warn("Facebook SDK 로드 실패:", error.message);
-  fbSDKAvailable = false;
-
-  // Fallback objects
-  LoginManager = null;
-  AccessToken = null;
-  GraphRequest = null;
-  GraphRequestManager = null;
-  Settings = null;
-}
+// Facebook SDK completely removed for release
+// No Facebook SDK imports or initialization
 
 // 환경변수 안전 처리
 let GOOGLE_WEB_CLIENT_ID: string;
@@ -443,212 +411,16 @@ class VercelAuthService {
     }
   }
 
+  // Apple login disabled for release
   async signInWithApple(): Promise<AuthResult> {
-    logger.info("🔑 실제 Apple 로그인 수행 - 서버 호출 없는 로컬 인증");
-
-    try {
-      if (Platform.OS !== "ios") {
-        throw new Error("Apple 로그인은 iOS에서만 지원됩니다");
-      }
-
-      // Apple Sign-In 요청
-      const appleAuthRequestResponse = await appleAuth.performRequest({
-        requestedOperation: appleAuth.Operation.LOGIN,
-        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
-      });
-
-      if (!appleAuthRequestResponse.identityToken) {
-        throw new Error("Apple Identity Token을 가져올 수 없습니다");
-      }
-
-      logger.info("Apple 로그인 성공");
-
-      console.log(
-        "🔍 Apple 로그인 전체 응답:",
-        JSON.stringify(appleAuthRequestResponse, null, 2)
-      );
-
-      // Apple 사용자 정보로 로컬 사용자 생성
-      const localUser = {
-        uid: `apple_${appleAuthRequestResponse.user || Date.now()}`,
-        email:
-          appleAuthRequestResponse.email ||
-          "apple_user@privaterelay.appleid.com",
-        displayName: appleAuthRequestResponse.fullName?.givenName
-          ? `${appleAuthRequestResponse.fullName.givenName} ${
-              appleAuthRequestResponse.fullName.familyName || ""
-            }`.trim()
-          : "Apple User",
-        photoURL: null, // Apple은 프로필 사진을 제공하지 않음
-        provider: "apple",
-      };
-
-      // 로컬 토큰 생성 (서버 호출 없음)
-      const localToken = `local_apple_${
-        appleAuthRequestResponse.user || Date.now()
-      }_${Date.now()}`;
-
-      // 로컬 저장 (배치 처리로 우선순위 역전 방지)
-      await AsyncStorage.multiSet([
-        ["@auth_token", localToken],
-        ["@user_profile", JSON.stringify(localUser)],
-      ]);
-
-      logger.info(
-        "✅ 실제 Apple 사용자 정보로 로컬 인증 완료: " + localUser.displayName
-      );
-
-      return {
-        user: localUser,
-        isNewUser: false,
-        token: localToken,
-      };
-    } catch (error) {
-      console.error("Apple Sign-In 실패:", error);
-      throw error;
-    }
+    throw new Error("Apple 로그인이 출시 버전에서 비활성화되었습니다");
   }
 
-  // Facebook 로그인
+  // Facebook login disabled for release
   async signInWithFacebook(): Promise<AuthResult> {
-    logger.info("🔑 실제 Facebook 로그인 수행 - 서버 호출 없는 로컬 인증");
-
-    // Facebook SDK 사용 가능 여부 확인
-    if (
-      !fbSDKAvailable ||
-      !LoginManager ||
-      !AccessToken ||
-      !GraphRequest ||
-      !GraphRequestManager
-    ) {
-      throw new Error(
-        "Facebook SDK를 사용할 수 없습니다. Facebook SDK가 제대로 설치되었는지 확인해주세요."
-      );
-    }
-
-    try {
-      // Facebook 로그인 시작 (웹뷰 방식으로 시뮬레이터에서도 가능)
-      const result = await LoginManager.logInWithPermissions([
-        "public_profile",
-        "email",
-      ]);
-
-      if (result.isCancelled) {
-        throw new Error("Facebook 로그인이 취소되었습니다");
-      }
-
-      // Access Token 가져오기
-      const accessToken = await AccessToken.getCurrentAccessToken();
-
-      if (!accessToken) {
-        throw new Error("Facebook Access Token을 가져올 수 없습니다");
-      }
-
-      logger.info("Facebook 로그인 성공, 프로필 정보 가져오기");
-
-      // Facebook 사용자 프로필 가져오기 (메모리 누수 방지)
-      return new Promise((resolve, reject) => {
-        let isResolved = false;
-
-        const infoRequest = new GraphRequest(
-          "/me",
-          {
-            accessToken: accessToken.accessToken,
-            parameters: {
-              fields: {
-                string: "id,name,email,picture.type(large)",
-              },
-            },
-          },
-          (error, result) => {
-            if (isResolved) {
-              return;
-            } // 중복 호출 방지
-            isResolved = true;
-
-            if (error) {
-              logger.error("Facebook 프로필 가져오기 실패:", error);
-              reject(error);
-              return;
-            }
-
-            console.log(
-              "🔍 Facebook 프로필 전체 응답:",
-              JSON.stringify(result, null, 2)
-            );
-
-            const fbProfile = result as any;
-
-            const localUser = {
-              uid: `facebook_${fbProfile.id || Date.now()}`,
-              email: fbProfile.email || "facebook_user@facebook.com",
-              displayName: fbProfile.name || "Facebook User",
-              photoURL: fbProfile.picture?.data?.url || null,
-              provider: "facebook",
-            };
-
-            // 로컬 토큰 생성 (서버 호출 없음)
-            const localToken = `local_facebook_${
-              fbProfile.id || Date.now()
-            }_${Date.now()}`;
-
-            // 로컬 저장 (배치 처리로 우선순위 역전 방지)
-            AsyncStorage.multiSet([
-              ["@auth_token", localToken],
-              ["@user_profile", JSON.stringify(localUser)],
-            ])
-              .then(() => {
-                logger.info(
-                  "✅ 실제 Facebook 사용자 정보로 로컬 인증 완료: " + localUser.displayName
-                );
-
-                resolve({
-                  user: localUser,
-                  isNewUser: false,
-                  token: localToken,
-                });
-              })
-              .catch(reject);
-          }
-        );
-
-        // Graph Request 실행
-        const requestManager = new GraphRequestManager();
-        requestManager.addRequest(infoRequest).start();
-
-        // 타임아웃 설정 (30초)
-        setTimeout(() => {
-          if (!isResolved) {
-            isResolved = true;
-            reject(new Error("Facebook 프로필 가져오기 타임아웃"));
-          }
-        }, 30000);
-      });
-    } catch (error) {
-      logger.error("Facebook Sign-In 실패:", error);
-
-      // 에러 발생 시 기본값으로 fallback
-      const fallbackUser = {
-        uid: `facebook_fallback_${Date.now()}`,
-        email: "facebook_user@facebook.com",
-        displayName: "Facebook User (로그인 오류)",
-        photoURL: null,
-        provider: "facebook",
-      };
-
-      const fallbackToken = `local_facebook_fallback_${Date.now()}`;
-      await AsyncStorage.multiSet([
-        ["@auth_token", fallbackToken],
-        ["@user_profile", JSON.stringify(fallbackUser)],
-      ]);
-
-      return {
-        user: fallbackUser,
-        isNewUser: false,
-        token: fallbackToken,
-      };
-    }
+    throw new Error("Facebook 로그인이 출시 버전에서 비활성화되었습니다");
   }
+
 
   // 토큰 관리
   async saveAuthToken(token: string): Promise<void> {
