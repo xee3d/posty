@@ -189,7 +189,7 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
               </Text>
               <View style={styles.progressBar}>
                 <LinearGradient
-                  colors={["#4F46E5", "#7C3AED"]}  // 진한 인디고에서 보라색으로
+                  colors={[colors.primary, colors.primary + "CC"]}  // 테마색 그라디언트
                   start={{ x: 0, y: 0 }}
                   end={{ x: 1, y: 0 }}
                   style={[styles.progressFill, { width: `${completeness}%` }]}
