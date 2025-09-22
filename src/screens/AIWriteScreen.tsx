@@ -2743,5 +2743,6 @@ const createStyles = (
       fontWeight: "600",
     },
   });
+};
 
 export default AIWriteScreen;
