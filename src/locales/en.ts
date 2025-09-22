@@ -485,9 +485,9 @@ const en = {
       "Fashion", "Beauty", "Interior", "Gardening", "Pets", "Gaming", "IT", "Stocks", "Real Estate", "Self Development"
     ],
     completion: {
-      low: "Set up your profile to experience personalized AI writing ✨",
-      medium: "Just a little more! AI can understand your style more accurately 🎯",
-      high: "Almost done! You'll soon meet personalized AI writing service 🚀",
+      low: "Set up your profile to experience personalized AI writing",
+      medium: "Just a little more! AI can understand your style more accurately",
+      high: "Almost done! You'll soon meet personalized AI writing service",
     },
   },
 
