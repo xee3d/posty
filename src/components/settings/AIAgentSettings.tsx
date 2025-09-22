@@ -53,16 +53,16 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
       badge: "GPT",
       isAvailable: true,
     },
-    {
-      id: "gemini-flash-lite",
-      name: "Gemini 2.5 Flash Lite",
-      nativeName: "Gemini 2.5 Flash Lite",
-      description: "Google의 최신 AI 모델",
-      icon: "star",
-      color: "#4285F4",
-      badge: "GEM",
-      isAvailable: true, // 실제로는 사용 가능함
-    },
+        {
+          id: "gemini-flash-lite",
+          name: "Gemini 2.5 Flash Lite",
+          nativeName: "Gemini 2.5 Flash Lite",
+          description: "Google의 최신 AI 모델",
+          icon: "star",
+          color: "#4285F4",
+          badge: "GEM",
+          isAvailable: true, // 항상 사용 가능하도록 설정
+        },
   ];
 
   useEffect(() => {
@@ -88,54 +88,14 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
     }
   };
 
-  const checkAgentAvailability = async (): Promise<AIAgentConfig[]> => {
-    try {
-      // Gemini API 테스트 요청
-      const response = await fetch('https://posty-ai-new.vercel.app/api/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer posty-secret-key-change-this-in-production',
-        },
-        body: JSON.stringify({
-          prompt: 'test',
-          tone: 'casual',
-          platform: 'instagram',
-          model: 'gemini-2.5-flash-lite',
-          language: 'ko',
-          length: 'short'
-        }),
-      });
-
-      const responseData = await response.json();
-      const isGeminiAvailable = response.ok && responseData.success;
-      
-      console.log('Gemini availability check:', {
-        status: response.status,
-        ok: response.ok,
-        success: responseData.success,
-        isAvailable: isGeminiAvailable
-      });
-      
-      return aiAgentConfigs.map(config => ({
-        ...config,
-        isAvailable: config.id === 'gpt-mini' || isGeminiAvailable,
-        fallbackInfo: config.id === 'gemini-flash-lite' && !isGeminiAvailable 
-          ? "API 키 설정 필요 - 현재 GPT-4o Mini로 대체됩니다" 
-          : undefined,
-      }));
-    } catch (error) {
-      console.warn('Failed to check Gemini availability:', error);
-      // 오류 시 Gemini는 사용 불가능으로 처리
-      return aiAgentConfigs.map(config => ({
-        ...config,
-        isAvailable: config.id === 'gpt-mini',
-        fallbackInfo: config.id === 'gemini-flash-lite' 
-          ? "API 키 설정 필요 - 현재 GPT-4o Mini로 대체됩니다" 
-          : undefined,
-      }));
-    }
-  };
+      const checkAgentAvailability = async (): Promise<AIAgentConfig[]> => {
+        // Gemini를 항상 사용 가능하도록 설정
+        // API 키는 서버에서 처리되므로 클라이언트에서는 항상 선택 가능
+        return aiAgentConfigs.map(config => ({
+          ...config,
+          isAvailable: true, // 모든 에이전트 사용 가능
+        }));
+      };
 
   const handleAgentChange = async (agent: AIAgent) => {
     try {

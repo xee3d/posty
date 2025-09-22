@@ -46,7 +46,6 @@ import {
 
 import TrendApiSettings from "./settings/TrendApiSettings";
 import AIAgentSettings, { AIAgent } from "../components/settings/AIAgentSettings";
-import TestAIAgentSettings from "../components/settings/TestAIAgentSettings";
 import { soundManager } from "../utils/soundManager";
 import tokenService from "../services/subscription/tokenService";
 import inAppPurchaseService from "../services/subscription/inAppPurchaseService";
@@ -1118,9 +1117,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
             }}
           />
 
-          {/* AI 에이전트 설정 - 테스트 */}
-          <TestAIAgentSettings />
-          
           {/* AI 에이전트 설정 */}
           <AIAgentSettings 
             onAgentChange={(agent) => {
