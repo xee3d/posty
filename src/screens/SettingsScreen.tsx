@@ -45,7 +45,6 @@ import {
 } from "./documents";
 
 import TrendApiSettings from "./settings/TrendApiSettings";
-import AIAgentSettings, { AIAgent } from "../components/settings/AIAgentSettings";
 import { soundManager } from "../utils/soundManager";
 import tokenService from "../services/subscription/tokenService";
 import inAppPurchaseService from "../services/subscription/inAppPurchaseService";
@@ -121,7 +120,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const [showNewUserWelcome, setShowNewUserWelcome] = useState(false);
   const [showProfileDetailModal, setShowProfileDetailModal] = useState(false);
   const [showThemeDialog, setShowThemeDialog] = useState(false);
-  const [selectedAIAgent, setSelectedAIAgent] = useState<AIAgent>("gpt-mini");
 
   // 프로필 완성도 관련
   const profileCompleteness =
@@ -1117,13 +1115,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
             }}
           />
 
-          {/* AI 에이전트 설정 */}
-          <AIAgentSettings 
-            onAgentChange={(agent) => {
-              console.log('[SettingsScreen] AI Agent changed to:', agent);
-              setSelectedAIAgent(agent);
-            }}
-          />
           <View style={styles.settingItem}>
             <View style={styles.settingInfo}>
               <View style={styles.settingHeader}>
