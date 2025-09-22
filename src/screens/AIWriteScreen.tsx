@@ -2392,14 +2392,14 @@ const createStyles = (
       fontStyle: "italic",
     },
     optionSection: {
-      paddingHorizontal: SPACING.md, // SPACING.lg에서 SPACING.md로 줄임
+      paddingHorizontal: SPACING.lg, // 원래대로 복구
       marginBottom: 0,
     },
     toneSection: {
       marginBottom: 8,
     },
     toneSlideInView: {
-      marginBottom: -12,
+      marginBottom: -30, // 더 위로 이동
     },
     toneGrid: {
       flexDirection: "row",
@@ -2499,9 +2499,9 @@ const createStyles = (
     },
     generateButton: {
       backgroundColor: colors.primary,
-      marginHorizontal: SPACING.sm, // SPACING.lg에서 SPACING.sm으로 줄여서 더 넓게
-      paddingVertical: 22, // 18에서 22로 늘림
-      paddingHorizontal: SPACING.xl, // 수평 패딩 추가
+      marginHorizontal: SPACING.md, // 좌우 마진 줄여서 길이 늘림
+      marginTop: SPACING.lg,
+      paddingVertical: 18, // 높이 줄임
       borderRadius: 24,
       flexDirection: "row",
       alignItems: "center",
