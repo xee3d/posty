@@ -406,6 +406,7 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
     if (apiModel.includes('gemini')) {
       // Gemini API 호출
       console.log("Calling Gemini API with model:", apiModel);
+      console.log("Gemini API Key exists:", !!process.env.GEMINI_API_KEY);
       
       // Gemini API 형식으로 메시지 변환
       const geminiContents = messages.map(msg => ({
@@ -424,6 +425,10 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
           temperature: generatePlatformVersions ? 0.5 : 0.8,
         }
       }, null, 2));
+
+      if (!process.env.GEMINI_API_KEY) {
+        throw new Error("GEMINI_API_KEY environment variable is not set");
+      }
 
       response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${process.env.GEMINI_API_KEY}`, {
         method: "POST",
