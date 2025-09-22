@@ -917,7 +917,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       {activeChallenge && (
         <View style={styles.activeChallengeCard}>
           <View style={styles.challengeHeader}>
-            <SafeIcon name="trophy" size={20} color={colors.warning} />
+            <SafeIcon name="trophy" size={20} color={colors.primary} />
             <Text style={styles.challengeTitle}>{String(t(`myStyle.challenges.${activeChallenge.id}.name`, activeChallenge.name))}</Text>
           </View>
           <Text style={styles.challengeProgress}>
@@ -1130,12 +1130,12 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                     styles.challengeIcon,
                     {
                       backgroundColor: isDark
-                        ? colors.warning + "40"
-                        : colors.warning + "15",
+                        ? colors.primary + "40"
+                        : colors.primary + "15",
                     },
                   ]}
                 >
-                  <SafeIcon name="trophy" size={28} color={colors.warning} />
+                  <SafeIcon name="trophy" size={28} color={colors.primary} />
                 </View>
               </View>
               <View style={styles.challengeContent}>
@@ -1160,7 +1160,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                             (activeChallenge.progress / challenge.duration) *
                             100
                           }%`,
-                          backgroundColor: colors.warning,
+                          backgroundColor: colors.primary,
                         },
                       ]}
                     />
@@ -1341,12 +1341,12 @@ const createStyles = (
       paddingBottom: SPACING.xl,
     },
     brandIdentity: {
-      backgroundColor: colors.surface,
+      backgroundColor: isDark ? colors.surface : '#FAFAFA',
       borderRadius: 16,
       padding: SPACING.lg,
       marginBottom: SPACING.lg,
-      borderWidth: isDark ? 0 : 1,
-      borderColor: isDark ? "transparent" : colors.border,
+      borderWidth: isDark ? 0 : 1.5,
+      borderColor: isDark ? "transparent" : '#E5E7EB',
       ...cardTheme.default.shadow,
     },
     brandHeader: {
@@ -1420,9 +1420,9 @@ const createStyles = (
       padding: SPACING.md,
       borderRadius: 12,
       marginBottom: SPACING.sm,
-      backgroundColor: colors.surface,
-      borderWidth: isDark ? 0 : 1,
-      borderColor: isDark ? "transparent" : colors.border,
+      backgroundColor: isDark ? colors.surface : '#FAFAFA',
+      borderWidth: isDark ? 0 : 1.5,
+      borderColor: isDark ? "transparent" : '#E5E7EB',
       ...cardTheme.default.shadow,
     },
     insightIcon: {
@@ -1518,13 +1518,13 @@ const createStyles = (
       padding: SPACING.lg,
       borderRadius: 16,
       marginBottom: SPACING.md,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
+      backgroundColor: isDark ? colors.surface : '#FAFAFA',
+      borderWidth: isDark ? 1 : 1.5,
       borderColor: isDark ? colors.border + "50" : "#E5E7EB",
       minHeight: 100, // 최소 높이 설정
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: isDark ? 0.15 : 0.05,
+      shadowOpacity: isDark ? 0.15 : 0.08,
       shadowRadius: 8,
       elevation: isDark ? 4 : 2,
       // 트랜지션 추가
@@ -1635,12 +1635,12 @@ const createStyles = (
       color: colors.text.primary,
     },
     activeChallengeCard: {
-      backgroundColor: colors.warning + "10",
+      backgroundColor: colors.primary + "10",
       padding: SPACING.md,
       borderRadius: 12,
       marginTop: SPACING.md,
       borderWidth: 1,
-      borderColor: colors.warning + "30",
+      borderColor: colors.primary + "30",
     },
     challengeHeader: {
       flexDirection: "row",
@@ -1666,19 +1666,19 @@ const createStyles = (
       padding: SPACING.lg,
       borderRadius: 16,
       marginBottom: SPACING.md,
-      backgroundColor: colors.surface,
-      borderWidth: 1,
+      backgroundColor: isDark ? colors.surface : '#FAFAFA',
+      borderWidth: isDark ? 1 : 1.5,
       borderColor: isDark ? colors.border : "#E5E7EB",
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: isDark ? 0.15 : 0.05,
+      shadowOpacity: isDark ? 0.15 : 0.08,
       shadowRadius: 8,
       elevation: isDark ? 4 : 2,
     },
     activeChallengeCardBorder: {
       borderWidth: 2,
-      borderColor: colors.warning,
-      backgroundColor: colors.warning + "08",
+      borderColor: colors.primary,
+      backgroundColor: colors.primary + "08",
     },
     challengeIconWrapper: {
       width: 56,
@@ -1731,14 +1731,14 @@ const createStyles = (
       borderRadius: 2,
     },
     challengeStatus: {
-      backgroundColor: colors.warning + "30",
+      backgroundColor: colors.primary + "30",
       paddingHorizontal: SPACING.md,
       paddingVertical: SPACING.xs,
       borderRadius: 14,
     },
     challengeStatusText: {
       fontSize: 13,
-      color: colors.warning,
+      color: colors.primary,
       fontWeight: "700",
     },
     accessDeniedContainer: {

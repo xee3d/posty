@@ -2,8 +2,8 @@
   "name": "Posty",
   "displayName": "Posty",
   "react-native-google-mobile-ads": {
-    "android_app_id": "ca-app-pub-4039842933564424~9331858554",
-    "ios_app_id": "ca-app-pub-4039842933564424~9331858554",
+    "android_app_id": "ca-app-pub-4039842933564424~3895363964",
+    "ios_app_id": "ca-app-pub-4039842933564424~3895363964",
     "delay_app_measurement_init": true,
     "optimize_initialization": true,
     "optimize_ad_loading": true,

@@ -458,7 +458,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
       {activePlatform !== "original" && (
         <View style={[styles.tokenNotice]}>
           <Icon
-                            name="info-outline"
+            name="information-circle-outline"
             size={14}
             color={colors.text.tertiary}
           />

@@ -120,24 +120,23 @@ const ko = {
     buttons: {
       generate: "포스티에게 부탁하기",
       generating: "포스티가 쓰는 중...",
-      generatingMessages: {
-        0: "포스티가 글을 작성중이에요...",
-        1: "문장을 수정중이에요...",
-        2: "글을 다듬고 있어요...",
-        3: "오타를 수정중이에요...",
-        4: "어조를 조절하고 있어요...",
-        5: "해시태그를 추가하고 있어요...",
-        6: "마지막 점검중이에요...",
-      },
+      generatingMessages: [
+        "포스티가 글을 작성중이에요...",
+        "문장을 수정중이에요...",
+        "글을 다듬고 있어요...",
+        "오타를 수정중이에요...",
+        "어조를 조절하고 있어요...",
+        "해시태그를 추가하고 있어요...",
+        "마지막 점검중이에요...",
+      ],
       copy: "복사",
       save: "저장",
       share: "공유",
     },
     alerts: {
-      noPrompt: "무엇에 대해 쓸지 알려주세요! 🤔",
-      noPhoto: "사진을 먼저 선택해주세요! 📸",
-      success: "짠! 완성됐어요 🎉",
-      error: "앗! 뭔가 문제가 생겼어요. 다시 시도해주세요 🥺",
+      noPrompt: "무엇에 대해 쓸지 알려주세요!",
+      noPhoto: "사진을 먼저 선택해주세요!",
+      error: "앗! 뭔가 문제가 생겼어요. 다시 시도해주세요",
       waitAnalysis: "사진 분석이 완료될 때까지 기다려주세요.",
       completeAnalysis: "사진 분석을 먼저 완료해주세요.",
       imageTooBig: {
@@ -175,7 +174,14 @@ const ko = {
       polishOptions: "원하는 변환 방향",
       photoSelect: "사진을 보여주세요!",
       photoAnalyzing: "사진을 분석하는 중...",
-      resultTitle: "짠! 완성됐어요 🎉",
+      completedHint: "생성 완료! 아래 플랫폼 탭을 눌러서 각 소셜미디어에 맞게 변환해보세요",
+      platformHint: "아래 플랫폼 탭을 눌러서 각 소셜미디어에 맞게 변환해보세요",
+      encouragements: [
+        "원하시는 느낌으로 써봤어요!",
+        "이런 스타일은 어떠세요?",
+        "포스티가 열심히 썼어요!",
+        "수정이 필요하면 말씀해주세요!"
+      ],
     },
     polishOptions: {
       summarize: "요약하기",
@@ -874,6 +880,12 @@ const ko = {
       enabled: "알림이 활성화되었습니다",
       soundEnabled: "사운드가 활성화되었습니다",
       vibrationEnabled: "진동이 활성화되었습니다"
+    },
+    adPersonalization: {
+      title: "광고 개인화 설정",
+      description: "맞춤형 광고 표시 여부를 설정합니다",
+      updateSuccess: "광고 개인화 설정이 업데이트되었습니다.",
+      updateError: "설정을 업데이트할 수 없습니다. 나중에 다시 시도해주세요."
     }
   },
 
@@ -1137,7 +1149,7 @@ const ko = {
 
   // Profile Detail Modal
   profile: {
-    updateSuccess: "프로필 업데이트 완료! 🎉",
+    updateSuccess: "프로필 업데이트 완료!",
     updateMessage: "프로필이 {completion}% 완성되었습니다.\n이제 AI가 당신의 스타일에 맞는 글을 작성해드려요!",
     confirm: "확인",
     sections: {
@@ -1524,7 +1536,7 @@ const ko = {
       },
       autoRefill: "무료 플랜 사용자는 매일 자정에 10개의 토큰이 자동 충전됩니다"
     },
-    earnTokens: "토큰 획득! 🎉",
+    earnTokens: "토큰 획득!",
     earnTokensMessage: "{{tokens}}개의 토큰을 받았어요!",
     watchAd: "광고 시청",
     watchAdMessage: "30초 광고를 시청하고 2개의 토큰을 받으시겠어요?",

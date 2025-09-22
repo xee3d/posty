@@ -221,7 +221,7 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
       {/* 빠른 정보 */}
       <View style={styles.quickInfo}>
         <SafeIcon
-          name="info-outline"
+          name="information-circle-outline"
           size={16}
           color={colors.text.tertiary}
         />

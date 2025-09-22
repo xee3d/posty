@@ -47,28 +47,33 @@ export const NotionSyncProvider: React.FC<NotionSyncProviderProps> = ({ children
         });
       }
 
-      // Auto-connect if API key is configured but not connected
-      if (notionApiService.isConfigured()) {
-        const isConnected = await testNotionConnection();
-        if (isConnected) {
-          console.log('✅ Auto-connecting to Notion API');
-          const newSyncData: NotionSyncData = {
-            isConnected: true,
-            lastSyncTime: new Date(),
-            documentsCount: 0,
-          };
-          
-          setSyncData(newSyncData);
-          await saveSyncState(newSyncData);
-          
-          // Auto-sync documents after connecting
-          setTimeout(() => {
-            syncDocuments().catch(console.error);
-          }, 1000);
-        } else {
-          console.warn('❌ Notion API key configured but connection failed');
-        }
-      }
+      // Notion integration disabled - using local documents only
+      console.log('📄 Using local documents (Notion integration disabled)');
+
+      // Set disconnected state
+      setSyncData({
+        isConnected: false,
+        lastSyncTime: undefined,
+        documentsCount: 0,
+      });
+
+      // Uncomment below to re-enable Notion integration
+      // if (notionApiService.isConfigured()) {
+      //   const isConnected = await testNotionConnection();
+      //   if (isConnected) {
+      //     console.log('✅ Auto-connecting to Notion API');
+      //     const newSyncData: NotionSyncData = {
+      //       isConnected: true,
+      //       lastSyncTime: new Date(),
+      //       documentsCount: 0,
+      //     };
+      //
+      //     setSyncData(newSyncData);
+      //     await saveSyncState(newSyncData);
+      //   } else {
+      //     console.warn('❌ Notion API key configured but connection failed');
+      //   }
+      // }
     } catch (error) {
       console.error('Error loading Notion sync state:', error);
     }
@@ -130,7 +135,8 @@ export const NotionSyncProvider: React.FC<NotionSyncProviderProps> = ({ children
 
   const syncDocuments = async () => {
     if (!syncData.isConnected) {
-      throw new Error('Not connected to Notion');
+      console.warn('⚠️ Notion sync skipped: Not connected to Notion');
+      return;
     }
 
     setIsLoading(true);

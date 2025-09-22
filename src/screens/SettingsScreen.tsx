@@ -1219,13 +1219,13 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                 await adConsentService.showPrivacyOptionsForm();
                 Alert.alert(
                   "Posty",
-                  "광고 개인화 설정이 업데이트되었습니다."
+                  t("settings.adPersonalization.updateSuccess", "Ad personalization settings have been updated.")
                 );
               } catch (error) {
                 console.error('Privacy options error:', error);
                 Alert.alert(
                   "Posty",
-                  "설정을 업데이트할 수 없습니다. 나중에 다시 시도해주세요."
+                  t("settings.adPersonalization.updateError", "Unable to update settings. Please try again later.")
                 );
               }
             }}
@@ -1237,10 +1237,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                   size={20}
                   color={colors.text.secondary}
                 />
-                <Text style={styles.settingLabel}>광고 개인화 설정</Text>
+                <Text style={styles.settingLabel}>{t("settings.adPersonalization.title", "Ad Personalization Settings")}</Text>
               </View>
               <Text style={styles.settingDescription}>
-                맞춤형 광고 표시 여부를 설정합니다
+                {t("settings.adPersonalization.description", "Configure personalized ads display preferences")}
               </Text>
             </View>
             <SafeIcon
@@ -1346,11 +1346,13 @@ const createStyles = (colors: any, cardTheme: any) => {
       color: colors.white,
     },
     section: {
-      backgroundColor: colors.surface,
+      backgroundColor: isDark ? colors.surface : '#FAFAFA',
       marginBottom: SPACING.md,
       paddingVertical: SPACING.md,
       borderRadius: 16,
       marginHorizontal: SPACING.md,
+      borderWidth: isDark ? 0 : 1.5,
+      borderColor: isDark ? 'transparent' : '#E5E7EB',
     },
     profileSection: {
       marginHorizontal: SPACING.md,
@@ -1364,9 +1366,11 @@ const createStyles = (colors: any, cardTheme: any) => {
       marginBottom: SPACING.md,
     },
     profileCard: {
-      backgroundColor: colors.surface,
+      backgroundColor: isDark ? colors.surface : '#FAFAFA',
       borderRadius: 16,
       padding: SPACING.lg,
+      borderWidth: isDark ? 0 : 1.5,
+      borderColor: isDark ? 'transparent' : '#E5E7EB',
       ...cardTheme.default.shadow,
     },
     profileHeader: {

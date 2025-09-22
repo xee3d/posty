@@ -385,15 +385,15 @@ const ja = {
     buttons: {
       generate: "Postyにお任せする",
       generating: "Postyが書いています...",
-      generatingMessages: {
-        0: "Postyが書いています...",
-        1: "文章を修正中...",
-        2: "文章を磨いています...",
-        3: "誤字を修正中...",
-        4: "トーンを調整中...",
-        5: "ハッシュタグを追加中...",
-        6: "最終チェック中...",
-      },
+      generatingMessages: [
+        "Postyが書いています...",
+        "文章を修正中...",
+        "文章を磨いています...",
+        "誤字を修正中...",
+        "トーンを調整中...",
+        "ハッシュタグを追加中...",
+        "最終チェック中...",
+      ],
       copy: "コピーする",
       save: "保存する",
       share: "共有する",
@@ -482,7 +482,6 @@ const ja = {
       polishOptions: "ご希望の変換方向",
       photoSelect: "お写真を見せてください！",
       photoAnalyzing: "写真を分析しています...",
-      resultTitle: "完成いたしました！🎉",
       completedHint: "🎉 生成が完了しました！下のプラットフォームタブをタップして各SNSに合わせて変換してみてください",
       platformHint: "下のプラットフォームタブをタップして各SNSに合わせて変換してみてください",
       encouragements: [
@@ -1169,6 +1168,12 @@ const ja = {
       enabled: "通知が有効です",
       soundEnabled: "音が有効です",
       vibrationEnabled: "振動が有効です"
+    },
+    adPersonalization: {
+      title: "広告パーソナライゼーション設定",
+      description: "パーソナライズ広告の表示設定",
+      updateSuccess: "広告パーソナライゼーション設定が更新されました。",
+      updateError: "設定を更新できませんでした。後でもう一度お試しください。"
     }
   },
 

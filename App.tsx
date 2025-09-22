@@ -647,6 +647,7 @@ const AppContent: React.FC = () => {
               goBack: () => handleTabPress("home"),
               navigate: handleTabPress,
             }}
+            initialTab={navigationData?.initialTab}
           />
         );
       case "terms":

@@ -256,7 +256,7 @@ const MissionModal: React.FC<MissionModalProps> = ({
                   ]}
                 >
                   <Icon
-                    name="info-outline"
+                    name="information-circle-outline"
                     size={20}
                     color={colors.primary}
                   />

@@ -12,6 +12,7 @@ import { SafeIcon } from "../../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import { COLORS, SPACING } from "../../utils/constants";
 import { useAppTheme } from "../../hooks/useAppTheme";
+import { useTranslation } from "react-i18next";
 
 import { Alert } from "../../utils/customAlert";
 interface RewardScreenProps {
@@ -34,6 +35,7 @@ interface RewardTask {
 
 export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
   const { colors, isDark } = useAppTheme();
+  const { t } = useTranslation();
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
   const [totalTokens] = useState(125); // 누적 획득 토큰
   const [availableTokens] = useState(10); // 현재 보유 토큰
@@ -41,8 +43,8 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
   const dailyTasks: RewardTask[] = [
     {
       id: "daily_login",
-      title: "매일 방문하기",
-      description: "7일 연속 로그인",
+      title: t('rewards.dailyTasks.dailyLogin.title', '매일 방문하기'),
+      description: t('rewards.dailyTasks.dailyLogin.description', '7일 연속 로그인'),
       tokens: 10,
       icon: "today",
       completed: false,
@@ -231,7 +233,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
                 </>
               )}
             </View>
-            {canClaim && <Text style={styles.claimText}>받기</Text>}
+            {canClaim && <Text style={styles.claimText}>{t('rewards.claim', '받기')}</Text>}
           </View>
         </View>
       </TouchableOpacity>
@@ -250,14 +252,14 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
         >
           <SafeIcon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>리워드</Text>
+        <Text style={styles.headerTitle}>{t('rewards.title', '리워드')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       {/* 토큰 요약 */}
       <View style={styles.tokenSummary}>
         <View style={styles.tokenStat}>
-          <Text style={styles.tokenStatLabel}>현재 토큰</Text>
+          <Text style={styles.tokenStatLabel}>{t('rewards.currentTokens', '현재 토큰')}</Text>
           <View style={styles.tokenStatValue}>
             <SafeIcon name="flash" size={24} color={colors.primary} />
             <Text style={styles.tokenStatNumber}>{availableTokens}</Text>
@@ -267,7 +269,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
         <View style={styles.tokenDivider} />
 
         <View style={styles.tokenStat}>
-          <Text style={styles.tokenStatLabel}>누적 획득</Text>
+          <Text style={styles.tokenStatLabel}>{t('rewards.totalEarned', '누적 획득')}</Text>
           <View style={styles.tokenStatValue}>
             <SafeIcon name="stars" size={24} color="#F59E0B" />
             <Text style={styles.tokenStatNumber}>{totalTokens}</Text>
@@ -279,8 +281,8 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
         {/* 일일 미션 */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>일일 미션</Text>
-            <Text style={styles.sectionSubtitle}>매일 0시에 초기화</Text>
+            <Text style={styles.sectionTitle}>{t('rewards.dailyMissions', '일일 미션')}</Text>
+            <Text style={styles.sectionSubtitle}>{t('rewards.dailyReset', '매일 0시에 초기화')}</Text>
           </View>
           {dailyTasks.map(renderTask)}
         </View>
@@ -288,8 +290,8 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
         {/* 도전 과제 */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>도전 과제</Text>
-            <Text style={styles.sectionSubtitle}>한 번만 받을 수 있어요</Text>
+            <Text style={styles.sectionTitle}>{t('rewards.achievements', '도전 과제')}</Text>
+            <Text style={styles.sectionSubtitle}>{t('rewards.oneTimeOnly', '한 번만 받을 수 있어요')}</Text>
           </View>
           {achievements.map(renderTask)}
         </View>
@@ -308,7 +310,7 @@ export const RewardScreen: React.FC<RewardScreenProps> = ({ navigation }) => {
         {/* 토큰 사용 안내 */}
         <View style={styles.infoSection}>
           <Icon
-                            name="info-outline"
+            name="information-circle-outline"
             size={20}
             color={colors.primary}
           />
@@ -420,7 +422,8 @@ const createStyles = (colors: any, isDark: boolean) =>
       borderColor: "#10B981",
     },
     claimedCard: {
-      opacity: 0.6,
+      backgroundColor: isDark ? colors.surface : '#F8F9FA',
+      borderColor: colors.border,
     },
     taskContent: {
       flexDirection: "row",

@@ -1002,10 +1002,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   };
 
 
-  const getRandomEncouragement = () => {
-    const encouragements = t('aiWrite.sections.encouragements', { returnObjects: true }) as string[];
-    return encouragements[Math.floor(Math.random() * encouragements.length)];
-  };
 
   const handleSaveContent = async (
     platform: string = "instagram",
@@ -2014,23 +2010,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           {generatedContent && (
             <SlideInView direction="up" delay={0}>
               <View style={styles.resultSection}>
-                <View style={styles.resultHeader}>
-                  <Text style={styles.resultTitle}>{t("aiWrite.sections.resultTitle")}</Text>
-                  <ScaleButton onPress={handleGenerate}>
-                    <SafeIcon name="refresh" size={20} color={COLORS.primary} />
-                  </ScaleButton>
-                </View>
-
-                <FadeInView delay={100}>
-                  <View style={styles.postyComment}>
-                    <Text style={styles.postyCommentText}>
-                      {getRandomEncouragement()}
-                    </Text>
-                  </View>
-                </FadeInView>
-
                 {/* 새로운 GeneratedContentDisplay 컴포넌트 사용 */}
-                <AnimatedCard delay={200}>
+                <AnimatedCard delay={100}>
                   <GeneratedContentDisplay
                     originalContent={generatedContent}
                     tone={selectedTone}
@@ -2411,23 +2392,28 @@ const createStyles = (
     toneCard: {
       width: "31%",
       aspectRatio: 1,
-      backgroundColor: isDark ? "#1C1C1E" : "#FFFFFF",
+      backgroundColor: isDark ? "#1C1C1E" : "#F8F9FA",
       borderRadius: 12,
       padding: 10,
       alignItems: "center",
       justifyContent: "center",
       marginBottom: 8,
-      borderWidth: 1,
-      borderColor: isDark ? "#3A3A3C" : "#F3F4F6",
-      elevation: isDark ? 0 : 1,
+      borderWidth: 1.5,
+      borderColor: isDark ? "#3A3A3C" : "#E5E7EB",
+      elevation: isDark ? 0 : 2,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: isDark ? 0 : 0.03,
-      shadowRadius: 2,
+      shadowOpacity: isDark ? 0 : 0.08,
+      shadowRadius: 3,
       overflow: "visible",
     },
     toneCardActive: {
-      borderWidth: 2,
+      borderWidth: 2.5,
+      backgroundColor: isDark ? colors.primary + "20" : "#FFFFFF",
+      elevation: isDark ? 0 : 4,
+      shadowOpacity: isDark ? 0 : 0.15,
+      shadowRadius: 6,
+      transform: [{ scale: 1.02 }],
     },
     toneLabel: {
       fontSize: 11,
@@ -2446,25 +2432,29 @@ const createStyles = (
     },
     lengthCard: {
       flex: 1,
-      backgroundColor: isDark ? "#1C1C1E" : "#FFFFFF",
+      backgroundColor: isDark ? "#1C1C1E" : "#F8F9FA",
       borderRadius: 16,
       paddingVertical: 14,
       paddingHorizontal: 12,
       alignItems: "center",
       justifyContent: "center",
       minHeight: 100,
-      borderWidth: 1,
-      borderColor: isDark ? "#3A3A3C" : "#F3F4F6",
-      elevation: isDark ? 0 : 1,
+      borderWidth: 1.5,
+      borderColor: isDark ? "#3A3A3C" : "#E5E7EB",
+      elevation: isDark ? 0 : 2,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: isDark ? 0 : 0.03,
-      shadowRadius: 2,
+      shadowOpacity: isDark ? 0 : 0.08,
+      shadowRadius: 3,
     },
     lengthCardActive: {
       borderColor: colors.primary,
-      backgroundColor: isDark ? colors.primary + "20" : "#F3E8FF",
-      borderWidth: 1.5,
+      backgroundColor: isDark ? colors.primary + "20" : "#FFFFFF",
+      borderWidth: 2.5,
+      elevation: isDark ? 0 : 4,
+      shadowOpacity: isDark ? 0 : 0.15,
+      shadowRadius: 6,
+      transform: [{ scale: 1.02 }],
     },
     lengthLabel: {
       fontSize: 14,
@@ -2525,36 +2515,10 @@ const createStyles = (
     resultSection: {
       marginTop: SPACING.xl,
     },
-    resultHeader: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      ...horizontalPadding,
-      marginBottom: SPACING.sm,
-    },
-    resultTitle: {
-      fontSize: 16,
-      fontWeight: "600",
-      color: colors.text.primary,
-    },
-    postyComment: {
-      ...horizontalPadding,
-      marginBottom: SPACING.md,
-      backgroundColor: isDark
-        ? colors.primary + "20"
-        : cardTheme.posty.background,
-      borderRadius: 12,
-      padding: SPACING.md,
-    },
-    postyCommentText: {
-      fontSize: 14,
-      color: colors.text.primary,
-      fontWeight: "500",
-    },
     // 광고 배너 스타일
     adBannerContainer: {
       ...horizontalPadding,
-      paddingVertical: SPACING.md,
+      paddingVertical: SPACING.xl,
     },
     adBanner: {
       width: '100%',

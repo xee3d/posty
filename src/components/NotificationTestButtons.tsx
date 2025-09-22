@@ -135,7 +135,7 @@ const NotificationTestButtons: React.FC = () => {
       <View style={styles.buttonRow}>
         <TouchableOpacity style={styles.testButton} onPress={showBadgeStatus}>
           <Icon
-                            name="info-outline"
+            name="information-circle-outline"
             size={16}
             color={colors.text.secondary}
           />

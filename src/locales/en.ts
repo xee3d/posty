@@ -133,23 +133,22 @@ const en = {
     buttons: {
       generate: "Ask Posty",
       generating: "Posty is writing...",
-      generatingMessages: {
-        0: "Posty is writing...",
-        1: "Editing sentences...",
-        2: "Polishing the text...",
-        3: "Fixing typos...",
-        4: "Adjusting tone...",
-        5: "Adding hashtags...",
-        6: "Final check...",
-      },
+      generatingMessages: [
+        "Posty is writing...",
+        "Editing sentences...",
+        "Polishing the text...",
+        "Fixing typos...",
+        "Adjusting tone...",
+        "Adding hashtags...",
+        "Final check...",
+      ],
       copy: "Copy",
       save: "Save",
       share: "Share",
     },
     alerts: {
-      noPrompt: "Tell me what to write about! 🤔",
-      noPhoto: "Please select a photo first! 📸",
-      success: "Done! Here you go 🎉",
+      noPrompt: "Tell me what to write about!",
+      noPhoto: "Please select a photo first!",
       error: "Something went wrong. Please try again.",
       waitAnalysis: "Please wait for photo analysis to complete.",
       completeAnalysis: "Please complete photo analysis first.",
@@ -188,15 +187,13 @@ const en = {
       polishOptions: "Polish Options",
       photoSelect: "Show me a photo!",
       photoAnalyzing: "Analyzing photo...",
-      resultTitle: "Done! 🎉",
-      completedHint: "🎉 Generation complete! Tap the platform tabs below to convert for each social media platform",
+      completedHint: "Generation complete! Tap the platform tabs below to convert for each social media platform",
       platformHint: "Tap the platform tabs below to convert for each social media platform",
       encouragements: [
-        "Here's what I wrote! How does it look? 😊",
-        "I wrote it with the feeling you wanted! 👀",
-        "How about this style? 🎨",
-        "Posty worked hard on this! 💜",
-        "Let me know if you'd like any changes! ✏️"
+        "I wrote it with the feeling you wanted!",
+        "How about this style?",
+        "Posty worked hard on this!",
+        "Let me know if you'd like any changes!"
       ],
     },
     polishOptions: {
@@ -589,7 +586,7 @@ const en = {
       },
       autoRefill: "Free plan users get 10 tokens automatically recharged every day at midnight"
     },
-    earnTokens: "Tokens Earned! 🎉",
+    earnTokens: "Tokens Earned!",
     earnTokensMessage: "You received {{tokens}} tokens!",
     watchAd: "Watch Ad",
     watchAdMessage: "Watch a 30-second ad to get 2 tokens?",
@@ -1118,6 +1115,12 @@ const en = {
       enabled: "Notifications enabled",
       soundEnabled: "Sound enabled",
       vibrationEnabled: "Vibration enabled"
+    },
+    adPersonalization: {
+      title: "Ad Personalization Settings",
+      description: "Configure personalized ads display preferences",
+      updateSuccess: "Ad personalization settings have been updated.",
+      updateError: "Unable to update settings. Please try again later."
     }
   },
 
@@ -1320,7 +1323,7 @@ const en = {
 
   // Profile Detail Modal
   profile: {
-    updateSuccess: "Profile updated successfully! 🎉",
+    updateSuccess: "Profile updated successfully!",
     updateMessage: "Your profile is {completion}% complete.\nNow AI will create content that matches your style!",
     confirm: "Confirm",
     sections: {

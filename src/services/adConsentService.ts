@@ -16,6 +16,17 @@ class AdConsentService {
     try {
       console.log('🎯 AdConsent: Initializing UMP...');
 
+      // Development bypass - AdMob app not yet approved
+      if (__DEV__) {
+        console.log('🔧 AdConsent: Development mode - bypassing UMP');
+        return {
+          canRequestAds: true,
+          canShowPersonalizedAds: false,
+          privacyOptionsRequired: false,
+          consentStatus: 'NOT_REQUIRED'
+        };
+      }
+
       // Request consent information update
       const consentInfo = await AdsConsent.requestInfoUpdate();
 
@@ -65,6 +76,12 @@ class AdConsentService {
 
   async showPrivacyOptionsForm(): Promise<void> {
     try {
+      // Development bypass
+      if (__DEV__) {
+        console.log('🔧 AdConsent: Development mode - privacy options unavailable');
+        return;
+      }
+
       console.log('🎯 AdConsent: Showing privacy options form...');
       await AdsConsent.showPrivacyOptionsForm();
       console.log('✅ AdConsent: Privacy options form completed');

@@ -34,7 +34,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import rewardAdService from "../../services/rewardAdService";
 import missionService from "../../services/missionService";
 import TokenPurchaseView from "../../components/TokenPurchaseView";
-import EarnTokenModal from "../../components/EarnTokenModal";
 import PaymentSuccessModal from "../../components/PaymentSuccessModal";
 import { AdaptiveNativeAd, SmartAdPlacement } from "../../components/ads";
 
@@ -45,11 +44,13 @@ const { width: screenWidth } = Dimensions.get("window");
 interface SubscriptionScreenProps {
   navigation: any;
   currentPlan?: "free" | "premium" | "pro";
+  initialTab?: string;
 }
 
 export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   navigation,
   currentPlan = "free",
+  initialTab,
 }) => {
   const { colors, isDark } = useAppTheme();
   const { t } = useTranslation();
@@ -63,7 +64,6 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   const [activeTab, setActiveTab] = useState<
     "subscription" | "tokens" | "manage"
   >("subscription");
-  const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
   const [stats, setStats] = useState({
     totalTokens: 0,
   });
@@ -90,6 +90,17 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       showSuccessModal
     );
   }, [showSuccessModal]);
+
+  // initialTab prop 처리
+  useEffect(() => {
+    if (initialTab) {
+      if (initialTab === 'freeTokens') {
+        setActiveTab('tokens');
+      } else {
+        setActiveTab(initialTab as any);
+      }
+    }
+  }, [initialTab]);
 
   useEffect(() => {
     loadTokenStats();
@@ -724,7 +735,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         </Text>
         <TouchableOpacity
           style={styles.headerButton}
-          onPress={() => setShowEarnTokenModal(true)}
+          onPress={() => setActiveTab('tokens')}
         >
           <SafeIcon name="flash" size={20} color={colors.primary} />
           <Text style={styles.currentTokens}>
@@ -1198,14 +1209,6 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
       {/* 하단 버튼 제거 - 각 카드에 버튼 추가됨 */}
 
-      <EarnTokenModal
-        visible={showEarnTokenModal}
-        onClose={() => {
-          setShowEarnTokenModal(false);
-          loadTokenStats();
-        }}
-        onTokensEarned={handleEarnTokens}
-      />
 
       {/* 결제 성공 모달 */}
       <PaymentSuccessModal

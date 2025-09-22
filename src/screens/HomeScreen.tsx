@@ -54,7 +54,6 @@ import simplePostService from "../services/simplePostService";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
 import { resetDailyTokens } from "../store/slices/userSlice";
 import { useTokenManagement } from "../hooks/useTokenManagement";
-import EarnTokenModal from "../components/EarnTokenModal";
 import { LowTokenPrompt } from "../components/LowTokenPrompt";
 // import { SyncIndicator } from '../components/SyncIndicator'; // Firebase 제거로 인해 비활성화
 import { useScreenTracking } from "../hooks/analytics/useScreenTracking";
@@ -85,9 +84,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   const {
     currentTokens,
     subscriptionPlan,
-    showEarnTokenModal,
     showLowTokenPrompt,
-    setShowEarnTokenModal,
     setShowLowTokenPrompt,
     handleEarnTokens,
     handleLowToken,
@@ -598,7 +595,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 {canShowEarnButton && (
                   <TouchableOpacity
                     style={styles.earnTokenButton}
-                    onPress={() => setShowEarnTokenModal(true)}
+                    onPress={() => onNavigate('subscription', { initialTab: 'freeTokens' })}
                     activeOpacity={0.7}
                   >
                     <SafeIcon name="add-circle" size={20} color={colors.primary} />
@@ -1210,14 +1207,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
         <PostListScreen onClose={() => setShowPostList(false)} />
       )}
 
-      {/* 무료 토큰 받기 모달 */}
-      <EarnTokenModal
-        visible={showEarnTokenModal}
-        onClose={() => {
-          setShowEarnTokenModal(false);
-        }}
-        onTokensEarned={handleEarnTokens}
-      />
 
       {/* 토큰 부족 자동 프롬프트 */}
       {showLowTokenPrompt && (
@@ -1426,16 +1415,16 @@ const createStyles = (
     },
     // 첫 글쓰기 카드 - 최상위 프라이머리 액션
     primaryWriteCard: {
-      backgroundColor: isDark ? '#1F1F1F' : colors.surface, // 사진 카드와 동일한 배경
+      backgroundColor: isDark ? '#1F1F1F' : '#FAFAFA', // 라이트 모드 배경 개선
       borderRadius: 16,
       paddingVertical: 24,
       paddingHorizontal: 24,
       marginBottom: 16,
-      borderWidth: isDark ? 1 : 0, // 사진 카드와 동일한 테두리
-      borderColor: isDark ? '#333333' : 'transparent',
+      borderWidth: isDark ? 1 : 1.5, // 라이트 모드에서도 테두리 추가
+      borderColor: isDark ? '#333333' : '#E5E7EB',
       shadowColor: isDark ? '#000000' : "#000",
       shadowOffset: { width: 0, height: isDark ? 3 : 2 },
-      shadowOpacity: isDark ? 0.3 : 0.1,
+      shadowOpacity: isDark ? 0.3 : 0.08,
       shadowRadius: isDark ? 6 : 4,
       elevation: isDark ? 5 : 3,
     },
@@ -1480,13 +1469,19 @@ const createStyles = (
     },
     subActionCard: {
       flex: 1,
-      backgroundColor: isDark ? '#1F1F1F' : colors.lightGray, // 다크모드에서 카드와 일관된 색상
-      borderRadius: 12,
-      borderWidth: isDark ? 1 : 0,
-      borderColor: isDark ? '#333333' : 'transparent',
+      backgroundColor: isDark ? '#1F1F1F' : '#FAFAFA', // primaryWriteCard와 동일한 배경
+      borderRadius: 16, // primaryWriteCard와 동일한 radius
+      borderWidth: isDark ? 1 : 1.5,
+      borderColor: isDark ? '#333333' : '#E5E7EB',
+      shadowColor: isDark ? '#000000' : "#000",
+      shadowOffset: { width: 0, height: isDark ? 3 : 2 }, // primaryWriteCard와 동일한 그림자
+      shadowOpacity: isDark ? 0.3 : 0.08,
+      shadowRadius: isDark ? 6 : 4,
+      elevation: isDark ? 5 : 3,
     },
     subActionContent: {
-      paddingVertical: SPACING.md,
+      paddingVertical: SPACING.lg, // SPACING.md에서 SPACING.lg로 증가
+      paddingHorizontal: SPACING.md, // 좌우 패딩 추가
       alignItems: "center",
       gap: SPACING.xs,
     },
@@ -1570,17 +1565,17 @@ const createStyles = (
       paddingBottom: SPACING.xs,
     },
     recommendCard: {
-      backgroundColor: isDark ? '#1F1F1F' : colors.surface, // 다크: 진한 회색, 라이트: 기본
+      backgroundColor: isDark ? '#1F1F1F' : '#FAFAFA', // 라이트 모드 배경 개선
       borderRadius: 16,
       padding: SPACING.md, // lg에서 md로 줄여서 여백 최소화
       width: cardWidth,
       minHeight: 180, // 내용이 보이도록 높이 조정
       maxHeight: 220, // 내용이 보이도록 최대 높이 조정
-      borderWidth: isDark ? 1 : 0, // 다크모드에서 경계선 추가
-      borderColor: isDark ? '#333333' : 'transparent',
+      borderWidth: isDark ? 1 : 1.5, // 라이트 모드에서도 테두리 추가
+      borderColor: isDark ? '#333333' : '#E5E7EB',
       shadowColor: isDark ? '#000000' : "#000",
       shadowOffset: { width: 0, height: isDark ? 3 : 2 },
-      shadowOpacity: isDark ? 0.3 : 0.1,
+      shadowOpacity: isDark ? 0.3 : 0.08,
       shadowRadius: isDark ? 6 : 4,
       elevation: isDark ? 5 : 3,
     },
@@ -1717,13 +1712,15 @@ const createStyles = (
       marginTop: SPACING.lg,
     },
     postCard: {
-      backgroundColor: colors.surface,
+      backgroundColor: isDark ? colors.surface : '#FAFAFA',
       borderRadius: 12,
       padding: SPACING.md,
       marginBottom: SPACING.sm,
+      borderWidth: isDark ? 0 : 1.5,
+      borderColor: isDark ? 'transparent' : '#E5E7EB',
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
+      shadowOpacity: isDark ? 0.1 : 0.08,
       shadowRadius: 4,
       elevation: 3,
     },
