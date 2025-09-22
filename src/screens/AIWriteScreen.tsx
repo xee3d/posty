@@ -2388,7 +2388,7 @@ const createStyles = (
     },
     optionSection: {
       paddingHorizontal: SPACING.lg,
-      marginBottom: SPACING.xl,
+      marginBottom: SPACING.md,
     },
     toneGrid: {
       flexDirection: "row",
