@@ -400,46 +400,86 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
       ];
     }
 
-    // OpenAI API 호출
-    console.log("Calling OpenAI API with model:", apiModel);
-    console.log(
-      "Request body:",
-      JSON.stringify(
-        {
-          model: apiModel,
-          messages: messages.map((m) => ({
-            role: m.role,
-            content:
-              m.content?.length > 100
-                ? m.content.substring(0, 100) + "..."
-                : m.content,
-          })),
-          max_tokens: finalMaxTokens,
-          temperature: generatePlatformVersions ? 0.2 : 0.8,
-          ...(generatePlatformVersions && {
-            response_format: { type: "json_object" },
-          }),
-        },
-        null,
-        2
-      )
-    );
+    // AI 모델에 따른 API 호출 분기
+    let response;
+    
+    if (apiModel.includes('gemini')) {
+      // Gemini API 호출
+      console.log("Calling Gemini API with model:", apiModel);
+      
+      // Gemini API 형식으로 메시지 변환
+      const geminiContents = messages.map(msg => ({
+        role: msg.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: msg.content }]
+      }));
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+      console.log("Gemini request body:", JSON.stringify({
         model: apiModel,
-        messages: messages,
-        max_tokens: finalMaxTokens,
-        temperature: generatePlatformVersions ? 0.5 : 0.8, // Moderate temperature for structured output
-        presence_penalty: 0.1,
-        frequency_penalty: 0.1,
-      }),
-    });
+        contents: geminiContents.map(c => ({
+          role: c.role,
+          parts: c.parts.map(p => ({ text: p.text.substring(0, 100) + "..." }))
+        })),
+        generationConfig: {
+          maxOutputTokens: finalMaxTokens,
+          temperature: generatePlatformVersions ? 0.5 : 0.8,
+        }
+      }, null, 2));
+
+      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: geminiContents,
+          generationConfig: {
+            maxOutputTokens: finalMaxTokens,
+            temperature: generatePlatformVersions ? 0.5 : 0.8,
+          },
+        }),
+      });
+    } else {
+      // OpenAI API 호출
+      console.log("Calling OpenAI API with model:", apiModel);
+      console.log(
+        "Request body:",
+        JSON.stringify(
+          {
+            model: apiModel,
+            messages: messages.map((m) => ({
+              role: m.role,
+              content:
+                m.content?.length > 100
+                  ? m.content.substring(0, 100) + "..."
+                  : m.content,
+            })),
+            max_tokens: finalMaxTokens,
+            temperature: generatePlatformVersions ? 0.2 : 0.8,
+            ...(generatePlatformVersions && {
+              response_format: { type: "json_object" },
+            }),
+          },
+          null,
+          2
+        )
+      );
+
+      response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: apiModel,
+          messages: messages,
+          max_tokens: finalMaxTokens,
+          temperature: generatePlatformVersions ? 0.5 : 0.8, // Moderate temperature for structured output
+          presence_penalty: 0.1,
+          frequency_penalty: 0.1,
+        }),
+      });
+    }
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -614,9 +654,18 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
 
     const data = await response.json();
 
-    console.log("OpenAI response:", JSON.stringify(data, null, 2));
+    console.log("AI API response:", JSON.stringify(data, null, 2));
 
-    let responseContent = data.choices[0].message.content;
+    // AI 모델에 따른 응답 처리
+    let responseContent;
+    if (apiModel.includes('gemini')) {
+      // Gemini 응답 처리
+      responseContent = data.candidates[0].content.parts[0].text;
+    } else {
+      // OpenAI 응답 처리
+      responseContent = data.choices[0].message.content;
+    }
+    
     let parsedContent = null;
 
     // 플랫폼별 콘텐츠 요청인 경우 자연어 응답에서 플랫폼별 내용 추출
