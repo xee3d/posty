@@ -403,7 +403,14 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
     // AI 모델에 따른 API 호출 분기
     let response;
     
-    if (apiModel.includes('gemini') || apiModel === 'gemini-2.5-flash') {
+    console.log("🔍 Model routing check:", {
+      apiModel,
+      startsWithGemini: apiModel.startsWith('gemini'),
+      equalsGeminiFlash: apiModel === 'gemini-2.5-flash',
+      willUseGemini: apiModel.startsWith('gemini') || apiModel === 'gemini-2.5-flash'
+    });
+    
+    if (apiModel.startsWith('gemini') || apiModel === 'gemini-2.5-flash') {
       // Gemini API 호출
       console.log("Calling Gemini API with model:", apiModel);
       console.log("Gemini API Key exists:", !!process.env.GEMINI_API_KEY);
@@ -683,7 +690,7 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
 
     // AI 모델에 따른 응답 처리
     let responseContent;
-    if (apiModel.includes('gemini') || apiModel === 'gemini-2.5-flash') {
+    if (apiModel.startsWith('gemini') || apiModel === 'gemini-2.5-flash') {
       // Gemini 응답 처리
       responseContent = data.candidates[0].content.parts[0].text;
     } else {
