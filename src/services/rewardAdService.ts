@@ -1,7 +1,6 @@
 import { Platform } from "react-native";
 import {
   RewardedAd,
-  RewardedAdEventType,
   TestIds,
 } from 'react-native-google-mobile-ads';
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -107,22 +106,22 @@ class RewardAdService {
   private setupAdEventListeners(): void {
     if (!this.rewardedAd) return;
 
-    this.rewardedAd.addAdEventListener(RewardedAdEventType.LOADED, () => {
+    this.rewardedAd.addAdEventListener('loaded', () => {
       console.log("RewardAdService: 광고 로드 완료");
       this.isAdLoaded = true;
     });
 
-    this.rewardedAd.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
+    this.rewardedAd.addAdEventListener('error', (error) => {
       console.log("RewardAdService: 광고 로드 실패:", error);
       this.isAdLoaded = false;
     });
 
-    this.rewardedAd.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+    this.rewardedAd.addAdEventListener('rewarded', (reward) => {
       console.log("RewardAdService: 사용자가 보상 획득:", reward);
       this.handleRewardEarned(reward.amount);
     });
 
-    this.rewardedAd.addAdEventListener(RewardedAdEventType.CLOSED, () => {
+    this.rewardedAd.addAdEventListener('closed', () => {
       console.log("RewardAdService: 광고 닫힘");
       this.isAdShowing = false;
       this.isAdLoaded = false; // 광고 사용 후 다시 로드 필요
