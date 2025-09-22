@@ -107,13 +107,21 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
         }),
       });
 
-      const isGeminiAvailable = response.ok;
+      const responseData = await response.json();
+      const isGeminiAvailable = response.ok && responseData.success;
+      
+      console.log('Gemini availability check:', {
+        status: response.status,
+        ok: response.ok,
+        success: responseData.success,
+        isAvailable: isGeminiAvailable
+      });
       
       return aiAgentConfigs.map(config => ({
         ...config,
         isAvailable: config.id === 'gpt-mini' || isGeminiAvailable,
         fallbackInfo: config.id === 'gemini-flash-lite' && !isGeminiAvailable 
-          ? "현재 GPT-4o Mini로 대체됩니다" 
+          ? "API 키 설정 필요 - 현재 GPT-4o Mini로 대체됩니다" 
           : undefined,
       }));
     } catch (error) {
@@ -123,7 +131,7 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
         ...config,
         isAvailable: config.id === 'gpt-mini',
         fallbackInfo: config.id === 'gemini-flash-lite' 
-          ? "현재 GPT-4o Mini로 대체됩니다" 
+          ? "API 키 설정 필요 - 현재 GPT-4o Mini로 대체됩니다" 
           : undefined,
       }));
     }
@@ -189,7 +197,7 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
               {!item.isAvailable && (
                 <View style={[styles.unavailableBadge, { backgroundColor: colors.text.tertiary + '20' }]}>
                   <Text style={[styles.unavailableText, { color: colors.text.tertiary }]}>
-                    준비중
+                    API 키 필요
                   </Text>
                 </View>
               )}
