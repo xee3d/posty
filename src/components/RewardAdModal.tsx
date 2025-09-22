@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { RewardedAd, RewardedAdEventType, TestIds } from 'react-native-google-mobile-ads';
+import { RewardedAd, TestIds } from 'react-native-google-mobile-ads';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { SPACING } from '../utils/constants';
 import { SafeIcon } from '../utils/SafeIcon';
@@ -60,25 +60,25 @@ const RewardAdModal: React.FC<RewardAdModalProps> = ({
       });
 
       // 광고 로드 이벤트 리스너
-      const unsubscribeLoaded = ad.addAdEventListener(RewardedAdEventType.LOADED, () => {
+      const unsubscribeLoaded = ad.addAdEventListener('loaded', () => {
         console.log('Reward ad loaded successfully');
         setAdLoaded(true);
         setAdLoading(false);
       });
 
-      const unsubscribeError = ad.addAdEventListener(RewardedAdEventType.ERROR, (error) => {
+      const unsubscribeError = ad.addAdEventListener('error', (error) => {
         console.log('Reward ad failed to load:', error);
         setAdError(true);
         setAdLoading(false);
       });
 
-      const unsubscribeEarned = ad.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
+      const unsubscribeEarned = ad.addAdEventListener('rewarded', (reward) => {
         console.log('User earned reward:', reward);
         onRewardEarned(reward.amount);
         onClose();
       });
 
-      const unsubscribeClosed = ad.addAdEventListener(RewardedAdEventType.CLOSED, () => {
+      const unsubscribeClosed = ad.addAdEventListener('closed', () => {
         console.log('Reward ad closed');
         onClose();
       });
