@@ -426,11 +426,15 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
         }
       }, null, 2));
 
-      if (!process.env.GEMINI_API_KEY) {
-        throw new Error("GEMINI_API_KEY environment variable is not set");
+      const geminiApiKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
+      
+      if (!geminiApiKey) {
+        throw new Error("GOOGLE_API_KEY or GEMINI_API_KEY environment variable is not set");
       }
 
-      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      console.log("Using Gemini API Key:", geminiApiKey.substring(0, 10) + "...");
+
+      response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${geminiApiKey}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
