@@ -28,6 +28,7 @@ import { Alert } from "../utils/customAlert";
 import { useAppSelector } from "../hooks/redux";
 import ProfileDetailModal from "../components/ProfileDetailModal";
 import { getProfileGuideMessage } from "../types/userProfile";
+import { useTranslation } from "react-i18next";
 import LinearGradient from "react-native-linear-gradient";
 
 const { width } = Dimensions.get("window");
@@ -42,6 +43,7 @@ const ProfileScreen: React.FC<ProfileScreenProps> = ({
   onClose,
 }) => {
   const { colors, isDark } = useAppTheme();
+  const { t } = useTranslation();
   const userInfo = useAppSelector((state) => state.user);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
