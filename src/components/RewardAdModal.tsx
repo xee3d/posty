@@ -39,9 +39,9 @@ const RewardAdModal: React.FC<RewardAdModalProps> = ({
   const [rewardedAd, setRewardedAd] = useState<RewardedAd | null>(null);
 
   // 실제 광고 ID (운영 환경)
-  const adUnitId = __DEV__ 
+  const adUnitId = __DEV__
     ? TestIds.REWARDED // 개발용 테스트 ID
-    : 'ca-app-pub-3940256099942544/5224354917'; // 실제 리워드 광고 ID (예시)
+    : 'ca-app-pub-4039842933564424/9440450013'; // Posty 토큰 리워드
 
   // 광고 로드
   useEffect(() => {

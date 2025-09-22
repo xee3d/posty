@@ -20,7 +20,7 @@
       <!-- Google Mobile Ads App ID -->
       <meta-data
         android:name="com.google.android.gms.ads.APPLICATION_ID"
-        android:value="ca-app-pub-3940256099942544~3347511713"/>
+        android:value="ca-app-pub-4039842933564424~3895363964"/>
       
       <!-- 네이버 로그인 설정 -->
       <meta-data

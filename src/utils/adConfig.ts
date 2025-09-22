@@ -1,27 +1,32 @@
 // 광고 관련 상수 및 타입 정의
 
 export const AD_CONFIG = {
-  // Google AdMob IDs - 테스트 ID 사용 중 (실제 배포 시 교체 필요)
+  // Google AdMob IDs - 프로덕션 ID 사용
   admob: {
     appId: {
-      ios: "ca-app-pub-3940256099942544~1458002511",
-      android: "ca-app-pub-3940256099942544~3347511713",
+      ios: "ca-app-pub-4039842933564424~3895363964",
+      android: "ca-app-pub-4039842933564424~3895363964",
     },
     unitIds: {
-      // 네이티브 광고
+      // 하단 배너 광고
+      banner: {
+        ios: "ca-app-pub-4039842933564424/8287150443", // Posty 하단 배너
+        android: "ca-app-pub-4039842933564424/8287150443", // Posty 하단 배너
+      },
+      // 네이티브 광고 (일반)
       native: {
-        ios: "ca-app-pub-3940256099942544/2247696110", // iOS 테스트 네이티브 광고 ID
-        android: "ca-app-pub-3940256099942544/2247696110", // Android 테스트 네이티브 광고 ID
+        ios: "ca-app-pub-4039842933564424/6870126998", // AdMob 광고 단위 ID
+        android: "ca-app-pub-4039842933564424/6870126998", // AdMob 광고 단위 ID
       },
-      // 보상형 광고 (추가 생성 횟수)
+      // 보상형 광고 (토큰 리워드)
       rewarded: {
-        ios: "ca-app-pub-3940256099942544/1712485313", // iOS 테스트 보상형 광고 ID
-        android: "ca-app-pub-3940256099942544/5224354917", // Android 테스트 보상형 광고 ID
+        ios: "ca-app-pub-4039842933564424/9440450013", // Posty 토큰 리워드
+        android: "ca-app-pub-4039842933564424/9440450013", // Posty 토큰 리워드
       },
-      // 전면 광고 (선택적)
+      // 전면 광고 (필요시 추가)
       interstitial: {
-        ios: "ca-app-pub-3940256099942544/4411468910", // iOS 테스트 전면 광고 ID
-        android: "ca-app-pub-3940256099942544/1033173712", // Android 테스트 전면 광고 ID
+        ios: "ca-app-pub-4039842933564424/6870126998", // 일반 광고 ID 재사용
+        android: "ca-app-pub-4039842933564424/6870126998", // 일반 광고 ID 재사용
       },
     },
   },

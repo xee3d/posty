@@ -20,9 +20,9 @@ const AdBanner: React.FC<AdBannerProps> = ({
   const [adError, setAdError] = useState(false);
 
   // 실제 광고 ID (운영 환경)
-  const adUnitId = __DEV__ 
+  const adUnitId = __DEV__
     ? TestIds.BANNER // 개발용 테스트 ID
-    : 'ca-app-pub-3940256099942544/6300978111'; // 실제 배너 광고 ID (예시)
+    : 'ca-app-pub-4039842933564424/8287150443'; // Posty 하단 배너
 
   const handleAdLoaded = () => {
     setAdLoaded(true);
