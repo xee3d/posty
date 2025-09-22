@@ -434,6 +434,16 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
 
       console.log("Using Gemini API Key:", geminiApiKey.substring(0, 10) + "...");
       console.log("Gemini API URL:", `https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${geminiApiKey.substring(0, 10)}...`);
+      console.log("Gemini request body:", JSON.stringify({
+        contents: messages.map((m) => ({
+          role: m.role === "user" ? "user" : "model",
+          parts: [{ text: m.content }],
+        })),
+        generationConfig: {
+          maxOutputTokens: finalMaxTokens,
+          temperature: generatePlatformVersions ? 0.5 : 0.8,
+        }
+      }, null, 2));
 
       response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${geminiApiKey}`, {
         method: "POST",
