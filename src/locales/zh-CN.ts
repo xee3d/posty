@@ -420,6 +420,15 @@ const zhCN = {
     buttons: {
       generate: "生成",
       generating: "生成中...",
+      generatingMessages: [
+        "Posty正在写作...",
+        "修改句子中...",
+        "润色文字中...",
+        "修正错别字...",
+        "调整语调中...",
+        "添加标签中...",
+        "最终检查中...",
+      ],
       copy: "复制",
       save: "保存",
       share: "分享"

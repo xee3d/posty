@@ -133,6 +133,15 @@ const en = {
     buttons: {
       generate: "Ask Posty",
       generating: "Posty is writing...",
+      generatingMessages: [
+        "Posty is writing...",
+        "Editing sentences...",
+        "Polishing the text...",
+        "Fixing typos...",
+        "Adjusting tone...",
+        "Adding hashtags...",
+        "Final check...",
+      ],
       copy: "Copy",
       save: "Save",
       share: "Share",

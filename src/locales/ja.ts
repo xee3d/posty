@@ -385,6 +385,15 @@ const ja = {
     buttons: {
       generate: "Postyにお任せする",
       generating: "Postyが書いています...",
+      generatingMessages: [
+        "Postyが書いています...",
+        "文章を修正中...",
+        "文章を磨いています...",
+        "誤字を修正中...",
+        "トーンを調整中...",
+        "ハッシュタグを追加中...",
+        "最終チェック中...",
+      ],
       copy: "コピーする",
       save: "保存する",
       share: "共有する",

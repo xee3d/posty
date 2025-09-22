@@ -173,6 +173,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   const scrollViewRef = useRef<ScrollView>(null);
   const [generatedPlatforms, setGeneratedPlatforms] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const [loadingMessageInterval, setLoadingMessageInterval] = useState<NodeJS.Timeout | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedPolishOption, setSelectedPolishOption] = useState<
     | "summarize"
@@ -213,6 +215,36 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
       }, 300); // 애니메이션 완료를 위한 약간의 딜레이
     }
   }, [generatedContent, isGenerating]);
+
+  // 로딩 메시지 순환 로직
+  useEffect(() => {
+    if (isGenerating) {
+      // 로딩 시작 시 첫 번째 메시지로 설정
+      setLoadingMessageIndex(0);
+      
+      // 2초마다 메시지 변경
+      const interval = setInterval(() => {
+        setLoadingMessageIndex(prev => {
+          const messages = t('aiWrite.buttons.generatingMessages', { returnObjects: true }) as string[];
+          return (prev + 1) % messages.length;
+        });
+      }, 2000);
+      
+      setLoadingMessageInterval(interval);
+    } else {
+      // 로딩 완료 시 인터벌 정리
+      if (loadingMessageInterval) {
+        clearInterval(loadingMessageInterval);
+        setLoadingMessageInterval(null);
+      }
+    }
+    
+    return () => {
+      if (loadingMessageInterval) {
+        clearInterval(loadingMessageInterval);
+      }
+    };
+  }, [isGenerating, t]);
 
   // initialText가 있을 때 자동으로 콘텐츠 생성 - 제거됨
   // 사용자가 직접 생성 버튼을 눌러야 함
@@ -1931,7 +1963,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       ]}
                     >
                       {isGenerating
-                        ? t("aiWrite.buttons.generating")
+                        ? (() => {
+                            const messages = t('aiWrite.buttons.generatingMessages', { returnObjects: true }) as string[];
+                            return messages[loadingMessageIndex] || t("aiWrite.buttons.generating");
+                          })()
                         : writeMode === "photo" && isAnalyzingImage
                         ? t("aiWrite.analysis.analyzing")
                         : t("aiWrite.buttons.generate")}
