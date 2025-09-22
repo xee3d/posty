@@ -2392,7 +2392,7 @@ const createStyles = (
       fontStyle: "italic",
     },
     optionSection: {
-      ...horizontalPadding,
+      paddingHorizontal: SPACING.md, // SPACING.lg에서 SPACING.md로 줄임
       marginBottom: 0,
     },
     toneSection: {
@@ -2499,8 +2499,9 @@ const createStyles = (
     },
     generateButton: {
       backgroundColor: colors.primary,
-      ...horizontalPadding,
-      paddingVertical: 18,
+      marginHorizontal: SPACING.sm, // SPACING.lg에서 SPACING.sm으로 줄여서 더 넓게
+      paddingVertical: 22, // 18에서 22로 늘림
+      paddingHorizontal: SPACING.xl, // 수평 패딩 추가
       borderRadius: 24,
       flexDirection: "row",
       alignItems: "center",
