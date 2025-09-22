@@ -411,15 +411,22 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
       exactMatch: apiModel === 'gemini-2.5-flash-lite'
     });
 
-    // 강화된 Gemini API 라우팅 로직
-    const isGeminiModel = apiModel.startsWith('gemini') ||
-                         apiModel.includes('gemini') ||
-                         apiModel === 'gemini-2.5-flash-lite' ||
-                         apiModel === 'gemini-1.5-flash';
+    // 🚨 CRITICAL: 강제 Gemini 라우팅 (디버깅용)
+    const isGeminiModel = (apiModel === 'gemini-2.5-flash-lite') ||
+                         (apiModel === 'gemini-1.5-flash') ||
+                         apiModel.startsWith('gemini') ||
+                         apiModel.includes('gemini');
 
-    console.log("🎯 Final routing decision:", { apiModel, isGeminiModel });
+    console.log("🚨 FORCED GEMINI ROUTING:", {
+      apiModel,
+      isGeminiModel,
+      exactMatch: apiModel === 'gemini-2.5-flash-lite',
+      startsWithGemini: apiModel.startsWith('gemini')
+    });
 
+    // 강제로 Gemini API 사용
     if (isGeminiModel) {
+      console.log("✅ CONFIRMED: Using Gemini API for model:", apiModel);
       // Gemini API 호출
       console.log("🟢 Routing to Gemini API with model:", apiModel);
 
@@ -488,7 +495,11 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
         }),
       });
     } else {
-      // OpenAI API 호출
+      // OpenAI API 호출 - Gemini 모델 차단
+      if (apiModel.includes('gemini')) {
+        console.error("🚨 ERROR: Gemini model reached OpenAI section! Model:", apiModel);
+        throw new Error(`Gemini model ${apiModel} should not reach OpenAI API`);
+      }
       console.log("Calling OpenAI API with model:", apiModel);
       console.log(
         "Request body:",
