@@ -1,46 +1,73 @@
 import { LIGHT_COLORS, DARK_COLORS } from "../utils/constants";
 
+// ThemeContext와 호환되는 색상 인터페이스
+export interface UnifiedColors {
+  primary: string;
+  secondary: string;
+  success: string;
+  warning: string;
+  error: string;
+  info: string;
+  accent: string;
+  accentLight: string;
+  accentDark: string;
+  gold: string;
+  goldLight: string;
+  goldDark: string;
+  background: string;
+  surface: string;
+  primaryWriteCardBg: string;
+  surfaceVariant: string;
+  cardBackground: string;
+  text: string;
+  textSecondary: string;
+  textTertiary: string;
+  textPrimary: string;
+  border: string;
+  headerBackground: string;
+  isDark: boolean;
+  white: string;
+  lightGray: string;
+}
+
 // 통합된 색상 테마 정의
-export const getUnifiedColors = (isDark: boolean) => {
+export const getUnifiedColors = (isDark: boolean): UnifiedColors => {
   const baseColors = isDark ? DARK_COLORS : LIGHT_COLORS;
 
   return {
-    ...baseColors,
-    // 텍스트 색상 통합
-    text: {
-      primary: isDark ? "#FFFFFF" : "#1F2937",
-      secondary: isDark ? "#A0A0A0" : "#6B7280",
-      tertiary: isDark ? "#6B6B6B" : "#8E8E93",
-      // 추가 텍스트 색상
-      primaryBright: isDark ? "#FFFFFF" : "#1F2937",
-      secondaryBright: isDark ? "#B0B0B0" : "#4B5563",
-      disabled: isDark ? "#4A4A4A" : "#C7C7CC",
-    },
-    // 배경색 통합
-    backgrounds: {
-      primary: baseColors.background,
-      secondary: baseColors.surface,
-      tertiary: isDark ? "#0F0F0F" : baseColors.lightGray,
-      card: isDark ? "#141414" : baseColors.surface,
-      cardElevated: isDark ? "#1F1F1F" : baseColors.white,
-      input: isDark ? "#0A0A0A" : "#F5F5F5",
-    },
-    // 보더 색상
-    borders: {
-      default: baseColors.border,
-      light: isDark ? "#2A2A2A" : "#E5E7EB",
-      dark: isDark ? "#3A3A3A" : "#D1D5DB",
-    },
-    // 상태 색상
-    states: {
-      primary: baseColors.primary,
-      primaryDark: isDark ? "#A78BFA" : "#7C3AED",
-      primaryLight: isDark ? "#E9D5FF" : "#F5F3FF",
-      success: baseColors.success,
-      warning: baseColors.warning,
-      error: baseColors.error,
-      info: baseColors.info,
-    },
+    // 기본 색상
+    primary: baseColors.primary,
+    secondary: baseColors.secondary,
+    success: baseColors.success,
+    warning: baseColors.warning,
+    error: baseColors.error,
+    info: baseColors.info,
+    accent: baseColors.accent,
+    accentLight: baseColors.accentLight,
+    accentDark: baseColors.accentDark,
+    gold: baseColors.gold,
+    goldLight: baseColors.goldLight,
+    goldDark: baseColors.goldDark,
+
+    // 배경 색상
+    background: baseColors.background,
+    surface: baseColors.surface,
+    primaryWriteCardBg: isDark ? baseColors.surface : "#F0EEFF",
+    surfaceVariant: isDark ? "#2A2A2A" : "#F2F2F7",
+    cardBackground: baseColors.card,
+    headerBackground: isDark ? "#141414" : "#FFFFFF",
+
+    // 텍스트 색상
+    text: baseColors.text.primary,
+    textPrimary: baseColors.text.primary,
+    textSecondary: baseColors.text.secondary,
+    textTertiary: baseColors.text.tertiary,
+
+    // 기타
+    border: baseColors.border,
+    white: baseColors.white,
+    lightGray: baseColors.lightGray,
+    isDark: isDark,
   };
 };
 
@@ -104,19 +131,19 @@ export const getUnifiedCardTheme = (isDark: boolean) => {
 
   return {
     default: {
-      backgroundColor: colors.backgrounds.card,
+      backgroundColor: colors.cardBackground,
       borderRadius: 16,
       padding: 16,
       ...shadows.small,
     },
     elevated: {
-      backgroundColor: colors.backgrounds.cardElevated,
+      backgroundColor: colors.surface,
       borderRadius: 16,
       padding: 16,
       ...shadows.medium,
     },
     molly: {
-      backgroundColor: isDark ? "#1A1A1A" : colors.states.primaryLight,
+      backgroundColor: isDark ? "#1A1A1A" : colors.accentLight,
       borderRadius: 16,
       padding: 16,
       ...shadows.medium,

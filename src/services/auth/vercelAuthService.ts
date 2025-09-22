@@ -502,6 +502,7 @@ class VercelAuthService {
 
       // Facebook 로그아웃
       try {
+        const { LoginManager } = require('react-native-fbsdk-next');
         if (LoginManager) {
           LoginManager.logOut();
           console.log("Facebook 로그아웃 완료");

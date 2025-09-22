@@ -150,7 +150,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
       const today = new Date().toDateString();
       const savedTasks = await AsyncStorage.getItem(`token_tasks_${today}`);
       const taskData = savedTasks ? JSON.parse(savedTasks) : {};
-      taskData["watch_ad"] = true;
+      taskData.watch_ad = true;
       await AsyncStorage.setItem(`token_tasks_${today}`, JSON.stringify(taskData));
       
       // UI 업데이트
@@ -337,7 +337,7 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
         .default;
 
       // 강화된 광고 준비 상태 확인
-      const readyStatus = await rewardAdService.isReady();
+      const readyStatus = rewardAdService.isReady;
       if (!readyStatus) {
         Alert.alert(
           "광고 준비 상태",

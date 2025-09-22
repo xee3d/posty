@@ -66,9 +66,9 @@ class BatteryOptimizer {
 
     this.clearInterval(id);
     const timer = setInterval(wrappedCallback, interval);
-    this.intervals.set(id, timer);
+    this.intervals.set(id, timer as any);
 
-    return timer;
+    return timer as any;
   }
 
   /**

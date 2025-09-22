@@ -6,8 +6,12 @@
 import { OPENAI_API_KEY } from "@env";
 import { getCurrentLanguage } from "./localization/languageService";
 
-// API 키가 없을 경우 기본값
-const API_KEY = OPENAI_API_KEY || "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";
+// API 키 설정 (환경변수 필수)
+const API_KEY = OPENAI_API_KEY;
+
+if (!API_KEY) {
+  console.error("OPENAI_API_KEY environment variable is required");
+}
 
 interface GenerateContentParams {
   prompt: string;
@@ -176,11 +180,12 @@ class OpenAIService {
 - 과도한 마케팅 문구는 피하세요
 - 따뜻하고 진솔한 느낌을 담아주세요`;
 
-    const baseInstructions = this.getBaseInstructionsByLanguage(language);
+    const currentLanguage = getCurrentLanguage();
+    const baseInstructions = this.getBaseInstructionsByLanguage(currentLanguage, platform);
     return baseInstructions + "\n\n" + basePrompt + enhancement;
   }
   
-  private getBaseInstructionsByLanguage(language: string): string {
+  private getBaseInstructionsByLanguage(language: string, platform?: string): string {
     switch (language) {
       case 'ja':
         return `あなたはソーシャルメディアプラットフォーム向けの専門的なコンテンツライターです。
@@ -209,7 +214,8 @@ Important instructions:
 Include only the generated content in your response, without additional explanations or metadata.`;
         
       default: // Korean
-        return `당신은 ${platform || '소셜미디어'} 플랫폼을 위한 전문적인 콘텐츠 작성자입니다.
+        const currentPlatform = platform || '소셜미디어';
+        return `당신은 ${currentPlatform} 플랫폼을 위한 전문적인 콘텐츠 작성자입니다.
 아래 지시사항에 따라 자연스럽고 매력적인 콘텐츠를 작성해주세요.
 
 중요한 지시사항:

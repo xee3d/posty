@@ -17,7 +17,7 @@ export class MemoryOptimizer {
 
   // 안전한 setInterval (자동 정리)
   static setInterval(callback: () => void, delay: number): NodeJS.Timeout {
-    const interval = setInterval(callback, delay);
+    const interval = setInterval(callback, delay) as any;
     this.intervals.add(interval);
     return interval;
   }

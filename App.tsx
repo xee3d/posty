@@ -9,6 +9,7 @@ import languageService from "./src/services/localization/languageService";
 import pricingService from "./src/services/localization/pricingService";
 import "./src/locales/i18n";
 import mobileAds from 'react-native-google-mobile-ads';
+import adConsentService from './src/services/adConsentService';
 import { SafeIcon } from "./src/utils/SafeIcon";
 import IconComponent from "react-native-vector-icons/Ionicons";
 import SplashScreen from "react-native-splash-screen";
@@ -127,16 +128,37 @@ const AppContent: React.FC = () => {
   useEffect(() => {
     console.log("[App] App initialization started");
     
-    // AdMob 초기화
-    mobileAds()
-      .initialize()
-      .then(adapterStatuses => {
-        console.log('[App] AdMob initialized successfully');
-        console.log('[App] Adapter statuses:', adapterStatuses);
-      })
-      .catch(error => {
-        console.warn('[App] AdMob initialization failed:', error);
-      });
+    // AdMob 및 UMP 초기화
+    const initializeAds = async () => {
+      try {
+        console.log('[App] Starting AdMob and UMP initialization...');
+
+        // 1. UMP 동의 관리 먼저 초기화
+        const consentInfo = await adConsentService.initialize();
+        console.log('[App] UMP consent initialized:', consentInfo);
+
+        // 2. 동의가 완료되었거나 광고 요청이 가능한 경우에만 AdMob 초기화
+        if (consentInfo.canRequestAds) {
+          const adapterStatuses = await mobileAds().initialize();
+          console.log('[App] AdMob initialized successfully');
+          console.log('[App] Adapter statuses:', adapterStatuses);
+        } else {
+          console.log('[App] AdMob initialization skipped - consent not obtained');
+        }
+      } catch (error) {
+        console.warn('[App] Ad initialization failed:', error);
+
+        // 에러가 발생해도 기본 AdMob만 초기화 시도
+        try {
+          await mobileAds().initialize();
+          console.log('[App] Fallback AdMob initialization successful');
+        } catch (fallbackError) {
+          console.warn('[App] Fallback AdMob initialization also failed:', fallbackError);
+        }
+      }
+    };
+
+    initializeAds();
     
     // 언어 디버깅
     import('./src/utils/deviceLanguage').then(({ getDeviceLanguage, isKorean }) => {

@@ -14,7 +14,7 @@ interface BadgeNotification {
   body: string;
   timestamp: number;
   isRead: boolean;
-  type: "mission" | "trend" | "achievement" | "tip";
+  type: "token" | "mission" | "trend" | "achievement" | "tip";
 }
 
 export class BadgeService {

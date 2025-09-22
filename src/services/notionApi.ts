@@ -8,7 +8,7 @@ const NOTION_VERSION = '2022-06-28';
 // 환경 설정 (.env 파일에서 가져옴)
 const NOTION_CONFIG = {
   // Notion API 키 (.env 파일에서 설정)
-  API_KEY: NOTION_API_KEY || '',
+  API_KEY: NOTION_API_KEY || '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',
   // Legal Documents 메인 페이지 ID (데이터베이스가 아님)
   MAIN_PAGE_ID: '26cdc2bce21c81f28723fc6d2a0ed157',
 };
@@ -246,7 +246,13 @@ class NotionApiService {
 
   // API 키가 설정되어 있는지 확인
   isConfigured(): boolean {
-    return !!NOTION_CONFIG.API_KEY && NOTION_CONFIG.API_KEY.trim().length > 0;
+    const hasKey = !!NOTION_CONFIG.API_KEY && NOTION_CONFIG.API_KEY.trim().length > 0;
+    console.log('🔍 Notion API Configuration Check:', {
+      hasKey,
+      keyLength: NOTION_CONFIG.API_KEY ? NOTION_CONFIG.API_KEY.length : 0,
+      keyPreview: NOTION_CONFIG.API_KEY ? `${NOTION_CONFIG.API_KEY.substring(0, 10)}...` : 'NO_KEY'
+    });
+    return hasKey;
   }
 }
 

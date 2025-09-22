@@ -44,7 +44,7 @@ const AchievementNotification: React.FC<AchievementNotificationProps> = ({
         if (AppState.currentState === "active") {
           checkNewAchievements();
         }
-      }, 30 * 60 * 1000); // 30분으로 변경
+      }, 30 * 60 * 1000) as any; // 30분으로 변경
     };
 
     const handleAppStateChange = (nextAppState: string) => {

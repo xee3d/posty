@@ -1,9 +1,13 @@
 // OpenRouter를 통한 AI 서비스 구현
 // DeepSeek 무료 모델로 시작, 추후 다른 모델로 전환 가능
 
-// 임시로 API 키 직접 입력 (나중에 react-native-dotenv로 변경)
-const OPENROUTER_API_KEY =
-  "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";
+// OpenRouter API 키 (환경변수에서 가져오기)
+// @ts-ignore
+import { OPENROUTER_API_KEY } from "@env";
+
+if (!OPENROUTER_API_KEY) {
+  console.error("OPENROUTER_API_KEY environment variable is required");
+}
 
 // 모델별 가격 정보 (1M 토큰당 USD)
 const MODEL_PRICING = {

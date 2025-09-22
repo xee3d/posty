@@ -14,6 +14,7 @@ interface ServerGenerateParams {
   model?: string;
   includeEmojis?: boolean;
   generatePlatformVersions?: boolean;
+  userProfile?: any; // Optional user profile data
 }
 
 interface ServerResponse {
@@ -470,7 +471,7 @@ Requirements: English language only, engaging tone, appropriate hashtags.`,
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Original language:", currentLanguage);
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Available language instructions:", Object.keys(languageInstructions));
     
-    if (currentLanguage.startsWith('zh') || currentLanguage === 'zh-CN' || currentLanguage === 'zh-Hans' || currentLanguage === 'zh-Hant') {
+    if (currentLanguage.startsWith('zh') || currentLanguage === 'zh-CN') {
       langKey = 'zh-CN';
       console.log("🔧 [ServerAIService] ENHANCED PROMPT - Chinese language detected, mapped to zh-CN");
     } else if (currentLanguage.startsWith('ja')) {

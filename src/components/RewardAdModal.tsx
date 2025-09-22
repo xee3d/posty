@@ -125,7 +125,7 @@ const RewardAdModal: React.FC<RewardAdModalProps> = ({
   };
 
   const getRewardDescription = () => {
-    if (rewardDescription) return rewardDescription;
+    if (rewardDescription) {return rewardDescription;}
     
     switch (rewardType) {
       case 'tokens':

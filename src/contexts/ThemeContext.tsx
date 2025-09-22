@@ -10,13 +10,26 @@ import { Appearance, ColorSchemeName } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
 import { RootState } from "../store";
+import { getUnifiedColors } from "../styles/themeStyles";
 
 export type ThemeMode = "light" | "dark" | "system";
 
 interface ThemeColors {
+  primary: string;
+  secondary: string;
+  success: string;
+  warning: string;
+  error: string;
+  info: string;
+  accent: string;
+  accentLight: string;
+  accentDark: string;
+  gold: string;
+  goldLight: string;
+  goldDark: string;
   background: string;
   surface: string;
-  primaryWriteCardBg: string; // 첫 글쓰기 카드 전용
+  primaryWriteCardBg: string;
   surfaceVariant: string;
   cardBackground: string;
   text: string;
@@ -24,14 +37,8 @@ interface ThemeColors {
   textTertiary: string;
   textPrimary: string;
   border: string;
-  accent: string;
   headerBackground: string;
   isDark: boolean;
-  warning: string;
-  success: string;
-  error: string;
-  primary: string;
-  accentLight: string;
   white: string;
   lightGray: string;
 }
@@ -163,59 +170,16 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       ? systemColorScheme === "dark"
       : themeMode === "dark";
 
-  // 테마 색상 생성 함수
+  // 테마 색상 생성 함수 (getUnifiedColors 사용)
   const createColors = (dark: boolean, color: string): ThemeColors => {
-    if (dark) {
-      return {
-        // 다크 테마 - TodayLucky 스타일 개선된 색상
-        background: "#0F0F0F", // 부드러운 검정 (완전한 검정보다 눈에 편함)
-        surface: "#1F1F1F", // 카드나 모달 배경 (더 밝게)
-        primaryWriteCardBg: "#1F1F1F", // 첫 글쓰기 카드 - 다크 모드에서는 surface와 동일
-        surfaceVariant: "#2A2A2A", // 입력 필드, 버튼 배경 (더 밝게)
-        cardBackground: "#1A1A1A", // 카드 배경 (약간 밝게)
-        text: "#FFFFFF", // 기본 텍스트
-        textPrimary: "#FFFFFF", // 중요 텍스트
-        textSecondary: "#BBBBBB", // 보조 텍스트 (가독성 개선)
-        textTertiary: "#888888", // 3차 텍스트 (더 밝게)
-        border: "#404040", // 경계선 (더 밝게)
-        accent: color, // 액센트 컬러
-        headerBackground: "#141414", // 헤더 배경 (약간 밝게)
-        isDark: true,
-        warning: "#FF9F0A", // 주황색 (약간 밝게)
-        success: "#32D74B", // 초록색 (약간 밝게)
-        error: "#FF453A", // 빨간색 (약간 밝게)
-        primary: color, // Legacy compatibility
-        accentLight: color + "25", // Legacy compatibility (투명도 증가)
-        white: "#FFFFFF", // Legacy compatibility
-        // 다크테마 전용 추가 색상들
-        lightGray: "#404040", // Switch 등에서 사용 (더 밝게)
-      };
-    } else {
-      return {
-        // 라이트 테마 - TodayLucky 스타일 개선된 색상
-        background: "#F2F2F7", // 시스템 배경
-        surface: "#FFFFFF", // 카드나 모달 배경
-        primaryWriteCardBg: "#F0EEFF", // 첫 글쓰기 카드 전용 배경
-        surfaceVariant: "#F2F2F7", // 입력 필드, 버튼 배경
-        cardBackground: "#FFFFFF", // 카드 배경
-        text: "#1D1D1F", // 기본 텍스트
-        textPrimary: "#1D1D1F", // 중요 텍스트
-        textSecondary: "#8E8E93", // 보조 텍스트 (더 읽기 좋게)
-        textTertiary: "#C7C7CC", // 3차 텍스트
-        border: "#E5E5EA", // 경계선 (더 섬세하게)
-        accent: color, // 액센트 컬러
-        headerBackground: "#FFFFFF", // 헤더 배경
-        isDark: false,
-        warning: "#FF9500", // 주황색
-        success: "#34C759", // 초록색
-        error: "#FF3B30", // 빨간색
-        primary: color, // Legacy compatibility
-        accentLight: color + "15", // Legacy compatibility
-        white: "#FFFFFF", // Legacy compatibility
-        // 라이트테마 전용 추가 색상들
-        lightGray: "#F5F5F5", // Switch 등에서 사용
-      };
-    }
+    const unifiedColors = getUnifiedColors(dark);
+    // 사용자 정의 색상을 accent로 적용
+    return {
+      ...unifiedColors,
+      accent: color,
+      primary: color,
+      accentLight: color + (dark ? "25" : "15"),
+    };
   };
 
   // 테마 색상 반환 (memoized) - 깜빡거림 방지를 위한 안정적인 의존성

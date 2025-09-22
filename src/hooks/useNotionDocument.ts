@@ -109,6 +109,13 @@ export const useNotionDocument = (initialDocumentId?: string): UseNotionDocument
 
   // Load document
   const loadDocument = useCallback(async (documentId: string): Promise<void> => {
+    console.log('📄 Loading document:', documentId);
+    console.log('📡 Notion sync status:', {
+      isConnected: syncData.isConnected,
+      isConfigured: notionApiService.isConfigured(),
+      documentsCount: syncData.documentsCount
+    });
+
     setIsLoading(true);
     setError(null);
     setCurrentDocumentId(documentId);
@@ -116,6 +123,7 @@ export const useNotionDocument = (initialDocumentId?: string): UseNotionDocument
     try {
       // First try to load from cache
       const cachedDoc = await loadFromCache(documentId);
+      console.log('💾 Cached document found:', !!cachedDoc);
       if (cachedDoc) {
         setDocument(cachedDoc);
         setIsLoading(false);
@@ -123,20 +131,23 @@ export const useNotionDocument = (initialDocumentId?: string): UseNotionDocument
 
       // If connected to Notion, fetch fresh data
       if (syncData.isConnected) {
+        console.log('🔄 Fetching fresh document from Notion...');
         const freshDoc = await fetchDocumentFromNotion(documentId);
         if (freshDoc) {
+          console.log('✅ Fresh document loaded from Notion');
           setDocument(freshDoc);
           await cacheDocument(freshDoc);
         } else if (!cachedDoc) {
           throw new Error('Document not found in Notion and no cached version available');
         }
       } else if (!cachedDoc) {
+        console.log('❌ Not connected to Notion and no cached document found');
         throw new Error('Not connected to Notion and no cached document found');
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to load document';
+      console.error('❌ Document loading error:', err);
       setError(errorMessage);
-      console.error('Error loading document:', err);
     } finally {
       setIsLoading(false);
     }

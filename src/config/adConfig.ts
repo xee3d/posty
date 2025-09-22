@@ -198,28 +198,28 @@ export const AD_CONFIG = {
   // 테스트 모드
   testMode: __DEV__,
 
-  // 광고 ID (실제 ID로 교체 필요)
+  // 광고 ID (실제 프로덕션 ID)
   admob: {
     appId: {
-      ios: "ca-app-pub-xxxxxxxxxxxxx~yyyyyyyyyy",
-      android: "ca-app-pub-xxxxxxxxxxxxx~yyyyyyyyyy",
+      ios: "ca-app-pub-4039842933564424~9331858554",
+      android: "ca-app-pub-4039842933564424~3895363964",
     },
     unitIds: {
       banner: {
-        ios: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy",
-        android: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy",
+        ios: "ca-app-pub-4039842933564424/8287150443", // ✅ 배너 광고 설정 완료
+        android: "ca-app-pub-4039842933564424/8287150443",
       },
       interstitial: {
-        ios: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy",
+        ios: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy", // 전면 광고 단위 ID 필요
         android: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy",
       },
       rewarded: {
-        ios: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy",
-        android: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy",
+        ios: "ca-app-pub-4039842933564424/9440450013", // ✅ 리워드 광고 설정 완료
+        android: "ca-app-pub-4039842933564424/9440450013",
       },
       native: {
-        ios: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy",
-        android: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy",
+        ios: "ca-app-pub-4039842933564424/6870126998", // ✅ 네이티브 광고 설정 완료
+        android: "ca-app-pub-4039842933564424/6870126998",
       },
     },
   },

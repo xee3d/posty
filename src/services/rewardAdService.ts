@@ -2,6 +2,8 @@ import { Platform } from "react-native";
 import {
   RewardedAd,
   TestIds,
+  AdEventType,
+  RewardedAdEventType,
 } from 'react-native-google-mobile-ads';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { adVerificationManager } from '../utils/security/adVerification';
@@ -19,6 +21,12 @@ const STORAGE_KEYS = {
 interface AdReward {
   type: string;
   amount: number;
+  success?: boolean;
+  error?: string;
+  reward?: {
+    type: string;
+    amount: number;
+  };
 }
 
 interface AdLimits {
@@ -38,9 +46,9 @@ class RewardAdService {
   private maxDailyViews = 10;
 
   // 실제 광고 ID (운영 환경)
-  private readonly adUnitId = __DEV__ 
+  private readonly adUnitId = __DEV__
     ? TestIds.REWARDED // 개발용 테스트 ID
-    : 'ca-app-pub-3940256099942544/5224354917'; // 실제 리워드 광고 ID (예시)
+    : 'ca-app-pub-4039842933564424/9440450013'; // ✅ 실제 리워드 광고 ID 설정 완료
 
   private readonly adLimits: AdLimits = {
     dailyLimit: 10,
@@ -104,24 +112,26 @@ class RewardAdService {
 
   // 광고 이벤트 리스너 설정
   private setupAdEventListeners(): void {
-    if (!this.rewardedAd) return;
+    if (!this.rewardedAd) {return;}
 
-    this.rewardedAd.addAdEventListener('loaded', () => {
+    this.rewardedAd.addAdEventListener(AdEventType.LOADED, () => {
       console.log("RewardAdService: 광고 로드 완료");
       this.isAdLoaded = true;
     });
 
-    this.rewardedAd.addAdEventListener('error', (error) => {
+    this.rewardedAd.addAdEventListener(AdEventType.ERROR, (error) => {
       console.log("RewardAdService: 광고 로드 실패:", error);
       this.isAdLoaded = false;
     });
 
-    this.rewardedAd.addAdEventListener('rewarded', (reward) => {
+    this.rewardedAd.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
       console.log("RewardAdService: 사용자가 보상 획득:", reward);
-      this.handleRewardEarned(reward.amount);
+      if (reward && typeof reward === 'object' && 'amount' in reward) {
+        this.handleRewardEarned(reward.amount);
+      }
     });
 
-    this.rewardedAd.addAdEventListener('closed', () => {
+    this.rewardedAd.addAdEventListener(AdEventType.CLOSED, () => {
       console.log("RewardAdService: 광고 닫힘");
       this.isAdShowing = false;
       this.isAdLoaded = false; // 광고 사용 후 다시 로드 필요
@@ -313,10 +323,25 @@ class RewardAdService {
       };
     }
   }
+
+  // 광고 준비 상태 확인 (호환성을 위한 메서드)
+  get isReady(): boolean {
+    return this.isAdLoaded && !this.isAdShowing;
+  }
+
+  // 리워드 광고 표시 (호환성을 위한 메서드)
+  async showRewardedAd(): Promise<AdReward | null> {
+    return this.showAd();
+  }
+
+  // 광고 시청 가능 여부 확인 (호환성을 위한 메서드)
+  async canWatchAd(): Promise<boolean> {
+    return this.canShowAd();
+  }
 }
 
 // 싱글톤 인스턴스
 const rewardAdService = new RewardAdService();
 
 export default rewardAdService;
-export { AdReward };
+export type { AdReward };

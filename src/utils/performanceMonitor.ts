@@ -72,9 +72,9 @@ class PerformanceMonitor {
       }
 
       // 메모리 사용량 (추정치)
-      if (__DEV__ && performance && performance.memory) {
+      if (__DEV__ && performance && (performance as any).memory) {
         this.metrics.memoryUsage =
-          (performance.memory as any).usedJSHeapSize || 0;
+          ((performance as any).memory as any).usedJSHeapSize || 0;
       }
 
       // 로그 출력 (개발 환경에서만)

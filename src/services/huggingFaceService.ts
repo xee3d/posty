@@ -1,7 +1,8 @@
 // Hugging Face 무료 API를 사용한 AI 서비스
 // 완전 무료, 한국어 지원
 
-const HF_API_KEY = "hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; // Hugging Face에서 무료로 발급
+// 주의: 이 서비스는 현재 사용되지 않습니다
+const HF_API_KEY = ""; // 사용하지 않음
 
 interface GenerateContentParams {
   prompt: string;

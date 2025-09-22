@@ -67,6 +67,7 @@ import AppLogo from "../components/AppLogo";
 import ProfileDetailModal from "../components/ProfileDetailModal";
 import { getProfileGuideMessage } from "../types/userProfile";
 import ThemeDialog from "../components/ThemeDialog";
+import adConsentService from "../services/adConsentService";
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
@@ -1057,7 +1058,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                 <View
                   style={[
                     styles.profileBadge,
-                    { backgroundColor: colors.warning },
+                    { backgroundColor: colors.primary },
                   ]}
                 >
                   <Text style={styles.profileBadgeText}>
@@ -1209,6 +1210,44 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                 color={colors.text.tertiary}
               />
             </View>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.settingItem}
+            onPress={async () => {
+              try {
+                await adConsentService.showPrivacyOptionsForm();
+                Alert.alert(
+                  "Posty",
+                  "광고 개인화 설정이 업데이트되었습니다."
+                );
+              } catch (error) {
+                console.error('Privacy options error:', error);
+                Alert.alert(
+                  "Posty",
+                  "설정을 업데이트할 수 없습니다. 나중에 다시 시도해주세요."
+                );
+              }
+            }}
+          >
+            <View style={styles.settingInfo}>
+              <View style={styles.settingHeader}>
+                <SafeIcon
+                  name="shield-outline"
+                  size={20}
+                  color={colors.text.secondary}
+                />
+                <Text style={styles.settingLabel}>광고 개인화 설정</Text>
+              </View>
+              <Text style={styles.settingDescription}>
+                맞춤형 광고 표시 여부를 설정합니다
+              </Text>
+            </View>
+            <SafeIcon
+              name="chevron-forward"
+              size={20}
+              color={colors.text.tertiary}
+            />
           </TouchableOpacity>
         </View>
 

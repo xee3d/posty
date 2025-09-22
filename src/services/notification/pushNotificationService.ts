@@ -348,7 +348,7 @@ export class PushNotificationService {
       {
         title: i18next.t("notifications.dailyShare.title", { defaultValue: "🌅 오늘 하루는 어땠나요?" }),
         body: i18next.t("notifications.dailyShare.body", { defaultValue: "Posty가 오늘의 소중한 순간을 멋진 글로 만들어드릴게요!" }),
-        data: { type: "daily_share" },
+        data: { type: "tip" }, // daily_share를 tip으로 매핑
       },
       "18:00"
     );
@@ -473,9 +473,9 @@ export class PushNotificationService {
       }
 
       // 배지 카운트 업데이트
-      const validateNotificationType = (type: string): "mission" | "trend" | "achievement" | "tip" => {
-        if (["mission", "trend", "achievement", "tip"].includes(type)) {
-          return type as "mission" | "trend" | "achievement" | "tip";
+      const validateNotificationType = (type: string): "token" | "mission" | "trend" | "achievement" | "tip" => {
+        if (["token", "mission", "trend", "achievement", "tip"].includes(type)) {
+          return type as "token" | "mission" | "trend" | "achievement" | "tip";
         }
         return "tip"; // default fallback
       };
