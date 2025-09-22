@@ -48,19 +48,17 @@ class AIAgentService {
     }
   }
 
-  // AI 에이전트를 서버 모델명으로 변환
-  public getModelName(agent: AIAgent): string {
-    switch (agent) {
-      case "gpt-mini":
-        return "gpt-4o-mini";
-      case "gemini-flash-lite":
-        // Gemini API 키가 설정되지 않은 경우 GPT로 폴백
-        console.warn("Gemini API key not configured, falling back to GPT");
-        return "gpt-4o-mini";
-      default:
-        return "gpt-4o-mini";
-    }
-  }
+      // AI 에이전트를 서버 모델명으로 변환
+      public getModelName(agent: AIAgent): string {
+        switch (agent) {
+          case "gpt-mini":
+            return "gpt-4o-mini";
+          case "gemini-flash-lite":
+            return "gemini-2.5-flash-lite";
+          default:
+            return "gpt-4o-mini";
+        }
+      }
 
   // 현재 에이전트의 모델명 가져오기
   public async getCurrentModelName(): Promise<string> {
