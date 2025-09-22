@@ -61,8 +61,7 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
       icon: "star",
       color: "#4285F4",
       badge: "GEM",
-      isAvailable: false, // Gemini API 키가 설정되지 않은 경우
-      fallbackInfo: "현재 GPT-4o Mini로 대체됩니다",
+      isAvailable: true, // 실제로는 사용 가능함
     },
   ];
 
@@ -78,9 +77,55 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
         : 'gpt-mini';
       
       setCurrentAgent(current);
-      setAvailableAgents(aiAgentConfigs);
+      
+      // Gemini API 가용성 확인
+      const updatedConfigs = await checkAgentAvailability();
+      setAvailableAgents(updatedConfigs);
     } catch (error) {
       console.error('Failed to initialize AI agent settings:', error);
+      // 오류 시 기본 설정 사용
+      setAvailableAgents(aiAgentConfigs);
+    }
+  };
+
+  const checkAgentAvailability = async (): Promise<AIAgentConfig[]> => {
+    try {
+      // Gemini API 테스트 요청
+      const response = await fetch('https://posty-ai-new.vercel.app/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer posty-secret-key-change-this-in-production',
+        },
+        body: JSON.stringify({
+          prompt: 'test',
+          tone: 'casual',
+          platform: 'instagram',
+          model: 'gemini-2.5-flash-lite',
+          language: 'ko',
+          length: 'short'
+        }),
+      });
+
+      const isGeminiAvailable = response.ok;
+      
+      return aiAgentConfigs.map(config => ({
+        ...config,
+        isAvailable: config.id === 'gpt-mini' || isGeminiAvailable,
+        fallbackInfo: config.id === 'gemini-flash-lite' && !isGeminiAvailable 
+          ? "현재 GPT-4o Mini로 대체됩니다" 
+          : undefined,
+      }));
+    } catch (error) {
+      console.warn('Failed to check Gemini availability:', error);
+      // 오류 시 Gemini는 사용 불가능으로 처리
+      return aiAgentConfigs.map(config => ({
+        ...config,
+        isAvailable: config.id === 'gpt-mini',
+        fallbackInfo: config.id === 'gemini-flash-lite' 
+          ? "현재 GPT-4o Mini로 대체됩니다" 
+          : undefined,
+      }));
     }
   };
 
