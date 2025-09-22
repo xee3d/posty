@@ -567,17 +567,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
         <FadeInView delay={0} duration={250}>
           <View style={styles.headerSection}>
             <View style={styles.headerContent}>
-              <TouchableOpacity
-                style={styles.logoContainer}
-                onPress={() => onNavigate("profile")}
-                activeOpacity={0.7}
-              >
+              <View style={styles.logoContainer}>
                 <AppLogo size={40} showText={false} variant="white" />
                 <View style={styles.logoTextContainer}>
                   <Text style={styles.appTitle}>{BRAND.name}</Text>
                   <Text style={styles.appSubtitle}>{t('app.slogan')}</Text>
                 </View>
-              </TouchableOpacity>
+              </View>
 
               {/* 우측 헤더 컨트롤 */}
               <View style={styles.headerControls}>
