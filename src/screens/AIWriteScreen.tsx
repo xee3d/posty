@@ -1964,7 +1964,15 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     >
                       {isGenerating
                         ? (() => {
-                            const messages = t('aiWrite.buttons.generatingMessages', { returnObjects: true }) as string[];
+                            const messages = [
+                              t("aiWrite.buttons.generatingMessages.0", "포스티가 글을 작성중이에요..."),
+                              t("aiWrite.buttons.generatingMessages.1", "문장을 수정중이에요..."),
+                              t("aiWrite.buttons.generatingMessages.2", "글을 다듬고 있어요..."),
+                              t("aiWrite.buttons.generatingMessages.3", "오타를 수정중이에요..."),
+                              t("aiWrite.buttons.generatingMessages.4", "어조를 조절하고 있어요..."),
+                              t("aiWrite.buttons.generatingMessages.5", "해시태그를 추가하고 있어요..."),
+                              t("aiWrite.buttons.generatingMessages.6", "마지막 점검중이에요..."),
+                            ];
                             return messages[loadingMessageIndex] || t("aiWrite.buttons.generating");
                           })()
                         : writeMode === "photo" && isAnalyzingImage
