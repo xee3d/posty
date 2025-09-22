@@ -1346,13 +1346,13 @@ const createStyles = (colors: any, cardTheme: any) => {
       color: colors.white,
     },
     section: {
-      backgroundColor: isDark ? colors.surface : '#FAFAFA',
+      backgroundColor: colors.surface,
       marginBottom: SPACING.md,
       paddingVertical: SPACING.md,
       borderRadius: 16,
       marginHorizontal: SPACING.md,
-      borderWidth: isDark ? 0 : 1.5,
-      borderColor: isDark ? 'transparent' : '#E5E7EB',
+      borderWidth: 1,
+      borderColor: colors.border,
     },
     profileSection: {
       marginHorizontal: SPACING.md,
@@ -1366,11 +1366,11 @@ const createStyles = (colors: any, cardTheme: any) => {
       marginBottom: SPACING.md,
     },
     profileCard: {
-      backgroundColor: isDark ? colors.surface : '#FAFAFA',
+      backgroundColor: colors.surface,
       borderRadius: 16,
       padding: SPACING.lg,
-      borderWidth: isDark ? 0 : 1.5,
-      borderColor: isDark ? 'transparent' : '#E5E7EB',
+      borderWidth: 1,
+      borderColor: colors.border,
       ...cardTheme.default.shadow,
     },
     profileHeader: {
@@ -1474,7 +1474,7 @@ const createStyles = (colors: any, cardTheme: any) => {
       color: colors.primary,
     },
     tokenStatusContainer: {
-      backgroundColor: isDark ? colors.surface : colors.lightGray,
+      backgroundColor: colors.surface,
       borderRadius: 12,
       padding: SPACING.md,
       marginBottom: SPACING.md,
@@ -1504,9 +1504,7 @@ const createStyles = (colors: any, cardTheme: any) => {
     },
     tokenProgressBar: {
       height: 6,
-      backgroundColor: isDark 
-        ? colors.surface + "80" 
-        : colors.border + "40",
+      backgroundColor: colors.border + "60",
       borderRadius: 3,
       overflow: "hidden",
     },
@@ -1525,7 +1523,7 @@ const createStyles = (colors: any, cardTheme: any) => {
       alignItems: "center",
       paddingVertical: SPACING.md,
       paddingHorizontal: SPACING.md,
-      backgroundColor: isDark ? colors.surface : colors.lightGray,
+      backgroundColor: colors.surface,
       borderRadius: 12,
       marginTop: SPACING.md,
       borderWidth: 1,
@@ -1553,9 +1551,7 @@ const createStyles = (colors: any, cardTheme: any) => {
     upgradePrompt: {
       flexDirection: "row",
       alignItems: "center",
-      backgroundColor: isDark 
-        ? colors.primary + "15"
-        : colors.primary + "08",
+      backgroundColor: colors.primary + "15",
       borderRadius: 12,
       padding: SPACING.md,
       marginTop: SPACING.sm,
@@ -1618,7 +1614,7 @@ const createStyles = (colors: any, cardTheme: any) => {
       backgroundColor: colors.primary,
     },
     connectedButton: {
-      backgroundColor: isDark ? colors.surface : colors.lightGray,
+      backgroundColor: colors.surface,
       borderWidth: 1,
       borderColor: colors.border,
     },
@@ -1669,7 +1665,7 @@ const createStyles = (colors: any, cardTheme: any) => {
       height: 24,
       borderRadius: 12,
       borderWidth: 2,
-      borderColor: isDark ? colors.border : colors.border + "60",
+      borderColor: colors.border,
       shadowColor: colors.primary,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.3,
@@ -1760,7 +1756,7 @@ const createStyles = (colors: any, cardTheme: any) => {
       paddingVertical: 14,
       paddingHorizontal: 24,
       borderRadius: 12,
-      backgroundColor: isDark ? colors.error + "20" : colors.error + "10",
+      backgroundColor: colors.error + "15",
       minWidth: 150,
       alignSelf: "center",
     },
@@ -1810,9 +1806,7 @@ const createStyles = (colors: any, cardTheme: any) => {
     profileGuide: {
       marginTop: SPACING.sm,
       padding: SPACING.sm,
-      backgroundColor: isDark 
-        ? colors.surface + "CC"
-        : colors.primary + "08",
+      backgroundColor: colors.primary + "10",
       borderRadius: 12,
       borderLeftWidth: 3,
       borderLeftColor: colors.primary,
