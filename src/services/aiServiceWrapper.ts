@@ -20,6 +20,7 @@ import { enhancedAI } from "./ai/enhancedAIService";
 import { SUBSCRIPTION_PLANS } from "../utils/adConfig";
 import { imageAnalysisCache } from "../utils/imageAnalysisCache";
 import i18next from "../locales/i18n";
+import aiAgentService from "./aiAgentService";
 
 class AIServiceWrapper {
   // 사용자 구독 플랜 가져오기
@@ -58,10 +59,17 @@ class AIServiceWrapper {
   ): Promise<GeneratedContent> {
     console.log("AIServiceWrapper: Generating content with params:", params);
 
+    // 사용자가 선택한 AI 에이전트 가져오기
+    const selectedModel = await aiAgentService.getCurrentModelName();
+    console.log("🔧 [AIServiceWrapper] Using AI model:", selectedModel);
+
     // 로컬 모드 사용 여부 확인
     if (!API_CONFIG.USE_SERVER) {
       console.log("Using local AI service");
-      return localAIService.generateContent(params);
+      return localAIService.generateContent({
+        ...params,
+        model: selectedModel,
+      });
     }
 
     try {
@@ -132,16 +140,16 @@ class AIServiceWrapper {
       const aiModel = this.getModelByPlan(userPlan, params.length);
       console.log("Using AI model:", aiModel, "for plan:", userPlan);
 
-      // 플랫폼별로 개별 API 호출하여 각기 다른 콘텐츠 생성
-      const platforms = ["instagram", "facebook", "twitter"];
-      const platformContents: Record<string, string> = {};
+      // 플랫폼별 콘텐츠 생성 여부 확인
+      if (params.generatePlatformVersions) {
+        console.log("Generating platform-specific content via multiple API calls...");
+        
+        // 플랫폼별로 개별 API 호출하여 각기 다른 콘텐츠 생성
+        const platforms = ["instagram", "facebook", "twitter"];
+        const platformContents: Record<string, string> = {};
 
-      console.log(
-        "Generating platform-specific content via multiple API calls..."
-      );
-
-      // 각 플랫폼별로 최적화된 프롬프트와 함께 개별 호출
-      for (const platformId of platforms) {
+        // 각 플랫폼별로 최적화된 프롬프트와 함께 개별 호출
+        for (const platformId of platforms) {
         try {
           let platformPrompt = finalPrompt;
 
@@ -164,7 +172,7 @@ class AIServiceWrapper {
             tone: params.tone || "casual",
             platform: platformId,
             length: params.length,
-            model: aiModel,
+            model: selectedModel, // 사용자가 선택한 AI 모델 사용
             includeEmojis: params.includeEmojis,
             generatePlatformVersions: false, // 개별 호출이므로 false
           });
@@ -185,42 +193,75 @@ class AIServiceWrapper {
         }
       }
 
-      // 첫 번째 성공한 플랫폼을 메인 콘텐츠로 사용
-      const response = {
-        content:
-          platformContents.instagram ||
-          platformContents.facebook ||
-          platformContents.twitter ||
-          finalPrompt,
-        platforms: platformContents,
-      };
+        // 플랫폼별 콘텐츠가 생성된 경우
+        const response = {
+          content:
+            platformContents.instagram ||
+            platformContents.facebook ||
+            platformContents.twitter ||
+            finalPrompt,
+          platforms: platformContents,
+        };
 
-      console.log("AIServiceWrapper received response:", response);
+        console.log("AIServiceWrapper received response:", response);
 
-      // 플랫폼별 콘텐츠 검증
-      const validation = validateContentForPlatform(
-        response.content,
-        platform as any
-      );
-      if (!validation.valid) {
-        console.warn("Content validation warning:", validation.message);
+        // 플랫폼별 콘텐츠 검증
+        const validation = validateContentForPlatform(
+          response.content,
+          platform as any
+        );
+        if (!validation.valid) {
+          console.warn("Content validation warning:", validation.message);
+        }
+
+        // 해시태그 추출 (서버에서 안 하면 클라이언트에서)
+        const hashtags = params.hashtags || extractHashtags(response.content);
+
+        return {
+          content: response.content,
+          hashtags,
+          platform: params.platform || "instagram",
+          platforms: response.platforms,
+          estimatedEngagement: 0,
+          metadata: {
+            tokensUsed: 0,
+            generationTime: 0,
+            strategy: "posty-server",
+          },
+        };
+      } else {
+        // 단일 콘텐츠 생성
+        console.log("Generating single content via server API...");
+        
+        const result = await serverAIService.generateContent({
+          prompt: finalPrompt,
+          tone: params.tone,
+          length: params.length,
+          platform: platform,
+          userProfile: userProfile,
+          includeEmojis: params.includeEmojis,
+          generatePlatformVersions: false,
+          model: selectedModel,
+        });
+
+        console.log("AIServiceWrapper received single response:", result);
+
+        // 해시태그 추출
+        const hashtags = params.hashtags || extractHashtags(result.content);
+
+        return {
+          content: result.content,
+          hashtags,
+          platform: params.platform || "instagram",
+          platforms: result.platforms || null,
+          estimatedEngagement: 0,
+          metadata: {
+            tokensUsed: 0,
+            generationTime: 0,
+            strategy: "posty-server",
+          },
+        };
       }
-
-      // 해시태그 추출 (서버에서 안 하면 클라이언트에서)
-      const hashtags = params.hashtags || extractHashtags(response.content);
-
-      return {
-        content: response.content,
-        hashtags,
-        platform: params.platform || "instagram",
-        platforms: response.platforms,
-        estimatedEngagement: 0,
-        metadata: {
-          tokensUsed: 0,
-          generationTime: 0,
-          strategy: "posty-server",
-        },
-      };
     } catch (error) {
       console.error("AIServiceWrapper generation error:", error);
       throw error;
