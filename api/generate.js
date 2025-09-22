@@ -403,14 +403,15 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
     // AI 모델에 따른 API 호출 분기
     let response;
     
-    console.log("🔍 Model routing check:", {
+    console.log("🚨 NEW CODE EXECUTING - Model routing check:", {
       apiModel,
       startsWithGemini: apiModel.startsWith('gemini'),
       equalsGeminiFlash: apiModel === 'gemini-2.5-flash',
       willUseGemini: apiModel.startsWith('gemini') || apiModel === 'gemini-2.5-flash'
     });
     
-    if (apiModel.startsWith('gemini') || apiModel === 'gemini-2.5-flash') {
+    // 강제로 Gemini API 사용하도록 수정
+    if (apiModel.startsWith('gemini') || apiModel === 'gemini-2.5-flash' || apiModel.includes('gemini')) {
       // Gemini API 호출
       console.log("Calling Gemini API with model:", apiModel);
       console.log("Gemini API Key exists:", !!process.env.GEMINI_API_KEY);
