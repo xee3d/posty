@@ -416,9 +416,9 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
       exactMatch: apiModel === 'gemini-2.5-flash-lite'
     });
 
-    // 🚨 CRITICAL: 강제 Gemini 라우팅 (디버깅용)
-    const isGeminiModel = (apiModel === 'gemini-2.5-flash-lite') ||
-                         (apiModel === 'gemini-1.5-flash') ||
+    // 🚨 CRITICAL: 강제 Gemini 라우팅 (안정적인 모델 사용)
+    const isGeminiModel = (apiModel === 'gemini-1.5-flash') ||
+                         (apiModel === 'gemini-2.5-flash-lite') ||
                          apiModel.startsWith('gemini') ||
                          apiModel.includes('gemini');
 
@@ -444,8 +444,8 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
 
       console.log("✅ Gemini API Key found:", geminiApiKey.substring(0, 10) + "...");
 
-      // Cheez 프로젝트와 동일한 모델명 사용
-      const geminiModel = "gemini-2.5-flash-lite";
+      // 요청된 Gemini 모델 사용 (Cheez에서 정상 동작 확인됨)
+      const geminiModel = apiModel;
 
       // 이미지가 있는 경우 Gemini Vision API 처리
       let geminiContents;
