@@ -35,10 +35,15 @@ function checkRateLimit(clientId) {
 }
 
 export default async function handler(req, res) {
-  // 환경 변수 체크 (디버깅용)
-  console.log("Environment check:", {
+  // 🚨 강화된 환경 변수 체크 (디버깅용)
+  console.log("🔍 DETAILED Environment check:", {
     hasOpenAI: !!process.env.OPENAI_API_KEY,
     hasAppSecret: !!process.env.APP_SECRET,
+    hasGoogleApiKey: !!process.env.GOOGLE_API_KEY,
+    hasGeminiApiKey: !!process.env.GEMINI_API_KEY,
+    googleKeyLength: process.env.GOOGLE_API_KEY?.length || 0,
+    geminiKeyLength: process.env.GEMINI_API_KEY?.length || 0,
+    googleKeyPreview: process.env.GOOGLE_API_KEY?.substring(0, 10) || 'NOT_SET',
     nodeEnv: process.env.NODE_ENV,
   });
 
