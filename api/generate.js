@@ -433,6 +433,7 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
       }
 
       console.log("Using Gemini API Key:", geminiApiKey.substring(0, 10) + "...");
+      console.log("Gemini API URL:", `https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${geminiApiKey.substring(0, 10)}...`);
 
       response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${apiModel}:generateContent?key=${geminiApiKey}`, {
         method: "POST",
@@ -490,9 +491,12 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
       });
     }
 
+    console.log("API Response status:", response.status);
+    console.log("API Response headers:", Object.fromEntries(response.headers.entries()));
+    
     if (!response.ok) {
       const errorData = await response.json();
-      console.error("OpenAI API Error:", errorData);
+      console.error("API Error:", errorData);
 
       // Vision 모델이 실패하면 다른 모델 시도
       if (image && errorData.error) {
