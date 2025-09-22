@@ -640,6 +640,7 @@ const createStyles = (colors: any, isDark: boolean) =>
       paddingVertical: 15,
       borderBottomWidth: 1,
       borderBottomColor: colors.border,
+      backgroundColor: colors.surface,
     },
     handleBar: {
       width: 40,
@@ -681,7 +682,7 @@ const createStyles = (colors: any, isDark: boolean) =>
     progressFill: {
       height: "100%",
       borderRadius: 6,
-      shadowColor: "#4F46E5",
+      shadowColor: colors.primary,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.3,
       shadowRadius: 4,
