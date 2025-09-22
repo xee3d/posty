@@ -56,6 +56,7 @@ export interface GenerateContentParams {
   userProfile?: UserProfile;
   includeEmojis?: boolean;
   generatePlatformVersions?: boolean;
+  model?: string; // AI 모델 선택 (gpt-mini, gemini-flash-lite)
   options?: {
     timeOfDay?: string;
     includeImage?: boolean;
