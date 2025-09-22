@@ -670,11 +670,16 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
         {/* 빠른 생성 - 사용자 레벨에 따라 다르게 표시 */}
         <FadeInView delay={175}>
           <View style={styles.quickActions}>
-            <Text style={styles.sectionTitle}>
-              {userLevel === "new"
-                ? t("home.sections.newUserQuestion")
-                : t("home.sections.regularUserQuestion")}
-            </Text>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleContainer}>
+                <SafeIcon name="create-outline" size={18} color={colors.primary} />
+                <Text style={styles.sectionTitle}>
+                  {userLevel === "new"
+                    ? t("home.sections.newUserQuestion")
+                    : t("home.sections.regularUserQuestion")}
+                </Text>
+              </View>
+            </View>
 
             {/* 신규 사용자를 위한 간단한 템플릿 */}
             {userLevel === "new" && (
@@ -884,6 +889,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
               horizontal
               showsHorizontalScrollIndicator={false}
               style={styles.recommendScroll}
+              contentContainerStyle={styles.recommendScrollContent}
             >
               {isLoading ? (
                 // 로딩 중일 때 스켈레톤 표시
@@ -893,7 +899,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                       key={`skeleton-${index}`}
                       style={[
                         styles.recommendCard,
-                        index > 0 && { marginLeft: SPACING.sm },
+                        index === 0 ? { marginLeft: SPACING.lg } : { marginLeft: SPACING.sm },
                       ]}
                     >
                       <View style={styles.recommendCardContent}>
@@ -927,7 +933,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     delay={700 + index * 50}
                     style={[
                       styles.recommendCard,
-                      index > 0 && { marginLeft: SPACING.sm },
+                      index === 0 ? { marginLeft: SPACING.lg } : { marginLeft: SPACING.sm },
                     ] as any}
                   >
                     <TouchableOpacity
@@ -1066,7 +1072,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                   <SafeIcon
                     name="document-text"
                     size={18}
-                    color={colors.text.primary}
+                    color={colors.primary}
                   />
                   <Text style={styles.sectionTitle}>{t("home.sections.myPosts")}</Text>
                 </View>
@@ -1496,7 +1502,6 @@ const createStyles = (
       justifyContent: "space-between",
       alignItems: "center",
       marginBottom: SPACING.md - 4, // 원래보다 살짝만 줄임 (16px에서 12px)
-      paddingHorizontal: SPACING.lg,
     },
     refreshText: {
       fontSize: 14,
@@ -1524,7 +1529,6 @@ const createStyles = (
       color: theme?.colors.text.primary || colors.text.primary,
       marginLeft: SPACING.xs,
       letterSpacing: -0.3,
-      marginBottom: 12,
     },
     coachingCard: {
       backgroundColor: cardTheme.posty.background,
@@ -1558,11 +1562,15 @@ const createStyles = (
     },
     // 추천 섹션
     todaySection: {
+      paddingHorizontal: SPACING.lg,
       marginTop: SPACING.lg,
     },
     recommendScroll: {
-      paddingLeft: SPACING.lg,
+      paddingLeft: 0,
       paddingBottom: SPACING.xs,
+    },
+    recommendScrollContent: {
+      paddingRight: SPACING.lg,
     },
     recommendCard: {
       backgroundColor: isDark ? '#1F1F1F' : '#FAFAFA', // 라이트 모드 배경 개선
