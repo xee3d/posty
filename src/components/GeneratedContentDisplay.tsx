@@ -213,7 +213,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
       setActivePlatform(platformId as any);
 
       if (platformId !== "original") {
-        setOptimizationTip("📱 API에서 생성된 플랫폼 최적화 콘텐츠입니다");
+        setOptimizationTip("");
       } else {
         setOptimizationTip("");
       }
