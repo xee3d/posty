@@ -2090,12 +2090,13 @@ const createStyles = (
   colors: typeof COLORS,
   cardTheme: typeof CARD_THEME,
   isDark: boolean
-) =>
-  StyleSheet.create({
-    // 공통 스타일
-    horizontalPadding: {
-      paddingHorizontal: SPACING.lg,
-    },
+) => {
+  // 공통 스타일 정의
+  const horizontalPadding = {
+    paddingHorizontal: SPACING.lg,
+  };
+
+  return StyleSheet.create({
     container: {
       flex: 1,
       backgroundColor: colors.background,
@@ -2151,7 +2152,7 @@ const createStyles = (
       lineHeight: 22,
     },
     modeSelectorWrapper: {
-      ...styles.horizontalPadding,
+      ...horizontalPadding,
       marginBottom: SPACING.xl,
     },
     modeSelector: {
@@ -2391,7 +2392,7 @@ const createStyles = (
       fontStyle: "italic",
     },
     optionSection: {
-      ...styles.horizontalPadding,
+      ...horizontalPadding,
       marginBottom: 0,
     },
     toneSection: {
@@ -2498,7 +2499,7 @@ const createStyles = (
     },
     generateButton: {
       backgroundColor: colors.primary,
-      ...styles.horizontalPadding,
+      ...horizontalPadding,
       paddingVertical: 18,
       borderRadius: 24,
       flexDirection: "row",
@@ -2527,7 +2528,7 @@ const createStyles = (
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
-      ...styles.horizontalPadding,
+      ...horizontalPadding,
       marginBottom: SPACING.sm,
     },
     resultTitle: {
@@ -2536,7 +2537,7 @@ const createStyles = (
       color: colors.text.primary,
     },
     postyComment: {
-      ...styles.horizontalPadding,
+      ...horizontalPadding,
       marginBottom: SPACING.md,
       backgroundColor: isDark
         ? colors.primary + "20"
@@ -2551,7 +2552,7 @@ const createStyles = (
     },
     // 광고 배너 스타일
     adBannerContainer: {
-      ...styles.horizontalPadding,
+      ...horizontalPadding,
       paddingVertical: SPACING.md,
     },
     adBanner: {
@@ -2564,10 +2565,10 @@ const createStyles = (
       height: SPACING.xxl,
     },
     generateButtonContainer: {
-      ...styles.horizontalPadding,
+      ...horizontalPadding,
     },
     styleGuideBanner: {
-      ...styles.horizontalPadding,
+      ...horizontalPadding,
       marginBottom: SPACING.md,
       backgroundColor: isDark
         ? colors.primary + "20"
