@@ -1743,7 +1743,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           {/* 톤 선택 - 문장 정리 모드에서는 숨김 */}
           {writeMode !== "polish" && (
             <SlideInView direction="up" delay={600}>
-              <View style={styles.optionSection}>
+              <View style={[styles.optionSection, styles.toneSection]}>
                 <Text style={styles.sectionTitle}>{t("aiWrite.sections.selectTone")}</Text>
                 <View style={styles.toneGrid}>
                   {tones.map((tone, index) => (
@@ -2389,6 +2389,9 @@ const createStyles = (
     optionSection: {
       paddingHorizontal: SPACING.lg,
       marginBottom: 4,
+    },
+    toneSection: {
+      marginBottom: 8,
     },
     toneGrid: {
       flexDirection: "row",
