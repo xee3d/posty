@@ -755,16 +755,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 {/* 문장 정리하기 - 신규 사용자 외 모든 레벨 */}
                 {userLevel !== "beginner" && (
                   <ScaleButton
-                    style={styles.mainActionCard}
+                    style={styles.primaryWriteCard}
                     onPress={() => handleQuickAction(t("aiWrite.modes.polish"))}
                   >
                     <View style={styles.mainActionRow}>
-                      <View
-                        style={[
-                          styles.mainActionIcon,
-                          { backgroundColor: "#9C27B0" },
-                        ]}
-                      >
+                      <View style={styles.mainActionIcon}>
                         <SafeIcon
                           name="color-wand"
                           size={24}
@@ -784,18 +779,13 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 )}
 
                 <ScaleButton
-                  style={styles.mainActionCard}
+                  style={styles.primaryWriteCard}
                   onPress={() =>
                     handleQuickAction(t("home.quickActions.analyzePhoto"))
                   }
                 >
                   <View style={styles.mainActionRow}>
-                    <View
-                      style={[
-                        styles.mainActionIcon,
-                        { backgroundColor: "#E91E63" },
-                      ]}
-                    >
+                    <View style={styles.mainActionIcon}>
                       <SafeIcon name="image" size={24} color={colors.white} />
                     </View>
                     <View style={styles.mainActionTextContainer}>
@@ -880,7 +870,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           <View style={styles.todaySection}>
             <View style={styles.sectionHeader}>
               <View style={styles.sectionTitleContainer}>
-                <SafeIcon name="target" size={18} color={colors.success} />
+                <SafeIcon name="target" size={18} color={colors.primary} />
                 <Text style={styles.sectionTitle}>{t("home.sections.todayRecommendation")}</Text>
               </View>
             </View>
