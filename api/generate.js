@@ -505,8 +505,10 @@ IMPORTANT: Do NOT include any content not directly related to the photo (such as
     console.log("API Response headers:", Object.fromEntries(response.headers.entries()));
     
     if (!response.ok) {
-      const errorData = await response.json();
-      console.error("API Error:", errorData);
+      const errorText = await response.text();
+      console.error("API Error Response:", errorText);
+      console.error("API Error Status:", response.status);
+      console.error("API Error URL:", response.url);
 
       // Vision 모델이 실패하면 다른 모델 시도
       if (image && errorData.error) {
