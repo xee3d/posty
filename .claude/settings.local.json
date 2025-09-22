@@ -86,7 +86,9 @@
       "Bash(do if ! grep -q \"$key\" /Users/ethan_macstudio/Projects/posty/src/locales/zh-CN.ts)",
       "Bash(lsof:*)",
       "Bash(vercel ls:*)",
-      "Read(//Users/ethan_macstudio/Projects/Cheez/src/services/**)"
+      "Read(//Users/ethan_macstudio/Projects/Cheez/src/services/**)",
+      "Bash(vercel logs:*)",
+      "Read(//Users/ethan_macstudio/Projects/Cheez/**)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

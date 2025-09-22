@@ -22,7 +22,7 @@ class AIAgentService {
   private async loadAIAgent(): Promise<void> {
     try {
       const savedAgent = await AsyncStorage.getItem(AI_AGENT_STORAGE_KEY);
-      if (savedAgent && (savedAgent === "gpt-mini" || savedAgent === "gemini-flash-lite")) {
+      if (savedAgent && savedAgent === "gpt-mini") {
         this.currentAgent = savedAgent as AIAgent;
       }
     } catch (error) {
@@ -48,17 +48,10 @@ class AIAgentService {
     }
   }
 
-      // AI 에이전트를 서버 모델명으로 변환
-      public getModelName(agent: AIAgent): string {
-        switch (agent) {
-          case "gpt-mini":
-            return "gpt-4o-mini";
-          case "gemini-flash-lite":
-            return "gemini-2.5-flash-lite"; // Cheez 프로젝트와 동일한 모델명
-          default:
-            return "gpt-4o-mini";
-        }
-      }
+  // AI 에이전트를 서버 모델명으로 변환
+  public getModelName(agent: AIAgent): string {
+    return "gpt-4o-mini";
+  }
 
   // 현재 에이전트의 모델명 가져오기
   public async getCurrentModelName(): Promise<string> {

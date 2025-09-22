@@ -17,7 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AI_AGENT_STORAGE_KEY = "@ai_agent_preference";
 
-export type AIAgent = "gpt-mini" | "gemini-flash-lite";
+export type AIAgent = "gpt-mini";
 
 interface AIAgentConfig {
   id: AIAgent;
@@ -53,16 +53,6 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
       badge: "GPT",
       isAvailable: true,
     },
-        {
-          id: "gemini-flash-lite",
-          name: "Gemini 2.5 Flash Lite",
-          nativeName: "Gemini 2.5 Flash Lite",
-          description: "짧은 지연 시간에 최적화된 Google AI 모델",
-          icon: "star",
-          color: "#4285F4",
-          badge: "GEM",
-          isAvailable: true, // 항상 사용 가능하도록 설정
-        },
   ];
 
   useEffect(() => {
@@ -72,15 +62,14 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
   const initializeAgentSettings = async () => {
     try {
       const savedAgent = await AsyncStorage.getItem(AI_AGENT_STORAGE_KEY);
-      const current = (savedAgent === "gemini-flash-lite" || savedAgent === "gpt-mini") 
+      const current = (savedAgent === "gpt-mini") 
         ? (savedAgent as AIAgent) 
         : 'gpt-mini';
       
       setCurrentAgent(current);
       
-      // Gemini API 가용성 확인
-      const updatedConfigs = await checkAgentAvailability();
-      setAvailableAgents(updatedConfigs);
+      // AI 에이전트 설정
+      setAvailableAgents(aiAgentConfigs);
     } catch (error) {
       console.error('Failed to initialize AI agent settings:', error);
       // 오류 시 기본 설정 사용
@@ -88,14 +77,6 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
     }
   };
 
-      const checkAgentAvailability = async (): Promise<AIAgentConfig[]> => {
-        // Gemini를 항상 사용 가능하도록 설정
-        // API 키는 서버에서 처리되므로 클라이언트에서는 항상 선택 가능
-        return aiAgentConfigs.map(config => ({
-          ...config,
-          isAvailable: true, // 모든 에이전트 사용 가능
-        }));
-      };
 
   const handleAgentChange = async (agent: AIAgent) => {
     try {
