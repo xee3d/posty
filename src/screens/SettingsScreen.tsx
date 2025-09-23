@@ -121,6 +121,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const [showNewUserWelcome, setShowNewUserWelcome] = useState(false);
   const [showProfileDetailModal, setShowProfileDetailModal] = useState(false);
   const [showThemeDialog, setShowThemeDialog] = useState(false);
+  const [themeChangeKey, setThemeChangeKey] = useState(0);
+
+  // 테마 변경 감지
+  useEffect(() => {
+    setThemeChangeKey(prev => prev + 1);
+  }, [themeMode, isDark]);
 
   // 프로필 완성도 관련
   const profileCompleteness =
@@ -861,7 +867,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   ];
 
   const planBadge = getSubscriptionBadge();
-  const styles = useMemo(() => createStyles(colors, cardTheme), [colors, cardTheme]);
+  const styles = useMemo(() => createStyles(colors, cardTheme, isDark), [colors, cardTheme, isDark]);
   const headerStyles = createHeaderStyles(colors);
 
 
@@ -910,7 +916,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView key={`settings-loading-${themeMode}-${isDark}-${themeChangeKey}`} style={styles.container}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -919,7 +925,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView key={`settings-${themeMode}-${isDark}-${themeChangeKey}`} style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* 헤더 */}
         <View style={headerStyles.headerSection}>
@@ -1308,15 +1314,16 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
         visible={showThemeDialog}
         onClose={() => {
           setShowThemeDialog(false);
-          // 테마 변경 후 강제 리렌더링
+          // 테마 변경 후 강제 리렌더링을 위해 상태 업데이트
+          setLoading(true);
+          setTimeout(() => setLoading(false), 100);
         }}
       />
     </SafeAreaView>
   );
 };
 
-const createStyles = (colors: any, cardTheme: any) => {
-  const isDark = colors.isDark;
+const createStyles = (colors: any, cardTheme: any, isDark: boolean) => {
 
   return StyleSheet.create({
     container: {

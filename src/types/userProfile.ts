@@ -84,7 +84,21 @@ export const getToneByProfile = (
 
 // 관심사 추천 목록
 export const INTEREST_SUGGESTIONS = () => {
-  return i18next.t("userProfile.interests", { returnObjects: true }) as string[];
+  // 하드코딩된 관심사 목록 사용 (다국어 지원)
+  const interests = [
+    "여행", "맛집", "카페", "요리", "베이킹", "운동", "헬스", "요가", "러닝", "등산",
+    "육아", "교육", "독서", "영화", "드라마", "음악", "콘서트", "전시회", "사진", "그림",
+    "패션", "뷰티", "인테리어", "가드닝", "반려동물", "게임", "IT", "주식", "부동산", "자기계발"
+  ];
+  
+  // 현재 언어에 따라 번역된 관심사 반환
+  try {
+    const translatedInterests = i18next.t("userProfile.interests", { returnObjects: true }) as string[];
+    return translatedInterests && translatedInterests.length > 0 ? translatedInterests : interests;
+  } catch (error) {
+    console.warn("Failed to load translated interests, using default:", error);
+    return interests;
+  }
 };
 
 // 프로필 완성 가이드 메시지

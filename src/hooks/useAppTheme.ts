@@ -61,25 +61,25 @@ export const useAppTheme = () => {
   const cardTheme = useMemo(
     () => ({
       posty: {
-        background: isDark ? newColors.surface : colors.accentLight,
-        iconBackground: colors.primary,
-        iconColor: colors.white,
-        titleColor: colors.text.primary,
-        textColor: colors.text.secondary,
+        background: isDark ? newColors.surface : newColors.accentLight,
+        iconBackground: newColors.primary,
+        iconColor: newColors.white,
+        titleColor: newColors.textPrimary,
+        textColor: newColors.textSecondary,
         button: {
-          background: colors.primary,
-          text: colors.white,
+          background: newColors.primary,
+          text: newColors.white,
         },
       },
       default: {
-        background: colors.surface,
-        titleColor: colors.text.primary,
-        textColor: colors.text.secondary,
-        borderColor: colors.border,
+        background: newColors.surface,
+        titleColor: newColors.textPrimary,
+        textColor: newColors.textSecondary,
+        borderColor: newColors.border,
         shadow: unifiedShadows.small,
       },
     }),
-    [isDark, newColors.surface, colors]
+    [isDark, newColors, unifiedShadows.small]
   );
 
   return {

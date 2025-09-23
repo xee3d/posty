@@ -694,12 +694,12 @@ const createStyles = (colors: any, isDark: boolean) =>
       marginTop: 10,
       padding: 14,
       backgroundColor: isDark 
-        ? colors.info + "20" 
-        : colors.info + "10", // 다크모드에서 더 진한 배경
+        ? colors.primary + "20" 
+        : colors.primary + "10", // 다크모드에서 더 진한 배경
       borderRadius: 10,
       borderLeftWidth: 4,
-      borderLeftColor: colors.info,
-      shadowColor: colors.info,
+      borderLeftColor: colors.primary,
+      shadowColor: colors.primary,
       shadowOffset: { width: 0, height: 1 },
       shadowOpacity: 0.1,
       shadowRadius: 2,
@@ -709,7 +709,7 @@ const createStyles = (colors: any, isDark: boolean) =>
       width: 24,
       height: 24,
       borderRadius: 12,
-      backgroundColor: colors.info + "20",
+      backgroundColor: colors.primary + "20",
       alignItems: "center",
       justifyContent: "center",
       marginRight: 10,
@@ -718,7 +718,7 @@ const createStyles = (colors: any, isDark: boolean) =>
     guideMessage: {
       flex: 1,
       fontSize: 13,
-      color: isDark ? colors.info + "E6" : colors.info, // 다크모드에서 살짝 투명도
+      color: isDark ? colors.primary + "E6" : colors.primary, // 다크모드에서 살짝 투명도
       lineHeight: 18,
       fontWeight: "500",
     },
@@ -780,18 +780,24 @@ const createStyles = (colors: any, isDark: boolean) =>
       paddingHorizontal: 14,
       paddingVertical: 8,
       borderRadius: 16,
-      backgroundColor: colors.border,
+      backgroundColor: isDark ? colors.surface : "#F5F5F5",
+      borderWidth: 1,
+      borderColor: isDark ? colors.border : "#E0E0E0",
+      marginBottom: 8,
+      marginRight: 8,
     },
     interestChipActive: {
-      backgroundColor: colors.accentLight || colors.primary + "20",
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
     },
     interestChipText: {
       fontSize: 13,
-      color: colors.text.secondary,
+      color: isDark ? colors.text.secondary : "#666666",
+      fontWeight: "500",
     },
     interestChipTextActive: {
-      color: colors.primary,
-      fontWeight: "500",
+      color: colors.white,
+      fontWeight: "600",
     },
     textInput: {
       marginTop: 12,
