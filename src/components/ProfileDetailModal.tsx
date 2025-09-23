@@ -87,7 +87,11 @@ const ProfileDetailModal: React.FC<ProfileDetailModalProps> = ({
     };
 
     console.log("🔄 Real-time profile update:", updatedProfile);
-    dispatch(updateDetailedProfile(updatedProfile));
+
+    // 상태 업데이트를 비동기로 처리하여 렌더링 중 업데이트 방지
+    setTimeout(() => {
+      dispatch(updateDetailedProfile(updatedProfile));
+    }, 0);
   };
 
   // 프로필 저장

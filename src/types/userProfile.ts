@@ -69,17 +69,23 @@ export const getToneByProfile = (
 
   // 가족 역할별 조정
   const familyRoles = i18next.t("userProfile.tones.familyRoles", { returnObjects: true }) as Record<string, string>;
-  
+
   if (profile.parentType === "mother" && context === "baby_photo") {
-    return familyRoles.mother;
+    return familyRoles?.mother || "따뜻하고 사랑스러운";
   } else if (profile.parentType === "father" && context === "baby_photo") {
-    return familyRoles.father;
+    return familyRoles?.father || "자상하고 든든한";
   } else if (profile.familyRole === "grandparent" && context === "baby_photo") {
-    return familyRoles.grandparent;
+    return familyRoles?.grandparent || "다정하고 지혜로운";
   }
 
   const ageGroup = profile.ageGroup || "30s";
-  return toneMap[ageGroup]?.[context || "default"] || toneMap["30s"].default;
+  const defaultTone = "친근하고 공감 가는";
+
+  if (!toneMap || typeof toneMap !== 'object') {
+    return defaultTone;
+  }
+
+  return toneMap[ageGroup]?.[context || "default"] || toneMap["30s"]?.default || defaultTone;
 };
 
 // 관심사 추천 목록
