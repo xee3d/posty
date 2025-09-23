@@ -1139,12 +1139,6 @@ const ko = {
       tips: "팁 알림",
       send: "테스트 알림 보내기"
     },
-    notifications: {
-      dailyShare: {
-        title: "🌅 오늘 하루는 어땠나요?",
-        body: "Posty가 오늘의 소중한 순간을 멋진 글로 만들어드릴게요!"
-      }
-    }
   },
 
   // Profile Detail Modal
@@ -2140,6 +2134,14 @@ const ko = {
       name: "명언",
       description: "시처럼 아름답고 깊이 있는 철학적 통찰"
     }
+  },
+
+  // Notification Center
+  notificationCenter: {
+    title: "알림 센터",
+    clearAll: "모두 지우기",
+    noNotifications: "새로운 알림이 없습니다",
+    noNotificationsSubtext: "포스티가 새로운 소식을 전해드릴게요!"
   }
 };
 

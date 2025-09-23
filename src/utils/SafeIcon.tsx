@@ -413,6 +413,10 @@ const ICON_MAPPING: Record<
   weekend: { type: "ionicons", name: "bed-outline" },
   hotel: { type: "ionicons", name: "bed-outline" },
   "local-cafe": { type: "ionicons", name: "cafe-outline" },
+  "restaurant-outline": { type: "ionicons", name: "restaurant-outline" },
+  "moon-outline": { type: "ionicons", name: "moon-outline" },
+  "cafe-outline": { type: "ionicons", name: "cafe-outline" },
+  "sunset-outline": { type: "ionicons", name: "sunset-outline" },
   "notifications-outline": { type: "ionicons", name: "notifications-outline" },
   "trophy-outline": { type: "ionicons", name: "trophy-outline" },
   "bulb-outline": { type: "ionicons", name: "bulb-outline" },
@@ -669,6 +673,9 @@ export const SafeIcon: React.FC<SafeIconProps> = ({
     }
     if (iconName.includes("cafe") || iconName.includes("coffee")) {
       return "cafe-outline";
+    }
+    if (iconName.includes("restaurant") || iconName.includes("food") || iconName.includes("lunch")) {
+      return "restaurant-outline";
     }
     if (
       iconName.includes("psychology") ||

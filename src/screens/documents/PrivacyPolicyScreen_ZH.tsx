@@ -1,10 +1,9 @@
 import React from 'react';
-import { ScrollView, Text, StyleSheet, SafeAreaView, View, TouchableOpacity, ActivityIndicator, RefreshControl } from 'react-native';
+import { ScrollView, Text, StyleSheet, SafeAreaView, View, TouchableOpacity } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { SafeIcon } from '../../utils/SafeIcon';
 import { COLORS, SPACING, FONT_SIZES } from '../../utils/constants';
 import { useAppTheme } from '../../hooks/useAppTheme';
-import { useNotionDocument } from '../../hooks/useNotionDocument';
 
 interface PrivacyPolicyScreenZHProps {
   onBack: () => void;
@@ -18,42 +17,157 @@ const PrivacyPolicyScreen_ZH: React.FC<PrivacyPolicyScreenZHProps> = ({
   const { colors } = useAppTheme();
   const { t } = useTranslation();
   const styles = createStyles(colors);
-  
-  const { document, loading, error, refresh, isNotionEnabled } = useNotionDocument('privacy-zh');
 
   const lastUpdated = "2024年1月1日";
 
-  const renderNotionContent = () => {
-    if (loading) {
-      return (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>{t('documents.loadingDocument')}</Text>
-        </View>
-      );
-    }
+  const staticContent = `# 隐私政策
 
-    if (error || !document) {
-      return (
-        <View style={styles.errorContainer}>
-          <SafeIcon name="warning" size={48} color={colors.text.tertiary} />
-          <Text style={styles.errorText}>
-            {error || t('documents.documentLoadError')}
-          </Text>
-          <TouchableOpacity onPress={refresh} style={styles.retryButton}>
-            <Text style={styles.retryText}>{t('documents.retry')}</Text>
-          </TouchableOpacity>
-        </View>
-      );
-    }
+生效日期：2024年1月1日
 
-    const content = document.content.split('\n\n').map((paragraph, index) => {
+公司名称：Tinrobot Studio
+
+Tinrobot Studio（以下简称"公司"）非常重视您的个人信息，并遵守《个人信息保护法》、《信息通信网利用促进及信息保护等相关法律》等相关法律法规。
+
+通过本隐私政策，我们向您说明您提供的个人信息如何被使用，以及为保护个人信息采取了哪些措施。
+
+## 1. 收集的个人信息项目
+
+公司为提供服务收集以下个人信息：
+
+### 必要收集项目
+
+• **注册时：** 姓名、电子邮件地址
+
+• **SNS账户关联时：** SNS账户信息、访问令牌
+
+• **服务使用时：** 生成的内容、使用记录
+
+### 自动收集项目
+
+• **设备信息：** 设备型号、操作系统版本、应用版本
+
+• **日志信息：** 服务使用记录、访问时间
+
+• **通过Cookie及类似技术获得的信息**
+
+## 2. 个人信息的收集和使用目的
+
+公司将收集的个人信息用于以下目的：
+
+• **会员管理：** 会员服务使用时的身份验证、个人识别
+
+• **服务提供：** AI内容生成、SNS账户关联、趋势分析
+
+• **服务改进：** 新服务开发、用户体验改进
+
+• **营销和广告：** 活动信息提供、定制化服务提供
+
+• **履行法律义务：** 履行相关法律规定的义务
+
+## 3. 个人信息的保留和使用期限
+
+• 公司在用户使用服务期间保留和使用个人信息。
+
+• 会员退出时立即销毁。但是，根据相关法律需要保存的情况下，将在相应期间内保管。
+
+### 根据相关法律的保存期限
+
+• **关于合同或撤销订阅等的记录：** 5年
+
+• **关于支付和商品等供应的记录：** 5年
+
+• **关于消费者投诉或纠纷处理的记录：** 3年
+
+• **关于展示·广告的记录：** 6个月
+
+## 4. 向第三方提供个人信息
+
+• 公司原则上不向第三方提供用户的个人信息。
+
+• 但是，以下情况除外：
+
+• 用户事先同意的情况
+
+• 法律规定的情况
+
+• 调查机关要求的情况
+
+### 广告服务提供商
+
+• **Google AdMob：** 为提供个性化广告，我们与Google AdMob共享个人信息。用户可以随时拒绝广告个性化，数据根据Google的隐私政策（https://policies.google.com/privacy）进行处理。
+
+## 5. 个人信息的销毁
+
+公司在个人信息保留期限届满、处理目的达成等个人信息变得不必要时，将立即销毁该个人信息。
+
+### 销毁程序
+
+用户输入的信息在达成目的后移至单独的数据库，根据内部政策及其他相关法律保存一定期间后销毁。
+
+### 销毁方法
+
+• **电子文件形式：** 使用无法再现记录的技术方法
+
+• **纸质文件：** 用碎纸机粉碎或焚烧
+
+## 6. 用户的权利和行使方法
+
+用户可以随时行使以下权利：
+
+• **要求查阅个人信息**
+
+• **如有错误等情况要求更正**
+
+• **要求删除**
+
+• **要求停止处理**
+
+可以通过应用内设置菜单或电子邮件（getposty@gmail.com）行使权利。
+
+## 7. 个人信息安全措施
+
+公司为保护个人信息采取以下措施：
+
+• **个人信息加密：** 密码等重要信息加密存储
+
+• **防范黑客攻击的技术对策：** 安装安全程序并定期更新
+
+• **限制个人信息访问：** 限制为最少人员
+
+• **对个人信息处理者的培训：** 定期进行培训
+
+## 8. 儿童个人信息保护
+
+公司不收集未满14岁儿童的个人信息。如果发现收集了未满14岁儿童的个人信息，将立即删除该信息。
+
+## 9. 个人信息保护负责人
+
+公司指定个人信息保护负责人，全面负责个人信息处理相关业务，处理用户投诉和损害救济等事宜：
+
+• **个人信息保护负责人：** [姓名]
+
+• **职位：** [职位]
+
+• **联系方式：** privacy@getposty.ai
+
+## 10. 隐私政策变更
+
+本隐私政策自生效日起适用，如有根据法律法规和政策的变更内容的增加、删除和修改，将在变更事项生效前7天通过公告通知。
+
+• --
+
+联系方式：getposty@gmail.com
+
+个人信息咨询：getposty@gmail.com`;
+
+  const renderStaticContent = () => {
+    const content = staticContent.split('\n\n').map((paragraph, index) => {
       if (paragraph.startsWith('#')) {
         const level = paragraph.match(/^#+/)?.[0].length || 1;
         const text = paragraph.replace(/^#+\s*/, '');
         return (
-          <Text 
-            key={index} 
+          <Text
+            key={index}
             style={level === 1 ? styles.sectionTitle : styles.subTitle}
           >
             {text}
@@ -78,35 +192,6 @@ const PrivacyPolicyScreen_ZH: React.FC<PrivacyPolicyScreenZHProps> = ({
     return content;
   };
 
-  const renderFallbackContent = () => (
-    <>
-      <Text style={styles.sectionTitle}>1. 我们收集的信息</Text>
-      <Text style={styles.paragraph}>
-        我们收集您直接向我们提供的信息，例如当您创建账户、使用我们的服务或联系我们寻求支持时。
-      </Text>
-      
-      <Text style={styles.sectionTitle}>2. 我们如何使用您的信息</Text>
-      <Text style={styles.paragraph}>
-        我们使用收集的信息来提供、维护和改进我们的服务、处理交易，以及与您沟通。
-      </Text>
-      
-      <Text style={styles.sectionTitle}>3. 信息共享</Text>
-      <Text style={styles.paragraph}>
-        除本隐私政策中所述情况外，未经您的同意，我们不会向第三方出售、交易或以其他方式转移您的个人信息。
-      </Text>
-      
-      <Text style={styles.sectionTitle}>4. 数据安全</Text>
-      <Text style={styles.paragraph}>
-        我们实施适当的安全措施来保护您的个人信息免受未经授权的访问、修改、泄露或破坏。
-      </Text>
-      
-      <Text style={styles.sectionTitle}>5. 联系我们</Text>
-      <Text style={styles.paragraph}>
-        如果您对此隐私政策有任何疑问，请通过 support@posty.app 联系我们。
-      </Text>
-    </>
-  );
-
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -114,48 +199,28 @@ const PrivacyPolicyScreen_ZH: React.FC<PrivacyPolicyScreenZHProps> = ({
           <SafeIcon name="arrow-back" size={24} color={colors.text.primary} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>
-          {document?.title || '隐私政策'}
+          {t('documents.privacyPolicy')}
         </Text>
-        <View style={styles.headerRight}>
-          {isNotionEnabled && (
-            <TouchableOpacity onPress={refresh} style={styles.refreshButton}>
-              <SafeIcon name="refresh" size={20} color={colors.text.secondary} />
-            </TouchableOpacity>
-          )}
-        </View>
+        <View style={styles.headerRight} />
       </View>
 
       <ScrollView
         style={styles.content}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.contentContainer}
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={refresh}
-            colors={[colors.primary]}
-          />
-        }
       >
         <Text style={styles.lastUpdated}>
-          最后更新: {document ? new Date(document.lastUpdated).toLocaleDateString('zh-CN') : lastUpdated}
+          {t('documents.lastUpdated')}: {lastUpdated}
         </Text>
 
-        {isNotionEnabled && document ? (
-          <View style={styles.notionBadge}>
-            <SafeIcon name="cloud" size={16} color={colors.primary} />
-            <Text style={styles.notionBadgeText}>从 Notion 同步</Text>
-          </View>
-        ) : null}
-
-        {isNotionEnabled && document ? renderNotionContent() : renderFallbackContent()}
+        {renderStaticContent()}
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            本隐私政策从{document ? new Date(document.lastUpdated).toLocaleDateString('zh-CN') : lastUpdated}开始生效。
+            本隐私政策自{lastUpdated}起生效。
           </Text>
           <Text style={styles.footerText}>
-            隐私相关问题: getposty@gmail.com
+            个人信息咨询：getposty@gmail.com
           </Text>
         </View>
 
@@ -195,9 +260,6 @@ const createStyles = (colors: typeof COLORS) =>
       width: 40,
       alignItems: 'flex-end',
     },
-    refreshButton: {
-      padding: SPACING.sm,
-    },
     content: {
       flex: 1,
     },
@@ -210,55 +272,6 @@ const createStyles = (colors: typeof COLORS) =>
       color: colors.text.tertiary,
       marginBottom: SPACING.xl,
       textAlign: "center",
-    },
-    notionBadge: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      alignSelf: 'center',
-      backgroundColor: colors.primary + '20',
-      paddingHorizontal: SPACING.md,
-      paddingVertical: SPACING.xs,
-      borderRadius: 16,
-      marginBottom: SPACING.lg,
-    },
-    notionBadgeText: {
-      fontSize: FONT_SIZES.small,
-      color: colors.primary,
-      marginLeft: SPACING.xs,
-    },
-    loadingContainer: {
-      alignItems: 'center',
-      paddingVertical: SPACING.xl,
-    },
-    loadingText: {
-      fontSize: FONT_SIZES.medium,
-      color: colors.text.secondary,
-      marginTop: SPACING.md,
-    },
-    errorContainer: {
-      alignItems: 'center',
-      paddingVertical: SPACING.xl,
-    },
-    errorText: {
-      fontSize: FONT_SIZES.medium,
-      color: colors.text.secondary,
-      textAlign: 'center',
-      marginVertical: SPACING.md,
-    },
-    retryButton: {
-      backgroundColor: colors.primary,
-      paddingHorizontal: SPACING.lg,
-      paddingVertical: SPACING.sm,
-      borderRadius: 8,
-      marginTop: SPACING.sm,
-    },
-    retryText: {
-      color: colors.text.inverse,
-      fontSize: FONT_SIZES.medium,
-      fontWeight: '600',
-    },
-    section: {
-      marginBottom: SPACING.xl,
     },
     sectionTitle: {
       fontSize: 16,

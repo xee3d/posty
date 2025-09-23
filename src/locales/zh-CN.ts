@@ -872,7 +872,13 @@ const zhCN = {
     updateFrequency: {
       realtime: "实时",
       daily: "每日更新"
-    }
+    },
+    profileCompletion: "个人资料完成度 {{completeness}}%",
+    interests: "兴趣爱好（可多选）",
+    formality: "正式程度",
+    emotiveness: "情感表达",
+    humor: "幽默感",
+    saveProfile: "保存个人资料"
   },
   
   // 代币相关
@@ -2453,7 +2459,7 @@ const zhCN = {
     }
   },
 
-  // 分析
+  // 분석
   analytics: {
     title: "分析",
     overview: "概览",
@@ -2468,6 +2474,14 @@ const zhCN = {
       title: "🌅 今天过得怎么样？",
       body: "Posty将帮助您把今天的珍贵时刻变成美丽的帖子！"
     }
+  },
+
+  // Notification Center
+  notificationCenter: {
+    title: "通知中心",
+    clearAll: "清除全部",
+    noNotifications: "没有新通知",
+    noNotificationsSubtext: "Posty将为您带来新消息！"
   }
 };
 

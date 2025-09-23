@@ -848,7 +848,13 @@ const ja = {
     updateFrequency: {
       realtime: "リアルタイム",
       daily: "毎日更新"
-    }
+    },
+    profileCompletion: "プロフィール完成度 {{completeness}}%",
+    interests: "興味・関心（複数選択可能）",
+    formality: "フォーマル度",
+    emotiveness: "感情表現",
+    humor: "ユーモア",
+    saveProfile: "プロフィール保存"
   },
   
   // トークン関連
@@ -1634,30 +1640,6 @@ const ja = {
       action: "カフェ写真",
       meta: "雰囲気よく"
     },
-    // 日常記録
-    dailyMoment: {
-      title: "今この瞬間を記録してみてください",
-      content: "特別である必要はありません\n日常の小さな瞬間が最も大切です",
-      badge: "📝 日常記録",
-      action: "記録する",
-      meta: "いつでも"
-    },
-    // 簡単な考え
-    simple: {
-      title: "今日浮かんだ考えを一つだけ",
-      content: "複雑に考える必要はありません\n浮かんだ考えを一つだけ書いてみてください",
-      badge: "💭 簡単な考え",
-      action: "考えを書く",
-      meta: "簡単に"
-    },
-    // 感謝の気持ち
-    gratitude: {
-      title: "今日感謝していることはありますか？",
-      content: "小さなことでも大丈夫です\n感謝の気持ちを表現してみてください",
-      badge: "🙏 感謝の気持ち",
-      action: "感謝を表現",
-      meta: "心穏やか"
-    }
   },
 
   // 時間帯別ハッシュタグ
@@ -2215,6 +2197,14 @@ const ja = {
     growth: "成長",
     insights: "インサイト"
   },
+
+  // Notification Center
+  notificationCenter: {
+    title: "通知センター",
+    clearAll: "すべて削除",
+    noNotifications: "新しい通知はありません",
+    noNotificationsSubtext: "Postyが新しいニュースをお届けします！"
+  }
 };
 
 export default ja;

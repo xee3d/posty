@@ -18,6 +18,7 @@ import { SafeIcon } from "../utils/SafeIcon";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { badgeService } from "../services/notification/badgeService";
 import { COLORS, SPACING, FONTS } from "../utils/constants";
+import { useTranslation } from "react-i18next";
 
 interface NotificationBadgeProps {
   size?: "small" | "medium" | "large";
@@ -31,6 +32,7 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
   onPress,
 }) => {
   const { colors, isDark } = useAppTheme();
+  const { t } = useTranslation();
   const [badgeCount, setBadgeCount] = useState(0);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showModal, setShowModal] = useState(false);
@@ -178,14 +180,14 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
       >
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>알림 센터</Text>
+            <Text style={styles.modalTitle}>{t("notificationCenter.title")}</Text>
             <View style={styles.modalHeaderButtons}>
               {notifications.length > 0 && (
                 <TouchableOpacity
                   style={styles.clearButton}
                   onPress={clearAllNotifications}
                 >
-                  <Text style={styles.clearButtonText}>모두 지우기</Text>
+                  <Text style={styles.clearButtonText}>{t("notificationCenter.clearAll")}</Text>
                 </TouchableOpacity>
               )}
               <TouchableOpacity
@@ -205,9 +207,9 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
                   size={48}
                   color={colors.text.tertiary}
                 />
-                <Text style={styles.emptyText}>새로운 알림이 없습니다</Text>
+                <Text style={styles.emptyText}>{t("notificationCenter.noNotifications")}</Text>
                 <Text style={styles.emptySubtext}>
-                  포스티가 새로운 소식을 전해드릴게요!
+                  {t("notificationCenter.noNotificationsSubtext")}
                 </Text>
               </View>
             ) : (

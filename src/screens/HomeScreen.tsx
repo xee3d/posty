@@ -163,21 +163,21 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
     // 시간대별 인사
     if (hour < 6) {
       return {
-        emoji: "🌙",
+        icon: "moon-outline",
         title: t("home.greetings.dawn.title", { userName }),
         message: t("home.greetings.dawn.message"),
         action: t("home.greetings.dawn.action"),
       };
     } else if (hour < 10) {
       return {
-        emoji: "☕",
+        icon: "cafe-outline",
         title: t("home.greetings.morning.title", { userName }),
         message: t("home.greetings.morning.message"),
         action: t("home.greetings.morning.action"),
       };
     } else if (hour < 14) {
       return {
-        emoji: "🍴",
+        icon: "restaurant-outline",
         title: t("home.greetings.lunch.title", { userName }),
         message: t("home.greetings.lunch.message"),
         action: t("home.greetings.lunch.action"),
@@ -185,7 +185,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       };
     } else if (hour < 18) {
       return {
-        emoji: "🚀",
+        icon: "rocket-outline",
         title: t("home.greetings.afternoon.title", { userName }),
         message:
           level === "regular"
@@ -195,7 +195,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       };
     } else if (hour < 22) {
       return {
-        emoji: "🌃",
+        icon: "sunset-outline",
         title: t("home.greetings.evening.title", { userName }),
         message: t("home.greetings.evening.message"),
         action: t("home.greetings.evening.action"),
@@ -203,7 +203,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       };
     } else {
       return {
-        emoji: "🌜",
+        icon: "moon-outline",
         title: t("home.greetings.night.title", { userName }),
         message: t("home.greetings.night.message"),
         action: t("home.greetings.night.action"),
@@ -616,9 +616,18 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
         <FadeInView delay={50} duration={200}>
           <View style={styles.postyBanner}>
             <View style={styles.postyAvatar}>
-              <Text style={styles.postyAvatarText}>
-                {getPersonalizedGreeting().emoji}
-              </Text>
+              {(() => {
+                const greeting = getPersonalizedGreeting();
+                console.log("Greeting icon:", greeting.icon);
+                return (
+                  <SafeIcon 
+                    name={greeting.icon || "sparkles-outline"} 
+                    size={24} 
+                    color={colors.white} 
+                    onError={(error) => console.log("SafeIcon error:", error)}
+                  />
+                );
+              })()}
             </View>
             <View style={styles.postyBannerContent}>
               <Text style={styles.postyBannerTitle}>
