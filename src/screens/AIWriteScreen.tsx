@@ -1144,7 +1144,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     writeMode === "text" && styles.modeButtonActive,
                   ] as any}
                   onPress={() => {
-                    soundManager.haptic("light"); // 모드 전환 햄틱
+                    // 햅틱 제거 - 불필요한 동작
                     if (writeMode !== "text") {
                       resetAllStates();
                     }
@@ -1175,7 +1175,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     writeMode === "polish" && styles.modeButtonActive,
                   ] as any}
                   onPress={() => {
-                    soundManager.haptic("light"); // 모드 전환 햄틱
+                    // 햅틱 제거 - 불필요한 동작
                     if (writeMode !== "polish") {
                       resetAllStates();
                     }
@@ -1206,7 +1206,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     writeMode === "photo" && styles.modeButtonActive,
                   ] as any}
                   onPress={() => {
-                    soundManager.haptic("light"); // 모드 전환 햄틱
+                    // 햅틱 제거 - 불필요한 동작
                     if (writeMode !== "photo") {
                       resetAllStates();
                     }

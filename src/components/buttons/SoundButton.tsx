@@ -35,7 +35,7 @@ interface SoundButtonProps extends TouchableOpacityProps {
  */
 export const SoundButton: React.FC<SoundButtonProps> = ({
   soundType = "tap",
-  hapticType = "light",
+  hapticType = "none",
   onPress,
   children,
   style,
