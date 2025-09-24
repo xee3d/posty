@@ -4,7 +4,7 @@ import { Platform } from "react-native";
 import logger from "../../utils/logger";
 
 // 소셜 로그인 라이브러리들
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 import NaverLogin from "@react-native-seoul/naver-login";
 import * as KakaoLogin from "@react-native-seoul/kakao-login";
 // Apple and Facebook login disabled for release
@@ -190,29 +190,19 @@ class VercelAuthService {
         isNewUser: false,
         token: localToken,
       };
-    } catch (error) {
+    } catch (error: any) {
       logger.error("Google Sign-In 실패:", error);
 
-      // 에러 발생 시 기본값으로 fallback
-      const fallbackUser = {
-        uid: `google_fallback_${Date.now()}`,
-        email: "google_user@gmail.com",
-        displayName: "Google User (로그인 오류)",
-        photoURL: null,
-        provider: "google",
-      };
+      // 사용자 취소는 조용히 처리
+      if (error.code === statusCodes.SIGN_IN_CANCELLED ||
+          error.message?.includes("SIGN_IN_CANCELLED") ||
+          error.message?.includes("cancel")) {
+        console.log("ℹ️ 구글 로그인 취소됨 (사용자 액션)");
+        throw new Error("USER_CANCELLED");
+      }
 
-      const fallbackToken = `local_google_fallback_${Date.now()}`;
-      await AsyncStorage.multiSet([
-        ["@auth_token", fallbackToken],
-        ["@user_profile", JSON.stringify(fallbackUser)],
-      ]);
-
-      return {
-        user: fallbackUser,
-        isNewUser: false,
-        token: fallbackToken,
-      };
+      // 다른 에러는 그대로 전달
+      throw error;
     }
   }
 
@@ -230,19 +220,14 @@ class VercelAuthService {
         await this.initializeNaverLogin();
       }
 
-      // 로그인 실행 (타임아웃 설정 - 메모리 누수 방지)
+      // 로그인 실행 (3초 타임아웃으로 무한 대기 방지)
       console.log("🚀 네이버 로그인 시작...");
-      let timeoutId: NodeJS.Timeout;
-      const loginPromise = NaverLogin.login();
-      const timeoutPromise = new Promise((_, reject) => {
-        timeoutId = setTimeout(
-          () => reject(new Error("네이버 로그인 타임아웃 (60초)")),
-          60000
-        );
-      });
-
-      const result = await Promise.race([loginPromise, timeoutPromise]);
-      clearTimeout(timeoutId); // 타임아웃 정리
+      const result = await Promise.race([
+        NaverLogin.login(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("USER_CANCELLED")), 3000)
+        )
+      ]);
 
       console.log("🔍 Naver 로그인 결과:", JSON.stringify(result, null, 2));
       console.log("🔍 result.isSuccess:", (result as any).isSuccess);
@@ -359,8 +344,21 @@ class VercelAuthService {
       console.log("📱 현재 앱 Bundle ID: com.posty");
       console.log("🔑 카카오 앱 키:", KAKAO_APP_KEY);
 
-      // 카카오톡 앱이 설치되어 있으면 앱으로, 없으면 웹으로 로그인
-      const result = await KakaoLogin.login();
+      // 기존 토큰 확인 (재로그인 시 화면 전환 방지)
+      let result;
+      try {
+        const token = await KakaoLogin.getAccessToken();
+        if (token) {
+          console.log("✅ 기존 카카오 토큰 사용 (화면 전환 없음)");
+          result = { accessToken: token };
+        } else {
+          // 토큰 없으면 로그인
+          result = await KakaoLogin.login();
+        }
+      } catch (tokenError) {
+        // 토큰 확인 실패 시 새로 로그인
+        result = await KakaoLogin.login();
+      }
 
       console.log(
         "🔍 Kakao 로그인 전체 응답:",
@@ -409,8 +407,17 @@ class VercelAuthService {
         isNewUser: false,
         token: localToken,
       };
-    } catch (error) {
+    } catch (error: any) {
       console.error("Kakao Sign-In 실패:", error);
+
+      // 사용자 취소는 조용히 처리
+      if (error.code === "E_CANCELLED" ||
+          error.message?.includes("cancel") ||
+          error.message?.includes("CANCELLED")) {
+        console.log("ℹ️ 카카오 로그인 취소됨 (사용자 액션)");
+        throw new Error("USER_CANCELLED");
+      }
+
       throw error;
     }
   }
@@ -504,18 +511,8 @@ class VercelAuthService {
         console.log("Google Sign-In 캐시 클리어 실패 (무시됨):", googleError);
       }
 
-      // Facebook 로그아웃
-      try {
-        const { LoginManager } = require('react-native-fbsdk-next');
-        if (LoginManager) {
-          LoginManager.logOut();
-          console.log("Facebook 로그아웃 완료");
-        } else {
-          console.log("Facebook SDK 사용 불가 - 로그아웃 건너뛰기");
-        }
-      } catch (fbError) {
-        console.log("Facebook 로그아웃 실패 (무시됨):", fbError);
-      }
+      // Facebook 로그아웃 - SDK 제거됨, 건너뛰기
+      console.log("Facebook SDK 제거됨 - 로그아웃 건너뛰기");
 
       // 로컬 스토리지 정리 (배치 삭제로 우선순위 역전 방지)
       await AsyncStorage.multiRemove(["@auth_token", "@user_profile"]);

@@ -53,7 +53,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>35</string>
+	<string>41</string>
 	<key>FacebookAppID</key>
 	<string>757255383655974</string>
 	<key>FacebookClientToken</key>
@@ -64,6 +64,8 @@
 	<string>ca-app-pub-4039842933564424~3895363964</string>
 	<key>GIDClientID</key>
 	<string>457030848293-dvk9uki8m2mc30f9qk1jsg262uf916kh.apps.googleusercontent.com</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>KAKAO_APP_KEY</key>
 	<string>566cba5c08009852b6b5f1a31c3b28d8</string>
 	<key>KAKAO_APP_SCHEME</key>
