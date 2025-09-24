@@ -72,9 +72,9 @@ class SoundManager {
 
     try {
       const duration = {
-        light: 10,
-        medium: 20,
-        heavy: 30,
+        light: 5,
+        medium: 10,
+        heavy: 15,
       };
 
       Vibration.vibrate(duration[type]);
