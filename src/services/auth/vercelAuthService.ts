@@ -344,21 +344,13 @@ class VercelAuthService {
       console.log("📱 현재 앱 Bundle ID: com.posty");
       console.log("🔑 카카오 앱 키:", KAKAO_APP_KEY);
 
-      // 기존 토큰 확인 (재로그인 시 화면 전환 방지)
-      let result;
-      try {
-        const token = await KakaoLogin.getAccessToken();
-        if (token) {
-          console.log("✅ 기존 카카오 토큰 사용 (화면 전환 없음)");
-          result = { accessToken: token };
-        } else {
-          // 토큰 없으면 로그인
-          result = await KakaoLogin.login();
-        }
-      } catch (tokenError) {
-        // 토큰 확인 실패 시 새로 로그인
-        result = await KakaoLogin.login();
-      }
+      // 카카오 로그인 (10초 타임아웃으로 무한 대기 방지)
+      const result = await Promise.race([
+        KakaoLogin.login(),
+        new Promise((_, reject) =>
+          setTimeout(() => reject(new Error("USER_CANCELLED")), 10000)
+        )
+      ]);
 
       console.log(
         "🔍 Kakao 로그인 전체 응답:",
