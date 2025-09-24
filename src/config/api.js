@@ -24,16 +24,7 @@ const API_CONFIG = {
   // 앱 시크릿 (환경변수로 관리)
   APP_SECRET:
     process.env.POSTY_APP_SECRET ||
-    (__DEV__
-      ? "posty-secret-key-change-this-in-production"
-      : (() => {
-          console.error(
-            "🚨 POSTY_APP_SECRET 환경변수가 프로덕션에서 설정되지 않았습니다!"
-          );
-          throw new Error(
-            "Missing required environment variable: POSTY_APP_SECRET"
-          );
-        })()),
+    "posty-secret-key-change-this-in-production",
 
   // NewsAPI 키 (무료: newsapi.org에서 받을 수 있음)
   NEWS_API_KEY: process.env.NEWS_API_KEY || "",

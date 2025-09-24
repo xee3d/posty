@@ -259,15 +259,19 @@ class VercelAuthService {
         console.log("  - 에러 메시지:", errorMsg);
         console.log("  - 전체 응답:", result);
 
+        // 사용자 취소는 조용히 처리 (에러 throw하지 않음)
+        if (errorCode === "user_cancel" || errorMsg.includes("cancel")) {
+          console.log("ℹ️ 네이버 로그인 취소됨 (사용자 액션)");
+          throw new Error("USER_CANCELLED"); // 특별한 에러 코드로 취소 표시
+        }
+
         logger.error(
           "Naver 로그인 실패: " + ((result as any).failureResponse || "Unknown error")
         );
 
         // 구체적인 에러 메시지 제공
         let detailedError = errorMsg;
-        if (errorCode === "user_cancel" || errorMsg.includes("cancel")) {
-          detailedError = "사용자가 로그인을 취소했습니다.";
-        } else if (
+        if (
           errorCode === "timeout" ||
           errorMsg.includes("timeout") ||
           errorMsg.includes("타임아웃")

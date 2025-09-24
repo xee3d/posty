@@ -155,6 +155,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
       } catch (error: any) {
         console.error(`${provider} 로그인 에러:`, error);
 
+        // 사용자 취소는 조용히 처리 (Alert 표시 안 함)
+        if (error.message === "USER_CANCELLED") {
+          console.log("ℹ️ 사용자가 로그인을 취소했습니다");
+          setIsLoading(false);
+          setLoadingProvider(null);
+          return;
+        }
+
         let errorMessage = t("login.errors.default");
 
         if (error.message && error.message.includes("Vercel SSO")) {
