@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   ScrollView,
   Animated,
+  Dimensions,
 } from "react-native";
 import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -48,6 +49,17 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   const [activePlatform, setActivePlatform] = useState<
     "original" | "instagram" | "facebook" | "twitter"
   >("original");
+  
+  // 화면 크기 감지
+  const [screenWidth, setScreenWidth] = useState(Dimensions.get('window').width);
+  
+  useEffect(() => {
+    const subscription = Dimensions.addEventListener('change', ({ window }) => {
+      setScreenWidth(window.width);
+    });
+    
+    return () => subscription?.remove();
+  }, []);
   const [copiedPlatform, setCopiedPlatform] = useState<string | null>(null);
   const [platformContents, setPlatformContents] = useState<
     Record<string, { content: string; hashtags: string[] }>
@@ -57,6 +69,62 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   const [regenerateCount, setRegenerateCount] = useState<
     Record<string, number>
   >({});
+
+  // 화면 크기에 따른 플랫폼 이름 조정
+  const getPlatformsForScreenSize = () => {
+    const basePlatforms = [
+      {
+        id: "original",
+        name: "원본",
+        icon: "document-text-outline",
+        color: colors.primary,
+      },
+      {
+        id: "instagram",
+        name: "Instagram",
+        icon: "logo-instagram",
+        color: "#E4405F",
+      },
+      {
+        id: "facebook",
+        name: "Facebook",
+        icon: "logo-facebook",
+        color: "#1877F2",
+      },
+      {
+        id: "twitter",
+        name: "X",
+        icon: "logo-twitter",
+        color: isDark ? "#FFFFFF" : "#000000",
+      },
+    ];
+
+    // 작은 화면 (iPhone mini, SE 등)에서는 플랫폼 이름을 축약
+    if (screenWidth < 375) {
+      return basePlatforms.map(platform => ({
+        ...platform,
+        name: platform.id === "original" ? "원본" : 
+              platform.id === "instagram" ? "IG" :
+              platform.id === "facebook" ? "FB" :
+              platform.id === "twitter" ? "X" : platform.name
+      }));
+    }
+
+    // 중간 화면에서는 일부만 축약
+    if (screenWidth < 414) {
+      return basePlatforms.map(platform => ({
+        ...platform,
+        name: platform.id === "instagram" ? "Instagram" :
+              platform.id === "facebook" ? "Facebook" :
+              platform.name
+      }));
+    }
+
+    // 큰 화면에서는 전체 이름 사용
+    return basePlatforms;
+  };
+
+  const platforms = getPlatformsForScreenSize();
   const [showPlatformHint, setShowPlatformHint] = useState(false);
   const hintOpacity = useRef(new Animated.Value(0)).current;
   const [contentHeight, setContentHeight] = useState<number>(300); // 동적 높이 상태
@@ -115,32 +183,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     }
   }, [originalContent]); // originalContent가 변경될 때마다 실행
 
-  const platforms = [
-    {
-      id: "original",
-      name: "원본",
-      icon: "document-text-outline",
-      color: colors.primary,
-    },
-    {
-      id: "instagram",
-      name: "Instagram",
-      icon: "logo-instagram",
-      color: "#E4405F",
-    },
-    {
-      id: "facebook",
-      name: "Facebook",
-      icon: "logo-facebook",
-      color: "#1877F2",
-    },
-    {
-      id: "twitter",
-      name: "X",
-      icon: "logo-twitter",
-      color: isDark ? "#FFFFFF" : "#000000",
-    },
-  ];
+  // 기존 하드코딩된 플랫폼 배열 제거 - 동적 플랫폼 사용
 
   // 플랫폼별 콘텐츠 생성
   useEffect(() => {
@@ -352,7 +395,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     }
   };
 
-  const styles = createStyles(colors, cardTheme, isDark);
+  const styles = createStyles(colors, cardTheme, isDark, screenWidth);
 
   return (
     <View style={styles.container}>
@@ -370,7 +413,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
           >
             <Icon
               name={platform.icon}
-              size={16}
+              size={screenWidth < 375 ? 12 : 14}
               color={
                 activePlatform === platform.id
                   ? platform.color
@@ -382,6 +425,8 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
                 styles.platformTabText,
                 activePlatform === platform.id && { color: platform.color },
               ]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
             >
               {platform.name}
             </Text>
@@ -687,7 +732,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   );
 };
 
-const createStyles = (colors: typeof COLORS, cardTheme: any, isDark: boolean) =>
+const createStyles = (colors: typeof COLORS, cardTheme: any, isDark: boolean, screenWidth: number) =>
   StyleSheet.create({
     container: {
       flex: 1,
@@ -695,22 +740,23 @@ const createStyles = (colors: typeof COLORS, cardTheme: any, isDark: boolean) =>
     platformTabs: {
       flexDirection: "row",
       justifyContent: "space-between",
-      paddingHorizontal: SPACING.md,
+      paddingHorizontal: screenWidth < 375 ? SPACING.xs : SPACING.sm,
       marginBottom: SPACING.sm,
-      gap: SPACING.xs,
+      gap: screenWidth < 375 ? 2 : 4,
     },
     platformTab: {
       flex: 1,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      paddingHorizontal: SPACING.xs,
-      paddingVertical: SPACING.sm,
-      borderRadius: 20,
+      paddingHorizontal: screenWidth < 375 ? 2 : 4,
+      paddingVertical: screenWidth < 375 ? SPACING.xs : SPACING.sm,
+      borderRadius: screenWidth < 375 ? 12 : 16,
       backgroundColor: colors.surface,
       borderWidth: 2,
       borderColor: "transparent",
-      minHeight: 40,
+      minHeight: screenWidth < 375 ? 32 : 36,
+      maxWidth: screenWidth < 375 ? 65 : 80,
     },
     platformTabActive: {
       backgroundColor: isDark ? colors.surface : "#fff",
@@ -721,11 +767,13 @@ const createStyles = (colors: typeof COLORS, cardTheme: any, isDark: boolean) =>
       elevation: 3,
     },
     platformTabText: {
-      fontSize: 11,
+      fontSize: screenWidth < 375 ? 8 : 9,
       fontFamily: "System",
       fontWeight: "600" as const,
       color: colors.text.secondary,
-      marginLeft: 4,
+      marginLeft: screenWidth < 375 ? 1 : 2,
+      textAlign: "center",
+      flexShrink: 1,
     },
     loader: {
       marginLeft: SPACING.xs,

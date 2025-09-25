@@ -171,6 +171,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   
   // ScrollView ref for auto-scroll to generated content
   const scrollViewRef = useRef<ScrollView>(null);
+  const generateButtonRef = useRef<View>(null);
   const [generatedPlatforms, setGeneratedPlatforms] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
@@ -209,10 +210,38 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     
     // 콘텐츠가 생성되고 로딩이 완료되면 자동으로 스크롤
     if (generatedContent && !isGenerating && scrollViewRef.current) {
+      // 생성 버튼이 상단에 보이도록 스크롤
       setTimeout(() => {
-        scrollViewRef.current?.scrollToEnd({ animated: true });
-        console.log("[AIWriteScreen] Auto-scrolled to generated content");
-      }, 300); // 애니메이션 완료를 위한 약간의 딜레이
+        if (scrollViewRef.current && generateButtonRef.current) {
+          generateButtonRef.current.measureLayout(
+            scrollViewRef.current as any,
+            (x, y) => {
+              // 생성 버튼이 화면 상단에서 약간 아래에 위치하도록 스크롤
+              const offsetY = Math.max(0, y - 100); // 100px 여유 공간
+              scrollViewRef.current?.scrollTo({
+                y: offsetY,
+                animated: true
+              });
+              console.log(`[AIWriteScreen] Auto-scrolled to show generate button at y: ${offsetY}`);
+            },
+            () => {
+              // measureLayout 실패 시 기본적으로 맨 위로 스크롤
+              scrollViewRef.current?.scrollTo({
+                y: 0,
+                animated: true
+              });
+              console.log("[AIWriteScreen] Fallback: Auto-scrolled to top");
+            }
+          );
+        } else {
+          // ref가 없는 경우 기본적으로 맨 위로 스크롤
+          scrollViewRef.current?.scrollTo({
+            y: 0,
+            animated: true
+          });
+          console.log("[AIWriteScreen] Default: Auto-scrolled to top");
+        }
+      }, 300);
     }
   }, [generatedContent, isGenerating]);
 
@@ -1919,7 +1948,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
 
           {/* 생성 버튼 */}
           <FadeInView delay={1200}>
-            <View style={styles.generateButtonContainer}>
+            <View style={styles.generateButtonContainer} ref={generateButtonRef}>
               <ScaleButton
                 style={[
                   styles.generateButton,
@@ -2489,9 +2518,10 @@ const createStyles = (
     },
     generateButton: {
       backgroundColor: colors.primary,
-      marginHorizontal: SPACING.md, // 좌우 마진 줄여서 길이 늘림
+      marginHorizontal: SPACING.sm, // 좌우 마진을 더 줄여서 길이 늘림
       marginTop: SPACING.lg,
-      paddingVertical: 18, // 높이 줄임
+      paddingVertical: 18,
+      paddingHorizontal: SPACING.lg, // 좌우 패딩 추가로 버튼 내부 공간 확보
       borderRadius: 24,
       flexDirection: "row",
       alignItems: "center",
@@ -2501,16 +2531,19 @@ const createStyles = (
       shadowOpacity: 0.25,
       shadowRadius: 12,
       elevation: 6,
+      minWidth: 280, // 최소 너비 설정으로 로딩 텍스트가 들어갈 공간 확보
     },
     generateButtonDisabled: {
       opacity: 0.6,
     },
     generateButtonText: {
-      fontSize: 17,
+      fontSize: 16, // 폰트 크기를 약간 줄여서 긴 텍스트도 잘 들어가도록
       fontWeight: "700",
       color: colors.white,
       marginLeft: 10,
       letterSpacing: -0.3,
+      textAlign: "center", // 텍스트 중앙 정렬
+      flexShrink: 1, // 공간이 부족할 때 축소 허용
     },
     resultSection: {
       marginTop: SPACING.xl,
@@ -2530,7 +2563,7 @@ const createStyles = (
       height: SPACING.xxl,
     },
     generateButtonContainer: {
-      ...horizontalPadding,
+      paddingHorizontal: SPACING.sm, // 컨테이너 패딩을 줄여서 버튼이 더 넓어지도록
     },
     styleGuideBanner: {
       ...horizontalPadding,
