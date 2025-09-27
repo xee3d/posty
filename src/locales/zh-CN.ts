@@ -387,6 +387,8 @@ const zhCN = {
         subtitle: "从相册选择或直接拍摄",
         button: "选择照片",
         change: "更改",
+        camera: "相机",
+        gallery: "相册",
       },
       defaultPrompt: "请写一篇与照片相配的自然社交媒体帖子。",
     },
