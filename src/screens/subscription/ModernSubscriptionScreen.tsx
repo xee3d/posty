@@ -592,41 +592,41 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         )}
 
         <View style={styles.planHeader}>
-          <View style={styles.planTitleRow}>
-            <MaterialIcon
-              name={planIcons[planKey]}
-              size={24}
-              color={isSelected ? planColor : colors.text.secondary}
-              style={{ marginRight: 8 }}
-            />
-            <Text
-            style={[
-            styles.planName,
-            { color: isSelected ? planColor : colors.text.primary },
-            ]}
-            >
-            {t(`subscription.plans.${planKey}.name`, { defaultValue: plan.name })}
+          <SafeIcon name={planIcons[planKey]} size={24} color={isSelected ? planColor : colors.text.secondary} />
+          <View style={styles.planInfo}>
+            <Text style={[styles.planName, { color: isSelected ? planColor : colors.text.primary }]}>
+              {t(`subscription.plans.${planKey}.name`, { defaultValue: plan.name })}
             </Text>
-            {isCurrent && (
-              <View style={styles.currentBadge}>
-                <Text style={styles.currentBadgeText}>{t("subscription.status.currentPlan")}</Text>
-              </View>
-            )}
+            <Text style={styles.planTagline}>
+              {planKey === "free" 
+                ? "시작하기 좋은 플랜" 
+                : planKey === "starter"
+                ? "기본 기능 제공"
+                : planKey === "premium"
+                ? "가장 인기 있는 선택"
+                : "전문가를 위한 플랜"}
+            </Text>
           </View>
-          {isSelected && (
-            <View
-              style={[styles.selectedCheckmark, { backgroundColor: planColor }]}
-            >
-              <SafeIcon name="checkmark" size={16} color="#FFFFFF" />
+          {isCurrent && (
+            <View style={styles.currentBadge}>
+              <Text style={styles.currentBadgeText}>{t("subscription.status.currentPlan")}</Text>
             </View>
           )}
         </View>
 
-        <View style={styles.priceContainer}>
-          <Text style={[styles.price, isSelected && { color: planColor }]}>
-            {plan.priceDisplay || plan.formattedPrice || t("subscription.plans.free.priceDisplay", { defaultValue: "Free" })}
-          </Text>
-          <Text style={styles.priceUnit}>{t("subscription.perMonth")}</Text>
+        <View style={styles.tokenSection}>
+          <View style={styles.tokenAmount}>
+            <Text style={[styles.tokenNumber, isSelected && { color: planColor }]}>
+              {planKey === "free" ? "10" : planKey === "pro" ? "무제한" : plan.tokens || 0}
+            </Text>
+            {planKey !== "pro" && <Text style={styles.tokenLabel}>토큰</Text>}
+          </View>
+          <View style={styles.priceContainer}>
+            <Text style={[styles.price, isSelected && { color: planColor }]}>
+              {plan.priceDisplay || plan.formattedPrice || t("subscription.plans.free.priceDisplay", { defaultValue: "Free" })}
+            </Text>
+            <Text style={styles.priceUnit}>{t("subscription.perMonth")}</Text>
+          </View>
         </View>
 
         <View
@@ -853,22 +853,6 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 </View>
               </View>
 
-              <View style={styles.benefitCard}>
-                <View
-                  style={[
-                    styles.benefitIcon,
-                    { backgroundColor: "#EC4899" + "20" },
-                  ]}
-                >
-                  <MaterialIcon name="auto-awesome" size={24} color="#EC4899" />
-                </View>
-                <View style={styles.benefitContent}>
-                  <Text style={styles.benefitTitle}>{t("subscription.benefits.advancedAI.title")}</Text>
-                  <Text style={styles.benefitDesc}>
-                    {t("subscription.benefits.advancedAI.description")}
-                  </Text>
-                </View>
-              </View>
 
               <View style={styles.benefitCard}>
                 <View
@@ -1389,7 +1373,7 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     planCard: {
       backgroundColor: colors.surface,
-      borderRadius: 16,
+      borderRadius: 24,
       padding: SPACING.large,
       marginBottom: SPACING.medium,
       borderWidth: 2,
@@ -1398,10 +1382,10 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     selectedPlanCard: {
       shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 12,
-      elevation: 5,
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.2,
+      shadowRadius: 16,
+      elevation: 8,
     },
     downgradePlanCard: {
       opacity: 0.6,
@@ -1422,14 +1406,17 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     planHeader: {
       flexDirection: "row",
-      justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: SPACING.small,
+      gap: 16,
+      marginBottom: 16,
     },
-    planTitleRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: SPACING.small,
+    planInfo: {
+      flex: 1,
+    },
+    planTagline: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginTop: 4,
     },
     planName: {
       fontSize: 20,
@@ -1453,10 +1440,31 @@ const createStyles = (colors: any, isDark: boolean) => {
       justifyContent: "center",
       alignItems: "center",
     },
+    tokenSection: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginBottom: 16,
+    },
+    tokenAmount: {
+      flexDirection: "row",
+      alignItems: "baseline",
+      gap: 8,
+    },
+    tokenNumber: {
+      fontSize: 36,
+      fontWeight: "800",
+      color: colors.text.primary,
+      letterSpacing: -0.5,
+    },
+    tokenLabel: {
+      fontSize: 18,
+      fontWeight: "500",
+      color: colors.text.secondary,
+    },
     priceContainer: {
       flexDirection: "row",
       alignItems: "baseline",
-      marginBottom: SPACING.medium,
     },
     price: {
       fontSize: 32,

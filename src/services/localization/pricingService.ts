@@ -28,15 +28,15 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'KRW',
     symbol: '₩',
     tokens: {
-      small: 1200,    // 50 토큰 - 1,200원 (20% 할인)
-      medium: 3200,   // 150 토큰 - 3,200원 (20% 할인)
-      large: 9500,    // 500 토큰 - 9,500원 (21% 할인)
-      extra: 18000,   // 1000 토큰 - 18,000원 (18% 할인)
+      small: 2500,    // 30 토큰 - 2,500원 (Starter 플랜과 동일)
+      medium: 4900,   // 100 토큰 - 4,900원 (Premium 플랜과 동일)
+      large: 9900,    // 300 토큰 - 9,900원 (대량 구매 할인)
+      extra: 19900,   // 1000 토큰 - 19,900원 (초대량 특별가)
     },
     subscription: {
-      starter: 7900,  // 스타터 - 7,900원/월 (20% 할인)
-      premium: 15900, // 프리미엄 - 15,900원/월 (20% 할인)
-      pro: 31900,     // 프로 - 31,900원/월 (20% 할인)
+      starter: 2500,  // 스타터 - 2,500원/월
+      premium: 4900,  // 프리미엄 - 4,900원/월
+      pro: 16900,     // 프로 - 16,900원/월
     },
     formatting: {
       position: 'after',
@@ -47,15 +47,15 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'USD',
     symbol: '$',
     tokens: {
-      small: 0.99,    // 50 토큰 - $0.99
-      medium: 2.99,   // 150 토큰 - $2.99
-      large: 7.99,    // 500 토큰 - $7.99
-      extra: 14.99,   // 1000 토큰 - $14.99
+      small: 1.99,    // 30 토큰 - $1.99 (Starter 플랜과 동일)
+      medium: 3.99,   // 100 토큰 - $3.99 (Premium 플랜과 동일)
+      large: 7.99,    // 300 토큰 - $7.99 (대량 구매 할인)
+      extra: 14.99,   // 1000 토큰 - $14.99 (초대량 특별가)
     },
     subscription: {
-      starter: 6.99,  // 스타터 - $6.99/month
-      premium: 12.99, // 프리미엄 - $12.99/month
-      pro: 24.99,     // 프로 - $24.99/month
+      starter: 1.99,  // 스타터 - $1.99/월
+      premium: 3.99,  // 프리미엄 - $3.99/월
+      pro: 12.99,     // 프로 - $12.99/월
     },
     formatting: {
       position: 'before',
@@ -66,15 +66,15 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'JPY',
     symbol: '¥',
     tokens: {
-      small: 180,     // 50 토큰 - ¥180 (20% 상향)
-      medium: 500,    // 150 토큰 - ¥500 (19% 상향)
-      large: 1400,    // 500 토큰 - ¥1,400 (17% 상향)
-      extra: 2600,    // 1000 토큰 - ¥2,600 (18% 상향)
+      small: 280,     // 30 토큰 - ¥280 (Starter 플랜과 동일)
+      medium: 580,    // 100 토큰 - ¥580 (Premium 플랜과 동일)
+      large: 1150,    // 300 토큰 - ¥1,150 (대량 구매 할인)
+      extra: 2300,    // 1000 토큰 - ¥2,300 (초대량 특별가)
     },
     subscription: {
-      starter: 1200,  // 스타터 - ¥1,200/月 (22% 상향)
-      premium: 2400,  // 프리미엄 - ¥2,400/月 (21% 상향)
-      pro: 4800,      // 프로 - ¥4,800/月 (21% 상향)
+      starter: 280,   // 스타터 - ¥280/월
+      premium: 580,   // 프리미엄 - ¥580/월
+      pro: 1850,      // 프로 - ¥1,850/월
     },
     formatting: {
       position: 'before',
@@ -85,15 +85,15 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'CNY',
     symbol: '¥',
     tokens: {
-      small: 6.9,     // 50 토큰 - ¥6.9
-      medium: 19.9,   // 150 토큰 - ¥19.9
-      large: 55.9,    // 500 토큰 - ¥55.9
-      extra: 99.9,    // 1000 토큰 - ¥99.9
+      small: 14.0,    // 30 토큰 - ¥14.0 (Starter 플랜과 동일)
+      medium: 28.9,   // 100 토큰 - ¥28.9 (Premium 플랜과 동일)
+      large: 57.9,    // 300 토큰 - ¥57.9 (대량 구매 할인)
+      extra: 115.9,   // 1000 토큰 - ¥115.9 (초대량 특별가)
     },
     subscription: {
-      starter: 45.9,  // 스타터 - ¥45.9/月
-      premium: 89.9,  // 프리미엄 - ¥89.9/月
-      pro: 169.9,     // 프로 - ¥169.9/月
+      starter: 14.0,  // 스타터 - ¥14.0/월
+      premium: 28.9,  // 프리미엄 - ¥28.9/월
+      pro: 92.0,      // 프로 - ¥92.0/월
     },
     formatting: {
       position: 'before',
@@ -175,28 +175,28 @@ class PricingService {
     
     return [
       {
-        id: 'small',
-        tokens: 50,
+        id: 'tokens_30',
+        tokens: 30,
         price: pricing.tokens.small,
         formattedPrice: this.formatPrice(pricing.tokens.small),
         popular: false,
       },
       {
-        id: 'medium', 
-        tokens: 150,
+        id: 'tokens_100', 
+        tokens: 100,
         price: pricing.tokens.medium,
         formattedPrice: this.formatPrice(pricing.tokens.medium),
         popular: true,
       },
       {
-        id: 'large',
-        tokens: 500, 
+        id: 'tokens_300',
+        tokens: 300, 
         price: pricing.tokens.large,
         formattedPrice: this.formatPrice(pricing.tokens.large),
         popular: false,
       },
       {
-        id: 'extra',
+        id: 'tokens_1000',
         tokens: 1000,
         price: pricing.tokens.extra,
         formattedPrice: this.formatPrice(pricing.tokens.extra),
@@ -212,8 +212,8 @@ class PricingService {
     return [
       {
         id: 'starter',
-        name: '스타터',
-        tokens: 100,
+        name: 'Starter',
+        tokens: 600,
         price: pricing.subscription.starter,
         formattedPrice: this.formatPrice(pricing.subscription.starter),
         period: '/월',
@@ -221,8 +221,8 @@ class PricingService {
       },
       {
         id: 'premium',
-        name: '프리미엄', 
-        tokens: 300,
+        name: 'Premium', 
+        tokens: 1100,
         price: pricing.subscription.premium,
         formattedPrice: this.formatPrice(pricing.subscription.premium),
         period: '/월',
@@ -230,8 +230,8 @@ class PricingService {
       },
       {
         id: 'pro',
-        name: '프로',
-        tokens: 800,
+        name: 'Pro',
+        tokens: -1, // 무제한
         price: pricing.subscription.pro,
         formattedPrice: this.formatPrice(pricing.subscription.pro),
         period: '/월',

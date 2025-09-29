@@ -1483,10 +1483,6 @@ const ko = {
         title: "더 많은 토큰",
         description: "STARTER는 총 600개(초기 300 + 일일 10x30), PRO는 총 1,100개(초기 500 + 일일 20x30), MAX는 무제한 토큰을 제공합니다"
       },
-      advancedAI: {
-        title: "고급 AI 모델",
-        description: "플랜별 차별화된 AI 모델 제공 (GPT-4o, GPT-4 Turbo)"
-      },
       noAds: {
         title: "광고 제거",
         description: "방해받지 않고 콘텐츠 제작에만 집중할 수 있습니다"

@@ -194,166 +194,43 @@ export const TokenPurchaseView: React.FC<TokenPurchaseViewProps> = ({
               </LinearGradient>
             )}
 
-            <View style={[pkg.popular && styles.popularPackage]}>
-              <LinearGradient
-                colors={pkg.gradient}
-                style={styles.packageCard}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
+            <View style={[styles.packageCard, pkg.popular && styles.popularPackage]}>
+              <View style={styles.packageHeader}>
+                <SafeIcon name="flash" size={24} color={pkg.gradient[0]} />
+                <View style={styles.packageInfo}>
+                  <Text style={styles.packageName}>{pkg.name}</Text>
+                  <Text style={styles.packageTagline}>{pkg.tagline}</Text>
+                </View>
+              </View>
+
+              <View style={styles.tokenSection}>
+                <View style={styles.tokenAmount}>
+                  <Text style={styles.tokenNumber}>{pkg.baseAmount}</Text>
+                  <Text style={styles.tokenLabel}>{t("tokens.label", { defaultValue: "토큰" })}</Text>
+                </View>
+              </View>
+
+              <View style={styles.priceSection}>
+                <View style={styles.priceRow}>
+                  <Text style={styles.price}>
+                    {pkg.formattedPrice}
+                  </Text>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.purchaseButton, { backgroundColor: pkg.gradient[0] }]}
+                activeOpacity={0.8}
               >
-                {/* Glass effect overlay */}
-                <View style={styles.glassOverlay} />
-
-                <View style={styles.packageHeader}>
-                  <Text style={styles.packageIcon}>{pkg.icon}</Text>
-                  <View style={styles.packageInfo}>
-                    <Text style={styles.packageName}>{pkg.name}</Text>
-                    <Text style={styles.packageTagline}>{pkg.tagline}</Text>
-                  </View>
-                </View>
-
-                <View style={styles.tokenSection}>
-                  <View style={styles.tokenAmount}>
-                    <Text style={styles.tokenNumber}>{pkg.baseAmount}</Text>
-                    <Text style={styles.tokenLabel}>{t("tokens.label", { defaultValue: "토큰" })}</Text>
-                  </View>
-                </View>
-
-                <View style={styles.priceSection}>
-                  <View style={styles.priceRow}>
-                    <Text style={styles.price}>
-                      {pkg.formattedPrice}
-                    </Text>
-                  </View>
-                </View>
-
-
-                <LinearGradient
-                  colors={["rgba(255,255,255,0.3)", "rgba(255,255,255,0.2)"]}
-                  style={styles.purchaseButton}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                >
-                  <Text style={styles.purchaseButtonText}>{t("common.purchase", { defaultValue: "구매하기" })}</Text>
-                  <SafeIcon name="arrow-forward" size={18} color="#FFFFFF" />
-                </LinearGradient>
-              </LinearGradient>
+                <Text style={styles.purchaseButtonText}>{t("common.purchase", { defaultValue: "구매하기" })}</Text>
+                <SafeIcon name="arrow-forward" size={18} color="#FFFFFF" />
+              </TouchableOpacity>
             </View>
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Features Section */}
-      <View style={styles.featuresSection}>
-        <Text style={styles.sectionTitle}>{t('tokenPurchase.sections.advantages')}</Text>
 
-        <View style={styles.featureCards}>
-          <LinearGradient
-            colors={isDark ? ["#374151", "#4B5563"] : ["#F3F4F6", "#E5E7EB"]}
-            style={styles.featureCard}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <LinearGradient
-              colors={["#6366F1", "#818CF8"]}
-              style={styles.featureIconWrapper}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <SafeIcon name="trending-up-outline" size={24} color="#FFFFFF" />
-            </LinearGradient>
-            <Text style={styles.featureTitle}>{t('tokenPurchase.sections.bulkDiscount')}</Text>
-            <Text style={styles.featureDesc}>
-              {t('tokenPurchase.sections.bulkDiscountDesc')}
-            </Text>
-          </LinearGradient>
-
-          <LinearGradient
-            colors={isDark ? ["#374151", "#4B5563"] : ["#F3F4F6", "#E5E7EB"]}
-            style={styles.featureCard}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <LinearGradient
-              colors={["#10B981", "#34D399"]}
-              style={styles.featureIconWrapper}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <SafeIcon name="lock-open-outline" size={24} color="#FFFFFF" />
-            </LinearGradient>
-            <Text style={styles.featureTitle}>{t('tokenPurchase.sections.flexibleUse')}</Text>
-            <Text style={styles.featureDesc}>
-              {t('tokenPurchase.sections.flexibleUseDesc')}
-            </Text>
-          </LinearGradient>
-
-          <LinearGradient
-            colors={isDark ? ["#374151", "#4B5563"] : ["#F3F4F6", "#E5E7EB"]}
-            style={styles.featureCard}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <LinearGradient
-              colors={["#F59E0B", "#FCD34D"]}
-              style={styles.featureIconWrapper}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <SafeIcon name="rocket-outline" size={24} color="#FFFFFF" />
-            </LinearGradient>
-            <Text style={styles.featureTitle}>{t('tokenPurchase.sections.permanentOwnership')}</Text>
-            <Text style={styles.featureDesc}>
-              {t('tokenPurchase.sections.permanentOwnershipDesc')}
-            </Text>
-          </LinearGradient>
-
-          <LinearGradient
-            colors={isDark ? ["#374151", "#4B5563"] : ["#F3F4F6", "#E5E7EB"]}
-            style={styles.featureCard}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <LinearGradient
-              colors={["#EC4899", "#F472B6"]}
-              style={styles.featureIconWrapper}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <SafeIcon name="star" size={24} color="#FFFFFF" />
-            </LinearGradient>
-            <Text style={styles.featureTitle}>{t('tokenPurchase.sections.planBenefits')}</Text>
-            <Text style={styles.featureDesc}>{t('tokenPurchase.sections.planBenefitsDesc')}</Text>
-          </LinearGradient>
-        </View>
-      </View>
-
-      {/* 구독 vs 토큰 구매 비교 */}
-      <View style={styles.comparisonSection}>
-        <Text style={styles.sectionTitle}>{t('tokenPurchase.sections.comparison')}</Text>
-
-        <View style={styles.comparisonCard}>
-          <SafeIcon name="help-circle-outline" size={20} color={colors.primary} />
-          <View style={styles.comparisonContent}>
-            <Text style={styles.comparisonTitle}>
-              {t('tokenPurchase.sections.whenToPurchase')}
-            </Text>
-            <Text style={styles.comparisonDesc}>
-              {t('tokenPurchase.sections.whenToPurchaseDesc')}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.comparisonCard}>
-          <SafeIcon name="diamond-outline" size={20} color={colors.primary} />
-          <View style={styles.comparisonContent}>
-            <Text style={styles.comparisonTitle}>{t('tokenPurchase.sections.subscriptionAdvantages')}</Text>
-            <Text style={styles.comparisonDesc}>
-              {t('tokenPurchase.sections.subscriptionAdvantagesDesc', { starterPrice: '₩1,900', premiumPrice: '₩4,900' })}
-            </Text>
-          </View>
-        </View>
-      </View>
 
       {/* Trust Section */}
       <LinearGradient
@@ -423,18 +300,20 @@ const createStyles = (colors: any, isDark: boolean) =>
       letterSpacing: 0.5,
     },
     packageCard: {
+      backgroundColor: colors.surface,
       borderRadius: 24,
       padding: 24,
       position: "relative",
-      overflow: "hidden",
+      borderWidth: 2,
+      borderColor: colors.border,
     },
     popularPackage: {
       transform: [{ scale: 1.02 }],
       shadowColor: "#000",
-      shadowOffset: { width: 0, height: 12 },
+      shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.2,
-      shadowRadius: 20,
-      elevation: 10,
+      shadowRadius: 16,
+      elevation: 8,
     },
     glassOverlay: {
       position: "absolute",
@@ -448,7 +327,7 @@ const createStyles = (colors: any, isDark: boolean) =>
       flexDirection: "row",
       alignItems: "center",
       gap: 16,
-      marginBottom: 20,
+      marginBottom: 16,
     },
     packageIcon: {
       fontSize: 48,
@@ -457,25 +336,21 @@ const createStyles = (colors: any, isDark: boolean) =>
       flex: 1,
     },
     packageName: {
-      fontSize: 22,
+      fontSize: 20,
       fontWeight: "700",
-      color: "#FFFFFF",
+      color: colors.text.primary,
       letterSpacing: -0.3,
       marginBottom: 4,
-      textShadowColor: "rgba(0, 0, 0, 0.3)",
-      textShadowOffset: { width: 0, height: 1 },
-      textShadowRadius: 2,
     },
     packageTagline: {
       fontSize: 14,
-      color: "#FFFFFF",
-      opacity: 0.9,
+      color: colors.text.secondary,
     },
     tokenSection: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "space-between",
-      marginBottom: 20,
+      marginBottom: 16,
     },
     tokenAmount: {
       flexDirection: "row",
@@ -485,16 +360,13 @@ const createStyles = (colors: any, isDark: boolean) =>
     tokenNumber: {
       fontSize: 36,
       fontWeight: "800",
-      color: "#FFFFFF",
+      color: colors.text.primary,
       letterSpacing: -1,
-      textShadowColor: "rgba(0, 0, 0, 0.3)",
-      textShadowOffset: { width: 0, height: 1 },
-      textShadowRadius: 2,
     },
     tokenLabel: {
       fontSize: 18,
       fontWeight: "500",
-      color: "#FFFFFF",
+      color: colors.text.secondary,
     },
     bonusBadge: {
       flexDirection: "row",
@@ -524,12 +396,9 @@ const createStyles = (colors: any, isDark: boolean) =>
     },
     price: {
       fontSize: 32,
-      fontWeight: "800",
-      color: "#FFFFFF",
+      fontWeight: "700",
+      color: colors.text.primary,
       letterSpacing: -0.5,
-      textShadowColor: "rgba(0, 0, 0, 0.3)",
-      textShadowOffset: { width: 0, height: 1 },
-      textShadowRadius: 2,
     },
     discountRow: {
       flexDirection: "row",
@@ -571,8 +440,6 @@ const createStyles = (colors: any, isDark: boolean) =>
       gap: 8,
       paddingVertical: 16,
       borderRadius: 16,
-      borderWidth: 1,
-      borderColor: "rgba(255, 255, 255, 0.4)",
     },
     purchaseButtonText: {
       fontSize: 16,

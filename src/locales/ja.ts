@@ -125,10 +125,6 @@ const ja = {
         title: "より多くのトークン",
         description: "STARTERは総600個(初期300 + 日次10x30)、PROは総1,100個(初期500 + 日次20x30)、MAXは無制限トークンを提供します"
       },
-      advancedAI: {
-        title: "高度なAIモデル",
-        description: "プラン別の差別化されたAIモデル提供 (GPT-4o, GPT-4 Turbo)"
-      },
       noAds: {
         title: "広告除去",
         description: "妨害されることなくコンテンツ作成にのみ集中できます"

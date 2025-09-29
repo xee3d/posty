@@ -164,10 +164,6 @@ const zhCN = {
         title: "更多代币",
         description: "STARTER共600个(初始300 + 每日额外10个)，PRO共1,100个(初始500 + 每日额外20个)，MAX提供无限代币"
       },
-      advancedAI: {
-        title: "高级AI模型",
-        description: "按计划提供差异化的AI模型 (GPT-4o, GPT-4 Turbo)"
-      },
       noAds: {
         title: "移除广告",
         description: "不受干扰，只专注于内容创作"
