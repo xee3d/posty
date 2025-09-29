@@ -217,6 +217,8 @@ const en = {
         subtitle: "Choose from gallery or take a new one",
         button: "Select Photo",
         change: "Change",
+        camera: "Camera",
+        gallery: "Gallery",
       },
       defaultPrompt: "Please write a natural social media post that goes well with the photo.",
     },

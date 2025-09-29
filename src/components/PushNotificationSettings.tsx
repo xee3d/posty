@@ -37,11 +37,11 @@ export const PushNotificationSettings: React.FC<
   } = usePushNotifications();
 
   const [notificationTypes, setNotificationTypes] = useState({
-    missions: true,
-    trends: true,
-    tokens: true,
-    achievements: true,
-    tips: true,
+    missions: false,
+    trends: false,
+    tokens: false,
+    achievements: false,
+    tips: false,
   });
 
   const styles = createStyles(colors);

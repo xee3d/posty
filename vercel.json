@@ -11,18 +11,19 @@
     }
   },
   "crons": [
-    {
-      "path": "/api/notifications/schedule?type=daily",
-      "schedule": "0 9,18 * * *"
-    },
-    {
-      "path": "/api/notifications/schedule?type=weekly",
-      "schedule": "0 20 * * 0"
-    },
-    {
-      "path": "/api/notifications/schedule?type=smart",
-      "schedule": "0 12,15 * * *"
-    }
+    // 푸시 알림 크론 작업 비활성화
+    // {
+    //   "path": "/api/notifications/schedule?type=daily",
+    //   "schedule": "0 9,18 * * *"
+    // },
+    // {
+    //   "path": "/api/notifications/schedule?type=weekly",
+    //   "schedule": "0 20 * * 0"
+    // },
+    // {
+    //   "path": "/api/notifications/schedule?type=smart",
+    //   "schedule": "0 12,15 * * *"
+    // }
   ],
   "rewrites": [
     {

@@ -204,6 +204,8 @@ const ko = {
         subtitle: "갤러리에서 선택하거나 직접 촬영하세요",
         button: "사진 선택",
         change: "변경",
+        camera: "카메라",
+        gallery: "갤러리",
       },
       defaultPrompt: "사진과 어울리는 자연스러운 SNS 글을 작성해주세요.",
     },

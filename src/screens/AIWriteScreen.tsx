@@ -579,22 +579,16 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   };
 
   const handleSelectImage = () => {
-    Alert.alert(
-      t("aiWrite.photo.select.title"),
-      t("aiWrite.photo.select.message"),
-      [
-        { text: t("alerts.buttons.cancel"), style: "cancel" },
-        {
-          text: t("aiWrite.photo.select.camera"),
-          onPress: () => openCamera(),
-        },
-        {
-          text: t("aiWrite.photo.select.gallery"),
-          onPress: () => openImageLibrary(),
-        },
-      ],
-      { cancelable: true }
-    );
+    // 팝업 제거 - 이제 직접 갤러리 열기
+    openImageLibrary();
+  };
+
+  const handleSelectFromGallery = () => {
+    openImageLibrary();
+  };
+
+  const handleSelectFromCamera = () => {
+    openCamera();
   };
 
   const analyzeImageImmediately = async (imageUrl: string) => {
@@ -1688,57 +1682,63 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                   <View style={styles.sectionHeader}>
                     <Text style={styles.sectionTitle}>{t("aiWrite.sections.photoSelect")}</Text>
                   </View>
-                  <ScaleButton
-                    style={styles.photoUploadArea}
-                    onPress={handleSelectImage}
-                  >
-                    {selectedImageUri ? (
-                      <View style={styles.selectedImageContainer}>
-                        <Image
-                          source={{ uri: selectedImageUri }}
-                          style={styles.selectedImage}
-                        />
-                        <TouchableOpacity
+                  {selectedImageUri ? (
+                    <View style={styles.selectedImageContainer}>
+                      <Image
+                        source={{ uri: selectedImageUri }}
+                        style={styles.selectedImage}
+                      />
+                      <View style={styles.changePhotoButtons}>
+                        <ScaleButton
                           style={styles.changePhotoButton}
-                          onPress={() => {
-                            // 이전 분석 결과만 초기화 (이미지는 유지)
-                            setImageAnalysisResult(null);
-                            setImageAnalysis("");
-                            // 캐시 클리어하여 새로운 분석 강제
-                            imageAnalysisCache.clear();
-                            console.log(
-                              "[AIWriteScreen] Cache cleared for new analysis"
-                            );
-                            handleSelectImage();
-                          }}
+                          onPress={handleSelectFromCamera}
                         >
                           <SafeIcon name="camera" size={16} color="#FFFFFF" />
-                          <Text style={styles.changePhotoText}>{t("aiWrite.photo.upload.change")}</Text>
-                        </TouchableOpacity>
+                          <Text style={styles.changePhotoText}>{t("aiWrite.photo.upload.camera")}</Text>
+                        </ScaleButton>
+                        <ScaleButton
+                          style={styles.changePhotoButton}
+                          onPress={handleSelectFromGallery}
+                        >
+                          <SafeIcon name="image-outline" size={16} color="#FFFFFF" />
+                          <Text style={styles.changePhotoText}>{t("aiWrite.photo.upload.gallery")}</Text>
+                        </ScaleButton>
                       </View>
-                    ) : (
-                      <View style={styles.uploadPlaceholder}>
-                        <View style={styles.uploadIconContainer}>
-                          <SafeIcon
-                            name="image-outline"
-                            size={56}
-                            color={colors.primary}
-                            style={{ opacity: 0.4 }}
-                          />
-                        </View>
-                        <Text style={styles.uploadTitle}>
-                          {t("aiWrite.photo.upload.title")}
-                        </Text>
-                        <Text style={styles.uploadSubtitle}>
-                          {t("aiWrite.photo.upload.subtitle")}
-                        </Text>
-                        <View style={styles.uploadButton}>
-                          <SafeIcon name="add" size={20} color="#FFFFFF" />
-                          <Text style={styles.uploadButtonText}>{t("aiWrite.photo.upload.button")}</Text>
-                        </View>
+                    </View>
+                  ) : (
+                    <View style={styles.photoSelectionContainer}>
+                      <Text style={styles.photoSelectionTitle}>
+                        {t("aiWrite.photo.upload.title")}
+                      </Text>
+                      <Text style={styles.photoSelectionSubtitle}>
+                        {t("aiWrite.photo.upload.subtitle")}
+                      </Text>
+                      <View style={styles.photoButtonsContainer}>
+                        <ScaleButton
+                          style={styles.photoButton}
+                          onPress={handleSelectFromCamera}
+                        >
+                          <View style={styles.photoButtonContent}>
+                            <SafeIcon name="camera" size={24} color={colors.primary} />
+                            <Text style={styles.photoButtonText}>
+                              {t("aiWrite.photo.upload.camera")}
+                            </Text>
+                          </View>
+                        </ScaleButton>
+                        <ScaleButton
+                          style={styles.photoButton}
+                          onPress={handleSelectFromGallery}
+                        >
+                          <View style={styles.photoButtonContent}>
+                            <SafeIcon name="image-outline" size={24} color={colors.primary} />
+                            <Text style={styles.photoButtonText}>
+                              {t("aiWrite.photo.upload.gallery")}
+                            </Text>
+                          </View>
+                        </ScaleButton>
                       </View>
-                    )}
-                  </ScaleButton>
+                    </View>
+                  )}
 
                   {/* 사진 분석 결과 - 더 간결하게 */}
                   {(imageAnalysis || isAnalyzingImage) && (
@@ -2739,6 +2739,66 @@ const createStyles = (
       fontSize: 9,
       color: colors.primary,
       fontWeight: "600",
+    },
+    // 새로운 사진 선택 UI 스타일
+    photoSelectionContainer: {
+      backgroundColor: isDark ? "#1C1C1E" : "#F8F9FA",
+      borderRadius: 20,
+      padding: SPACING.lg,
+      alignItems: "center",
+      borderWidth: 2,
+      borderColor: isDark ? "#3A3A3C" : "#E5E7EB",
+      borderStyle: "dashed",
+    },
+    photoSelectionTitle: {
+      fontSize: 18,
+      fontWeight: "600",
+      color: colors.text.primary,
+      marginBottom: SPACING.sm,
+      textAlign: "center",
+    },
+    photoSelectionSubtitle: {
+      fontSize: 14,
+      color: colors.text.secondary,
+      marginBottom: SPACING.lg,
+      textAlign: "center",
+    },
+    photoButtonsContainer: {
+      flexDirection: "row",
+      gap: SPACING.md,
+      width: "100%",
+    },
+    photoButton: {
+      flex: 1,
+      backgroundColor: isDark ? "#2C2C2E" : "#FFFFFF",
+      borderRadius: 16,
+      padding: SPACING.lg,
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1.5,
+      borderColor: isDark ? "#3A3A3C" : "#E5E7EB",
+      elevation: isDark ? 0 : 2,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: isDark ? 0 : 0.08,
+      shadowRadius: 3,
+    },
+    photoButtonContent: {
+      alignItems: "center",
+      gap: SPACING.sm,
+    },
+    photoButtonText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.text.primary,
+      textAlign: "center",
+    },
+    changePhotoButtons: {
+      position: "absolute",
+      bottom: SPACING.md,
+      right: SPACING.md,
+      flexDirection: "row",
+      gap: SPACING.sm,
     },
   });
 };

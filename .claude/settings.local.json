@@ -88,7 +88,11 @@
       "Bash(vercel ls:*)",
       "Read(//Users/ethan_macstudio/Projects/Cheez/src/services/**)",
       "Bash(vercel logs:*)",
-      "Read(//Users/ethan_macstudio/Projects/Cheez/**)"
+      "Read(//Users/ethan_macstudio/Projects/Cheez/**)",
+      "Bash(do cp /Users/ethan_macstudio/Projects/posty/logo/posty_logo_new.png \"$file\")",
+      "Bash(do cp \"/Users/ethan_macstudio/Projects/posty/ios/assets/src/assets/images/posty_logo_w.png\" \"$file\")",
+      "Bash(do cp \"/Users/ethan_macstudio/Projects/posty/logo/posty_logo_new.png\" \"$file\")",
+      "Bash(do cp \"/Users/ethan_macstudio/Projects/posty/logo/posty_logo_black.png\" \"$file\")"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

@@ -683,7 +683,6 @@ const AppContent: React.FC = () => {
     isCheckingOnboarding,
     needsOnboarding,
     showMinimalWelcome,
-    handleTabPress,
     navigationData,
     photoMode,
     handleOnboardingComplete,

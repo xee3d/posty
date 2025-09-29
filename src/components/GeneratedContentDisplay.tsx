@@ -70,6 +70,55 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     Record<string, number>
   >({});
 
+  // 동적 폰트 사이즈 계산 함수
+  const calculateOptimalFontSize = (text: string, containerWidth: number) => {
+    // 기본 폰트 사이즈들 (더 세분화)
+    const baseFontSizes = {
+      xlarge: 12,   // >= 428px (iPhone 14 Pro Max)
+      large: 11,    // >= 414px (iPhone 14 Plus)
+      medium: 10,   // >= 390px (iPhone 14 Pro)
+      small: 9,     // >= 375px (iPhone 14, 13, 12)
+      xsmall: 8,    // >= 360px (일반 Android)
+      xxsmall: 7,   // < 360px (iPhone SE, mini)
+    };
+
+    // 화면 너비별 기본 폰트 사이즈 결정
+    let fontSize = baseFontSizes.medium;
+
+    if (screenWidth >= 428) {
+      fontSize = baseFontSizes.xlarge;
+    } else if (screenWidth >= 414) {
+      fontSize = baseFontSizes.large;
+    } else if (screenWidth >= 390) {
+      fontSize = baseFontSizes.medium;
+    } else if (screenWidth >= 375) {
+      fontSize = baseFontSizes.small;
+    } else if (screenWidth >= 360) {
+      fontSize = baseFontSizes.xsmall;
+    } else {
+      fontSize = baseFontSizes.xxsmall;
+    }
+
+    // 텍스트 길이별 세밀한 조정
+    const textLength = text.length;
+    const estimatedTextWidth = textLength * (fontSize * 0.6); // 대략적인 텍스트 너비 추정
+
+    // 컨테이너에 비해 텍스트가 너무 긴 경우 폰트 사이즈 축소
+    if (estimatedTextWidth > containerWidth) {
+      const reductionFactor = containerWidth / estimatedTextWidth;
+      fontSize = Math.max(fontSize * reductionFactor, 6); // 최소 6px
+    }
+
+    // 특정 텍스트별 추가 최적화
+    if (text === "Instagram" && screenWidth < 375) {
+      fontSize = Math.min(fontSize, 8);
+    } else if (text === "Facebook" && screenWidth < 375) {
+      fontSize = Math.min(fontSize, 8);
+    }
+
+    return Math.round(fontSize * 10) / 10; // 소수점 첫째 자리까지 반올림
+  };
+
   // 화면 크기에 따른 플랫폼 이름 조정
   const getPlatformsForScreenSize = () => {
     const basePlatforms = [
@@ -125,6 +174,18 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   };
 
   const platforms = getPlatformsForScreenSize();
+
+  // 각 탭의 실제 사용 가능한 너비 계산
+  const getTabWidth = () => {
+    const padding = screenWidth < 375 ? 4 : 8; // SPACING.xs : SPACING.sm
+    const gap = screenWidth < 375 ? 2 : 4;
+    const totalGaps = (platforms.length - 1) * gap;
+    const totalPadding = padding * 2;
+    const availableWidth = screenWidth - totalPadding - totalGaps;
+    return availableWidth / platforms.length;
+  };
+
+  const tabWidth = getTabWidth();
   const [showPlatformHint, setShowPlatformHint] = useState(false);
   const hintOpacity = useRef(new Animated.Value(0)).current;
   const [contentHeight, setContentHeight] = useState<number>(300); // 동적 높이 상태
@@ -424,6 +485,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
               style={[
                 styles.platformTabText,
                 activePlatform === platform.id && { color: platform.color },
+                { fontSize: calculateOptimalFontSize(platform.name, tabWidth - 20) } // 아이콘 + 여백 고려
               ]}
               numberOfLines={1}
               ellipsizeMode="tail"
@@ -756,7 +818,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: any, isDark: boolean, sc
       borderWidth: 2,
       borderColor: "transparent",
       minHeight: screenWidth < 375 ? 32 : 36,
-      maxWidth: screenWidth < 375 ? 65 : 80,
+      // maxWidth를 동적으로 조정하여 더 많은 공간 확보
+      maxWidth: Math.max(screenWidth / 4.2, 70), // 화면 크기에 비례하여 조정
     },
     platformTabActive: {
       backgroundColor: isDark ? colors.surface : "#fff",
@@ -767,13 +830,15 @@ const createStyles = (colors: typeof COLORS, cardTheme: any, isDark: boolean, sc
       elevation: 3,
     },
     platformTabText: {
-      fontSize: screenWidth < 375 ? 8 : 9,
+      // fontSize는 동적으로 계산되어 인라인으로 적용됨
       fontFamily: "System",
       fontWeight: "600" as const,
       color: colors.text.secondary,
       marginLeft: screenWidth < 375 ? 1 : 2,
       textAlign: "center",
       flexShrink: 1,
+      includeFontPadding: false, // Android에서 폰트 패딩 제거
+      textAlignVertical: "center", // Android 수직 정렬
     },
     loader: {
       marginLeft: SPACING.xs,

@@ -410,6 +410,8 @@ const ja = {
         subtitle: "ギャラリーから選択するか直接撮影してください",
         button: "写真を選択する",
         change: "変更する",
+        camera: "カメラ",
+        gallery: "ギャラリー",
       },
       defaultPrompt: "写真に合う自然なSNSの投稿を書いてください。",
     },

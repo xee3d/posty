@@ -46,11 +46,11 @@ export default async function handler(req, res) {
       updatedAt: new Date().toISOString(),
       isActive: true,
       notifications: {
-        mission: true, // 일일 미션 알림
-        trend: true, // 트렌드 업데이트
-        achievement: true, // 업적 달성
-        tip: true, // 맞춤 팁
-        marketing: true, // 마케팅 알림
+        mission: false, // 일일 미션 알림 (비활성화)
+        trend: false, // 트렌드 업데이트 (비활성화)
+        achievement: false, // 업적 달성 (비활성화)
+        tip: false, // 맞춤 팁 (비활성화)
+        marketing: false, // 마케팅 알림 (비활성화)
       },
     };
 
