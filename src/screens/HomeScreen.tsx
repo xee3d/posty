@@ -894,7 +894,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                       key={`skeleton-${index}`}
                       style={[
                         styles.recommendCard,
-                        index === 0 ? { marginLeft: SPACING.lg } : { marginLeft: SPACING.sm },
+                        index === 0 ? { marginLeft: 0 } : { marginLeft: SPACING.md },
                       ]}
                     >
                       <View style={styles.recommendCardContent}>
@@ -928,7 +928,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                     delay={700 + index * 50}
                     style={[
                       styles.recommendCard,
-                      index === 0 ? { marginLeft: SPACING.lg } : { marginLeft: SPACING.sm },
+                      index === 0 ? { marginLeft: 0 } : { marginLeft: SPACING.md },
                     ] as any}
                   >
                     <TouchableOpacity
@@ -1230,7 +1230,7 @@ const createStyles = (
   isDark?: boolean
 ) => {
   const { width: screenWidth } = Dimensions.get('window');
-  const cardWidth = Math.min(screenWidth * 0.75, 280); // 화면 너비의 75% 또는 최대 280px로 줄임
+  const cardWidth = Math.min(screenWidth * 0.85, 300); // 화면 너비의 85% 또는 최대 300px로 조정
 
   return StyleSheet.create({
     container: {
@@ -1565,7 +1565,8 @@ const createStyles = (
       paddingBottom: SPACING.xs,
     },
     recommendScrollContent: {
-      paddingRight: SPACING.lg,
+      paddingLeft: 0, // 왼쪽 패딩 제거로 정렬 맞춤
+      paddingRight: SPACING.xl, // 오른쪽 패딩 증가로 마지막 카드가 잘리지 않도록
     },
     recommendCard: {
       backgroundColor: isDark ? '#1F1F1F' : '#FAFAFA', // 라이트 모드 배경 개선
