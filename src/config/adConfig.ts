@@ -201,25 +201,25 @@ export const AD_CONFIG = {
   // 광고 ID (실제 프로덕션 ID)
   admob: {
     appId: {
-      ios: "ca-app-pub-4039842933564424~9331858554",
-      android: "ca-app-pub-4039842933564424~3895363964",
+      ios: "ca-app-pub-4435733896538626~2244557050",
+      android: "ca-app-pub-4435733896538626~9851584331",
     },
     unitIds: {
       banner: {
-        ios: "ca-app-pub-4039842933564424/8287150443", // ✅ 배너 광고 설정 완료
-        android: "ca-app-pub-4039842933564424/8287150443",
+        ios: "ca-app-pub-4435733896538626/6058204207", // Posty 하단 배너
+        android: "ca-app-pub-4435733896538626/8889856459", // Posty 하단 배너
       },
       interstitial: {
-        ios: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy", // 전면 광고 단위 ID 필요
-        android: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy",
+        ios: "ca-app-pub-4435733896538626/2571860116", // 네이티브 광고 ID 재사용
+        android: "ca-app-pub-4435733896538626/7576774789", // 네이티브 광고 ID 재사용
       },
       rewarded: {
-        ios: "ca-app-pub-4039842933564424/9440450013", // ✅ 리워드 광고 설정 완료
-        android: "ca-app-pub-4039842933564424/9440450013",
+        ios: "ca-app-pub-4435733896538626/2198850241", // Posty 토큰 리워드
+        android: "ca-app-pub-4435733896538626/1258778446", // Posty 토큰 리워드
       },
       native: {
-        ios: "ca-app-pub-4039842933564424/6870126998", // ✅ 네이티브 광고 설정 완료
-        android: "ca-app-pub-4039842933564424/6870126998",
+        ios: "ca-app-pub-4435733896538626/2571860116", // Posty 피드 네이티브
+        android: "ca-app-pub-4435733896538626/7576774789", // Posty 피드 네이티브
       },
     },
   },

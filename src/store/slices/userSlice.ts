@@ -39,6 +39,7 @@ interface UserState {
   subscriptionPlan: "free" | "starter" | "premium" | "pro"; // 호환성을 위해 임시 유지
   subscriptionExpiresAt: string | null;
   subscriptionAutoRenew: boolean; // 자동 갱신 여부 (false면 구독 취소 상태)
+  gracePeriodEndsAt: string | null; // 청구 유예 기간 종료일
 
   // 토큰 정보
   tokens: {
@@ -82,6 +83,7 @@ const initialState: UserState = {
   subscriptionPlan: "free",
   subscriptionExpiresAt: null,
   subscriptionAutoRenew: true,
+  gracePeriodEndsAt: null,
   tokens: {
     current: 10,
     total: 0,
@@ -194,6 +196,7 @@ const userSlice = createSlice({
         expiresAt?: string;
         autoRenew?: boolean;
         isServerVerified?: boolean; // 서버에서 검증된 업데이트인지 표시
+        gracePeriodEndsAt?: string | null; // 청구 유예 기간 종료일
       }>
     ) => {
       const previousPlan = state.subscriptionPlan;
@@ -221,6 +224,9 @@ const userSlice = createSlice({
       state.subscriptionExpiresAt = action.payload.expiresAt || null;
       if (action.payload.autoRenew !== undefined) {
         state.subscriptionAutoRenew = action.payload.autoRenew;
+      }
+      if (action.payload.gracePeriodEndsAt !== undefined) {
+        state.gracePeriodEndsAt = action.payload.gracePeriodEndsAt;
       }
 
       console.log(

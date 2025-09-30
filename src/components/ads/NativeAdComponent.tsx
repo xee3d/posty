@@ -30,8 +30,8 @@ const NativeAdComponent: React.FC<NativeAdComponentProps> = ({
   const adUnitId = testMode
     ? TestIds.GAM_NATIVE
     : Platform.select({
-        ios: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy", // 실제 iOS 네이티브 광고 ID로 교체
-        android: "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy", // 실제 Android 네이티브 광고 ID로 교체
+        ios: "ca-app-pub-4435733896538626/2571860116", // Posty 피드 네이티브 (iOS)
+        android: "ca-app-pub-4435733896538626/7576774789", // Posty 피드 네이티브 (Android)
       }) || TestIds.GAM_NATIVE;
 
   if (!adUnitId) {

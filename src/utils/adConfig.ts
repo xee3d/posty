@@ -4,29 +4,29 @@ export const AD_CONFIG = {
   // Google AdMob IDs - 프로덕션 ID 사용
   admob: {
     appId: {
-      ios: "ca-app-pub-4039842933564424~3895363964",
-      android: "ca-app-pub-4039842933564424~3895363964",
+      ios: "ca-app-pub-4435733896538626~2244557050",
+      android: "ca-app-pub-4435733896538626~9851584331",
     },
     unitIds: {
       // 하단 배너 광고
       banner: {
-        ios: "ca-app-pub-4039842933564424/8287150443", // Posty 하단 배너
-        android: "ca-app-pub-4039842933564424/8287150443", // Posty 하단 배너
+        ios: "ca-app-pub-4435733896538626/6058204207", // Posty 하단 배너
+        android: "ca-app-pub-4435733896538626/8889856459", // Posty 하단 배너
       },
       // 네이티브 광고 (일반)
       native: {
-        ios: "ca-app-pub-4039842933564424/6870126998", // AdMob 광고 단위 ID
-        android: "ca-app-pub-4039842933564424/6870126998", // AdMob 광고 단위 ID
+        ios: "ca-app-pub-4435733896538626/2571860116", // Posty 피드 네이티브
+        android: "ca-app-pub-4435733896538626/7576774789", // Posty 피드 네이티브
       },
       // 보상형 광고 (토큰 리워드)
       rewarded: {
-        ios: "ca-app-pub-4039842933564424/9440450013", // Posty 토큰 리워드
-        android: "ca-app-pub-4039842933564424/9440450013", // Posty 토큰 리워드
+        ios: "ca-app-pub-4435733896538626/2198850241", // Posty 토큰 리워드
+        android: "ca-app-pub-4435733896538626/1258778446", // Posty 토큰 리워드
       },
       // 전면 광고 (필요시 추가)
       interstitial: {
-        ios: "ca-app-pub-4039842933564424/6870126998", // 일반 광고 ID 재사용
-        android: "ca-app-pub-4039842933564424/6870126998", // 일반 광고 ID 재사용
+        ios: "ca-app-pub-4435733896538626/2571860116", // 네이티브 광고 ID 재사용
+        android: "ca-app-pub-4435733896538626/7576774789", // 네이티브 광고 ID 재사용
       },
     },
   },

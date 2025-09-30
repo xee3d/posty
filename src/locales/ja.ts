@@ -156,6 +156,11 @@ const ja = {
       cancelPlan: "プランを解除する",
       upgradePlan: "プラン変更"
     },
+    gracePeriod: {
+      title: "請求猶予期間",
+      message: "支払い問題によりサブスクリプションが一時停止されています。猶予期間中は引き続きサービスをご利用いただけます。",
+      daysRemaining: "残り時間: {{days}}日"
+    },
     earnTokensSection: {
       title: "無料でトークンを獲得しましょう",
       subtitle: "様々な活動で無料トークンを獲得しましょう",

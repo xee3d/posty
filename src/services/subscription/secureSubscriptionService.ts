@@ -213,12 +213,15 @@ class SecureSubscriptionService {
   }
 
   /**
-   * 구독 상태 실시간 확인
+   * 구독 상태 실시간 확인 (청구 유예 기간 포함)
    */
   async checkSubscriptionStatus(): Promise<{
     isValid: boolean;
     plan: "free" | "starter" | "premium" | "pro";
     needsServerValidation: boolean;
+    isInGracePeriod?: boolean;
+    gracePeriodEndsAt?: string;
+    daysRemaining?: number;
   }> {
     try {
       const validation = await subscriptionSecurity.validateSubscription();
@@ -243,10 +246,14 @@ class SecureSubscriptionService {
         needsServerValidation = daysSinceVerification > 7;
       }
 
+      // 청구 유예 기간 확인
+      const gracePeriodInfo = await this.checkBillingGracePeriod();
+
       return {
         isValid: validation.isValid,
         plan: validation.plan,
         needsServerValidation,
+        ...gracePeriodInfo,
       };
     } catch (error) {
       console.error("[SecureSubscription] Status check failed:", error);
@@ -255,6 +262,68 @@ class SecureSubscriptionService {
         plan: "free",
         needsServerValidation: false,
       };
+    }
+  }
+
+  /**
+   * 청구 유예 기간 확인
+   */
+  private async checkBillingGracePeriod(): Promise<{
+    isInGracePeriod: boolean;
+    gracePeriodEndsAt?: string;
+    daysRemaining?: number;
+  }> {
+    try {
+      const state = store.getState();
+      const subscription = state.user;
+
+      if (!subscription || subscription.subscriptionPlan === "free") {
+        return { isInGracePeriod: false };
+      }
+
+      const now = new Date();
+      const expiryDate = new Date(subscription.subscriptionExpiresAt || "");
+      const gracePeriodEndsAt = subscription.gracePeriodEndsAt 
+        ? new Date(subscription.gracePeriodEndsAt) 
+        : null;
+
+      // 유예 기간이 설정되어 있고 아직 유효한 경우
+      if (gracePeriodEndsAt && now < gracePeriodEndsAt) {
+        const daysRemaining = Math.ceil((gracePeriodEndsAt.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+        return {
+          isInGracePeriod: true,
+          gracePeriodEndsAt: subscription.gracePeriodEndsAt,
+          daysRemaining: Math.max(0, daysRemaining)
+        };
+      }
+
+      // 구독이 만료되었지만 유예 기간이 없는 경우, 유예 기간 시작
+      if (now > expiryDate && !gracePeriodEndsAt && subscription.subscriptionPlan !== "free") {
+        const gracePeriodEndsAt = new Date();
+        gracePeriodEndsAt.setDate(gracePeriodEndsAt.getDate() + 7); // 7일 유예 기간
+
+        // Redux 상태 업데이트
+        store.dispatch(
+          updateSubscription({
+            plan: subscription.subscriptionPlan,
+            expiresAt: subscription.subscriptionExpiresAt,
+            autoRenew: subscription.subscriptionAutoRenew,
+            gracePeriodEndsAt: gracePeriodEndsAt.toISOString(),
+            isServerVerified: true,
+          })
+        );
+
+        return {
+          isInGracePeriod: true,
+          gracePeriodEndsAt: gracePeriodEndsAt.toISOString(),
+          daysRemaining: 7
+        };
+      }
+
+      return { isInGracePeriod: false };
+    } catch (error) {
+      console.error("[SecureSubscription] Grace period check error:", error);
+      return { isInGracePeriod: false };
     }
   }
 

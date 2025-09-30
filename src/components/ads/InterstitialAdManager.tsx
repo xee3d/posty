@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Platform } from "react-native";
 import {
   InterstitialAd,
   AdEventType,
@@ -31,7 +32,10 @@ class InterstitialAdManager {
     // 테스트 ID 또는 실제 광고 ID 사용
     const adUnitId = __DEV__
       ? TestIds.INTERSTITIAL
-      : "ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyy"; // 실제 광고 ID로 교체
+      : Platform.select({
+          ios: "ca-app-pub-4435733896538626/2571860116", // 네이티브 광고 ID 재사용 (iOS)
+          android: "ca-app-pub-4435733896538626/7576774789", // 네이티브 광고 ID 재사용 (Android)
+        });
 
     this.interstitialAd = InterstitialAd.createForAdRequest(adUnitId, {
       requestNonPersonalizedAdsOnly: false,

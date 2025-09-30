@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Dimensions } from "react-native";
+import { View, StyleSheet, Dimensions, Platform } from "react-native";
 import {
   BannerAd,
   BannerAdSize,
@@ -19,7 +19,10 @@ const CompactBanner: React.FC<CompactBannerProps> = ({
 }) => {
   const adUnitId = __DEV__
     ? TestIds.BANNER
-    : "ca-app-pub-xxxxxxxxxxxxx/banner-compact";
+    : Platform.select({
+        ios: "ca-app-pub-4435733896538626/6058204207", // Posty 하단 배너 (iOS)
+        android: "ca-app-pub-4435733896538626/8889856459", // Posty 하단 배너 (Android)
+      });
 
   const getBannerSize = () => {
     switch (size) {

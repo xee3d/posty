@@ -1498,6 +1498,11 @@ const ko = {
       canceledUntil: "구독이 취소되었으며, {{date}}에 만료됩니다.",
       cancelButton: "구독 취소"
     },
+    gracePeriod: {
+      title: "청구 유예 기간",
+      message: "결제 문제로 구독이 일시 중단되었습니다. 유예 기간 동안 계속 이용하실 수 있습니다.",
+      daysRemaining: "남은 기간: {{days}}일"
+    },
     earnTokensSection: {
       title: "무료 토큰 받기",
       subtitle: "다양한 활동으로 무료 토큰을 획득하세요",

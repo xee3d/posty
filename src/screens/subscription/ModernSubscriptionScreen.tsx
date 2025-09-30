@@ -36,6 +36,7 @@ import missionService from "../../services/missionService";
 import TokenPurchaseView from "../../components/TokenPurchaseView";
 import PaymentSuccessModal from "../../components/PaymentSuccessModal";
 import { AdaptiveNativeAd, SmartAdPlacement } from "../../components/ads";
+import secureSubscriptionService from "../../services/subscription/secureSubscriptionService";
 
 import { Alert } from "../../utils/customAlert";
 import { DeviceEventEmitter } from "react-native";
@@ -82,6 +83,11 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     "subscription"
   );
   const [purchaseDetails, setPurchaseDetails] = useState<any>({});
+  const [gracePeriodInfo, setGracePeriodInfo] = useState<{
+    isInGracePeriod: boolean;
+    gracePeriodEndsAt?: string;
+    daysRemaining?: number;
+  }>({ isInGracePeriod: false });
 
   // 디버깅용
   useEffect(() => {
@@ -105,6 +111,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   useEffect(() => {
     loadTokenStats();
     loadAdStats();
+    checkGracePeriod();
 
     const checkInitialTab = async () => {
       const initialTab = await AsyncStorage.getItem("subscription_initial_tab");
@@ -183,6 +190,19 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       });
     } catch (error) {
       console.error("Failed to load ad stats:", error);
+    }
+  };
+
+  const checkGracePeriod = async () => {
+    try {
+      const status = await secureSubscriptionService.checkSubscriptionStatus();
+      setGracePeriodInfo({
+        isInGracePeriod: status.isInGracePeriod || false,
+        gracePeriodEndsAt: status.gracePeriodEndsAt,
+        daysRemaining: status.daysRemaining,
+      });
+    } catch (error) {
+      console.error("Failed to check grace period:", error);
     }
   };
 
@@ -871,6 +891,32 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 </View>
               </View>
             </View>
+
+            {/* 청구 유예 기간 알림 */}
+            {gracePeriodInfo.isInGracePeriod && (
+              <View style={styles.gracePeriodAlert}>
+                <View style={styles.gracePeriodHeader}>
+                  <MaterialIcon name="warning" size={24} color="#F59E0B" />
+                  <Text style={styles.gracePeriodTitle}>
+                    {t("subscription.gracePeriod.title", { defaultValue: "청구 유예 기간" })}
+                  </Text>
+                </View>
+                <Text style={styles.gracePeriodMessage}>
+                  {t("subscription.gracePeriod.message", { 
+                    defaultValue: "결제 문제로 구독이 일시 중단되었습니다. 유예 기간 동안 계속 이용하실 수 있습니다.",
+                    days: gracePeriodInfo.daysRemaining || 0
+                  })}
+                </Text>
+                <View style={styles.gracePeriodFooter}>
+                  <Text style={styles.gracePeriodDays}>
+                    {t("subscription.gracePeriod.daysRemaining", { 
+                      defaultValue: "남은 기간: {days}일",
+                      days: gracePeriodInfo.daysRemaining || 0
+                    })}
+                  </Text>
+                </View>
+              </View>
+            )}
 
             {/* 구독 관리 섹션 */}
             {subscriptionPlan !== "free" && (
@@ -1758,6 +1804,42 @@ const createStyles = (colors: any, isDark: boolean) => {
     activeTabText: {
       color: colors.primary,
       fontWeight: "600",
+    },
+    gracePeriodAlert: {
+      marginHorizontal: SPACING.large,
+      marginTop: SPACING.large,
+      padding: SPACING.large,
+      backgroundColor: "#FEF3C7",
+      borderRadius: 12,
+      borderWidth: 1,
+      borderColor: "#F59E0B",
+    },
+    gracePeriodHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      marginBottom: SPACING.small,
+      gap: SPACING.small,
+    },
+    gracePeriodTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: "#92400E",
+    },
+    gracePeriodMessage: {
+      fontSize: 14,
+      color: "#92400E",
+      lineHeight: 20,
+      marginBottom: SPACING.small,
+    },
+    gracePeriodFooter: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+    },
+    gracePeriodDays: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: "#92400E",
     },
   });
 };

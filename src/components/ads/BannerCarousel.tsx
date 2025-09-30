@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
+import { Platform } from "react-native";
 import {
   View,
   ScrollView,
@@ -36,14 +37,25 @@ const BannerCarousel: React.FC<BannerCarouselProps> = ({
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const [isPaused, setIsPaused] = useState(false);
 
-  // 여러 광고 유닛 ID (캐러셀용) - 모두 테스트 ID 사용
-  const adUnitIds = [
-    TestIds.BANNER,
-    TestIds.BANNER,
-    TestIds.BANNER,
-    TestIds.BANNER,
-    TestIds.BANNER,
-  ];
+  // 여러 광고 유닛 ID (캐러셀용)
+  const adUnitIds = __DEV__
+    ? [TestIds.BANNER, TestIds.BANNER, TestIds.BANNER, TestIds.BANNER, TestIds.BANNER]
+    : Platform.select({
+        ios: [
+          "ca-app-pub-4435733896538626/6058204207", // Posty 하단 배너 (iOS)
+          "ca-app-pub-4435733896538626/6058204207",
+          "ca-app-pub-4435733896538626/6058204207",
+          "ca-app-pub-4435733896538626/6058204207",
+          "ca-app-pub-4435733896538626/6058204207",
+        ],
+        android: [
+          "ca-app-pub-4435733896538626/8889856459", // Posty 하단 배너 (Android)
+          "ca-app-pub-4435733896538626/8889856459",
+          "ca-app-pub-4435733896538626/8889856459",
+          "ca-app-pub-4435733896538626/8889856459",
+          "ca-app-pub-4435733896538626/8889856459",
+        ],
+      }) || [TestIds.BANNER, TestIds.BANNER, TestIds.BANNER, TestIds.BANNER, TestIds.BANNER];
 
   const bannerData = [
     {

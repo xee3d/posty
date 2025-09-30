@@ -48,7 +48,10 @@ class RewardAdService {
   // 실제 광고 ID (운영 환경)
   private readonly adUnitId = __DEV__
     ? TestIds.REWARDED // 개발용 테스트 ID
-    : 'ca-app-pub-4039842933564424/9440450013'; // ✅ 실제 리워드 광고 ID 설정 완료
+    : Platform.select({
+        ios: 'ca-app-pub-4435733896538626/2198850241', // Posty 토큰 리워드 (iOS)
+        android: 'ca-app-pub-4435733896538626/1258778446', // Posty 토큰 리워드 (Android)
+      });
 
   private readonly adLimits: AdLimits = {
     dailyLimit: 10,
