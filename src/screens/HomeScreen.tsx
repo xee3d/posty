@@ -121,18 +121,11 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   >("beginner");
   const [showWelcome, setShowWelcome] = useState(false);
   const [styleAnalysis, setStyleAnalysis] = useState<any>(null);
-  const [isDevMode, setIsDevMode] = useState(true); // 항상 활성화
 
   // 앱 시작 시 매일 토큰 리셋 체크
   useEffect(() => {
     dispatch(resetDailyTokens());
   }, [dispatch]);
-
-  // 구독 플랜 변경 함수
-  const changeSubscriptionPlan = (plan: "free" | "starter" | "premium" | "pro") => {
-    dispatch(updateSubscription({ plan }));
-    Alert.alert("구독 플랜 변경", `${plan.toUpperCase()} 플랜으로 변경되었습니다.`);
-  };
 
   // 사용자 레벨 판단
   const getUserLevel = (
@@ -1228,41 +1221,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
         />
       )}
 
-      {/* 개발자용 구독 플랜 테스트 버튼 */}
-      {isDevMode && (
-        <View style={styles.devModeContainer}>
-          <Text style={styles.devModeTitle}>🔧 개발자 모드</Text>
-          <View style={styles.devModeButtons}>
-            <TouchableOpacity
-              style={[styles.devButton, subscriptionPlan === 'free' && styles.devButtonActive]}
-              onPress={() => changeSubscriptionPlan('free')}
-            >
-              <Text style={styles.devButtonText}>무료</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.devButton, subscriptionPlan === 'starter' && styles.devButtonActive]}
-              onPress={() => changeSubscriptionPlan('starter')}
-            >
-              <Text style={styles.devButtonText}>스타터</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.devButton, subscriptionPlan === 'premium' && styles.devButtonActive]}
-              onPress={() => changeSubscriptionPlan('premium')}
-            >
-              <Text style={styles.devButtonText}>프리미엄</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.devButton, subscriptionPlan === 'pro' && styles.devButtonActive]}
-              onPress={() => changeSubscriptionPlan('pro')}
-            >
-              <Text style={styles.devButtonText}>프로</Text>
-            </TouchableOpacity>
-          </View>
-          <Text style={styles.devModeCurrentPlan}>
-            현재: {subscriptionPlan?.toUpperCase() || 'FREE'}
-          </Text>
-        </View>
-      )}
 
     </SafeAreaView>
   );
@@ -2013,56 +1971,6 @@ const createStyles = (
       fontSize: 12,
       color: colors.text.secondary,
       textAlign: "center",
-    },
-    
-    // 개발자 모드 스타일
-    devModeContainer: {
-      position: 'absolute',
-      bottom: 100,
-      left: 10,
-      right: 10,
-      backgroundColor: colors.card.background,
-      borderRadius: 12,
-      padding: 12,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5,
-      zIndex: 1000,
-    },
-    devModeTitle: {
-      fontSize: 12,
-      fontWeight: 'bold',
-      color: colors.text.primary,
-      marginBottom: 8,
-      textAlign: 'center',
-    },
-    devModeButtons: {
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      gap: 4,
-    },
-    devButton: {
-      backgroundColor: colors.background.secondary,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 6,
-      margin: 1,
-    },
-    devButtonActive: {
-      backgroundColor: colors.primary,
-    },
-    devButtonText: {
-      fontSize: 10,
-      color: colors.text.primary,
-      fontWeight: '600',
-    },
-    devModeCurrentPlan: {
-      fontSize: 10,
-      color: colors.text.secondary,
-      textAlign: 'center',
-      marginTop: 4,
     },
   });
 };
