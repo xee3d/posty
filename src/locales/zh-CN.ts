@@ -549,6 +549,7 @@ const zhCN = {
       watchAd: "观看广告（一次使用）",
       upgrade: "升级",
       oneTimeUse: "一次使用",
+      styleMessage: "要使用{{styleName}}风格，请升级或观看广告。\n\n观看广告可免费使用一次！",
     },
     
     tokenUsage: {

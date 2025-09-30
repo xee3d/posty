@@ -246,6 +246,7 @@ const ko = {
       watchAd: "광고보기 (1회 사용)",
       upgrade: "업그레이드",
       oneTimeUse: "1회사용",
+      styleMessage: "{{styleName}} 스타일을 사용하려면 업그레이드하거나 광고를 시청하세요.\n\n광고 시청 시 1회 무료로 사용할 수 있습니다!",
     },
     tokenUsage: {
       photoWrite: "사진 글쓰기",

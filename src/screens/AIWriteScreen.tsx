@@ -1788,7 +1788,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           soundManager.playError(); // 잠긴 톤 선택 시 에러음
                           Alert.alert(
                             t("aiWrite.premium.styleTitle"),
-                            `${tone.label} 스타일을 사용하려면 업그레이드하거나 광고를 시청하세요.\n\n광고 시청 시 1회 무료로 사용할 수 있습니다!`,
+                            t("aiWrite.premium.styleMessage", { styleName: tone.label }),
                             [
                               { text: t("common.later"), style: "cancel" },
                               {

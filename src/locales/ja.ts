@@ -432,6 +432,7 @@ const ja = {
       watchAd: "広告視聴（1回使用）",
       upgrade: "変更",
       oneTimeUse: "1回使用",
+      styleMessage: "{{styleName}}スタイルを使用するには、アップグレードまたは広告をご視聴ください。\n\n広告視聴で1回無料でご利用いただけます！",
     },
     tokenUsage: {
       photoWrite: "写真投稿",
