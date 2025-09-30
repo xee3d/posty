@@ -27,7 +27,6 @@ import { useTokenManagement } from "../hooks/useTokenManagement";
 import { useTimer } from "../hooks/useCleanup";
 import EarnTokenModal from "../components/EarnTokenModal";
 import { LowTokenPrompt } from "../components/LowTokenPrompt";
-import PremiumStyleModal from "../components/PremiumStyleModal";
 import {
   AnimatedCard,
   SlideInView,
@@ -187,8 +186,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     | "engaging"
   >("engaging");
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
-  const [showPremiumStyleModal, setShowPremiumStyleModal] = useState(false);
-  const [premiumStyleName, setPremiumStyleName] = useState("");
   const [imageAnalysis, setImageAnalysis] = useState<string>("");
   const [imageAnalysisResult, setImageAnalysisResult] = useState<any>(null);
   const [isAnalyzingImage, setIsAnalyzingImage] = useState(false);
@@ -1789,8 +1786,22 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       onPress={() => {
                         if (!canAccessToneWithAd(tone.id)) {
                           soundManager.playError(); // 잠긴 톤 선택 시 에러음
-                          setPremiumStyleName(tone.label);
-                          setShowPremiumStyleModal(true);
+                          Alert.alert(
+                            t("aiWrite.premium.styleTitle"),
+                            t("aiWrite.premium.styleMessage", { styleName: tone.label }),
+                            [
+                              { text: t("common.later"), style: "cancel" },
+                              {
+                                text: t("aiWrite.premium.watchAd"),
+                                onPress: () => handleWatchAdForTone(tone.id),
+                                style: "default"
+                              },
+                              {
+                                text: t("aiWrite.premium.upgrade"),
+                                onPress: () => onNavigate?.("subscription"),
+                              },
+                            ]
+                          );
                           return;
                         }
                         soundManager.playTap(); // 톤 선택 사운드
@@ -2077,26 +2088,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         />
       )}
 
-      {/* Premium Style Modal */}
-      <PremiumStyleModal
-        visible={showPremiumStyleModal}
-        styleName={premiumStyleName}
-        onClose={() => setShowPremiumStyleModal(false)}
-        onWatchAd={() => {
-          setShowPremiumStyleModal(false);
-          // Find the tone to handle watch ad
-          const lockedTone = predefinedTones.find(tone =>
-            tone.label === premiumStyleName && !canAccessToneWithAd(tone.id)
-          );
-          if (lockedTone) {
-            handleWatchAdForTone(lockedTone.id);
-          }
-        }}
-        onUpgrade={() => {
-          setShowPremiumStyleModal(false);
-          onNavigate?.("subscription");
-        }}
-      />
     </SafeAreaView>
   );
 };
