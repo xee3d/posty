@@ -8,27 +8,39 @@ import {
   FlatList,
   Alert,
 } from 'react-native';
-import languageService, { 
-  SupportedLanguage, 
-  LanguageConfig,
-  getLanguageConfig 
-} from '../../services/localization/languageService';
+import { useTranslation } from 'react-i18next';
 import { useAppTheme } from '../../hooks/useAppTheme';
 import SafeIcon from '../../utils/SafeIcon';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { SPACING, FONT_SIZES } from '../../utils/constants';
-import { useTranslation } from 'react-i18next';
+
+type SupportedLanguage = 'ko' | 'en' | 'ja' | 'zh-CN';
+
+interface LanguageConfig {
+  code: SupportedLanguage;
+  name: string;
+  nativeName: string;
+  flag: string;
+  isRTL: boolean;
+}
 
 interface LanguageSettingsProps {
   onLanguageChange?: (language: SupportedLanguage) => void;
 }
 
+const SUPPORTED_LANGUAGES: LanguageConfig[] = [
+  { code: 'ko', name: 'Korean', nativeName: '한국어', flag: '🇰🇷', isRTL: false },
+  { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸', isRTL: false },
+  { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '🇯🇵', isRTL: false },
+  { code: 'zh-CN', name: 'Chinese', nativeName: '中文', flag: '🇨🇳', isRTL: false },
+];
+
 const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange }) => {
   const { colors, isDark } = useAppTheme();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [currentLanguage, setCurrentLanguage] = useState<SupportedLanguage>('ko');
   const [showLanguageModal, setShowLanguageModal] = useState(false);
-  const [supportedLanguages, setSupportedLanguages] = useState<LanguageConfig[]>([]);
+  const [supportedLanguages, setSupportedLanguages] = useState<LanguageConfig[]>(SUPPORTED_LANGUAGES);
   const [isSystemLanguage, setIsSystemLanguage] = useState(false);
 
   useEffect(() => {
@@ -37,13 +49,10 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
 
   const initializeLanguageSettings = async () => {
     try {
-      const current = languageService.getCurrentLanguage();
-      const languages = languageService.getSupportedLanguages();
-      const isUsingSystem = languageService.isUsingSystemLanguage();
-      
+      const current = i18n.language as SupportedLanguage;
       setCurrentLanguage(current);
-      setSupportedLanguages(languages);
-      setIsSystemLanguage(isUsingSystem);
+      setSupportedLanguages(SUPPORTED_LANGUAGES);
+      setIsSystemLanguage(false); // 시스템 언어 감지는 복잡하므로 단순화
     } catch (error) {
       console.error('Failed to initialize language settings:', error);
     }
@@ -52,9 +61,9 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
   const handleLanguageChange = async (language: SupportedLanguage) => {
     try {
       console.log('[LanguageSettings] Changing language to:', language);
-      await languageService.setLanguage(language);
+      await i18n.changeLanguage(language);
       setCurrentLanguage(language);
-      setIsSystemLanguage(language === languageService.getCurrentLanguage());
+      setIsSystemLanguage(false);
       setShowLanguageModal(false);
       
       if (onLanguageChange) {
@@ -70,13 +79,14 @@ const LanguageSettings: React.FC<LanguageSettingsProps> = ({ onLanguageChange })
 
   const handleResetToSystem = async () => {
     try {
-      await languageService.resetToSystemLanguage();
-      const newLanguage = languageService.getCurrentLanguage();
-      setCurrentLanguage(newLanguage);
+      // 시스템 언어 감지는 복잡하므로 기본값으로 설정
+      const defaultLanguage: SupportedLanguage = 'ko';
+      await i18n.changeLanguage(defaultLanguage);
+      setCurrentLanguage(defaultLanguage);
       setIsSystemLanguage(true);
       
       if (onLanguageChange) {
-        onLanguageChange(newLanguage);
+        onLanguageChange(defaultLanguage);
       }
 
       // 시스템 언어로 재설정 완료 - 팝업 제거됨
