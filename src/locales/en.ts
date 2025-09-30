@@ -558,11 +558,6 @@ const en = {
       canceledUntil: "Your subscription has been canceled and will expire on {{date}}.",
       cancelButton: "Cancel"
     },
-    gracePeriod: {
-      title: "Billing Grace Period",
-      message: "Your subscription has been temporarily suspended due to payment issues. You can continue using the service during the grace period.",
-      daysRemaining: "Remaining time: {{days}} days"
-    },
     earnTokensSection: {
       title: "Earn Free Tokens",
       subtitle: "Get free tokens through various activities",

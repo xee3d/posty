@@ -126,11 +126,6 @@ const zhCN = {
       cancelPlan: "取消计划",
       upgradePlan: "升级计划"
     },
-    gracePeriod: {
-      title: "计费宽限期",
-      message: "由于支付问题，您的订阅已暂时暂停。在宽限期内，您可以继续使用服务。",
-      daysRemaining: "剩余时间: {{days}}天"
-    },
 
     features: {
       dailyTokens10: "每日10个代币",
