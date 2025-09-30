@@ -313,8 +313,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const userPlan = getUserPlan(
     subscriptionPlan || subscription?.plan || "free"
   );
-  const MY_STYLE_ACCESS = getMyStyleAccess();
-  const styleAccess = MY_STYLE_ACCESS[userPlan] || MY_STYLE_ACCESS.free;
+  const styleAccess = getMyStyleAccess()[userPlan] || getMyStyleAccess().free;
 
   console.log("[MyStyleScreen] subscription:", subscription);
   console.log("[MyStyleScreen] subscriptionPlan:", subscriptionPlan);
@@ -817,8 +816,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <View style={styles.brandInfo}>
             <Text style={styles.brandName}>
               {styleAnalysis
-                ? t(`styleTemplates.${styleAnalysis.dominantStyle}.name`, 
-                    STYLE_TEMPLATES.find(t => t.id === styleAnalysis.dominantStyle)?.name || "")
+                ? STYLE_TEMPLATES.find(t => t.id === styleAnalysis.dominantStyle)?.name || styleAnalysis.dominantStyle
                 : ""}{" "}
               {t('myStyle.brand.title')}
             </Text>
@@ -1064,17 +1062,16 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
               </View>
 
               <View style={styles.templateContent}>
-                <Text style={styles.templateName}>{String(t(`styleTemplates.${template.id}.name`))}</Text>
+                <Text style={styles.templateName}>
+                  {template.name}
+                </Text>
                 <Text style={styles.templateDescription}>
-                  {String(t(`styleTemplates.${template.id}.description`))}
+                  {template.description}
                 </Text>
 
                 <View style={styles.templateDetails}>
                   <Text style={styles.templateDetailedDescription}>
-                    {t(`styleTemplates.${template.id}.detailedDescription`, 
-                      template.detailedDescription || 
-                      t(`styleTemplates.${template.id}.description`, template.description)
-                    )}
+                    {template.detailedDescription || template.description}
                   </Text>
 
                   {templateUsageData && templateUsageData.count > 0 && (

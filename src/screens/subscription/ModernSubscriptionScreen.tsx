@@ -15,6 +15,7 @@ import { SafeIcon } from "../../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import { COLORS, SPACING } from "../../utils/constants";
 import { getSubscriptionPlans } from "../../services/localization/pricingService";
+import { SUBSCRIPTION_PLANS } from "../../config/adConfig";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { useAppSelector } from "../../hooks/redux";
@@ -36,7 +37,6 @@ import missionService from "../../services/missionService";
 import TokenPurchaseView from "../../components/TokenPurchaseView";
 import PaymentSuccessModal from "../../components/PaymentSuccessModal";
 import { AdaptiveNativeAd, SmartAdPlacement } from "../../components/ads";
-import secureSubscriptionService from "../../services/subscription/secureSubscriptionService";
 
 import { Alert } from "../../utils/customAlert";
 import { DeviceEventEmitter } from "react-native";
@@ -63,7 +63,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     "free" | "starter" | "premium" | "pro"
   >("premium");
   const [activeTab, setActiveTab] = useState<
-    "subscription" | "tokens" | "manage"
+    "subscription" | "manage"
   >("subscription");
   const [stats, setStats] = useState({
     totalTokens: 0,
@@ -79,15 +79,10 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   // 폭죽 애니메이션용 state
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [purchaseType, setPurchaseType] = useState<"subscription" | "tokens">(
+  const [purchaseType, setPurchaseType] = useState<"subscription">(
     "subscription"
   );
   const [purchaseDetails, setPurchaseDetails] = useState<any>({});
-  const [gracePeriodInfo, setGracePeriodInfo] = useState<{
-    isInGracePeriod: boolean;
-    gracePeriodEndsAt?: string;
-    daysRemaining?: number;
-  }>({ isInGracePeriod: false });
 
   // 디버깅용
   useEffect(() => {
@@ -100,18 +95,13 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   // initialTab prop 처리
   useEffect(() => {
     if (initialTab) {
-      if (initialTab === 'freeTokens') {
-        setActiveTab('tokens');
-      } else {
-        setActiveTab(initialTab as any);
-      }
+      setActiveTab(initialTab as any);
     }
   }, [initialTab]);
 
   useEffect(() => {
     loadTokenStats();
     loadAdStats();
-    checkGracePeriod();
 
     const checkInitialTab = async () => {
       const initialTab = await AsyncStorage.getItem("subscription_initial_tab");
@@ -190,19 +180,6 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       });
     } catch (error) {
       console.error("Failed to load ad stats:", error);
-    }
-  };
-
-  const checkGracePeriod = async () => {
-    try {
-      const status = await secureSubscriptionService.checkSubscriptionStatus();
-      setGracePeriodInfo({
-        isInGracePeriod: status.isInGracePeriod || false,
-        gracePeriodEndsAt: status.gracePeriodEndsAt,
-        daysRemaining: status.daysRemaining,
-      });
-    } catch (error) {
-      console.error("Failed to check grace period:", error);
     }
   };
 
@@ -612,41 +589,41 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         )}
 
         <View style={styles.planHeader}>
-          <SafeIcon name={planIcons[planKey]} size={24} color={isSelected ? planColor : colors.text.secondary} />
-          <View style={styles.planInfo}>
-            <Text style={[styles.planName, { color: isSelected ? planColor : colors.text.primary }]}>
-              {t(`subscription.plans.${planKey}.name`, { defaultValue: plan.name })}
+          <View style={styles.planTitleRow}>
+            <MaterialIcon
+              name={planIcons[planKey]}
+              size={24}
+              color={isSelected ? planColor : colors.text.secondary}
+              style={{ marginRight: 8 }}
+            />
+            <Text
+            style={[
+            styles.planName,
+            { color: isSelected ? planColor : colors.text.primary },
+            ]}
+            >
+            {t(`subscription.plans.${planKey}.name`, { defaultValue: plan.name })}
             </Text>
-            <Text style={styles.planTagline}>
-              {planKey === "free" 
-                ? "시작하기 좋은 플랜" 
-                : planKey === "starter"
-                ? "기본 기능 제공"
-                : planKey === "premium"
-                ? "가장 인기 있는 선택"
-                : "전문가를 위한 플랜"}
-            </Text>
+            {isCurrent && (
+              <View style={styles.currentBadge}>
+                <Text style={styles.currentBadgeText}>{t("subscription.status.currentPlan")}</Text>
+              </View>
+            )}
           </View>
-          {isCurrent && (
-            <View style={styles.currentBadge}>
-              <Text style={styles.currentBadgeText}>{t("subscription.status.currentPlan")}</Text>
+          {isSelected && (
+            <View
+              style={[styles.selectedCheckmark, { backgroundColor: planColor }]}
+            >
+              <SafeIcon name="checkmark" size={16} color="#FFFFFF" />
             </View>
           )}
         </View>
 
-        <View style={styles.tokenSection}>
-          <View style={styles.tokenAmount}>
-            <Text style={[styles.tokenNumber, isSelected && { color: planColor }]}>
-              {planKey === "free" ? "10" : planKey === "pro" ? "무제한" : plan.tokens || 0}
-            </Text>
-            {planKey !== "pro" && <Text style={styles.tokenLabel}>토큰</Text>}
-          </View>
-          <View style={styles.priceContainer}>
-            <Text style={[styles.price, isSelected && { color: planColor }]}>
-              {plan.priceDisplay || plan.formattedPrice || t("subscription.plans.free.priceDisplay", { defaultValue: "Free" })}
-            </Text>
-            <Text style={styles.priceUnit}>{t("subscription.perMonth")}</Text>
-          </View>
+        <View style={styles.priceContainer}>
+          <Text style={[styles.price, isSelected && { color: planColor }]}>
+            {plan.priceDisplay || plan.formattedPrice || t("subscription.plans.free.priceDisplay", { defaultValue: "Free" })}
+          </Text>
+          <Text style={styles.priceUnit}>{t("subscription.perMonth")}</Text>
         </View>
 
         <View
@@ -677,16 +654,154 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         </View>
 
         <View style={styles.features}>
-          {plan.features?.slice(0, 3).map((feature, index) => (
-            <View key={index} style={styles.featureItem}>
-              <Icon
-                name="checkmark"
-                size={16}
-                color={isSelected ? planColor : "#10B981"}
-              />
-              <Text style={styles.featureText}>{t(feature)}</Text>
-            </View>
-          ))}
+          {/* 플랜별 주요 기능 표시 */}
+          {planKey === "free" && (
+            <>
+              <View style={styles.featureItem}>
+                <Icon
+                  name="checkmark"
+                  size={16}
+                  color={isSelected ? planColor : "#10B981"}
+                />
+                <Text style={styles.featureText}>일일 10개 토큰</Text>
+              </View>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="close"
+                       size={16}
+                       color="#EF4444"
+                     />
+                     <Text style={[styles.featureText, { color: colors.text.secondary }]}>글쓰기 스타일 {SUBSCRIPTION_PLANS.free.features.writingStyles}개 + 문장정리 {SUBSCRIPTION_PLANS.free.features.polishStyles}개</Text>
+                   </View>
+              <View style={styles.featureItem}>
+                <Icon
+                  name="close"
+                  size={16}
+                  color="#EF4444"
+                />
+                <Text style={[styles.featureText, { color: colors.text.secondary }]}>내 스타일</Text>
+              </View>
+              <View style={styles.featureItem}>
+                <Icon
+                  name="close"
+                  size={16}
+                  color="#EF4444"
+                />
+                <Text style={[styles.featureText, { color: colors.text.secondary }]}>광고 제거</Text>
+              </View>
+            </>
+          )}
+          
+               {planKey === "starter" && (
+                 <>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>가입 시 200개 + 소진 시 매일 10개</Text>
+                   </View>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>글쓰기 스타일 {SUBSCRIPTION_PLANS.starter.features.writingStyles}개 + 문장정리 {SUBSCRIPTION_PLANS.starter.features.polishStyles}개</Text>
+                   </View>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>내 스타일 (3개 템플릿)</Text>
+                   </View>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>광고 제거</Text>
+                   </View>
+                 </>
+               )}
+          
+               {planKey === "premium" && (
+                 <>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>가입 시 500개 + 소진 시 매일 10개</Text>
+                   </View>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>글쓰기 스타일 {SUBSCRIPTION_PLANS.premium.features.writingStyles}개 + 문장정리 {SUBSCRIPTION_PLANS.premium.features.polishStyles}개</Text>
+                   </View>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>내 스타일 (10개 템플릿)</Text>
+                   </View>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>광고 제거</Text>
+                   </View>
+                 </>
+               )}
+          
+               {planKey === "pro" && (
+                 <>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>무제한 토큰</Text>
+                   </View>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>글쓰기 스타일 {SUBSCRIPTION_PLANS.pro.features.writingStyles}개 + 문장정리 {SUBSCRIPTION_PLANS.pro.features.polishStyles}개</Text>
+                   </View>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>내 스타일 (무제한)</Text>
+                   </View>
+                   <View style={styles.featureItem}>
+                     <Icon
+                       name="checkmark"
+                       size={16}
+                       color={isSelected ? planColor : "#10B981"}
+                     />
+                     <Text style={styles.featureText}>광고 제거</Text>
+                   </View>
+                 </>
+               )}
         </View>
 
         {/* 각 카드 내 구매 버튼 */}
@@ -791,26 +906,6 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity
-          style={[styles.tabButton, activeTab === "tokens" && styles.activeTab]}
-          onPress={() => setActiveTab("tokens")}
-        >
-          <Icon
-            name="flash"
-            size={20}
-            color={
-              activeTab === "tokens" ? colors.primary : colors.text.secondary
-            }
-          />
-          <Text
-            style={[
-              styles.tabText,
-              activeTab === "tokens" && styles.activeTabText,
-            ]}
-          >
-            {t("subscription.tokenPurchase")}
-          </Text>
-        </TouchableOpacity>
 
         <TouchableOpacity
           style={[styles.tabButton, activeTab === "manage" && styles.activeTab]}
@@ -853,70 +948,6 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               {renderPlanCard("pro")}
             </View>
 
-            <View style={styles.benefitsSection}>
-              <Text style={styles.sectionTitle}>{t("subscription.benefits.title")}</Text>
-
-              <View style={styles.benefitCard}>
-                <View
-                  style={[
-                    styles.benefitIcon,
-                    { backgroundColor: "#8B5CF6" + "20" },
-                  ]}
-                >
-                  <SafeIcon name="flash" size={24} color="#8B5CF6" />
-                </View>
-                <View style={styles.benefitContent}>
-                  <Text style={styles.benefitTitle}>{t("subscription.benefits.moreTokens.title")}</Text>
-                  <Text style={styles.benefitDesc}>
-                    {t("subscription.benefits.moreTokens.description")}
-                  </Text>
-                </View>
-              </View>
-
-
-              <View style={styles.benefitCard}>
-                <View
-                  style={[
-                    styles.benefitIcon,
-                    { backgroundColor: "#10B981" + "20" },
-                  ]}
-                >
-                  <MaterialIcon name="block" size={24} color="#10B981" />
-                </View>
-                <View style={styles.benefitContent}>
-                  <Text style={styles.benefitTitle}>{t("subscription.benefits.noAds.title")}</Text>
-                  <Text style={styles.benefitDesc}>
-                    {t("subscription.benefits.noAds.description")}
-                  </Text>
-                </View>
-              </View>
-            </View>
-
-            {/* 청구 유예 기간 알림 */}
-            {gracePeriodInfo.isInGracePeriod && (
-              <View style={styles.gracePeriodAlert}>
-                <View style={styles.gracePeriodHeader}>
-                  <MaterialIcon name="warning" size={24} color="#F59E0B" />
-                  <Text style={styles.gracePeriodTitle}>
-                    {t("subscription.gracePeriod.title", { defaultValue: "청구 유예 기간" })}
-                  </Text>
-                </View>
-                <Text style={styles.gracePeriodMessage}>
-                  {t("subscription.gracePeriod.message", { 
-                    defaultValue: "결제 문제로 구독이 일시 중단되었습니다. 유예 기간 동안 계속 이용하실 수 있습니다.",
-                    days: gracePeriodInfo.daysRemaining || 0
-                  })}
-                </Text>
-                <View style={styles.gracePeriodFooter}>
-                  <Text style={styles.gracePeriodDays}>
-                    {t("subscription.gracePeriod.daysRemaining", { 
-                      defaultValue: "남은 기간: {days}일",
-                      days: gracePeriodInfo.daysRemaining || 0
-                    })}
-                  </Text>
-                </View>
-              </View>
-            )}
 
             {/* 구독 관리 섹션 */}
             {subscriptionPlan !== "free" && (
@@ -1011,18 +1042,6 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               </View>
             )}
           </>
-        ) : activeTab === "tokens" ? (
-          <TokenPurchaseView
-            onPurchase={async (tokenAmount) => {
-              try {
-                await inAppPurchaseService.purchaseTokens(tokenAmount);
-              } catch (error) {
-                console.error("Token purchase error:", error);
-              }
-            }}
-            colors={colors}
-            isDark={isDark}
-          />
         ) : activeTab === "manage" ? (
           <>
             <View style={styles.heroSection}>
@@ -1419,7 +1438,7 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     planCard: {
       backgroundColor: colors.surface,
-      borderRadius: 24,
+      borderRadius: 16,
       padding: SPACING.large,
       marginBottom: SPACING.medium,
       borderWidth: 2,
@@ -1428,10 +1447,10 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     selectedPlanCard: {
       shadowColor: "#000",
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.2,
-      shadowRadius: 16,
-      elevation: 8,
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 5,
     },
     downgradePlanCard: {
       opacity: 0.6,
@@ -1452,17 +1471,14 @@ const createStyles = (colors: any, isDark: boolean) => {
     },
     planHeader: {
       flexDirection: "row",
+      justifyContent: "space-between",
       alignItems: "center",
-      gap: 16,
-      marginBottom: 16,
+      marginBottom: SPACING.small,
     },
-    planInfo: {
-      flex: 1,
-    },
-    planTagline: {
-      fontSize: 14,
-      color: colors.text.secondary,
-      marginTop: 4,
+    planTitleRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: SPACING.small,
     },
     planName: {
       fontSize: 20,
@@ -1486,31 +1502,10 @@ const createStyles = (colors: any, isDark: boolean) => {
       justifyContent: "center",
       alignItems: "center",
     },
-    tokenSection: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-      marginBottom: 16,
-    },
-    tokenAmount: {
-      flexDirection: "row",
-      alignItems: "baseline",
-      gap: 8,
-    },
-    tokenNumber: {
-      fontSize: 36,
-      fontWeight: "800",
-      color: colors.text.primary,
-      letterSpacing: -0.5,
-    },
-    tokenLabel: {
-      fontSize: 18,
-      fontWeight: "500",
-      color: colors.text.secondary,
-    },
     priceContainer: {
       flexDirection: "row",
       alignItems: "baseline",
+      marginBottom: SPACING.medium,
     },
     price: {
       fontSize: 32,
@@ -1804,42 +1799,6 @@ const createStyles = (colors: any, isDark: boolean) => {
     activeTabText: {
       color: colors.primary,
       fontWeight: "600",
-    },
-    gracePeriodAlert: {
-      marginHorizontal: SPACING.large,
-      marginTop: SPACING.large,
-      padding: SPACING.large,
-      backgroundColor: "#FEF3C7",
-      borderRadius: 12,
-      borderWidth: 1,
-      borderColor: "#F59E0B",
-    },
-    gracePeriodHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      marginBottom: SPACING.small,
-      gap: SPACING.small,
-    },
-    gracePeriodTitle: {
-      fontSize: 16,
-      fontWeight: "600",
-      color: "#92400E",
-    },
-    gracePeriodMessage: {
-      fontSize: 14,
-      color: "#92400E",
-      lineHeight: 20,
-      marginBottom: SPACING.small,
-    },
-    gracePeriodFooter: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
-    gracePeriodDays: {
-      fontSize: 13,
-      fontWeight: "600",
-      color: "#92400E",
     },
   });
 };

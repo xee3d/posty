@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Image } from "react-native";
+import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { useTranslation } from "react-i18next";
@@ -9,6 +9,7 @@ interface AppLogoProps {
   showText?: boolean;
   variant?: "primary" | "white";
   useAppIcon?: boolean; // 새로운 prop: 실제 앱 아이콘 이미지 사용 여부
+  onPress?: () => void; // 개발자 모드용 onPress 추가
 }
 
 const AppLogo: React.FC<AppLogoProps> = ({
@@ -16,6 +17,7 @@ const AppLogo: React.FC<AppLogoProps> = ({
   showText = false,
   variant = "primary",
   useAppIcon = false,
+  onPress
 }) => {
   const { colors } = useAppTheme();
   const { t } = useTranslation();
@@ -39,8 +41,8 @@ const AppLogo: React.FC<AppLogoProps> = ({
     }
   }, [showText, useAppIcon]);
 
-  return (
-    <View style={styles.container}>
+  const LogoContent = () => (
+    <>
       {useAppIcon ? (
         // 실제 앱 아이콘 이미지 사용
         <View style={[styles.imageContainer, { width: size, height: size }]}>
@@ -89,6 +91,18 @@ const AppLogo: React.FC<AppLogoProps> = ({
             {useAppIcon ? displayedText : t("app.slogan")}
           </Text>
         </View>
+      )}
+    </>
+  );
+
+  return (
+    <View style={styles.container}>
+      {onPress ? (
+        <TouchableOpacity onPress={onPress} activeOpacity={0.8}>
+          <LogoContent />
+        </TouchableOpacity>
+      ) : (
+        <LogoContent />
       )}
     </View>
   );

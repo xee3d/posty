@@ -156,10 +156,10 @@ Requirements:
 
 // 이미지 분석 프롬프트
 export const IMAGE_ANALYSIS_PROMPTS: Record<SupportedLanguage, string> = {
-  'ko': '이 사진의 핵심 내용을 간단히 설명해주세요. 무엇을, 어디서, 어떤 분위기인지 1-2문장으로 요약해주세요.',
-  'en': 'Please briefly describe the key elements of this photo. Summarize what, where, and what atmosphere in 1-2 sentences.',
-  'ja': 'この写真の要点を簡潔に説明してください。何が、どこで、どんな雰囲気なのかを1-2文で要約してください。',
-  'zh-CN': '请简要描述这张照片的关键内容。用1-2句话总结是什么、在哪里、什么氛围。',
+  'ko': `이 사진의 주요 내용과 특징을 객관적으로 설명해주세요. 사진 속 주요 객체, 배경, 색감, 전반적인 분위기를 중심으로 3-4문장으로 요약해주세요. 친근한 멘트나 감정적인 표현은 사용하지 마세요.`,
+  'en': `Please objectively describe the main content and characteristics of this photo. Summarize the key objects, background, color scheme, and overall atmosphere in 3-4 sentences. Do not use friendly commentary or emotional expressions.`,
+  'ja': `この写真の主要な内容と特徴を客観的に説明してください。写真の中の主要なオブジェクト、背景、色合い、全体的な雰囲気を中心に3〜4文で要約してください。親しみやすいコメントや感情的な表現は使用しないでください。`,
+  'zh-CN': `请客观地描述这张照片的主要内容和特点。请围绕照片中的主要物体、背景、色彩和整体氛围，用3-4句话进行总结。请勿使用友好的评论或情感表达。`,
 };
 
 // 프롬프트 생성 함수

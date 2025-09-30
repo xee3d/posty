@@ -54,6 +54,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
       gradient: ["#A78BFA", "#8B5CF6"],
       features: [
         { icon: "flash", text: "매월 100개 토큰 제공" },
+        { icon: "sparkles", text: "GPT-4 기반 고급 AI" },
         { icon: "ban-outline", text: "광고 완전 제거" },
         { icon: "speed", text: "우선 처리 속도" },
       ],
@@ -65,6 +66,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
       gradient: ["#FCD34D", "#F59E0B"],
       features: [
         { icon: "infinite-outline", text: "무제한 토큰" },
+        { icon: "sparkles", text: "최고급 AI 모델" },
         { icon: "ban-outline", text: "광고 완전 제거" },
         { icon: "headset-outline", text: "1:1 프리미엄 지원" },
         { icon: "diamond-outline", text: "베타 기능 우선 체험" },
@@ -152,9 +154,11 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
                 <Text style={styles.tokenInfoText}>
                   {plan.key === "free"
                     ? "일일 10개"
+                    : plan.key === "starter"
+                    ? "200개"
                     : plan.key === "premium"
-                    ? "월 100개"
-                    : "무제한"}
+                    ? "500개"
+                    : "1500개"}
                 </Text>
               </LinearGradient>
             </View>
@@ -225,6 +229,18 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
           </View>
 
           <View style={styles.comparisonRow}>
+            <Text style={styles.comparisonLabel}>AI 모델</Text>
+            <View style={styles.comparisonValues}>
+              <Text style={[styles.comparisonValue, styles.freeValue]}>
+                기본
+              </Text>
+              <Text style={[styles.comparisonValue, styles.premiumValue]}>
+                고급
+              </Text>
+              <Text style={[styles.comparisonValue, styles.proValue]}>
+                최고급
+              </Text>
+            </View>
           </View>
 
           <View style={styles.comparisonRow}>
@@ -263,6 +279,10 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
             end={{ x: 1, y: 1 }}
           >
             <SafeIcon name="sparkles" size={32} color="#FFFFFF" />
+            <Text style={styles.benefitTitle}>고급 AI</Text>
+            <Text style={styles.benefitDesc}>
+              GPT-4 기반의 더 똑똑한 AI 활용
+            </Text>
           </LinearGradient>
 
           <LinearGradient

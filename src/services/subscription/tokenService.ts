@@ -126,11 +126,8 @@ class TokenService {
       const subscription = await this.getSubscription();
       await this.checkDailyReset(subscription);
 
-      // 월간 리셋 체크 (STARTER, PREMIUM 플랜)
-      const subscriptionPlan = store.getState().user.subscriptionPlan;
-      if (subscriptionPlan === "starter" || subscriptionPlan === "premium") {
-        store.dispatch(resetMonthlyTokens());
-      }
+      // 월간 리셋 체크 (스타터/프리미엄 플랜)
+      await this.checkMonthlyReset();
     } catch (error) {
       console.error("TokenService: Initialization error:", error);
       // 에러 발생 시 현재 Redux 상태 유지
@@ -324,29 +321,84 @@ class TokenService {
   /**
    * 일일 리셋 체크
    * - 무료 플랜: 매일 10개로 리셋
-   * - 유료 플랜: 일일 보너스 토큰 추가
+   * - 스타터/프리미엄 플랜: 토큰 소진 시 매일 10개 충전
    */
   private async checkDailyReset(subscription: UserTokenData): Promise<void> {
     const now = new Date();
     const lastReset = new Date(subscription.lastResetDate);
 
-    // 날짜가 다르면 리셋 (모든 플랜에서 적용)
+    // 날짜가 다르면 리셋
     if (now.toDateString() !== lastReset.toDateString()) {
-      // Redux에서 일일 토큰 리셋
       console.log(
         "[TokenService] Daily reset triggered for",
         subscription.subscriptionPlan
       );
-      store.dispatch(resetDailyTokens());
+
+      // 무료 플랜: 매일 10개로 리셋
+      if (subscription.subscriptionPlan === "free") {
+        store.dispatch(resetDailyTokens());
+      }
+      // 스타터/프리미엄 플랜: 토큰이 0개일 때만 10개 충전
+      else if (subscription.subscriptionPlan === "starter" || subscription.subscriptionPlan === "premium") {
+        const currentTokens = store.getState().user.currentTokens || 0;
+        if (currentTokens === 0) {
+          console.log("[TokenService] Adding daily 10 tokens for", subscription.subscriptionPlan);
+          store.dispatch(earnTokens({ amount: 10, description: "일일 충전" }));
+        }
+      }
     }
   }
 
   /**
-   * 월간 리셋 체크 (Premium 플랜)
+   * 월간 리셋 체크 (스타터/프리미엄 플랜)
+   * - 매월 가입 시 제공했던 토큰을 재충전
    */
   async checkMonthlyReset(): Promise<void> {
-    // Redux에서 처리하므로 액션만 호출
-    store.dispatch(resetMonthlyTokens());
+    const subscriptionPlan = store.getState().user.subscriptionPlan;
+    
+    if (subscriptionPlan === "starter" || subscriptionPlan === "premium") {
+      try {
+        // 마지막 월간 리셋 날짜 확인
+        const lastMonthlyResetKey = `LAST_MONTHLY_RESET_${subscriptionPlan}`;
+        const lastResetDate = await AsyncStorage.getItem(lastMonthlyResetKey);
+        
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+        
+        let shouldReset = false;
+        
+        if (!lastResetDate) {
+          // 첫 번째 월간 리셋
+          shouldReset = true;
+        } else {
+          const lastReset = new Date(lastResetDate);
+          const lastMonth = lastReset.getMonth();
+          const lastYear = lastReset.getFullYear();
+          
+          // 월이 바뀌었거나 년도가 바뀌었으면 리셋
+          shouldReset = (currentYear > lastYear) || (currentYear === lastYear && currentMonth > lastMonth);
+        }
+        
+        if (shouldReset) {
+          // 매월 가입 시 제공했던 토큰 재충전
+          const { SUBSCRIPTION_PLANS } = await import("../../utils/adConfig");
+          const planConfig = SUBSCRIPTION_PLANS[subscriptionPlan];
+          const initialTokens = planConfig.features.initialTokens;
+          
+          console.log(`[TokenService] Monthly refill: ${initialTokens} tokens for ${subscriptionPlan}`);
+          store.dispatch(earnTokens({ 
+            amount: initialTokens, 
+            description: "월간 재충전" 
+          }));
+          
+          // 마지막 리셋 날짜 업데이트
+          await AsyncStorage.setItem(lastMonthlyResetKey, now.toISOString());
+        }
+      } catch (error) {
+        console.error("Failed to check monthly reset:", error);
+      }
+    }
   }
 
   /**

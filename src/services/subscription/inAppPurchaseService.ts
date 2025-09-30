@@ -280,36 +280,6 @@ class InAppPurchaseService {
     }
   }
 
-  /**
-   * 토큰 구매
-   */
-  async purchaseTokens(packageId: string): Promise<void> {
-    // 시뮬레이터 환경에서는 구매 불가 메시지 표시
-    if (Platform.OS === "ios" && __DEV__) {
-      throw new Error(
-        "시뮬레이터에서는 인앱 결제를 테스트할 수 없습니다. 실제 기기에서 테스트해주세요."
-      );
-    }
-
-    try {
-      const sku = this.getTokenSku(packageId);
-      const product = this.products.find((p) => (p as any).productId === sku);
-
-      if (!product) {
-        throw new Error("Product not found");
-      }
-
-      console.log("Purchasing tokens:", sku);
-
-      await requestPurchase({
-        skus: [sku],
-        andDangerouslyFinishTransactionAutomaticallyIOS: false,
-      });
-    } catch (error) {
-      console.error("Purchase tokens error:", error);
-      throw error;
-    }
-  }
 
   /**
    * 구매 검증

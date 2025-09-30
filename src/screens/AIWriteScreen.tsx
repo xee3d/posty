@@ -1683,28 +1683,23 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     <Text style={styles.sectionTitle}>{t("aiWrite.sections.photoSelect")}</Text>
                   </View>
                   {selectedImageUri ? (
-                    <View style={styles.selectedImageContainer}>
+                    <TouchableOpacity 
+                      style={styles.selectedImageContainer}
+                      onPress={() => {
+                        // 사진을 다시 누르면 갤러리에서 선택
+                        handleSelectFromGallery();
+                      }}
+                      activeOpacity={0.8}
+                    >
                       <Image
                         source={{ uri: selectedImageUri }}
                         style={styles.selectedImage}
                       />
-                      <View style={styles.changePhotoButtons}>
-                        <ScaleButton
-                          style={styles.changePhotoButton}
-                          onPress={handleSelectFromCamera}
-                        >
-                          <SafeIcon name="camera" size={16} color="#FFFFFF" />
-                          <Text style={styles.changePhotoText}>{t("aiWrite.photo.upload.camera")}</Text>
-                        </ScaleButton>
-                        <ScaleButton
-                          style={styles.changePhotoButton}
-                          onPress={handleSelectFromGallery}
-                        >
-                          <SafeIcon name="image-outline" size={16} color="#FFFFFF" />
-                          <Text style={styles.changePhotoText}>{t("aiWrite.photo.upload.gallery")}</Text>
-                        </ScaleButton>
+                      <View style={styles.changePhotoButton}>
+                        <SafeIcon name="camera" size={16} color="#FFFFFF" />
+                        <Text style={styles.changePhotoText}>사진 변경</Text>
                       </View>
-                    </View>
+                    </TouchableOpacity>
                   ) : (
                     <View style={styles.photoSelectionContainer}>
                       <Text style={styles.photoSelectionTitle}>
@@ -2404,6 +2399,7 @@ const createStyles = (
     optionSection: {
       paddingHorizontal: SPACING.lg, // 원래대로 복구
       marginBottom: 0,
+      marginTop: SPACING.lg, // 안드로이드에서 상단 카드와의 간격 추가
     },
     toneSection: {
       marginBottom: 8,

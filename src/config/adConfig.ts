@@ -10,8 +10,10 @@ export const PLAN_FEATURES = {
     monthlyTokens: 0,
     initialTokens: 0, // 초기 지급 토큰
     dailyBonus: 0, // 일일 추가 토큰
-    tones: ["casual", "professional", "humorous"], // 3개
-    lengths: ["short", "medium"],
+    writingStyles: 2, // 글쓰기 스타일 2개
+    polishStyles: 2, // 문장정리 2개
+    tones: ["casual", "professional"], // 2개
+    lengths: ["short", "medium"], // 길게는 프리미엄부터
     hasAds: true,
     imageAnalysisTokens: 1,
   },
@@ -20,8 +22,10 @@ export const PLAN_FEATURES = {
     monthlyTokens: 600, // 월 총 600개 (300 + 10*30)
     initialTokens: 300, // 초기 지급 300개
     dailyBonus: 10, // 일일 10개 추가
+    writingStyles: 4, // 글쓰기 스타일 4개
+    polishStyles: 3, // 문장정리 3개
     tones: ["casual", "professional", "humorous", "emotional"], // 4개
-    lengths: ["short", "medium", "long"],
+    lengths: ["short", "medium"], // 길게는 프리미엄부터
     hasAds: false,
     imageAnalysisTokens: 1,
   },
@@ -30,6 +34,8 @@ export const PLAN_FEATURES = {
     monthlyTokens: 1100, // 월 총 1100개 (500 + 20*30)
     initialTokens: 500, // 초기 지급 500개
     dailyBonus: 20, // 일일 20개 추가
+    writingStyles: 6, // 글쓰기 스타일 6개
+    polishStyles: 4, // 문장정리 4개
     tones: [
       "casual",
       "professional",
@@ -38,7 +44,7 @@ export const PLAN_FEATURES = {
       "genz",
       "millennial",
     ], // 6개
-    lengths: ["short", "medium", "long"],
+    lengths: ["short", "medium", "long"], // 프리미엄부터 길게 해금
     hasAds: false,
     imageAnalysisTokens: 1,
   },
@@ -47,6 +53,8 @@ export const PLAN_FEATURES = {
     monthlyTokens: -1, // 무제한
     initialTokens: 9999, // 무제한
     dailyBonus: 0, // 추가 충전 불필요
+    writingStyles: 9, // 글쓰기 스타일 9개
+    polishStyles: 6, // 문장정리 6개
     tones: [
       "casual",
       "professional",
@@ -58,7 +66,7 @@ export const PLAN_FEATURES = {
       "storytelling",
       "motivational",
     ],
-    lengths: ["short", "medium", "long"],
+    lengths: ["short", "medium", "long"], // 모든 길이 사용 가능
     hasAds: false,
     imageAnalysisTokens: 1,
   },
@@ -113,17 +121,14 @@ export const getImageAnalysisTokens = (plan: PlanType): number => {
 
 // 플랜별 문장 다듬기 옵션
 export const POLISH_OPTIONS = {
-  free: ["summarize", "simple", "engaging"], // 3개
+  free: ["summarize", "engaging"], // 2개 (요약하기, 매력적으로)
   starter: ["summarize", "simple", "formal", "engaging", "hashtag"], // 5개
   premium: [
     "summarize",
     "simple",
     "formal",
-    "emotion",
-    "storytelling",
     "engaging",
-    "hashtag",
-  ], // 7개
+  ], // 4개
   pro: [
     "summarize",
     "simple",
@@ -146,29 +151,31 @@ export const canAccessPolishOption = (
   return availableOptions.includes(option);
 };
 
-// MyStyle 접근 권한
-export const getMyStyleAccess = () => ({
-  free: {
-    hasAccess: false,
-    message: i18next.t("myStyle.access.freeMessage"),
-    templateLimit: 0,
-  },
-  starter: {
-    hasAccess: true,
-    message: "",
-    templateLimit: 3, // 3개 템플릿만 사용 가능
-  },
-  premium: {
-    hasAccess: true,
-    message: "",
-    templateLimit: 0, // 제한 없음
-  },
-  pro: {
-    hasAccess: true,
-    message: "",
-    templateLimit: 0, // 제한 없음
-  },
-});
+// MyStyle 접근 권한 - 구독자만 사용 가능
+export const getMyStyleAccess = () => {
+  return {
+    free: {
+      hasAccess: false, // 무료 사용자는 접근 불가
+      message: i18next.t("myStyle.access.freeMessage"),
+      templateLimit: 0,
+    },
+    starter: {
+      hasAccess: true,
+      message: "",
+      templateLimit: 3, // 3개 템플릿만 사용 가능
+    },
+    premium: {
+      hasAccess: true,
+      message: "",
+      templateLimit: 0, // 제한 없음
+    },
+    pro: {
+      hasAccess: true,
+      message: "",
+      templateLimit: 0, // 제한 없음
+    },
+  };
+};
 
 // 호환성을 위한 기존 상수 (함수 호출로 변경)
 export const MY_STYLE_ACCESS = getMyStyleAccess();
@@ -231,118 +238,61 @@ export const AD_CONFIG = {
   },
 };
 
-// 구독 플랜 정보
+// 구독 플랜 정보 (PLAN_FEATURES와 통합)
 export const SUBSCRIPTION_PLANS = {
   free: {
     id: "free",
     name: "무료",
     price: 0,
     priceDisplay: "무료",
-    dailyTokens: 10,
-    monthlyTokens: 0,
-    features: [
-      "subscription.features.dailyTokens10",
-      "subscription.features.tones3",
-      "subscription.features.lengthShortMedium",
-      "subscription.features.hasAds",
-    ],
+    features: {
+      initialTokens: 0,
+      dailyTokens: 10,
+      writingStyles: 2,
+      polishStyles: 2,
+      hasAds: true,
+    },
   },
   starter: {
     id: "starter",
-    name: "Starter",
+    name: "STARTER",
     price: 1900,
     priceDisplay: "₩1,900",
-    monthlyPrice: 1900,
-    yearlyPrice: 19000,
-    dailyTokens: -1, // 일일 제한 없음
-    monthlyTokens: 600, // 월 총 600개
-    features: [
-      "subscription.features.signup300",
-      "subscription.features.daily10",
-      "subscription.features.tones4",
-      "subscription.features.longLength",
-      "subscription.features.noAds",
-      "subscription.features.myStyleAnalysis",
-    ],
+    features: {
+      initialTokens: 200,
+      dailyTokens: -1,
+      writingStyles: 4,
+      polishStyles: 3,
+      hasAds: false,
+    },
   },
   premium: {
     id: "premium",
-    name: "Premium",
+    name: "PREMIUM",
     price: 4900,
     priceDisplay: "₩4,900",
-    monthlyPrice: 4900,
-    yearlyPrice: 49000,
-    dailyTokens: -1, // 일일 제한 없음
-    monthlyTokens: 1100, // 월 총 1100개
-    features: [
-      "subscription.features.signup500",
-      "subscription.features.daily20",
-      "subscription.features.tones6",
-      "subscription.features.allLengths",
-      "subscription.features.noAds",
-      "subscription.features.myStyleAnalysis",
-      "subscription.features.fastImageAnalysis",
-      "subscription.features.gpt4Model",
-    ],
+    features: {
+      initialTokens: 500,
+      dailyTokens: -1,
+      writingStyles: 6,
+      polishStyles: 4,
+      hasAds: false,
+    },
   },
   pro: {
     id: "pro",
-    name: "Pro",
+    name: "PRO",
     price: 14900,
     priceDisplay: "₩14,900",
-    monthlyPrice: 14900,
-    yearlyPrice: 149000,
-    dailyTokens: -1, // 무제한
-    monthlyTokens: -1, // 무제한
-    features: [
-      "subscription.features.unlimitedTokens",
-      "subscription.features.allTones",
-      "subscription.features.allLengths",
-      "subscription.features.noAds",
-      "subscription.features.myStyleAnalysis",
-      "subscription.features.instantImageAnalysis",
-      "subscription.features.gpt4TurboModel",
-      "subscription.features.apiAccess",
-      "subscription.features.prioritySupport",
-    ],
+    features: {
+      initialTokens: -1, // 무제한
+      dailyTokens: -1,
+      writingStyles: 9,
+      polishStyles: 6,
+      hasAds: false,
+    },
   },
 };
 
 // 토큰 패키지 (구독 플랜과 일관성 있게 조정)
-export const TOKEN_PACKAGES = [
-  { id: "tokens_30", tokens: 30, price: 1900, priceDisplay: "₩1,900" }, // STARTER 한달치와 동일
-  { id: "tokens_100", tokens: 100, price: 4900, priceDisplay: "₩4,900" }, // PREMIUM 한달치와 동일
-  { id: "tokens_300", tokens: 300, price: 9900, priceDisplay: "₩9,900" }, // 대량 구매 할인
-  { id: "tokens_1000", tokens: 1000, price: 19900, priceDisplay: "₩19,900" }, // 초대량 특별가
-];
 
-// 토큰 구매 설정
-export const TOKEN_PURCHASE_CONFIG = {
-  // 플랜별 보너스
-  planBonuses: {
-    free: {
-      bonusRate: 0, // 0% 보너스
-      priceDiscount: 0, // 0% 할인
-    },
-    starter: {
-      bonusRate: 0.1, // 10% 보너스 토큰
-      priceDiscount: 10, // 10% 할인
-    },
-    premium: {
-      bonusRate: 0.2, // 20% 보너스 토큰
-      priceDiscount: 20, // 20% 할인
-    },
-    pro: {
-      bonusRate: 0, // PRO는 무제한이므로 보너스 없음
-      priceDiscount: 0, // PRO는 무제한이므로 할인 없음
-    },
-  },
-
-  // 프로모션
-  promotions: {
-    firstPurchase: {
-      minAmount: 30, // 최소 30개 이상 구매 시
-      discount: 30, // 추가 30% 할인
-    },
-  },
-};

@@ -70,122 +70,37 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
     Record<string, number>
   >({});
 
-  // 동적 폰트 사이즈 계산 함수
-  const calculateOptimalFontSize = (text: string, containerWidth: number) => {
-    // 기본 폰트 사이즈들 (더 세분화)
-    const baseFontSizes = {
-      xlarge: 12,   // >= 428px (iPhone 14 Pro Max)
-      large: 11,    // >= 414px (iPhone 14 Plus)
-      medium: 10,   // >= 390px (iPhone 14 Pro)
-      small: 9,     // >= 375px (iPhone 14, 13, 12)
-      xsmall: 8,    // >= 360px (일반 Android)
-      xxsmall: 7,   // < 360px (iPhone SE, mini)
-    };
+  // 아이콘만 사용하므로 폰트 사이즈 계산 함수 제거
 
-    // 화면 너비별 기본 폰트 사이즈 결정
-    let fontSize = baseFontSizes.medium;
+  // 플랫폼 아이콘 정의 (텍스트 제거로 인해 이름은 툴팁용으로만 사용)
+  const platforms = [
+    {
+      id: "original",
+      name: "원본",
+      icon: "document-text-outline",
+      color: colors.primary,
+    },
+    {
+      id: "instagram",
+      name: "Instagram",
+      icon: "logo-instagram",
+      color: "#E4405F",
+    },
+    {
+      id: "facebook",
+      name: "Facebook",
+      icon: "logo-facebook",
+      color: "#1877F2",
+    },
+    {
+      id: "twitter",
+      name: "X",
+      icon: "logo-twitter",
+      color: isDark ? "#FFFFFF" : "#000000",
+    },
+  ];
 
-    if (screenWidth >= 428) {
-      fontSize = baseFontSizes.xlarge;
-    } else if (screenWidth >= 414) {
-      fontSize = baseFontSizes.large;
-    } else if (screenWidth >= 390) {
-      fontSize = baseFontSizes.medium;
-    } else if (screenWidth >= 375) {
-      fontSize = baseFontSizes.small;
-    } else if (screenWidth >= 360) {
-      fontSize = baseFontSizes.xsmall;
-    } else {
-      fontSize = baseFontSizes.xxsmall;
-    }
-
-    // 텍스트 길이별 세밀한 조정
-    const textLength = text.length;
-    const estimatedTextWidth = textLength * (fontSize * 0.6); // 대략적인 텍스트 너비 추정
-
-    // 컨테이너에 비해 텍스트가 너무 긴 경우 폰트 사이즈 축소
-    if (estimatedTextWidth > containerWidth) {
-      const reductionFactor = containerWidth / estimatedTextWidth;
-      fontSize = Math.max(fontSize * reductionFactor, 6); // 최소 6px
-    }
-
-    // 특정 텍스트별 추가 최적화
-    if (text === "Instagram" && screenWidth < 375) {
-      fontSize = Math.min(fontSize, 8);
-    } else if (text === "Facebook" && screenWidth < 375) {
-      fontSize = Math.min(fontSize, 8);
-    }
-
-    return Math.round(fontSize * 10) / 10; // 소수점 첫째 자리까지 반올림
-  };
-
-  // 화면 크기에 따른 플랫폼 이름 조정
-  const getPlatformsForScreenSize = () => {
-    const basePlatforms = [
-      {
-        id: "original",
-        name: "원본",
-        icon: "document-text-outline",
-        color: colors.primary,
-      },
-      {
-        id: "instagram",
-        name: "Instagram",
-        icon: "logo-instagram",
-        color: "#E4405F",
-      },
-      {
-        id: "facebook",
-        name: "Facebook",
-        icon: "logo-facebook",
-        color: "#1877F2",
-      },
-      {
-        id: "twitter",
-        name: "X",
-        icon: "logo-twitter",
-        color: isDark ? "#FFFFFF" : "#000000",
-      },
-    ];
-
-    // 작은 화면 (iPhone mini, SE 등)에서는 플랫폼 이름을 축약
-    if (screenWidth < 375) {
-      return basePlatforms.map(platform => ({
-        ...platform,
-        name: platform.id === "original" ? "원본" : 
-              platform.id === "instagram" ? "IG" :
-              platform.id === "facebook" ? "FB" :
-              platform.id === "twitter" ? "X" : platform.name
-      }));
-    }
-
-    // 중간 화면에서는 일부만 축약
-    if (screenWidth < 414) {
-      return basePlatforms.map(platform => ({
-        ...platform,
-        name: platform.id === "instagram" ? "Instagram" :
-              platform.id === "facebook" ? "Facebook" :
-              platform.name
-      }));
-    }
-
-    // 큰 화면에서는 전체 이름 사용
-    return basePlatforms;
-  };
-
-  const platforms = getPlatformsForScreenSize();
-
-  // 각 탭의 실제 사용 가능한 너비 계산
-  const getTabWidth = () => {
-    const padding = screenWidth < 375 ? 4 : 8; // SPACING.xs : SPACING.sm
-    const gap = screenWidth < 375 ? 2 : 4;
-    const totalGaps = (platforms.length - 1) * gap;
-    const totalPadding = padding * 2;
-    const availableWidth = screenWidth - totalPadding - totalGaps;
-    return availableWidth / platforms.length;
-  };
-
-  const tabWidth = getTabWidth();
+  // 아이콘만 사용하므로 탭 너비 계산 불필요
   const [showPlatformHint, setShowPlatformHint] = useState(false);
   const hintOpacity = useRef(new Animated.Value(0)).current;
   const [contentHeight, setContentHeight] = useState<number>(300); // 동적 높이 상태
@@ -474,24 +389,13 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
           >
             <Icon
               name={platform.icon}
-              size={screenWidth < 375 ? 12 : 14}
+              size={screenWidth < 375 ? 22 : 24}
               color={
                 activePlatform === platform.id
                   ? platform.color
                   : colors.text.secondary
               }
             />
-            <Text
-              style={[
-                styles.platformTabText,
-                activePlatform === platform.id && { color: platform.color },
-                { fontSize: calculateOptimalFontSize(platform.name, tabWidth - 20) } // 아이콘 + 여백 고려
-              ]}
-              numberOfLines={1}
-              ellipsizeMode="tail"
-            >
-              {platform.name}
-            </Text>
             {isOptimizing && activePlatform === platform.id && (
               <ActivityIndicator
                 size="small"
@@ -801,25 +705,24 @@ const createStyles = (colors: typeof COLORS, cardTheme: any, isDark: boolean, sc
     },
     platformTabs: {
       flexDirection: "row",
-      justifyContent: "space-between",
-      paddingHorizontal: screenWidth < 375 ? SPACING.xs : SPACING.sm,
+      justifyContent: "center",
+      paddingHorizontal: screenWidth < 375 ? SPACING.md : SPACING.lg,
       marginBottom: SPACING.sm,
-      gap: screenWidth < 375 ? 2 : 4,
+      gap: screenWidth < 375 ? 8 : 12,
     },
     platformTab: {
-      flex: 1,
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
-      paddingHorizontal: screenWidth < 375 ? 2 : 4,
-      paddingVertical: screenWidth < 375 ? SPACING.xs : SPACING.sm,
-      borderRadius: screenWidth < 375 ? 12 : 16,
+      paddingHorizontal: screenWidth < 375 ? 12 : 16,
+      paddingVertical: screenWidth < 375 ? 10 : 12,
+      borderRadius: screenWidth < 375 ? 14 : 18,
       backgroundColor: colors.surface,
       borderWidth: 2,
       borderColor: "transparent",
-      minHeight: screenWidth < 375 ? 32 : 36,
-      // maxWidth를 동적으로 조정하여 더 많은 공간 확보
-      maxWidth: Math.max(screenWidth / 4.2, 70), // 화면 크기에 비례하여 조정
+      minHeight: screenWidth < 375 ? 44 : 48,
+      minWidth: screenWidth < 375 ? 44 : 48, // 정사각형에 가까운 형태
+      maxWidth: screenWidth < 375 ? 60 : 70, // 더 큰 버튼 크기
     },
     platformTabActive: {
       backgroundColor: isDark ? colors.surface : "#fff",
@@ -828,17 +731,6 @@ const createStyles = (colors: typeof COLORS, cardTheme: any, isDark: boolean, sc
       shadowOpacity: 0.1,
       shadowRadius: 4,
       elevation: 3,
-    },
-    platformTabText: {
-      // fontSize는 동적으로 계산되어 인라인으로 적용됨
-      fontFamily: "System",
-      fontWeight: "600" as const,
-      color: colors.text.secondary,
-      marginLeft: screenWidth < 375 ? 1 : 2,
-      textAlign: "center",
-      flexShrink: 1,
-      includeFontPadding: false, // Android에서 폰트 패딩 제거
-      textAlignVertical: "center", // Android 수직 정렬
     },
     loader: {
       marginLeft: SPACING.xs,

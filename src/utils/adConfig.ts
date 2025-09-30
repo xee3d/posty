@@ -87,7 +87,7 @@ export const SUBSCRIPTION_PLANS = {
 
   premium: {
     id: "premium",
-    name: "PRO",
+    name: "PREMIUM",
     price: 4900,
     priceDisplay: "₩4,900",
     features: {
@@ -111,13 +111,13 @@ export const SUBSCRIPTION_PLANS = {
 
   pro: {
     id: "pro",
-    name: "MAX",
+    name: "PRO",
     price: 14900,
     priceDisplay: "₩14,900",
     features: {
       monthlyTokens: -1, // 무제한
       dailyLimit: -1, // 무제한
-      aiModel: "gpt-4-turbo", // 최고급 모델
+      aiModel: "gpt-4o", // 최고급 모델
       hasAds: false,
       platforms: [
         "instagram",
