@@ -178,7 +178,11 @@ class LanguageService {
       // i18n 시스템과 연동
       try {
         await i18next.changeLanguage(language);
-        console.log('[LanguageService] i18n language changed successfully to:', language);
+
+        // 리소스 강제 리로드로 최신 번역 적용
+        await i18next.reloadResources(language);
+
+        console.log('[LanguageService] i18n language changed and resources reloaded for:', language);
       } catch (error) {
         console.warn('[LanguageService] i18n language change failed:', error);
       }

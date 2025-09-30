@@ -16,6 +16,7 @@ import {
   selectSubscriptionPlan,
 } from "../store/slices/userSlice";
 import { SPACING } from "../utils/constants";
+import { useTranslation } from "react-i18next";
 
 interface TokenDisplayProps {
   size?: "small" | "medium" | "large";
@@ -35,6 +36,7 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
   const { colors } = useAppTheme();
   const currentTokens = useAppSelector(selectCurrentTokens);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
+  const { t } = useTranslation();
 
   // 플랜별 월간 토큰 제한 계산
   const getMonthlyLimit = () => {
@@ -55,7 +57,7 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
   // 표시 텍스트 결정
   const getDisplayText = () => {
     if (subscriptionPlan === "pro") {
-      return "무제한";
+      return t("tokens.unlimited");
     }
 
     if (subscriptionPlan === "starter" || subscriptionPlan === "premium") {

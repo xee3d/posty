@@ -1,5 +1,6 @@
 const ja = {
   common: {
+    ok: "OK",
     confirm: "確認する",
     cancel: "キャンセル",
     save: "保存する",
@@ -125,10 +126,6 @@ const ja = {
         title: "より多くのトークン",
         description: "STARTERは総600個(初期300 + 日次10x30)、PROは総1,100個(初期500 + 日次20x30)、MAXは無制限トークンを提供します"
       },
-      advancedAI: {
-        title: "高度なAIモデル",
-        description: "プラン別の差別化されたAIモデル提供 (GPT-4o, GPT-4 Turbo)"
-      },
       noAds: {
         title: "広告除去",
         description: "妨害されることなくコンテンツ作成にのみ集中できます"
@@ -231,23 +228,23 @@ const ja = {
     },
     membershipNotices: {
       free: "無料会員の方は毎日10個のトークンが自動チャージされます",
-      starter: "STARTERメンバーの方はご登録時に300個、毎日10個ずつ追加トークンをお受け取りいただけます",
-      premium: "PROメンバーの方はご登録時に500個、毎日20個ずつ追加トークンをお受け取りいただけます",
-      pro: "MAXメンバーの方は無制限のトークンをご利用いただけます"
+      starter: "STARTERメンバーの方はご登録時に200個のトークンをお受け取りいただけます",
+      premium: "PROメンバーの方はご登録時に500個のトークンをお受け取りいただけます",
+      pro: "MAXメンバーの方は無制限でトークンをご利用いただけます"
     },
     planDescriptions: {
       free: "毎日10個無料チャージされます",
-      starter: "ご登録時300個+毎日10個",
-      premium: "ご登録時500個+毎日20個",
+      starter: "ご登録時200個トークン支給",
+      premium: "ご登録時500個トークン支給",
       pro: "無制限トークン",
       downgradeBlocked: "下位プランへの変更はできません"
     },
     upgradeDescriptions: {
-      starterImmediate: "ご登録と同時に300個のトークンをお受け取りいただけます",
+      starterImmediate: "ご登録と同時に200個のトークンをお受け取りいただけます",
       premiumImmediate: "ご登録と同時に500個のトークンをお受け取りいただけます",
-      proImmediate: "無制限のトークンをご利用いただけます",
+      proImmediate: "ご登録と同時に1500個のトークンをお受け取りいただけます",
       premiumUpgrade: "合計500個のトークンを追加でお受け取りいただけます",
-      proUpgrade: "無制限のトークンをご利用いただけます",
+      proUpgrade: "ご登録と同時に1500個のトークンをお受け取りいただけます",
       starterDowngrade: "ご注意：無料トークンが300個に制限されます"
     },
     plans: {
@@ -276,7 +273,7 @@ const ja = {
         ]
       },
       premium: {
-        name: "プレミアム",
+        name: "プロ",
         features: [
           "ご登録時に500個のトークンを即時お渡し",
           "毎日20個ずつ追加チャージ",
@@ -288,7 +285,7 @@ const ja = {
         ]
       },
       pro: {
-        name: "プロ",
+        name: "マックス",
         features: [
           "ご登録時に500個のトークンを即時お渡し",
           "無制限トークン（Fair Use）",
@@ -410,6 +407,8 @@ const ja = {
         subtitle: "ギャラリーから選択するか直接撮影してください",
         button: "写真を選択する",
         change: "変更する",
+        camera: "カメラ",
+        gallery: "ギャラリー",
       },
       defaultPrompt: "写真に合う自然なSNSの投稿を書いてください。",
     },
@@ -848,7 +847,13 @@ const ja = {
     updateFrequency: {
       realtime: "リアルタイム",
       daily: "毎日更新"
-    }
+    },
+    profileCompletion: "プロフィール完成度 {{completeness}}%",
+    interests: "興味・関心（複数選択可能）",
+    formality: "フォーマル度",
+    emotiveness: "感情表現",
+    humor: "ユーモア",
+    saveProfile: "プロフィール保存"
   },
   
   // トークン関連
@@ -915,9 +920,9 @@ const ja = {
       "ファッション", "美容", "インテリア", "ガーデニング", "ペット", "ゲーム", "IT", "株式", "不動産", "自己啓発"
     ],
     completion: {
-      low: "プロフィールを設定すると、あなただけのカスタマイズされたAI文章作成をご体験いただけます ✨",
-      medium: "もう少しです！AIがあなたのスタイルをより正確に把握できます 🎯",
-      high: "ほぼ完成です！パーソナライズされたAIライティングサービスにもうすぐ出会えます 🚀"
+      low: "プロフィールを設定すると、あなただけのカスタマイズされたAI文章作成をご体験いただけます",
+      medium: "もう少しです！AIがあなたのスタイルをより正確に把握できます",
+      high: "ほぼ完成です！パーソナライズされたAIライティングサービスにもうすぐ出会えます"
     }
   },
 
@@ -1634,30 +1639,6 @@ const ja = {
       action: "カフェ写真",
       meta: "雰囲気よく"
     },
-    // 日常記録
-    dailyMoment: {
-      title: "今この瞬間を記録してみてください",
-      content: "特別である必要はありません\n日常の小さな瞬間が最も大切です",
-      badge: "📝 日常記録",
-      action: "記録する",
-      meta: "いつでも"
-    },
-    // 簡単な考え
-    simple: {
-      title: "今日浮かんだ考えを一つだけ",
-      content: "複雑に考える必要はありません\n浮かんだ考えを一つだけ書いてみてください",
-      badge: "💭 簡単な考え",
-      action: "考えを書く",
-      meta: "簡単に"
-    },
-    // 感謝の気持ち
-    gratitude: {
-      title: "今日感謝していることはありますか？",
-      content: "小さなことでも大丈夫です\n感謝の気持ちを表現してみてください",
-      badge: "🙏 感謝の気持ち",
-      action: "感謝を表現",
-      meta: "心穏やか"
-    }
   },
 
   // 時間帯別ハッシュタグ
@@ -2215,6 +2196,14 @@ const ja = {
     growth: "成長",
     insights: "インサイト"
   },
+
+  // Notification Center
+  notificationCenter: {
+    title: "通知センター",
+    clearAll: "すべて削除",
+    noNotifications: "新しい通知はありません",
+    noNotificationsSubtext: "Postyが新しいニュースをお届けします！"
+  }
 };
 
 export default ja;

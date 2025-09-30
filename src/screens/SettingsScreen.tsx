@@ -984,7 +984,39 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
                   </Text>
                   {userProfile?.selectedTitle && (
                     <Text style={styles.profileTitle}>
-                      {userProfile.selectedTitle}
+                      {(() => {
+                        console.log('🔍 [SettingsScreen] selectedTitle value:', userProfile.selectedTitle);
+
+                        // Map old Korean titles to achievement IDs
+                        const koreanToIdMap: { [key: string]: string } = {
+                          "첫 발걸음": "first_post",
+                          "새내기 작가": "post_3",
+                          "인플루언서": "influencer",
+                          "얼리버드": "early_bird",
+                          "새해 첫 글": "new_year",
+                          // Add more mappings as needed
+                        };
+
+                        // Get the achievement ID (either stored directly or mapped from Korean title)
+                        const achievementId = koreanToIdMap[userProfile.selectedTitle] || userProfile.selectedTitle;
+
+                        // Handle backward compatibility for old Korean titles
+                        const titleKey = `achievements.items.${achievementId}.name`;
+                        const translatedTitle = t(titleKey);
+
+                        console.log('🔍 [SettingsScreen] achievementId:', achievementId);
+                        console.log('🔍 [SettingsScreen] titleKey:', titleKey);
+                        console.log('🔍 [SettingsScreen] translatedTitle:', translatedTitle);
+
+                        // If translation key not found, it returns the key itself
+                        if (translatedTitle === titleKey) {
+                          console.log('⚠️ [SettingsScreen] Translation key not found, using original title');
+                          // Fallback to the stored title (for old Korean titles)
+                          return userProfile.selectedTitle;
+                        }
+                        console.log('✅ [SettingsScreen] Using translated title');
+                        return translatedTitle;
+                      })()}
                     </Text>
                   )}
                   {/* 플랫폼 정보 표시 */}

@@ -3,7 +3,7 @@ import * as RNLocalize from "react-native-localize";
 
 export const getDeviceLanguage = (): string => {
   // 테스트를 위한 강제 언어 설정 (개발 중)
-  const FORCE_LANGUAGE_TEST = 'ko'; // 'ko', 'ja', 'zh', 'en' 또는 null
+  const FORCE_LANGUAGE_TEST = null; // 'ko', 'ja', 'zh', 'en' 또는 null
   if (FORCE_LANGUAGE_TEST) {
     console.log(`🌍 [DeviceLanguage] Force language test: ${FORCE_LANGUAGE_TEST}`);
     return FORCE_LANGUAGE_TEST;

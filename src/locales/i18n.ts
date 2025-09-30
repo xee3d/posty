@@ -31,10 +31,17 @@ const getDeviceLanguage = () => {
 // 리소스 새로고침 함수
 const refreshResources = () => {
   try {
+    // 강제로 리소스 번들을 다시 로드하여 최신 번역을 적용
     i18next.addResourceBundle('ko', 'translation', ko, true, true);
     i18next.addResourceBundle('en', 'translation', en, true, true);
     i18next.addResourceBundle('ja', 'translation', ja, true, true);
     i18next.addResourceBundle('zh-CN', 'translation', zhCN, true, true);
+
+    // 현재 언어 리로드
+    const currentLang = i18next.language;
+    i18next.reloadResources(currentLang).then(() => {
+      console.log('🌍 [i18n] Resources reloaded for language:', currentLang);
+    });
 
     console.log('🌍 [i18n] Resources refreshed successfully');
     return true;
@@ -79,7 +86,12 @@ export const getCurrentLanguage = () => i18next.language;
 export const changeLanguage = async (language: string) => {
   try {
     await i18next.changeLanguage(language);
-    console.log('🌍 [i18n] Language changed to:', language);
+
+    // 리소스 강제 새로고침으로 최신 번역 적용
+    refreshResources();
+    await i18next.reloadResources(language);
+
+    console.log('🌍 [i18n] Language changed and resources refreshed for:', language);
     return true;
   } catch (error) {
     console.error('❌ [i18n] Failed to change language:', error);

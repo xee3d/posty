@@ -122,7 +122,7 @@ const AchievementsScreen: React.FC<AchievementsScreenProps> = ({ navigation }) =
 
     try {
       await achievementService.setSelectedBadge(selectedAchievement.id);
-      await achievementService.setSelectedTitle(t(`achievements.items.${selectedAchievement.id}.name`));
+      await achievementService.setSelectedTitle(selectedAchievement.id);
       
       Alert.alert(
         t('achievements.modal.success'),

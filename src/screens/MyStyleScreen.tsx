@@ -535,8 +535,8 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       insights.push({
         type: "strength",
         icon: dominantTemplate.icon,
-        title: t("myStyle.insights.styleTitle", { name: t(`styleTemplates.${dominantTemplate.id}.name`, dominantTemplate.name) }),
-        description: t("myStyle.insights.styleDescription", { description: t(`styleTemplates.${dominantTemplate.id}.description`, dominantTemplate.description) }),
+        title: t("myStyle.insights.styleTitle", { name: t(`styleTemplates.${dominantTemplate.id}.name`) }),
+        description: t("myStyle.insights.styleDescription", { description: t(`styleTemplates.${dominantTemplate.id}.description`) }),
         action: t("myStyle.insights.styleAction"),
       });
     }
@@ -580,7 +580,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         type: "trend",
         icon: "trophy",
         title: t("myStyle.insights.challengeTitle"),
-        description: t("myStyle.insights.challengeDescription", { name: t(`myStyle.challenges.${recommendedChallenge.id}.name`, recommendedChallenge.name) }),
+        description: t("myStyle.insights.challengeDescription", { name: t(`myStyle.challenges.${recommendedChallenge.id}.name`) }),
         action: t("myStyle.insights.challengeAction"),
       });
     }
@@ -702,7 +702,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
       setActiveChallenge(challenge);
       Alert.alert(
         t("myStyle.alerts.challengeStart"),
-        t("myStyle.alerts.challengeStarted", { name: challenge ? t(`myStyle.challenges.${challenge.id}.name`, challenge.name) : "" })
+        t("myStyle.alerts.challengeStarted", { name: challenge ? t(`myStyle.challenges.${challenge.id}.name`) : "" })
       );
     }
   };
@@ -767,10 +767,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         initialTone: tone,
         title: t(`styleTemplates.${template.id}.name`),
         style: template.id,
-        tips: [t(`styleTemplates.${template.id}.detailedDescription`, 
-              template.detailedDescription || 
-              t(`styleTemplates.${template.id}.description`, template.description)
-            )],
+        tips: [t(`styleTemplates.${template.id}.detailedDescription`)],
       });
     }
   };
@@ -816,7 +813,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <View style={styles.brandInfo}>
             <Text style={styles.brandName}>
               {styleAnalysis
-                ? STYLE_TEMPLATES.find(t => t.id === styleAnalysis.dominantStyle)?.name || styleAnalysis.dominantStyle
+                ? t(`styleTemplates.${styleAnalysis.dominantStyle}.name`)
                 : ""}{" "}
               {t('myStyle.brand.title')}
             </Text>
@@ -846,7 +843,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                         color={template?.color || colors.primary}
                       />
                       <Text style={styles.styleScoreName}>
-                        {t(`styleTemplates.${styleId}.name`, template?.name || styleId)}
+                        {t(`styleTemplates.${styleId}.name`)}
                       </Text>
                       <Text style={styles.styleScoreValue}>{Number(score) || 0}%</Text>
                     </View>
@@ -916,7 +913,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
         <View style={styles.activeChallengeCard}>
           <View style={styles.challengeHeader}>
             <SafeIcon name="trophy" size={20} color={colors.primary} />
-            <Text style={styles.challengeTitle}>{String(t(`myStyle.challenges.${activeChallenge.id}.name`, activeChallenge.name))}</Text>
+            <Text style={styles.challengeTitle}>{String(t(`myStyle.challenges.${activeChallenge.id}.name`))}</Text>
           </View>
           <Text style={styles.challengeProgress}>
             {t('myStyle.challenge.progress', '진행도: {{current}}/{{total}}', { current: activeChallenge.progress || 0, total: activeChallenge.duration })}
@@ -1063,15 +1060,15 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
               <View style={styles.templateContent}>
                 <Text style={styles.templateName}>
-                  {template.name}
+                  {t(`styleTemplates.${template.id}.name`)}
                 </Text>
                 <Text style={styles.templateDescription}>
-                  {template.description}
+                  {t(`styleTemplates.${template.id}.description`)}
                 </Text>
 
                 <View style={styles.templateDetails}>
                   <Text style={styles.templateDetailedDescription}>
-                    {template.detailedDescription || template.description}
+                    {t(`styleTemplates.${template.id}.detailedDescription`)}
                   </Text>
 
                   {templateUsageData && templateUsageData.count > 0 && (
@@ -1136,9 +1133,9 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 </View>
               </View>
               <View style={styles.challengeContent}>
-                <Text style={styles.challengeName}>{t(`myStyle.challenges.${challenge.id}.name`, challenge.name)}</Text>
+                <Text style={styles.challengeName}>{t(`myStyle.challenges.${challenge.id}.name`)}</Text>
                 <Text style={styles.challengeDescription}>
-                  {t(`myStyle.challenges.${challenge.id}.description`, challenge.description)}
+                  {t(`myStyle.challenges.${challenge.id}.description`)}
                 </Text>
                 <View style={styles.challengeRules}>
                   {challenge.rules.slice(0, 2).map((rule, index) => (

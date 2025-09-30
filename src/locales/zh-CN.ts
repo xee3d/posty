@@ -69,7 +69,7 @@ const zhCN = {
     subtitle: "解锁所有功能",
     popular: "热门",
     currentPlan: "当前计划",
-    upgradeNow: "升级",
+    upgradeNow: "立即升级",
     manageSubscription: "管理订阅",
     renewalDate: "续订日期",
     perMonth: "/月",
@@ -99,7 +99,7 @@ const zhCN = {
     
     cancelSubscription: "取消订阅",
     cancelSubscriptionMessage: "确定要取消{{planName}}计划订阅吗？\n\n取消后仍可以使用到下次计费日。",
-    cancelSubscriptionAction: "取消",
+    cancelSubscriptionAction: "取消订阅",
     cancelSubscriptionSuccess: "订阅取消完成",
     cancelSubscriptionSuccessMessage: "订阅已取消。可以继续使用到下次计费日。",
     cancelSubscriptionFailed: "订阅取消失败",
@@ -124,7 +124,7 @@ const zhCN = {
       managePayment: "管理支付方式",
       viewInvoices: "查看账单",
       cancelPlan: "取消计划",
-      upgradePlan: "升级"
+      upgradePlan: "升级计划"
     },
 
     features: {
@@ -132,7 +132,7 @@ const zhCN = {
       tones3: "3种语调风格",
       lengthShortMedium: "短/中等长度",
       hasAds: "包含广告",
-      signup300: "注册送300代币",
+      signup300: "注册送200代币",
       daily10: "每日额外10代币",
       tones4: "4种语调风格",
       longLength: "支持长文章",
@@ -162,7 +162,7 @@ const zhCN = {
       title: "高级特权",
       moreTokens: {
         title: "更多代币",
-        description: "STARTER共600个(初始300 + 每日额外10个)，PRO共1,100个(初始500 + 每日额外20个)，MAX提供无限代币"
+        description: "STARTER注册时200个代币，PRO注册时500个代币，MAX注册时1500个代币"
       },
       advancedAI: {
         title: "高级AI模型",
@@ -218,7 +218,7 @@ const zhCN = {
     
     // 计划描述
     descriptions: {
-      signup300: "注册即可获得300个代币",
+      signup300: "注册即可获得200个代币",
       signup500: "注册即可获得500个代币",
       unlimitedAccess: "可以使用无限代币",
       upgrade500: "获得额外500个代币",
@@ -228,16 +228,16 @@ const zhCN = {
     // 会员通知
     membershipNotices: {
       free: "免费会员每天自动充值10个代币",
-      starter: "STARTER会员注册时获得300个 + 每天额外10个代币",
-      premium: "PRO会员注册时获得500个 + 每天额外20个代币",
-      pro: "MAX会员可以使用无限代币"
+      starter: "STARTER会员注册时获得200个代币",
+      premium: "PRO会员注册时获得500个代币",
+      pro: "MAX会员获得无限代币"
     },
     
     // 计划描述
     planDescriptions: {
       free: "每天免费10个代币",
-      starter: "注册时300个 + 每天10个",
-      premium: "注册时500个 + 每天20个",
+      starter: "注册时200个代币",
+      premium: "注册时500个代币",
       pro: "无限代币",
       downgradeBlocked: "不能降级到低级计划"
     },
@@ -258,7 +258,7 @@ const zhCN = {
         name: "入门版",
         priceDisplay: "¥25",
         features: [
-          "注册时立即获得300个代币",
+          "注册时立即获得200个代币",
           "每天额外充值10个",
           "4种语调风格",
           "可写长文",
@@ -267,7 +267,7 @@ const zhCN = {
         ]
       },
       premium: {
-        name: "高级版", 
+        name: "专业版", 
         priceDisplay: "¥50",
         features: [
           "注册时立即获得500个代币",
@@ -280,7 +280,7 @@ const zhCN = {
         ]
       },
       pro: {
-        name: "专业版",
+        name: "MAX版",
         priceDisplay: "¥99",
         features: [
           "无限代币",
@@ -349,6 +349,7 @@ const zhCN = {
       polishOptions: "期望的转换方向",
       photoSelect: "请展示照片！",
       photoAnalyzing: "正在分析照片...",
+      resultTitle: "完成了！🎉",
       additionalOptions: "附加选项",
       photoUpload: "照片上传",
       result: {
@@ -386,6 +387,8 @@ const zhCN = {
         subtitle: "从相册选择或直接拍摄",
         button: "选择照片",
         change: "更改",
+        camera: "相机",
+        gallery: "相册",
       },
       defaultPrompt: "请写一篇与照片相配的自然社交媒体帖子。",
     },
@@ -419,15 +422,6 @@ const zhCN = {
     buttons: {
       generate: "生成",
       generating: "生成中...",
-      generatingMessages: [
-        "Posty正在写作...",
-        "修改句子中...",
-        "润色文字中...",
-        "修正错别字...",
-        "调整语调中...",
-        "添加标签中...",
-        "最终检查中...",
-      ],
       copy: "复制",
       save: "保存",
       share: "分享"
@@ -616,7 +610,7 @@ const zhCN = {
     loading: "分析风格中...",
     access: {
       freeMessage: "我的风格分析功能从STARTER计划开始提供。",
-      upgradeButton: "升级"
+      upgradeButton: "升级计划"
     },
     empty: {
       title: "还没有创建内容",
@@ -1137,10 +1131,6 @@ const zhCN = {
     weeklyCount: {
       thisWeek: "本周",
       consistency: "一致性",
-    },
-    banner: {
-      title: "用Posty写出精彩内容",
-      subtitle: "AI助力的完美发布",
     }
   },
 
@@ -1176,12 +1166,6 @@ const zhCN = {
       enabled: "通知已启用",
       soundEnabled: "声音已启用",
       vibrationEnabled: "振动已启用"
-    },
-    adPersonalization: {
-      title: "广告个性化设置",
-      description: "配置个性化广告显示偏好",
-      updateSuccess: "广告个性化设置已更新。",
-      updateError: "无法更新设置。请稍后重试。"
     }
   },
 
@@ -1381,7 +1365,7 @@ const zhCN = {
       monthlyTokens: "每月{{count}}个代币",
       limitedOffer: "限时优惠",
       limitedOfferDesc: "特价提供",
-      upgradeNow: "升级",
+      upgradeNow: "立即升级",
       freeTokens: "免费代币",
       maxPlanNotice: "MAX套餐使用中",
       maxPlanNoticeDesc: "您正在使用无限代币服务，无需额外购买",
@@ -1415,7 +1399,7 @@ const zhCN = {
       content: "只需要一张食物照片\n说一句\"好吃\"就完美了",
       badge: "🍽️ 1分钟完成",
       action: "开始",
-      meta: "快速"
+      meta: "1分钟完成"
     },
     weatherTalk: {
       title: "天气话题，人人都爱！",
@@ -1429,7 +1413,7 @@ const zhCN = {
       content: "吃了美味的午餐吗？\n和食物照片一起分享吧！",
       badge: "🍽️ 午餐时间",
       action: "上传照片",
-      meta: "午餐",
+      meta: "午餐时间推荐",
     },
     dailyMoment: {
       title: "记录此时此刻",
@@ -1563,7 +1547,7 @@ const zhCN = {
       content: "分享一下这周的\n目标或计划怎么样？",
       badge: "💪 星期一",
       action: "写作",
-      meta: "励志"
+      meta: "励志内容"
     },
     // 雨天
     rainyDay: {
@@ -1586,14 +1570,14 @@ const zhCN = {
       content: "与晨间咖啡一起记录\n一天的开始如何？",
       badge: "🌅 晨间例行",
       action: "写作",
-      meta: "上午"
+      meta: "上午7-9点推荐"
     },
     goldenHour: {
       title: "黄金时刻摄影",
       content: "夕阳的黄金色彩最美丽！\n这是拍摄感性照片的好时机",
       badge: "📸 黄金时刻",
       action: "查看摄影技巧",
-      meta: "黄昏"
+      meta: "日落前1小时"
     },
     fridayMood: {
       title: "燃烧的周五！",
@@ -1614,7 +1598,7 @@ const zhCN = {
       content: "您已经留下了10个故事！\n来写个特别的回顾如何？",
       badge: "🏆 10篇达成",
       action: "写回顾",
-      meta: "祖贺"
+      meta: "恭喜您！"
     },
     recentPhotos: {
       title: "相册里的隐藏照片",
@@ -1635,14 +1619,14 @@ const zhCN = {
       content: "随便写的备忘录也能\n变成高质量的帖子！",
       badge: "🎨 文章完善工具",
       action: "AI完善",
-      meta: "提升"
+      meta: "文章质量提升"
     },
     petPhoto: {
       title: "可爱宠物炫耀",
       content: "我家宠物的可爱模样\n和大家一起分享吧",
       badge: "🐾 宠物",
       action: "炫耀",
-      meta: "治愈"
+      meta: "治愈内容"
     },
     weekendRest: {
       title: "周末可以休息！",
@@ -2114,11 +2098,11 @@ const zhCN = {
     title: "便捷登录",
     moreOptions: "用其他账户连接",
     buttons: {
-      naver: "Naver",
-      google: "Google",
-      kakao: "KakaoTalk",
-      facebook: "Facebook",
-      apple: "Apple",
+      naver: "用Naver开始",
+      google: "用Google开始",
+      kakao: "用KakaoTalk开始",
+      facebook: "用Facebook开始",
+      apple: "用Apple开始",
     },
     errors: {
       title: "登录失败",
@@ -2461,14 +2445,6 @@ const zhCN = {
     growth: "增长",
     insights: "洞察"
   },
-
-  // 通知
-  notifications: {
-    dailyShare: {
-      title: "🌅 今天过得怎么样？",
-      body: "Posty将帮助您把今天的珍贵时刻变成美丽的帖子！"
-    }
-  }
 };
 
 export default zhCN;

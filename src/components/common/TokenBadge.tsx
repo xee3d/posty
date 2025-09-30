@@ -4,6 +4,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { COLORS, SPACING } from "../../utils/constants";
 import { useAppTheme } from "../../hooks/useAppTheme";
+import { useTranslation } from "react-i18next";
 
 interface TokenBadgeProps {
   tokens: number;
@@ -19,6 +20,7 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
   onPress,
 }) => {
   const { colors } = useAppTheme();
+  const { t } = useTranslation();
   const styles = createStyles(colors);
 
   const isUnlimited = tokens === 9999;
@@ -56,7 +58,7 @@ export const TokenBadge: React.FC<TokenBadgeProps> = ({
           isEmpty && styles.textEmpty,
         ]}
       >
-        {isUnlimited ? "무제한" : tokens}
+        {isUnlimited ? t("tokens.unlimited") : tokens}
       </Text>
     </Container>
   );

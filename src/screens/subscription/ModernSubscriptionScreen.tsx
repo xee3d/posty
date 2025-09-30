@@ -663,7 +663,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   size={16}
                   color={isSelected ? planColor : "#10B981"}
                 />
-                <Text style={styles.featureText}>일일 10개 토큰</Text>
+                <Text style={styles.featureText}>{t("subscription.features.dailyTokens10")}</Text>
               </View>
                    <View style={styles.featureItem}>
                      <Icon
@@ -671,7 +671,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color="#EF4444"
                      />
-                     <Text style={[styles.featureText, { color: colors.text.secondary }]}>글쓰기 스타일 {SUBSCRIPTION_PLANS.free.features.writingStyles}개 + 문장정리 {SUBSCRIPTION_PLANS.free.features.polishStyles}개</Text>
+                     <Text style={[styles.featureText, { color: colors.text.secondary }]}>{t("subscription.features.tones3")}</Text>
                    </View>
               <View style={styles.featureItem}>
                 <Icon
@@ -679,7 +679,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   size={16}
                   color="#EF4444"
                 />
-                <Text style={[styles.featureText, { color: colors.text.secondary }]}>내 스타일</Text>
+                <Text style={[styles.featureText, { color: colors.text.secondary }]}>{t("subscription.features.myStyleAnalysis")}</Text>
               </View>
               <View style={styles.featureItem}>
                 <Icon
@@ -687,7 +687,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   size={16}
                   color="#EF4444"
                 />
-                <Text style={[styles.featureText, { color: colors.text.secondary }]}>광고 제거</Text>
+                <Text style={[styles.featureText, { color: colors.text.secondary }]}>{t("subscription.features.noAds")}</Text>
               </View>
             </>
           )}
@@ -700,7 +700,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>가입 시 200개 + 소진 시 매일 10개</Text>
+                     <Text style={styles.featureText}>{t("subscription.features.signup300")}</Text>
                    </View>
                    <View style={styles.featureItem}>
                      <Icon
@@ -708,7 +708,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>글쓰기 스타일 {SUBSCRIPTION_PLANS.starter.features.writingStyles}개 + 문장정리 {SUBSCRIPTION_PLANS.starter.features.polishStyles}개</Text>
+                     <Text style={styles.featureText}>{t("subscription.features.tones4")}</Text>
                    </View>
                    <View style={styles.featureItem}>
                      <Icon
@@ -716,7 +716,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>내 스타일 (3개 템플릿)</Text>
+                     <Text style={styles.featureText}>{t("subscription.features.myStyleAnalysis")}</Text>
                    </View>
                    <View style={styles.featureItem}>
                      <Icon
@@ -724,7 +724,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>광고 제거</Text>
+                     <Text style={styles.featureText}>{t("subscription.features.noAds")}</Text>
                    </View>
                  </>
                )}
@@ -737,7 +737,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>가입 시 500개 + 소진 시 매일 10개</Text>
+                     <Text style={styles.featureText}>{t("subscription.features.signup500")}</Text>
                    </View>
                    <View style={styles.featureItem}>
                      <Icon
@@ -745,7 +745,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>글쓰기 스타일 {SUBSCRIPTION_PLANS.premium.features.writingStyles}개 + 문장정리 {SUBSCRIPTION_PLANS.premium.features.polishStyles}개</Text>
+                     <Text style={styles.featureText}>{t("subscription.features.tones6")}</Text>
                    </View>
                    <View style={styles.featureItem}>
                      <Icon
@@ -753,7 +753,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>내 스타일 (10개 템플릿)</Text>
+                     <Text style={styles.featureText}>{t("subscription.features.myStyleAnalysis")}</Text>
                    </View>
                    <View style={styles.featureItem}>
                      <Icon
@@ -761,7 +761,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>광고 제거</Text>
+                     <Text style={styles.featureText}>{t("subscription.features.noAds")}</Text>
                    </View>
                  </>
                )}
@@ -774,7 +774,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>무제한 토큰</Text>
+                     <Text style={styles.featureText}>{t("tokens.unlimited")}</Text>
                    </View>
                    <View style={styles.featureItem}>
                      <Icon
@@ -782,7 +782,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>글쓰기 스타일 {SUBSCRIPTION_PLANS.pro.features.writingStyles}개 + 문장정리 {SUBSCRIPTION_PLANS.pro.features.polishStyles}개</Text>
+                     <Text style={styles.featureText}>{t("subscription.features.allTones")}</Text>
                    </View>
                    <View style={styles.featureItem}>
                      <Icon
@@ -790,7 +790,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>내 스타일 (무제한)</Text>
+                     <Text style={styles.featureText}>{t("subscription.features.myStyleAnalysis")}</Text>
                    </View>
                    <View style={styles.featureItem}>
                      <Icon
@@ -798,7 +798,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                        size={16}
                        color={isSelected ? planColor : "#10B981"}
                      />
-                     <Text style={styles.featureText}>광고 제거</Text>
+                     <Text style={styles.featureText}>{t("subscription.features.noAds")}</Text>
                    </View>
                  </>
                )}

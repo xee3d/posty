@@ -1,5 +1,22 @@
 const ko = {
   // 공통
+  common: {
+    ok: "확인",
+    cancel: "취소",
+    save: "저장",
+    delete: "삭제",
+    edit: "편집",
+    close: "닫기",
+    back: "뒤로",
+    next: "다음",
+    previous: "이전",
+    done: "완료",
+    loading: "로딩 중...",
+    error: "오류",
+    success: "성공",
+    warning: "경고",
+    info: "정보",
+  },
   app: {
     name: "Posty",
     tagline: "AI가 만드는 창의적인 콘텐츠",
@@ -204,6 +221,8 @@ const ko = {
         subtitle: "갤러리에서 선택하거나 직접 촬영하세요",
         button: "사진 선택",
         change: "변경",
+        camera: "카메라",
+        gallery: "갤러리",
       },
       defaultPrompt: "사진과 어울리는 자연스러운 SNS 글을 작성해주세요.",
     },
@@ -509,34 +528,34 @@ const ko = {
     },
     greetings: {
       dawn: {
-        title: "{{userName}}, 새벽감성이네?",
-        message: "이 시간의 생각들은 특별해. 기록해볼까?",
+        title: "{{userName}}님, 새벽감성이 느껴지시나요?",
+        message: "이 시간의 생각들은 특별합니다. 기록해보시겠어요?",
         action: "새벽 감성 글쓰기"
       },
       morning: {
-        title: "좋은 아침! {{userName}}",
-        message: "오늘은 뭐 올릴거야? 모닝커피 사진이라도 좋아!",
+        title: "좋은 아침입니다! {{userName}}님",
+        message: "오늘은 무엇을 올리실 건가요? 모닝커피 사진이라도 좋습니다!",
         action: "아침 일상 공유"
       },
       lunch: {
-        title: "{{userName}}, 점심은 먹었어?",
-        message: "맛있는 거 먹었으면 자랑해야지!",
+        title: "{{userName}}님, 점심은 드셨나요?",
+        message: "맛있는 것을 드셨다면 자랑해보세요!",
         action: "점심 리뷰"
       },
       afternoon: {
-        title: "{{userName}}, 오후도 힙내자!",
-        message: "짧은 글이라도 좋아. 오늘의 순간을 기록해보자",
-        messageRegular: "오늘 벌써 {{postCount}}개나 썼네! 대단해 👍",
+        title: "{{userName}}님, 오후도 힘내세요!",
+        message: "짧은 글이라도 좋습니다. 오늘의 순간을 기록해보세요",
+        messageRegular: "오늘 벌써 {{postCount}}개나 쓰셨네요! 대단합니다 👍",
         action: "일상 공유"
       },
       evening: {
-        title: "{{userName}}, 오늘 하루 어땠어?",
-        message: "하루를 마무리하는 글 하나 쓸까? 간단하게라도 좋아",
+        title: "{{userName}}님, 오늘 하루 어떠셨나요?",
+        message: "하루를 마무리하는 글 하나 써보시겠어요? 간단하게라도 좋습니다",
         action: "저녁 감성 글"
       },
       night: {
-        title: "{{userName}}, 아직 안 자?",
-        message: "잠들기 전 오늘 있었던 일 기록해볼까?",
+        title: "{{userName}}님, 아직 안 주무시나요?",
+        message: "잠들기 전 오늘 있었던 일을 기록해보시겠어요?",
         action: "밤 감성 글"
       }
     },
@@ -556,14 +575,14 @@ const ko = {
       evening: ["오늘도 수고했어 🌙", "내일은 더 좋은 날", "하루 끝!"]
     },
     sections: {
-      newUserQuestion: "뭘 써야 할지 모르겠다면?",
-      regularUserQuestion: "오늘은 뭘 올릴까?",
-      todayRecommendation: "오늘 뭐 쓸까?",
+      newUserQuestion: "무엇을 써야 할지 모르시겠다면?",
+      regularUserQuestion: "오늘은 무엇을 올리실까요?",
+      todayRecommendation: "오늘 무엇을 써보실까요?",
       myPosts: "내가 쓴 글"
     },
     actions: {
       firstWrite: "첫 글 쓰기",
-      writeAssist: "글쓰기 도와줘",
+      writeAssist: "글쓰기 도와드릴게요",
       photoStart: "사진으로 시작",
       polishText: "AI 글 완성도구",
       viewAll: "전체보기",
@@ -571,9 +590,9 @@ const ko = {
       share: "공유"
     },
     messages: {
-      writeAssistDesc: "한 줄만 써도 멋지게 만들어줄게",
-      polishTextDesc: "어색한 문장을 자연스럽게 다듬어줘",
-      photoStartDesc: "사진만 보여주면 글 써줄게",
+      writeAssistDesc: "한 줄만 써도 멋지게 만들어드릴게요",
+      polishTextDesc: "어색한 문장을 자연스럽게 다듬어드릴게요",
+      photoStartDesc: "사진만 보여주시면 글 써드릴게요",
       copySuccess: "복사 완료",
       copySuccessDesc: "클립보드에 복사되었습니다"
     },
@@ -1139,12 +1158,6 @@ const ko = {
       tips: "팁 알림",
       send: "테스트 알림 보내기"
     },
-    notifications: {
-      dailyShare: {
-        title: "🌅 오늘 하루는 어땠나요?",
-        body: "Posty가 오늘의 소중한 순간을 멋진 글로 만들어드릴게요!"
-      }
-    }
   },
 
   // Profile Detail Modal
@@ -1487,10 +1500,6 @@ const ko = {
         title: "더 많은 토큰",
         description: "STARTER는 총 600개(초기 300 + 일일 10x30), PRO는 총 1,100개(초기 500 + 일일 20x30), MAX는 무제한 토큰을 제공합니다"
       },
-      advancedAI: {
-        title: "고급 AI 모델",
-        description: "플랜별 차별화된 AI 모델 제공 (GPT-4o, GPT-4 Turbo)"
-      },
       noAds: {
         title: "광고 제거",
         description: "방해받지 않고 콘텐츠 제작에만 집중할 수 있습니다"
@@ -1596,25 +1605,25 @@ const ko = {
       upgrade500: "전액 500개 토큰을 추가로 받게 됩니다",
       downgradeWarning: "경고: 무료 토큰이 300개로 제한됩니다"
     },
-    membershipNotices: {
-      free: "무료 회원은 매일 10개의 토큰이 자동 충전됩니다",
-      starter: "STARTER 회원은 가입 시 300개 + 매일 10개씩 추가 토큰을 받습니다",
-      premium: "PRO 회원은 가입 시 500개 + 매일 20개씩 추가 토큰을 받습니다",
+  membershipNotices: {
+    free: "무료 회원은 매일 10개의 토큰이 자동 충전됩니다",
+    starter: "STARTER 회원은 가입 시 200개 토큰을 받고, 소진 시 매일 10개 충전됩니다",
+    premium: "PRO 회원은 가입 시 500개 토큰을 받고, 소진 시 매일 10개 충전됩니다",
       pro: "MAX 회원은 무제한 토큰을 사용할 수 있습니다"
-    },
+  },
     planDescriptions: {
       free: "매일 10개 무료 충전",
-      starter: "가입 시 300개 + 매일 10개", 
-      premium: "가입 시 500개 + 매일 20개",
+      starter: "가입 시 200개 + 소진 시 매일 10개 충전", 
+      premium: "가입 시 500개 + 소진 시 매일 10개 충전",
       pro: "무제한 토큰",
       downgradeBlocked: "하위 플랜으로 변경 불가"
     },
     upgradeDescriptions: {
-      starterImmediate: "가입 즉시 300개 토큰을 받게 됩니다",
+      starterImmediate: "가입 즉시 200개 토큰을 받게 됩니다",
       premiumImmediate: "가입 즉시 500개 토큰을 받게 됩니다",
-      proImmediate: "무제한 토큰을 사용할 수 있습니다",
+      proImmediate: "가입 즉시 1500개 토큰을 받게 됩니다",
       premiumUpgrade: "전액 500개 토큰을 추가로 받게 됩니다",
-      proUpgrade: "무제한 토큰을 사용할 수 있습니다",
+      proUpgrade: "가입 즉시 1500개 토큰을 받게 됩니다",
       starterDowngrade: "경고: 무료 토큰이 300개로 제한됩니다"
     },
     plans: {
@@ -1632,7 +1641,7 @@ const ko = {
         ],
       },
       starter: {
-        name: "스타터",
+        name: "STARTER",
         features: [
           "가입 시 300개 토큰 즉시 지급",
           "매일 10개씩 추가 충전",
@@ -1643,7 +1652,7 @@ const ko = {
         ],
       },
       premium: {
-        name: "프리미엄",
+        name: "PREMIUM",
         features: [
           "가입 시 500개 토큰 즉시 지급",
           "매일 20개씩 추가 충전",
@@ -1655,13 +1664,22 @@ const ko = {
         ],
       },
       pro: {
-        name: "프로",
+        name: "PRO",
         features: [
           "가입 시 500개 토큰 즉시 지급",
           "무제한 토큰 (Fair Use)",
           "모든 톤 스타일",
           "우선순위 처리",
           "광고 완전 제거",
+        ],
+      },
+      proDetails: {
+        features: [
+          "무제한 토큰",
+          "최고급 AI 모델",
+          "광고 완전 제거",
+          "1:1 프리미엄 지원",
+          "베타 기능 우선 체험",
         ],
       },
     },
@@ -1883,6 +1901,12 @@ const ko = {
       usd: "$",
       jpy: "¥",
       cny: "¥"
+    },
+    faq: {
+      tokenCarryover: {
+        question: "토큰은 다음 달로 이월되나요?",
+        answer: "아니요, 매월 토큰은 초기화됩니다. 프로 플랜은 무제한입니다."
+      }
     }
   },
 
@@ -2098,48 +2122,67 @@ const ko = {
   styleTemplates: {
     minimalist: {
       name: "미니멀리스트",
-      description: "간결하고 깔끔한 스타일"
+      description: "간결하고 깔끔한 스타일",
+      detailedDescription: "불필요한 수식어는 제거하세요. 한 문장에 하나의 메시지만. 여백을 두려워하지 말고 핵심만 전달하는 깔끔한 글쓰기로 독자가 이해하기 쉽게."
     },
     storytelling: {
-      name: "문어체", 
-      description: "격식있는 서면 표현"
+      name: "문어체",
+      description: "격식있는 서면 표현",
+      detailedDescription: "전문적이고 정중한 문체를 사용하세요. 완전한 문장으로 결론까지 명확하게. 격식 있는 표현으로 신뢰감을 구축."
     },
     humorous: {
       name: "유머러스",
-      description: "재치있고 유쾌한 표현"
+      description: "재치있고 유쾌한 표현",
+      detailedDescription: "농담과 위트로 독자를 웃게 만드세요. 자연스러운 유머로 친근감을 더하기. 억지스럽지 않게 재치를 발휘해서."
     },
     trendsetter: {
       name: "트렌드세터",
-      description: "최신 트렌드를 반영하는 스타일"
+      description: "최신 트렌드를 반영하는 스타일",
+      detailedDescription: "신조어와 유행 표현을 사용하세요. 새로운 흐름을 만들어내는 콘텐츠. 참신한 내용으로 트렌드를 리드."
     },
     philosopher: {
       name: "철학가",
-      description: "깊이 있는 생각을 담은 스타일"
+      description: "깊이 있는 생각을 담은 스타일",
+      detailedDescription: "비유를 통해 극단적 사고를 피하세요. 삶의 본질에 대한 생각거리를 제시. 깊은 통찰로 성찰을 이끌어."
     },
     casual: {
       name: "캐주얼",
-      description: "친근하고 편안한 일상 대화체"
+      description: "친근하고 편안한 일상 대화체",
+      detailedDescription: "일상의 대화체로 따뜻함을 전달하세요. 친구에게 말하듯 자연스럽게. 의무적이지 않게 편안하게 소통."
     },
     professional: {
       name: "전문적",
-      description: "격식있고 신뢰감 있는 비즈니스 톤"
+      description: "격식있고 신뢰감 있는 비즈니스 톤",
+      detailedDescription: "정확한 데이터와 사실에 기반하세요. 전문 용어에는 이해하기 쉬운 설명을 추가. 권위 있는 소통으로 신뢰감 구축."
     },
     emotional: {
       name: "감성적",
-      description: "감정을 담은 따뜻한 표현"
+      description: "감정을 담은 따뜻한 표현",
+      detailedDescription: "솔직한 마음과 경험을 공유하세요. 진심으로 감정을 표현하기. 과하지 않은 범위에서 공감을 이끌어."
     },
     genz: {
       name: "Gen Z",
-      description: "MZ세대 특유의 트렌디한 표현"
+      description: "MZ세대 특유의 트렌디한 표현",
+      detailedDescription: "인터넷 용어와 줄임말을 자연스럽게 사용하세요. 빠른 템포와 참신한 시각. 세대적인 트렌디한 표현으로 소통."
     },
     millennial: {
       name: "밀레니얼",
-      description: "밀레니얼 세대의 감성적 표현"
+      description: "밀레니얼 세대의 감성적 표현",
+      detailedDescription: "노스탤지어와 추억의 감성을 담으세요. 달달한 분위기를 연출하기. 소소한 범위에서 특별함을 더해."
     },
     motivational: {
       name: "명언",
-      description: "시처럼 아름답고 깊이 있는 철학적 통찰"
+      description: "시처럼 아름답고 깊이 있는 철학적 통찰",
+      detailedDescription: "간결하지만 강력한 메시지로 영감을 주세요. 생각할 거리와 동기를 제공. 행동 변화를 이끄는 깊은 통찰로."
     }
+  },
+
+  // Notification Center
+  notificationCenter: {
+    title: "알림 센터",
+    clearAll: "모두 지우기",
+    noNotifications: "새로운 알림이 없습니다",
+    noNotificationsSubtext: "포스티가 새로운 소식을 전해드릴게요!"
   }
 };
 

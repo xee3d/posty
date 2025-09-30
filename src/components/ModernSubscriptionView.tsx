@@ -65,11 +65,11 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
       icon: "💎",
       gradient: ["#FCD34D", "#F59E0B"],
       features: [
-        { icon: "infinite-outline", text: "무제한 토큰" },
-        { icon: "sparkles", text: "최고급 AI 모델" },
-        { icon: "ban-outline", text: "광고 완전 제거" },
-        { icon: "headset-outline", text: "1:1 프리미엄 지원" },
-        { icon: "diamond-outline", text: "베타 기능 우선 체험" },
+        { icon: "infinite-outline", text: t("subscription.plans.proDetails.features.0") },
+        { icon: "sparkles", text: t("subscription.plans.proDetails.features.1") },
+        { icon: "ban-outline", text: t("subscription.plans.proDetails.features.2") },
+        { icon: "headset-outline", text: t("subscription.plans.proDetails.features.3") },
+        { icon: "diamond-outline", text: t("subscription.plans.proDetails.features.4") },
       ],
       highlight: false,
     },
@@ -223,7 +223,7 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
                 100개
               </Text>
               <Text style={[styles.comparisonValue, styles.proValue]}>
-                무제한
+                {t("tokens.unlimited")}
               </Text>
             </View>
           </View>
@@ -334,10 +334,10 @@ export const ModernSubscriptionView: React.FC<ModernSubscriptionViewProps> = ({
             <SafeIcon name="help-circle-outline" size={20} color={colors.primary} />
             <View style={styles.faqContent}>
               <Text style={styles.faqQuestion}>
-                토큰은 다음 달로 이월되나요?
+                {t("subscription.faq.tokenCarryover.question")}
               </Text>
               <Text style={styles.faqAnswer}>
-                아니요, 매월 토큰은 초기화됩니다. 프로 플랜은 무제한입니다.
+                {t("subscription.faq.tokenCarryover.answer")}
               </Text>
             </View>
           </View>
