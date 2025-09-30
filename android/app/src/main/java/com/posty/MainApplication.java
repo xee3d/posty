@@ -10,18 +10,7 @@ import com.facebook.react.defaults.DefaultReactNativeHost;
 import com.facebook.soloader.SoLoader;
 import java.util.List;
 
-// Facebook Key Hash 디버깅을 위한 import
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
-import android.util.Base64;
-import android.util.Log;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
-// Facebook SDK import
-import com.facebook.FacebookSdk;
-import com.facebook.appevents.AppEventsLogger;
+// Facebook 관련 import 완전 제거됨
 
 public class MainApplication extends Application implements ReactApplication {
 
@@ -66,10 +55,10 @@ public class MainApplication extends Application implements ReactApplication {
   public void onCreate() {
     super.onCreate();
     
-    // Facebook SDK 초기화 (설정이 저장되지 않는 경우를 위해)
-    FacebookSdk.setApplicationId("757255383655974");
-    FacebookSdk.sdkInitialize(getApplicationContext());
-    AppEventsLogger.activateApp(this);
+    // Facebook SDK 초기화 비활성화 (release 빌드를 위해)
+    // FacebookSdk.setApplicationId("757255383655974");
+    // FacebookSdk.sdkInitialize(getApplicationContext());
+    // AppEventsLogger.activateApp(this);
     
     SoLoader.init(this, /* native exopackage */ false);
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
@@ -78,25 +67,7 @@ public class MainApplication extends Application implements ReactApplication {
     }
     // ReactNativeFlipper.initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
     // Flipper is no longer supported in React Native 0.74.5
-    
-    // Facebook Key Hash 디버깅 (개발 환경에서만)
-    if (BuildConfig.DEBUG) {
-      try {
-        PackageInfo info = getPackageManager().getPackageInfo(
-          "com.posty",
-          PackageManager.GET_SIGNATURES
-        );
-        for (Signature signature : info.signatures) {
-          MessageDigest md = MessageDigest.getInstance("SHA");
-          md.update(signature.toByteArray());
-          String keyHash = Base64.encodeToString(md.digest(), Base64.DEFAULT);
-          Log.d("FacebookKeyHash", "KeyHash: " + keyHash.trim());
-        }
-      } catch (PackageManager.NameNotFoundException e) {
-        Log.e("FacebookKeyHash", "Package not found", e);
-      } catch (NoSuchAlgorithmException e) {
-        Log.e("FacebookKeyHash", "Algorithm not found", e);
-      }
-    }
+
+    // Facebook 관련 코드 완전 제거됨
   }
 }

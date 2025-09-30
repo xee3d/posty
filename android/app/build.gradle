@@ -26,7 +26,7 @@ react {
 
     /* Bundling */
     //   A list containing the node command and its flags. Default is just 'node'.
-    nodeExecutableAndArgs = ["/Users/ethanchoi/.nvm/versions/node/v24.5.0/bin/node"]
+    nodeExecutableAndArgs = ["/opt/homebrew/bin/node"]
     //
     //   The command to run when bundling. By default is 'bundle'
     // bundleCommand = "ram-bundle"
