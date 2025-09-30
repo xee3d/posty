@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { SPACING } from '../utils/constants';
+import { AD_CONFIG } from '../config/adConfig';
 
 interface AdBannerProps {
   style?: any;
@@ -19,10 +20,13 @@ const AdBanner: React.FC<AdBannerProps> = ({
   const [adLoaded, setAdLoaded] = useState(false);
   const [adError, setAdError] = useState(false);
 
-  // 실제 광고 ID (운영 환경)
+  // 실제 광고 ID (운영 환경) - adConfig.ts에서 가져온 올바른 ID 사용
   const adUnitId = __DEV__
     ? TestIds.BANNER // 개발용 테스트 ID
-    : 'ca-app-pub-4039842933564424/8287150443'; // Posty 하단 배너
+    : Platform.select({
+        ios: AD_CONFIG.admob.unitIds.banner.ios, // ca-app-pub-4435733896538626/6058204207
+        android: AD_CONFIG.admob.unitIds.banner.android, // ca-app-pub-4435733896538626/8889856459
+      });
 
   const handleAdLoaded = () => {
     setAdLoaded(true);

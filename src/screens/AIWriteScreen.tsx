@@ -2049,11 +2049,11 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
             </SlideInView>
           )}
 
-          {/* 글쓰기 결과 하단 광고 배너 - 조건부 표시 */}
-          {generatedContent && (
+          {/* 글쓰기 결과 하단 광고 배너 - 무료 사용자에게만 표시 */}
+          {generatedContent && userPlan === "free" && (
             <SlideInView direction="up" delay={300}>
               <View style={styles.adBannerContainer}>
-                <AdBanner 
+                <AdBanner
                   style={styles.adBanner}
                   onAdLoaded={() => {
                     console.log('AI Write screen ad banner loaded successfully');

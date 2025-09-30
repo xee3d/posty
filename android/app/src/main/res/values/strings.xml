@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Posty</string>
+    <string name="app_name">Posty AI</string>
     
     <!-- 네이버 로그인 설정 -->
     <string name="naver_client_id">jXC0jUWPhSCotIWBrKrB</string>
     <string name="naver_client_secret">RND5w7pcJt</string>
-    <string name="naver_client_name">Posty</string>
+    <string name="naver_client_name">Posty AI</string>
     
     <!-- 카카오 로그인 설정 -->
     <string name="kakao_app_key">566cba5c08009852b6b5f1a31c3b28d8</string>
     <string name="kakao_scheme">kakao566cba5c08009852b6b5f1a31c3b28d8</string>
     
+    <!-- AdMob Firebase 통합을 위한 설정 -->
+    <string name="google_app_id">ca-app-pub-4435733896538626~9851584331</string>
+
     <!-- Facebook 로그인 설정 disabled for release -->
     <!--
     <string name="facebook_app_id">757255383655974</string>

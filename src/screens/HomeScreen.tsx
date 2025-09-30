@@ -1186,20 +1186,22 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           </SlideInView>
         )}
 
-        {/* 광고 배너 */}
-        <SlideInView direction="up" delay={700}>
-          <View style={styles.adBannerContainer}>
-            <AdBanner 
-              style={styles.adBanner}
-              onAdLoaded={() => {
-                console.log('Ad banner loaded successfully');
-              }}
-              onAdFailedToLoad={(error) => {
-                console.log('Ad banner failed to load:', error);
-              }}
-            />
-          </View>
-        </SlideInView>
+        {/* 광고 배너 - 무료 사용자에게만 표시 */}
+        {(!subscriptionPlan || subscriptionPlan === "free") && (
+          <SlideInView direction="up" delay={700}>
+            <View style={styles.adBannerContainer}>
+              <AdBanner
+                style={styles.adBanner}
+                onAdLoaded={() => {
+                  console.log('Home screen ad banner loaded successfully');
+                }}
+                onAdFailedToLoad={(error) => {
+                  console.log('Home screen ad banner failed to load:', error);
+                }}
+              />
+            </View>
+          </SlideInView>
+        )}
 
         <View style={styles.bottomSpace} />
       </ScrollView>
