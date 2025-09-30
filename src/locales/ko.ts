@@ -204,8 +204,6 @@ const ko = {
         subtitle: "갤러리에서 선택하거나 직접 촬영하세요",
         button: "사진 선택",
         change: "변경",
-        camera: "카메라",
-        gallery: "갤러리",
       },
       defaultPrompt: "사진과 어울리는 자연스러운 SNS 글을 작성해주세요.",
     },
@@ -1141,6 +1139,12 @@ const ko = {
       tips: "팁 알림",
       send: "테스트 알림 보내기"
     },
+    notifications: {
+      dailyShare: {
+        title: "🌅 오늘 하루는 어땠나요?",
+        body: "Posty가 오늘의 소중한 순간을 멋진 글로 만들어드릴게요!"
+      }
+    }
   },
 
   // Profile Detail Modal
@@ -1482,6 +1486,10 @@ const ko = {
       moreTokens: {
         title: "더 많은 토큰",
         description: "STARTER는 총 600개(초기 300 + 일일 10x30), PRO는 총 1,100개(초기 500 + 일일 20x30), MAX는 무제한 토큰을 제공합니다"
+      },
+      advancedAI: {
+        title: "고급 AI 모델",
+        description: "플랜별 차별화된 AI 모델 제공 (GPT-4o, GPT-4 Turbo)"
       },
       noAds: {
         title: "광고 제거",
@@ -2132,14 +2140,6 @@ const ko = {
       name: "명언",
       description: "시처럼 아름답고 깊이 있는 철학적 통찰"
     }
-  },
-
-  // Notification Center
-  notificationCenter: {
-    title: "알림 센터",
-    clearAll: "모두 지우기",
-    noNotifications: "새로운 알림이 없습니다",
-    noNotificationsSubtext: "포스티가 새로운 소식을 전해드릴게요!"
   }
 };
 
