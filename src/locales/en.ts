@@ -259,7 +259,7 @@ const en = {
       watchAd: "Watch Ad (1-time use)",
       upgrade: "Upgrade",
       oneTimeUse: "1-time use",
-      styleMessage: "To use {{styleName}} style, upgrade or watch an ad.\n\nWatching an ad gives you one free use!",
+      styleMessage: "✨ {{styleName}} style is a premium feature!\n\n🎯 Get access right now:\n• 🎬 Watch an ad (free trial)\n• ⭐ Upgrade to Pro plan",
     },
     tokenUsage: {
       photoWrite: "Photo Writing",

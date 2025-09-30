@@ -549,7 +549,7 @@ const zhCN = {
       watchAd: "观看广告（一次使用）",
       upgrade: "升级",
       oneTimeUse: "一次使用",
-      styleMessage: "要使用{{styleName}}风格，请升级或观看广告。\n\n观看广告可免费使用一次！",
+      styleMessage: "✨ {{styleName}}风格是高级功能！\n\n🎯 立即获得使用权限:\n• 🎬 观看广告（免费试用）\n• ⭐ 升级到专业版",
     },
     
     tokenUsage: {
