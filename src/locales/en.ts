@@ -166,6 +166,9 @@ const en = {
     alerts: {
       noPrompt: "Tell me what to write about!",
       noPhoto: "Please select a photo first!",
+      noTokens: "Insufficient tokens",
+      watchAdToWrite: "Watch an ad to get 1 token and write immediately!",
+      watchAd: "Watch Ad & Write",
       error: "Something went wrong. Please try again.",
       waitAnalysis: "Please wait for photo analysis to complete.",
       completeAnalysis: "Please complete photo analysis first.",

@@ -153,6 +153,9 @@ const ko = {
     alerts: {
       noPrompt: "무엇에 대해 쓸지 알려주세요!",
       noPhoto: "사진을 먼저 선택해주세요!",
+      noTokens: "토큰이 부족합니다",
+      watchAdToWrite: "광고를 시청하면 토큰 1개를 받고 바로 글을 작성할 수 있어요!",
+      watchAd: "광고 보고 작성하기",
       error: "앗! 뭔가 문제가 생겼어요. 다시 시도해주세요",
       waitAnalysis: "사진 분석이 완료될 때까지 기다려주세요.",
       completeAnalysis: "사진 분석을 먼저 완료해주세요.",

@@ -65,6 +65,7 @@ import missionService from "../services/missionService";
 import improvedStyleService, {
   STYLE_TEMPLATES,
 } from "../services/improvedStyleService";
+import rewardAdService from "../services/rewardAdService";
 import {
   UNIFIED_STYLES,
   getStyleById,
@@ -793,8 +794,32 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     // 토큰 체크 - 플랜별 이미지 분석 토큰 적용
     const requiredTokens =
       writeMode === "photo" ? getImageAnalysisTokens(userPlan) : 1;
-    if (!checkTokenAvailability(requiredTokens)) {
-      soundManager.playError(); // 토큰 부족 에러음
+    
+    if (currentTokens < requiredTokens) {
+      // 토큰 부족 시 광고 시청 옵션 제공
+      soundManager.playError();
+      Alert.alert(
+        t("aiWrite.alerts.noTokens"),
+        t("aiWrite.alerts.watchAdToWrite"),
+        [
+          { text: t("common.cancel"), style: "cancel" },
+          {
+            text: t("aiWrite.alerts.watchAd"),
+            onPress: async () => {
+              // 광고 시청 후 글 생성
+              const adResult = await rewardAdService.showRewardedAd();
+              if (adResult.success) {
+                // 광고 시청 성공 후 토큰 1개 지급하고 바로 생성
+                await handleEarnTokens(1);
+                // 토큰 지급 후 자동으로 생성 실행
+                setTimeout(() => {
+                  handleGenerate();
+                }, 500);
+              }
+            },
+          },
+        ]
+      );
       return;
     }
 
