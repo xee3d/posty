@@ -43,18 +43,19 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
     if (!pkg) return;
 
     const totalTokens = pkg.tokens + pkg.bonus;
+    const gradient = packageGradients[packageId as keyof typeof packageGradients];
     
     Alert.alert(
-      "토큰 구매",
-      `${totalTokens}개 토큰을 ${pkg.priceDisplay}에 구매하시겠습니까?${pkg.bonus > 0 ? `\n\n🎁 보너스 ${pkg.bonus}개 포함!` : ''}`,
+      `${gradient.name} 패키지 구매`,
+      `${totalTokens}개 토큰을 ${pkg.priceDisplay}에 구매하시겠습니까?${pkg.bonus > 0 ? `\n\n보너스 ${pkg.bonus}개 포함!` : ''}`,
       [
-        { text: t("common.cancel"), style: "cancel" },
+        { text: "취소", style: "cancel" },
         {
           text: "구매하기",
           onPress: async () => {
             try {
               await inAppPurchaseService.purchaseTokenPackage(packageId);
-              Alert.alert("구매 완료! 🎉", `${totalTokens}개 토큰이 지급되었습니다!`);
+              Alert.alert("구매 완료!", `${totalTokens}개 토큰이 지급되었습니다!`);
             } catch (error) {
               Alert.alert("구매 실패", "토큰 구매에 실패했습니다. 다시 시도해주세요.");
             }
