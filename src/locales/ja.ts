@@ -2227,8 +2227,9 @@ const ja = {
     buy: "購入",
     purchase: {
       title: "{{name}}パッケージ購入",
-      message: "{{tokens}}個のトークンを\n{{price}}で購入しますか？",
-      messageWithBonus: "{{tokens}}個のトークンを\n{{price}}で購入しますか？\n\nボーナス{{bonus}}個含む！",
+      message: "{{tokens}}個のトークンを{{price}}で\n購入しますか？",
+      messageWithBonus: "{{tokens}}個のトークンを{{price}}で\n購入しますか？\n\nボーナス{{bonus}}個含む",
+      cancel: "キャンセル",
       confirm: "購入する",
       successTitle: "購入完了！",
       successMessage: "{{tokens}}個のトークンが付与されました！",

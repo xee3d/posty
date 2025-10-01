@@ -2207,8 +2207,9 @@ const ko = {
     buy: "구매",
     purchase: {
       title: "{{name}} 패키지 구매",
-      message: "{{tokens}}개 토큰을\n{{price}}에 구매하시겠습니까?",
-      messageWithBonus: "{{tokens}}개 토큰을\n{{price}}에 구매하시겠습니까?\n\n보너스 {{bonus}}개 포함!",
+      message: "{{tokens}}개 토큰을 {{price}}에\n구매하시겠습니까?",
+      messageWithBonus: "{{tokens}}개 토큰을 {{price}}에\n구매하시겠습니까?\n\n보너스 {{bonus}}개 포함",
+      cancel: "취소",
       confirm: "구매하기",
       successTitle: "구매 완료!",
       successMessage: "{{tokens}}개 토큰이 지급되었습니다!",

@@ -59,7 +59,7 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
       t("tokenShop.purchase.title", { name: packageName }),
       message,
       [
-        { text: t("common.cancel"), style: "cancel" },
+        { text: t("tokenShop.purchase.cancel"), style: "cancel" },
         {
           text: t("tokenShop.purchase.confirm"),
           onPress: async () => {

@@ -2471,8 +2471,9 @@ const zhCN = {
     buy: "购买",
     purchase: {
       title: "购买{{name}}套餐",
-      message: "购买{{tokens}}个代币\n价格{{price}}？",
-      messageWithBonus: "购买{{tokens}}个代币\n价格{{price}}？\n\n包含{{bonus}}个奖励！",
+      message: "以{{price}}购买{{tokens}}个代币？",
+      messageWithBonus: "以{{price}}购买{{tokens}}个代币？\n\n包含{{bonus}}个奖励",
+      cancel: "取消",
       confirm: "购买",
       successTitle: "购买成功！",
       successMessage: "已获得{{tokens}}个代币！",

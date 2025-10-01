@@ -2521,8 +2521,9 @@ Personal Information Inquiry: getposty@gmail.com`
     buy: "Buy",
     purchase: {
       title: "{{name}} Package Purchase",
-      message: "Purchase {{tokens}} tokens\nfor {{price}}?",
-      messageWithBonus: "Purchase {{tokens}} tokens\nfor {{price}}?\n\nBonus {{bonus}} tokens included!",
+      message: "Purchase {{tokens}} tokens for {{price}}?",
+      messageWithBonus: "Purchase {{tokens}} tokens for {{price}}?\n\nBonus {{bonus}} tokens included",
+      cancel: "Cancel",
       confirm: "Purchase",
       successTitle: "Purchase Complete!",
       successMessage: "{{tokens}} tokens have been added!",
