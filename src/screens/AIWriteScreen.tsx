@@ -1062,9 +1062,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           ref={scrollViewRef}
           style={styles.content}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingBottom: generatedContent ? 120 : 20 },
+            { paddingBottom: generatedContent ? 200 : 100 },
           ]}
         >
           {/* 헤더 */}
@@ -1275,6 +1276,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       onChangeText={setPrompt}
                       multiline
                       maxLength={100}
+                      onFocus={() => {
+                        // 키보드가 올라올 때 하단으로 스크롤
+                        setTimeout(() => {
+                          scrollViewRef.current?.scrollToEnd({ animated: true });
+                        }, 300);
+                      }}
                     />
                     <CharacterCount current={prompt.length} max={100} />
                   </View>
@@ -1301,6 +1308,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       onChangeText={setPrompt}
                       multiline
                       maxLength={500}
+                      onFocus={() => {
+                        // 키보드가 올라올 때 하단으로 스크롤
+                        setTimeout(() => {
+                          scrollViewRef.current?.scrollToEnd({ animated: true });
+                        }, 300);
+                      }}
                     />
                     <CharacterCount current={prompt.length} max={500} />
                   </View>
