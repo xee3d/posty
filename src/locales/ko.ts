@@ -2197,6 +2197,14 @@ const ko = {
     currentTokens: "보유 토큰",
     dailyRefill: "매일 자정에 10개 무료 충전",
     packagesTitle: "토큰 패키지",
+    packageNames: {
+      tokens_50: "베이직",
+      tokens_150: "스탠다드",
+      tokens_500: "프리미엄"
+    },
+    popular: "인기",
+    bonus: "보너스 +{{count}}",
+    buy: "구매",
     purchase: {
       title: "{{name}} 패키지 구매",
       message: "{{tokens}}개 토큰을\n{{price}}에 구매하시겠습니까?",

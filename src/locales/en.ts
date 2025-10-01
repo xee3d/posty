@@ -2511,6 +2511,14 @@ Personal Information Inquiry: getposty@gmail.com`
     currentTokens: "Current Tokens",
     dailyRefill: "Daily auto-refill: 10 tokens at midnight",
     packagesTitle: "Token Packages",
+    packageNames: {
+      tokens_50: "Basic",
+      tokens_150: "Standard",
+      tokens_500: "Premium"
+    },
+    popular: "Popular",
+    bonus: "Bonus +{{count}}",
+    buy: "Buy",
     purchase: {
       title: "{{name}} Package Purchase",
       message: "Purchase {{tokens}} tokens\nfor {{price}}?",

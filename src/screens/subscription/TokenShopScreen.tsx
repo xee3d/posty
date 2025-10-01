@@ -28,9 +28,9 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
 
   // 패키지별 그라데이션 색상
   const packageGradients = {
-    tokens_50: { colors: ["#667eea", "#764ba2"], name: "베이직" },
-    tokens_150: { colors: ["#f093fb", "#f5576c"], name: "스탠다드" },
-    tokens_500: { colors: ["#4facfe", "#00f2fe"], name: "프리미엄" },
+    tokens_50: { colors: ["#667eea", "#764ba2"] },
+    tokens_150: { colors: ["#f093fb", "#f5576c"] },
+    tokens_500: { colors: ["#4facfe", "#00f2fe"] },
   };
 
   const handlePurchase = async (packageId: string) => {
@@ -38,7 +38,7 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
     if (!pkg) return;
 
     const totalTokens = pkg.tokens + pkg.bonus;
-    const gradient = packageGradients[packageId as keyof typeof packageGradients];
+    const packageName = t(`tokenShop.packageNames.${packageId}` as const);
     
     // 스마트 줄바꿈 적용
     const message = pkg.bonus > 0
@@ -53,7 +53,7 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
         });
     
     Alert.alert(
-      t("tokenShop.purchase.title", { name: gradient.name }),
+      t("tokenShop.purchase.title", { name: packageName }),
       message,
       [
         { text: t("common.cancel"), style: "cancel" },
@@ -147,6 +147,7 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
           {TOKEN_PACKAGES.map((pkg) => {
             const gradient = packageGradients[pkg.id as keyof typeof packageGradients];
             const totalTokens = pkg.tokens + pkg.bonus;
+            const packageName = t(`tokenShop.packageNames.${pkg.id}` as const);
             
             return (
               <TouchableOpacity
@@ -164,7 +165,7 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
                   {pkg.popular && (
                     <View style={styles.popularBadge}>
                       <Icon name="star" size={14} color="#FFFFFF" />
-                      <Text style={styles.popularBadgeText}>인기</Text>
+                      <Text style={styles.popularBadgeText}>{t("tokenShop.popular")}</Text>
                     </View>
                   )}
 
@@ -179,18 +180,18 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
                         <View style={styles.bonusBadge}>
                           <Icon name="gift" size={14} color="#FFFFFF" />
                           <Text style={styles.bonusText}>
-                            보너스 +{pkg.bonus}
+                            {t("tokenShop.bonus", { count: pkg.bonus })}
                           </Text>
                         </View>
                       )}
                       
-                      <Text style={styles.packageName}>{gradient.name}</Text>
+                      <Text style={styles.packageName}>{packageName}</Text>
                     </View>
 
                     <View style={styles.packageRight}>
                       <Text style={styles.packagePrice}>{pkg.priceDisplay}</Text>
                       <View style={styles.buyButton}>
-                        <Text style={styles.buyButtonText}>구매</Text>
+                        <Text style={styles.buyButtonText}>{t("tokenShop.buy")}</Text>
                         <Icon name="arrow-forward" size={18} color="#FFFFFF" />
                       </View>
                     </View>

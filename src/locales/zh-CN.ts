@@ -2461,6 +2461,14 @@ const zhCN = {
     currentTokens: "当前代币",
     dailyRefill: "每天午夜自动充值10个代币",
     packagesTitle: "代币套餐",
+    packageNames: {
+      tokens_50: "基础版",
+      tokens_150: "标准版",
+      tokens_500: "高级版"
+    },
+    popular: "热门",
+    bonus: "奖励 +{{count}}",
+    buy: "购买",
     purchase: {
       title: "购买{{name}}套餐",
       message: "购买{{tokens}}个代币\n价格{{price}}？",

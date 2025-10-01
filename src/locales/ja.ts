@@ -2217,6 +2217,14 @@ const ja = {
     currentTokens: "保有トークン",
     dailyRefill: "毎日深夜0時に10個無料チャージ",
     packagesTitle: "トークンパッケージ",
+    packageNames: {
+      tokens_50: "ベーシック",
+      tokens_150: "スタンダード",
+      tokens_500: "プレミアム"
+    },
+    popular: "人気",
+    bonus: "ボーナス +{{count}}",
+    buy: "購入",
     purchase: {
       title: "{{name}}パッケージ購入",
       message: "{{tokens}}個のトークンを\n{{price}}で購入しますか？",

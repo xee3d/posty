@@ -40,6 +40,11 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
       premium: 5500,  // 프리미엄 - 5,500원/월 ($3.99 ≈ ₩5,500) - Apple 제안가
       pro: 19000,     // 프로 - 19,000원/월 ($12.99 ≈ ₩19,000) - Apple 제안가
     },
+    tokenPackages: {
+      tokens_50: 3300,    // 50 토큰 - 3,300원 (Starter 플랜과 동일)
+      tokens_150: 5500,   // 150 + 10 보너스 - 5,500원 (Premium 플랜과 동일)
+      tokens_500: 19000,  // 500 + 50 보너스 - 19,000원 (Pro 플랜과 동일)
+    },
     formatting: {
       position: 'after',
       spaceBetween: false,
@@ -58,6 +63,11 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
       starter: 1.99,  // 스타터 - $1.99/월
       premium: 3.99,  // 프리미엄 - $3.99/월
       pro: 12.99,     // 프로 - $12.99/월
+    },
+    tokenPackages: {
+      tokens_50: 1.99,    // 50 토큰 - $1.99
+      tokens_150: 3.99,   // 150 + 10 보너스 - $3.99
+      tokens_500: 12.99,  // 500 + 50 보너스 - $12.99
     },
     formatting: {
       position: 'before',
@@ -78,6 +88,11 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
       premium: 600,   // 프리미엄 - ¥600/월 ($3.99 ≈ ¥600) - Apple 제안가
       pro: 2000,      // 프로 - ¥2,000/월 ($12.99 ≈ ¥2,000) - Apple 제안가
     },
+    tokenPackages: {
+      tokens_50: 300,     // 50 토큰 - ¥300
+      tokens_150: 600,    // 150 + 10 보너스 - ¥600
+      tokens_500: 2000,   // 500 + 50 보너스 - ¥2,000
+    },
     formatting: {
       position: 'before',
       spaceBetween: false,
@@ -96,6 +111,11 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
       starter: 15.0,  // 스타터 - ¥15.0/월 ($1.99 ≈ ¥15.0) - Apple 제안가
       premium: 28.0,  // 프리미엄 - ¥28.0/월 ($3.99 ≈ ¥28.0) - Apple 제안가
       pro: 88.0,      // 프로 - ¥88.0/월 ($12.99 ≈ ¥88.0) - Apple 제안가
+    },
+    tokenPackages: {
+      tokens_50: 15.0,    // 50 토큰 - ¥15.0
+      tokens_150: 28.0,   // 150 + 10 보너스 - ¥28.0
+      tokens_500: 88.0,   // 500 + 50 보너스 - ¥88.0
     },
     formatting: {
       position: 'before',
