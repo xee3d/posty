@@ -45,19 +45,37 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
     const totalTokens = pkg.tokens + pkg.bonus;
     const gradient = packageGradients[packageId as keyof typeof packageGradients];
     
+    // 스마트 줄바꿈 적용
+    const message = pkg.bonus > 0
+      ? t("tokenShop.purchase.messageWithBonus", {
+          tokens: totalTokens,
+          price: pkg.priceDisplay,
+          bonus: pkg.bonus,
+        })
+      : t("tokenShop.purchase.message", {
+          tokens: pkg.tokens,
+          price: pkg.priceDisplay,
+        });
+    
     Alert.alert(
-      `${gradient.name} 패키지 구매`,
-      `${totalTokens}개 토큰을 ${pkg.priceDisplay}에 구매하시겠습니까?${pkg.bonus > 0 ? `\n\n보너스 ${pkg.bonus}개 포함!` : ''}`,
+      t("tokenShop.purchase.title", { name: gradient.name }),
+      message,
       [
-        { text: "취소", style: "cancel" },
+        { text: t("common.cancel"), style: "cancel" },
         {
-          text: "구매하기",
+          text: t("tokenShop.purchase.confirm"),
           onPress: async () => {
             try {
               await inAppPurchaseService.purchaseTokenPackage(packageId);
-              Alert.alert("구매 완료!", `${totalTokens}개 토큰이 지급되었습니다!`);
+              Alert.alert(
+                t("tokenShop.purchase.successTitle"),
+                t("tokenShop.purchase.successMessage", { tokens: totalTokens })
+              );
             } catch (error) {
-              Alert.alert("구매 실패", "토큰 구매에 실패했습니다. 다시 시도해주세요.");
+              Alert.alert(
+                t("tokenShop.purchase.errorTitle"),
+                t("tokenShop.purchase.errorMessage")
+              );
             }
           },
         },
@@ -206,27 +224,27 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
           </View>
           <View style={styles.noticeList}>
             <View style={styles.noticeRow}>
-              <Icon name="checkmark-circle" size={18} color="#10B981" />
+              <Icon name="gift" size={18} color="#8B5CF6" />
               <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-                구매한 토큰은 절대 소멸되지 않습니다
+                <Text style={{ fontWeight: "700" }}>무료 토큰:</Text> 매일 자정 10개 자동 충전 (최대 10개)
               </Text>
             </View>
             <View style={styles.noticeRow}>
-              <Icon name="checkmark-circle" size={18} color="#10B981" />
+              <Icon name="cart" size={18} color="#F59E0B" />
               <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-                매일 자정에 10개 무료 충전
+                <Text style={{ fontWeight: "700" }}>구매 토큰:</Text> 절대 소멸되지 않고 무제한 보관
               </Text>
             </View>
             <View style={styles.noticeRow}>
-              <Icon name="checkmark-circle" size={18} color="#10B981" />
+              <Icon name="layers" size={18} color="#10B981" />
               <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-                광고 시청으로 언제든지 무료 토큰 획득
+                <Text style={{ fontWeight: "700" }}>사용 순서:</Text> 무료 토큰 먼저 사용 → 구매 토큰 사용
               </Text>
             </View>
             <View style={styles.noticeRow}>
-              <Icon name="checkmark-circle" size={18} color="#10B981" />
+              <Icon name="play-circle" size={18} color="#EF4444" />
               <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-                모든 기능이 무료로 해금되어 있습니다
+                광고 시청으로 무료 토큰 추가 획득 가능
               </Text>
             </View>
           </View>

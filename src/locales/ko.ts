@@ -2188,6 +2188,20 @@ const ko = {
     clearAll: "모두 지우기",
     noNotifications: "새로운 알림이 없습니다",
     noNotificationsSubtext: "포스티가 새로운 소식을 전해드릴게요!"
+  },
+
+  // 토큰 상점
+  tokenShop: {
+    purchase: {
+      title: "{{name}} 패키지 구매",
+      message: "{{tokens}}개 토큰을\n{{price}}에 구매하시겠습니까?",
+      messageWithBonus: "{{tokens}}개 토큰을\n{{price}}에 구매하시겠습니까?\n\n보너스 {{bonus}}개 포함!",
+      confirm: "구매하기",
+      successTitle: "구매 완료!",
+      successMessage: "{{tokens}}개 토큰이 지급되었습니다!",
+      errorTitle: "구매 실패",
+      errorMessage: "토큰 구매에 실패했습니다.\n다시 시도해주세요.",
+    }
   }
 };
 

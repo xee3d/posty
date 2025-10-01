@@ -2208,6 +2208,20 @@ const ja = {
     clearAll: "すべて削除",
     noNotifications: "新しい通知はありません",
     noNotificationsSubtext: "Postyが新しいニュースをお届けします！"
+  },
+
+  // トークンショップ
+  tokenShop: {
+    purchase: {
+      title: "{{name}}パッケージ購入",
+      message: "{{tokens}}個のトークンを\n{{price}}で購入しますか？",
+      messageWithBonus: "{{tokens}}個のトークンを\n{{price}}で購入しますか？\n\nボーナス{{bonus}}個含む！",
+      confirm: "購入する",
+      successTitle: "購入完了！",
+      successMessage: "{{tokens}}個のトークンが付与されました！",
+      errorTitle: "購入失敗",
+      errorMessage: "トークンの購入に失敗しました。\nもう一度お試しください。",
+    }
   }
 };
 

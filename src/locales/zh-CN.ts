@@ -2453,6 +2453,20 @@ const zhCN = {
     growth: "增长",
     insights: "洞察"
   },
+
+  // 代币商店
+  tokenShop: {
+    purchase: {
+      title: "购买{{name}}套餐",
+      message: "购买{{tokens}}个代币\n价格{{price}}？",
+      messageWithBonus: "购买{{tokens}}个代币\n价格{{price}}？\n\n包含{{bonus}}个奖励！",
+      confirm: "购买",
+      successTitle: "购买成功！",
+      successMessage: "已获得{{tokens}}个代币！",
+      errorTitle: "购买失败",
+      errorMessage: "代币购买失败。\n请重试。",
+    }
+  }
 };
 
 export default zhCN;
