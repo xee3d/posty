@@ -11,13 +11,13 @@ import {
 import Icon from "react-native-vector-icons/Ionicons";
 import LinearGradient from "react-native-linear-gradient";
 import { SPACING } from "../../utils/constants";
-import { TOKEN_PACKAGES } from "../../config/adConfig";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { useAppSelector } from "../../hooks/redux";
 import { useTranslation } from "react-i18next";
 import { selectCurrentTokens } from "../../store/slices/userSlice";
 import inAppPurchaseService from "../../services/subscription/inAppPurchaseService";
 import { Alert } from "../../utils/customAlert";
+import pricingService from "../../services/localization/pricingService";
 
 const { width: screenWidth } = Dimensions.get("window");
 
@@ -25,6 +25,9 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
   const { colors, isDark } = useAppTheme();
   const { t } = useTranslation();
   const currentTokens = useAppSelector(selectCurrentTokens);
+
+  // 언어별 토큰 패키지 가져오기
+  const TOKEN_PACKAGES = pricingService.getNewTokenPackages();
 
   // 패키지별 그라데이션 색상
   const packageGradients = {

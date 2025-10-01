@@ -18,6 +18,11 @@ export interface LocalePricing {
     premium: number;  // 월간
     pro: number;      // 월간
   };
+  tokenPackages: {
+    tokens_50: number;   // 50 토큰
+    tokens_150: number;  // 150 + 10 보너스
+    tokens_500: number;  // 500 + 50 보너스
+  };
   formatting: {
     position: 'before' | 'after';
     spaceBetween: boolean;
@@ -202,7 +207,40 @@ class PricingService {
     }
   }
 
-  // 토큰 패키지 정보 가져오기
+  // 새로운 토큰 패키지 정보 가져오기 (언어별 가격)
+  getNewTokenPackages() {
+    this.updateLanguage();
+    const pricing = this.getCurrentPricing();
+    
+    return [
+      {
+        id: 'tokens_50',
+        tokens: 50,
+        price: pricing.tokenPackages.tokens_50,
+        priceDisplay: this.formatPrice(pricing.tokenPackages.tokens_50),
+        bonus: 0,
+        popular: false,
+      },
+      {
+        id: 'tokens_150', 
+        tokens: 150,
+        price: pricing.tokenPackages.tokens_150,
+        priceDisplay: this.formatPrice(pricing.tokenPackages.tokens_150),
+        bonus: 10,
+        popular: true,
+      },
+      {
+        id: 'tokens_500',
+        tokens: 500, 
+        price: pricing.tokenPackages.tokens_500,
+        priceDisplay: this.formatPrice(pricing.tokenPackages.tokens_500),
+        bonus: 50,
+        popular: false,
+      },
+    ];
+  }
+
+  // 토큰 패키지 정보 가져오기 (기존)
   getTokenPackages() {
     const pricing = this.getCurrentPricing();
     
