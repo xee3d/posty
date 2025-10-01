@@ -6,10 +6,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  Dimensions,
 } from "react-native";
 import { SafeIcon } from "../../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
+import LinearGradient from "react-native-linear-gradient";
 import { COLORS, SPACING } from "../../utils/constants";
 import { TOKEN_PACKAGES } from "../../config/adConfig";
 import { useAppTheme } from "../../hooks/useAppTheme";
@@ -18,21 +20,37 @@ import { useTranslation } from "react-i18next";
 import { selectCurrentTokens } from "../../store/slices/userSlice";
 import rewardAdService from "../../services/rewardAdService";
 import inAppPurchaseService from "../../services/subscription/inAppPurchaseService";
+import EarnTokenModal from "../../components/EarnTokenModal";
+import { useTokenManagement } from "../../hooks/useTokenManagement";
 import { Alert } from "../../utils/customAlert";
 
-export const TokenShopScreen: React.FC = ({ navigation }) => {
+const { width: screenWidth } = Dimensions.get("window");
+
+export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
   const { colors, isDark } = useAppTheme();
   const { t } = useTranslation();
   const currentTokens = useAppSelector(selectCurrentTokens);
   const [selectedPackage, setSelectedPackage] = useState<string>("tokens_150");
+  const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
+  
+  const { handleEarnTokens } = useTokenManagement({ onNavigate });
+
+  // 패키지별 그라데이션 색상
+  const packageGradients = {
+    tokens_50: ["#667eea", "#764ba2"], // 보라-핑크
+    tokens_150: ["#f093fb", "#f5576c"], // 핑크-레드 (인기)
+    tokens_500: ["#4facfe", "#00f2fe"], // 블루-시안
+  };
 
   const handlePurchase = async (packageId: string) => {
     const pkg = TOKEN_PACKAGES.find(p => p.id === packageId);
     if (!pkg) return;
 
+    const totalTokens = pkg.tokens + pkg.bonus;
+    
     Alert.alert(
       "토큰 구매",
-      `${pkg.tokens}개 토큰${pkg.bonus > 0 ? ` (+${pkg.bonus}개 보너스)` : ''}을 ${pkg.priceDisplay}에 구매하시겠습니까?`,
+      `${totalTokens}개 토큰을 ${pkg.priceDisplay}에 구매하시겠습니까?${pkg.bonus > 0 ? `\n\n🎁 보너스 ${pkg.bonus}개 포함!` : ''}`,
       [
         { text: t("common.cancel"), style: "cancel" },
         {
@@ -40,7 +58,7 @@ export const TokenShopScreen: React.FC = ({ navigation }) => {
           onPress: async () => {
             try {
               await inAppPurchaseService.purchaseTokenPackage(packageId);
-              Alert.alert("구매 완료", `${pkg.tokens + pkg.bonus}개 토큰이 지급되었습니다!`);
+              Alert.alert("구매 완료! 🎉", `${totalTokens}개 토큰이 지급되었습니다!`);
             } catch (error) {
               Alert.alert("구매 실패", "토큰 구매에 실패했습니다. 다시 시도해주세요.");
             }
@@ -50,11 +68,46 @@ export const TokenShopScreen: React.FC = ({ navigation }) => {
     );
   };
 
-  const handleWatchAd = async () => {
-    const result = await rewardAdService.showRewardedAd();
-    if (result.success) {
-      Alert.alert("광고 시청 완료", "1개 토큰이 지급되었습니다!");
-    }
+export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
+  const { colors, isDark } = useAppTheme();
+  const { t } = useTranslation();
+  const currentTokens = useAppSelector(selectCurrentTokens);
+  const [selectedPackage, setSelectedPackage] = useState<string>("tokens_150");
+  const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
+  
+  const { handleEarnTokens } = useTokenManagement({ onNavigate });
+
+  // 패키지별 그라데이션 색상
+  const packageGradients = {
+    tokens_50: { colors: ["#667eea", "#764ba2"], name: "스타터" }, // 보라-핑크
+    tokens_150: { colors: ["#f093fb", "#f5576c"], name: "인기" }, // 핑크-레드
+    tokens_500: { colors: ["#4facfe", "#00f2fe"], name: "프리미엄" }, // 블루-시안
+  };
+
+  const handlePurchase = async (packageId: string) => {
+    const pkg = TOKEN_PACKAGES.find(p => p.id === packageId);
+    if (!pkg) return;
+
+    const totalTokens = pkg.tokens + pkg.bonus;
+    
+    Alert.alert(
+      "토큰 구매",
+      `${totalTokens}개 토큰을 ${pkg.priceDisplay}에 구매하시겠습니까?${pkg.bonus > 0 ? `\n\n🎁 보너스 ${pkg.bonus}개 포함!` : ''}`,
+      [
+        { text: t("common.cancel"), style: "cancel" },
+        {
+          text: "구매하기",
+          onPress: async () => {
+            try {
+              await inAppPurchaseService.purchaseTokenPackage(packageId);
+              Alert.alert("구매 완료! 🎉", `${totalTokens}개 토큰이 지급되었습니다!`);
+            } catch (error) {
+              Alert.alert("구매 실패", "토큰 구매에 실패했습니다. 다시 시도해주세요.");
+            }
+          },
+        },
+      ]
+    );
   };
 
   return (
@@ -63,155 +116,163 @@ export const TokenShopScreen: React.FC = ({ navigation }) => {
         {/* 헤더 */}
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <View style={[styles.iconBadge, { backgroundColor: colors.primary }]}>
-              <Icon name="flash" size={24} color="#FFFFFF" />
-            </View>
+            <LinearGradient
+              colors={["#667eea", "#764ba2"]}
+              style={styles.iconBadge}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <Icon name="flash" size={28} color="#FFFFFF" />
+            </LinearGradient>
             <Text style={[styles.headerTitle, { color: colors.text.primary }]}>
               토큰 상점
             </Text>
           </View>
           <Text style={[styles.headerSubtitle, { color: colors.text.secondary }]}>
-            토큰을 구매하고 원하는 만큼 글을 작성하세요
+            필요한 만큼 구매하고 무제한으로 사용하세요
           </Text>
         </View>
 
-        {/* 현재 토큰 */}
-        <View style={[styles.currentTokensCard, { backgroundColor: colors.surface }]}>
+        {/* 현재 토큰 카드 - 그라데이션 */}
+        <LinearGradient
+          colors={isDark ? ["#1a1a2e", "#16213e"] : ["#FFFFFF", "#F0F4FF"]}
+          style={styles.currentTokensCard}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
           <View style={styles.currentTokensContent}>
             <Text style={[styles.currentTokensLabel, { color: colors.text.secondary }]}>
-              보유 토큰
+              💎 보유 토큰
             </Text>
             <View style={styles.currentTokensValue}>
-              <Icon name="flash" size={32} color={colors.primary} />
-              <Text style={[styles.currentTokensNumber, { color: colors.text.primary }]}>
+              <Text style={[styles.currentTokensNumber, { color: colors.primary }]}>
                 {currentTokens}
+              </Text>
+              <Text style={[styles.currentTokensUnit, { color: colors.text.secondary }]}>
+                개
               </Text>
             </View>
           </View>
           
           {/* 무료 토큰 받기 버튼 */}
           <TouchableOpacity
-            style={[styles.watchAdButton, { backgroundColor: colors.primary }]}
-            onPress={handleWatchAd}
+            style={[styles.freeTokenButton, { backgroundColor: colors.primary }]}
+            onPress={() => setShowEarnTokenModal(true)}
           >
-            <Icon name="play-circle" size={20} color="#FFFFFF" />
-            <Text style={styles.watchAdButtonText}>광고 보고 +1</Text>
+            <Icon name="gift" size={20} color="#FFFFFF" />
+            <Text style={styles.freeTokenButtonText}>무료로 받기</Text>
           </TouchableOpacity>
-        </View>
+        </LinearGradient>
 
         {/* 일일 충전 안내 */}
-        <View style={[styles.infoCard, { backgroundColor: colors.primary + "15" }]}>
-          <Icon name="information-circle" size={20} color={colors.primary} />
+        <View style={[styles.infoCard, { backgroundColor: colors.primary + "10", borderColor: colors.primary + "30" }]}>
+          <Icon name="time-outline" size={20} color={colors.primary} />
           <Text style={[styles.infoText, { color: colors.text.primary }]}>
-            💡 매일 3개씩 자동 충전 (최대 10개)
+            매일 3개씩 자동 충전 (무료 토큰 최대 10개)
           </Text>
         </View>
 
         {/* 토큰 패키지 */}
         <View style={styles.packagesSection}>
           <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
-            토큰 패키지
+            🔥 토큰 패키지
           </Text>
           
           {TOKEN_PACKAGES.map((pkg) => {
-            const isSelected = selectedPackage === pkg.id;
-            const isPopular = pkg.popular;
+            const gradient = packageGradients[pkg.id as keyof typeof packageGradients];
+            const totalTokens = pkg.tokens + pkg.bonus;
             
             return (
               <TouchableOpacity
                 key={pkg.id}
-                style={[
-                  styles.packageCard,
-                  { backgroundColor: colors.surface, borderColor: colors.border },
-                  isSelected && styles.selectedPackageCard,
-                  isSelected && { borderColor: colors.primary },
-                ]}
-                onPress={() => setSelectedPackage(pkg.id)}
+                style={styles.packageCardWrapper}
+                onPress={() => handlePurchase(pkg.id)}
+                activeOpacity={0.9}
               >
-                {isPopular && (
-                  <View style={[styles.popularBadge, { backgroundColor: colors.primary }]}>
-                    <Text style={styles.popularBadgeText}>인기</Text>
-                  </View>
-                )}
+                <LinearGradient
+                  colors={gradient.colors}
+                  style={styles.packageCard}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  {pkg.popular && (
+                    <View style={styles.popularBadge}>
+                      <Text style={styles.popularBadgeText}>⭐ 인기</Text>
+                    </View>
+                  )}
 
-                <View style={styles.packageHeader}>
-                  <View style={styles.packageIconContainer}>
-                    <Icon 
-                      name="flash" 
-                      size={32} 
-                      color={isSelected ? colors.primary : colors.text.secondary} 
-                    />
-                  </View>
-                  
-                  <View style={styles.packageInfo}>
-                    <View style={styles.tokenAmount}>
-                      <Text style={[styles.tokenCount, { color: colors.text.primary }]}>
-                        {pkg.tokens}
-                      </Text>
-                      <Text style={[styles.tokenLabel, { color: colors.text.secondary }]}>
-                        개
-                      </Text>
+                  <View style={styles.packageContent}>
+                    <View style={styles.packageLeft}>
+                      <View style={styles.tokenAmountRow}>
+                        <Icon name="flash" size={36} color="#FFFFFF" />
+                        <Text style={styles.tokenCount}>{totalTokens}</Text>
+                      </View>
+                      
                       {pkg.bonus > 0 && (
-                        <View style={[styles.bonusBadge, { backgroundColor: colors.primary + "20" }]}>
-                          <Text style={[styles.bonusText, { color: colors.primary }]}>
-                            +{pkg.bonus}
+                        <View style={styles.bonusBadge}>
+                          <Text style={styles.bonusText}>
+                            🎁 보너스 +{pkg.bonus}
                           </Text>
                         </View>
                       )}
+                      
+                      <Text style={styles.packageName}>{gradient.name}</Text>
                     </View>
-                    
-                    <Text style={[styles.packagePrice, { color: colors.text.primary }]}>
-                      {pkg.priceDisplay}
-                    </Text>
+
+                    <View style={styles.packageRight}>
+                      <Text style={styles.packagePrice}>{pkg.priceDisplay}</Text>
+                      <View style={styles.buyButton}>
+                        <Text style={styles.buyButtonText}>구매</Text>
+                        <Icon name="arrow-forward" size={18} color="#FFFFFF" />
+                      </View>
+                    </View>
                   </View>
-
-                  {isSelected && (
-                    <View style={[styles.selectedCheck, { backgroundColor: colors.primary }]}>
-                      <Icon name="checkmark" size={16} color="#FFFFFF" />
-                    </View>
-                  )}
-                </View>
-
-                <TouchableOpacity
-                  style={[
-                    styles.buyButton,
-                    { backgroundColor: isSelected ? colors.primary : colors.background },
-                  ]}
-                  onPress={() => handlePurchase(pkg.id)}
-                >
-                  <Text style={[
-                    styles.buyButtonText,
-                    { color: isSelected ? "#FFFFFF" : colors.text.primary }
-                  ]}>
-                    구매하기
-                  </Text>
-                </TouchableOpacity>
+                </LinearGradient>
               </TouchableOpacity>
             );
           })}
         </View>
 
         {/* 안내 사항 */}
-        <View style={[styles.noticeCard, { backgroundColor: colors.surface }]}>
+        <View style={[styles.noticeCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <Text style={[styles.noticeTitle, { color: colors.text.primary }]}>
-            📌 토큰 안내
+            📌 토큰 시스템 안내
           </Text>
           <View style={styles.noticeList}>
-            <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-              • 구매한 토큰은 소멸되지 않습니다
-            </Text>
-            <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-              • 무료 토큰은 매일 3개씩 자동 충전됩니다 (최대 10개)
-            </Text>
-            <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-              • 광고 시청으로 언제든지 무료 토큰을 받을 수 있습니다
-            </Text>
-            <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-              • 모든 기능이 해금되어 있습니다
-            </Text>
+            <View style={styles.noticeRow}>
+              <Icon name="checkmark-circle" size={18} color="#10B981" />
+              <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
+                구매한 토큰은 절대 소멸되지 않습니다
+              </Text>
+            </View>
+            <View style={styles.noticeRow}>
+              <Icon name="checkmark-circle" size={18} color="#10B981" />
+              <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
+                무료 토큰은 매일 3개씩 자동 충전 (최대 10개)
+              </Text>
+            </View>
+            <View style={styles.noticeRow}>
+              <Icon name="checkmark-circle" size={18} color="#10B981" />
+              <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
+                광고 시청으로 언제든지 무료 토큰 획득
+              </Text>
+            </View>
+            <View style={styles.noticeRow}>
+              <Icon name="checkmark-circle" size={18} color="#10B981" />
+              <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
+                모든 기능이 무료로 해금되어 있습니다
+              </Text>
+            </View>
           </View>
         </View>
       </ScrollView>
+
+      {/* 무료 토큰 받기 모달 */}
+      <EarnTokenModal
+        visible={showEarnTokenModal}
+        onClose={() => setShowEarnTokenModal(false)}
+        onTokensEarned={handleEarnTokens}
+      />
     </SafeAreaView>
   );
 };
@@ -225,6 +286,7 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: SPACING.large,
+    paddingTop: 20,
   },
   headerTop: {
     flexDirection: "row",
@@ -232,178 +294,222 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.small,
   },
   iconBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: "center",
     alignItems: "center",
     marginRight: SPACING.medium,
+    shadowColor: "#667eea",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
   headerTitle: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: "800",
+    letterSpacing: -0.5,
   },
   headerSubtitle: {
     fontSize: 15,
     lineHeight: 22,
+    marginTop: 4,
   },
   currentTokensCard: {
     marginHorizontal: SPACING.large,
     marginBottom: SPACING.large,
     padding: SPACING.large,
-    borderRadius: 16,
+    borderRadius: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 4,
   },
   currentTokensContent: {
     flex: 1,
   },
   currentTokensLabel: {
-    fontSize: 14,
-    marginBottom: 4,
+    fontSize: 15,
+    marginBottom: 8,
+    fontWeight: "500",
   },
   currentTokensValue: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+    alignItems: "baseline",
+    gap: 4,
   },
   currentTokensNumber: {
-    fontSize: 32,
-    fontWeight: "700",
+    fontSize: 42,
+    fontWeight: "800",
   },
-  watchAdButton: {
+  currentTokensUnit: {
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  freeTokenButton: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    paddingHorizontal: SPACING.medium,
-    paddingVertical: SPACING.small,
-    borderRadius: 12,
+    paddingHorizontal: SPACING.large,
+    paddingVertical: SPACING.medium,
+    borderRadius: 14,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  watchAdButtonText: {
+  freeTokenButtonText: {
     color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: 15,
+    fontWeight: "700",
   },
   infoCard: {
     marginHorizontal: SPACING.large,
-    marginBottom: SPACING.large,
+    marginBottom: SPACING.xl,
     padding: SPACING.medium,
-    borderRadius: 12,
+    borderRadius: 14,
     flexDirection: "row",
     alignItems: "center",
     gap: SPACING.small,
+    borderWidth: 1,
   },
   infoText: {
     fontSize: 14,
     flex: 1,
+    fontWeight: "500",
   },
   packagesSection: {
     paddingHorizontal: SPACING.large,
     marginBottom: SPACING.large,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: SPACING.medium,
+    fontSize: 22,
+    fontWeight: "800",
+    marginBottom: SPACING.large,
+    letterSpacing: -0.5,
+  },
+  packageCardWrapper: {
+    marginBottom: SPACING.large,
   },
   packageCard: {
-    borderRadius: 16,
-    padding: SPACING.large,
-    marginBottom: SPACING.medium,
-    borderWidth: 2,
-  },
-  selectedPackageCard: {
+    borderRadius: 20,
+    padding: SPACING.xl,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25,
+    shadowRadius: 16,
+    elevation: 8,
+    minHeight: 140,
   },
   popularBadge: {
     position: "absolute",
-    top: -10,
-    right: 20,
+    top: 12,
+    right: 12,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
     paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.5)",
   },
   popularBadgeText: {
     color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  packageHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: SPACING.medium,
-  },
-  packageIconContainer: {
-    marginRight: SPACING.medium,
-  },
-  packageInfo: {
-    flex: 1,
-  },
-  tokenAmount: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 4,
-    gap: 4,
-  },
-  tokenCount: {
-    fontSize: 32,
+    fontSize: 13,
     fontWeight: "700",
   },
-  tokenLabel: {
-    fontSize: 18,
-    fontWeight: "500",
+  packageContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  packageLeft: {
+    flex: 1,
+  },
+  tokenAmountRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    marginBottom: 8,
+  },
+  tokenCount: {
+    fontSize: 48,
+    fontWeight: "800",
+    color: "#FFFFFF",
+    letterSpacing: -1,
   },
   bonusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    alignSelf: "flex-start",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    marginBottom: 8,
   },
   bonusText: {
-    fontSize: 12,
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  packageName: {
+    fontSize: 16,
     fontWeight: "600",
+    color: "rgba(255, 255, 255, 0.9)",
+  },
+  packageRight: {
+    alignItems: "flex-end",
+    gap: 12,
   },
   packagePrice: {
-    fontSize: 20,
-    fontWeight: "600",
-  },
-  selectedCheck: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    justifyContent: "center",
-    alignItems: "center",
+    fontSize: 24,
+    fontWeight: "800",
+    color: "#FFFFFF",
   },
   buyButton: {
-    paddingVertical: SPACING.medium,
-    borderRadius: 12,
+    flexDirection: "row",
     alignItems: "center",
+    gap: 6,
+    backgroundColor: "rgba(255, 255, 255, 0.25)",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "rgba(255, 255, 255, 0.4)",
   },
   buyButtonText: {
     fontSize: 16,
-    fontWeight: "600",
+    fontWeight: "700",
+    color: "#FFFFFF",
   },
   noticeCard: {
     marginHorizontal: SPACING.large,
-    marginBottom: SPACING.xl,
+    marginBottom: SPACING.xl * 2,
     padding: SPACING.large,
     borderRadius: 16,
+    borderWidth: 1,
   },
   noticeTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "700",
     marginBottom: SPACING.medium,
   },
   noticeList: {
+    gap: SPACING.medium,
+  },
+  noticeRow: {
+    flexDirection: "row",
+    alignItems: "center",
     gap: SPACING.small,
   },
   noticeItem: {
     fontSize: 14,
     lineHeight: 20,
+    flex: 1,
   },
 });
 
