@@ -256,8 +256,8 @@ export const SUBSCRIPTION_PLANS = {
   starter: {
     id: "starter",
     name: "STARTER",
-    price: 1900,
-    priceDisplay: "₩1,900",
+    price: 3300,
+    priceDisplay: "₩3,300",
     features: {
       initialTokens: 200,
       dailyTokens: -1,
@@ -269,8 +269,8 @@ export const SUBSCRIPTION_PLANS = {
   premium: {
     id: "premium",
     name: "PREMIUM",
-    price: 4900,
-    priceDisplay: "₩4,900",
+    price: 5500,
+    priceDisplay: "₩5,500",
     features: {
       initialTokens: 500,
       dailyTokens: -1,
@@ -282,8 +282,8 @@ export const SUBSCRIPTION_PLANS = {
   pro: {
     id: "pro",
     name: "PRO",
-    price: 14900,
-    priceDisplay: "₩14,900",
+    price: 19000,
+    priceDisplay: "₩19,000",
     features: {
       initialTokens: -1, // 무제한
       dailyTokens: -1,

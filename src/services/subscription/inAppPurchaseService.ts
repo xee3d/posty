@@ -510,6 +510,20 @@ class InAppPurchaseService {
     // 토큰 상품은 소비 가능
     return productId.includes("tokens");
   }
+
+  /**
+   * 로드된 상품 정보 가져오기
+   */
+  getProducts(): Product[] {
+    return this.products;
+  }
+
+  /**
+   * 특정 상품 정보 가져오기
+   */
+  getProduct(sku: string): Product | undefined {
+    return this.products.find(p => p.productId === sku);
+  }
 }
 
 export default new InAppPurchaseService();

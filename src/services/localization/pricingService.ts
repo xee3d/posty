@@ -1,6 +1,8 @@
 // 현지 시세 기반 가격 설정 서비스
 import { SupportedLanguage } from './languageService';
 import languageService from './languageService';
+import countryDetectionService, { CountryPricing } from './countryDetectionService';
+import { CURRENCY_SYMBOLS } from './currencyPricingData';
 
 export interface LocalePricing {
   currency: string;
@@ -28,15 +30,15 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'KRW',
     symbol: '₩',
     tokens: {
-      small: 2500,    // 30 토큰 - 2,500원 (Starter 플랜과 동일)
-      medium: 4900,   // 100 토큰 - 4,900원 (Premium 플랜과 동일)
-      large: 9900,    // 300 토큰 - 9,900원 (대량 구매 할인)
+      small: 2900,    // 30 토큰 - 2,900원 (Starter 플랜과 동일)
+      medium: 5900,   // 100 토큰 - 5,900원 (Premium 플랜과 동일)
+      large: 11900,   // 300 토큰 - 11,900원 (대량 구매 할인)
       extra: 19900,   // 1000 토큰 - 19,900원 (초대량 특별가)
     },
     subscription: {
-      starter: 2500,  // 스타터 - 2,500원/월
-      premium: 4900,  // 프리미엄 - 4,900원/월
-      pro: 16900,     // 프로 - 16,900원/월
+      starter: 3300,  // 스타터 - 3,300원/월 ($1.99 ≈ ₩3,300) - Apple 제안가
+      premium: 5500,  // 프리미엄 - 5,500원/월 ($3.99 ≈ ₩5,500) - Apple 제안가
+      pro: 19000,     // 프로 - 19,000원/월 ($12.99 ≈ ₩19,000) - Apple 제안가
     },
     formatting: {
       position: 'after',
@@ -66,15 +68,15 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'JPY',
     symbol: '¥',
     tokens: {
-      small: 280,     // 30 토큰 - ¥280 (Starter 플랜과 동일)
-      medium: 580,    // 100 토큰 - ¥580 (Premium 플랜과 동일)
-      large: 1150,    // 300 토큰 - ¥1,150 (대량 구매 할인)
-      extra: 2300,    // 1000 토큰 - ¥2,300 (초대량 특별가)
+      small: 300,     // 30 토큰 - ¥300 (Starter 플랜과 동일)
+      medium: 600,    // 100 토큰 - ¥600 (Premium 플랜과 동일)
+      large: 1200,    // 300 토큰 - ¥1,200 (대량 구매 할인)
+      extra: 2000,    // 1000 토큰 - ¥2,000 (초대량 특별가)
     },
     subscription: {
-      starter: 280,   // 스타터 - ¥280/월
-      premium: 580,   // 프리미엄 - ¥580/월
-      pro: 1850,      // 프로 - ¥1,850/월
+      starter: 300,   // 스타터 - ¥300/월 ($1.99 ≈ ¥300) - Apple 제안가
+      premium: 600,   // 프리미엄 - ¥600/월 ($3.99 ≈ ¥600) - Apple 제안가
+      pro: 2000,      // 프로 - ¥2,000/월 ($12.99 ≈ ¥2,000) - Apple 제안가
     },
     formatting: {
       position: 'before',
@@ -85,15 +87,15 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'CNY',
     symbol: '¥',
     tokens: {
-      small: 14.0,    // 30 토큰 - ¥14.0 (Starter 플랜과 동일)
-      medium: 28.9,   // 100 토큰 - ¥28.9 (Premium 플랜과 동일)
-      large: 57.9,    // 300 토큰 - ¥57.9 (대량 구매 할인)
-      extra: 115.9,   // 1000 토큰 - ¥115.9 (초대량 특별가)
+      small: 15.0,    // 30 토큰 - ¥15.0 (Starter 플랜과 동일)
+      medium: 28.0,   // 100 토큰 - ¥28.0 (Premium 플랜과 동일)
+      large: 56.0,    // 300 토큰 - ¥56.0 (대량 구매 할인)
+      extra: 88.0,    // 1000 토큰 - ¥88.0 (초대량 특별가)
     },
     subscription: {
-      starter: 14.0,  // 스타터 - ¥14.0/월
-      premium: 28.9,  // 프리미엄 - ¥28.9/월
-      pro: 92.0,      // 프로 - ¥92.0/월
+      starter: 15.0,  // 스타터 - ¥15.0/월 ($1.99 ≈ ¥15.0) - Apple 제안가
+      premium: 28.0,  // 프리미엄 - ¥28.0/월 ($3.99 ≈ ¥28.0) - Apple 제안가
+      pro: 88.0,      // 프로 - ¥88.0/월 ($12.99 ≈ ¥88.0) - Apple 제안가
     },
     formatting: {
       position: 'before',
@@ -104,6 +106,7 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
 
 class PricingService {
   private currentLanguage: SupportedLanguage = 'ko';
+  private useGlobalPricing: boolean = true; // 새로운 글로벌 가격 시스템 사용 여부
 
   constructor() {
     this.updateLanguage();
@@ -119,9 +122,19 @@ class PricingService {
     }
   }
 
-  // 현재 로케일의 가격 정보 가져오기
+  // 글로벌 가격 시스템 사용 여부 설정
+  setUseGlobalPricing(useGlobal: boolean): void {
+    this.useGlobalPricing = useGlobal;
+  }
+
+  // 현재 로케일의 가격 정보 가져오기 (기존 방식)
   getCurrentPricing(): LocalePricing {
     return LOCALE_PRICING[this.currentLanguage] || LOCALE_PRICING.ko;
+  }
+
+  // 새로운 방식: 국가 감지 기반 가격 정보 가져오기
+  async getCurrentCountryPricing(): Promise<CountryPricing> {
+    return await countryDetectionService.getCurrentCountryPricing();
   }
 
   // 토큰 가격 가져오기
@@ -208,7 +221,7 @@ class PricingService {
   // 구독 플랜 정보 가져오기
   getSubscriptionPlans() {
     const pricing = this.getCurrentPricing();
-    
+
     return [
       {
         id: 'starter',
@@ -221,7 +234,7 @@ class PricingService {
       },
       {
         id: 'premium',
-        name: 'Premium', 
+        name: 'Premium',
         tokens: 1100,
         price: pricing.subscription.premium,
         formattedPrice: this.formatPrice(pricing.subscription.premium),
@@ -236,6 +249,60 @@ class PricingService {
         formattedPrice: this.formatPrice(pricing.subscription.pro),
         period: '/월',
         popular: false,
+      },
+    ];
+  }
+
+  // 새로운 방식: 국가별 구독 플랜 정보 가져오기
+  async getGlobalSubscriptionPlans() {
+    if (!this.useGlobalPricing) {
+      return this.getSubscriptionPlans();
+    }
+
+    const countryPricing = await this.getCurrentCountryPricing();
+
+    // CSV 데이터의 가격을 기준으로 다른 플랜 가격 계산
+    const basePrice = countryPricing.price;
+    const currency = countryPricing.currency;
+
+    // 플랜별 가격 비율 (Premium 플랜을 기준으로)
+    const starterPrice = basePrice * 0.65; // Premium의 65%
+    const premiumPrice = basePrice;        // 기준 가격
+    const proPrice = basePrice * 2.5;      // Premium의 250%
+
+    return [
+      {
+        id: 'starter',
+        name: 'Starter',
+        tokens: 600,
+        price: starterPrice,
+        formattedPrice: countryDetectionService.formatPrice(starterPrice, currency),
+        priceDisplay: countryDetectionService.formatPrice(starterPrice, currency),
+        period: '/월',
+        popular: false,
+        currency: currency,
+      },
+      {
+        id: 'premium',
+        name: 'Premium',
+        tokens: 1100,
+        price: premiumPrice,
+        formattedPrice: countryDetectionService.formatPrice(premiumPrice, currency),
+        priceDisplay: countryDetectionService.formatPrice(premiumPrice, currency),
+        period: '/월',
+        popular: true,
+        currency: currency,
+      },
+      {
+        id: 'pro',
+        name: 'Pro',
+        tokens: -1, // 무제한
+        price: proPrice,
+        formattedPrice: countryDetectionService.formatPrice(proPrice, currency),
+        priceDisplay: countryDetectionService.formatPrice(proPrice, currency),
+        period: '/월',
+        popular: false,
+        currency: currency,
       },
     ];
   }
@@ -300,3 +367,16 @@ export const getTokenPackages = () => {
 export const getSubscriptionPlans = () => {
   return pricingService.getSubscriptionPlans();
 };
+
+// 새로운 글로벌 구독 플랜 가져오기 함수
+export const getGlobalSubscriptionPlans = async () => {
+  return await pricingService.getGlobalSubscriptionPlans();
+};
+
+// 글로벌 가격 시스템 활성화/비활성화
+export const setUseGlobalPricing = (useGlobal: boolean) => {
+  pricingService.setUseGlobalPricing(useGlobal);
+};
+
+// 국가 감지 서비스 직접 접근
+export { countryDetectionService };

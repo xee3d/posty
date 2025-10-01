@@ -14,7 +14,7 @@ import {
 import { SafeIcon } from "../../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import { COLORS, SPACING } from "../../utils/constants";
-import { getSubscriptionPlans } from "../../services/localization/pricingService";
+import { getSubscriptionPlans, getGlobalSubscriptionPlans, setUseGlobalPricing, countryDetectionService } from "../../services/localization/pricingService";
 import { SUBSCRIPTION_PLANS } from "../../config/adConfig";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { useAppTheme } from "../../hooks/useAppTheme";
@@ -76,6 +76,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     remainingToday: 10,
     dailyLimit: 10,
   });
+  const [globalSubscriptionPlans, setGlobalSubscriptionPlans] = useState<any[]>([]);
+  const [currentCurrency, setCurrentCurrency] = useState({ code: 'USD', symbol: '$' });
 
   // 폭죽 애니메이션용 state
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -102,6 +104,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   useEffect(() => {
     loadTokenStats();
     loadAdStats();
+    loadGlobalPricing();
 
     const checkInitialTab = async () => {
       const initialTab = await AsyncStorage.getItem("subscription_initial_tab");
@@ -148,6 +151,11 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     );
   }, [subscriptionPlan]);
 
+  // 언어가 변경되면 가격 정보 다시 로드
+  useEffect(() => {
+    loadGlobalPricing();
+  }, [i18n.language]);
+
   useEffect(() => {
     if (activeTab === "manage") {
       loadTokenStats();
@@ -180,6 +188,33 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       });
     } catch (error) {
       console.error("Failed to load ad stats:", error);
+    }
+  };
+
+  const loadGlobalPricing = async () => {
+    try {
+      console.log('[ModernSubscriptionScreen] Loading global pricing...');
+
+      // 글로벌 가격 시스템 활성화
+      setUseGlobalPricing(true);
+
+      // 국가별 구독 플랜 로드
+      const plans = await getGlobalSubscriptionPlans();
+      setGlobalSubscriptionPlans(plans);
+
+      // 현재 통화 정보 로드
+      const currency = await countryDetectionService.getCurrentCurrency();
+      setCurrentCurrency(currency);
+
+      console.log('[ModernSubscriptionScreen] Global pricing loaded:', {
+        plansCount: plans.length,
+        currency: currency.code,
+        firstPlanPrice: plans[0]?.formattedPrice
+      });
+    } catch (error) {
+      console.error('[ModernSubscriptionScreen] Failed to load global pricing:', error);
+      // 에러 발생 시 기본 방식 사용
+      setUseGlobalPricing(false);
     }
   };
 
@@ -552,10 +587,29 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   };
 
   const renderPlanCard = (planKey: "free" | "starter" | "premium" | "pro") => {
-    const subscriptionPlans = getSubscriptionPlans();
-    const plan = planKey === "free" 
-      ? { id: "free", name: t("subscription.plans.free.name", { defaultValue: "Free" }), price: 0, priceDisplay: t("subscription.plans.free.priceDisplay", { defaultValue: "Free" }), tokens: 0 }
-      : subscriptionPlans.find(p => p.id === planKey) || subscriptionPlans[0];
+    // 글로벌 가격 플랜 우선 사용
+    let plan;
+    if (planKey === "free") {
+      plan = {
+        id: "free",
+        name: t("subscription.plans.free.name", { defaultValue: "Free" }),
+        price: 0,
+        priceDisplay: t("subscription.plans.free.priceDisplay", { defaultValue: "Free" }),
+        formattedPrice: t("subscription.plans.free.priceDisplay", { defaultValue: "Free" }),
+        tokens: 0,
+        currency: currentCurrency.code
+      };
+    } else {
+      // 글로벌 플랜에서 찾기
+      const globalPlan = globalSubscriptionPlans.find(p => p.id === planKey);
+      if (globalPlan) {
+        plan = globalPlan;
+      } else {
+        // 글로벌 플랜이 없으면 기존 방식 사용
+        const subscriptionPlans = getSubscriptionPlans();
+        plan = subscriptionPlans.find(p => p.id === planKey) || subscriptionPlans[0];
+      }
+    }
     const isSelected = selectedPlan === planKey;
     const isCurrent = subscriptionPlan === planKey;
     const isPopular = planKey === "premium";
@@ -876,6 +930,11 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           <Text style={styles.currentTokens}>
             {subscriptionPlan === "pro" ? t("subscription.status.unlimited") : currentTokens}
           </Text>
+          {currentCurrency.code !== 'USD' && (
+            <Text style={styles.currencyIndicator}>
+              {currentCurrency.symbol}
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
 
@@ -966,8 +1025,10 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                     <View style={styles.planInfoItem}>
                       <Text style={styles.planInfoLabel}>{t("subscription.management.monthlyFee")}</Text>
                       <Text style={styles.planInfoValue}>
-                        {subscriptionPlan === "free" ? t("subscription.plans.free.priceDisplay", { defaultValue: "Free" }) : 
-                         getSubscriptionPlans().find(p => p.id === subscriptionPlan)?.formattedPrice || t("subscription.plans.free.priceDisplay", { defaultValue: "Free" })}
+                        {subscriptionPlan === "free" ? t("subscription.plans.free.priceDisplay", { defaultValue: "Free" }) :
+                         globalSubscriptionPlans.find(p => p.id === subscriptionPlan)?.formattedPrice ||
+                         getSubscriptionPlans().find(p => p.id === subscriptionPlan)?.formattedPrice ||
+                         t("subscription.plans.free.priceDisplay", { defaultValue: "Free" })}
                       </Text>
                     </View>
                   </View>
@@ -1329,6 +1390,13 @@ const createStyles = (colors: any, isDark: boolean) => {
       fontSize: 14,
       fontWeight: "700",
       color: colors.primary,
+    },
+    currencyIndicator: {
+      fontSize: 12,
+      fontWeight: "600",
+      color: colors.primary,
+      opacity: 0.8,
+      marginLeft: 4,
     },
     tokenInfoBanner: {
       flexDirection: "row",
