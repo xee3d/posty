@@ -530,7 +530,11 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
             </View>
 
             {/* 작업 목록 */}
-            <View style={styles.taskList}>
+            <ScrollView 
+              style={styles.taskList}
+              contentContainerStyle={styles.taskListContent}
+              showsVerticalScrollIndicator={false}
+            >
               {tasks.map((task, index) => (
                 <FadeInView key={task.id} delay={index * 100}>
                   <TouchableOpacity
@@ -621,25 +625,27 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
                   </TouchableOpacity>
                 </FadeInView>
               ))}
-            </View>
 
-            {/* 안내 메시지 */}
-            <View style={styles.infoBox}>
-              <SafeIcon
-                name="information-circle"
-                size={20}
-                color={colors.primary}
-              />
-              <Text style={styles.infoText}>
-                매일 미션은 자정에 초기화됩니다. '앱 평가하기'는 한 번만 받을 수
-                있어요!
-              </Text>
-            </View>
+              {/* 안내 메시지 */}
+              <View style={styles.infoBox}>
+                <SafeIcon
+                  name="information-circle"
+                  size={20}
+                  color={colors.primary}
+                />
+                <Text style={styles.infoText}>
+                  매일 미션은 자정에 초기화됩니다. '앱 평가하기'는 한 번만 받을 수
+                  있어요!
+                </Text>
+              </View>
+            </ScrollView>
 
-            {/* 닫기 버튼 */}
-            <ScaleButton style={styles.closeButton} onPress={onClose}>
-              <Text style={styles.closeButtonText}>닫기</Text>
-            </ScaleButton>
+            {/* 닫기 버튼 - ScrollView 밖으로 */}
+            <View style={styles.bottomButtonContainer}>
+              <ScaleButton style={styles.closeButton} onPress={onClose}>
+                <Text style={styles.closeButtonText}>닫기</Text>
+              </ScaleButton>
+            </View>
           </View>
         </FadeInView>
       </View>
@@ -668,8 +674,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) =>
       backgroundColor: colors.surface,
       borderTopLeftRadius: 24,
       borderTopRightRadius: 24,
-      paddingBottom: 40,
-      maxHeight: "85%",
+      maxHeight: "90%",
+      overflow: "hidden",
     },
     header: {
       flexDirection: "row",
@@ -703,7 +709,11 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) =>
       marginTop: 2,
     },
     taskList: {
+      flex: 1,
+    },
+    taskListContent: {
       padding: SPACING.lg,
+      paddingBottom: SPACING.xl,
     },
     taskItem: {
       flexDirection: "row",
@@ -778,10 +788,10 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) =>
       flexDirection: "row",
       alignItems: "center",
       backgroundColor: colors.primary + "10",
-      marginHorizontal: SPACING.lg,
       padding: SPACING.md,
       borderRadius: 12,
       gap: SPACING.sm,
+      marginTop: SPACING.md,
     },
     infoText: {
       flex: 1,
@@ -789,17 +799,22 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) =>
       color: colors.primary,
       lineHeight: 18,
     },
+    bottomButtonContainer: {
+      padding: SPACING.lg,
+      paddingBottom: SPACING.md,
+      backgroundColor: colors.surface,
+      borderTopWidth: 1,
+      borderTopColor: colors.border,
+    },
     closeButton: {
       backgroundColor: colors.primary,
-      marginHorizontal: SPACING.lg,
-      marginTop: SPACING.lg,
       paddingVertical: 14,
       borderRadius: 12,
       alignItems: "center",
     },
     closeButtonText: {
       fontSize: 16,
-      fontWeight: "600",
+      fontWeight: "700",
       color: colors.white,
     },
   });
