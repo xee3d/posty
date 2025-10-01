@@ -21,7 +21,6 @@ export const useTokenManagement = ({
   const currentTokens = useAppSelector(selectCurrentTokens);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
 
-  const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
   const [showLowTokenPrompt, setShowLowTokenPrompt] = useState(false);
   const [hasShownPromptToday, setHasShownPromptToday] = useState(false);
 
@@ -127,8 +126,8 @@ export const useTokenManagement = ({
   // 토큰 부족 시 처리
   const handleLowToken = useCallback(() => {
     setShowLowTokenPrompt(false);
-    setShowEarnTokenModal(true);
-  }, []);
+    onNavigate?.("subscription"); // 토큰 상점으로 이동
+  }, [onNavigate]);
 
   // 구독 유도
   const handleUpgrade = useCallback(() => {
@@ -140,11 +139,9 @@ export const useTokenManagement = ({
     // 상태
     currentTokens,
     subscriptionPlan,
-    showEarnTokenModal,
     showLowTokenPrompt,
 
     // 상태 변경
-    setShowEarnTokenModal,
     setShowLowTokenPrompt,
 
     // 기능

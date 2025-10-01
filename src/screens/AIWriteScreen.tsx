@@ -25,7 +25,6 @@ import { SafeIcon } from "../utils/SafeIcon";
 import { useAppSelector, useAppDispatch } from "../hooks/redux";
 import { useTokenManagement } from "../hooks/useTokenManagement";
 import { useTimer } from "../hooks/useCleanup";
-import EarnTokenModal from "../components/EarnTokenModal";
 import { LowTokenPrompt } from "../components/LowTokenPrompt";
 import {
   AnimatedCard,
@@ -2107,13 +2106,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           <View style={styles.bottomSpace} />
         </ScrollView>
       </KeyboardAvoidingView>
-
-      {/* 무료 토큰 받기 모달 */}
-      <EarnTokenModal
-        visible={showEarnTokenModal}
-        onClose={() => setShowEarnTokenModal(false)}
-        onTokensEarned={handleEarnTokens}
-      />
 
       {/* 토큰 부족 자동 프롬프트 */}
       {showLowTokenPrompt && (
