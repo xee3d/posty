@@ -7,6 +7,7 @@ import {
   Modal,
   ActivityIndicator,
   Platform,
+  ScrollView,
 } from "react-native";
 import { SafeIcon } from "../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
