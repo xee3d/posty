@@ -17,7 +17,7 @@ import { useAppSelector } from "../../hooks/redux";
 import { useTranslation } from "react-i18next";
 import { selectCurrentTokens } from "../../store/slices/userSlice";
 import inAppPurchaseService from "../../services/subscription/inAppPurchaseService";
-import EarnTokenModal from "../../components/EarnTokenModal";
+import FreeTokenModal from "../../components/FreeTokenModal";
 import { useTokenManagement } from "../../hooks/useTokenManagement";
 import { Alert } from "../../utils/customAlert";
 
@@ -233,7 +233,7 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
       </ScrollView>
 
       {/* 무료 토큰 받기 모달 */}
-      <EarnTokenModal
+      <FreeTokenModal
         visible={showEarnTokenModal}
         onClose={() => setShowEarnTokenModal(false)}
         onTokensEarned={handleEarnTokens}
