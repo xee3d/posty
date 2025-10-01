@@ -193,28 +193,29 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   const loadGlobalPricing = async () => {
     try {
-      console.log('[ModernSubscriptionScreen] Loading global pricing...');
+      console.log('[ModernSubscriptionScreen] Loading pricing (language-based)...');
 
-      // 글로벌 가격 시스템 활성화
-      setUseGlobalPricing(true);
+      // 언어 기반 가격 시스템 사용
+      setUseGlobalPricing(false);
 
-      // 국가별 구독 플랜 로드
-      const plans = await getGlobalSubscriptionPlans();
+      // 언어별 구독 플랜 로드
+      const plans = getSubscriptionPlans();
       setGlobalSubscriptionPlans(plans);
 
-      // 현재 통화 정보 로드
-      const currency = await countryDetectionService.getCurrentCurrency();
+      // 현재 언어의 통화 정보 로드
+      const currency = {
+        code: plans[0]?.currency || 'KRW',
+        symbol: plans[0]?.formattedPrice?.match(/[₩$¥€£]/)?.[0] || '₩'
+      };
       setCurrentCurrency(currency);
 
-      console.log('[ModernSubscriptionScreen] Global pricing loaded:', {
+      console.log('[ModernSubscriptionScreen] Language-based pricing loaded:', {
         plansCount: plans.length,
         currency: currency.code,
         firstPlanPrice: plans[0]?.formattedPrice
       });
     } catch (error) {
-      console.error('[ModernSubscriptionScreen] Failed to load global pricing:', error);
-      // 에러 발생 시 기본 방식 사용
-      setUseGlobalPricing(false);
+      console.error('[ModernSubscriptionScreen] Failed to load pricing:', error);
     }
   };
 
@@ -600,14 +601,12 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         currency: currentCurrency.code
       };
     } else {
-      // 글로벌 플랜에서 찾기
+      // 언어 기반 플랜에서 찾기
       const globalPlan = globalSubscriptionPlans.find(p => p.id === planKey);
       if (globalPlan) {
         plan = globalPlan;
-        console.log('[ModernSubscriptionScreen] Using global plan for', planKey, ':', globalPlan.formattedPrice, globalPlan.currency);
       } else {
-        // 글로벌 플랜이 없으면 기존 방식 사용 (언어 기반 - fallback)
-        console.warn('[ModernSubscriptionScreen] Global plan not found for', planKey, ', using fallback');
+        // fallback
         const subscriptionPlans = getSubscriptionPlans();
         plan = subscriptionPlans.find(p => p.id === planKey) || subscriptionPlans[0];
       }

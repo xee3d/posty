@@ -218,12 +218,8 @@ class PricingService {
     ];
   }
 
-  // 구독 플랜 정보 가져오기 (동기 버전 - 글로벌 가격 시스템 사용 시 비권장)
+  // 구독 플랜 정보 가져오기 (언어 기반)
   getSubscriptionPlans() {
-    // 글로벌 가격 시스템을 사용하는 경우, async 버전(getGlobalSubscriptionPlans)을 사용해야 함
-    // 이 함수는 fallback용으로만 사용
-    console.warn('[PricingService] Using legacy getSubscriptionPlans (language-based). Consider using getGlobalSubscriptionPlans (country-based) instead.');
-    
     const pricing = this.getCurrentPricing();
 
     return [
