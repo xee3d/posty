@@ -2530,25 +2530,15 @@ Personal Information Inquiry: getposty@gmail.com`
       errorTitle: "Purchase Failed",
       errorMessage: "Failed to purchase tokens.\nPlease try again.",
     },
-    adWatch: {
-      title: "Watch Ad & Get Tokens",
-      available: "Get up to {{tokens}} more tokens",
-      maxed: "Maximum reached for today",
-      maxReached: "Token Limit Reached",
-      maxReachedMessage: "You can only hold up to 10 free tokens",
-      successTitle: "Tokens Earned!",
-      successMessage: "You received {{tokens}} tokens!",
-      errorTitle: "Ad Failed",
-    },
     notice: {
-      title: "Token System Guide",
+      title: "Token System",
       freeTokens: "Free Tokens:",
-      freeTokensDesc: "Daily auto-refill of 10 tokens (max 10)",
+      freeTokensDesc: "10 tokens daily auto-refill",
       purchasedTokens: "Purchased Tokens:",
-      purchasedTokensDesc: "Never expire, unlimited storage",
+      purchasedTokensDesc: "Permanent, never expire",
       usageOrder: "Usage Order:",
-      usageOrderDesc: "Free tokens used first → Purchased tokens",
-      adReward: "Earn additional free tokens by watching ads"
+      usageOrderDesc: "Free → Purchased",
+      adReward: "Watch ads when tokens run out"
     }
   }
 };

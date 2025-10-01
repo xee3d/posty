@@ -2481,14 +2481,14 @@ const zhCN = {
       errorMessage: "代币购买失败。\n请重试。",
     },
     notice: {
-      title: "代币系统指南",
+      title: "代币系统",
       freeTokens: "免费代币：",
-      freeTokensDesc: "每天午夜自动充值10个（最多10个）",
+      freeTokensDesc: "每天自动充值10个",
       purchasedTokens: "购买代币：",
-      purchasedTokensDesc: "永不过期，无限存储",
+      purchasedTokensDesc: "永久保存，不过期",
       usageOrder: "使用顺序：",
-      usageOrderDesc: "优先使用免费代币 → 购买代币",
-      adReward: "观看广告可获得额外免费代币"
+      usageOrderDesc: "免费 → 购买",
+      adReward: "不足时可看广告获得"
     }
   }
 };

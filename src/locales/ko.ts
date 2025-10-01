@@ -2216,25 +2216,15 @@ const ko = {
       errorTitle: "구매 실패",
       errorMessage: "토큰 구매에 실패했습니다.\n다시 시도해주세요.",
     },
-    adWatch: {
-      title: "광고 시청하고 토큰 받기",
-      available: "최대 {{tokens}}개 더 받을 수 있어요",
-      maxed: "오늘은 최대치에 도달했어요",
-      maxReached: "토큰 최대치 도달",
-      maxReachedMessage: "무료 토큰은 최대 10개까지만 보유할 수 있어요",
-      successTitle: "토큰 획득!",
-      successMessage: "{{tokens}}개 토큰을 받았어요!",
-      errorTitle: "광고 시청 실패",
-    },
     notice: {
-      title: "토큰 시스템 안내",
+      title: "토큰 시스템",
       freeTokens: "무료 토큰:",
-      freeTokensDesc: "매일 자정 10개 자동 충전 (최대 10개)",
+      freeTokensDesc: "매일 10개 자동 충전",
       purchasedTokens: "구매 토큰:",
-      purchasedTokensDesc: "절대 소멸되지 않고 무제한 보관",
+      purchasedTokensDesc: "영구 보관, 소멸 없음",
       usageOrder: "사용 순서:",
-      usageOrderDesc: "무료 토큰 먼저 사용 → 구매 토큰 사용",
-      adReward: "광고 시청으로 무료 토큰 추가 획득 가능"
+      usageOrderDesc: "무료 → 구매",
+      adReward: "토큰 부족 시 광고로 획득 가능"
     }
   }
 };

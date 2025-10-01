@@ -2237,14 +2237,14 @@ const ja = {
       errorMessage: "トークンの購入に失敗しました。\nもう一度お試しください。",
     },
     notice: {
-      title: "トークンシステムガイド",
+      title: "トークンシステム",
       freeTokens: "無料トークン：",
-      freeTokensDesc: "毎日深夜0時に10個自動チャージ（最大10個）",
+      freeTokensDesc: "毎日10個自動チャージ",
       purchasedTokens: "購入トークン：",
-      purchasedTokensDesc: "絶対に消滅せず無制限に保管",
+      purchasedTokensDesc: "永久保管、消滅なし",
       usageOrder: "使用順序：",
-      usageOrderDesc: "無料トークンを先に使用 → 購入トークン使用",
-      adReward: "広告視聴で無料トークンを追加獲得可能"
+      usageOrderDesc: "無料 → 購入",
+      adReward: "不足時は広告で獲得可能"
     }
   }
 };
