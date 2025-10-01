@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -8,17 +8,14 @@ import {
   SafeAreaView,
   Dimensions,
 } from "react-native";
-import { SafeIcon } from "../../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
-import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import LinearGradient from "react-native-linear-gradient";
-import { COLORS, SPACING } from "../../utils/constants";
+import { SPACING } from "../../utils/constants";
 import { TOKEN_PACKAGES } from "../../config/adConfig";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { useAppSelector } from "../../hooks/redux";
 import { useTranslation } from "react-i18next";
 import { selectCurrentTokens } from "../../store/slices/userSlice";
-import rewardAdService from "../../services/rewardAdService";
 import inAppPurchaseService from "../../services/subscription/inAppPurchaseService";
 import EarnTokenModal from "../../components/EarnTokenModal";
 import { useTokenManagement } from "../../hooks/useTokenManagement";
@@ -30,58 +27,15 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
   const { colors, isDark } = useAppTheme();
   const { t } = useTranslation();
   const currentTokens = useAppSelector(selectCurrentTokens);
-  const [selectedPackage, setSelectedPackage] = useState<string>("tokens_150");
   const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
   
   const { handleEarnTokens } = useTokenManagement({ onNavigate });
 
   // 패키지별 그라데이션 색상
   const packageGradients = {
-    tokens_50: ["#667eea", "#764ba2"], // 보라-핑크
-    tokens_150: ["#f093fb", "#f5576c"], // 핑크-레드 (인기)
-    tokens_500: ["#4facfe", "#00f2fe"], // 블루-시안
-  };
-
-  const handlePurchase = async (packageId: string) => {
-    const pkg = TOKEN_PACKAGES.find(p => p.id === packageId);
-    if (!pkg) return;
-
-    const totalTokens = pkg.tokens + pkg.bonus;
-    
-    Alert.alert(
-      "토큰 구매",
-      `${totalTokens}개 토큰을 ${pkg.priceDisplay}에 구매하시겠습니까?${pkg.bonus > 0 ? `\n\n🎁 보너스 ${pkg.bonus}개 포함!` : ''}`,
-      [
-        { text: t("common.cancel"), style: "cancel" },
-        {
-          text: "구매하기",
-          onPress: async () => {
-            try {
-              await inAppPurchaseService.purchaseTokenPackage(packageId);
-              Alert.alert("구매 완료! 🎉", `${totalTokens}개 토큰이 지급되었습니다!`);
-            } catch (error) {
-              Alert.alert("구매 실패", "토큰 구매에 실패했습니다. 다시 시도해주세요.");
-            }
-          },
-        },
-      ]
-    );
-  };
-
-export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
-  const { colors, isDark } = useAppTheme();
-  const { t } = useTranslation();
-  const currentTokens = useAppSelector(selectCurrentTokens);
-  const [selectedPackage, setSelectedPackage] = useState<string>("tokens_150");
-  const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
-  
-  const { handleEarnTokens } = useTokenManagement({ onNavigate });
-
-  // 패키지별 그라데이션 색상
-  const packageGradients = {
-    tokens_50: { colors: ["#667eea", "#764ba2"], name: "스타터" }, // 보라-핑크
-    tokens_150: { colors: ["#f093fb", "#f5576c"], name: "인기" }, // 핑크-레드
-    tokens_500: { colors: ["#4facfe", "#00f2fe"], name: "프리미엄" }, // 블루-시안
+    tokens_50: { colors: ["#667eea", "#764ba2"], name: "스타터" },
+    tokens_150: { colors: ["#f093fb", "#f5576c"], name: "인기" },
+    tokens_500: { colors: ["#4facfe", "#00f2fe"], name: "프리미엄" },
   };
 
   const handlePurchase = async (packageId: string) => {
@@ -133,7 +87,7 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
           </Text>
         </View>
 
-        {/* 현재 토큰 카드 - 그라데이션 */}
+        {/* 현재 토큰 카드 */}
         <LinearGradient
           colors={isDark ? ["#1a1a2e", "#16213e"] : ["#FFFFFF", "#F0F4FF"]}
           style={styles.currentTokensCard}
@@ -154,7 +108,6 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
             </View>
           </View>
           
-          {/* 무료 토큰 받기 버튼 */}
           <TouchableOpacity
             style={[styles.freeTokenButton, { backgroundColor: colors.primary }]}
             onPress={() => setShowEarnTokenModal(true)}
