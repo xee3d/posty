@@ -83,53 +83,26 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {/* 헤더 */}
-        <View style={styles.header}>
-          <View style={styles.headerTop}>
-            <TouchableOpacity
-              onPress={() => navigation?.goBack()}
-              style={styles.backButton}
-            >
-              <Icon name="chevron-back" size={28} color={colors.text.primary} />
-            </TouchableOpacity>
-            <LinearGradient
-              colors={["#667eea", "#764ba2"]}
-              style={styles.iconBadge}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-            >
-              <Icon name="flash" size={28} color="#FFFFFF" />
-            </LinearGradient>
-            <Text style={[styles.headerTitle, { color: colors.text.primary }]}>
-              {t("tokenShop.title")}
-            </Text>
-          </View>
-          <Text style={[styles.headerSubtitle, { color: colors.text.secondary }]}>
-            {t("tokenShop.subtitle")}
+      {/* 헤더 */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation?.goBack()}
+          style={styles.backButton}
+        >
+          <Icon name="arrow-back" size={24} color={colors.text.primary} />
+        </TouchableOpacity>
+        <Text style={[styles.headerTitle, { color: colors.text.primary }]}>
+          {t("tokenShop.title")}
+        </Text>
+        <View style={styles.headerRight}>
+          <Icon name="flash" size={20} color={colors.primary} />
+          <Text style={[styles.headerTokens, { color: colors.primary }]}>
+            {currentTokens}
           </Text>
         </View>
+      </View>
 
-        {/* 현재 토큰 카드 */}
-        <LinearGradient
-          colors={isDark ? ["#1a1a2e", "#16213e"] : ["#FFFFFF", "#F0F4FF"]}
-          style={styles.currentTokensCard}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-        >
-          <View style={styles.currentTokensContent}>
-            <Text style={[styles.currentTokensLabel, { color: colors.text.secondary }]}>
-              {t("tokenShop.currentTokens")}
-            </Text>
-            <View style={styles.currentTokensValue}>
-              <Icon name="flash" size={36} color={colors.primary} />
-              <Text style={[styles.currentTokensNumber, { color: colors.primary }]}>
-                {currentTokens}
-              </Text>
-            </View>
-          </View>
-        </LinearGradient>
-
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* 일일 충전 안내 */}
         <View style={[styles.infoCard, { backgroundColor: colors.primary + "10", borderColor: colors.primary + "30" }]}>
           <Icon name="moon-outline" size={20} color={colors.primary} />
@@ -253,14 +226,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    padding: SPACING.large,
-    paddingTop: 20,
-  },
-  headerTop: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: SPACING.small,
-    gap: SPACING.small,
+    justifyContent: "space-between",
+    paddingHorizontal: SPACING.large,
+    paddingVertical: SPACING.medium,
+    borderBottomWidth: 1,
+    borderBottomColor: "transparent",
   },
   backButton: {
     width: 40,
@@ -268,63 +240,24 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  iconBadge: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: SPACING.medium,
-    shadowColor: "#667eea",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
   headerTitle: {
-    fontSize: 32,
-    fontWeight: "800",
-    letterSpacing: -0.5,
-  },
-  headerSubtitle: {
-    fontSize: 15,
-    lineHeight: 22,
-    marginTop: 4,
-  },
-  currentTokensCard: {
-    marginHorizontal: SPACING.large,
-    marginBottom: SPACING.large,
-    padding: SPACING.large,
-    borderRadius: 20,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-  currentTokensContent: {
+    fontSize: 18,
+    fontWeight: "700",
     flex: 1,
+    textAlign: "center",
   },
-  currentTokensLabel: {
-    fontSize: 15,
-    marginBottom: 8,
-    fontWeight: "500",
-  },
-  currentTokensValue: {
+  headerRight: {
     flexDirection: "row",
-    alignItems: "baseline",
-    gap: 4,
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+    backgroundColor: "rgba(99, 102, 241, 0.1)",
   },
-  currentTokensNumber: {
-    fontSize: 42,
-    fontWeight: "800",
-  },
-  currentTokensUnit: {
-    fontSize: 20,
-    fontWeight: "600",
+  headerTokens: {
+    fontSize: 16,
+    fontWeight: "700",
   },
   infoCard: {
     marginHorizontal: SPACING.large,
