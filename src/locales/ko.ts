@@ -1687,6 +1687,7 @@ const ko = {
     // 플랜별 기능 번역 키
     features: {
       dailyTokens10: "일일 10개 토큰",
+      tones2: "2가지 톤 스타일",
       tones3: "3가지 톤 스타일",
       lengthShortMedium: "짧은/중간 길이",
       hasAds: "광고 포함",

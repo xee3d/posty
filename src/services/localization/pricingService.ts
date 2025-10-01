@@ -218,8 +218,12 @@ class PricingService {
     ];
   }
 
-  // 구독 플랜 정보 가져오기
+  // 구독 플랜 정보 가져오기 (동기 버전 - 글로벌 가격 시스템 사용 시 비권장)
   getSubscriptionPlans() {
+    // 글로벌 가격 시스템을 사용하는 경우, async 버전(getGlobalSubscriptionPlans)을 사용해야 함
+    // 이 함수는 fallback용으로만 사용
+    console.warn('[PricingService] Using legacy getSubscriptionPlans (language-based). Consider using getGlobalSubscriptionPlans (country-based) instead.');
+    
     const pricing = this.getCurrentPricing();
 
     return [
@@ -229,8 +233,10 @@ class PricingService {
         tokens: 600,
         price: pricing.subscription.starter,
         formattedPrice: this.formatPrice(pricing.subscription.starter),
+        priceDisplay: this.formatPrice(pricing.subscription.starter),
         period: '/월',
         popular: false,
+        currency: pricing.currency,
       },
       {
         id: 'premium',
@@ -238,8 +244,10 @@ class PricingService {
         tokens: 1100,
         price: pricing.subscription.premium,
         formattedPrice: this.formatPrice(pricing.subscription.premium),
+        priceDisplay: this.formatPrice(pricing.subscription.premium),
         period: '/월',
         popular: true,
+        currency: pricing.currency,
       },
       {
         id: 'pro',
@@ -247,8 +255,10 @@ class PricingService {
         tokens: -1, // 무제한
         price: pricing.subscription.pro,
         formattedPrice: this.formatPrice(pricing.subscription.pro),
+        priceDisplay: this.formatPrice(pricing.subscription.pro),
         period: '/월',
         popular: false,
+        currency: pricing.currency,
       },
     ];
   }
@@ -260,15 +270,12 @@ class PricingService {
     }
 
     const countryPricing = await this.getCurrentCountryPricing();
-
-    // CSV 데이터의 가격을 기준으로 다른 플랜 가격 계산
-    const basePrice = countryPricing.price;
     const currency = countryPricing.currency;
 
-    // 플랜별 가격 비율 (Premium 플랜을 기준으로)
-    const starterPrice = basePrice * 0.65; // Premium의 65%
-    const premiumPrice = basePrice;        // 기준 가격
-    const proPrice = basePrice * 2.5;      // Premium의 250%
+    // CSV 데이터에 각 플랜별 가격이 있으면 사용, 없으면 계산
+    const starterPrice = countryPricing.starter || countryPricing.price * 0.15; // Pro의 15%
+    const premiumPrice = countryPricing.premium || countryPricing.price * 0.29; // Pro의 29%
+    const proPrice = countryPricing.pro || countryPricing.price;                // Pro 가격
 
     return [
       {

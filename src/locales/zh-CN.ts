@@ -129,6 +129,7 @@ const zhCN = {
 
     features: {
       dailyTokens10: "每日10个代币",
+      tones2: "2种语调风格",
       tones3: "3种语调风格",
       lengthShortMedium: "短/中等长度",
       hasAds: "包含广告",

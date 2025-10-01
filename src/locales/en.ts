@@ -737,6 +737,7 @@ const en = {
     // Plan features translation keys
     features: {
       dailyTokens10: "10 daily tokens",
+      tones2: "2 tone styles",
       tones3: "3 tone styles",
       lengthShortMedium: "Short/medium length",
       hasAds: "Includes ads",

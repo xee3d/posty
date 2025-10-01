@@ -604,8 +604,10 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       const globalPlan = globalSubscriptionPlans.find(p => p.id === planKey);
       if (globalPlan) {
         plan = globalPlan;
+        console.log('[ModernSubscriptionScreen] Using global plan for', planKey, ':', globalPlan.formattedPrice, globalPlan.currency);
       } else {
-        // 글로벌 플랜이 없으면 기존 방식 사용
+        // 글로벌 플랜이 없으면 기존 방식 사용 (언어 기반 - fallback)
+        console.warn('[ModernSubscriptionScreen] Global plan not found for', planKey, ', using fallback');
         const subscriptionPlans = getSubscriptionPlans();
         plan = subscriptionPlans.find(p => p.id === planKey) || subscriptionPlans[0];
       }
@@ -719,14 +721,14 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                 />
                 <Text style={styles.featureText}>{t("subscription.features.dailyTokens10")}</Text>
               </View>
-                   <View style={styles.featureItem}>
-                     <Icon
-                       name="close"
-                       size={16}
-                       color="#EF4444"
-                     />
-                     <Text style={[styles.featureText, { color: colors.text.secondary }]}>{t("subscription.features.tones3")}</Text>
-                   </View>
+              <View style={styles.featureItem}>
+                <Icon
+                  name="checkmark"
+                  size={16}
+                  color={isSelected ? planColor : "#10B981"}
+                />
+                <Text style={styles.featureText}>{t("subscription.features.tones2")}</Text>
+              </View>
               <View style={styles.featureItem}>
                 <Icon
                   name="close"

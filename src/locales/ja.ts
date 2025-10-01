@@ -96,6 +96,7 @@ const ja = {
     trialEnds: "トライアル終了日: {{date}}",
     features: {
       dailyTokens10: "毎日10トークン",
+      tones2: "2つのトーンスタイル",
       tones3: "3つのトーンスタイル",
       lengthShortMedium: "短い/中間の長さ",
       hasAds: "広告あり",
