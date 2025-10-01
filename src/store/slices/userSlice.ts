@@ -344,47 +344,35 @@ const userSlice = createSlice({
       }
     },
 
-    // 토큰 사용 - 최적화: 토큰 히스토리 관리 개선
+    // 토큰 사용 - 무료 토큰 먼저 사용, 그 다음 구매 토큰 사용
     useTokens: (state, action: PayloadAction<number>) => {
       console.log("[UserSlice] useTokens called with amount:", action.payload);
-      console.log("[UserSlice] Current plan:", state.subscriptionPlan);
-      console.log("[UserSlice] Current tokens before:", state.currentTokens);
-
-      // PRO 플랜은 무제한이므로 토큰 차감 안함
-      if (state.subscriptionPlan === "pro") {
-        // 히스토리만 추가
-        const newHistory: TokenHistory = {
-          id: Date.now().toString(),
-          date: new Date().toISOString(),
-          type: "use",
-          amount: -action.payload,
-          description: "AI 콘텐츠 생성",
-          balance: 9999, // 항상 무제한
-        };
-        state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
-        return;
-      }
+      console.log("[UserSlice] Free tokens:", state.freeTokens, "Purchased:", state.purchasedTokens);
+      console.log("[UserSlice] Total tokens before:", state.currentTokens);
 
       const amount = action.payload;
       if (state.currentTokens >= amount) {
-        state.currentTokens -= amount;
-        state.tokens.current = state.currentTokens;
-        console.log(
-          "[UserSlice] Tokens deducted. New balance:",
-          state.currentTokens
-        );
-
-        // 무료 토큰부터 차감
+        // 무료 토큰부터 먼저 차감
         if (state.freeTokens >= amount) {
           state.freeTokens -= amount;
         } else {
           const remaining = amount - state.freeTokens;
           state.freeTokens = 0;
-          state.purchasedTokens = Math.max(
-            0,
-            state.purchasedTokens - remaining
-          );
+          state.purchasedTokens = Math.max(0, state.purchasedTokens - remaining);
         }
+        
+        // 총 토큰 = 무료 토큰 + 구매 토큰
+        state.currentTokens = state.freeTokens + state.purchasedTokens;
+        state.tokens.current = state.currentTokens;
+        
+        console.log(
+          "[UserSlice] Tokens deducted. Free:",
+          state.freeTokens,
+          "Purchased:",
+          state.purchasedTokens,
+          "Total:",
+          state.currentTokens
+        );
 
         // 히스토리 추가 - 최적화: 최대 20개만 유지
         const newHistory: TokenHistory = {
@@ -432,19 +420,21 @@ const userSlice = createSlice({
       state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
     },
 
-    // 일일 토큰 리셋 (매일 3개 재충전)
+    // 일일 토큰 리셋 (매일 3개 재충전, 무료 토큰 최대 10개)
     resetDailyTokens: (state) => {
       const today = new Date().toISOString().split("T")[0];
 
       if (state.lastTokenResetDate !== today) {
-        // 매일 3개 추가 (최대 50개까지)
+        // 무료 토큰만 충전 (최대 10개까지)
         const dailyRefill = 3;
-        const maxTokens = 50;
+        const maxFreeTokens = 10;
         
-        if (state.currentTokens < maxTokens) {
-          const tokensToAdd = Math.min(dailyRefill, maxTokens - state.currentTokens);
+        if (state.freeTokens < maxFreeTokens) {
+          const tokensToAdd = Math.min(dailyRefill, maxFreeTokens - state.freeTokens);
           state.freeTokens += tokensToAdd;
-          state.currentTokens += tokensToAdd;
+          
+          // 총 토큰 = 무료 토큰 + 구매 토큰
+          state.currentTokens = state.freeTokens + state.purchasedTokens;
           state.tokens.current = state.currentTokens;
 
           const newHistory: TokenHistory = {
@@ -477,7 +467,7 @@ const userSlice = createSlice({
       state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
     },
 
-    // 리워드로 토큰 획득
+    // 리워드로 토큰 획득 (광고 시청 등 - 무료 토큰에 추가, 최대 10개)
     earnTokens: (
       state,
       action: PayloadAction<{
@@ -485,14 +475,20 @@ const userSlice = createSlice({
         description: string;
       }>
     ) => {
-      state.currentTokens += action.payload.amount;
-      state.purchasedTokens += action.payload.amount;
+      const maxFreeTokens = 10;
+      const tokensToAdd = Math.min(action.payload.amount, maxFreeTokens - state.freeTokens);
+      
+      if (tokensToAdd > 0) {
+        state.freeTokens += tokensToAdd;
+        state.currentTokens = state.freeTokens + state.purchasedTokens;
+        state.tokens.current = state.currentTokens;
+      }
 
       const newHistory: TokenHistory = {
         id: Date.now().toString(),
         date: new Date().toISOString(),
         type: "earn",
-        amount: action.payload.amount,
+        amount: tokensToAdd,
         description: action.payload.description,
         balance: state.currentTokens,
       };

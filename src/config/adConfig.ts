@@ -7,7 +7,8 @@ export type PlanType = "free"; // 단일 플랜으로 통합
 export const TOKEN_CONFIG = {
   initialTokens: 10, // 가입 시 10개 지급
   dailyRefill: 3, // 매일 3개 재충전
-  maxDailyTokens: 50, // 최대 보유 가능 토큰 (일일 충전 제한)
+  maxFreeTokens: 10, // 무료 토큰 최대 10개
+  maxPurchasedTokens: 9999, // 구매 토큰은 제한 없음
   adReward: 1, // 광고 시청 시 1개 지급
   imageAnalysisCost: 2, // 이미지 분석 비용
 };
