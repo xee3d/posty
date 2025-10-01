@@ -220,7 +220,11 @@ class PricingService {
 
   // 구독 플랜 정보 가져오기 (언어 기반)
   getSubscriptionPlans() {
+    // 현재 언어 정보 업데이트
+    this.updateLanguage();
     const pricing = this.getCurrentPricing();
+    
+    console.log('[PricingService] Current language:', this.currentLanguage, 'Currency:', pricing.currency);
 
     return [
       {
