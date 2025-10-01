@@ -420,33 +420,28 @@ const userSlice = createSlice({
       state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
     },
 
-    // 일일 토큰 리셋 (매일 3개 재충전, 무료 토큰 최대 10개)
+    // 일일 토큰 리셋 (매일 자정 10개 재충전)
     resetDailyTokens: (state) => {
       const today = new Date().toISOString().split("T")[0];
 
       if (state.lastTokenResetDate !== today) {
-        // 무료 토큰만 충전 (최대 10개까지)
-        const dailyRefill = 3;
-        const maxFreeTokens = 10;
+        // 무료 토큰을 10개로 리셋 (자정마다)
+        const previousFreeTokens = state.freeTokens;
+        state.freeTokens = 10;
         
-        if (state.freeTokens < maxFreeTokens) {
-          const tokensToAdd = Math.min(dailyRefill, maxFreeTokens - state.freeTokens);
-          state.freeTokens += tokensToAdd;
-          
-          // 총 토큰 = 무료 토큰 + 구매 토큰
-          state.currentTokens = state.freeTokens + state.purchasedTokens;
-          state.tokens.current = state.currentTokens;
+        // 총 토큰 = 무료 토큰 + 구매 토큰
+        state.currentTokens = state.freeTokens + state.purchasedTokens;
+        state.tokens.current = state.currentTokens;
 
-          const newHistory: TokenHistory = {
-            id: Date.now().toString(),
-            date: new Date().toISOString(),
-            type: "earn",
-            amount: tokensToAdd,
-            description: i18next.t("tokens.descriptions.dailyFree"),
-            balance: state.currentTokens,
-          };
-          state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
-        }
+        const newHistory: TokenHistory = {
+          id: Date.now().toString(),
+          date: new Date().toISOString(),
+          type: "earn",
+          amount: 10 - previousFreeTokens,
+          description: i18next.t("tokens.descriptions.dailyFree"),
+          balance: state.currentTokens,
+        };
+        state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
 
         state.lastTokenResetDate = today;
       }

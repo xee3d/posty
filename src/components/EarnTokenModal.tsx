@@ -123,16 +123,6 @@ const EarnTokenModal: React.FC<EarnTokenModalProps> = ({
         dailyLimit: 1,
         currentCount: taskData.share_social?.count || 0,
       },
-      {
-        id: "daily_login",
-        title: "일일 출석",
-        description: "매일 앱을 방문하고 1개의 토큰을 받으세요",
-        icon: "event-available",
-        iconType: "material",
-        tokens: 1,
-        available: !taskData.daily_login?.completed,
-        completed: taskData.daily_login?.completed || false,
-      },
     ];
 
     setTasks(availableTasks);
@@ -678,8 +668,8 @@ const createStyles = (colors: typeof COLORS, cardTheme: any) =>
       backgroundColor: colors.surface,
       borderTopLeftRadius: 24,
       borderTopRightRadius: 24,
-      paddingBottom: SPACING.xl,
-      maxHeight: "80%",
+      paddingBottom: 40,
+      maxHeight: "85%",
     },
     header: {
       flexDirection: "row",

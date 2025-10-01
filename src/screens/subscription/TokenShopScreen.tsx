@@ -33,8 +33,8 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
 
   // 패키지별 그라데이션 색상
   const packageGradients = {
-    tokens_50: { colors: ["#667eea", "#764ba2"], name: "스타터" },
-    tokens_150: { colors: ["#f093fb", "#f5576c"], name: "인기" },
+    tokens_50: { colors: ["#667eea", "#764ba2"], name: "베이직" },
+    tokens_150: { colors: ["#f093fb", "#f5576c"], name: "스탠다드" },
     tokens_500: { colors: ["#4facfe", "#00f2fe"], name: "프리미엄" },
   };
 
@@ -70,6 +70,12 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
         {/* 헤더 */}
         <View style={styles.header}>
           <View style={styles.headerTop}>
+            <TouchableOpacity
+              onPress={() => navigation?.goBack()}
+              style={styles.backButton}
+            >
+              <Icon name="chevron-back" size={28} color={colors.text.primary} />
+            </TouchableOpacity>
             <LinearGradient
               colors={["#667eea", "#764ba2"]}
               style={styles.iconBadge}
@@ -96,14 +102,12 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
         >
           <View style={styles.currentTokensContent}>
             <Text style={[styles.currentTokensLabel, { color: colors.text.secondary }]}>
-              💎 보유 토큰
+              보유 토큰
             </Text>
             <View style={styles.currentTokensValue}>
+              <Icon name="flash" size={36} color={colors.primary} />
               <Text style={[styles.currentTokensNumber, { color: colors.primary }]}>
                 {currentTokens}
-              </Text>
-              <Text style={[styles.currentTokensUnit, { color: colors.text.secondary }]}>
-                개
               </Text>
             </View>
           </View>
@@ -119,17 +123,20 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
 
         {/* 일일 충전 안내 */}
         <View style={[styles.infoCard, { backgroundColor: colors.primary + "10", borderColor: colors.primary + "30" }]}>
-          <Icon name="time-outline" size={20} color={colors.primary} />
+          <Icon name="moon-outline" size={20} color={colors.primary} />
           <Text style={[styles.infoText, { color: colors.text.primary }]}>
-            매일 3개씩 자동 충전 (무료 토큰 최대 10개)
+            매일 자정에 10개 무료 충전
           </Text>
         </View>
 
         {/* 토큰 패키지 */}
         <View style={styles.packagesSection}>
-          <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
-            🔥 토큰 패키지
-          </Text>
+          <View style={styles.sectionTitleRow}>
+            <Icon name="cart" size={24} color={colors.primary} />
+            <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
+              토큰 패키지
+            </Text>
+          </View>
           
           {TOKEN_PACKAGES.map((pkg) => {
             const gradient = packageGradients[pkg.id as keyof typeof packageGradients];
@@ -150,7 +157,8 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
                 >
                   {pkg.popular && (
                     <View style={styles.popularBadge}>
-                      <Text style={styles.popularBadgeText}>⭐ 인기</Text>
+                      <Icon name="star" size={14} color="#FFFFFF" />
+                      <Text style={styles.popularBadgeText}>인기</Text>
                     </View>
                   )}
 
@@ -163,8 +171,9 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
                       
                       {pkg.bonus > 0 && (
                         <View style={styles.bonusBadge}>
+                          <Icon name="gift" size={14} color="#FFFFFF" />
                           <Text style={styles.bonusText}>
-                            🎁 보너스 +{pkg.bonus}
+                            보너스 +{pkg.bonus}
                           </Text>
                         </View>
                       )}
@@ -188,9 +197,12 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
 
         {/* 안내 사항 */}
         <View style={[styles.noticeCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-          <Text style={[styles.noticeTitle, { color: colors.text.primary }]}>
-            📌 토큰 시스템 안내
-          </Text>
+          <View style={styles.noticeTitleRow}>
+            <Icon name="information-circle" size={22} color={colors.primary} />
+            <Text style={[styles.noticeTitle, { color: colors.text.primary }]}>
+              토큰 시스템 안내
+            </Text>
+          </View>
           <View style={styles.noticeList}>
             <View style={styles.noticeRow}>
               <Icon name="checkmark-circle" size={18} color="#10B981" />
@@ -201,7 +213,7 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
             <View style={styles.noticeRow}>
               <Icon name="checkmark-circle" size={18} color="#10B981" />
               <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-                무료 토큰은 매일 3개씩 자동 충전 (최대 10개)
+                매일 자정에 10개 무료 충전
               </Text>
             </View>
             <View style={styles.noticeRow}>
@@ -245,6 +257,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginBottom: SPACING.small,
+    gap: SPACING.small,
+  },
+  backButton: {
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
   },
   iconBadge: {
     width: 56,
@@ -341,10 +360,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.large,
     marginBottom: SPACING.large,
   },
+  sectionTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.small,
+    marginBottom: SPACING.large,
+  },
   sectionTitle: {
     fontSize: 22,
     fontWeight: "800",
-    marginBottom: SPACING.large,
     letterSpacing: -0.5,
   },
   packageCardWrapper: {
@@ -364,6 +388,9 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 12,
     right: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
     backgroundColor: "rgba(255, 255, 255, 0.25)",
     paddingHorizontal: 12,
     paddingVertical: 6,
@@ -397,6 +424,9 @@ const styles = StyleSheet.create({
     letterSpacing: -1,
   },
   bonusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
     backgroundColor: "rgba(255, 255, 255, 0.2)",
     alignSelf: "flex-start",
     paddingHorizontal: 12,
@@ -446,10 +476,15 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     borderWidth: 1,
   },
+  noticeTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: SPACING.small,
+    marginBottom: SPACING.medium,
+  },
   noticeTitle: {
     fontSize: 18,
     fontWeight: "700",
-    marginBottom: SPACING.medium,
   },
   noticeList: {
     gap: SPACING.medium,

@@ -6,7 +6,7 @@ export type PlanType = "free"; // 단일 플랜으로 통합
 // 토큰 기반 시스템 설정
 export const TOKEN_CONFIG = {
   initialTokens: 10, // 가입 시 10개 지급
-  dailyRefill: 3, // 매일 3개 재충전
+  dailyRefill: 10, // 매일 자정 10개 재충전
   maxFreeTokens: 10, // 무료 토큰 최대 10개
   maxPurchasedTokens: 9999, // 구매 토큰은 제한 없음
   adReward: 1, // 광고 시청 시 1개 지급
@@ -16,7 +16,7 @@ export const TOKEN_CONFIG = {
 // 모든 기능 해금 (토큰만으로 사용 판단)
 export const PLAN_FEATURES = {
   free: {
-    dailyTokens: 3, // 매일 3개 재충전
+    dailyTokens: 10, // 매일 자정 10개 재충전
     monthlyTokens: 0,
     initialTokens: 10, // 가입 시 10개 지급
     dailyBonus: 0,
