@@ -51,7 +51,7 @@ import HomeScreen from "./src/screens/HomeScreen";
 import AIWriteScreen from "./src/screens/AIWriteScreen";
 import MyStyleScreen from "./src/screens/MyStyleScreen";
 import SettingsScreen from "./src/screens/SettingsScreen";
-import ModernSubscriptionScreen from "./src/screens/subscription/ModernSubscriptionScreen";
+import TokenShopScreen from "./src/screens/subscription/TokenShopScreen";
 import LoginScreen from "./src/screens/LoginScreen";
 import {
   TermsOfServiceScreen,
@@ -640,7 +640,7 @@ const AppContent: React.FC = () => {
         return <SettingsScreen key="settings" onNavigate={handleTabPress} />;
       case "subscription":
         return (
-          <ModernSubscriptionScreen
+          <TokenShopScreen
             key="subscription"
             navigation={{
               goBack: () => handleTabPress("home"),

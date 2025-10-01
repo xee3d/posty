@@ -438,6 +438,28 @@ class InAppPurchaseService {
   }
 
   /**
+   * 토큰 패키지 구매
+   */
+  async purchaseTokenPackage(packageId: string): Promise<void> {
+    try {
+      // SKU 매핑
+      const sku = Platform.select({
+        ios: packageId.replace('tokens_', 'com.posty.tokens.'),
+        android: packageId,
+      });
+
+      if (!sku) {
+        throw new Error("Invalid package ID");
+      }
+
+      await requestPurchase({ sku });
+    } catch (error) {
+      console.error("Token purchase error:", error);
+      throw error;
+    }
+  }
+
+  /**
    * 연결 종료
    */
   async disconnect(): Promise<void> {
