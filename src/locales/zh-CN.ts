@@ -1168,6 +1168,12 @@ const zhCN = {
       enabled: "通知已启用",
       soundEnabled: "声音已启用",
       vibrationEnabled: "振动已启用"
+    },
+    adPersonalization: {
+      title: "广告个性化设置",
+      description: "配置个性化广告显示偏好",
+      updateSuccess: "广告个性化设置已更新。",
+      updateError: "无法更新设置。请稍后再试。"
     }
   },
 
