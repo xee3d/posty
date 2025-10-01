@@ -2216,6 +2216,16 @@ const ko = {
       errorTitle: "구매 실패",
       errorMessage: "토큰 구매에 실패했습니다.\n다시 시도해주세요.",
     },
+    adWatch: {
+      title: "광고 시청하고 토큰 받기",
+      available: "최대 {{tokens}}개 더 받을 수 있어요",
+      maxed: "오늘은 최대치에 도달했어요",
+      maxReached: "토큰 최대치 도달",
+      maxReachedMessage: "무료 토큰은 최대 10개까지만 보유할 수 있어요",
+      successTitle: "토큰 획득!",
+      successMessage: "{{tokens}}개 토큰을 받았어요!",
+      errorTitle: "광고 시청 실패",
+    },
     notice: {
       title: "토큰 시스템 안내",
       freeTokens: "무료 토큰:",

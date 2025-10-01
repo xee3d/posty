@@ -2530,6 +2530,16 @@ Personal Information Inquiry: getposty@gmail.com`
       errorTitle: "Purchase Failed",
       errorMessage: "Failed to purchase tokens.\nPlease try again.",
     },
+    adWatch: {
+      title: "Watch Ad & Get Tokens",
+      available: "Get up to {{tokens}} more tokens",
+      maxed: "Maximum reached for today",
+      maxReached: "Token Limit Reached",
+      maxReachedMessage: "You can only hold up to 10 free tokens",
+      successTitle: "Tokens Earned!",
+      successMessage: "You received {{tokens}} tokens!",
+      errorTitle: "Ad Failed",
+    },
     notice: {
       title: "Token System Guide",
       freeTokens: "Free Tokens:",
