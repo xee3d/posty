@@ -17,8 +17,6 @@ import { useAppSelector } from "../../hooks/redux";
 import { useTranslation } from "react-i18next";
 import { selectCurrentTokens } from "../../store/slices/userSlice";
 import inAppPurchaseService from "../../services/subscription/inAppPurchaseService";
-import FreeTokenModal from "../../components/FreeTokenModal";
-import { useTokenManagement } from "../../hooks/useTokenManagement";
 import { Alert } from "../../utils/customAlert";
 
 const { width: screenWidth } = Dimensions.get("window");
@@ -27,9 +25,6 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
   const { colors, isDark } = useAppTheme();
   const { t } = useTranslation();
   const currentTokens = useAppSelector(selectCurrentTokens);
-  const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
-  
-  const { handleEarnTokens } = useTokenManagement({ onNavigate });
 
   // 패키지별 그라데이션 색상
   const packageGradients = {
@@ -104,11 +99,11 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
               <Icon name="flash" size={28} color="#FFFFFF" />
             </LinearGradient>
             <Text style={[styles.headerTitle, { color: colors.text.primary }]}>
-              토큰 상점
+              {t("tokenShop.title")}
             </Text>
           </View>
           <Text style={[styles.headerSubtitle, { color: colors.text.secondary }]}>
-            필요한 만큼 구매하고 무제한으로 사용하세요
+            {t("tokenShop.subtitle")}
           </Text>
         </View>
 
@@ -121,7 +116,7 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
         >
           <View style={styles.currentTokensContent}>
             <Text style={[styles.currentTokensLabel, { color: colors.text.secondary }]}>
-              보유 토큰
+              {t("tokenShop.currentTokens")}
             </Text>
             <View style={styles.currentTokensValue}>
               <Icon name="flash" size={36} color={colors.primary} />
@@ -130,21 +125,13 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
               </Text>
             </View>
           </View>
-          
-          <TouchableOpacity
-            style={[styles.freeTokenButton, { backgroundColor: colors.primary }]}
-            onPress={() => setShowEarnTokenModal(true)}
-          >
-            <Icon name="gift" size={20} color="#FFFFFF" />
-            <Text style={styles.freeTokenButtonText}>무료로 받기</Text>
-          </TouchableOpacity>
         </LinearGradient>
 
         {/* 일일 충전 안내 */}
         <View style={[styles.infoCard, { backgroundColor: colors.primary + "10", borderColor: colors.primary + "30" }]}>
           <Icon name="moon-outline" size={20} color={colors.primary} />
           <Text style={[styles.infoText, { color: colors.text.primary }]}>
-            매일 자정에 10개 무료 충전
+            {t("tokenShop.dailyRefill")}
           </Text>
         </View>
 
@@ -153,7 +140,7 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
           <View style={styles.sectionTitleRow}>
             <Icon name="cart" size={24} color={colors.primary} />
             <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
-              토큰 패키지
+              {t("tokenShop.packagesTitle")}
             </Text>
           </View>
           
@@ -219,44 +206,37 @@ export const TokenShopScreen: React.FC = ({ navigation, onNavigate }) => {
           <View style={styles.noticeTitleRow}>
             <Icon name="information-circle" size={22} color={colors.primary} />
             <Text style={[styles.noticeTitle, { color: colors.text.primary }]}>
-              토큰 시스템 안내
+              {t("tokenShop.notice.title")}
             </Text>
           </View>
           <View style={styles.noticeList}>
             <View style={styles.noticeRow}>
               <Icon name="gift" size={18} color="#8B5CF6" />
               <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-                <Text style={{ fontWeight: "700" }}>무료 토큰:</Text> 매일 자정 10개 자동 충전 (최대 10개)
+                <Text style={{ fontWeight: "700" }}>{t("tokenShop.notice.freeTokens")}</Text> {t("tokenShop.notice.freeTokensDesc")}
               </Text>
             </View>
             <View style={styles.noticeRow}>
               <Icon name="cart" size={18} color="#F59E0B" />
               <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-                <Text style={{ fontWeight: "700" }}>구매 토큰:</Text> 절대 소멸되지 않고 무제한 보관
+                <Text style={{ fontWeight: "700" }}>{t("tokenShop.notice.purchasedTokens")}</Text> {t("tokenShop.notice.purchasedTokensDesc")}
               </Text>
             </View>
             <View style={styles.noticeRow}>
               <Icon name="layers" size={18} color="#10B981" />
               <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-                <Text style={{ fontWeight: "700" }}>사용 순서:</Text> 무료 토큰 먼저 사용 → 구매 토큰 사용
+                <Text style={{ fontWeight: "700" }}>{t("tokenShop.notice.usageOrder")}</Text> {t("tokenShop.notice.usageOrderDesc")}
               </Text>
             </View>
             <View style={styles.noticeRow}>
               <Icon name="play-circle" size={18} color="#EF4444" />
               <Text style={[styles.noticeItem, { color: colors.text.secondary }]}>
-                광고 시청으로 무료 토큰 추가 획득 가능
+                {t("tokenShop.notice.adReward")}
               </Text>
             </View>
           </View>
         </View>
       </ScrollView>
-
-      {/* 무료 토큰 받기 모달 */}
-      <FreeTokenModal
-        visible={showEarnTokenModal}
-        onClose={() => setShowEarnTokenModal(false)}
-        onTokensEarned={handleEarnTokens}
-      />
     </SafeAreaView>
   );
 };
@@ -341,24 +321,6 @@ const styles = StyleSheet.create({
   currentTokensUnit: {
     fontSize: 20,
     fontWeight: "600",
-  },
-  freeTokenButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingHorizontal: SPACING.large,
-    paddingVertical: SPACING.medium,
-    borderRadius: 14,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  freeTokenButtonText: {
-    color: "#FFFFFF",
-    fontSize: 15,
-    fontWeight: "700",
   },
   infoCard: {
     marginHorizontal: SPACING.large,

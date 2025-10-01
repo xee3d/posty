@@ -2212,6 +2212,11 @@ const ja = {
 
   // トークンショップ
   tokenShop: {
+    title: "トークンショップ",
+    subtitle: "必要な分だけ購入して無制限に使用できます",
+    currentTokens: "保有トークン",
+    dailyRefill: "毎日深夜0時に10個無料チャージ",
+    packagesTitle: "トークンパッケージ",
     purchase: {
       title: "{{name}}パッケージ購入",
       message: "{{tokens}}個のトークンを\n{{price}}で購入しますか？",
@@ -2221,6 +2226,16 @@ const ja = {
       successMessage: "{{tokens}}個のトークンが付与されました！",
       errorTitle: "購入失敗",
       errorMessage: "トークンの購入に失敗しました。\nもう一度お試しください。",
+    },
+    notice: {
+      title: "トークンシステムガイド",
+      freeTokens: "無料トークン：",
+      freeTokensDesc: "毎日深夜0時に10個自動チャージ（最大10個）",
+      purchasedTokens: "購入トークン：",
+      purchasedTokensDesc: "絶対に消滅せず無制限に保管",
+      usageOrder: "使用順序：",
+      usageOrderDesc: "無料トークンを先に使用 → 購入トークン使用",
+      adReward: "広告視聴で無料トークンを追加獲得可能"
     }
   }
 };

@@ -2456,6 +2456,11 @@ const zhCN = {
 
   // 代币商店
   tokenShop: {
+    title: "代币商店",
+    subtitle: "按需购买，无限使用",
+    currentTokens: "当前代币",
+    dailyRefill: "每天午夜自动充值10个代币",
+    packagesTitle: "代币套餐",
     purchase: {
       title: "购买{{name}}套餐",
       message: "购买{{tokens}}个代币\n价格{{price}}？",
@@ -2465,6 +2470,16 @@ const zhCN = {
       successMessage: "已获得{{tokens}}个代币！",
       errorTitle: "购买失败",
       errorMessage: "代币购买失败。\n请重试。",
+    },
+    notice: {
+      title: "代币系统指南",
+      freeTokens: "免费代币：",
+      freeTokensDesc: "每天午夜自动充值10个（最多10个）",
+      purchasedTokens: "购买代币：",
+      purchasedTokensDesc: "永不过期，无限存储",
+      usageOrder: "使用顺序：",
+      usageOrderDesc: "优先使用免费代币 → 购买代币",
+      adReward: "观看广告可获得额外免费代币"
     }
   }
 };

@@ -2506,6 +2506,11 @@ Personal Information Inquiry: getposty@gmail.com`
 
   // Token Shop
   tokenShop: {
+    title: "Token Shop",
+    subtitle: "Buy what you need and use it unlimitedly",
+    currentTokens: "Current Tokens",
+    dailyRefill: "Daily auto-refill: 10 tokens at midnight",
+    packagesTitle: "Token Packages",
     purchase: {
       title: "{{name}} Package Purchase",
       message: "Purchase {{tokens}} tokens\nfor {{price}}?",
@@ -2515,6 +2520,16 @@ Personal Information Inquiry: getposty@gmail.com`
       successMessage: "{{tokens}} tokens have been added!",
       errorTitle: "Purchase Failed",
       errorMessage: "Failed to purchase tokens.\nPlease try again.",
+    },
+    notice: {
+      title: "Token System Guide",
+      freeTokens: "Free Tokens:",
+      freeTokensDesc: "Daily auto-refill of 10 tokens (max 10)",
+      purchasedTokens: "Purchased Tokens:",
+      purchasedTokensDesc: "Never expire, unlimited storage",
+      usageOrder: "Usage Order:",
+      usageOrderDesc: "Free tokens used first → Purchased tokens",
+      adReward: "Earn additional free tokens by watching ads"
     }
   }
 };

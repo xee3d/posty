@@ -2192,6 +2192,11 @@ const ko = {
 
   // 토큰 상점
   tokenShop: {
+    title: "토큰 상점",
+    subtitle: "필요한 만큼 구매하고 무제한으로 사용하세요",
+    currentTokens: "보유 토큰",
+    dailyRefill: "매일 자정에 10개 무료 충전",
+    packagesTitle: "토큰 패키지",
     purchase: {
       title: "{{name}} 패키지 구매",
       message: "{{tokens}}개 토큰을\n{{price}}에 구매하시겠습니까?",
@@ -2201,6 +2206,16 @@ const ko = {
       successMessage: "{{tokens}}개 토큰이 지급되었습니다!",
       errorTitle: "구매 실패",
       errorMessage: "토큰 구매에 실패했습니다.\n다시 시도해주세요.",
+    },
+    notice: {
+      title: "토큰 시스템 안내",
+      freeTokens: "무료 토큰:",
+      freeTokensDesc: "매일 자정 10개 자동 충전 (최대 10개)",
+      purchasedTokens: "구매 토큰:",
+      purchasedTokensDesc: "절대 소멸되지 않고 무제한 보관",
+      usageOrder: "사용 순서:",
+      usageOrderDesc: "무료 토큰 먼저 사용 → 구매 토큰 사용",
+      adReward: "광고 시청으로 무료 토큰 추가 획득 가능"
     }
   }
 };
