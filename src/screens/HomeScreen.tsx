@@ -613,9 +613,44 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           <SyncIndicator />
         </View> */}
 
-        {/* 빠른 템플릿 (시간대별) */}
-        {getPersonalizedGreeting().quickTemplates && (
-          <FadeInView delay={50} duration={200}>
+        {/* 개인화된 인사 배너 */}
+        <FadeInView delay={50} duration={200}>
+          <View style={styles.postyBanner}>
+            <View style={styles.postyAvatar}>
+              {(() => {
+                const greeting = getPersonalizedGreeting();
+                console.log("Greeting icon:", greeting.icon);
+                return (
+                  <SafeIcon 
+                    name={greeting.icon || "sparkles-outline"} 
+                    size={24} 
+                    color={colors.white} 
+                    onError={(error) => console.log("SafeIcon error:", error)}
+                  />
+                );
+              })()}
+            </View>
+            <View style={styles.postyBannerContent}>
+              <Text style={styles.postyBannerTitle}>
+                {getPersonalizedGreeting().title}
+              </Text>
+              <Text style={styles.postyBannerSubtitle}>
+                {getPersonalizedGreeting().message}
+              </Text>
+            </View>
+          </View>
+
+          {/* 신규 사용자를 위한 추가 메시지 */}
+          {userLevel === "new" && getPersonalizedGreeting().subMessage && (
+            <View style={styles.welcomeSubMessage}>
+              <Text style={styles.welcomeSubText}>
+                💡 {getPersonalizedGreeting().subMessage}
+              </Text>
+            </View>
+          )}
+
+          {/* 빠른 템플릿 (시간대별) */}
+          {getPersonalizedGreeting().quickTemplates && (
             <ScrollView
               horizontal
               showsHorizontalScrollIndicator={false}
@@ -635,8 +670,8 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 )
               )}
             </ScrollView>
-          </FadeInView>
-        )}
+          )}
+        </FadeInView>
 
         {/* 빠른 생성 - 사용자 레벨에 따라 다르게 표시 */}
         <FadeInView delay={175}>
