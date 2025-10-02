@@ -4,7 +4,7 @@ import HomeScreen from "../screens/HomeScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import MyStyleScreen from "../screens/MyStyleScreen";
 import AIWriteScreen from "../screens/AIWriteScreen";
-import ModernSubscriptionScreen from "../screens/subscription/ModernSubscriptionScreen";
+// import ModernSubscriptionScreen from "../screens/subscription/ModernSubscriptionScreen"; // 구독탭 제거
 import CostMonitorScreen from "../screens/CostMonitorScreen";
 import MissionScreen from "../screens/MissionScreen";
 import TabNavigator from "../components/TabNavigator";
@@ -90,16 +90,16 @@ const AppNavigator: React.FC = () => {
         return <SettingsScreen key="settings" />;
       case "feed-ads":
         return <HomeScreen key="feed-ads" onNavigate={handleNavigate} />;
-      case "subscription":
-        return (
-          <ModernSubscriptionScreen
-            key="subscription"
-            navigation={{
-              navigate: handleTabChange,
-              goBack: () => handleTabChange("home"),
-            }}
-          />
-        );
+      // case "subscription": // 구독탭 제거
+      //   return (
+      //     <ModernSubscriptionScreen
+      //       key="subscription"
+      //       navigation={{
+      //         navigate: handleTabChange,
+      //         goBack: () => handleTabChange("home"),
+      //       }}
+      //     />
+      //   );
       case "mission":
         return <MissionScreen key="mission" />;
       case "animation-examples":
