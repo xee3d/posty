@@ -46,6 +46,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
   onEdit,
 }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
+  const { t } = useTranslation();
   const [activePlatform, setActivePlatform] = useState<
     "original" | "instagram" | "facebook" | "twitter"
   >("original");
@@ -432,14 +433,14 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
       {activePlatform !== "original" && (
         <View style={styles.conversionInfo}>
           <View style={styles.conversionInfoItem}>
-            <Text style={styles.conversionLabel}>원본 길이:</Text>
+            <Text style={styles.conversionLabel}>{t("aiWrite.contentDisplay.originalLength")}:</Text>
             <Text style={styles.conversionValue}>
-              {safeOriginalContent.split("#")[0].trim().length}자
+              {safeOriginalContent.split("#")[0].trim().length}{t("aiWrite.contentDisplay.characters")}
             </Text>
           </View>
           <SafeIcon name="arrow-forward" size={16} color={colors.text.tertiary} />
           <View style={styles.conversionInfoItem}>
-            <Text style={styles.conversionLabel}>변환 후:</Text>
+            <Text style={styles.conversionLabel}>{t("aiWrite.contentDisplay.convertedLength")}:</Text>
             <Text
               style={[
                 styles.conversionValue,
@@ -449,7 +450,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
                 },
               ]}
             >
-              {getContentLength()}자
+              {getContentLength()}{t("aiWrite.contentDisplay.characters")}
               {getContentLength() <
                 safeOriginalContent.split("#")[0].trim().length * 0.5 &&
                 " (-" +
@@ -474,7 +475,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
             color={colors.text.tertiary}
           />
           <Text style={styles.tokenNoticeText}>
-            플랫폼 변경은 토큰을 사용하지 않아요
+            {t("aiWrite.contentDisplay.platformChangeNotice")}
           </Text>
         </View>
       )}
@@ -499,8 +500,8 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
             ]}
           >
             {showPlatformHint
-              ? "🎉 생성 완료! 아래 플랫폼 탭을 눌러 SNS에 맞게 변환해보세요"
-              : "아래 플랫폼 탭을 눌러 각 SNS에 맞게 변환해보세요"}
+              ? `🎉 ${t("common.success")}! ${t("aiWrite.contentDisplay.platformHint")}`
+              : t("aiWrite.contentDisplay.platformHint")}
           </Text>
         </Animated.View>
       )}
@@ -511,7 +512,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
           {activePlatform === "original" && (
             <View style={styles.originalBadge}>
               <SafeIcon name="create-outline" size={12} color={colors.primary} />
-              <Text style={styles.originalBadgeText}>생성된 원본</Text>
+              <Text style={styles.originalBadgeText}>{t("aiWrite.contentDisplay.originalContent")}</Text>
             </View>
           )}
           <View style={styles.contentHeaderRight}>
@@ -540,11 +541,11 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
                     : styles.emojiToggleTextInactive,
                 ]}
               >
-                {showEmojis ? "이모지ON" : "이모지OFF"}
+                {showEmojis ? t("aiWrite.contentDisplay.emojiOn") : "이모지OFF"}
               </Text>
             </TouchableOpacity>
             <Text style={styles.contentLengthText}>
-              본문 {getContentLength()}자
+              {t("aiWrite.contentDisplay.bodyText")} {getContentLength()}{t("aiWrite.contentDisplay.characters")}
             </Text>
           </View>
         </View>

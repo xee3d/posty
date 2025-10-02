@@ -72,6 +72,16 @@ const ko = {
       polish: "정리하고 싶은 글을 입력해주세요",
       photo: "사진을 보여주세요!",
     },
+    contentDisplay: {
+      originalLength: "원본 길이",
+      convertedLength: "변환 후",
+      characters: "자",
+      platformChangeNotice: "플랫폼 변경은 토큰을 사용하지 않아요",
+      originalContent: "생성된 원본",
+      emojiOn: "이모지ON",
+      bodyText: "본문",
+      platformHint: "아래 플랫폼 탭을 눌러 각 SNS에 맞게 변환해보세요",
+    },
     placeholderExamples: {
       text: [
         "오늘 맛있게 먹은 점심 메뉴",

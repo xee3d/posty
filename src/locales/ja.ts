@@ -315,6 +315,16 @@ const ja = {
       polish: "整理したい文章をご入力ください",
       photo: "お写真を見せてください！",
     },
+    contentDisplay: {
+      originalLength: "元の長さ",
+      convertedLength: "変換後",
+      characters: "文字",
+      platformChangeNotice: "プラットフォーム変更はトークンを使用しません",
+      originalContent: "生成されたオリジナル",
+      emojiOn: "絵文字ON",
+      bodyText: "本文",
+      platformHint: "下のプラットフォームタブをタップして各SNSに合わせて変換してください",
+    },
     placeholderExamples: {
       text: [
         "今日の美味しいランチメニュー",

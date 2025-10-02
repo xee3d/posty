@@ -442,6 +442,16 @@ const zhCN = {
       polish: "请输入你想整理的文字",
       photo: "选择一张照片！"
     },
+    contentDisplay: {
+      originalLength: "原文长度",
+      convertedLength: "转换后",
+      characters: "字",
+      platformChangeNotice: "平台转换不使用令牌",
+      originalContent: "生成的原文",
+      emojiOn: "表情ON",
+      bodyText: "正文",
+      platformHint: "点击下方平台标签转换为适合各SNS的格式",
+    },
     
     prompt: {
       title: "你想写什么？",

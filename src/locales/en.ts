@@ -85,6 +85,16 @@ const en = {
       polish: "Enter the text you'd like to polish",
       photo: "Select a photo!",
     },
+    contentDisplay: {
+      originalLength: "Original Length",
+      convertedLength: "Converted",
+      characters: "chars",
+      platformChangeNotice: "Platform changes don't use tokens",
+      originalContent: "Generated Original",
+      emojiOn: "Emoji ON",
+      bodyText: "Body",
+      platformHint: "Tap the platform tabs below to convert for each SNS",
+    },
     placeholderExamples: {
       text: [
         "Today's delicious lunch",
