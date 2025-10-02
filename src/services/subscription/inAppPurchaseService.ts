@@ -31,40 +31,28 @@ import { store } from "../../store";
 // 상품 ID 정의
 const productIds = Platform.select({
   ios: [
-    "com.posty.starter.monthly",
-    "com.posty.premium.monthly",
-    "com.posty.premium.yearly",
     "com.posty.pro.monthly",
     "com.posty.pro.yearly",
-    "com.posty.tokens.50",
-    "com.posty.tokens.100",
-    "com.posty.tokens.200",
+    "com.posty.tokens.app.100",
+    "com.posty.tokens.app.200",
+    "com.posty.tokens.app.300",
   ],
   android: [
-    "starter_monthly",
-    "premium_monthly",
-    "premium_yearly",
     "pro_monthly",
     "pro_yearly",
-    "tokens_50",
     "tokens_100",
     "tokens_200",
+    "tokens_300",
   ],
   default: [],
 });
 
 const subscriptionIds = Platform.select({
   ios: [
-    "com.posty.starter.monthly",
-    "com.posty.premium.monthly",
-    "com.posty.premium.yearly",
     "com.posty.pro.monthly",
     "com.posty.pro.yearly",
   ],
   android: [
-    "starter_monthly",
-    "premium_monthly",
-    "premium_yearly",
     "pro_monthly",
     "pro_yearly",
   ],

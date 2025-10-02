@@ -2221,6 +2221,11 @@ const ja = {
     buy: "購入",
     discount: "{{percent}}%オフ",
     bestValue: "最高の価値",
+    packageNames: {
+      tokens_100: "100トークン",
+      tokens_200: "200トークン",
+      tokens_300: "300トークン"
+    },
     subscription: {
       title: "サブスクリプションプラン",
       pro: {

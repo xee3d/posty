@@ -2508,6 +2508,11 @@ Personal Information Inquiry: getposty@gmail.com`
     buy: "Buy",
     discount: "{{percent}}% off",
     bestValue: "Best Value",
+    packageNames: {
+      tokens_100: "100 Tokens",
+      tokens_200: "200 Tokens",
+      tokens_300: "300 Tokens"
+    },
     subscription: {
       title: "Subscription Plans",
       pro: {

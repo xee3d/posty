@@ -1,6 +1,6 @@
 // 광고 및 수익화 관련 설정
 
-export type PlanType = 'free' | 'starter' | 'premium' | 'pro';
+export type PlanType = 'free' | 'pro';
 
 // 플랜별 기능 접근 권한
 export const PLAN_FEATURES = {
@@ -13,26 +13,6 @@ export const PLAN_FEATURES = {
     lengths: ['short', 'medium'],
     hasAds: true,
     imageAnalysisTokens: 2,
-  },
-  starter: {
-    dailyTokens: -1, // 일일 제한 없음
-    monthlyTokens: 600, // 월 총 600개 (300 + 10*30)
-    initialTokens: 300, // 초기 지급 300개
-    dailyBonus: 10, // 일일 10개 추가
-    tones: ['casual', 'professional', 'humorous', 'emotional'], // 4개
-    lengths: ['short', 'medium', 'long'],
-    hasAds: false,
-    imageAnalysisTokens: 2,
-  },
-  premium: {
-    dailyTokens: -1, // 일일 제한 없음
-    monthlyTokens: 1100, // 월 총 1100개 (500 + 20*30)
-    initialTokens: 500, // 초기 지급 500개
-    dailyBonus: 20, // 일일 20개 추가
-    tones: ['casual', 'professional', 'humorous', 'emotional', 'genz', 'millennial'], // 6개
-    lengths: ['short', 'medium', 'long'],
-    hasAds: false,
-    imageAnalysisTokens: 1,
   },
   pro: {
     dailyTokens: -1, // 무제한
@@ -106,6 +86,12 @@ export const MY_STYLE_ACCESS = {
     message: '',
     templateLimit: 0, // 제한 없음
   },
+};
+
+// MyStyle 접근 권한 확인 함수
+export const getMyStyleAccess = (subscriptionPlan?: string) => {
+  const plan = getUserPlan(subscriptionPlan);
+  return MY_STYLE_ACCESS[plan];
 };
 
 // 트렌드 접근 권한

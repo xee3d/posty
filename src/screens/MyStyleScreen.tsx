@@ -313,7 +313,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const userPlan = getUserPlan(
     subscriptionPlan || subscription?.plan || "free"
   );
-  const styleAccess = getMyStyleAccess()[userPlan] || getMyStyleAccess().free;
+  const styleAccess = getMyStyleAccess(subscriptionPlan || subscription?.plan);
 
   console.log("[MyStyleScreen] subscription:", subscription);
   console.log("[MyStyleScreen] subscriptionPlan:", subscriptionPlan);

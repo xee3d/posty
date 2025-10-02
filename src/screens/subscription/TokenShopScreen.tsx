@@ -82,7 +82,7 @@ const ShimmerEffect: React.FC<{ colors: any; isDark: boolean }> = ({ colors, isD
         {
           transform: [{ translateX }],
           opacity,
-          backgroundColor: isDark ? "rgba(255, 255, 255, 0.15)" : "rgba(0, 0, 0, 0.1)",
+          backgroundColor: colors.overlay,
         },
       ]}
     />
@@ -105,11 +105,25 @@ interface TokenShopScreenProps {
   initialTab?: string;
 }
 
+
 export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, onNavigate, initialTab }) => {
   const { colors, isDark } = useAppTheme();
   const { t } = useTranslation();
   const currentTokens = useAppSelector(selectCurrentTokens);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
+
+  // 공통 아이콘 컴포넌트
+  const SuccessIcon: React.FC<{ size?: number }> = ({ size = 16 }) => (
+    <Icon name="checkmark-circle" size={getResponsiveSize(size)} color={colors.surface} />
+  );
+
+  const WarningIcon: React.FC<{ name?: string; size?: number }> = ({ name = "warning", size = 16 }) => (
+    <Icon name={name} size={getResponsiveSize(size)} color={colors.warning} />
+  );
+
+  const PrimaryIcon: React.FC<{ name: string; size?: number }> = ({ name, size = 16 }) => (
+    <Icon name={name} size={getResponsiveSize(size)} color={colors.primary} />
+  );
   
   // 언어별 토큰 패키지 가져오기
   const TOKEN_PACKAGES = pricingService.getNewTokenPackages();
@@ -363,7 +377,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
           {t("tokenShop.title")}
         </Text>
         <View style={styles.headerRight}>
-          <Icon name="flash" size={getResponsiveSize(20)} color={colors.primary} />
+          <PrimaryIcon name="flash" size={20} />
           <Text style={[styles.headerTokens, { color: colors.primary }]}>
             {currentTokens}
           </Text>
@@ -379,7 +393,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
         {/* 토큰 패키지 */}
         <View style={styles.packagesSection}>
           <View style={styles.sectionTitleRow}>
-            <Icon name="cart" size={getResponsiveSize(24)} color={colors.primary} />
+            <PrimaryIcon name="cart" size={24} />
             <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
               {t("tokenShop.packagesTitle")}
             </Text>
@@ -441,7 +455,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
                     { backgroundColor: packageColors.tokenSectionBg }
                   ]}>
                     <View style={styles.tokenLeft}>
-                      <Icon name="flash" size={getResponsiveSize(24)} color={colors.primary} />
+                      <PrimaryIcon name="flash" size={24} />
                       <Text style={styles.tokenCount}>{totalTokens}개</Text>
                     </View>
                     {/* 할인율 표시 - 토큰 오른쪽 */}
@@ -463,7 +477,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
                     <View style={styles.buyButton}>
                       <View style={styles.buyButtonContent}>
                         <Text style={styles.buyButtonText}>{t("tokenShop.buy")}</Text>
-                        <Icon name="arrow-forward" size={getResponsiveSize(18)} color="#FFFFFF" />
+                        <Icon name="arrow-forward" size={getResponsiveSize(18)} color={colors.surface} />
                       </View>
                     </View>
                   </View>
@@ -476,7 +490,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
         {/* 구독 플랜 섹션 */}
         <View style={styles.subscriptionSection}>
           <View style={styles.sectionTitleRow}>
-            <Icon name="card" size={getResponsiveSize(24)} color={colors.primary} />
+            <PrimaryIcon name="card" size={24} />
             <Text style={[styles.sectionTitle, { color: colors.text.primary }]}>
               {t("tokenShop.subscription.title")}
             </Text>
@@ -484,23 +498,23 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
           
           {/* 프로 버전 구독 카드 */}
           <LinearGradient
-            colors={['#667eea', '#764ba2']}
+            colors={[colors.primary, colors.accent]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={[styles.subscriptionCard, { borderColor: colors.border }]}
           >
             <View style={styles.subscriptionHeader}>
               <View style={styles.subscriptionTitleRow}>
-                <Icon name="star" size={getResponsiveSize(20)} color="#F59E0B" />
-                <Text style={[styles.subscriptionTitle, { color: "#FFFFFF" }]}>
+                <Icon name="star" size={getResponsiveSize(20)} color={colors.surface} />
+                <Text style={[styles.subscriptionTitle, { color: colors.surface }]}>
                   {t("tokenShop.subscription.pro.title")}
                 </Text>
               </View>
               <View style={styles.subscriptionPriceRow}>
-                <Text style={[styles.subscriptionPrice, { color: "#FFFFFF" }]}>
+                <Text style={[styles.subscriptionPrice, { color: colors.surface }]}>
                   {pricingService.formatPrice(pricingService.getSubscriptionPrice('pro'))}
                 </Text>
-                <Text style={[styles.subscriptionPeriod, { color: "rgba(255, 255, 255, 0.8)" }]}>
+                <Text style={[styles.subscriptionPeriod, { color: colors.surface + "CC" }]}>
                   {t("tokenShop.subscription.monthly")}
                 </Text>
               </View>
@@ -508,20 +522,20 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
             
             <View style={styles.subscriptionFeatures}>
               <View style={styles.featureItem}>
-                <Icon name="checkmark-circle" size={getResponsiveSize(16)} color="#10B981" />
-                <Text style={[styles.featureText, { color: "#FFFFFF" }]}>
+                <SuccessIcon />
+                <Text style={[styles.featureText, { color: colors.surface }]}>
                   {t("tokenShop.subscription.pro.features.unlimitedTokens")}
                 </Text>
               </View>
               <View style={styles.featureItem}>
-                <Icon name="checkmark-circle" size={getResponsiveSize(16)} color="#10B981" />
-                <Text style={[styles.featureText, { color: "#FFFFFF" }]}>
+                <SuccessIcon />
+                <Text style={[styles.featureText, { color: colors.surface }]}>
                   {t("tokenShop.subscription.pro.features.noAds")}
                 </Text>
               </View>
               <View style={styles.featureItem}>
-                <Icon name="checkmark-circle" size={getResponsiveSize(16)} color="#10B981" />
-                <Text style={[styles.featureText, { color: "#FFFFFF" }]}>
+                <SuccessIcon />
+                <Text style={[styles.featureText, { color: colors.surface }]}>
                   {t("tokenShop.subscription.pro.features.aiAgents")}
                 </Text>
               </View>
@@ -534,7 +548,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
               <Text style={styles.subscriptionButtonText}>
                 {t("tokenShop.subscription.subscribe")}
               </Text>
-              <Icon name="arrow-forward" size={getResponsiveSize(16)} color="#FFFFFF" />
+              <Icon name="arrow-forward" size={getResponsiveSize(16)} color={colors.text.primary} />
             </TouchableOpacity>
           </LinearGradient>
         </View>
@@ -543,7 +557,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
         {isSubscribed && (
           <View style={[styles.subscriptionCancelCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.cancelTitleRow}>
-              <Icon name="warning" size={getResponsiveSize(22)} color="#F59E0B" />
+              <WarningIcon size={22} />
               <Text style={[styles.cancelTitle, { color: colors.text.primary }]}>
                 구독 관리
               </Text>
@@ -551,21 +565,21 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
             
             <View style={styles.subscriptionInfo}>
               <View style={styles.subscriptionStatusRow}>
-                <Icon name="checkmark-circle" size={getResponsiveSize(16)} color="#10B981" />
+                <SuccessIcon />
                 <Text style={[styles.subscriptionStatus, { color: colors.text.secondary }]}>
                   현재 {subscriptionPlan?.toUpperCase()} 플랜 구독 중
                 </Text>
               </View>
               
               <View style={styles.expiryInfoRow}>
-                <Icon name="calendar" size={getResponsiveSize(16)} color={colors.primary} />
+                <PrimaryIcon name="calendar" size={16} />
                 <Text style={[styles.expiryInfo, { color: colors.text.secondary }]}>
                   다음 결제일: {formatExpiryDate(getSubscriptionExpiryDate())}
                 </Text>
               </View>
               
               <View style={styles.daysRemainingRow}>
-                <Icon name="time" size={getResponsiveSize(16)} color="#F59E0B" />
+                <WarningIcon name="time" />
                 <Text style={[styles.daysRemaining, { color: colors.text.secondary }]}>
                   {calculateDaysRemaining(getSubscriptionExpiryDate())}일 남음
                 </Text>
@@ -576,7 +590,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
               style={styles.cancelButton}
               onPress={handleCancelSubscription}
             >
-              <Icon name="information-circle" size={getResponsiveSize(20)} color="#3B82F6" />
+              <PrimaryIcon name="information-circle" size={20} />
               <Text style={styles.cancelButtonText}>구독 취소 안내</Text>
             </TouchableOpacity>
             
@@ -590,32 +604,32 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
         {/* 환불 정책 */}
         <View style={[styles.refundCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
           <View style={styles.noticeTitleRow}>
-            <Icon name="shield-checkmark" size={getResponsiveSize(22)} color="#10B981" />
+            <Icon name="shield-checkmark" size={getResponsiveSize(22)} color={colors.text.secondary} />
             <Text style={[styles.noticeTitle, { color: colors.text.primary }]}>
               {t("tokenShop.refund.title")}
             </Text>
           </View>
           <View style={styles.refundList}>
             <View style={styles.refundRow}>
-              <Icon name="information-circle" size={getResponsiveSize(16)} color="#6B7280" />
+              <Icon name="information-circle" size={getResponsiveSize(16)} color={colors.text.secondary} />
               <Text style={[styles.refundItem, { color: colors.text.secondary }]}>
                 {t("tokenShop.refund.policy")}
               </Text>
             </View>
             <View style={styles.refundRow}>
-              <Icon name="checkmark-circle" size={getResponsiveSize(16)} color="#10B981" />
+              <Icon name="checkmark-circle" size={getResponsiveSize(16)} color={colors.text.secondary} />
               <Text style={[styles.refundItem, { color: colors.text.secondary }]}>
                 {t("tokenShop.refund.unused")}
               </Text>
             </View>
             <View style={styles.refundRow}>
-              <Icon name="mail" size={getResponsiveSize(16)} color="#3B82F6" />
+              <Icon name="mail" size={getResponsiveSize(16)} color={colors.text.secondary} />
               <Text style={[styles.refundItem, { color: colors.text.secondary }]}>
                 {t("tokenShop.refund.contact")}
               </Text>
             </View>
             <View style={styles.refundRow}>
-              <Icon name="document-text" size={getResponsiveSize(16)} color="#8B5CF6" />
+              <Icon name="document-text" size={getResponsiveSize(16)} color={colors.text.secondary} />
               <Text style={[styles.refundItem, { color: colors.text.secondary }]}>
                 {t("tokenShop.refund.terms")}
               </Text>
@@ -638,7 +652,13 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
   );
 };
 
-const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
+const createStyles = (colors: any, isDark: boolean) => {
+  // 공통 스타일
+  const commonPadding = {
+    paddingHorizontal: getResponsiveSize(SPACING.xl), // 마진 증가
+  };
+
+  return StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -655,7 +675,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: getResponsiveSize(SPACING.large),
+    ...commonPadding,
     paddingVertical: getResponsiveSize(SPACING.medium),
     borderBottomWidth: 1,
     borderBottomColor: "transparent",
@@ -678,7 +698,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     paddingHorizontal: getResponsiveSize(12),
     paddingVertical: getResponsiveSize(6),
     borderRadius: getResponsiveSize(12),
-    backgroundColor: "rgba(99, 102, 241, 0.1)",
+    backgroundColor: colors.primary + "1A",
   },
   headerTokens: {
     ...getFontStyle("md", "bold"),
@@ -698,7 +718,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     flex: 1,
   },
   packagesSection: {
-    paddingHorizontal: getResponsiveSize(SPACING.large),
+    ...commonPadding,
     marginBottom: getResponsiveSize(SPACING.large),
   },
   sectionTitleRow: {
@@ -718,7 +738,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   packageCard: {
     borderRadius: getResponsiveSize(16),
     overflow: "visible", // 스티커가 보이도록 변경
-    shadowColor: isDark ? '#000000' : "#000",
+    shadowColor: colors.shadow,
     shadowOffset: { width: 0, height: isDark ? 4 : 3 },
     shadowOpacity: isDark ? 0.4 : 0.15,
     shadowRadius: isDark ? 8 : 6,
@@ -737,7 +757,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     paddingHorizontal: getResponsiveSize(24),
     paddingVertical: getResponsiveSize(20),
     borderBottomWidth: 2,
-    borderBottomColor: isDark ? '#333333' : '#E5E7EB',
+    borderBottomColor: colors.border,
     zIndex: 2,
   },
   tokenLeft: {
@@ -819,14 +839,14 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   buyButtonText: {
     fontSize: getResponsiveSize(isSmallDevice ? 16 : isMediumDevice ? 18 : 20),
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: colors.surface,
     letterSpacing: -0.3,
   },
   discountSticker: {
     position: "absolute",
     top: getResponsiveSize(-8),
     right: getResponsiveSize(-8),
-    backgroundColor: "#10B981",
+    backgroundColor: colors.success,
     paddingHorizontal: getResponsiveSize(8),
     paddingVertical: getResponsiveSize(4),
     borderRadius: getResponsiveSize(10),
@@ -841,21 +861,21 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 2,
-    borderColor: "#FFFFFF",
+    borderColor: colors.surface,
   },
   discountStickerText: {
     fontSize: getResponsiveSize(9),
     fontWeight: "800",
-    color: "#FFFFFF",
+    color: colors.surface,
     textAlign: "center",
     letterSpacing: 0.5,
   },
   discountBadge: {
-    backgroundColor: "#10B981",
+    backgroundColor: colors.accent,
     paddingHorizontal: getResponsiveSize(10),
     paddingVertical: getResponsiveSize(6),
     borderRadius: getResponsiveSize(12),
-    shadowColor: "#10B981",
+    shadowColor: colors.accent,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -864,12 +884,12 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   discountText: {
     fontSize: getResponsiveSize(14),
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: colors.surface,
     letterSpacing: 0.5,
     textAlign: "center",
   },
   subscriptionSection: {
-    paddingHorizontal: getResponsiveSize(SPACING.large),
+    ...commonPadding,
     marginBottom: getResponsiveSize(SPACING.large),
   },
   subscriptionCard: {
@@ -926,8 +946,10 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: colors.primary,
-    paddingHorizontal: getResponsiveSize(SPACING.large),
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    ...commonPadding,
     paddingVertical: getResponsiveSize(SPACING.medium),
     borderRadius: getResponsiveSize(12),
     gap: getResponsiveSize(SPACING.small),
@@ -935,7 +957,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   subscriptionButtonText: {
     fontSize: getResponsiveSize(16),
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: colors.text.primary,
   },
   noticeCard: {
     marginHorizontal: getResponsiveSize(SPACING.large),
@@ -1013,8 +1035,8 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#3B82F6",
-    paddingHorizontal: getResponsiveSize(SPACING.large),
+    backgroundColor: colors.primary,
+    ...commonPadding,
     paddingVertical: getResponsiveSize(SPACING.medium),
     borderRadius: getResponsiveSize(12),
     gap: getResponsiveSize(SPACING.small),
@@ -1023,7 +1045,7 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   cancelButtonText: {
     fontSize: getResponsiveSize(16),
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: colors.surface,
   },
   cancelInfo: {
     ...getFontStyle("xs", "regular"),
@@ -1050,7 +1072,8 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
     flex: 1,
     lineHeight: getResponsiveSize(22),
   },
-});
+  });
+};
 
 export default TokenShopScreen;
 

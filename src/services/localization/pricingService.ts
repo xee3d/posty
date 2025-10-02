@@ -14,8 +14,6 @@ export interface LocalePricing {
     extra: number;    // 1000 토큰
   };
   subscription: {
-    starter: number;  // 월간
-    premium: number;  // 월간
     pro: number;      // 월간
   };
   tokenPackages: {
@@ -41,8 +39,6 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
       extra: 19900,   // 1000 토큰 - 19,900원 (초대량 특별가)
     },
     subscription: {
-      starter: 3300,  // 스타터 - 3,300원/월 ($1.99 ≈ ₩3,300) - Apple 제안가
-      premium: 5500,  // 프리미엄 - 5,500원/월 ($3.99 ≈ ₩5,500) - Apple 제안가
       pro: 15000,     // 프로 - 15,000원/월 ($9.99 ≈ ₩15,000) - 무한 토큰 + 광고 제거 + Gemini 2.5/GPT-4o
     },
     tokenPackages: {
@@ -65,8 +61,6 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
       extra: 14.99,   // 1000 토큰 - $14.99 (초대량 특별가)
     },
     subscription: {
-      starter: 1.99,  // 스타터 - $1.99/월
-      premium: 3.99,  // 프리미엄 - $3.99/월
       pro: 9.99,     // 프로 - $9.99/월 (무한 토큰 + 광고 제거 + Gemini 2.5/GPT-4o)
     },
     tokenPackages: {
@@ -89,9 +83,7 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
       extra: 2000,    // 1000 토큰 - ¥2,000 (초대량 특별가)
     },
     subscription: {
-      starter: 300,   // 스타터 - ¥300/월 ($1.99 ≈ ¥300) - Apple 제안가
-      premium: 600,   // 프리미엄 - ¥600/월 ($3.99 ≈ ¥600) - Apple 제안가
-      pro: 2000,      // 프로 - ¥2,000/월 ($12.99 ≈ ¥2,000) - Apple 제안가
+      pro: 2000,      // 프로 - ¥2,000/월 ($9.99 ≈ ¥2,000) - Apple 제안가
     },
     tokenPackages: {
       tokens_100: 300,     // 100 토큰 - ¥300 (Tier 2)
@@ -113,9 +105,7 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
       extra: 88.0,    // 1000 토큰 - ¥88.0 (초대량 특별가)
     },
     subscription: {
-      starter: 15.0,  // 스타터 - ¥15.0/월 ($1.99 ≈ ¥15.0) - Apple 제안가
-      premium: 28.0,  // 프리미엄 - ¥28.0/월 ($3.99 ≈ ¥28.0) - Apple 제안가
-      pro: 88.0,      // 프로 - ¥88.0/월 ($12.99 ≈ ¥88.0) - Apple 제안가
+      pro: 88.0,      // 프로 - ¥88.0/월 ($9.99 ≈ ¥88.0) - Apple 제안가
     },
     tokenPackages: {
       tokens_100: 15.0,    // 100 토큰 - ¥15.0 (Tier 2)

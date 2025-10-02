@@ -2288,6 +2288,11 @@ const zhCN = {
     buy: "购买",
     discount: "{{percent}}% 折扣",
     bestValue: "最佳价值",
+    packageNames: {
+      tokens_100: "100代币",
+      tokens_200: "200代币",
+      tokens_300: "300代币"
+    },
     subscription: {
       title: "订阅计划",
       pro: {
