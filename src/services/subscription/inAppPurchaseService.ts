@@ -1,5 +1,6 @@
 // Safe import for react-native-iap
-let purchaseErrorListener,
+import {
+  purchaseErrorListener,
   purchaseUpdatedListener,
   ProductPurchase,
   PurchaseError,
@@ -16,38 +17,16 @@ let purchaseErrorListener,
   flushFailedPurchasesCachedAsPendingAndroid,
   acknowledgePurchaseAndroid,
   validateReceiptIos,
-  getReceiptIOS;
-
-try {
-  const iap = require("react-native-iap");
-  purchaseErrorListener = iap.purchaseErrorListener;
-  purchaseUpdatedListener = iap.purchaseUpdatedListener;
-  ProductPurchase = iap.ProductPurchase;
-  PurchaseError = iap.PurchaseError;
-  SubscriptionPurchase = iap.SubscriptionPurchase;
-  Purchase = iap.Purchase;
-  finishTransaction = iap.finishTransaction;
-  getProducts = iap.getProducts;
-  initConnection = iap.initConnection;
-  endConnection = iap.endConnection;
-  requestPurchase = iap.requestPurchase;
-  requestSubscription = iap.requestSubscription;
-  getAvailablePurchases = iap.getAvailablePurchases;
-  Product = iap.Product;
-  flushFailedPurchasesCachedAsPendingAndroid =
-    iap.flushFailedPurchasesCachedAsPendingAndroid;
-  acknowledgePurchaseAndroid = iap.acknowledgePurchaseAndroid;
-  validateReceiptIos = iap.validateReceiptIos;
-  getReceiptIOS = iap.getReceiptIOS;
-} catch (error) {
-  console.warn("react-native-iap 로드 실패 (시뮬레이터 환경):", error.message);
-}
+  getReceiptIOS,
+} from "react-native-iap";
 import { Platform, EmitterSubscription } from "react-native";
 import { DeviceEventEmitter } from "react-native";
 import serverSubscriptionService from "./serverSubscriptionService";
 import tokenService from "./tokenService";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "../../utils/customAlert";
+import { updateSubscription } from "../../store/slices/userSlice";
+import { store } from "../../store";
 
 // 상품 ID 정의
 const productIds = Platform.select({
@@ -328,8 +307,6 @@ class InAppPurchaseService {
       const planId = this.getPlanIdFromSku(productId);
 
       // Redux를 통해 구독 업데이트 (서버 검증된 상태로 처리)
-      const { updateSubscription } = require("../../store/slices/userSlice");
-      const { store } = require("../../store");
 
       const expiryDate = new Date();
       expiryDate.setMonth(expiryDate.getMonth() + 1); // 1달 후 만료
@@ -433,8 +410,8 @@ class InAppPurchaseService {
   /**
    * 특정 상품 정보 가져오기
    */
-  getProduct(productId: string): any {
-    return this.products.find((p: any) => p.productId === productId);
+  getProduct(productId: string): Product | undefined {
+    return this.products.find((p: Product) => p.productId === productId);
   }
 
   /**
@@ -531,20 +508,6 @@ class InAppPurchaseService {
   private isConsumable(productId: string): boolean {
     // 토큰 상품은 소비 가능
     return productId.includes("tokens");
-  }
-
-  /**
-   * 로드된 상품 정보 가져오기
-   */
-  getProducts(): Product[] {
-    return this.products;
-  }
-
-  /**
-   * 특정 상품 정보 가져오기
-   */
-  getProduct(sku: string): Product | undefined {
-    return this.products.find(p => p.productId === sku);
   }
 }
 

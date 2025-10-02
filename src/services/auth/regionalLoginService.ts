@@ -1,7 +1,7 @@
 import { getDeviceLanguage } from '../../utils/deviceLanguage';
 
 // 지원하는 소셜 로그인 타입
-export type SocialProvider = 'kakao' | 'naver' | 'google'; // Facebook and Apple disabled for release
+export type SocialProvider = 'kakao' | 'naver' | 'google' | 'facebook' | 'apple'; // Facebook and Apple for future use
 
 // 지역별 로그인 설정
 interface RegionalLoginConfig {

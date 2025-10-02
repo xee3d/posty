@@ -60,25 +60,25 @@ const RewardAdModal: React.FC<RewardAdModalProps> = ({
       });
 
       // 광고 로드 이벤트 리스너
-      const unsubscribeLoaded = ad.addAdEventListener('loaded', () => {
+      const unsubscribeLoaded = ad.addAdEventListener('loaded' as any, () => {
         console.log('Reward ad loaded successfully');
         setAdLoaded(true);
         setAdLoading(false);
       });
 
-      const unsubscribeError = ad.addAdEventListener('error', (error) => {
+      const unsubscribeError = ad.addAdEventListener('error' as any, (error: any) => {
         console.log('Reward ad failed to load:', error);
         setAdError(true);
         setAdLoading(false);
       });
 
-      const unsubscribeEarned = ad.addAdEventListener('rewarded', (reward) => {
+      const unsubscribeEarned = ad.addAdEventListener('rewarded' as any, (reward: any) => {
         console.log('User earned reward:', reward);
         onRewardEarned(reward.amount);
         onClose();
       });
 
-      const unsubscribeClosed = ad.addAdEventListener('closed', () => {
+      const unsubscribeClosed = ad.addAdEventListener('closed' as any, () => {
         console.log('Reward ad closed');
         onClose();
       });

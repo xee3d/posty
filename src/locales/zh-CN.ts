@@ -1681,6 +1681,7 @@ const zhCN = {
     title: "成就",
     headerTitle: "成就",
     overallProgress: "整体进度",
+    progressTemplate: "共{{total}}个，已获得{{achieved}}个成就",
     categories: {
       all: "全部",
       writing: "写作",
@@ -2119,9 +2120,9 @@ const zhCN = {
       existingAccount: "已经用其他方式注册的账户。",
       cancelled: "登录已取消。",
       timeout: "登录超时。请重试。",
-      bundleId: "请在KakaoTalk开发者控制台中确认Bundle ID设置。\n当前Bundle ID: com.posty",
-      kakaoSetup: "KakaoTalk登录失败\n1. 在KakaoTalk开发者控制台中确认Bundle ID\n2. 确认KakaoTalk应用安装",
-      naverSetup: "Naver登录失败\n1. 在Naver开发者中心确认Bundle ID\n2. 确认URL模式设置",
+      bundleId: "KakaoTalk登录设置有问题。\n请重新启动应用或联系客服。",
+      kakaoSetup: "KakaoTalk登录失败\n1. 请确认KakaoTalk应用是否已安装\n2. 请确认网络连接",
+      naverSetup: "Naver登录失败\n1. 请确认Naver应用是否已安装\n2. 请确认网络连接",
     },
   },
 
@@ -2266,185 +2267,6 @@ const zhCN = {
     }
   },
 
-  // 成就
-  achievements: {
-    title: "成就",
-    headerTitle: "成就",
-    overallProgress: "总体进度",
-    progressTemplate: "共{{total}}个，已获得{{achieved}}个成就",
-    categories: {
-      all: "全部",
-      writing: "写作",
-      style: "风格",
-      social: "社交",
-      special: "特殊"
-    },
-    categoryNames: {
-      writing: "写作",
-      style: "风格",
-      social: "社交",
-      special: "特殊"
-    },
-    rarity: {
-      common: "普通",
-      rare: "稀有",
-      epic: "史诗",
-      legendary: "传说"
-    },
-    modal: {
-      category: "类别",
-      rarity: "稀有度",
-      progress: "进度",
-      unlockedAt: "获得日期",
-      selectBadge: "设为代表成就",
-      success: "成功",
-      setBadgeSuccess: "代表成就设置成功！",
-      error: "错误",
-      setBadgeError: "设置代表成就失败。"
-    },
-    status: {
-      completed: "已获得",
-      empty: "还未获得任何成就"
-    },
-    items: {
-      // 写作相关
-      first_post: {
-        name: "第一步",
-        description: "发布了第一篇文章"
-      },
-      post_3: {
-        name: "新手作家",
-        description: "发布了3篇文章"
-      },
-      post_7: {
-        name: "一周作家",
-        description: "发布了7篇文章"
-      },
-      post_15: {
-        name: "坚持作家",
-        description: "发布了15篇文章"
-      },
-      post_30: {
-        name: "一月作家",
-        description: "发布了30篇文章"
-      },
-      post_50: {
-        name: "充满热情",
-        description: "发布了50篇文章"
-      },
-      post_100: {
-        name: "百战百胜",
-        description: "发布了100篇文章"
-      },
-      post_200: {
-        name: "专业作家",
-        description: "发布了200篇文章"
-      },
-      post_365: {
-        name: "每日作家",
-        description: "发布了365篇文章"
-      },
-      post_500: {
-        name: "传奇作家",
-        description: "发布了500篇文章"
-      },
-      post_1000: {
-        name: "千篇故事",
-        description: "发布了1000篇文章"
-      },
-
-      // 风格相关
-      minimal_master: {
-        name: "极简大师",
-        description: "完成了极简周挑战"
-      },
-      story_teller: {
-        name: "故事家",
-        description: "完成了故事月挑战"
-      },
-      trend_hunter: {
-        name: "潮流猎手",
-        description: "完成了潮流猎手挑战"
-      },
-      all_style_master: {
-        name: "全能造型师",
-        description: "掌握了所有风格"
-      },
-
-      // 社交相关
-      first_like: {
-        name: "初次点赞",
-        description: "获得了第一个点赞"
-      },
-      like_streak_7: {
-        name: "受欢迎",
-        description: "连续7天获得点赞"
-      },
-      viral_post: {
-        name: "病毒式传播",
-        description: "单篇文章获得超过100个点赞"
-      },
-
-      // 特殊成就
-      early_bird: {
-        name: "早起鸟",
-        description: "在早上6点前发布文章"
-      },
-      night_owl: {
-        name: "夜猫子",
-        description: "在晚上11点后发布文章"
-      },
-      perfectionist: {
-        name: "完美主义者",
-        description: "连续使用文章润色功能10次"
-      },
-      creative_burst: {
-        name: "创意爆发",
-        description: "一天内发布5篇文章"
-      },
-      long_form_writer: {
-        name: "长篇作家",
-        description: "发布超过500字的文章"
-      },
-      hashtag_master: {
-        name: "标签大师",
-        description: "在文章中使用超过10个标签"
-      },
-      emoji_lover: {
-        name: "表情符号爱好者",
-        description: "在文章中使用超过20个表情符号"
-      },
-      consistent_writer: {
-        name: "坚持不懈的作家",
-        description: "连续30天发布文章"
-      },
-      weekend_warrior: {
-        name: "周末战士",
-        description: "连续4个周末发布文章"
-      },
-      photo_storyteller: {
-        name: "图片故事家",
-        description: "发布50篇带照片的文章"
-      },
-      trend_setter: {
-        name: "潮流引领者",
-        description: "使用最新趋势标签发布文章"
-      },
-      community_helper: {
-        name: "社区助手",
-        description: "帮助其他用户改进文章"
-      },
-      beta_tester: {
-        name: "测试版用户",
-        description: "参与了测试版功能测试"
-      },
-      posty_veteran: {
-        name: "Posty老兵",
-        description: "使用Posty超过1年"
-      }
-    }
-  },
-
   // 分析
   analytics: {
     title: "分析",
@@ -2456,21 +2278,31 @@ const zhCN = {
 
   // 代币商店
   tokenShop: {
-    title: "代币商店",
+    title: "商店",
     subtitle: "按需购买，无限使用",
     currentTokens: "当前代币",
     dailyRefill: "每天午夜自动充值10个代币",
     packagesTitle: "代币套餐",
-    packageNames: {
-      tokens_50: "基础版",
-      tokens_150: "标准版",
-      tokens_500: "高级版"
-    },
     popular: "热门",
     bonus: "奖励 +{{count}}",
     buy: "购买",
+    discount: "{{percent}}% 折扣",
+    bestValue: "最佳价值",
+    subscription: {
+      title: "订阅计划",
+      pro: {
+        title: "专业版",
+        features: {
+          unlimitedTokens: "无限代币",
+          noAds: "移除所有广告",
+          aiAgents: "Gemini 2.5 / GPT-4o 代理"
+        }
+      },
+      subscribe: "订阅",
+      monthly: "/月"
+    },
     purchase: {
-      title: "购买{{name}}套餐",
+      title: "代币购买",
       message: "以{{price}}购买{{tokens}}个代币？",
       messageWithBonus: "以{{price}}购买{{tokens}}个代币？\n\n包含{{bonus}}个奖励",
       cancel: "取消",
@@ -2483,12 +2315,19 @@ const zhCN = {
     notice: {
       title: "代币系统",
       freeTokens: "免费代币：",
-      freeTokensDesc: "每天自动充值10个",
+      freeTokensDesc: "余额为0时才充值10个",
       purchasedTokens: "购买代币：",
       purchasedTokensDesc: "永久保存，不过期",
       usageOrder: "使用顺序：",
       usageOrderDesc: "免费 → 购买",
       adReward: "不足时可看广告获得"
+    },
+    refund: {
+      title: "退款政策",
+      policy: "代币购买后立即可用。一旦使用，无法退款。",
+      unused: "仅限购买后完全未使用的代币可申请退款。",
+      contact: "退款咨询: getposty@gmail.com",
+      terms: "详细退款政策请参考服务条款。"
     }
   }
 };

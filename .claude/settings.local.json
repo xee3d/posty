@@ -127,7 +127,16 @@
       "Bash(JAVA_HOME=/opt/homebrew/opt/openjdk@17 ANDROID_HOME=/Users/ethan_macstudio/Library/Android/sdk PATH=/opt/homebrew/opt/openjdk@17/bin:/Users/ethan_macstudio/Library/Android/sdk/platform-tools:$PATH ./gradlew assembleRelease)",
       "Bash(/Users/ethan_macstudio/Library/Android/sdk/platform-tools/adb install app/build/outputs/apk/release/app-release.apk)",
       "Bash(/Users/ethan_macstudio/Library/Android/sdk/platform-tools/adb install android/app/build/outputs/apk/release/app-release.apk)",
-      "Bash(JAVA_HOME=/opt/homebrew/opt/openjdk@17 ANDROID_HOME=/Users/ethan_macstudio/Library/Android/sdk PATH=/opt/homebrew/opt/openjdk@17/bin:/Users/ethan_macstudio/Library/Android/sdk/platform-tools:$PATH cp android/app/build/outputs/bundle/release/app-release.aab posty-ai-release-v2.aab)"
+      "Bash(JAVA_HOME=/opt/homebrew/opt/openjdk@17 ANDROID_HOME=/Users/ethan_macstudio/Library/Android/sdk PATH=/opt/homebrew/opt/openjdk@17/bin:/Users/ethan_macstudio/Library/Android/sdk/platform-tools:$PATH cp android/app/build/outputs/bundle/release/app-release.aab posty-ai-release-v2.aab)",
+      "Bash(xcrun simctl terminate:*)",
+      "Bash(RCT_METRO_PORT=8082 npx react-native run-ios --simulator \"iPhone 16e\")",
+      "Bash(JAVA_HOME=/opt/homebrew/opt/openjdk@17 ANDROID_HOME=/Users/ethan_macstudio/Library/Android/sdk PATH=/opt/homebrew/opt/openjdk@17/bin:/Users/ethan_macstudio/Library/Android/sdk/platform-tools:$PATH /Users/ethan_macstudio/Projects/posty/android/gradlew -p /Users/ethan_macstudio/Projects/posty/android assembleRelease)",
+      "Bash(/Users/ethan_macstudio/Library/Android/sdk/platform-tools/adb install -r /Users/ethan_macstudio/Projects/posty/android/app/build/outputs/apk/release/app-release.apk)",
+      "Bash(JAVA_HOME=/opt/homebrew/opt/openjdk@17 ANDROID_HOME=/Users/ethan_macstudio/Library/Android/sdk PATH=/opt/homebrew/opt/openjdk@17/bin:/Users/ethan_macstudio/Library/Android/sdk/platform-tools:$PATH ./gradlew clean)",
+      "Bash(/Users/ethan_macstudio/Library/Android/sdk/platform-tools/adb install -r app/build/outputs/apk/release/app-release.apk)",
+      "Bash(/Users/ethan_macstudio/Library/Android/sdk/platform-tools/adb install -r android/app/build/outputs/apk/release/app-release.apk)",
+      "Bash(/Users/ethan_macstudio/Library/Android/sdk/platform-tools/adb install -r ./app/build/outputs/apk/release/app-release.apk)",
+      "Bash(JAVA_HOME=/opt/homebrew/opt/openjdk@17 ANDROID_HOME=/Users/ethan_macstudio/Library/Android/sdk PATH=/opt/homebrew/opt/openjdk@17/bin:/Users/ethan_macstudio/Library/Android/sdk/platform-tools:$PATH ./gradlew bundleRelease)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

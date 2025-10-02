@@ -77,7 +77,7 @@ interface SettingsScreenProps {
 const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const { t } = useTranslation();
   // useAppTheme으로 변경하여 기존 코드와의 호환성 확보
-  const { themeMode, colors, isDark, changeTheme, cardTheme } = useAppTheme();
+  const { themeMode, colors, isDark, changeTheme, cardTheme, setThemeColor } = useAppTheme();
   const { resetThemeToDefault } = useTheme();
   const dispatch = useAppDispatch();
   const timer = useTimer();

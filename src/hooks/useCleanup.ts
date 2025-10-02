@@ -80,10 +80,10 @@ export const useTimer = () => {
     (callback: () => void, delay: number) => {
       const timer = global.setInterval(callback, delay);
 
-      timersRef.current.add(timer);
+      timersRef.current.add(timer as any);
       cleanup.addCleanup(() => {
         global.clearInterval(timer);
-        timersRef.current.delete(timer);
+        timersRef.current.delete(timer as any);
       });
 
       return timer;
@@ -91,14 +91,14 @@ export const useTimer = () => {
     [cleanup]
   );
 
-  const clearTimeout = useCallback((timer: NodeJS.Timeout) => {
+  const clearTimeout = useCallback((timer: ReturnType<typeof setTimeout>) => {
     global.clearTimeout(timer);
     timersRef.current.delete(timer);
   }, []);
 
-  const clearInterval = useCallback((timer: NodeJS.Timeout) => {
+  const clearInterval = useCallback((timer: ReturnType<typeof setInterval>) => {
     global.clearInterval(timer);
-    timersRef.current.delete(timer);
+    timersRef.current.delete(timer as any);
   }, []);
 
   return { setTimeout, setInterval, clearTimeout, clearInterval };

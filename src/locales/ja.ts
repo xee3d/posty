@@ -16,7 +16,6 @@ const ja = {
     info: "お知らせ",
     yes: "はい",
     no: "いいえ",
-    ok: "OK",
     retry: "もう一度試す",
     skip: "スキップする",
     done: "完了",
@@ -2121,9 +2120,9 @@ const ja = {
       existingAccount: "既に他の方法で登録されたアカウントです。",
       cancelled: "ログインがキャンセルされました。",
       timeout: "ログイン時間が超過されました。もう一度お試しください。",
-      bundleId: "カカオデベロッパーコンソールでBundle ID設定をご確認ください。\n現在Bundle ID: com.posty",
-      kakaoSetup: "カカオログインに失敗しました\n1. カカオデベロッパーコンソールでBundle IDをご確認\n2. カカオトークアプリのインストールをご確認",
-      naverSetup: "Naverログインに失敗しました\n1. NaverデベロッパーセンターでBundle IDをご確認\n2. URLスキーマ設定をご確認",
+      bundleId: "カカオログイン設定に問題があります。\nアプリを再起動するか、サポートにお問い合わせください。",
+      kakaoSetup: "カカオログインに失敗しました\n1. カカオトークアプリがインストールされているかご確認ください\n2. ネットワーク接続をご確認ください",
+      naverSetup: "Naverログインに失敗しました\n1. Naverアプリがインストールされているかご確認ください\n2. ネットワーク接続をご確認ください",
     },
   },
 
@@ -2212,21 +2211,31 @@ const ja = {
 
   // トークンショップ
   tokenShop: {
-    title: "トークンショップ",
+    title: "ショップ",
     subtitle: "必要な分だけ購入して無制限に使用できます",
     currentTokens: "保有トークン",
     dailyRefill: "毎日深夜0時に10個無料チャージ",
     packagesTitle: "トークンパッケージ",
-    packageNames: {
-      tokens_50: "ベーシック",
-      tokens_150: "スタンダード",
-      tokens_500: "プレミアム"
-    },
     popular: "人気",
     bonus: "ボーナス +{{count}}",
     buy: "購入",
+    discount: "{{percent}}%オフ",
+    bestValue: "最高の価値",
+    subscription: {
+      title: "サブスクリプションプラン",
+      pro: {
+        title: "プロバージョン",
+        features: {
+          unlimitedTokens: "無制限トークン",
+          noAds: "すべての広告を削除",
+          aiAgents: "Gemini 2.5 / GPT-4o エージェント"
+        }
+      },
+      subscribe: "購読する",
+      monthly: "/月"
+    },
     purchase: {
-      title: "{{name}}パッケージ購入",
+      title: "トークン購入",
       message: "{{tokens}}個のトークンを{{price}}で\n購入しますか？",
       messageWithBonus: "{{tokens}}個のトークンを{{price}}で\n購入しますか？\n\nボーナス{{bonus}}個含む",
       cancel: "キャンセル",
@@ -2239,12 +2248,19 @@ const ja = {
     notice: {
       title: "トークンシステム",
       freeTokens: "無料トークン：",
-      freeTokensDesc: "毎日10個自動チャージ",
+      freeTokensDesc: "残高0の時のみ10個チャージ",
       purchasedTokens: "購入トークン：",
       purchasedTokensDesc: "永久保管、消滅なし",
       usageOrder: "使用順序：",
       usageOrderDesc: "無料 → 購入",
       adReward: "不足時は広告で獲得可能"
+    },
+    refund: {
+      title: "返金ポリシー",
+      policy: "トークンは購入後即座に使用可能です。1回でも使用すると返金は不可能です。",
+      unused: "購入後完全に未使用の状態でのみ返金が可能です。",
+      contact: "返金お問い合わせ: getposty@gmail.com",
+      terms: "詳細な返金ポリシーは利用規約をご参照ください。"
     }
   }
 };

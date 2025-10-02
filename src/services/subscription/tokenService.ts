@@ -320,8 +320,7 @@ class TokenService {
 
   /**
    * 일일 리셋 체크
-   * - 무료 플랜: 매일 10개로 리셋
-   * - 스타터/프리미엄 플랜: 토큰 소진 시 매일 10개 충전
+   * - 토큰이 0개일 때만 10개 충전 (구매 여부와 관계없이)
    */
   private async checkDailyReset(subscription: UserTokenData): Promise<void> {
     const now = new Date();
@@ -334,17 +333,14 @@ class TokenService {
         subscription.subscriptionPlan
       );
 
-      // 무료 플랜: 매일 10개로 리셋
-      if (subscription.subscriptionPlan === "free") {
-        store.dispatch(resetDailyTokens());
-      }
-      // 스타터/프리미엄 플랜: 토큰이 0개일 때만 10개 충전
-      else if (subscription.subscriptionPlan === "starter" || subscription.subscriptionPlan === "premium") {
-        const currentTokens = store.getState().user.currentTokens || 0;
-        if (currentTokens === 0) {
-          console.log("[TokenService] Adding daily 10 tokens for", subscription.subscriptionPlan);
-          store.dispatch(earnTokens({ amount: 10, description: "일일 충전" }));
-        }
+      const currentTokens = store.getState().user.currentTokens || 0;
+      
+      // 토큰이 0개일 때만 10개 충전 (구매 여부와 관계없이)
+      if (currentTokens === 0) {
+        console.log("[TokenService] Adding daily 10 tokens - current tokens: 0");
+        store.dispatch(earnTokens({ amount: 10, description: "일일 충전" }));
+      } else {
+        console.log("[TokenService] Skipping daily reset - current tokens:", currentTokens);
       }
     }
   }

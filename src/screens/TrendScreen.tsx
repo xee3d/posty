@@ -173,7 +173,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
     try {
       setIsUserTrendsLoading(true);
       const improvedUserTrendsService =
-        require("../services/improvedUserTrendsService").default;
+        (await import("../services/improvedUserTrendsService")).default;
       const userTrendData = await improvedUserTrendsService.analyzeTrends(
         "week"
       );

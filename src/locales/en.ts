@@ -16,6 +16,18 @@ const en = {
     success: "Success",
     warning: "Warning",
     info: "Info",
+    count: "",
+    start: "Start",
+    skip: "Skip",
+    later: "Later",
+    confirm: "Confirm",
+    purchase: "Purchase",
+    categories: {
+      all: "All",
+      casual: "Casual",
+      serious: "Serious",
+      special: "Special"
+    }
   },
   app: {
     name: "Posty",
@@ -532,9 +544,9 @@ const en = {
       existingAccount: "Account already registered with different method.",
       cancelled: "Login was cancelled.",
       timeout: "Login timeout. Please try again.",
-      bundleId: "Please check Bundle ID settings in Kakao Developer Console.\nCurrent Bundle ID: com.posty",
-      kakaoSetup: "Kakao login failed\n1. Check Bundle ID in Kakao Developer Console\n2. Check KakaoTalk app installation",
-      naverSetup: "Naver login failed\n1. Check Bundle ID in Naver Developer Center\n2. Check URL scheme settings",
+      bundleId: "There is a problem with Kakao login settings.\nPlease restart the app or contact support.",
+      kakaoSetup: "Kakao login failed\n1. Please check if KakaoTalk app is installed\n2. Please check your network connection",
+      naverSetup: "Naver login failed\n1. Please check if Naver app is installed\n2. Please check your network connection",
     },
   },
 
@@ -1425,26 +1437,6 @@ const en = {
       serious: "Serious",
       light: "Light",
       witty: "Witty"
-    }
-  },
-
-  // Common
-  common: {
-    error: "Error",
-    success: "Success",
-    close: "Close",
-    count: "",
-    start: "Start",
-    skip: "Skip",
-    loading: "Loading...",
-    later: "Later",
-    confirm: "Confirm",
-    purchase: "Purchase",
-    categories: {
-      all: "All",
-      casual: "Casual",
-      serious: "Serious",
-      special: "Special"
     }
   },
 
@@ -2506,21 +2498,31 @@ Personal Information Inquiry: getposty@gmail.com`
 
   // Token Shop
   tokenShop: {
-    title: "Token Shop",
+    title: "Shop",
     subtitle: "Buy what you need and use it unlimitedly",
     currentTokens: "Current Tokens",
     dailyRefill: "Daily auto-refill: 10 tokens at midnight",
     packagesTitle: "Token Packages",
-    packageNames: {
-      tokens_50: "Basic",
-      tokens_150: "Standard",
-      tokens_500: "Premium"
-    },
     popular: "Popular",
     bonus: "Bonus +{{count}}",
     buy: "Buy",
+    discount: "{{percent}}% off",
+    bestValue: "Best Value",
+    subscription: {
+      title: "Subscription Plans",
+      pro: {
+        title: "Pro Version",
+        features: {
+          unlimitedTokens: "Unlimited Tokens",
+          noAds: "Remove All Ads",
+          aiAgents: "Gemini 2.5 / GPT-4o Agents"
+        }
+      },
+      subscribe: "Subscribe",
+      monthly: "/month"
+    },
     purchase: {
-      title: "{{name}} Package Purchase",
+      title: "Token Purchase",
       message: "Purchase {{tokens}} tokens for {{price}}?",
       messageWithBonus: "Purchase {{tokens}} tokens for {{price}}?\n\nBonus {{bonus}} tokens included",
       cancel: "Cancel",
@@ -2533,12 +2535,19 @@ Personal Information Inquiry: getposty@gmail.com`
     notice: {
       title: "Token System",
       freeTokens: "Free Tokens:",
-      freeTokensDesc: "10 tokens daily auto-refill",
+      freeTokensDesc: "10 tokens only when balance is 0",
       purchasedTokens: "Purchased Tokens:",
       purchasedTokensDesc: "Permanent, never expire",
       usageOrder: "Usage Order:",
       usageOrderDesc: "Free → Purchased",
       adReward: "Watch ads when tokens run out"
+    },
+    refund: {
+      title: "Refund Policy",
+      policy: "Tokens are available immediately after purchase. Any usage makes refund impossible.",
+      unused: "Refunds are only possible if tokens are completely unused after purchase.",
+      contact: "Refund inquiries: getposty@gmail.com",
+      terms: "Please refer to Terms of Service for detailed refund policy."
     }
   }
 };

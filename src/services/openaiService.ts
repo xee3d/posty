@@ -1018,7 +1018,7 @@ ${platformInstruction}
 
       // PersonalizedHashtagService로부터 개인화된 해시태그 가져오기 (하드코딩 제거)
       try {
-        const personalizedHashtagService = require('./personalizedHashtagService').default;
+        const personalizedHashtagService = (await import('./personalizedHashtagService')).default;
         const neededCount = targetCount - uniqueTags.length;
         const personalizedTags = personalizedHashtagService.getPersonalizedHashtags(content, neededCount * 2);
         
@@ -1038,7 +1038,7 @@ ${platformInstruction}
         console.error('Failed to get personalized hashtags, using fallback:', error);
         // 폴백: 번역된 기본 태그 사용
         try {
-          const { t } = require('../locales/i18n');
+          const { t } = await import('../locales/i18n');
           const fallbackTags = [
             t("home.topics.daily"),
             t("home.topics.weekend"), 

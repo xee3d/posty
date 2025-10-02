@@ -109,7 +109,7 @@ const AccountChangeSection: React.FC<AccountChangeSectionProps> = ({
 
       // 업적 초기화 (사용자별로 분리)
       const achievementService =
-        require("../../services/achievementService").default;
+        (await import("../../services/achievementService")).default;
       await achievementService.resetForNewUser();
 
       Alert.alert(

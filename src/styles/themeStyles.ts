@@ -19,7 +19,13 @@ export interface UnifiedColors {
   primaryWriteCardBg: string;
   surfaceVariant: string;
   cardBackground: string;
-  text: string;
+  card: string;
+  text: {
+    primary: string;
+    secondary: string;
+    tertiary: string;
+    inverse: string;
+  };
   textSecondary: string;
   textTertiary: string;
   textPrimary: string;
@@ -28,6 +34,7 @@ export interface UnifiedColors {
   isDark: boolean;
   white: string;
   lightGray: string;
+  transparent: string;
 }
 
 // 통합된 색상 테마 정의
@@ -55,10 +62,16 @@ export const getUnifiedColors = (isDark: boolean): UnifiedColors => {
     primaryWriteCardBg: isDark ? baseColors.surface : "#F0EEFF",
     surfaceVariant: isDark ? "#2A2A2A" : "#F2F2F7",
     cardBackground: baseColors.card,
+    card: baseColors.card,
     headerBackground: isDark ? "#141414" : "#FFFFFF",
 
-    // 텍스트 색상
-    text: baseColors.text.primary,
+    // 텍스트 색상 (객체 형태)
+    text: {
+      primary: baseColors.text.primary,
+      secondary: baseColors.text.secondary,
+      tertiary: baseColors.text.tertiary,
+      inverse: baseColors.white,
+    },
     textPrimary: baseColors.text.primary,
     textSecondary: baseColors.text.secondary,
     textTertiary: baseColors.text.tertiary,
@@ -67,6 +80,7 @@ export const getUnifiedColors = (isDark: boolean): UnifiedColors => {
     border: baseColors.border,
     white: baseColors.white,
     lightGray: baseColors.lightGray,
+    transparent: 'transparent',
     isDark: isDark,
   };
 };

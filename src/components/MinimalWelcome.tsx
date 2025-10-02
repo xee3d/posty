@@ -35,7 +35,7 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({
   const cursorOpacity = useRef(new Animated.Value(1)).current;
 
   // 타이핑 인터벌 참조
-  const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const typingIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // 슬로건 배열
@@ -79,41 +79,32 @@ const MinimalWelcome: React.FC<MinimalWelcomeProps> = ({
       }),
     ]).start();
 
-    typingIntervalRef.current = setInterval(() => {
-      if (charIndex <= currentSlogan.length) {
-        setDisplayText(currentSlogan.slice(0, charIndex));
-        charIndex++;
-      } else {
-        if (typingIntervalRef.current) {
-          clearInterval(typingIntervalRef.current);
-          typingIntervalRef.current = null;
-        }
-        setIsTyping(false);
-
-        // 마지막 슬로건이 아니면 다음으로 이동
-        if (currentSloganIndex < slogans.length - 1) {
-          timeoutRef.current = setTimeout(() => {
-            // 페이드아웃 (더 빠르게)
-            Animated.parallel([
-              Animated.timing(fadeAnim, {
-                toValue: 0,
-                duration: 250,
-                useNativeDriver: true,
-              }),
-              Animated.timing(scaleAnim, {
-                toValue: 0.8,
-                duration: 250,
-                useNativeDriver: true,
-              }),
-            ]).start(() => {
-              setSloganIndex(currentSloganIndex + 1);
-              fadeAnim.setValue(0);
-              scaleAnim.setValue(0.8);
-            });
-          }, 1000); // 1초 대기 후 다음 슬로건
-        }
-      }
-    }, 50); // 타이핑 속도 (더 빠르게)
+    // 타이핑 애니메이션 대신 즉시 전체 텍스트 표시
+    setDisplayText(currentSlogan);
+    setIsTyping(false);
+    
+    // 마지막 슬로건이 아니면 다음으로 이동
+    if (currentSloganIndex < slogans.length - 1) {
+      timeoutRef.current = setTimeout(() => {
+        // 페이드아웃 (더 빠르게)
+        Animated.parallel([
+          Animated.timing(fadeAnim, {
+            toValue: 0,
+            duration: 250,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleAnim, {
+            toValue: 0.8,
+            duration: 250,
+            useNativeDriver: true,
+          }),
+        ]).start(() => {
+          setSloganIndex(currentSloganIndex + 1);
+          fadeAnim.setValue(0);
+          scaleAnim.setValue(0.8);
+        });
+      }, 1000); // 1초 대기 후 다음 슬로건
+    }
 
     return () => {
       if (typingIntervalRef.current) {

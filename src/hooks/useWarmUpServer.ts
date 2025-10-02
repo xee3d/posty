@@ -3,7 +3,7 @@ import { AppState } from "react-native";
 import serverAIService from "../services/serverAIService";
 
 export const useWarmUpServer = () => {
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const isActiveRef = useRef(true);
 
   useEffect(() => {

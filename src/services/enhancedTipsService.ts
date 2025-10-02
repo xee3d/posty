@@ -295,7 +295,7 @@ class TrendingHashtagService {
   }): Promise<string[]> {
     try {
       // PersonalizedHashtagService 인스턴스 가져오기 (이미 인스턴스로 export됨)
-      const service = require('./personalizedHashtagService').default;
+      const service = (await import('./personalizedHashtagService')).default;
       
       // 카테고리 정보를 프롬프트로 변환
       let prompt = '';
@@ -320,7 +320,7 @@ class TrendingHashtagService {
     } catch (error) {
       console.error('Failed to get personalized hashtags:', error);
       // 폴백: 기본 해시태그 몇 개만 반환 (번역된 것들로)
-      const i18next = require('../locales/i18n').default;
+      const i18next = (await import('../locales/i18n')).default;
       try {
         return [
           i18next.t("home.topics.daily"),

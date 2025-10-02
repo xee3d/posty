@@ -156,7 +156,29 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         console.error(`${provider} 로그인 에러:`, error);
 
         // 사용자 취소는 조용히 처리 (Alert 표시 안 함)
-        if (error.message === "USER_CANCELLED") {
+        if (
+          error.message === "USER_CANCELLED" ||
+          error.code === "auth/cancelled" ||
+          error.message.includes("구글 로그인 취소") ||
+          error.message.includes("cancelled") ||
+          error.message.includes("사용자 취소") ||
+          error.message.includes("사용자가 취소") ||
+          error.message.includes("User cancelled") ||
+          error.message.includes("user_cancel") ||
+          error.message.includes("사용자가 로그인을 취소") ||
+          error.message.includes("로그인 취소") ||
+          error.message.includes("Login cancelled") ||
+          error.message.includes("cancelled by user") ||
+          error.message.includes("사용자에 의해 취소") ||
+          error.message.includes("사용자 취소됨") ||
+          error.message.includes("취소됨") ||
+          error.message.includes("canceled") ||
+          error.message.includes("Canceled") ||
+          error.message.includes("CANCELED") ||
+          error.message.includes("취소") ||
+          error.message.includes("Cancel") ||
+          error.message.includes("CANCEL")
+        ) {
           console.log("ℹ️ 사용자가 로그인을 취소했습니다");
           setIsLoading(false);
           setLoadingProvider(null);
@@ -171,13 +193,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
           error.code === "auth/account-exists-with-different-credential"
         ) {
           errorMessage = t("login.errors.existingAccount");
-        } else if (error.code === "auth/cancelled") {
-          errorMessage = t("login.errors.cancelled");
-        } else if (
-          error.message.includes("구글 로그인 취소") ||
-          error.message.includes("cancelled")
-        ) {
-          errorMessage = t("login.errors.cancelled");
         } else if (
           error.message.includes("invalid android_key_hash or ios_bundle_id")
         ) {

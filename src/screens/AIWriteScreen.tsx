@@ -114,9 +114,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   // 토큰 관리 훅 사용
   const {
     currentTokens,
-    showEarnTokenModal,
     showLowTokenPrompt,
-    setShowEarnTokenModal,
     setShowLowTokenPrompt,
     checkTokenAvailability,
     consumeTokens,
@@ -175,7 +173,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   const [generatedPlatforms, setGeneratedPlatforms] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
-  const [loadingMessageInterval, setLoadingMessageInterval] = useState<NodeJS.Timeout | null>(null);
+  const [loadingMessageInterval, setLoadingMessageInterval] = useState<ReturnType<typeof setInterval> | null>(null);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [selectedPolishOption, setSelectedPolishOption] = useState<
     | "summarize"
@@ -994,6 +992,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         // storage.ts의 saveContent 호출
         await saveContent({
           content: result,
+          hashtags: [],
           tone: selectedTone,
           length: selectedLength as any,
           platform: platformToSave,

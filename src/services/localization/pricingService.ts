@@ -19,9 +19,9 @@ export interface LocalePricing {
     pro: number;      // 월간
   };
   tokenPackages: {
-    tokens_50: number;   // 50 토큰
-    tokens_150: number;  // 150 + 10 보너스
-    tokens_500: number;  // 500 + 50 보너스
+    tokens_100: number;   // 100 토큰
+    tokens_200: number;   // 200 + 20 보너스
+    tokens_300: number;   // 300 + 30 보너스
   };
   formatting: {
     position: 'before' | 'after';
@@ -43,12 +43,12 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     subscription: {
       starter: 3300,  // 스타터 - 3,300원/월 ($1.99 ≈ ₩3,300) - Apple 제안가
       premium: 5500,  // 프리미엄 - 5,500원/월 ($3.99 ≈ ₩5,500) - Apple 제안가
-      pro: 19000,     // 프로 - 19,000원/월 ($12.99 ≈ ₩19,000) - Apple 제안가
+      pro: 15000,     // 프로 - 15,000원/월 ($9.99 ≈ ₩15,000) - 무한 토큰 + 광고 제거 + Gemini 2.5/GPT-4o
     },
     tokenPackages: {
-      tokens_50: 3300,    // 50 토큰 - 3,300원 (Starter 플랜과 동일)
-      tokens_150: 5500,   // 150 + 10 보너스 - 5,500원 (Premium 플랜과 동일)
-      tokens_500: 19000,  // 500 + 50 보너스 - 19,000원 (Pro 플랜과 동일)
+      tokens_100: 3000,    // 100 토큰 - 3,000원
+      tokens_200: 6000,   // 200 + 20 보너스 - 6,000원
+      tokens_300: 9000,   // 300 + 30 보너스 - 9,000원
     },
     formatting: {
       position: 'after',
@@ -67,12 +67,12 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     subscription: {
       starter: 1.99,  // 스타터 - $1.99/월
       premium: 3.99,  // 프리미엄 - $3.99/월
-      pro: 12.99,     // 프로 - $12.99/월
+      pro: 9.99,     // 프로 - $9.99/월 (무한 토큰 + 광고 제거 + Gemini 2.5/GPT-4o)
     },
     tokenPackages: {
-      tokens_50: 1.99,    // 50 토큰 - $1.99
-      tokens_150: 3.99,   // 150 + 10 보너스 - $3.99
-      tokens_500: 12.99,  // 500 + 50 보너스 - $12.99
+      tokens_100: 1.99,    // 100 토큰 - $1.99 (Tier 2)
+      tokens_200: 3.99,   // 200 + 20 보너스 - $3.99 (Tier 4)
+      tokens_300: 5.99,   // 300 + 30 보너스 - $5.99 (Tier 6)
     },
     formatting: {
       position: 'before',
@@ -94,9 +94,9 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
       pro: 2000,      // 프로 - ¥2,000/월 ($12.99 ≈ ¥2,000) - Apple 제안가
     },
     tokenPackages: {
-      tokens_50: 300,     // 50 토큰 - ¥300
-      tokens_150: 600,    // 150 + 10 보너스 - ¥600
-      tokens_500: 2000,   // 500 + 50 보너스 - ¥2,000
+      tokens_100: 300,     // 100 토큰 - ¥300 (Tier 2)
+      tokens_200: 600,    // 200 + 20 보너스 - ¥600 (Tier 4)
+      tokens_300: 2000,   // 300 + 30 보너스 - ¥2,000 (Tier 13)
     },
     formatting: {
       position: 'before',
@@ -118,9 +118,9 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
       pro: 88.0,      // 프로 - ¥88.0/월 ($12.99 ≈ ¥88.0) - Apple 제안가
     },
     tokenPackages: {
-      tokens_50: 15.0,    // 50 토큰 - ¥15.0
-      tokens_150: 28.0,   // 150 + 10 보너스 - ¥28.0
-      tokens_500: 88.0,   // 500 + 50 보너스 - ¥88.0
+      tokens_100: 15.0,    // 100 토큰 - ¥15.0 (Tier 2)
+      tokens_200: 28.0,   // 200 + 20 보너스 - ¥28.0 (Tier 4)
+      tokens_300: 88.0,   // 300 + 30 보너스 - ¥88.0 (Tier 13)
     },
     formatting: {
       position: 'before',
@@ -176,6 +176,12 @@ class PricingService {
 
   // 가격 포맷팅
   formatPrice(price: number): string {
+    // price 유효성 검사
+    if (price === undefined || price === null || isNaN(price)) {
+      console.warn('formatPrice: price is invalid:', price);
+      return '0';
+    }
+    
     const pricing = this.getCurrentPricing();
     const { symbol, formatting } = pricing;
     
@@ -214,27 +220,27 @@ class PricingService {
     
     return [
       {
-        id: 'tokens_50',
-        tokens: 50,
-        price: pricing.tokenPackages.tokens_50,
-        priceDisplay: this.formatPrice(pricing.tokenPackages.tokens_50),
+        id: 'tokens_100',
+        tokens: 100,
+        price: pricing.tokenPackages.tokens_100,
+        priceDisplay: this.formatPrice(pricing.tokenPackages.tokens_100),
         bonus: 0,
         popular: false,
       },
       {
-        id: 'tokens_150', 
-        tokens: 150,
-        price: pricing.tokenPackages.tokens_150,
-        priceDisplay: this.formatPrice(pricing.tokenPackages.tokens_150),
-        bonus: 10,
+        id: 'tokens_200', 
+        tokens: 200,
+        price: pricing.tokenPackages.tokens_200,
+        priceDisplay: this.formatPrice(pricing.tokenPackages.tokens_200),
+        bonus: 20,
         popular: true,
       },
       {
-        id: 'tokens_500',
-        tokens: 500, 
-        price: pricing.tokenPackages.tokens_500,
-        priceDisplay: this.formatPrice(pricing.tokenPackages.tokens_500),
-        bonus: 50,
+        id: 'tokens_300',
+        tokens: 300,
+        price: pricing.tokenPackages.tokens_300,
+        priceDisplay: this.formatPrice(pricing.tokenPackages.tokens_300),
+        bonus: 30,
         popular: false,
       },
     ];

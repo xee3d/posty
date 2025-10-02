@@ -40,6 +40,7 @@
     "src/**/*",
     "src/types/global.d.ts",
     "src/types/env.d.ts",
+    "types/**/*",
     "index.js",
     "App.tsx"
   ],

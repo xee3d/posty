@@ -196,7 +196,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
       };
     } else if (hour < 22) {
       return {
-        icon: "sunset-outline",
+        icon: "partly-sunny-outline",
         title: t("home.greetings.evening.title", { userName }),
         message: t("home.greetings.evening.message"),
         action: t("home.greetings.evening.action"),
@@ -622,10 +622,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                 console.log("Greeting icon:", greeting.icon);
                 return (
                   <SafeIcon 
-                    name={greeting.icon || "sparkles-outline"} 
-                    size={24} 
-                    color={colors.white} 
-                    onError={(error) => console.log("SafeIcon error:", error)}
+                    name={greeting.icon || "sparkles-outline"}
+                    size={24}
+                    color={colors.white}
                   />
                 );
               })()}

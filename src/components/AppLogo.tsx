@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, memo } from "react";
 import { View, Text, StyleSheet, Image, TouchableOpacity } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { useAppTheme } from "../hooks/useAppTheme";
@@ -11,6 +11,30 @@ interface AppLogoProps {
   useAppIcon?: boolean; // 새로운 prop: 실제 앱 아이콘 이미지 사용 여부
   onPress?: () => void; // 개발자 모드용 onPress 추가
 }
+
+// 이미지 컴포넌트를 메모이제이션하여 불필요한 리렌더링 방지
+const MemoizedAppIcon = memo(({ size }: { size: number }) => (
+  <View style={[styles.imageContainer, { width: size, height: size }]}>
+    <Image
+      source={require("../assets/images/app_icon.png")}
+      style={[styles.appIconImage, { width: size, height: size }]}
+      resizeMode="contain"
+    />
+  </View>
+));
+
+// 타이핑 텍스트 컴포넌트를 메모이제이션
+const MemoizedTypingText = memo(({ 
+  displayedText, 
+  isWhite 
+}: { 
+  displayedText: string; 
+  isWhite: boolean; 
+}) => (
+  <Text style={[styles.tagline, isWhite && styles.whiteTagline]}>
+    {displayedText}
+  </Text>
+));
 
 const AppLogo: React.FC<AppLogoProps> = ({
   size = 100,
@@ -27,31 +51,16 @@ const AppLogo: React.FC<AppLogoProps> = ({
 
   useEffect(() => {
     if (showText && useAppIcon) {
-      let currentIndex = 0;
-      const typingInterval = setInterval(() => {
-        if (currentIndex <= fullText.length) {
-          setDisplayedText(fullText.slice(0, currentIndex));
-          currentIndex++;
-        } else {
-          clearInterval(typingInterval);
-        }
-      }, 100); // 100ms마다 한 글자씩 타이핑
-
-      return () => clearInterval(typingInterval);
+      // 타이핑 애니메이션 대신 즉시 전체 텍스트 표시
+      setDisplayedText(fullText);
     }
-  }, [showText, useAppIcon]);
+  }, [showText, useAppIcon, fullText]);
 
   const LogoContent = () => (
     <>
       {useAppIcon ? (
-        // 실제 앱 아이콘 이미지 사용
-        <View style={[styles.imageContainer, { width: size, height: size }]}>
-          <Image
-            source={require("../assets/images/app_icon.png")}
-            style={[styles.appIconImage, { width: size, height: size }]}
-            resizeMode="contain"
-          />
-        </View>
+        // 메모이제이션된 앱 아이콘 이미지 사용
+        <MemoizedAppIcon size={size} />
       ) : isWhite ? (
         <View
           style={[
@@ -87,9 +96,13 @@ const AppLogo: React.FC<AppLogoProps> = ({
               Posty
             </Text>
           )}
-          <Text style={[styles.tagline, isWhite && styles.whiteTagline]}>
-            {useAppIcon ? displayedText : t("app.slogan")}
-          </Text>
+          {useAppIcon ? (
+            <MemoizedTypingText displayedText={displayedText} isWhite={isWhite} />
+          ) : (
+            <Text style={[styles.tagline, isWhite && styles.whiteTagline]}>
+              {t("app.slogan")}
+            </Text>
+          )}
         </View>
       )}
     </>

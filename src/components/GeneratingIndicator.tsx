@@ -110,7 +110,7 @@ export const GeneratingIndicator: React.FC<GeneratingIndicatorProps> = ({
   ];
 
   React.useEffect(() => {
-    let tipInterval: NodeJS.Timeout | null = null;
+    let tipInterval: ReturnType<typeof setInterval> | null = null;
 
     if (visible) {
       // 팁 로테이션 (배터리 최적화: 빈도 줄임)

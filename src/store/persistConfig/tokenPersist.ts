@@ -57,7 +57,7 @@ export const restoreTokenData = async (): Promise<boolean> => {
       const tokenData = JSON.parse(tokenDataStr);
 
       // Redux 상태 복원 - setUserData를 사용하여 전체 토큰 정보 설정
-      const { setUserData } = require("../slices/userSlice");
+      const { setUserData } = await import("../slices/userSlice");
 
       // 현재 토큰을 기준으로 freeTokens 계산
       const currentTokens = tokenData.currentTokens || 10;
@@ -94,7 +94,7 @@ export const restoreTokenData = async (): Promise<boolean> => {
       });
     } else {
       // 저장된 데이터가 없으면 기본값 설정
-      const { setUserData } = require("../slices/userSlice");
+      const { setUserData } = await import("../slices/userSlice");
       store.dispatch(
         setUserData({
           tokens: {
@@ -163,19 +163,23 @@ export const setupTokenPersistence = () => {
 };
 
 /**
- * 일일 리셋 체크 (복원 후)
+ * 일일 리셋 체크 (복원 후) - 토큰이 0개일 때만
  */
 export const checkDailyResetAfterRestore = async () => {
   const state = store.getState().user;
   const today = new Date().toISOString().split("T")[0];
 
-  // 모든 플랜에서 일일 리셋 체크 (무료는 충전, 유료는 보너스)
-  if (state.lastTokenResetDate !== today) {
+  // 날짜가 다르고 토큰이 0개일 때만 일일 리셋 체크
+  if (state.lastTokenResetDate !== today && state.currentTokens === 0) {
+    console.log("복원 후 일일 리셋 실행 - 토큰이 0개");
+    
     // resetDailyTokens 액션은 이미 userSlice에 정의되어 있음
-    const { resetDailyTokens } = require("../slices/userSlice");
+    const { resetDailyTokens } = await import("../slices/userSlice");
     store.dispatch(resetDailyTokens());
 
     // 리셋 후 데이터 저장
     await persistTokenData();
+  } else if (state.currentTokens > 0) {
+    console.log("복원 후 일일 리셋 건너뜀 - 토큰이 있음:", state.currentTokens);
   }
 };

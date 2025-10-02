@@ -16,6 +16,18 @@ const ko = {
     success: "성공",
     warning: "경고",
     info: "정보",
+    count: "개",
+    start: "시작하기",
+    skip: "건너뛰기",
+    later: "나중에",
+    confirm: "확인",
+    purchase: "구매하기",
+    categories: {
+      all: "전체",
+      casual: "캐주얼",
+      serious: "진지함",
+      special: "특별"
+    }
   },
   app: {
     name: "Posty",
@@ -514,9 +526,9 @@ const ko = {
       existingAccount: "이미 다른 방법으로 가입된 계정입니다.",
       cancelled: "로그인이 취소되었습니다.",
       timeout: "로그인 시간이 초과되었습니다. 다시 시도해주세요.",
-      bundleId: "카카오 개발자 콘솔에서 Bundle ID 설정을 확인해주세요.\n현재 Bundle ID: com.posty",
-      kakaoSetup: "카카오 로그인 실패\n1. 카카오 개발자 콘솔에서 Bundle ID 확인\n2. 카카오톡 앱 설치 확인",
-      naverSetup: "네이버 로그인 실패\n1. 네이버 개발자센터에서 Bundle ID 확인\n2. URL 스키마 설정 확인",
+      bundleId: "카카오 로그인 설정에 문제가 있습니다.\n앱을 다시 시작하거나 관리자에게 문의해주세요.",
+      kakaoSetup: "카카오 로그인에 실패했습니다.\n1. 카카오톡 앱이 설치되어 있는지 확인해주세요\n2. 네트워크 연결을 확인해주세요",
+      naverSetup: "네이버 로그인에 실패했습니다.\n1. 네이버 앱이 설치되어 있는지 확인해주세요\n2. 네트워크 연결을 확인해주세요",
     },
   },
 
@@ -1238,26 +1250,6 @@ const ko = {
       serious: "진지하게",
       light: "가볍게",
       witty: "재치있게"
-    }
-  },
-
-  // Common
-  common: {
-    error: "오류",
-    success: "성공",
-    close: "닫기",
-    count: "개",
-    start: "시작하기",
-    skip: "건너뛰기",
-    loading: "로딩 중...",
-    later: "나중에",
-    confirm: "확인",
-    purchase: "구매하기",
-    categories: {
-      all: "전체",
-      casual: "캐주얼",
-      serious: "진지함",
-      special: "특별"
     }
   },
 
@@ -2192,21 +2184,31 @@ const ko = {
 
   // 토큰 상점
   tokenShop: {
-    title: "토큰 상점",
+    title: "상점",
     subtitle: "필요한 만큼 구매하고 무제한으로 사용하세요",
     currentTokens: "보유 토큰",
     dailyRefill: "매일 자정에 10개 무료 충전",
     packagesTitle: "토큰 패키지",
-    packageNames: {
-      tokens_50: "베이직",
-      tokens_150: "스탠다드",
-      tokens_500: "프리미엄"
-    },
     popular: "인기",
     bonus: "보너스 +{{count}}",
     buy: "구매",
+    discount: "{{percent}}% 할인",
+    bestValue: "최고 가치",
+    subscription: {
+      title: "구독 플랜",
+      pro: {
+        title: "프로 버전",
+        features: {
+          unlimitedTokens: "무한 토큰",
+          noAds: "모든 광고 제거",
+          aiAgents: "Gemini 2.5 / GPT-4o 에이전트"
+        }
+      },
+      subscribe: "구독하기",
+      monthly: "/월"
+    },
     purchase: {
-      title: "{{name}} 패키지 구매",
+      title: "토큰 구매",
       message: "{{tokens}}개 토큰을 {{price}}에\n구매하시겠습니까?",
       messageWithBonus: "{{tokens}}개 토큰을 {{price}}에\n구매하시겠습니까?\n\n보너스 {{bonus}}개 포함",
       cancel: "취소",
@@ -2219,12 +2221,19 @@ const ko = {
     notice: {
       title: "토큰 시스템",
       freeTokens: "무료 토큰:",
-      freeTokensDesc: "매일 10개 자동 충전",
+      freeTokensDesc: "토큰이 0개일 때만 10개 충전",
       purchasedTokens: "구매 토큰:",
       purchasedTokensDesc: "영구 보관, 소멸 없음",
       usageOrder: "사용 순서:",
       usageOrderDesc: "무료 → 구매",
       adReward: "토큰 부족 시 광고로 획득 가능"
+    },
+    refund: {
+      title: "환불 정책",
+      policy: "토큰은 구매 후 즉시 사용 가능하며, 1회라도 사용하면 환불이 불가능합니다.",
+      unused: "구매 후 사용하지 않은 상태에서만 환불이 가능합니다.",
+      contact: "환불 문의: getposty@gmail.com",
+      terms: "자세한 환불 정책은 이용약관을 참고해주세요."
     }
   }
 };

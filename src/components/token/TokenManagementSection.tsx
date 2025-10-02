@@ -177,24 +177,6 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
 
         {/* 액션 버튼들 */}
         <View style={styles.actionButtons}>
-          {tokenInfo.plan === "free" && (
-            <TouchableOpacity
-              style={[styles.actionButton, styles.earnButton]}
-              onPress={() => {
-                onNavigateToSubscription();
-                // 구독 화면의 무료 토큰 탭으로 이동하도록 설정
-                setTimeout(() => {
-                  AsyncStorage.setItem("subscription_initial_tab", "manage");
-                }, 100);
-              }}
-            >
-              <SafeIcon name="gift" size={18} color={colors.primary} />
-              <Text style={[styles.actionButtonText, { color: colors.primary }]}>
-                {t("tokens.actions.getFree")}
-              </Text>
-            </TouchableOpacity>
-          )}
-
           <TouchableOpacity
             style={[styles.actionButton, styles.chargeButton]}
             onPress={() => {

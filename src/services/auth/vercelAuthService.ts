@@ -136,6 +136,12 @@ class VercelAuthService {
         console.log("🔍 userInfo.user keys:", Object.keys((userInfo as any).user));
       }
 
+      // 사용자 취소 확인 - type이 "cancelled"인 경우
+      if ((userInfo as any).type === "cancelled" || (userInfo as any).type === "cancel") {
+        console.log("ℹ️ 구글 로그인 취소됨 (사용자 액션) - type: cancelled");
+        throw new Error("USER_CANCELLED");
+      }
+
       logger.info(
         "Google 로그인 성공: " + (userInfo.data?.user?.name ||
           userInfo.data?.user?.email ||
@@ -192,15 +198,56 @@ class VercelAuthService {
       };
     } catch (error: any) {
       logger.error("Google Sign-In 실패:", error);
+      
+      // 상세 에러 정보 로깅 (취소 패턴 확인용)
+      console.log("🔍 구글 에러 상세 정보:");
+      console.log("  - error.code:", error.code);
+      console.log("  - error.message:", error.message);
+      console.log("  - error.name:", error.name);
+      console.log("  - error.toString():", error.toString());
+      console.log("  - statusCodes.SIGN_IN_CANCELLED:", statusCodes.SIGN_IN_CANCELLED);
 
-      // 사용자 취소는 조용히 처리
-      if (error.code === statusCodes.SIGN_IN_CANCELLED ||
-          error.message?.includes("SIGN_IN_CANCELLED") ||
-          error.message?.includes("cancel")) {
-        console.log("ℹ️ 구글 로그인 취소됨 (사용자 액션)");
+      // 사용자 취소는 조용히 처리 - 더 포괄적인 패턴 추가
+      const isUserCancellation = 
+        error.code === statusCodes.SIGN_IN_CANCELLED ||
+        error.code === "SIGN_IN_CANCELLED" ||
+        error.code === "CANCELLED" ||
+        error.code === "USER_CANCELLED" ||
+        error.code === 0 ||
+        error.message?.includes("SIGN_IN_CANCELLED") ||
+        error.message?.includes("cancel") ||
+        error.message?.includes("CANCELLED") ||
+        error.message?.includes("취소") ||
+        error.message?.includes("사용자 취소") ||
+        error.message?.includes("사용자가 취소") ||
+        error.message?.includes("User cancelled") ||
+        error.message?.includes("user_cancel") ||
+        error.message?.includes("사용자가 로그인을 취소") ||
+        error.message?.includes("로그인 취소") ||
+        error.message?.includes("Login cancelled") ||
+        error.message?.includes("cancelled by user") ||
+        error.message?.includes("사용자에 의해 취소") ||
+        error.message?.includes("사용자 취소됨") ||
+        error.message?.includes("취소됨") ||
+        error.message?.includes("canceled") ||
+        error.message?.includes("Canceled") ||
+        error.message?.includes("CANCELED") ||
+        error.message?.includes("Cancel") ||
+        error.message?.includes("CANCEL") ||
+        error.message?.includes("작업을 완료할 수 없습니다") ||
+        error.name?.includes("cancel") ||
+        error.name?.includes("Cancel") ||
+        error.toString()?.includes("cancel") ||
+        error.toString()?.includes("Cancel") ||
+        error.toString()?.includes("취소") ||
+        error.toString()?.includes("작업을 완료할 수 없습니다");
+
+      if (isUserCancellation) {
+        console.log("ℹ️ 구글 로그인 취소됨 (사용자 액션) - 에러창 표시 안 함");
         throw new Error("USER_CANCELLED");
       }
 
+      console.log("❌ 실제 구글 로그인 실패 - 에러창 표시");
       // 다른 에러는 그대로 전달
       throw error;
     }
@@ -245,7 +292,31 @@ class VercelAuthService {
         console.log("  - 전체 응답:", result);
 
         // 사용자 취소는 조용히 처리 (에러 throw하지 않음)
-        if (errorCode === "user_cancel" || errorMsg.includes("cancel")) {
+        if (errorCode === "user_cancel" || 
+            errorCode === "CANCELLED" ||
+            errorCode === "USER_CANCELLED" ||
+            errorCode === 0 ||
+            errorMsg.includes("cancel") ||
+            errorMsg.includes("취소") ||
+            errorMsg.includes("사용자 취소") ||
+            errorMsg.includes("사용자가 취소") ||
+            errorMsg.includes("User cancelled") ||
+            errorMsg.includes("user_cancel") ||
+            errorMsg.includes("사용자가 로그인을 취소") ||
+            errorMsg.includes("로그인 취소") ||
+            errorMsg.includes("Login cancelled") ||
+            errorMsg.includes("cancelled by user") ||
+            errorMsg.includes("사용자에 의해 취소") ||
+            errorMsg.includes("사용자 취소됨") ||
+            errorMsg.includes("취소됨") ||
+            errorMsg.includes("canceled") ||
+            errorMsg.includes("Canceled") ||
+            errorMsg.includes("CANCELED") ||
+            errorMsg.includes("Cancel") ||
+            errorMsg.includes("CANCEL") ||
+            errorMsg.includes("작업을 완료할 수 없습니다") ||
+            errorMsg.includes("timeout") ||
+            errorMsg.includes("타임아웃")) {
           console.log("ℹ️ 네이버 로그인 취소됨 (사용자 액션)");
           throw new Error("USER_CANCELLED"); // 특별한 에러 코드로 취소 표시
         }
@@ -401,15 +472,56 @@ class VercelAuthService {
       };
     } catch (error: any) {
       console.error("Kakao Sign-In 실패:", error);
+      
+      // 상세 에러 정보 로깅 (취소 패턴 확인용)
+      console.log("🔍 카카오 에러 상세 정보:");
+      console.log("  - error.code:", error.code);
+      console.log("  - error.message:", error.message);
+      console.log("  - error.name:", error.name);
+      console.log("  - error.toString():", error.toString());
+      console.log("  - 전체 error 객체:", JSON.stringify(error, null, 2));
 
-      // 사용자 취소는 조용히 처리
-      if (error.code === "E_CANCELLED" ||
-          error.message?.includes("cancel") ||
-          error.message?.includes("CANCELLED")) {
-        console.log("ℹ️ 카카오 로그인 취소됨 (사용자 액션)");
+      // 사용자 취소는 조용히 처리 - 더 포괄적인 패턴 추가
+      const isUserCancellation = 
+        error.code === "E_CANCELLED" ||
+        error.code === "CANCELLED" ||
+        error.code === "user_cancel" ||
+        error.code === "USER_CANCELLED" ||
+        error.code === 0 || // KakaoSDKCommon.SdkError 오류 0
+        error.message?.includes("cancel") ||
+        error.message?.includes("CANCELLED") ||
+        error.message?.includes("취소") ||
+        error.message?.includes("사용자 취소") ||
+        error.message?.includes("사용자가 취소") ||
+        error.message?.includes("User cancelled") ||
+        error.message?.includes("user_cancel") ||
+        error.message?.includes("사용자가 로그인을 취소") ||
+        error.message?.includes("로그인 취소") ||
+        error.message?.includes("Login cancelled") ||
+        error.message?.includes("cancelled by user") ||
+        error.message?.includes("사용자에 의해 취소") ||
+        error.message?.includes("사용자 취소됨") ||
+        error.message?.includes("취소됨") ||
+        error.message?.includes("canceled") ||
+        error.message?.includes("Canceled") ||
+        error.message?.includes("CANCELED") ||
+        error.message?.includes("Cancel") ||
+        error.message?.includes("CANCEL") ||
+        error.message?.includes("작업을 완료할 수 없습니다") || // 콘솔에서 본 메시지
+        error.name?.includes("cancel") ||
+        error.name?.includes("Cancel") ||
+        error.name?.includes("SdkError") ||
+        error.toString()?.includes("cancel") ||
+        error.toString()?.includes("Cancel") ||
+        error.toString()?.includes("취소") ||
+        error.toString()?.includes("작업을 완료할 수 없습니다");
+
+      if (isUserCancellation) {
+        console.log("ℹ️ 카카오 로그인 취소됨 (사용자 액션) - 에러창 표시 안 함");
         throw new Error("USER_CANCELLED");
       }
 
+      console.log("❌ 실제 카카오 로그인 실패 - 에러창 표시");
       throw error;
     }
   }

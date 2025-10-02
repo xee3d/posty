@@ -32,7 +32,13 @@ interface ThemeColors {
   primaryWriteCardBg: string;
   surfaceVariant: string;
   cardBackground: string;
-  text: string;
+  card: string;
+  text: {
+    primary: string;
+    secondary: string;
+    tertiary: string;
+    inverse: string;
+  };
   textSecondary: string;
   textTertiary: string;
   textPrimary: string;
@@ -41,6 +47,7 @@ interface ThemeColors {
   isDark: boolean;
   white: string;
   lightGray: string;
+  transparent: string;
 }
 
 interface ThemeContextType {

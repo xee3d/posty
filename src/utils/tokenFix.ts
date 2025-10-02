@@ -70,31 +70,32 @@ export const fixTokenInconsistency = async () => {
 };
 
 /**
- * 일일 리셋 후 토큰 데이터 정리
+ * 일일 리셋 후 토큰 데이터 정리 (토큰이 0개일 때만)
  */
 export const cleanupAfterDailyReset = async () => {
   try {
-    // 일일 리셋 실행
-    store.dispatch(resetDailyTokens());
-
-    // 잠시 대기 (Redux 업데이트 완료 대기)
-    await new Promise((resolve) => setTimeout(resolve, 100));
-
-    // 리셋 후 상태 확인
     const state = store.getState().user;
+    
+    // 토큰이 0개일 때만 일일 리셋 실행
+    if (state.currentTokens === 0) {
+      console.log("토큰이 0개 - 일일 리셋 실행");
+      store.dispatch(resetDailyTokens());
 
-    // 무료 사용자인 경우 토큰 재계산
-    if (state.subscriptionPlan === "free") {
-      const correctTokens = state.purchasedTokens + 10; // 무료 10개 + 구매한 토큰
+      // 잠시 대기 (Redux 업데이트 완료 대기)
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
-      if (state.currentTokens !== correctTokens) {
+      // 리셋 후 상태 확인
+      const updatedState = store.getState().user;
+      const correctTokens = updatedState.purchasedTokens + 10; // 무료 10개 + 구매한 토큰
+
+      if (updatedState.currentTokens !== correctTokens) {
         console.log("일일 리셋 후 토큰 불일치 발견, 수정 중...");
 
         store.dispatch(
           setUserData({
             currentTokens: correctTokens,
             freeTokens: 10,
-            purchasedTokens: state.purchasedTokens,
+            purchasedTokens: updatedState.purchasedTokens,
             tokens: {
               current: correctTokens,
               total: correctTokens,
@@ -105,7 +106,7 @@ export const cleanupAfterDailyReset = async () => {
         // AsyncStorage도 업데이트
         const tokenData = {
           currentTokens: correctTokens,
-          purchasedTokens: state.purchasedTokens,
+          purchasedTokens: updatedState.purchasedTokens,
           freeTokens: 10,
           lastTokenResetDate: new Date().toISOString().split("T")[0],
           tokens: {
@@ -119,6 +120,8 @@ export const cleanupAfterDailyReset = async () => {
           JSON.stringify(tokenData)
         );
       }
+    } else {
+      console.log("토큰이 있음 - 일일 리셋 건너뜀, 현재 토큰:", state.currentTokens);
     }
 
     console.log("일일 리셋 정리 완료");

@@ -9,9 +9,9 @@ import { store } from "../store";
 // 순환 참조 해결을 위해 lazy import 사용
 let simplePostService: any = null;
 
-const getSimplePostService = () => {
+const getSimplePostService = async () => {
   if (!simplePostService) {
-    simplePostService = require("./simplePostService").default;
+    simplePostService = (await import("./simplePostService")).default;
   }
   return simplePostService;
 };
@@ -132,7 +132,7 @@ class AchievementService {
       return;
     }
 
-    const postService = getSimplePostService();
+    const postService = await getSimplePostService();
 
     // 포스트 저장 시 업적 체크
     postService.onPostSaved(async () => {
@@ -227,7 +227,7 @@ class AchievementService {
   // 업적 체크 및 업데이트
   async checkAchievements(): Promise<Achievement[]> {
     try {
-      const postService = getSimplePostService();
+      const postService = await getSimplePostService();
       const stats = await postService.getStats();
       const savedAchievements = await this.getSavedAchievements();
       const newlyUnlocked: Achievement[] = [];
@@ -374,7 +374,7 @@ class AchievementService {
   async getAchievements(): Promise<Achievement[]> {
     try {
       const saved = await this.getSavedAchievements();
-      const postService = getSimplePostService();
+      const postService = await getSimplePostService();
       const stats = await postService.getStats();
 
       // 새로운 업적이 추가된 경우를 위해 머지하고 현재 진행도 업데이트
@@ -534,7 +534,7 @@ class AchievementService {
     // 주말 전사 체크
     if (day === 0 || day === 6) {
       // 오늘 작성한 글 수 체크
-      const postService = getSimplePostService();
+      const postService = await getSimplePostService();
       const posts = await postService.getRecentPosts(10);
       const today = new Date().toDateString();
       const todayPosts = posts.filter(
@@ -657,7 +657,7 @@ class AchievementService {
 
   // 완벽한 한 주 체크
   private async checkPerfectWeek(): Promise<void> {
-    const postService = getSimplePostService();
+    const postService = await getSimplePostService();
     const posts = await postService.getRecentPosts(50);
     const now = new Date();
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -681,7 +681,7 @@ class AchievementService {
 
   // 돌아온 작가 체크
   private async checkComeback(): Promise<void> {
-    const postService = getSimplePostService();
+    const postService = await getSimplePostService();
     const posts = await postService.getPosts();
     if (posts.length < 2) {
       return;
