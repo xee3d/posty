@@ -68,23 +68,13 @@ export const getImageAnalysisTokens = (plan: PlanType): number => {
 export const MY_STYLE_ACCESS = {
   free: {
     hasAccess: false,
-    message: 'STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.',
+    message: 'PRO 플랜부터 내 스타일 분석을 사용할 수 있습니다.',
     templateLimit: 0,
-  },
-  starter: {
-    hasAccess: true,
-    message: '',
-    templateLimit: 3, // 3개 템플릿만 사용 가능
-  },
-  premium: {
-    hasAccess: true,
-    message: '',
-    templateLimit: 0, // 제한 없음
   },
   pro: {
     hasAccess: true,
     message: '',
-    templateLimit: 0, // 제한 없음
+    templateLimit: -1, // 무제한
   },
 };
 
@@ -97,14 +87,6 @@ export const getMyStyleAccess = (subscriptionPlan?: string) => {
 // 트렌드 접근 권한
 export const TREND_ACCESS = {
   free: {
-    hasAccess: true,
-    updateFrequency: 'daily', // 하루 한 번
-  },
-  starter: {
-    hasAccess: true,
-    updateFrequency: 'daily', // 하루 한 번
-  },
-  premium: {
     hasAccess: true,
     updateFrequency: 'daily', // 하루 한 번
   },

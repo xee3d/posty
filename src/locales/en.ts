@@ -953,7 +953,7 @@ const en = {
     subtitle: "Build your own content brand",
     loading: "Analyzing style...",
     access: {
-      freeMessage: "My Style analysis is available from STARTER plan.",
+      freeMessage: "My Style analysis is available from PRO plan.",
     },
     empty: {
       title: "No content created yet",
@@ -969,6 +969,12 @@ const en = {
       styleAnalysis: "Style Analysis",
       tagline: "My unique style created from {{count}} stories"
     },
+    profileCompletion: "Profile Completion {{completeness}}%",
+    interests: "Interests (Multiple selection available)",
+    formality: "Formality",
+    emotiveness: "Emotional Expression",
+    humor: "Humor",
+    saveProfile: "Save Profile",
     keywords: {
       title: "Key Keywords"
     },
