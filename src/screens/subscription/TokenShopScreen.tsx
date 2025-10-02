@@ -21,6 +21,7 @@ import inAppPurchaseService from "../../services/subscription/inAppPurchaseServi
 import { PurchaseModal } from "../../components/PurchaseModal";
 import { Alert } from "../../utils/customAlert";
 import pricingService from "../../services/localization/pricingService";
+import subscriptionManager from "../../services/subscription/subscriptionManager";
 import { getFontStyle } from "../../utils/fonts";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
@@ -121,6 +122,51 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
       return Math.round(bonusValue);
     }
     return 0;
+  };
+
+  // 구독 구매 핸들러
+  const handleSubscriptionPurchase = async () => {
+    try {
+      // 시뮬레이터에서는 구독 불가 메시지 표시
+      if (Platform.OS === 'ios' && __DEV__) {
+        Alert.alert(
+          '시뮬레이터 제한',
+          '시뮬레이터에서는 인앱 결제를 테스트할 수 없습니다. 실제 기기에서 테스트해주세요.',
+          [{ text: '확인' }]
+        );
+        return;
+      }
+
+      // 구독 관리자 초기화 (사용자 ID 필요)
+      const userId = 'current-user-id'; // 실제 사용자 ID로 교체 필요
+      
+      await subscriptionManager.initialize({
+        userId,
+        onSubscriptionUpdate: (status) => {
+          console.log('구독 상태 업데이트:', status);
+        },
+        onError: (error) => {
+          console.error('구독 오류:', error);
+          Alert.alert('오류', '구독 처리 중 오류가 발생했습니다.');
+        }
+      });
+
+      // Pro 플랜 구독 구매
+      await subscriptionManager.purchaseSubscription('pro');
+      
+      Alert.alert(
+        '구독 완료',
+        'Pro 플랜 구독이 완료되었습니다!',
+        [{ text: '확인' }]
+      );
+    } catch (error) {
+      console.error('구독 구매 실패:', error);
+      Alert.alert(
+        '구독 실패',
+        '구독 처리 중 오류가 발생했습니다. 다시 시도해주세요.',
+        [{ text: '확인' }]
+      );
+    }
   };
 
   // 디버깅용 로그
@@ -451,7 +497,10 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
               </View>
             </View>
             
-            <TouchableOpacity style={styles.subscriptionButton}>
+            <TouchableOpacity 
+              style={styles.subscriptionButton}
+              onPress={handleSubscriptionPurchase}
+            >
               <Text style={styles.subscriptionButtonText}>
                 {t("tokenShop.subscription.subscribe")}
               </Text>

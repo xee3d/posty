@@ -31,6 +31,8 @@ target 'Posty' do
   
   # Google Mobile Ads
   pod 'RNGoogleMobileAds', :path => '../node_modules/react-native-google-mobile-ads'
+  
+  # gRPC 관련 의존성 완전 제거 (Firebase 제거로 인해 불필요)
 
   post_install do |installer|
     react_native_post_install(

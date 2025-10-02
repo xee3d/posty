@@ -1,9 +1,9 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { store } from '../index';
-import { updateTokens, setSubscriptionPlan } from '../slices/userSlice';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { store } from "../index";
+import { updateTokens, setSubscriptionPlan } from "../slices/userSlice";
 
-const TOKEN_PERSIST_KEY = '@posty:persisted_tokens';
-const SUBSCRIPTION_PERSIST_KEY = '@posty:persisted_subscription';
+const TOKEN_PERSIST_KEY = "@posty:persisted_tokens";
+const SUBSCRIPTION_PERSIST_KEY = "@posty:persisted_subscription";
 
 /**
  * 토큰과 구독 정보를 AsyncStorage에 저장
@@ -11,7 +11,7 @@ const SUBSCRIPTION_PERSIST_KEY = '@posty:persisted_subscription';
 export const persistTokenData = async () => {
   try {
     const state = store.getState().user;
-    
+
     // 토큰 정보 저장
     const tokenData = {
       currentTokens: state.currentTokens,
@@ -20,23 +20,26 @@ export const persistTokenData = async () => {
       lastTokenResetDate: state.lastTokenResetDate,
       tokens: state.tokens,
     };
-    
+
     // 구독 정보 저장
     const subscriptionData = {
       subscriptionPlan: state.subscriptionPlan,
       subscriptionExpiresAt: state.subscriptionExpiresAt,
       subscription: state.subscription,
     };
-    
+
     await AsyncStorage.setItem(TOKEN_PERSIST_KEY, JSON.stringify(tokenData));
-    await AsyncStorage.setItem(SUBSCRIPTION_PERSIST_KEY, JSON.stringify(subscriptionData));
-    
-    console.log('Token data persisted:', {
+    await AsyncStorage.setItem(
+      SUBSCRIPTION_PERSIST_KEY,
+      JSON.stringify(subscriptionData)
+    );
+
+    console.log("Token data persisted:", {
       currentTokens: state.currentTokens,
       plan: state.subscriptionPlan,
     });
   } catch (error) {
-    console.error('Failed to persist token data:', error);
+    console.error("Failed to persist token data:", error);
   }
 };
 
@@ -49,70 +52,78 @@ export const restoreTokenData = async (): Promise<boolean> => {
       AsyncStorage.getItem(TOKEN_PERSIST_KEY),
       AsyncStorage.getItem(SUBSCRIPTION_PERSIST_KEY),
     ]);
-    
+
     if (tokenDataStr) {
       const tokenData = JSON.parse(tokenDataStr);
-      
+
       // Redux 상태 복원 - setUserData를 사용하여 전체 토큰 정보 설정
-      const { setUserData } = require('../slices/userSlice');
-      
+      const { setUserData } = await import("../slices/userSlice");
+
       // 현재 토큰을 기준으로 freeTokens 계산
       const currentTokens = tokenData.currentTokens || 10;
       const purchasedTokens = tokenData.purchasedTokens || 0;
       const calculatedFreeTokens = Math.max(0, currentTokens - purchasedTokens);
-      
-      store.dispatch(setUserData({
-        currentTokens: currentTokens,
-        tokens: {
-          current: currentTokens,
-          total: tokenData.tokens?.total || currentTokens,
-        },
-        purchasedTokens: purchasedTokens,
-        freeTokens: calculatedFreeTokens,
-        lastTokenResetDate: tokenData.lastTokenResetDate || new Date().toISOString().split('T')[0],
-      }));
-      
-      console.log('Token data restored from AsyncStorage:', {
+
+      store.dispatch(
+        setUserData({
+          currentTokens: currentTokens,
+          tokens: {
+            current: currentTokens,
+            total: tokenData.tokens?.total || currentTokens,
+          },
+          purchasedTokens: purchasedTokens,
+          freeTokens: calculatedFreeTokens,
+          lastTokenResetDate:
+            tokenData.lastTokenResetDate ||
+            new Date().toISOString().split("T")[0],
+        })
+      );
+
+      console.log("Token data restored from AsyncStorage:", {
         currentTokens: tokenData.currentTokens,
         purchasedTokens: tokenData.purchasedTokens,
         freeTokens: tokenData.freeTokens,
         tokens: tokenData.tokens,
       });
-      
+
       // 복원 후 Redux 상태 확인
       const restoredState = store.getState().user;
-      console.log('Redux state after restore:', {
+      console.log("Redux state after restore:", {
         currentTokens: restoredState.currentTokens,
         tokens: restoredState.tokens,
       });
     } else {
       // 저장된 데이터가 없으면 기본값 설정
-      const { setUserData } = require('../slices/userSlice');
-      store.dispatch(setUserData({
-        tokens: {
-          current: 10,
-          total: 10,
-        },
-        purchasedTokens: 0,
-        freeTokens: 10,
-        lastTokenResetDate: new Date().toISOString().split('T')[0],
-      }));
+      const { setUserData } = await import("../slices/userSlice");
+      store.dispatch(
+        setUserData({
+          tokens: {
+            current: 10,
+            total: 10,
+          },
+          purchasedTokens: 0,
+          freeTokens: 10,
+          lastTokenResetDate: new Date().toISOString().split("T")[0],
+        })
+      );
     }
-    
+
     if (subscriptionDataStr) {
       const subscriptionData = JSON.parse(subscriptionDataStr);
-      
+
       // 구독 정보 복원
-      store.dispatch(setSubscriptionPlan(subscriptionData.subscriptionPlan || 'free'));
-      
-      console.log('Subscription data restored:', {
+      store.dispatch(
+        setSubscriptionPlan(subscriptionData.subscriptionPlan || "free")
+      );
+
+      console.log("Subscription data restored:", {
         plan: subscriptionData.subscriptionPlan,
       });
     }
-    
+
     return true;
   } catch (error) {
-    console.error('Failed to restore token data:', error);
+    console.error("Failed to restore token data:", error);
     return false;
   }
 };
@@ -126,21 +137,23 @@ export const setupTokenPersistence = () => {
   // Redux 상태 변경 감지
   let previousTokens = store.getState().user.currentTokens;
   let previousPlan = store.getState().user.subscriptionPlan;
-  
+
   store.subscribe(() => {
     const currentState = store.getState().user;
-    
+
     // 토큰이나 구독 정보가 변경되었을 때만 저장
-    if (currentState.currentTokens !== previousTokens || 
-        currentState.subscriptionPlan !== previousPlan) {
+    if (
+      currentState.currentTokens !== previousTokens ||
+      currentState.subscriptionPlan !== previousPlan
+    ) {
       previousTokens = currentState.currentTokens;
       previousPlan = currentState.subscriptionPlan;
-      
+
       // 기존 타이머 취소
       if (persistTimeout) {
         clearTimeout(persistTimeout);
       }
-      
+
       // 디바운스: 500ms 후에 저장 (중복 방지)
       persistTimeout = setTimeout(() => {
         persistTokenData();
@@ -150,19 +163,23 @@ export const setupTokenPersistence = () => {
 };
 
 /**
- * 일일 리셋 체크 (복원 후)
+ * 일일 리셋 체크 (복원 후) - 토큰이 0개일 때만
  */
 export const checkDailyResetAfterRestore = async () => {
   const state = store.getState().user;
-  const today = new Date().toISOString().split('T')[0];
-  
-  // 모든 플랜에서 일일 리셋 체크 (무료는 충전, 유료는 보너스)
-  if (state.lastTokenResetDate !== today) {
-    // resetDailyTokens 액션은 이미 userSlice에 정의되어 있음
-    const { resetDailyTokens } = require('../slices/userSlice');
-    store.dispatch(resetDailyTokens());
+  const today = new Date().toISOString().split("T")[0];
+
+  // 날짜가 다르고 토큰이 0개일 때만 일일 리셋 체크
+  if (state.lastTokenResetDate !== today && state.currentTokens === 0) {
+    console.log("복원 후 일일 리셋 실행 - 토큰이 0개");
     
+    // resetDailyTokens 액션은 이미 userSlice에 정의되어 있음
+    const { resetDailyTokens } = await import("../slices/userSlice");
+    store.dispatch(resetDailyTokens());
+
     // 리셋 후 데이터 저장
     await persistTokenData();
+  } else if (state.currentTokens > 0) {
+    console.log("복원 후 일일 리셋 건너뜀 - 토큰이 있음:", state.currentTokens);
   }
 };

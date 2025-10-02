@@ -12,8 +12,7 @@ import {
   resetDailyTokens,
   resetMonthlyTokens
 } from '../../store/slices/userSlice';
-import auth from '@react-native-firebase/auth';
-import firestoreService from '../firebase/firestoreService';
+// Firebase 제거 - Vercel 기반 인증으로 변경됨
 
 export interface TokenUsage {
   timestamp: string;

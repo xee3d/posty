@@ -1,0 +1,27 @@
+# Vercel 환경 변수 예시
+# 실제 배포 시 Vercel 대시보드에서 환경 변수 설정
+
+# API URL
+EXPO_PUBLIC_API_URL=https://your-vercel-app.vercel.app
+
+# 데이터베이스 연결
+POSTGRES_URL=your_postgres_connection_string
+POSTGRES_PRISMA_URL=your_postgres_prisma_connection_string
+POSTGRES_URL_NON_POOLING=your_postgres_non_pooling_connection_string
+POSTGRES_USER=your_postgres_user
+POSTGRES_HOST=your_postgres_host
+POSTGRES_PASSWORD=your_postgres_password
+POSTGRES_DATABASE=your_postgres_database
+
+# App Store Connect 설정
+APPLE_TEAM_ID=your_apple_team_id
+APPLE_KEY_ID=your_apple_key_id
+APPLE_PRIVATE_KEY=your_apple_private_key
+APPLE_BUNDLE_ID=com.posty
+
+# Google Play Console 설정
+GOOGLE_PLAY_SERVICE_ACCOUNT_KEY=your_google_service_account_json
+
+# 보안 키
+JWT_SECRET=your_jwt_secret_key
+ENCRYPTION_KEY=your_encryption_key

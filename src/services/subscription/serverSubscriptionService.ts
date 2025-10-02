@@ -2,6 +2,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import DeviceInfo from "react-native-device-info";
 import vercelAuthService from "../auth/vercelAuthService";
+import vercelSubscriptionService from "./vercelSubscriptionService";
+import subscriptionManager from "./subscriptionManager";
 
 export interface SubscriptionPlan {
   id: string;
