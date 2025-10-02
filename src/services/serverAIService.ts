@@ -440,7 +440,7 @@ class ServerAIService {
   ): string {
     const currentLanguage = getCurrentLanguage();
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Current language:", currentLanguage);
-    console.log("🔧 [ServerAIService] ENHANCED PROMPT - i18next language:", require('../locales/i18n').default.language);
+    // console.log("🔧 [ServerAIService] ENHANCED PROMPT - i18next language:", i18n.language);
     console.log("🔧 [ServerAIService] ENHANCED PROMPT - Call stack:", new Error().stack?.split('\n')[1]);
     
     // 완전히 새로운 접근법: 언어별 전용 프롬프트 생성

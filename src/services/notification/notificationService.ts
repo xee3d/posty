@@ -6,10 +6,17 @@
 // pushNotificationService import를 안전하게 처리
 let pushNotificationService: any = null;
 try {
-  const pushNotificationModule = require("./pushNotificationService");
-  pushNotificationService =
-    pushNotificationModule.pushNotificationService ||
-    pushNotificationModule.default;
+  // 동적 import로 변경
+  import("./pushNotificationService").then((pushNotificationModule) => {
+    pushNotificationService =
+      pushNotificationModule.pushNotificationService ||
+      pushNotificationModule.default;
+  }).catch((error) => {
+    console.warn(
+      "📱 Push notification service import failed:",
+      error?.message || "Unknown error"
+    );
+  });
 } catch (error) {
   console.warn(
     "📱 Push notification service import failed:",

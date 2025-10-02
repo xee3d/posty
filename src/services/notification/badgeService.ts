@@ -199,14 +199,14 @@ export class BadgeService {
       if (Platform.OS === "ios") {
         // iOS의 경우 @react-native-community/push-notification-ios 사용
         try {
-          const PushNotificationIOS = require("@react-native-community/push-notification-ios");
+          const { PushNotificationIOS } = await import("@react-native-community/push-notification-ios");
           PushNotificationIOS.setApplicationIconBadgeNumber(count);
           console.log(`📱 iOS badge set to: ${count}`);
         } catch (error) {
           // @react-native-community/push-notification-ios 대체 시도
           try {
-            const PushNotificationIOS =
-              require("@react-native-community/push-notification-ios").default;
+            const PushNotificationIOSModule = await import("@react-native-community/push-notification-ios");
+            const PushNotificationIOS = PushNotificationIOSModule.default || PushNotificationIOSModule;
             PushNotificationIOS.setApplicationIconBadgeNumber(count);
             console.log(`📱 iOS badge set to: ${count} (PushNotificationIOS)`);
           } catch (iosError) {
@@ -216,7 +216,8 @@ export class BadgeService {
       } else if (Platform.OS === "android") {
         // Android 배지 관리 (react-native-push-notification 재활성화)
         try {
-          const PushNotification = require("react-native-push-notification");
+          const PushNotificationModule = await import("react-native-push-notification");
+          const PushNotification = PushNotificationModule.default || PushNotificationModule;
           if (
             PushNotification &&
             PushNotification.setApplicationIconBadgeNumber

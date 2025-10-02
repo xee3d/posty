@@ -489,74 +489,23 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     setShowStyleGuide(false);
   };
 
-  // 광고 시청 후 프리미엄 스타일 일회성 액세스 처리
+  // 광고 시청 후 프리미엄 스타일 일회성 액세스 처리 (더 이상 필요 없음)
   const handleWatchAdForTone = async (toneId: string) => {
-    try {
-      // 광고 시청 로직 (실제로는 광고 SDK 연동 필요)
-      Alert.alert(
-        t("aiWrite.ads.watching.title"),
-        t("aiWrite.ads.watching.message"),
-        [],
-        { cancelable: false }
-      );
-      
-      // 임시로 2초 딜레이 (실제로는 광고 완료 콜백)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // 광고 시청 완료 후 해당 톤에 대한 일회성 액세스 부여
-      setAdWatchedTones(prev => new Set(prev).add(toneId));
-      
-      Alert.alert(
-        t("aiWrite.ads.complete.title"),
-        t("aiWrite.ads.complete.messageStyle"),
-        [{ text: t("common.confirm"), onPress: () => {} }]
-      );
-      
-      soundManager.playSuccess();
-    } catch (error) {
-      console.error('광고 시청 실패:', error);
-      Alert.alert(t("common.error"), t("aiWrite.ads.error"));
-    }
+    // 모든 톤이 프리버전에서 사용 가능하므로 더 이상 필요 없음
   };
 
-  // 프리미엄 톤 액세스 체크 함수 (구독 + 광고 시청 고려)
+  // 모든 톤과 길이는 프리버전에서 사용 가능
   const canAccessToneWithAd = (toneId: string): boolean => {
-    return canAccessTone(userPlan, toneId) || adWatchedTones.has(toneId);
+    return true; // 모든 톤 사용 가능
   };
 
-  // 프리미엄 길이 액세스 체크 함수 (구독 + 광고 시청 고려)
   const canAccessLengthWithAd = (lengthId: string): boolean => {
-    return canAccessLength(userPlan, lengthId) || adWatchedLengths.has(lengthId);
+    return true; // 모든 길이 사용 가능
   };
 
-  // 광고 시청 후 프리미엄 길이 일회성 액세스 처리
+  // 광고 시청 후 프리미엄 길이 일회성 액세스 처리 (더 이상 필요 없음)
   const handleWatchAdForLength = async (lengthId: string) => {
-    try {
-      // 광고 시청 로직 (실제로는 광고 SDK 연동 필요)
-      Alert.alert(
-        t("aiWrite.ads.watching.title"),
-        t("aiWrite.ads.watching.message"),
-        [],
-        { cancelable: false }
-      );
-      
-      // 임시로 2초 딜레이 (실제로는 광고 완료 콜백)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // 광고 시청 완료 후 해당 길이에 대한 일회성 액세스 부여
-      setAdWatchedLengths(prev => new Set(prev).add(lengthId));
-      
-      Alert.alert(
-        t("aiWrite.ads.complete.title"),
-        t("aiWrite.ads.complete.messageLength"),
-        [{ text: t("common.confirm"), onPress: () => {} }]
-      );
-      
-      soundManager.playSuccess();
-    } catch (error) {
-      console.error('광고 시청 실패:', error);
-      Alert.alert(t("common.error"), t("aiWrite.ads.error"));
-    }
+    // 모든 길이가 프리버전에서 사용 가능하므로 더 이상 필요 없음
   };
 
   // 예시 placeholder 가져오기
@@ -1353,32 +1302,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           styles.polishOptionButton,
                           selectedPolishOption === "summarize" &&
                             styles.polishOptionButtonActive,
-                          !canAccessPolishOption(userPlan, "summarize") &&
-                            styles.lockedItem,
                         ]}
                         onPress={() => {
-                          if (!canAccessPolishOption(userPlan, "summarize")) {
-                            soundManager.playError();
-                            Alert.alert(
-                              t("aiWrite.premium.title"),
-                              `요약하기 기능은 ${
-                                userPlan === "free"
-                                  ? "Starter"
-                                  : userPlan === "starter"
-                                  ? "Premium"
-                                  : "Pro"
-                              } 플랜 이상에서 사용 가능해요.`,
-                              [
-                                { text: t("alerts.buttons.later"), style: "cancel" },
-                                {
-                                  text: t("aiWrite.premium.viewPlans"),
-                                  onPress: () => onNavigate?.("subscription"),
-                                },
-                              ]
-                            );
-                            return;
-                          }
                           setSelectedPolishOption("summarize");
+                          soundManager.playTap();
                         }}
                       >
                         <SafeIcon
@@ -1387,8 +1314,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           color={
                             selectedPolishOption === "summarize"
                               ? colors.primary
-                              : !canAccessPolishOption(userPlan, "summarize")
-                              ? colors.text.tertiary
                               : colors.text.secondary
                           }
                         />
@@ -1397,8 +1322,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             styles.polishOptionText,
                             selectedPolishOption === "summarize" &&
                               styles.polishOptionTextActive,
-                            !canAccessPolishOption(userPlan, "summarize") &&
-                              styles.lockedItemText,
                           ]}
                         >
                           {t("aiWrite.polishOptions.summarize")}
@@ -1409,32 +1332,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           styles.polishOptionButton,
                           selectedPolishOption === "simple" &&
                             styles.polishOptionButtonActive,
-                          !canAccessPolishOption(userPlan, "simple") &&
-                            styles.lockedItem,
                         ]}
                         onPress={() => {
-                          if (!canAccessPolishOption(userPlan, "simple")) {
-                            soundManager.playError();
-                            Alert.alert(
-                              t("aiWrite.premium.title"),
-                              `쉽게 풀어쓰기 기능은 ${
-                                userPlan === "free"
-                                  ? "Starter"
-                                  : userPlan === "starter"
-                                  ? "Premium"
-                                  : "Pro"
-                              } 플랜 이상에서 사용 가능해요.`,
-                              [
-                                { text: t("alerts.buttons.later"), style: "cancel" },
-                                {
-                                  text: t("aiWrite.premium.viewPlans"),
-                                  onPress: () => onNavigate?.("subscription"),
-                                },
-                              ]
-                            );
-                            return;
-                          }
                           setSelectedPolishOption("simple");
+                          soundManager.playTap();
                         }}
                       >
                         <SafeIcon
@@ -1443,8 +1344,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           color={
                             selectedPolishOption === "simple"
                               ? colors.primary
-                              : !canAccessPolishOption(userPlan, "simple")
-                              ? colors.text.tertiary
                               : colors.text.secondary
                           }
                         />
@@ -1453,8 +1352,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             styles.polishOptionText,
                             selectedPolishOption === "simple" &&
                               styles.polishOptionTextActive,
-                            !canAccessPolishOption(userPlan, "simple") &&
-                              styles.lockedItemText,
                           ]}
                         >
                           {t("aiWrite.polishOptions.simple")}
@@ -1465,32 +1362,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           styles.polishOptionButton,
                           selectedPolishOption === "formal" &&
                             styles.polishOptionButtonActive,
-                          !canAccessPolishOption(userPlan, "formal") &&
-                            styles.lockedItem,
                         ]}
                         onPress={() => {
-                          if (!canAccessPolishOption(userPlan, "formal")) {
-                            soundManager.playError();
-                            Alert.alert(
-                              t("aiWrite.premium.title"),
-                              `격식체 변환 기능은 ${
-                                userPlan === "free"
-                                  ? "Starter"
-                                  : userPlan === "starter"
-                                  ? "Premium"
-                                  : "Pro"
-                              } 플랜 이상에서 사용 가능해요.`,
-                              [
-                                { text: t("alerts.buttons.later"), style: "cancel" },
-                                {
-                                  text: t("aiWrite.premium.viewPlans"),
-                                  onPress: () => onNavigate?.("subscription"),
-                                },
-                              ]
-                            );
-                            return;
-                          }
                           setSelectedPolishOption("formal");
+                          soundManager.playTap();
                         }}
                       >
                         <SafeIcon
@@ -1499,8 +1374,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           color={
                             selectedPolishOption === "formal"
                               ? colors.primary
-                              : !canAccessPolishOption(userPlan, "formal")
-                              ? colors.text.tertiary
                               : colors.text.secondary
                           }
                         />
@@ -1509,8 +1382,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             styles.polishOptionText,
                             selectedPolishOption === "formal" &&
                               styles.polishOptionTextActive,
-                            !canAccessPolishOption(userPlan, "formal") &&
-                              styles.lockedItemText,
                           ]}
                         >
                           {t("aiWrite.polishOptions.formal")}
@@ -1530,32 +1401,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           styles.polishOptionButton,
                           selectedPolishOption === "emotion" &&
                             styles.polishOptionButtonActive,
-                          !canAccessPolishOption(userPlan, "emotion") &&
-                            styles.lockedItem,
                         ]}
                         onPress={() => {
-                          if (!canAccessPolishOption(userPlan, "emotion")) {
-                            soundManager.playError();
-                            Alert.alert(
-                              t("aiWrite.premium.title"),
-                              `감정 강화 기능은 ${
-                                userPlan === "free"
-                                  ? "Starter"
-                                  : userPlan === "starter"
-                                  ? "Premium"
-                                  : "Pro"
-                              } 플랜 이상에서 사용 가능해요.`,
-                              [
-                                { text: t("alerts.buttons.later"), style: "cancel" },
-                                {
-                                  text: t("aiWrite.premium.viewPlans"),
-                                  onPress: () => onNavigate?.("subscription"),
-                                },
-                              ]
-                            );
-                            return;
-                          }
                           setSelectedPolishOption("emotion");
+                          soundManager.playTap();
                         }}
                       >
                         <SafeIcon
@@ -1564,8 +1413,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           color={
                             selectedPolishOption === "emotion"
                               ? colors.primary
-                              : !canAccessPolishOption(userPlan, "emotion")
-                              ? colors.text.tertiary
                               : colors.text.secondary
                           }
                         />
@@ -1574,8 +1421,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             styles.polishOptionText,
                             selectedPolishOption === "emotion" &&
                               styles.polishOptionTextActive,
-                            !canAccessPolishOption(userPlan, "emotion") &&
-                              styles.lockedItemText,
                           ]}
                         >
                           {t("aiWrite.polishOptions.emotion")}
@@ -1587,34 +1432,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           styles.polishOptionButton,
                           selectedPolishOption === "storytelling" &&
                             styles.polishOptionButtonActive,
-                          !canAccessPolishOption(userPlan, "storytelling") &&
-                            styles.lockedItem,
                         ]}
                         onPress={() => {
-                          if (
-                            !canAccessPolishOption(userPlan, "storytelling")
-                          ) {
-                            soundManager.playError();
-                            Alert.alert(
-                              t("aiWrite.premium.title"),
-                              `스토리텔링 기능은 ${
-                                userPlan === "free"
-                                  ? "Starter"
-                                  : userPlan === "starter"
-                                  ? "Premium"
-                                  : "Pro"
-                              } 플랜 이상에서 사용 가능해요.`,
-                              [
-                                { text: t("alerts.buttons.later"), style: "cancel" },
-                                {
-                                  text: t("aiWrite.premium.viewPlans"),
-                                  onPress: () => onNavigate?.("subscription"),
-                                },
-                              ]
-                            );
-                            return;
-                          }
                           setSelectedPolishOption("storytelling");
+                          soundManager.playTap();
                         }}
                       >
                         <SafeIcon
@@ -1623,8 +1444,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           color={
                             selectedPolishOption === "storytelling"
                               ? colors.primary
-                              : !canAccessPolishOption(userPlan, "storytelling")
-                              ? colors.text.tertiary
                               : colors.text.secondary
                           }
                         />
@@ -1633,8 +1452,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             styles.polishOptionText,
                             selectedPolishOption === "storytelling" &&
                               styles.polishOptionTextActive,
-                            !canAccessPolishOption(userPlan, "storytelling") &&
-                              styles.lockedItemText,
                           ]}
                         >
                           {t("aiWrite.polishOptions.storytelling")}
@@ -1646,32 +1463,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           styles.polishOptionButton,
                           selectedPolishOption === "engaging" &&
                             styles.polishOptionButtonActive,
-                          !canAccessPolishOption(userPlan, "engaging") &&
-                            styles.lockedItem,
                         ]}
                         onPress={() => {
-                          if (!canAccessPolishOption(userPlan, "engaging")) {
-                            soundManager.playError();
-                            Alert.alert(
-                              t("aiWrite.premium.title"),
-                              `매력적으로 기능은 ${
-                                userPlan === "free"
-                                  ? "Starter"
-                                  : userPlan === "starter"
-                                  ? "Premium"
-                                  : "Pro"
-                              } 플랜 이상에서 사용 가능해요.`,
-                              [
-                                { text: t("alerts.buttons.later"), style: "cancel" },
-                                {
-                                  text: t("aiWrite.premium.viewPlans"),
-                                  onPress: () => onNavigate?.("subscription"),
-                                },
-                              ]
-                            );
-                            return;
-                          }
                           setSelectedPolishOption("engaging");
+                          soundManager.playTap();
                         }}
                       >
                         <SafeIcon
@@ -1680,8 +1475,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           color={
                             selectedPolishOption === "engaging"
                               ? colors.primary
-                              : !canAccessPolishOption(userPlan, "engaging")
-                              ? colors.text.tertiary
                               : colors.text.secondary
                           }
                         />
@@ -1690,8 +1483,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             styles.polishOptionText,
                             selectedPolishOption === "engaging" &&
                               styles.polishOptionTextActive,
-                            !canAccessPolishOption(userPlan, "engaging") &&
-                              styles.lockedItemText,
                           ]}
                         >
                           {t("aiWrite.polishOptions.engaging")}
@@ -1817,29 +1608,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           shadowOpacity: 0.2,
                           elevation: 3,
                         },
-                        !canAccessToneWithAd(tone.id) && styles.lockedItem,
                       ]}
                       onPress={() => {
-                        if (!canAccessToneWithAd(tone.id)) {
-                          soundManager.playError(); // 잠긴 톤 선택 시 에러음
-                          Alert.alert(
-                            t("aiWrite.premium.styleTitle"),
-                            t("aiWrite.premium.styleMessage", { styleName: tone.label }),
-                            [
-                              { text: t("common.later"), style: "cancel" },
-                              {
-                                text: t("aiWrite.premium.watchAd"),
-                                onPress: () => handleWatchAdForTone(tone.id),
-                                style: "default"
-                              },
-                              {
-                                text: t("aiWrite.premium.upgrade"),
-                                onPress: () => onNavigate?.("subscription"),
-                              },
-                            ]
-                          );
-                          return;
-                        }
                         soundManager.playTap(); // 톤 선택 사운드
                         setSelectedTone(tone.id);
                       }}
@@ -1851,8 +1621,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         color={
                           selectedTone === tone.id
                             ? tone.color
-                            : !canAccessToneWithAd(tone.id)
-                            ? colors.text.tertiary
                             : colors.text.secondary
                         }
                       />
@@ -1861,23 +1629,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           styles.toneLabel,
                           selectedTone === tone.id && styles.toneLabelActive,
                           selectedTone === tone.id && { color: tone.color },
-                          !canAccessToneWithAd(tone.id) &&
-                            styles.lockedItemText,
                         ]}
                       >
                         {tone.label}
                       </Text>
-                      {adWatchedTones.has(tone.id) && !canAccessTone(userPlan, tone.id) && (
-                        <View style={styles.adUnlockedBadge}>
-                          <SafeIcon 
-                            name="play-circle" 
-                            size={12} 
-                            color={colors.primary}
-                            style={styles.adUnlockedIcon}
-                          />
-                          <Text style={styles.adUnlockedText}>{t("aiWrite.premium.oneTimeUse")}</Text>
-                        </View>
-                      )}
                     </TouchableOpacity>
                   ))}
                 </View>
@@ -1896,30 +1651,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                     style={[
                       styles.lengthCard,
                       selectedLength === length.id && styles.lengthCardActive,
-                      !canAccessLengthWithAd(length.id) &&
-                        styles.lockedItem,
                     ]}
                     onPress={() => {
-                      if (!canAccessLengthWithAd(length.id)) {
-                        Alert.alert(
-                          t("aiWrite.premium.lengthTitle"),
-                          `${length.count} 길이를 사용하려면 업그레이드하거나 광고를 시청하세요.\n\n광고 시청 시 1회 무료로 사용할 수 있습니다!`,
-                          [
-                            { text: t("common.later"), style: "cancel" },
-                            {
-                              text: "광고보기 (1회 사용)",
-                              onPress: () => handleWatchAdForLength(length.id),
-                              style: "default"
-                            },
-                            {
-                              text: "업그레이드",
-                              onPress: () => onNavigate?.("subscription"),
-                            },
-                          ]
-                        );
-                        return;
-                      }
                       setSelectedLength(length.id);
+                      soundManager.playTap();
                     }}
                     activeOpacity={0.7}
                   >
@@ -1929,8 +1664,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       color={
                         selectedLength === length.id
                           ? colors.primary
-                          : !canAccessLengthWithAd(length.id)
-                          ? colors.text.tertiary
                           : colors.text.secondary
                       }
                       style={[
@@ -1943,8 +1676,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         styles.lengthCount,
                         selectedLength === length.id &&
                           styles.lengthCountActive,
-                        !canAccessLengthWithAd(length.id) &&
-                          styles.lockedItemText,
                       ]}
                     >
                       {length.count}
@@ -1953,8 +1684,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       style={[
                         styles.lengthDesc,
                         selectedLength === length.id && styles.lengthDescActive,
-                        !canAccessLengthWithAd(length.id) &&
-                          styles.lockedItemText,
                       ]}
                     >
                       {length.desc}

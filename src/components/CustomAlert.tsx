@@ -344,7 +344,8 @@ class AlertManager {
           if (__DEV__) {
             console.log("AlertManager: Using fallback React Native Alert");
           }
-          const RNAlert = require("react-native").Alert;
+          const ReactNative = require("react-native");
+          const RNAlert = ReactNative.Alert;
           RNAlert.alert(title || "", message, buttons, { cancelable: true });
         }
       }, 100);

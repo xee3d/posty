@@ -9,8 +9,8 @@ export const PLAN_FEATURES = {
     monthlyTokens: 0,
     initialTokens: 0, // 초기 지급 토큰
     dailyBonus: 0, // 일일 추가 토큰
-    tones: ['casual', 'professional', 'humorous'], // 3개
-    lengths: ['short', 'medium'],
+    tones: ['casual', 'professional', 'humorous', 'emotional', 'genz', 'millennial', 'minimalist', 'storytelling', 'motivational'], // 모든 톤 사용 가능
+    lengths: ['short', 'medium', 'long', 'extra'], // 모든 길이 사용 가능
     hasAds: true,
     imageAnalysisTokens: 2,
   },
@@ -29,8 +29,6 @@ export const PLAN_FEATURES = {
 // 사용자 플랜 가져오기
 export const getUserPlan = (subscriptionPlan?: string): PlanType => {
   if (!subscriptionPlan || subscriptionPlan === 'free') return 'free';
-  if (subscriptionPlan === 'starter') return 'starter';
-  if (subscriptionPlan === 'premium') return 'premium';
   if (subscriptionPlan === 'pro') return 'pro';
   return 'free';
 };
@@ -67,9 +65,9 @@ export const getImageAnalysisTokens = (plan: PlanType): number => {
 // MyStyle 접근 권한
 export const MY_STYLE_ACCESS = {
   free: {
-    hasAccess: false,
-    message: 'PRO 플랜부터 내 스타일 분석을 사용할 수 있습니다.',
-    templateLimit: 0,
+    hasAccess: true,
+    message: '',
+    templateLimit: 5, // 프리버전에서 5개 템플릿 사용 가능
   },
   pro: {
     hasAccess: true,
@@ -82,6 +80,11 @@ export const MY_STYLE_ACCESS = {
 export const getMyStyleAccess = (subscriptionPlan?: string) => {
   const plan = getUserPlan(subscriptionPlan);
   return MY_STYLE_ACCESS[plan];
+};
+
+// 폴리시 옵션 접근 권한 확인 함수 (모든 옵션이 프리버전에서 사용 가능)
+export const canAccessPolishOption = (plan: PlanType, option: string): boolean => {
+  return true; // 모든 폴리시 옵션 사용 가능
 };
 
 // 트렌드 접근 권한

@@ -16,8 +16,16 @@ let PushNotification: any = null;
 // Android용 푸시 알림 (Firebase 없이)
 if (Platform.OS === "android") {
   try {
-    const PushNotificationModule = require("react-native-push-notification");
-    PushNotification = PushNotificationModule.default || PushNotificationModule;
+    // 동적 import로 변경
+    import("react-native-push-notification").then((PushNotificationModule) => {
+      PushNotification = PushNotificationModule.default || PushNotificationModule;
+    }).catch((error) => {
+      console.warn(
+        "📱 Android push notification not available:",
+        error?.message || "Unknown error"
+      );
+      PushNotification = null;
+    });
   } catch (error) {
     console.warn(
       "📱 Android push notification not available:",

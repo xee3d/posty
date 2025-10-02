@@ -95,7 +95,7 @@ class ServerValidationClient {
 
       // 광고 전용 서명 생성
       const signatureData = `${adUnitId}-${timestamp}-${rewardAmount}-${deviceFingerprint}-${sessionId}`;
-      const crypto = require("crypto-js");
+      const crypto = await import("crypto-js");
       const signature = crypto
         .HmacSHA256(signatureData, "POSTY_AD_SECRET_2024")
         .toString();
