@@ -16,7 +16,7 @@ import { SPACING } from "../../utils/constants";
 import { useAppTheme } from "../../hooks/useAppTheme";
 import { useAppSelector } from "../../hooks/redux";
 import { useTranslation } from "react-i18next";
-import { selectCurrentTokens } from "../../store/slices/userSlice";
+import { selectCurrentTokens, selectSubscriptionPlan } from "../../store/slices/userSlice";
 import inAppPurchaseService from "../../services/subscription/inAppPurchaseService";
 import { PurchaseModal } from "../../components/PurchaseModal";
 import { Alert } from "../../utils/customAlert";
@@ -24,7 +24,7 @@ import pricingService from "../../services/localization/pricingService";
 import subscriptionManager from "../../services/subscription/subscriptionManager";
 import { getFontStyle } from "../../utils/fonts";
 
-const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
+const { width: screenWidth } = Dimensions.get("window");
 const isSmallDevice = screenWidth < 360;
 const isMediumDevice = screenWidth >= 360 && screenWidth < 400;
 const isLargeDevice = screenWidth >= 400;
@@ -109,6 +109,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
   const { colors, isDark } = useAppTheme();
   const { t } = useTranslation();
   const currentTokens = useAppSelector(selectCurrentTokens);
+  const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
   
   // 언어별 토큰 패키지 가져오기
   const TOKEN_PACKAGES = pricingService.getNewTokenPackages();
@@ -122,6 +123,44 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
       return Math.round(bonusValue);
     }
     return 0;
+  };
+
+  // 구독 상태 확인
+  const isSubscribed = subscriptionPlan && subscriptionPlan !== 'free';
+  
+  // 구독 만료일 계산 (임시로 30일 후로 설정)
+  const getSubscriptionExpiryDate = () => {
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 30);
+    return expiryDate;
+  };
+
+  const formatExpiryDate = (date: Date) => {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    return `${year}년 ${month}월 ${day}일`;
+  };
+
+  const calculateDaysRemaining = (expiryDate: Date) => {
+    const today = new Date();
+    const diffTime = expiryDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
+
+  // 구독 취소 안내 핸들러
+  const handleCancelSubscription = () => {
+    Alert.alert(
+      '구독 취소 안내',
+      '구독 취소는 앱스토어에서 직접 해야 합니다.\n\n' +
+      '• iOS: 설정 > Apple ID > 구독 > Posty\n' +
+      '• Android: Google Play 스토어 > 구독 > Posty\n\n' +
+      '취소해도 다음 결제일까지 현재 플랜을 이용할 수 있습니다.',
+      [
+        { text: '확인', style: 'default' }
+      ]
+    );
   };
 
   // 구독 구매 핸들러
@@ -143,7 +182,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
       await subscriptionManager.initialize({
         userId,
         onSubscriptionUpdate: (status) => {
-          console.log('구독 상태 업데이트:', status);
+          // 구독 상태 업데이트 처리
         },
         onError: (error) => {
           console.error('구독 오류:', error);
@@ -169,15 +208,6 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
     }
   };
 
-  // 디버깅용 로그
-  console.log('토큰 패키지 정보:', TOKEN_PACKAGES.map(pkg => ({
-    id: pkg.id,
-    tokens: pkg.tokens,
-    bonus: pkg.bonus,
-    price: pkg.price,
-    totalTokens: pkg.tokens + pkg.bonus,
-    pricePerToken: pkg.price / (pkg.tokens + pkg.bonus)
-  })));
   
   // 애니메이션 상태
   const [isAnimating, setIsAnimating] = useState(true);
@@ -508,6 +538,54 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
             </TouchableOpacity>
           </LinearGradient>
         </View>
+
+        {/* 구독 취소 섹션 - 구독 중인 경우에만 표시 */}
+        {isSubscribed && (
+          <View style={[styles.subscriptionCancelCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.cancelTitleRow}>
+              <Icon name="warning" size={getResponsiveSize(22)} color="#F59E0B" />
+              <Text style={[styles.cancelTitle, { color: colors.text.primary }]}>
+                구독 관리
+              </Text>
+            </View>
+            
+            <View style={styles.subscriptionInfo}>
+              <View style={styles.subscriptionStatusRow}>
+                <Icon name="checkmark-circle" size={getResponsiveSize(16)} color="#10B981" />
+                <Text style={[styles.subscriptionStatus, { color: colors.text.secondary }]}>
+                  현재 {subscriptionPlan?.toUpperCase()} 플랜 구독 중
+                </Text>
+              </View>
+              
+              <View style={styles.expiryInfoRow}>
+                <Icon name="calendar" size={getResponsiveSize(16)} color={colors.primary} />
+                <Text style={[styles.expiryInfo, { color: colors.text.secondary }]}>
+                  다음 결제일: {formatExpiryDate(getSubscriptionExpiryDate())}
+                </Text>
+              </View>
+              
+              <View style={styles.daysRemainingRow}>
+                <Icon name="time" size={getResponsiveSize(16)} color="#F59E0B" />
+                <Text style={[styles.daysRemaining, { color: colors.text.secondary }]}>
+                  {calculateDaysRemaining(getSubscriptionExpiryDate())}일 남음
+                </Text>
+              </View>
+            </View>
+            
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={handleCancelSubscription}
+            >
+              <Icon name="information-circle" size={getResponsiveSize(20)} color="#3B82F6" />
+              <Text style={styles.cancelButtonText}>구독 취소 안내</Text>
+            </TouchableOpacity>
+            
+            <Text style={[styles.cancelInfo, { color: colors.text.secondary }]}>
+              구독을 취소해도 {formatExpiryDate(getSubscriptionExpiryDate())}까지 
+              현재 플랜을 계속 이용할 수 있습니다.
+            </Text>
+          </View>
+        )}
 
         {/* 환불 정책 */}
         <View style={[styles.refundCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -886,6 +964,71 @@ const createStyles = (colors: any, isDark: boolean) => StyleSheet.create({
   noticeItem: {
     ...getFontStyle("sm", "regular"),
     flex: 1,
+  },
+  subscriptionCancelCard: {
+    marginHorizontal: getResponsiveSize(SPACING.large),
+    marginBottom: getResponsiveSize(SPACING.large),
+    padding: getResponsiveSize(SPACING.large),
+    borderRadius: getResponsiveSize(16),
+    borderWidth: 1,
+  },
+  cancelTitleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: getResponsiveSize(SPACING.small),
+    marginBottom: getResponsiveSize(SPACING.medium),
+  },
+  cancelTitle: {
+    ...getFontStyle("lg", "bold"),
+  },
+  subscriptionInfo: {
+    gap: getResponsiveSize(SPACING.small),
+    marginBottom: getResponsiveSize(SPACING.medium),
+  },
+  subscriptionStatusRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: getResponsiveSize(SPACING.small),
+  },
+  subscriptionStatus: {
+    ...getFontStyle("sm", "regular"),
+  },
+  expiryInfoRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: getResponsiveSize(SPACING.small),
+  },
+  expiryInfo: {
+    ...getFontStyle("sm", "regular"),
+  },
+  daysRemainingRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: getResponsiveSize(SPACING.small),
+  },
+  daysRemaining: {
+    ...getFontStyle("sm", "regular"),
+  },
+  cancelButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#3B82F6",
+    paddingHorizontal: getResponsiveSize(SPACING.large),
+    paddingVertical: getResponsiveSize(SPACING.medium),
+    borderRadius: getResponsiveSize(12),
+    gap: getResponsiveSize(SPACING.small),
+    marginBottom: getResponsiveSize(SPACING.small),
+  },
+  cancelButtonText: {
+    fontSize: getResponsiveSize(16),
+    fontWeight: "700",
+    color: "#FFFFFF",
+  },
+  cancelInfo: {
+    ...getFontStyle("xs", "regular"),
+    textAlign: "center",
+    lineHeight: getResponsiveSize(18),
   },
   refundCard: {
     marginHorizontal: getResponsiveSize(SPACING.large),
