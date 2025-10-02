@@ -1,7 +1,7 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { store } from "../../store";
-import {
-  setTokens,
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { store } from '../../store';
+import { 
+  setTokens, 
   setSubscriptionPlan,
   selectCurrentTokens,
   selectSubscriptionPlan,
@@ -10,15 +10,16 @@ import {
   earnTokens,
   updateSubscription,
   resetDailyTokens,
-  resetMonthlyTokens,
-} from "../../store/slices/userSlice";
-// Firebase 제거 - Vercel 기반 인증으로 변경됨
+  resetMonthlyTokens
+} from '../../store/slices/userSlice';
+import auth from '@react-native-firebase/auth';
+import firestoreService from '../firebase/firestoreService';
 
 export interface TokenUsage {
   timestamp: string;
   tokens: number;
   action: string;
-  type?: "generate" | "image" | "refine";
+  type?: 'generate' | 'image' | 'refine';
 }
 
 export interface UserTokenData {
@@ -26,110 +27,106 @@ export interface UserTokenData {
   purchasedTokens: number;
   lastResetDate: string;
   tokensUsedToday: number;
-  subscriptionPlan: "free" | "premium" | "pro";
+  subscriptionPlan: 'free' | 'premium' | 'pro';
   monthlyTokensRemaining?: number;
   tokenHistory: TokenUsage[];
 }
 
 class TokenService {
-  private readonly TOKEN_KEY = "USER_TOKENS";
-  private readonly SUBSCRIPTION_KEY = "USER_SUBSCRIPTION";
-  private readonly HISTORY_KEY = "TOKEN_HISTORY";
+  private readonly TOKEN_KEY = 'USER_TOKENS';
+  private readonly SUBSCRIPTION_KEY = 'USER_SUBSCRIPTION';
+  private readonly HISTORY_KEY = 'TOKEN_HISTORY';
 
   /**
    * 토큰 시스템 초기화
    */
   async initialize(): Promise<void> {
     try {
-      console.log("TokenService: Initializing...");
-
+      console.log('TokenService: Initializing...');
+      
       // 1. Redux persist에서 복원된 데이터 확인
       const state = store.getState().user;
       const persistedTokens = state.currentTokens;
-
-      if (
-        persistedTokens !== undefined &&
-        persistedTokens !== null &&
-        persistedTokens !== 0
-      ) {
-        console.log(
-          "TokenService: Using persisted tokens from Redux:",
-          persistedTokens
-        );
+      
+      if (persistedTokens !== undefined && persistedTokens !== null && persistedTokens !== 0) {
+        console.log('TokenService: Using persisted tokens from Redux:', persistedTokens);
         // Redux persist에 이미 데이터가 있으면 그대로 사용
         return;
       }
-
-      // 2. Firebase 비활성화 상태에서는 로컬 스토리지만 사용
-      // Firebase removed - using Vercel-based auth
-      // const currentUser = auth().currentUser;
-      // if (currentUser) {
-      //   console.log('TokenService: Fetching from Firestore for user:', currentUser.uid);
-      //
-      //   // Firestore에서 사용자 데이터 가져오기
-      //   const userData = await firestoreService.getUser();
-      //   if (userData && userData.tokens) {
-      //     const firestoreTokens = userData.tokens.current;
-      //     console.log('TokenService: Got tokens from Firestore:', firestoreTokens);
-      //
-      //     // Redux와 로컬 스토리지에 저장
-      //     store.dispatch(setTokens(firestoreTokens));
-      //     // subscriptionPlan 필드를 우선 사용, 없으면 subscription.plan 사용
-      //     const plan = userData.subscriptionPlan || userData.subscription?.plan || 'free';
-      //     store.dispatch(setSubscriptionPlan(plan));
-      //
-      //     // 로컬 스토리지에도 저장 (백업)
-      //     await AsyncStorage.setItem(this.TOKEN_KEY, JSON.stringify({
-      //       current: firestoreTokens,
-      //       total: firestoreTokens,
-      //       lastUpdated: new Date().toISOString(),
-      //     }));
-      //
-      //     await AsyncStorage.setItem(this.SUBSCRIPTION_KEY, JSON.stringify({
-      //       ...this.getDefaultSubscription(),
-      //       subscriptionPlan: plan,
-      //       dailyTokens: firestoreTokens,
-      //     }));
-      //
-      //     return;
-      //   } else {
-      //     // Firestore에 데이터가 없으면 초기 사용자로 생성
-      //     console.log('TokenService: Creating new user in Firestore');
-      //     await firestoreService.createOrUpdateUser({
-      //       tokens: {
-      //         current: 10,
-      //         total: 0,
-      //         lastUpdated: new Date().toISOString(),
-      //       },
-      //     });
-      //     store.dispatch(setTokens(10));
-      //   }
-      // } else {
-      // 3. Firebase 비활성화 상태에서는 항상 로컬 스토리지 확인
-      console.log("TokenService: No user logged in, checking local storage");
-      const savedTokens = await AsyncStorage.getItem(this.TOKEN_KEY);
-
-      if (savedTokens) {
-        const tokenData = JSON.parse(savedTokens);
-        const tokens = tokenData.current || 10;
-        console.log("TokenService: Found tokens in local storage:", tokens);
-
-        store.dispatch(setTokens(tokens));
+      
+      // 2. 로그인된 사용자가 있으면 Firestore에서 데이터 가져오기
+      const currentUser = auth().currentUser;
+      if (currentUser) {
+        console.log('TokenService: Fetching from Firestore for user:', currentUser.uid);
+        
+        // Firestore에서 사용자 데이터 가져오기
+        const userData = await firestoreService.getUser();
+        if (userData && userData.tokens) {
+          const firestoreTokens = userData.tokens.current;
+          console.log('TokenService: Got tokens from Firestore:', firestoreTokens);
+          
+          // Redux와 로컬 스토리지에 저장
+          store.dispatch(setTokens(firestoreTokens));
+          // subscriptionPlan 필드를 우선 사용, 없으면 subscription.plan 사용
+          const plan = userData.subscriptionPlan || userData.subscription?.plan || 'free';
+          store.dispatch(setSubscriptionPlan(plan));
+          
+          // 로컬 스토리지에도 저장 (백업)
+          await AsyncStorage.setItem(this.TOKEN_KEY, JSON.stringify({
+            current: firestoreTokens,
+            total: firestoreTokens,
+            lastUpdated: new Date().toISOString(),
+          }));
+          
+          await AsyncStorage.setItem(this.SUBSCRIPTION_KEY, JSON.stringify({
+            ...this.getDefaultSubscription(),
+            subscriptionPlan: plan,
+            dailyTokens: firestoreTokens,
+          }));
+          
+          return;
+        } else {
+          // Firestore에 데이터가 없으면 초기 사용자로 생성
+          console.log('TokenService: Creating new user in Firestore');
+          await firestoreService.createOrUpdateUser({
+            tokens: {
+              current: 10,
+              total: 0,
+              lastUpdated: new Date().toISOString(),
+            },
+          });
+          store.dispatch(setTokens(10));
+        }
       } else {
-        // 아무 데이터도 없으면 기본값
-        console.log("TokenService: No data found, using defaults");
-        await this.resetToDefault();
+        // 3. 로그인하지 않은 상태면 로컬 스토리지 확인
+        console.log('TokenService: No user logged in, checking local storage');
+        const savedTokens = await AsyncStorage.getItem(this.TOKEN_KEY);
+        
+        if (savedTokens) {
+          const tokenData = JSON.parse(savedTokens);
+          const tokens = tokenData.current || 10;
+          console.log('TokenService: Found tokens in local storage:', tokens);
+          
+          store.dispatch(setTokens(tokens));
+        } else {
+          // 아무 데이터도 없으면 기본값
+          console.log('TokenService: No data found, using defaults');
+          await this.resetToDefault();
+        }
       }
-      // }
-
+      
       // 일일 리셋 체크
       const subscription = await this.getSubscription();
       await this.checkDailyReset(subscription);
-
-      // 월간 리셋 체크 (스타터/프리미엄 플랜)
-      await this.checkMonthlyReset();
+      
+      // 월간 리셋 체크 (STARTER, PREMIUM 플랜)
+      const subscriptionPlan = store.getState().user.subscriptionPlan;
+      if (subscriptionPlan === 'starter' || subscriptionPlan === 'premium') {
+        store.dispatch(resetMonthlyTokens());
+      }
+      
     } catch (error) {
-      console.error("TokenService: Initialization error:", error);
+      console.error('TokenService: Initialization error:', error);
       // 에러 발생 시 현재 Redux 상태 유지
       const currentTokens = store.getState().user.tokens?.current;
       if (currentTokens === undefined || currentTokens === null) {
@@ -146,46 +143,38 @@ class TokenService {
       // Redux 상태를 우선적으로 확인
       const state = store.getState().user;
       const reduxTokens = state.currentTokens;
-      const reduxPlan = state.subscriptionPlan || "free";
-
+      const reduxPlan = state.subscriptionPlan || 'free';
+      
       if (reduxTokens !== undefined) {
         return {
           dailyTokens: state.freeTokens || 10,
           purchasedTokens: state.purchasedTokens || 0,
           lastResetDate: state.lastTokenResetDate || new Date().toISOString(),
           tokensUsedToday: 0,
-          subscriptionPlan: reduxPlan as "free" | "premium" | "pro",
-          monthlyTokensRemaining: reduxPlan === "premium" ? 100 : 0,
+          subscriptionPlan: reduxPlan as 'free' | 'premium' | 'pro',
+          monthlyTokensRemaining: reduxPlan === 'premium' ? 100 : 0,
           tokenHistory: [],
         };
       }
-
+      
       // Redux에 없으면 로컬 스토리지 확인
       const data = await AsyncStorage.getItem(this.SUBSCRIPTION_KEY);
       if (data) {
         const parsed = JSON.parse(data);
         // 필수 필드 검증
         if (!parsed.subscriptionPlan) {
-          parsed.subscriptionPlan = "free";
+          parsed.subscriptionPlan = 'free';
         }
         // NaN 방지
-        parsed.dailyTokens = isNaN(parsed.dailyTokens)
-          ? 10
-          : parsed.dailyTokens;
-        parsed.purchasedTokens = isNaN(parsed.purchasedTokens)
-          ? 0
-          : parsed.purchasedTokens;
-        parsed.monthlyTokensRemaining = isNaN(parsed.monthlyTokensRemaining)
-          ? 0
-          : parsed.monthlyTokensRemaining;
-        parsed.tokensUsedToday = isNaN(parsed.tokensUsedToday)
-          ? 0
-          : parsed.tokensUsedToday;
-
+        parsed.dailyTokens = isNaN(parsed.dailyTokens) ? 10 : parsed.dailyTokens;
+        parsed.purchasedTokens = isNaN(parsed.purchasedTokens) ? 0 : parsed.purchasedTokens;
+        parsed.monthlyTokensRemaining = isNaN(parsed.monthlyTokensRemaining) ? 0 : parsed.monthlyTokensRemaining;
+        parsed.tokensUsedToday = isNaN(parsed.tokensUsedToday) ? 0 : parsed.tokensUsedToday;
+        
         return parsed;
       }
     } catch (error) {
-      console.error("Failed to get subscription:", error);
+      console.error('Failed to get subscription:', error);
     }
 
     // 기본값 반환
@@ -199,39 +188,36 @@ class TokenService {
     try {
       // Redux에서 현재 토큰 수 확인
       const currentTokens = store.getState().user.currentTokens || 0;
-      const subscriptionPlan = store.getState().user.subscriptionPlan || "free";
-
+      const subscriptionPlan = store.getState().user.subscriptionPlan || 'free';
+      
       // 무제한 체크
-      if (subscriptionPlan === "pro") {
+      if (subscriptionPlan === 'pro') {
         await this.recordUsage(amount, action);
         return true;
       }
-
+      
       // 토큰 부족 체크
       if (currentTokens < amount) {
         return false;
       }
-
+      
       // Redux 상태 업데이트 (이것이 Firestore로 자동 동기화됨)
       store.dispatch(useTokensAction(amount));
-
+      
       // 로컬 스토리지에도 저장
       const newTokenCount = currentTokens - amount;
-      await AsyncStorage.setItem(
-        this.TOKEN_KEY,
-        JSON.stringify({
-          current: newTokenCount,
-          total: newTokenCount,
-          lastUpdated: new Date().toISOString(),
-        })
-      );
-
+      await AsyncStorage.setItem(this.TOKEN_KEY, JSON.stringify({
+        current: newTokenCount,
+        total: newTokenCount,
+        lastUpdated: new Date().toISOString(),
+      }));
+      
       // 사용 기록
       await this.recordUsage(amount, action);
-
+      
       return true;
     } catch (error) {
-      console.error("Failed to use tokens:", error);
+      console.error('Failed to use tokens:', error);
       return false;
     }
   }
@@ -242,50 +228,43 @@ class TokenService {
   async addPurchasedTokens(amount: number): Promise<void> {
     try {
       // Redux 상태 업데이트 (이것이 Firestore로 자동 동기화됨)
-      store.dispatch(
-        purchaseTokens({
-          amount,
-          price: 0, // 가격 정보는 별도로 처리
-        })
-      );
-
+      store.dispatch(purchaseTokens({
+        amount,
+        price: 0, // 가격 정보는 별도로 처리
+      }));
+      
       // 로컬 스토리지에도 저장
       const currentState = store.getState().user;
       const newTokenCount = currentState.currentTokens;
-      await AsyncStorage.setItem(
-        this.TOKEN_KEY,
-        JSON.stringify({
-          current: newTokenCount,
-          total: newTokenCount,
-          lastUpdated: new Date().toISOString(),
-        })
-      );
-
+      await AsyncStorage.setItem(this.TOKEN_KEY, JSON.stringify({
+        current: newTokenCount,
+        total: newTokenCount,
+        lastUpdated: new Date().toISOString(),
+      }));
+      
       // 구독 정보도 업데이트
       const subscription = await this.getSubscription();
       subscription.purchasedTokens = currentState.purchasedTokens;
       await this.saveSubscription(subscription);
     } catch (error) {
-      console.error("Failed to add purchased tokens:", error);
+      console.error('Failed to add purchased tokens:', error);
     }
   }
 
   /**
    * 구독 업그레이드
    */
-  async upgradeSubscription(
-    plan: "starter" | "premium" | "pro"
-  ): Promise<void> {
+  async upgradeSubscription(plan: 'starter' | 'premium' | 'pro'): Promise<void> {
     try {
       // Redux 상태 업데이트
       store.dispatch(updateSubscription({ plan }));
-
+      
       // 월간 토큰 리셋 (새로운 플랜으로 변경 시)
-      if (plan === "starter" || plan === "premium") {
+      if (plan === 'starter' || plan === 'premium') {
         store.dispatch(resetMonthlyTokens());
       }
     } catch (error) {
-      console.error("Failed to upgrade subscription:", error);
+      console.error('Failed to upgrade subscription:', error);
     }
   }
 
@@ -295,106 +274,47 @@ class TokenService {
   async earnTokensFromAd(amount: number): Promise<void> {
     try {
       // Redux 상태 업데이트 (이것이 Firestore로 자동 동기화됨)
-      store.dispatch(
-        earnTokens({
-          amount,
-          description: "광고 시청 리워드",
-        })
-      );
-
+      store.dispatch(earnTokens({
+        amount,
+        description: '광고 시청 리워드',
+      }));
+      
       // 로컬 스토리지에도 저장
       const currentState = store.getState().user;
       const newTokenCount = currentState.currentTokens;
-      await AsyncStorage.setItem(
-        this.TOKEN_KEY,
-        JSON.stringify({
-          current: newTokenCount,
-          total: newTokenCount,
-          lastUpdated: new Date().toISOString(),
-        })
-      );
+      await AsyncStorage.setItem(this.TOKEN_KEY, JSON.stringify({
+        current: newTokenCount,
+        total: newTokenCount,
+        lastUpdated: new Date().toISOString(),
+      }));
     } catch (error) {
-      console.error("Failed to earn tokens from ad:", error);
+      console.error('Failed to earn tokens from ad:', error);
     }
   }
 
   /**
    * 일일 리셋 체크
-   * - 토큰이 0개일 때만 10개 충전 (구매 여부와 관계없이)
+   * - 무료 플랜: 매일 10개로 리셋
+   * - 유료 플랜: 일일 보너스 토큰 추가
    */
   private async checkDailyReset(subscription: UserTokenData): Promise<void> {
     const now = new Date();
     const lastReset = new Date(subscription.lastResetDate);
-
-    // 날짜가 다르면 리셋
+    
+    // 날짜가 다르면 리셋 (모든 플랜에서 적용)
     if (now.toDateString() !== lastReset.toDateString()) {
-      console.log(
-        "[TokenService] Daily reset triggered for",
-        subscription.subscriptionPlan
-      );
-
-      const currentTokens = store.getState().user.currentTokens || 0;
-      
-      // 토큰이 0개일 때만 10개 충전 (구매 여부와 관계없이)
-      if (currentTokens === 0) {
-        console.log("[TokenService] Adding daily 10 tokens - current tokens: 0");
-        store.dispatch(earnTokens({ amount: 10, description: "일일 충전" }));
-      } else {
-        console.log("[TokenService] Skipping daily reset - current tokens:", currentTokens);
-      }
+      // Redux에서 일일 토큰 리셋
+      console.log('[TokenService] Daily reset triggered for', subscription.subscriptionPlan);
+      store.dispatch(resetDailyTokens());
     }
   }
 
   /**
-   * 월간 리셋 체크 (스타터/프리미엄 플랜)
-   * - 매월 가입 시 제공했던 토큰을 재충전
+   * 월간 리셋 체크 (Premium 플랜)
    */
   async checkMonthlyReset(): Promise<void> {
-    const subscriptionPlan = store.getState().user.subscriptionPlan;
-    
-    if (subscriptionPlan === "starter" || subscriptionPlan === "premium") {
-      try {
-        // 마지막 월간 리셋 날짜 확인
-        const lastMonthlyResetKey = `LAST_MONTHLY_RESET_${subscriptionPlan}`;
-        const lastResetDate = await AsyncStorage.getItem(lastMonthlyResetKey);
-        
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
-        
-        let shouldReset = false;
-        
-        if (!lastResetDate) {
-          // 첫 번째 월간 리셋
-          shouldReset = true;
-        } else {
-          const lastReset = new Date(lastResetDate);
-          const lastMonth = lastReset.getMonth();
-          const lastYear = lastReset.getFullYear();
-          
-          // 월이 바뀌었거나 년도가 바뀌었으면 리셋
-          shouldReset = (currentYear > lastYear) || (currentYear === lastYear && currentMonth > lastMonth);
-        }
-        
-        if (shouldReset) {
-          // 매월 가입 시 제공했던 토큰 재충전
-          const { SUBSCRIPTION_PLANS } = await import("../../utils/adConfig");
-          const planConfig = SUBSCRIPTION_PLANS[subscriptionPlan];
-          const initialTokens = planConfig.features.initialTokens;
-          
-          console.log(`[TokenService] Monthly refill: ${initialTokens} tokens for ${subscriptionPlan}`);
-          store.dispatch(earnTokens({ 
-            amount: initialTokens, 
-            description: "월간 재충전" 
-          }));
-          
-          // 마지막 리셋 날짜 업데이트
-          await AsyncStorage.setItem(lastMonthlyResetKey, now.toISOString());
-        }
-      } catch (error) {
-        console.error("Failed to check monthly reset:", error);
-      }
-    }
+    // Redux에서 처리하므로 액션만 호출
+    store.dispatch(resetMonthlyTokens());
   }
 
   /**
@@ -413,16 +333,16 @@ class TokenService {
       const historyKey = `${this.HISTORY_KEY}_${today}`;
       const existingHistory = await AsyncStorage.getItem(historyKey);
       const history = existingHistory ? JSON.parse(existingHistory) : [];
-
+      
       history.push(usage);
-
+      
       // 최근 100개만 유지
       if (history.length > 100) {
         history.splice(0, history.length - 100);
       }
-
+      
       await AsyncStorage.setItem(historyKey, JSON.stringify(history));
-
+      
       // 오늘 사용량 통계 업데이트
       const todayStatsKey = `stats_${today}`;
       const todayStats = await AsyncStorage.getItem(todayStatsKey);
@@ -430,7 +350,7 @@ class TokenService {
       stats.generated = (stats.generated || 0) + 1;
       await AsyncStorage.setItem(todayStatsKey, JSON.stringify(stats));
     } catch (error) {
-      console.error("Failed to record usage:", error);
+      console.error('Failed to record usage:', error);
     }
   }
 
@@ -439,7 +359,7 @@ class TokenService {
    */
   private calculateTotalTokens(subscription: UserTokenData): number {
     // Pro 플랜은 무제한
-    if (subscription.subscriptionPlan === "pro") {
+    if (subscription.subscriptionPlan === 'pro') {
       return 999;
     }
 
@@ -447,13 +367,10 @@ class TokenService {
     const purchased = subscription.purchasedTokens || 0;
     const daily = subscription.dailyTokens || 0;
     let total = purchased + daily;
-
+    
     // Premium 플랜은 월간 토큰 추가
-    if (
-      subscription.subscriptionPlan === "premium" &&
-      subscription.monthlyTokensRemaining
-    ) {
-      total += subscription.monthlyTokensRemaining || 0;
+    if (subscription.subscriptionPlan === 'premium' && subscription.monthlyTokensRemaining) {
+      total += (subscription.monthlyTokensRemaining || 0);
     }
 
     // NaN 체크
@@ -464,10 +381,7 @@ class TokenService {
    * 구독 정보 저장
    */
   private async saveSubscription(subscription: UserTokenData): Promise<void> {
-    await AsyncStorage.setItem(
-      this.SUBSCRIPTION_KEY,
-      JSON.stringify(subscription)
-    );
+    await AsyncStorage.setItem(this.SUBSCRIPTION_KEY, JSON.stringify(subscription));
   }
 
   /**
@@ -479,7 +393,7 @@ class TokenService {
       purchasedTokens: 0,
       lastResetDate: new Date().toISOString(),
       tokensUsedToday: 0,
-      subscriptionPlan: "free",
+      subscriptionPlan: 'free',
       monthlyTokensRemaining: 0,
       tokenHistory: [],
     };
@@ -491,19 +405,16 @@ class TokenService {
   private async resetToDefault(): Promise<void> {
     const defaultSub = this.getDefaultSubscription();
     await this.saveSubscription(defaultSub);
-
+    
     // 로컬 스토리지에 토큰 정보 저장
-    await AsyncStorage.setItem(
-      this.TOKEN_KEY,
-      JSON.stringify({
-        current: 10,
-        total: 10,
-        lastUpdated: new Date().toISOString(),
-      })
-    );
-
+    await AsyncStorage.setItem(this.TOKEN_KEY, JSON.stringify({
+      current: 10,
+      total: 10,
+      lastUpdated: new Date().toISOString(),
+    }));
+    
     store.dispatch(setTokens(10));
-    store.dispatch(setSubscriptionPlan("free"));
+    store.dispatch(setSubscriptionPlan('free'));
   }
 
   /**
@@ -529,7 +440,7 @@ class TokenService {
         history: history.slice(-10), // 최근 10개
       };
     } catch (error) {
-      console.error("Failed to get usage stats:", error);
+      console.error('Failed to get usage stats:', error);
       return {
         today: 0,
         week: 0,
@@ -557,28 +468,25 @@ class TokenService {
     daily: number;
     purchased: number;
     monthly?: number;
-    plan: "free" | "premium" | "pro";
+    plan: 'free' | 'premium' | 'pro';
   }> {
     // Redux에서 현재 상태 가져오기
     const state = store.getState().user;
     const currentTokens = state.currentTokens || 0;
-    const subscriptionPlan = state.subscriptionPlan || "free";
-
+    const subscriptionPlan = state.subscriptionPlan || 'free';
+    
     // 로컬 스토리지에서 추가 정보 가져오기 (필요한 경우)
     const subscription = await this.getSubscription();
-
+    
     return {
       current: currentTokens,
       total: currentTokens, // 호환성을 위해 유지
       daily: state.freeTokens || subscription.dailyTokens || 0,
       purchased: state.purchasedTokens || subscription.purchasedTokens || 0,
       monthly: subscription.monthlyTokensRemaining,
-      plan: subscriptionPlan as "free" | "premium" | "pro",
+      plan: subscriptionPlan as 'free' | 'premium' | 'pro',
     };
   }
 }
 
-const tokenService = new TokenService();
-
-export default tokenService;
-export { tokenService };
+export default new TokenService();
