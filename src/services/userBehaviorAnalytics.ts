@@ -471,10 +471,9 @@ class UserBehaviorAnalytics {
         recommendations.push({
           id: "time-based-" + currentHour,
           type: "dynamic",
-          title: "지금이 글쓰기 타임!",
-          content:
-            "평소 이 시간에 자주 글을 쓰시는군요!\n오늘도 멋진 포스팅 어떠세요?",
-          actionText: "지금 써보기",
+          titleKey: "recommendations.writingTime.title",
+          contentKey: "recommendations.writingTime.content",
+          actionTextKey: "recommendations.writingTime.action",
           actionPayload: {
             prompt: `${currentHour}시의 나만의 이야기`,
             category: "personal",

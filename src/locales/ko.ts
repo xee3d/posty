@@ -79,6 +79,7 @@ const ko = {
       platformChangeNotice: "플랫폼 변경은 토큰을 사용하지 않아요",
       originalContent: "생성된 원본",
       emojiOn: "이모지ON",
+      emojiOff: "이모지OFF",
       bodyText: "본문",
       platformHint: "아래 플랫폼 탭을 눌러 각 SNS에 맞게 변환해보세요",
     },
@@ -1360,6 +1361,12 @@ const ko = {
       badge: "🏆 달성",
       action: "경험 공유",
       meta: "글쓰기 꾸준함",
+    },
+    // 글쓰기 타임
+    writingTime: {
+      title: "지금이 글쓰기 타임!",
+      content: "평소 이 시간에 자주 글을 쓰시는군요!\n오늘도 멋진 포스팅 어떠세요?",
+      action: "지금 써보기",
     },
     // 최근 사진들
     recentPhotos: {

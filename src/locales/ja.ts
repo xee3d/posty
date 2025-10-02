@@ -322,6 +322,7 @@ const ja = {
       platformChangeNotice: "プラットフォーム変更はトークンを使用しません",
       originalContent: "生成されたオリジナル",
       emojiOn: "絵文字ON",
+      emojiOff: "絵文字OFF",
       bodyText: "本文",
       platformHint: "下のプラットフォームタブをタップして各SNSに合わせて変換してください",
     },
@@ -1610,6 +1611,12 @@ const ja = {
       badge: "🏆 10個達成",
       action: "振り返りを書く",
       meta: "祝福"
+    },
+    // ライティングタイム
+    writingTime: {
+      title: "今がライティングタイム！",
+      content: "普段この時間によく書いていますね！\n今日も素敵な投稿いかがですか？",
+      action: "今書いてみる",
     },
     recentPhotos: {
       title: "ギャラリーの隠れた写真たち",

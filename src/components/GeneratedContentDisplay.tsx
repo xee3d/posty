@@ -18,6 +18,7 @@ import Clipboard from "@react-native-clipboard/clipboard";
 // import { optimizeForPlatform, getPlatformTips } from '../utils/platformOptimizer'; // 제거 - API에서만 처리
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
+import { useTranslation } from "react-i18next";
 import { ScaleButton } from "./AnimationComponents";
 import { launchSNSApp } from "../utils/snsLauncher";
 import { enhancedSNSLaunch } from "../utils/enhancedSNSLauncher";
@@ -541,7 +542,7 @@ export const GeneratedContentDisplay: React.FC<GeneratedContentProps> = ({
                     : styles.emojiToggleTextInactive,
                 ]}
               >
-                {showEmojis ? t("aiWrite.contentDisplay.emojiOn") : "이모지OFF"}
+                {showEmojis ? t("aiWrite.contentDisplay.emojiOn") : t("aiWrite.contentDisplay.emojiOff")}
               </Text>
             </TouchableOpacity>
             <Text style={styles.contentLengthText}>

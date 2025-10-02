@@ -92,6 +92,7 @@ const en = {
       platformChangeNotice: "Platform changes don't use tokens",
       originalContent: "Generated Original",
       emojiOn: "Emoji ON",
+      emojiOff: "Emoji OFF",
       bodyText: "Body",
       platformHint: "Tap the platform tabs below to convert for each SNS",
     },
@@ -1553,6 +1554,12 @@ const en = {
       badge: "🏆 Achievement",
       action: "Share Experience",
       meta: "Consistency",
+    },
+    // Writing time
+    writingTime: {
+      title: "It's Writing Time!",
+      content: "You often write at this time!\nHow about a great post today?",
+      action: "Write Now",
     },
     // Recent photos
     recentPhotos: {

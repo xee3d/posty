@@ -449,6 +449,7 @@ const zhCN = {
       platformChangeNotice: "平台转换不使用令牌",
       originalContent: "生成的原文",
       emojiOn: "表情ON",
+      emojiOff: "表情OFF",
       bodyText: "正文",
       platformHint: "点击下方平台标签转换为适合各SNS的格式",
     },
@@ -1617,6 +1618,12 @@ const zhCN = {
       badge: "🏆 10篇达成",
       action: "写回顾",
       meta: "恭喜您！"
+    },
+    // 写作时间
+    writingTime: {
+      title: "现在是写作时间！",
+      content: "你经常在这个时间写作！\n今天也来写一篇精彩的内容吧？",
+      action: "现在写",
     },
     recentPhotos: {
       title: "相册里的隐藏照片",
