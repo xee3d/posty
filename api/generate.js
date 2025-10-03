@@ -91,10 +91,32 @@ ${includeEmojis ? "적절한 이모지를 포함해주세요." : "이모지는 �
 길이: ${length} (${finalMaxTokens}토큰 이내)
 언어: ${language}`;
 
-    const messages = [
-      { role: "system", content: systemMessage },
-      { role: "user", content: prompt },
-    ];
+    // 이미지 분석을 위한 메시지 구성
+    let messages;
+    if (image) {
+      // 이미지가 있는 경우 Vision API 형식
+      messages = [
+        { role: "system", content: systemMessage },
+        {
+          role: "user",
+          content: [
+            { type: "text", text: prompt },
+            {
+              type: "image_url",
+              image_url: {
+                url: `data:image/jpeg;base64,${image}`
+              }
+            }
+          ]
+        }
+      ];
+    } else {
+      // 텍스트만 있는 경우
+      messages = [
+        { role: "system", content: systemMessage },
+        { role: "user", content: prompt },
+      ];
+    }
 
     // AI 모델에 따른 API 호출 분기
     let responseContent;
