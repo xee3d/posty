@@ -136,7 +136,8 @@
       "Bash(/Users/ethan_macstudio/Library/Android/sdk/platform-tools/adb install -r app/build/outputs/apk/release/app-release.apk)",
       "Bash(/Users/ethan_macstudio/Library/Android/sdk/platform-tools/adb install -r android/app/build/outputs/apk/release/app-release.apk)",
       "Bash(/Users/ethan_macstudio/Library/Android/sdk/platform-tools/adb install -r ./app/build/outputs/apk/release/app-release.apk)",
-      "Bash(JAVA_HOME=/opt/homebrew/opt/openjdk@17 ANDROID_HOME=/Users/ethan_macstudio/Library/Android/sdk PATH=/opt/homebrew/opt/openjdk@17/bin:/Users/ethan_macstudio/Library/Android/sdk/platform-tools:$PATH ./gradlew bundleRelease)"
+      "Bash(JAVA_HOME=/opt/homebrew/opt/openjdk@17 ANDROID_HOME=/Users/ethan_macstudio/Library/Android/sdk PATH=/opt/homebrew/opt/openjdk@17/bin:/Users/ethan_macstudio/Library/Android/sdk/platform-tools:$PATH ./gradlew bundleRelease)",
+      "Bash(git log:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

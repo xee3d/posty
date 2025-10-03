@@ -1697,16 +1697,23 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               : colors.text.secondary
                           }
                         />
-                        <Text
-                          style={[
-                            styles.toneLabel,
-                            isSelected && styles.toneLabelActive,
-                            isSelected && { color: tone.color },
-                            isLocked && styles.lockedItemText,
-                          ]}
-                        >
-                          {tone.label}
-                        </Text>
+                        <View style={styles.toneLabelContainer}>
+                          <Text
+                            style={[
+                              styles.toneLabel,
+                              isSelected && styles.toneLabelActive,
+                              isSelected && { color: tone.color },
+                              isLocked && styles.lockedItemText,
+                            ]}
+                          >
+                            {tone.label}
+                          </Text>
+                          {!isLocked && adWatchedTones.has(tone.id) && !canAccessTone(userPlan, tone.id) && (
+                            <View style={styles.oneTimeUseBadge}>
+                              <Text style={styles.oneTimeUseText}>1회</Text>
+                            </View>
+                          )}
+                        </View>
                         {isLocked && (
                           <View style={styles.lockIcon}>
                             <SafeIcon
@@ -1714,11 +1721,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                               size={16}
                               color={colors.text.tertiary}
                             />
-                          </View>
-                        )}
-                        {!isLocked && adWatchedTones.has(tone.id) && !canAccessTone(userPlan, tone.id) && (
-                          <View style={styles.oneTimeUseBadge}>
-                            <Text style={styles.oneTimeUseText}>1회 사용</Text>
                           </View>
                         )}
                       </TouchableOpacity>
@@ -2550,26 +2552,20 @@ const createStyles = (
       shadowRadius: 4,
       elevation: 3,
     },
-    oneTimeUseBadge: {
-      position: "absolute",
-      bottom: -8,
-      left: 0,
-      right: 0,
+    toneLabelContainer: {
+      flexDirection: "row",
       alignItems: "center",
+      gap: 4,
+    },
+    oneTimeUseBadge: {
       backgroundColor: "#10B981",
-      borderRadius: 12,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      marginHorizontal: 8,
-      shadowColor: "#10B981",
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.3,
-      shadowRadius: 4,
-      elevation: 4,
+      borderRadius: 8,
+      paddingHorizontal: 6,
+      paddingVertical: 2,
     },
     oneTimeUseText: {
       color: "#FFFFFF",
-      fontSize: 10,
+      fontSize: 9,
       fontWeight: "700",
     },
     lockIcon: {
