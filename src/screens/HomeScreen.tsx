@@ -922,7 +922,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                   ))}
                 </>
               ) : recommendations.length > 0 ? (
-                recommendations.map((card, index) => (
+                recommendations
+                  .filter(card => card && card.title && card.content) // 빈 카드 필터링
+                  .map((card, index) => (
                   <AnimatedCard
                     key={card.id}
                     delay={700 + index * 50}
@@ -966,7 +968,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                           </View>
                         </View>
                         <Text style={styles.recommendTitle} numberOfLines={1} ellipsizeMode="tail">
-                          {card.titleKey ? t(card.titleKey) : (card.title || "추천 제목")}
+                          {card.titleKey ? t(card.titleKey) : card.title}
                         </Text>
                         <Text 
                           style={styles.recommendContent} 
@@ -975,7 +977,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
                           textBreakStrategy="balanced"
                           allowFontScaling={false}
                         >
-                          {card.contentKey ? t(card.contentKey) : (card.content || "추천 내용")}
+                          {card.contentKey ? t(card.contentKey) : card.content}
                         </Text>
                       </View>
                     </TouchableOpacity>

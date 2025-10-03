@@ -539,6 +539,12 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
                   {t("tokenShop.subscription.pro.features.aiAgents")}
                 </Text>
               </View>
+              <View style={styles.featureItem}>
+                <SuccessIcon />
+                <Text style={[styles.featureText, { color: colors.surface }]}>
+                  {t("tokenShop.subscription.pro.features.allStyles")}
+                </Text>
+              </View>
             </View>
             
             <TouchableOpacity 

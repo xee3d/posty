@@ -2317,7 +2317,8 @@ const zhCN = {
         features: {
           unlimitedTokens: "无限代币",
           noAds: "移除所有广告",
-          aiAgents: "Gemini 2.5 / GPT-4o 代理"
+          aiAgents: "Gemini 2.5 / GPT-4o 代理",
+          allStyles: "所有写作风格可用"
         }
       },
       subscribe: "订阅",

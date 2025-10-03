@@ -2250,7 +2250,8 @@ const ja = {
         features: {
           unlimitedTokens: "無制限トークン",
           noAds: "すべての広告を削除",
-          aiAgents: "Gemini 2.5 / GPT-4o エージェント"
+          aiAgents: "Gemini 2.5 / GPT-4o エージェント",
+          allStyles: "すべてのライティングスタイル利用可能"
         }
       },
       subscribe: "購読する",

@@ -2543,7 +2543,8 @@ Personal Information Inquiry: getposty@gmail.com`
         features: {
           unlimitedTokens: "Unlimited Tokens",
           noAds: "Remove All Ads",
-          aiAgents: "Gemini 2.5 / GPT-4o Agents"
+          aiAgents: "Gemini 2.5 / GPT-4o Agents",
+          allStyles: "All Writing Styles Available"
         }
       },
       subscribe: "Subscribe",

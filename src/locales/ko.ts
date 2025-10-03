@@ -2223,7 +2223,8 @@ const ko = {
         features: {
           unlimitedTokens: "무한 토큰",
           noAds: "모든 광고 제거",
-          aiAgents: "Gemini 2.5 / GPT-4o 에이전트"
+          aiAgents: "Gemini 2.5 / GPT-4o 에이전트",
+          allStyles: "모든 스타일 사용 가능"
         }
       },
       subscribe: "구독하기",

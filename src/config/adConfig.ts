@@ -9,7 +9,7 @@ export const PLAN_FEATURES = {
     monthlyTokens: 0,
     initialTokens: 0, // 초기 지급 토큰
     dailyBonus: 0, // 일일 추가 토큰
-    tones: ['casual', 'professional', 'humorous', 'emotional', 'genz', 'millennial', 'minimalist', 'storytelling', 'motivational'], // 모든 톤 사용 가능
+    tones: ['casual', 'professional', 'humorous', 'emotional', 'genz', 'millennial', 'storytelling'], // 기본 톤만 사용 가능
     lengths: ['short', 'medium', 'long', 'extra'], // 모든 길이 사용 가능
     hasAds: true,
     imageAnalysisTokens: 2,
@@ -19,7 +19,7 @@ export const PLAN_FEATURES = {
     monthlyTokens: -1, // 무제한
     initialTokens: 9999, // 무제한
     dailyBonus: 0, // 추가 충전 불필요
-    tones: ['casual', 'professional', 'humorous', 'emotional', 'genz', 'millennial', 'minimalist', 'storytelling', 'motivational'],
+    tones: ['casual', 'professional', 'humorous', 'emotional', 'genz', 'millennial', 'minimalist', 'storytelling', 'motivational'], // 모든 톤 사용 가능
     lengths: ['short', 'medium', 'long', 'extra'],
     hasAds: false,
     imageAnalysisTokens: 1,

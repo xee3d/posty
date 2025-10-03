@@ -860,7 +860,16 @@ class PersonalizedRecommendationService {
       return b.priority - a.priority;
     });
 
-    return recommendations.slice(0, 6); // 6개로 변경
+    // 빈 카드 필터링
+    const validRecommendations = recommendations.filter(card => 
+      card && 
+      card.title && 
+      card.content && 
+      card.title.trim() !== '' && 
+      card.content.trim() !== ''
+    );
+    
+    return validRecommendations.slice(0, 6); // 6개로 변경
   }
 
   // 조건 확인
