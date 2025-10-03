@@ -11,6 +11,7 @@ import {
   Image,
   ActivityIndicator,
   Platform,
+  InteractionManager,
 } from "react-native";
 import {
   COLORS,
@@ -489,18 +490,94 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     setShowStyleGuide(false);
   };
 
-  // 광고 시청 후 프리미엄 스타일 일회성 액세스 처리 (더 이상 필요 없음)
+  // 광고 시청 후 프리미엄 스타일 1회 해제
   const handleWatchAdForTone = async (toneId: string) => {
-    // 모든 톤이 프리버전에서 사용 가능하므로 더 이상 필요 없음
+    try {
+      console.log('광고 시청으로 스타일 잠금 해제:', toneId);
+
+      // 1. 광고 로드
+      const loaded = await rewardAdService.loadAd();
+      if (!loaded) {
+        soundManager.playError();
+        Alert.alert('광고 로드 실패', '잠시 후 다시 시도해주세요.');
+        return;
+      }
+
+      // 2. 광고 표시
+      const adResult = await rewardAdService.showAd();
+
+      console.log('광고 표시 결과:', adResult);
+
+      // 3. 광고 표시 성공 확인
+      if (adResult?.success) {
+        // 광고 시청 성공 - 스타일 1회 사용 가능하도록 설정
+        console.log('스타일 활성화 중:', toneId);
+        setAdWatchedTones(prev => {
+          const newSet = new Set(prev);
+          newSet.add(toneId);
+          console.log('업데이트된 adWatchedTones:', Array.from(newSet));
+          return newSet;
+        });
+
+        const style = getStyleById(toneId);
+        const styleName = style?.label || toneId;
+
+        // InteractionManager를 사용하여 모든 상호작용 완료 후 UI 업데이트
+        InteractionManager.runAfterInteractions(() => {
+          soundManager.playSuccess();
+          Alert.alert(
+            '잠금 해제 성공! 🎉',
+            `${styleName} 스타일을 1회 사용할 수 있어요!`,
+            [{
+              text: '확인',
+              onPress: () => {
+                // 스타일 자동 선택
+                setSelectedTone(toneId);
+              }
+            }]
+          );
+        });
+      } else {
+        console.log('광고 표시 실패 또는 보상 미수령:', adResult);
+
+        InteractionManager.runAfterInteractions(() => {
+          soundManager.playError();
+          Alert.alert(
+            '광고 시청 미완료',
+            '광고를 끝까지 시청해야 스타일을 잠금 해제할 수 있어요.',
+            [{ text: '확인' }]
+          );
+        });
+      }
+    } catch (error) {
+      console.error('광고 시청 실패:', error);
+
+      InteractionManager.runAfterInteractions(() => {
+        soundManager.playError();
+        Alert.alert(
+          '오류',
+          '광고 시청 중 문제가 발생했습니다.\n잠시 후 다시 시도해주세요.',
+          [{ text: '확인' }]
+        );
+      });
+    }
   };
 
-  // 모든 톤과 길이는 프리버전에서 사용 가능
+  // 광고로 톤 사용 가능 여부 확인
   const canAccessToneWithAd = (toneId: string): boolean => {
-    return true; // 모든 톤 사용 가능
+    // PRO 사용자는 모든 톤 사용 가능
+    if (canAccessTone(userPlan, toneId)) {
+      return true;
+    }
+    // 광고로 해제된 톤인지 확인
+    return adWatchedTones.has(toneId);
   };
 
   const canAccessLengthWithAd = (lengthId: string): boolean => {
-    return true; // 모든 길이 사용 가능
+    if (canAccessLength(userPlan, lengthId)) {
+      return true;
+    }
+    return adWatchedLengths.has(lengthId);
   };
 
   // 광고 시청 후 프리미엄 길이 일회성 액세스 처리 (더 이상 필요 없음)
@@ -1585,38 +1662,22 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           isLocked && styles.lockedItem,
                         ]}
                         onPress={() => {
-                          if (isLocked) {
-                            // 프리미엄 톤 선택 시 알림
+                          if (isLocked && !adWatchedTones.has(tone.id)) {
+                            // 잠긴 스타일 - 광고 시청으로 1회 해제
                             Alert.alert(
-                              t("aiWrite.premium.title"),
-                              t("aiWrite.premium.toneMessage", { tone: tone.label }),
+                              '🔒 프로 버전 스타일',
+                              `${tone.label} 스타일은 프로 버전입니다.\n광고를 시청하면 1회 사용할 수 있어요!`,
                               [
                                 {
-                                  text: t("aiWrite.premium.watchAd"),
-                                  onPress: async () => {
-                                    try {
-                                      const result = await rewardAdService.showRewardedAd();
-                                      if (result && result.success) {
-                                        // 광고 시청 성공 시 일회성 사용 허용
-                                        setSelectedTone(tone.id);
-                                        Alert.alert(
-                                          t("aiWrite.premium.unlockedTitle"),
-                                          t("aiWrite.premium.unlockedMessage", { tone: tone.label })
-                                        );
-                                      }
-                                    } catch (error) {
-                                      console.error("광고 시청 실패:", error);
-                                    }
-                                  },
+                                  text: '광고 보고 해제하기',
+                                  onPress: () => handleWatchAdForTone(tone.id),
                                 },
                                 {
-                                  text: t("aiWrite.premium.upgrade"),
-                                  onPress: () => onNavigate?.("subscription"),
+                                  text: 'Pro 구독하기',
+                                  onPress: () => onNavigate?.("subscription", { scrollToPro: true }),
                                 },
-                                { text: t("common.cancel") },
-                              ],
-                              tone.icon,
-                              tone.color
+                                { text: '취소' },
+                              ]
                             );
                           } else {
                             soundManager.playTap();
@@ -1866,6 +1927,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           onClose={() => setShowLowTokenPrompt(false)}
           onEarnTokens={handleLowToken}
           onUpgrade={handleUpgrade}
+          styleIcon={getStyleByAiTone(selectedTone)?.icon || "flash"}
+          styleColor={getStyleByAiTone(selectedTone)?.color}
         />
       )}
 

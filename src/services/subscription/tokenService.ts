@@ -26,7 +26,7 @@ export interface UserTokenData {
   purchasedTokens: number;
   lastResetDate: string;
   tokensUsedToday: number;
-  subscriptionPlan: 'free' | 'premium' | 'pro';
+  subscriptionPlan: 'free' | 'pro';
   monthlyTokensRemaining?: number;
   tokenHistory: TokenUsage[];
 }
@@ -150,8 +150,8 @@ class TokenService {
           purchasedTokens: state.purchasedTokens || 0,
           lastResetDate: state.lastTokenResetDate || new Date().toISOString(),
           tokensUsedToday: 0,
-          subscriptionPlan: reduxPlan as 'free' | 'premium' | 'pro',
-          monthlyTokensRemaining: reduxPlan === 'premium' ? 100 : 0,
+          subscriptionPlan: reduxPlan as 'free' | 'pro',
+          monthlyTokensRemaining: 0,
           tokenHistory: [],
         };
       }
@@ -253,15 +253,10 @@ class TokenService {
   /**
    * 구독 업그레이드
    */
-  async upgradeSubscription(plan: 'starter' | 'premium' | 'pro'): Promise<void> {
+  async upgradeSubscription(plan: 'free' | 'pro'): Promise<void> {
     try {
       // Redux 상태 업데이트
       store.dispatch(updateSubscription({ plan }));
-      
-      // 월간 토큰 리셋 (새로운 플랜으로 변경 시)
-      if (plan === 'starter' || plan === 'premium') {
-        store.dispatch(resetMonthlyTokens());
-      }
     } catch (error) {
       console.error('Failed to upgrade subscription:', error);
     }
@@ -467,7 +462,7 @@ class TokenService {
     daily: number;
     purchased: number;
     monthly?: number;
-    plan: 'free' | 'premium' | 'pro';
+    plan: 'free' | 'pro';
   }> {
     // Redux에서 현재 상태 가져오기
     const state = store.getState().user;
@@ -483,7 +478,7 @@ class TokenService {
       daily: state.freeTokens || subscription.dailyTokens || 0,
       purchased: state.purchasedTokens || subscription.purchasedTokens || 0,
       monthly: subscription.monthlyTokensRemaining,
-      plan: subscriptionPlan as 'free' | 'premium' | 'pro',
+      plan: subscriptionPlan as 'free' | 'pro',
     };
   }
 }

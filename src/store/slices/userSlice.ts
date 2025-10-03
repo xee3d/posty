@@ -28,7 +28,7 @@ interface UserState {
     expiresAt?: any;
     autoRenew: boolean;
   };
-  subscriptionPlan: 'free' | 'starter' | 'premium' | 'pro'; // 호환성을 위해 임시 유지
+  subscriptionPlan: 'free' | 'pro';
   subscriptionExpiresAt: string | null;
   
   // 토큰 정보
@@ -157,88 +157,20 @@ const userSlice = createSlice({
       }
     },
     
-    // 구독 정보 업데이트
+    // 구독 정보 업데이트 (FREE와 PRO만 지원)
     updateSubscription: (state, action: PayloadAction<{
-      plan: 'free' | 'starter' | 'premium' | 'pro';
+      plan: 'free' | 'pro';
       expiresAt?: string;
     }>) => {
       const previousPlan = state.subscriptionPlan;
       state.subscriptionPlan = action.payload.plan;
       state.subscriptionExpiresAt = action.payload.expiresAt || null;
-      
+
       console.log('[UserSlice] Updating subscription from', previousPlan, 'to', action.payload.plan);
-      
+
       // 구독 플랜별 토큰 처리
-      if (action.payload.plan === 'starter' && previousPlan !== 'starter') {
-        // STARTER: 초기 300개 + 일일 10개 추가
-        if (previousPlan === 'free') {
-          // 무료에서 업그레이드: 기존 토큰 + 300개 추가
-          state.freeTokens += 300;
-          state.currentTokens += 300;
-        } else if (previousPlan === 'premium' || previousPlan === 'pro') {
-          // 상위 플랜에서 다운그레이드: 기존 구매 토큰은 유지, 무료 토큰만 조정
-          state.freeTokens = Math.min(state.freeTokens, 300);
-          state.currentTokens = state.purchasedTokens + state.freeTokens;
-        }
-        state.tokens.current = state.currentTokens;
-        
-        // 히스토리 추가
-        const newHistory: TokenHistory = {
-          id: Date.now().toString(),
-          date: new Date().toISOString(),
-          type: 'earn',
-          amount: previousPlan === 'free' ? 300 : 0,
-          description: 'STARTER 플랜 가입 보너스',
-          balance: state.currentTokens,
-        };
-        if (previousPlan === 'free') {
-          state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
-        }
-        
-        console.log('[UserSlice] STARTER plan activated: tokens =', state.currentTokens);
-      } else if (action.payload.plan === 'premium' && previousPlan !== 'premium') {
-        // PREMIUM: 초기 500개 + 일일 20개 추가
-        if (previousPlan === 'free') {
-          // 무료에서 업그레이드: 기존 토큰 + 500개 추가
-          state.freeTokens += 500;
-          state.currentTokens += 500;
-        } else if (previousPlan === 'starter') {
-          // STARTER에서 업그레이드: 전액 500개 추가 (누적 방식)
-          state.freeTokens += 500;
-          state.currentTokens += 500;
-        } else if (previousPlan === 'pro') {
-          // PRO에서 다운그레이드: 기존 구매 토큰은 유지, 무료 토큰만 조정
-          state.freeTokens = Math.min(state.freeTokens, 500);
-          state.currentTokens = state.purchasedTokens + state.freeTokens;
-        }
-        state.tokens.current = state.currentTokens;
-        
-        // 히스토리 추가
-        let bonusAmount = 0;
-        let description = '';
-        if (previousPlan === 'free') {
-          bonusAmount = 500;
-          description = 'PREMIUM 플랜 가입 보너스';
-        } else if (previousPlan === 'starter') {
-          bonusAmount = 500;
-          description = 'PREMIUM 플랜 업그레이드 보너스 (전액)';
-        }
-        
-        if (bonusAmount > 0) {
-          const newHistory: TokenHistory = {
-            id: Date.now().toString(),
-            date: new Date().toISOString(),
-            type: 'earn',
-            amount: bonusAmount,
-            description: description,
-            balance: state.currentTokens,
-          };
-          state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
-        }
-        
-        console.log('[UserSlice] PREMIUM plan activated: tokens =', state.currentTokens);
-      } else if (action.payload.plan === 'pro' && previousPlan !== 'pro') {
-        // MAX (Pro): 무제한
+      if (action.payload.plan === 'pro' && previousPlan !== 'pro') {
+        // PRO: 무제한 토큰
         state.currentTokens = 9999;
         state.freeTokens = 9999;
         state.tokens.current = state.currentTokens;
@@ -251,14 +183,9 @@ const userSlice = createSlice({
         state.tokens.current = state.currentTokens;
         console.log('[UserSlice] Downgraded to FREE plan: tokens =', state.currentTokens);
       }
-      
+
       // subscription 객체는 레거시이므로 항상 free로 설정
       state.subscription.plan = 'free';
-      
-      // 월간 리셋 날짜 초기화 (새 플랜 시작 시)
-      if (action.payload.plan === 'starter' || action.payload.plan === 'premium') {
-        state.lastMonthlyResetDate = new Date().toISOString();
-      }
     },
     
     // 토큰 사용 - 최적화: 토큰 히스토리 관리 개선
@@ -505,7 +432,7 @@ export const setTokens = (tokens: number) => (dispatch: any, getState: any) => {
   }
 };
 
-export const setSubscriptionPlan = (plan: 'free' | 'starter' | 'premium' | 'pro') => (dispatch: any) => {
+export const setSubscriptionPlan = (plan: 'free' | 'pro') => (dispatch: any) => {
   dispatch(updateSubscription({ plan }));
 };
 

@@ -28,9 +28,11 @@ interface AdMetrics {
 
 class AdVerificationManager {
   private readonly MAX_DAILY_ADS = 10;
-  private readonly MIN_AD_INTERVAL = 60000; // 1분 최소 간격
+  // 개발 모드: 10초, 프로덕션: 1분
+  private readonly MIN_AD_INTERVAL = __DEV__ ? 10000 : 60000;
   private readonly MAX_AD_INTERVAL = 3600000; // 1시간 최대 간격
-  private readonly MIN_VIEW_TIME = 15000; // 최소 15초 시청
+  // 개발 모드: 5초, 프로덕션: 15초
+  private readonly MIN_VIEW_TIME = __DEV__ ? 5000 : 15000;
   private readonly SECRET_KEY = "POSTY_AD_VERIFICATION_KEY_2024";
 
   private sessionId: string = "";
@@ -133,11 +135,15 @@ class AdVerificationManager {
         };
       }
 
-      // 2. 리워드 양 검증
-      if (earnedReward !== 2) {
+      // 2. 리워드 양 검증 (개발 모드에서는 유연하게, 프로덕션에서는 엄격하게)
+      const expectedReward = __DEV__ ? 1 : 1; // 우리 앱은 항상 1 토큰
+      const maxReward = __DEV__ ? 100 : 10; // 개발 모드에서는 100까지 허용
+
+      if (earnedReward < 1 || earnedReward > maxReward) {
         await this.logSuspiciousActivity("invalid_reward_amount", {
-          expected: 2,
+          expected: expectedReward,
           received: earnedReward,
+          max: maxReward,
         });
         return {
           isValid: false,
@@ -147,6 +153,9 @@ class AdVerificationManager {
         };
       }
 
+      // 실제 지급할 토큰은 항상 1개로 고정 (AdMob 반환값과 무관)
+      const actualReward = 1;
+
       // 3. 서명 생성 및 검증
       const timestamp = Date.now();
       const deviceFingerprint =
@@ -155,7 +164,7 @@ class AdVerificationManager {
       const verificationData: AdVerificationRequest = {
         adUnitId: "rewarded_ad",
         timestamp,
-        rewardAmount: earnedReward,
+        rewardAmount: actualReward, // 실제 지급할 토큰 수
         deviceFingerprint,
         sessionId: this.sessionId,
       };
@@ -174,7 +183,7 @@ class AdVerificationManager {
 
       return {
         isValid: true,
-        reward: earnedReward,
+        reward: actualReward, // 항상 1 토큰 반환
       };
     } catch (error) {
       console.error("Ad completion verification failed:", error);

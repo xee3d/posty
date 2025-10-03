@@ -12,7 +12,7 @@ export const PLAN_FEATURES = {
     tones: ['casual', 'professional', 'humorous', 'emotional', 'genz', 'millennial'], // 기본 톤만 사용 가능
     lengths: ['short', 'medium', 'long', 'extra'], // 모든 길이 사용 가능
     hasAds: true,
-    imageAnalysisTokens: 2,
+    imageAnalysisTokens: 1,
   },
   pro: {
     dailyTokens: -1, // 무제한
@@ -148,47 +148,9 @@ export const SUBSCRIPTION_PLANS = {
     monthlyTokens: 0,
     features: [
       '일일 10개 토큰',
-      '3가지 톤 스타일',
+      '기본 톤 스타일',
       '짧은/중간 길이',
       '광고 포함',
-    ],
-  },
-  starter: {
-    id: 'starter',
-    name: 'Starter',
-    price: 1900,
-    priceDisplay: '₩1,900',
-    monthlyPrice: 1900,
-    yearlyPrice: 19000,
-    dailyTokens: -1, // 일일 제한 없음
-    monthlyTokens: 600, // 월 총 600개
-    features: [
-      '가입 시 300개 토큰 즉시 지급',
-      '매일 10개씩 추가 충전',
-      '4가지 톤 스타일',
-      '긴 글 작성 가능',
-      '광고 제거',
-      'MyStyle 분석',
-    ],
-  },
-  premium: {
-    id: 'premium',
-    name: 'Premium',
-    price: 4900,
-    priceDisplay: '₩4,900',
-    monthlyPrice: 4900,
-    yearlyPrice: 49000,
-    dailyTokens: -1, // 일일 제한 없음
-    monthlyTokens: 1100, // 월 총 1100개
-    features: [
-      '가입 시 500개 토큰 즉시 지급',
-      '매일 20개씩 추가 충전',
-      '6가지 톤 스타일',
-      '모든 글 길이',
-      '광고 제거',
-      'MyStyle 분석',
-      '빠른 이미지 분석',
-      'GPT-4 모델',
     ],
   },
   pro: {
@@ -230,20 +192,12 @@ export const TOKEN_PURCHASE_CONFIG = {
       bonusRate: 0, // 0% 보너스
       priceDiscount: 0, // 0% 할인
     },
-    starter: {
-      bonusRate: 0.1, // 10% 보너스 토큰
-      priceDiscount: 10, // 10% 할인
-    },
-    premium: {
-      bonusRate: 0.2, // 20% 보너스 토큰
-      priceDiscount: 20, // 20% 할인
-    },
     pro: {
       bonusRate: 0, // PRO는 무제한이므로 보너스 없음
       priceDiscount: 0, // PRO는 무제한이므로 할인 없음
     },
   },
-  
+
   // 프로모션
   promotions: {
     firstPurchase: {

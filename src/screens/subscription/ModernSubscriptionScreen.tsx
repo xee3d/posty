@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Linking, Share, Platform,  } from 'react-native';
 import { COLORS, SPACING } from '../../utils/constants';
 import { SUBSCRIPTION_PLANS } from '../../config/adConfig';
@@ -19,12 +19,14 @@ const { width: screenWidth } = Dimensions.get('window');
 
 interface SubscriptionScreenProps {
   navigation: any;
+  route?: any;
   currentPlan?: 'free' | 'premium' | 'pro';
 }
 
-export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({ 
-  navigation, 
-  currentPlan = 'free' 
+export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
+  navigation,
+  route,
+  currentPlan = 'free'
 }) => {
   const { colors, isDark } = useAppTheme();
   const currentTokens = useAppSelector(selectCurrentTokens);
@@ -42,10 +44,14 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     dailyLimit: 10,
   });
 
+  // ScrollView and PRO card refs
+  const scrollViewRef = useRef<ScrollView>(null);
+  const proCardRef = useRef<View>(null);
+
   useEffect(() => {
     loadTokenStats();
     loadAdStats();
-    
+
     const checkInitialTab = async () => {
       const initialTab = await AsyncStorage.getItem('subscription_initial_tab');
       if (initialTab) {
@@ -56,6 +62,20 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     checkInitialTab();
 
     rewardAdService.preloadAd();
+
+    // Check if we need to scroll to PRO card
+    if (route?.params?.scrollToPro) {
+      // Delay to ensure layout is complete
+      setTimeout(() => {
+        proCardRef.current?.measureLayout(
+          scrollViewRef.current as any,
+          (x, y) => {
+            scrollViewRef.current?.scrollTo({ y: y - 20, animated: true });
+          },
+          () => {}
+        );
+      }, 300);
+    }
   }, []);
 
   // 구독 플랜이 변경되면 화면 새로고침
@@ -448,7 +468,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     const isCurrent = subscriptionPlan === planKey;
     const isPopular = planKey === 'premium';
     const planColor = planColors[planKey];
-    
+
     // 다운그레이드 체크
     const isDowngrade = (
       (subscriptionPlan === 'pro' && planKey !== 'pro') ||
@@ -459,6 +479,7 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     return (
       <TouchableOpacity
         key={planKey}
+        ref={planKey === 'pro' ? proCardRef : undefined}
         style={[
           styles.planCard,
           isSelected && styles.selectedPlanCard,
@@ -636,7 +657,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
         </TouchableOpacity>
       </View>
 
-      <ScrollView 
+      <ScrollView
+        ref={scrollViewRef}
         style={styles.content}
         showsVerticalScrollIndicator={false}
       >

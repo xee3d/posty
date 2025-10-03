@@ -301,7 +301,7 @@ class InAppPurchaseService {
 
       store.dispatch(
         updateSubscription({
-          plan: planId as "starter" | "premium" | "pro",
+          plan: planId as "free" | "pro",
           expiresAt: expiryDate.toISOString(),
           autoRenew: true,
           isServerVerified: true, // 서버에서 검증된 업데이트
@@ -315,12 +315,7 @@ class InAppPurchaseService {
         type: "subscription",
         planId,
         planName: planId.toUpperCase(),
-        features:
-          planId === "starter"
-            ? "가입 즉시 300개 + 매일 10개 토큰"
-            : planId === "premium"
-            ? "가입 즉시 500개 + 매일 20개 토큰"
-            : "무제한 토큰",
+        features: "무제한 토큰",
       });
     } else {
       // 토큰 구매 처리
@@ -467,17 +462,11 @@ class InAppPurchaseService {
     return `${prefix}tokens.${packageId}`;
   }
 
-  private getPlanIdFromSku(sku: string): "starter" | "premium" | "pro" {
-    if (sku.includes("starter")) {
-      return "starter";
-    }
-    if (sku.includes("premium")) {
-      return "premium";
-    }
+  private getPlanIdFromSku(sku: string): "free" | "pro" {
     if (sku.includes("pro")) {
       return "pro";
     }
-    throw new Error("Invalid SKU");
+    return "free";
   }
 
   private getTokensFromSku(sku: string): number {

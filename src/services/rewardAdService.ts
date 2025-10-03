@@ -84,12 +84,13 @@ class RewardAdService {
   // 광고 로드
   async loadAd(): Promise<boolean> {
     if (this.isAdLoaded) {
+      console.log("RewardAdService: 광고가 이미 로드됨");
       return true;
     }
 
     try {
       console.log("RewardAdService: 광고 로드 시작");
-      
+
       // 기존 광고 정리
       if (this.rewardedAd) {
         this.rewardedAd = null;
@@ -103,10 +104,25 @@ class RewardAdService {
       // 이벤트 리스너 등록
       this.setupAdEventListeners();
 
-      // 광고 로드 시작
+      // 광고 로드 시작 (비동기)
       this.rewardedAd.load();
-      
-      return true;
+
+      // 광고 로드 완료를 기다림 (최대 10초)
+      return new Promise((resolve) => {
+        const timeout = setTimeout(() => {
+          console.log("RewardAdService: 광고 로드 타임아웃");
+          resolve(false);
+        }, 10000);
+
+        const checkLoaded = setInterval(() => {
+          if (this.isAdLoaded) {
+            clearInterval(checkLoaded);
+            clearTimeout(timeout);
+            console.log("RewardAdService: 광고 로드 완료 확인됨");
+            resolve(true);
+          }
+        }, 100);
+      });
     } catch (error) {
       console.error("RewardAdService: 광고 로드 실패:", error);
       return false;
@@ -117,14 +133,9 @@ class RewardAdService {
   private setupAdEventListeners(): void {
     if (!this.rewardedAd) {return;}
 
-    this.rewardedAd.addAdEventListener(AdEventType.LOADED, () => {
+    this.rewardedAd.addAdEventListener(RewardedAdEventType.LOADED, () => {
       console.log("RewardAdService: 광고 로드 완료");
       this.isAdLoaded = true;
-    });
-
-    this.rewardedAd.addAdEventListener(AdEventType.ERROR, (error) => {
-      console.log("RewardAdService: 광고 로드 실패:", error);
-      this.isAdLoaded = false;
     });
 
     this.rewardedAd.addAdEventListener(RewardedAdEventType.EARNED_REWARD, (reward) => {
@@ -134,12 +145,46 @@ class RewardAdService {
       }
     });
 
+    // 일반 AdEventType 사용
     this.rewardedAd.addAdEventListener(AdEventType.CLOSED, () => {
       console.log("RewardAdService: 광고 닫힘");
       this.isAdShowing = false;
       this.isAdLoaded = false; // 광고 사용 후 다시 로드 필요
+
+      // 보상을 받지 못한 채 닫힌 경우 Promise 해결
+      if (this.rewardPromiseResolve) {
+        console.log("RewardAdService: 광고가 보상 없이 닫힘");
+        this.rewardPromiseResolve(null);
+        this.rewardPromiseResolve = null;
+      }
+
+      // 다음 광고를 위해 미리 로드
+      setTimeout(() => {
+        this.loadAd();
+      }, 1000);
+    });
+
+    this.rewardedAd.addAdEventListener(AdEventType.ERROR, (error) => {
+      console.log("RewardAdService: 광고 오류:", error);
+      this.isAdLoaded = false;
+      this.isAdShowing = false;
+
+      // 에러 발생 시 Promise 해결
+      if (this.rewardPromiseResolve) {
+        console.log("RewardAdService: 광고 오류로 인한 실패");
+        this.rewardPromiseResolve(null);
+        this.rewardPromiseResolve = null;
+      }
+    });
+
+    // Android에서 추가로 필요할 수 있는 이벤트들
+    this.rewardedAd.addAdEventListener(AdEventType.OPENED, () => {
+      console.log("RewardAdService: 광고 열림");
+      this.isAdShowing = true;
     });
   }
+
+  private rewardPromiseResolve: ((result: AdReward | null) => void) | null = null;
 
   // 광고 표시
   async showAd(): Promise<AdReward | null> {
@@ -163,25 +208,42 @@ class RewardAdService {
 
     try {
       this.isAdShowing = true;
-      await this.rewardedAd.show();
-      
+
       // 광고 시청 시작 기록
       adVerificationManager.startAdViewing();
-      
+
       // 광고 시청 기록
       await this.recordAdView();
 
-      console.log("RewardAdService: 광고 표시 완료");
-      
-      // 광고 시청 성공 시 보상 반환
-      return {
-        type: "tone_unlock",
-        amount: 1,
-        success: true
-      };
+      // 보상 이벤트를 기다리기 위한 Promise 생성
+      const rewardPromise = new Promise<AdReward | null>((resolve) => {
+        this.rewardPromiseResolve = resolve;
+
+        // 타임아웃 설정 (30초 후 자동 실패)
+        setTimeout(() => {
+          if (this.rewardPromiseResolve) {
+            console.log("RewardAdService: 보상 대기 타임아웃");
+            this.rewardPromiseResolve(null);
+            this.rewardPromiseResolve = null;
+          }
+        }, 30000);
+      });
+
+      await this.rewardedAd.show();
+      console.log("RewardAdService: 광고 표시 완료, 보상 대기 중...");
+
+      // 보상 이벤트가 발생할 때까지 대기
+      const result = await rewardPromise;
+      console.log("RewardAdService: 보상 처리 결과:", result);
+
+      return result;
     } catch (error) {
       console.error("RewardAdService: 광고 표시 실패:", error);
       this.isAdShowing = false;
+      if (this.rewardPromiseResolve) {
+        this.rewardPromiseResolve(null);
+        this.rewardPromiseResolve = null;
+      }
       return null;
     }
   }
@@ -189,24 +251,46 @@ class RewardAdService {
   // 보상 획득 처리
   private async handleRewardEarned(amount: number): Promise<void> {
     try {
+      console.log("RewardAdService: 보상 획득 이벤트 수신:", amount);
+
       // 광고 시청 완료 검증
       const verification = await adVerificationManager.verifyAdCompletion(amount);
-      
+
       if (verification.isValid) {
-        console.log("RewardAdService: 보상 검증 성공:", amount);
-        
-        // 토큰 서비스에 보상 지급 요청
-        const { tokenService } = await import('./subscription/tokenService');
-        await tokenService.earnTokensFromAd(amount);
-        
-        // 성공 사운드 재생
-        const { soundManager } = await import('../utils/soundManager');
-        soundManager.playSuccess();
+        console.log("RewardAdService: 보상 검증 성공, 토큰 지급:", verification.reward);
+
+        // 토큰 서비스에 보상 지급 요청 (검증된 보상 양 사용)
+        const tokenService = (await import('./subscription/tokenService')).default;
+        await tokenService.earnTokensFromAd(verification.reward);
+
+        console.log("RewardAdService: 토큰 지급 완료");
+
+        // Promise 해결 - 성공 결과 반환
+        if (this.rewardPromiseResolve) {
+          this.rewardPromiseResolve({
+            type: "tokens",
+            amount: verification.reward,
+            success: true
+          });
+          this.rewardPromiseResolve = null;
+        }
       } else {
         console.log("RewardAdService: 보상 검증 실패:", verification.reason);
+
+        // Promise 해결 - 실패 결과 반환
+        if (this.rewardPromiseResolve) {
+          this.rewardPromiseResolve(null);
+          this.rewardPromiseResolve = null;
+        }
       }
     } catch (error) {
       console.error("RewardAdService: 보상 처리 실패:", error);
+
+      // Promise 해결 - 에러 결과 반환
+      if (this.rewardPromiseResolve) {
+        this.rewardPromiseResolve(null);
+        this.rewardPromiseResolve = null;
+      }
     }
   }
 

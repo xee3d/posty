@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import { SafeIcon } from "../utils/SafeIcon";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { SPACING } from "../utils/constants";
@@ -11,6 +12,8 @@ interface LowTokenPromptProps {
   onClose: () => void;
   onEarnTokens: () => void;
   onUpgrade: () => void;
+  styleIcon?: string; // 스타일 아이콘 이름
+  styleColor?: string; // 스타일 색상
 }
 
 export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
@@ -19,9 +22,42 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
   onClose,
   onEarnTokens,
   onUpgrade,
+  styleIcon = "flash",
+  styleColor,
 }) => {
   const { colors } = useAppTheme();
   const styles = createStyles(colors);
+
+  // 스타일 아이콘 렌더링
+  const renderStyleIcon = () => {
+    const iconColor = styleColor || colors.primary;
+
+    // MaterialCommunityIcons 아이콘들
+    const materialIcons = [
+      'book-open-variant', 'typewriter', 'chart-line', 'lightbulb-on',
+      'emoticon-happy', 'earth', 'feather', 'script-text',
+      'palette', 'briefcase', 'school', 'guitar'
+    ];
+
+    if (materialIcons.includes(styleIcon)) {
+      return (
+        <MaterialCommunityIcons
+          name={styleIcon}
+          size={48}
+          color={iconColor}
+        />
+      );
+    }
+
+    // Ionicons 기본
+    return (
+      <Icon
+        name={styleIcon}
+        size={48}
+        color={iconColor}
+      />
+    );
+  };
 
   return (
     <Modal
@@ -37,7 +73,7 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
           </TouchableOpacity>
 
           <View style={styles.iconContainer}>
-            <SafeIcon name="battery-alert" size={48} color={colors.warning} />
+            {renderStyleIcon()}
           </View>
 
           <Text style={styles.title}>토큰이 부족해요!</Text>
@@ -47,44 +83,14 @@ export const LowTokenPrompt: React.FC<LowTokenPromptProps> = ({
           </Text>
 
           <View style={styles.options}>
-            {/* 무료 토큰 받기 - 메인 CTA */}
+            {/* 토큰 구매 - 메인 CTA */}
             <TouchableOpacity
               style={[styles.button, styles.primaryButton]}
               onPress={onEarnTokens}
             >
-              <SafeIcon name="gift" size={20} color={colors.white} />
-              <Text style={styles.primaryButtonText}>무료 토큰 받기</Text>
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>최대 +20</Text>
-              </View>
+              <SafeIcon name="cart" size={20} color={colors.white} />
+              <Text style={styles.primaryButtonText}>토큰 구매하기</Text>
             </TouchableOpacity>
-
-            {/* 빠른 옵션들 */}
-            <View style={styles.quickOptions}>
-              <TouchableOpacity style={styles.quickOption}>
-                <View style={styles.quickOptionIcon}>
-                  <Icon
-                    name="play-circle-outline"
-                    size={24}
-                    color={colors.primary}
-                  />
-                </View>
-                <Text style={styles.quickOptionText}>광고 시청</Text>
-                <Text style={styles.quickOptionReward}>+2 토큰</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.quickOption}>
-                <View style={styles.quickOptionIcon}>
-                  <Icon
-                    name="people-outline"
-                    size={24}
-                    color={colors.primary}
-                  />
-                </View>
-                <Text style={styles.quickOptionText}>친구 초대</Text>
-                <Text style={styles.quickOptionReward}>+5 토큰</Text>
-              </TouchableOpacity>
-            </View>
 
             {/* 구독 업그레이드 */}
             <TouchableOpacity
@@ -180,45 +186,6 @@ const createStyles = (colors: any) =>
       color: colors.primary,
       fontSize: 12,
       marginTop: 2,
-    },
-    badge: {
-      position: "absolute",
-      top: -8,
-      right: 16,
-      backgroundColor: colors.error,
-      paddingHorizontal: 8,
-      paddingVertical: 4,
-      borderRadius: 12,
-    },
-    badgeText: {
-      color: colors.white,
-      fontSize: 11,
-      fontWeight: "700",
-    },
-    quickOptions: {
-      flexDirection: "row",
-      gap: SPACING.sm,
-    },
-    quickOption: {
-      flex: 1,
-      backgroundColor: colors.background,
-      borderRadius: 12,
-      padding: SPACING.md,
-      alignItems: "center",
-    },
-    quickOptionIcon: {
-      marginBottom: SPACING.sm,
-    },
-    quickOptionText: {
-      fontSize: 13,
-      fontWeight: "500",
-      color: colors.text.primary,
-      marginBottom: 4,
-    },
-    quickOptionReward: {
-      fontSize: 12,
-      color: colors.primary,
-      fontWeight: "600",
     },
     hint: {
       fontSize: 13,
