@@ -1718,7 +1718,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         )}
                         {!isLocked && adWatchedTones.has(tone.id) && !canAccessTone(userPlan, tone.id) && (
                           <View style={styles.oneTimeUseBadge}>
-                            <Text style={styles.oneTimeUseText}>1회</Text>
+                            <Text style={styles.oneTimeUseText}>1회사용권</Text>
                           </View>
                         )}
                       </TouchableOpacity>
