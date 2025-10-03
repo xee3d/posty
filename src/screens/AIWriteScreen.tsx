@@ -519,23 +519,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           return newSet;
         });
 
-        const style = getStyleById(toneId);
-        const styleName = style?.label || toneId;
-
-        // InteractionManager를 사용하여 모든 상호작용 완료 후 UI 업데이트
+        // 팝업 없이 바로 스타일 자동 선택
         InteractionManager.runAfterInteractions(() => {
           soundManager.playSuccess();
-          Alert.alert(
-            '잠금 해제 성공! 🎉',
-            `${styleName} 스타일을 1회 사용할 수 있어요!`,
-            [{
-              text: '확인',
-              onPress: () => {
-                // 스타일 자동 선택
-                setSelectedTone(toneId);
-              }
-            }]
-          );
+          setSelectedTone(toneId);
         });
       } else {
         console.log('광고 표시 실패 또는 보상 미수령:', adResult);
