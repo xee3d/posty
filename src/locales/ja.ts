@@ -483,7 +483,8 @@ const ja = {
         error: "エラー",
         errorMessage: "広告視聴中に問題が発生しました。\nしばらくしてからもう一度お試しください。",
         unlockOption: "広告を見てロック解除",
-        proStyleMessage: "このスタイルはPROバージョンです。\n広告を視聴すると1回使用できます！"
+        proStyleMessage: "このスタイルはPROバージョンです。\n広告を視聴すると1回使用できます！",
+        loadingAd: "広告を読み込んでいます..."
       }
     },
     keywords: {

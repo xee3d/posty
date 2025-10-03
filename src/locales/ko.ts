@@ -200,7 +200,8 @@ const ko = {
         error: "오류",
         errorMessage: "광고 시청 중 문제가 발생했습니다.\n잠시 후 다시 시도해주세요.",
         unlockOption: "광고 보고 해제하기",
-        proStyleMessage: "이 스타일은 프로 버전입니다.\n광고를 시청하면 1회 사용할 수 있어요!"
+        proStyleMessage: "이 스타일은 프로 버전입니다.\n광고를 시청하면 1회 사용할 수 있어요!",
+        loadingAd: "광고 로딩 중..."
       }
     },
     keywords: {
@@ -1606,6 +1607,7 @@ const ko = {
     downgradeNotAllowed: "다운그레이드 불가",
     downgradeNotAllowedMessage: "하위 플랜으로 변경할 수 없습니다.\n\n현재 구독을 취소하고 만료 후 새로 가입해주세요.",
     confirmSubscriptionMessage: "{{planName}} 플랜을 구독하시겠습니까?\n\n{{description}}\n현재 토큰: {{currentTokens}}개\n변경 후: {{afterTokens}}개",
+    subscribePro: "Pro 구독하기",
     // 추가 번역 키들
     alerts: {
       adWatch: {
@@ -2243,21 +2245,6 @@ const ko = {
       tokens_100: "100 토큰",
       tokens_200: "200 토큰",
       tokens_300: "300 토큰"
-    },
-    subscription: {
-      title: "구독 플랜",
-      pro: {
-        title: "프로 버전",
-        features: {
-          unlimitedTokens: "무한 토큰",
-          noAds: "모든 광고 제거",
-          aiAgents: "Gemini 2.5 / GPT-4o 에이전트",
-          allStyles: "모든 스타일 사용 가능"
-        }
-      },
-      subscribe: "구독하기",
-      subscribePro: "Pro 구독하기",
-      monthly: "/월"
     },
     purchase: {
       title: "토큰 구매",

@@ -316,7 +316,8 @@ const zhCN = {
         }
       }
     },
-    confirmSubscriptionMessage: "要订阅{{planName}}计划吗？\n\n{{description}}\n当前代币：{{currentTokens}}个\n变更后：{{afterTokens}}个"
+    confirmSubscriptionMessage: "要订阅{{planName}}计划吗？\n\n{{description}}\n当前代币：{{currentTokens}}个\n变更后：{{afterTokens}}个",
+    subscribePro: "订阅Pro"
   },
 
   aiWrite: {
@@ -567,7 +568,8 @@ const zhCN = {
         error: "错误",
         errorMessage: "观看广告时发生问题。\n请稍后重试。",
         unlockOption: "观看广告解锁",
-        proStyleMessage: "这是PRO风格。\n观看广告可使用一次！"
+        proStyleMessage: "这是PRO风格。\n观看广告可使用一次！",
+        loadingAd: "正在加载广告..."
       }
     },
     
@@ -2360,21 +2362,6 @@ const zhCN = {
       tokens_100: "100代币",
       tokens_200: "200代币",
       tokens_300: "300代币"
-    },
-    subscription: {
-      title: "订阅计划",
-      pro: {
-        title: "专业版",
-        features: {
-          unlimitedTokens: "无限代币",
-          noAds: "移除所有广告",
-          aiAgents: "Gemini 2.5 / GPT-4o 代理",
-          allStyles: "所有写作风格可用"
-        }
-      },
-      subscribe: "订阅",
-      subscribePro: "订阅Pro",
-      monthly: "/月"
     },
     purchase: {
       title: "代币购买",

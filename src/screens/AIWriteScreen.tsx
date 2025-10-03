@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   Platform,
   InteractionManager,
+  Modal,
 } from "react-native";
 import {
   COLORS,
@@ -192,6 +193,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   // 광고 시청으로 얻은 일회성 프리미엄 액세스 상태 관리
   const [adWatchedTones, setAdWatchedTones] = useState<Set<string>>(new Set());
   const [adWatchedLengths, setAdWatchedLengths] = useState<Set<string>>(new Set());
+  const [isLoadingAd, setIsLoadingAd] = useState(false);
 
   // 구독 플랜 정보 가져오기
   const subscriptionPlan = useAppSelector(
@@ -495,8 +497,15 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     try {
       console.log('광고 시청으로 스타일 잠금 해제:', toneId);
 
+      // 로딩 시작
+      setIsLoadingAd(true);
+
       // 1. 광고 로드
       const loaded = await rewardAdService.loadAd();
+
+      // 로딩 종료
+      setIsLoadingAd(false);
+
       if (!loaded) {
         soundManager.playError();
         Alert.alert(t("aiWrite.alerts.styleLock.loadFailed"), t("aiWrite.alerts.styleLock.loadFailedMessage"));
@@ -538,6 +547,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
       }
     } catch (error) {
       console.error('광고 시청 실패:', error);
+
+      // 로딩 종료
+      setIsLoadingAd(false);
 
       InteractionManager.runAfterInteractions(() => {
         soundManager.playError();
@@ -1976,6 +1988,18 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         />
       )}
 
+      {/* 광고 로딩 중 표시 */}
+      <Modal transparent visible={isLoadingAd} animationType="fade">
+        <View style={styles.loadingOverlay}>
+          <View style={[styles.loadingContainer, { backgroundColor: colors.surface }]}>
+            <ActivityIndicator size="large" color={colors.primary} />
+            <Text style={[styles.loadingText, { color: colors.text.primary }]}>
+              {t("aiWrite.alerts.styleLock.loadingAd")}
+            </Text>
+          </View>
+        </View>
+      </Modal>
+
     </SafeAreaView>
   );
 };
@@ -2779,6 +2803,30 @@ const createStyles = (
       right: SPACING.md,
       flexDirection: "row",
       gap: SPACING.sm,
+    },
+    loadingOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.6)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    loadingContainer: {
+      borderRadius: 16,
+      padding: SPACING.xl,
+      alignItems: "center",
+      justifyContent: "center",
+      minWidth: 200,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.3,
+      shadowRadius: 8,
+      elevation: 8,
+    },
+    loadingText: {
+      fontSize: 16,
+      fontWeight: "600",
+      marginTop: SPACING.md,
+      textAlign: "center",
     },
   });
 };

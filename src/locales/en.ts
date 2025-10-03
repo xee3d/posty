@@ -213,7 +213,8 @@ const en = {
         error: "Error",
         errorMessage: "An error occurred while watching the ad.\nPlease try again later.",
         unlockOption: "Watch Ad to Unlock",
-        proStyleMessage: "This is a PRO style.\nWatch an ad to use it once!"
+        proStyleMessage: "This is a PRO style.\nWatch an ad to use it once!",
+        loadingAd: "Loading ad..."
       }
     },
     keywords: {
@@ -803,7 +804,8 @@ const en = {
       apiAccess: "API access",
       prioritySupport: "Priority support",
     },
-    confirmSubscriptionMessage: "Do you want to subscribe to the {{planName}} plan?\n\n{{description}}\nCurrent tokens: {{currentTokens}}\nAfter change: {{afterTokens}}"
+    confirmSubscriptionMessage: "Do you want to subscribe to the {{planName}} plan?\n\n{{description}}\nCurrent tokens: {{currentTokens}}\nAfter change: {{afterTokens}}",
+    subscribePro: "Subscribe to Pro"
   },
 
   // Home Screen
@@ -2570,21 +2572,6 @@ Personal Information Inquiry: getposty@gmail.com`
       tokens_100: "100 Tokens",
       tokens_200: "200 Tokens",
       tokens_300: "300 Tokens"
-    },
-    subscription: {
-      title: "Subscription Plans",
-      pro: {
-        title: "Pro Version",
-        features: {
-          unlimitedTokens: "Unlimited Tokens",
-          noAds: "Remove All Ads",
-          aiAgents: "Gemini 2.5 / GPT-4o Agents",
-          allStyles: "All Writing Styles Available"
-        }
-      },
-      subscribe: "Subscribe",
-      subscribePro: "Subscribe to Pro",
-      monthly: "/month"
     },
     purchase: {
       title: "Token Purchase",
