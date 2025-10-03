@@ -361,8 +361,8 @@ class ServerAIService {
         if (__DEV__) {
           console.log("Parsed response data:", {
             success: data.success,
-            hasContent: !!data.data?.content,
-            contentLength: data.data?.content?.length || 0,
+            hasContent: !!data.content,
+            contentLength: data.content?.length || 0,
           });
         }
       } catch (parseError) {
@@ -380,7 +380,7 @@ class ServerAIService {
       }
 
       // content에서 분석 결과만 추출
-      const content = data.data?.content || "";
+      const content = data.content || "";
       // 해시태그 제거
       const description = content.replace(/#\S+/g, "").trim();
 
