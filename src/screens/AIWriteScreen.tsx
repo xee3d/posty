@@ -1593,48 +1593,99 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
               <View style={[styles.optionSection, styles.toneSection]}>
                 <Text style={styles.sectionTitle}>{t("aiWrite.sections.selectTone")}</Text>
                 <View style={styles.toneGrid}>
-                  {tones.map((tone, index) => (
-                    <TouchableOpacity
-                      key={tone.id}
-                      style={[
-                        styles.toneCard,
-                        selectedTone === tone.id && styles.toneCardActive,
-                        selectedTone === tone.id && {
-                          borderColor: tone.color,
-                          backgroundColor: isDark
-                            ? tone.color + "20"
-                            : tone.color + "25",
-                          shadowColor: tone.color,
-                          shadowOpacity: 0.2,
-                          elevation: 3,
-                        },
-                      ]}
-                      onPress={() => {
-                        soundManager.playTap(); // 톤 선택 사운드
-                        setSelectedTone(tone.id);
-                      }}
-                      activeOpacity={0.7}
-                    >
-                      <SafeIcon
-                        name={tone.icon}
-                        size={32}
-                        color={
-                          selectedTone === tone.id
-                            ? tone.color
-                            : colors.text.secondary
-                        }
-                      />
-                      <Text
+                  {tones.map((tone, index) => {
+                    const isLocked = !canAccessTone(userPlan, tone.id);
+                    const isSelected = selectedTone === tone.id;
+                    
+                    return (
+                      <TouchableOpacity
+                        key={tone.id}
                         style={[
-                          styles.toneLabel,
-                          selectedTone === tone.id && styles.toneLabelActive,
-                          selectedTone === tone.id && { color: tone.color },
+                          styles.toneCard,
+                          isSelected && styles.toneCardActive,
+                          isSelected && {
+                            borderColor: tone.color,
+                            backgroundColor: isDark
+                              ? tone.color + "20"
+                              : tone.color + "25",
+                            shadowColor: tone.color,
+                            shadowOpacity: 0.2,
+                            elevation: 3,
+                          },
+                          isLocked && styles.lockedItem,
                         ]}
+                        onPress={() => {
+                          if (isLocked) {
+                            // 프리미엄 톤 선택 시 알림
+                            Alert.alert(
+                              t("aiWrite.premium.title"),
+                              t("aiWrite.premium.toneMessage", { tone: tone.label }),
+                              [
+                                {
+                                  text: t("aiWrite.premium.watchAd"),
+                                  onPress: async () => {
+                                    try {
+                                      const success = await rewardAdService.showRewardedAd();
+                                      if (success) {
+                                        // 광고 시청 성공 시 일회성 사용 허용
+                                        setSelectedTone(tone.id);
+                                        Alert.alert(
+                                          t("aiWrite.premium.unlockedTitle"),
+                                          t("aiWrite.premium.unlockedMessage", { tone: tone.label })
+                                        );
+                                      }
+                                    } catch (error) {
+                                      console.error("광고 시청 실패:", error);
+                                    }
+                                  },
+                                },
+                                {
+                                  text: t("aiWrite.premium.upgrade"),
+                                  onPress: () => onNavigate?.("subscription"),
+                                },
+                                { text: t("common.cancel") },
+                              ]
+                            );
+                          } else {
+                            soundManager.playTap();
+                            setSelectedTone(tone.id);
+                          }
+                        }}
+                        activeOpacity={0.7}
                       >
-                        {tone.label}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
+                        <SafeIcon
+                          name={tone.icon}
+                          size={32}
+                          color={
+                            isLocked
+                              ? colors.text.tertiary
+                              : isSelected
+                              ? tone.color
+                              : colors.text.secondary
+                          }
+                        />
+                        <Text
+                          style={[
+                            styles.toneLabel,
+                            isSelected && styles.toneLabelActive,
+                            isSelected && { color: tone.color },
+                            isLocked && styles.lockedItemText,
+                          ]}
+                        >
+                          {tone.label}
+                        </Text>
+                        {isLocked && (
+                          <View style={styles.lockIcon}>
+                            <SafeIcon
+                              name="lock-closed"
+                              size={16}
+                              color={colors.text.tertiary}
+                            />
+                          </View>
+                        )}
+                      </TouchableOpacity>
+                    );
+                  })}
                 </View>
               </View>
             </SlideInView>
