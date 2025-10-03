@@ -185,10 +185,12 @@ class RewardAdService {
   }
 
   private rewardPromiseResolve: ((result: AdReward | null) => void) | null = null;
+  private skipTokenReward = false;
 
   // 광고 표시
-  async showAd(): Promise<AdReward | null> {
-    console.log("RewardAdService: 광고 표시 시작");
+  async showAd(options?: { skipTokenReward?: boolean }): Promise<AdReward | null> {
+    console.log("RewardAdService: 광고 표시 시작", options);
+    this.skipTokenReward = options?.skipTokenReward || false;
 
     if (!this.isAdLoaded || !this.rewardedAd) {
       console.log("RewardAdService: 광고가 로드되지 않음");
@@ -257,13 +259,17 @@ class RewardAdService {
       const verification = await adVerificationManager.verifyAdCompletion(amount);
 
       if (verification.isValid) {
-        console.log("RewardAdService: 보상 검증 성공, 토큰 지급:", verification.reward);
+        console.log("RewardAdService: 보상 검증 성공");
 
-        // 토큰 서비스에 보상 지급 요청 (검증된 보상 양 사용)
-        const tokenService = (await import('./subscription/tokenService')).default;
-        await tokenService.earnTokensFromAd(verification.reward);
-
-        console.log("RewardAdService: 토큰 지급 완료");
+        // 토큰 지급 (스타일 잠금 해제용이 아닌 경우만)
+        if (!this.skipTokenReward) {
+          console.log("RewardAdService: 토큰 지급:", verification.reward);
+          const tokenService = (await import('./subscription/tokenService')).default;
+          await tokenService.earnTokensFromAd(verification.reward);
+          console.log("RewardAdService: 토큰 지급 완료");
+        } else {
+          console.log("RewardAdService: 스타일 잠금 해제용 광고 - 토큰 지급 건너뜀");
+        }
 
         // Promise 해결 - 성공 결과 반환
         if (this.rewardPromiseResolve) {

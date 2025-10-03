@@ -503,8 +503,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         return;
       }
 
-      // 2. 광고 표시
-      const adResult = await rewardAdService.showAd();
+      // 2. 광고 표시 (스타일 잠금 해제용 - 토큰 지급 안함)
+      const adResult = await rewardAdService.showAd({ skipTokenReward: true });
 
       console.log('광고 표시 결과:', adResult);
 
