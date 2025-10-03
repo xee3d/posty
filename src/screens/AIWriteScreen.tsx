@@ -1641,7 +1641,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                 <Text style={styles.sectionTitle}>{t("aiWrite.sections.selectTone")}</Text>
                 <View style={styles.toneGrid}>
                   {tones.map((tone, index) => {
-                    const isLocked = !canAccessTone(userPlan, tone.id);
+                    const isLocked = !canAccessTone(userPlan, tone.id) && !adWatchedTones.has(tone.id);
                     const isSelected = selectedTone === tone.id;
                     
                     return (
@@ -1662,7 +1662,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           isLocked && styles.lockedItem,
                         ]}
                         onPress={() => {
-                          if (isLocked && !adWatchedTones.has(tone.id)) {
+                          if (isLocked) {
                             // 잠긴 스타일 - 광고 시청으로 1회 해제
                             Alert.alert(
                               '🔒 프로 버전 스타일',
