@@ -41,7 +41,7 @@ import contentSaveService from "../services/contentSaveService";
 import userBehaviorAnalytics from "../services/userBehaviorAnalytics";
 import { soundManager } from "../utils/soundManager";
 import { Alert } from "../utils/customAlert";
-import { CustomAlert } from "../components/CustomAlert";
+import { CustomAlert, AlertManager } from "../components/CustomAlert";
 import { imageAnalysisCache } from "../utils/imageAnalysisCache";
 import {
   getPlaceholderText,
@@ -1651,9 +1651,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         onPress={() => {
                           if (isLocked) {
                             // 잠긴 스타일 - 광고 시청으로 1회 해제
-                            Alert.alert(
-                              '🔒 프로 버전 스타일',
-                              `${tone.label} 스타일은 프로 버전입니다.\n광고를 시청하면 1회 사용할 수 있어요!`,
+                            AlertManager.show(
+                              `${tone.label} 스타일`,
+                              `이 스타일은 프로 버전입니다.\n광고를 시청하면 1회 사용할 수 있어요!`,
                               [
                                 {
                                   text: '광고 보고 해제하기',
@@ -1663,8 +1663,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   text: 'Pro 구독하기',
                                   onPress: () => onNavigate?.("subscription", { scrollToPro: true }),
                                 },
-                                { text: '취소' },
-                              ]
+                                { text: '취소', style: 'cancel' },
+                              ],
+                              {
+                                icon: tone.icon,
+                                iconColor: tone.color,
+                              }
                             );
                           } else {
                             soundManager.playTap();
