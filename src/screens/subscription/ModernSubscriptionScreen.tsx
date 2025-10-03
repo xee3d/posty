@@ -65,18 +65,22 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
     // Check if we need to scroll to PRO card
     if (route?.params?.scrollToPro) {
+      console.log('[ModernSubscriptionScreen] Scrolling to PRO card');
       // Delay to ensure layout is complete
       setTimeout(() => {
         proCardRef.current?.measureLayout(
           scrollViewRef.current as any,
           (x, y) => {
+            console.log('[ModernSubscriptionScreen] Scroll position:', y);
             scrollViewRef.current?.scrollTo({ y: y - 20, animated: true });
           },
-          () => {}
+          (error) => {
+            console.log('[ModernSubscriptionScreen] measureLayout failed:', error);
+          }
         );
-      }, 300);
+      }, 500);
     }
-  }, []);
+  }, [route?.params?.scrollToPro]);
 
   // 구독 플랜이 변경되면 화면 새로고침
   useEffect(() => {
