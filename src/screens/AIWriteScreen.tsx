@@ -1128,6 +1128,42 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
             </View>
           </FadeInView>
 
+          {/* 프로필 완성도 배너 */}
+          {(() => {
+            const detailedProfile = useAppSelector((state) => state.user.detailedProfile);
+            const profileCompleteness = detailedProfile?.profileCompleteness || 0;
+
+            // 프로필 완성도가 30% 미만일 때만 표시
+            if (profileCompleteness < 30) {
+              return (
+                <SlideInView direction="down" delay={50}>
+                  <TouchableOpacity
+                    style={[styles.profileCompleteBanner, {
+                      backgroundColor: colors.warning + '15',
+                      borderColor: colors.warning + '30'
+                    }]}
+                    onPress={() => onNavigate?.("settings")}
+                    activeOpacity={0.7}
+                  >
+                    <View style={[styles.profileBannerIcon, { backgroundColor: colors.warning + '20' }]}>
+                      <SafeIcon name="person-outline" size={18} color={colors.warning} />
+                    </View>
+                    <View style={styles.profileBannerContent}>
+                      <Text style={[styles.profileBannerTitle, { color: colors.text.primary }]}>
+                        💡 프로필을 완성하면 더 나에게 맞는 글을 생성해요
+                      </Text>
+                      <Text style={[styles.profileBannerSubtitle, { color: colors.text.secondary }]}>
+                        완성도 {profileCompleteness}% → 설정에서 프로필 입력하기
+                      </Text>
+                    </View>
+                    <SafeIcon name="chevron-forward" size={20} color={colors.text.tertiary} />
+                  </TouchableOpacity>
+                </SlideInView>
+              );
+            }
+            return null;
+          })()}
+
           {/* 스타일 가이드 배너 */}
           {styleInfo && showStyleGuide && (
             <SlideInView direction="down" delay={100}>
@@ -2392,6 +2428,35 @@ const createStyles = (
     },
     generateButtonContainer: {
       paddingHorizontal: SPACING.sm, // 컨테이너 패딩을 줄여서 버튼이 더 넓어지도록
+    },
+    // 프로필 완성도 배너
+    profileCompleteBanner: {
+      marginHorizontal: SPACING.lg,
+      marginBottom: SPACING.md,
+      borderRadius: 12,
+      padding: SPACING.md,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: SPACING.sm,
+      borderWidth: 1,
+    },
+    profileBannerIcon: {
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    profileBannerContent: {
+      flex: 1,
+    },
+    profileBannerTitle: {
+      fontSize: 13,
+      fontWeight: "600",
+      marginBottom: 3,
+    },
+    profileBannerSubtitle: {
+      fontSize: 11,
     },
     styleGuideBanner: {
       ...horizontalPadding,

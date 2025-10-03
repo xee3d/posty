@@ -21,6 +21,7 @@ import { SUBSCRIPTION_PLANS } from "../utils/adConfig";
 import { imageAnalysisCache } from "../utils/imageAnalysisCache";
 import i18next from "../locales/i18n";
 import aiAgentService from "./aiAgentService";
+import { profileBasedAI } from "./profileBasedAIService";
 
 class AIServiceWrapper {
   // 사용자 구독 플랜 가져오기
@@ -82,37 +83,23 @@ class AIServiceWrapper {
       let finalPrompt = "";
 
       // 개인화된 프롬프트 생성 (프로필 정보가 있는 경우)
-      if (userProfile && userProfile.profileCompleteness > 0) {
+      if (userProfile && userProfile.profileCompleteness >= 30) {
         console.log(
-          "Using personalized AI prompt with profile completion:",
-          userProfile.profileCompleteness + "%"
+          "✨ [AIServiceWrapper] Using profile-based AI (completeness:",
+          userProfile.profileCompleteness + "%)"
         );
 
-        // 이미지 컨텍스트 감지 시도
-        const imageContext = enhancedAI.detectImageContext(params.prompt || "");
+        // 새로운 profileBasedAI 사용 (토큰 효율적)
+        finalPrompt = profileBasedAI.generatePersonalizedPrompt({
+          profile: userProfile,
+          platform,
+          tone: params.tone || 'casual',
+          length: params.length || 'medium',
+          language: (i18next.language as 'ko' | 'en' | 'ja' | 'zh-CN') || 'ko',
+          prompt: params.prompt || '',
+        });
 
-        const personalizedConfig = {
-          userProfile: userProfile,
-          content: params.prompt || "",
-          platform: platform,
-          imageContext: imageContext,
-          occasion: "general",
-        };
-
-        finalPrompt = enhancedAI.generatePersonalizedPrompt(personalizedConfig);
-
-        // 길이 조정 추가
-        switch (params.length) {
-          case "short":
-            finalPrompt += `\n${i18next.t('aiPrompts.length.short', '[길이: 50자 이내로 짧고 간결하게 작성해주세요]')}`;
-            break;
-          case "medium":
-            finalPrompt += `\n${i18next.t('aiPrompts.length.medium', '[길이: 100-150자 사이로 적당한 길이로 작성해주세요]')}`;
-            break;
-          case "long":
-            finalPrompt += `\n${i18next.t('aiPrompts.length.long', '[길이: 200-300자로 자세하고 풍부하게 작성해주세요]')}`;
-            break;
-        }
+        console.log("🎯 [AIServiceWrapper] Profile-based prompt generated, length:", finalPrompt.length);
       } else {
         // 기존 방식 (프로필 정보가 없는 경우) - 간단한 프롬프트 사용
         console.log("Using standard AI prompt (no profile data)");
@@ -153,16 +140,13 @@ class AIServiceWrapper {
         try {
           let platformPrompt = finalPrompt;
 
-          // 플랫폼별 특화 프롬프트 추가 (사용자 관점으로)
+          // 플랫폼별 특화 프롬프트 추가 (최적화 - 간결화)
           if (platformId === "instagram") {
-            platformPrompt +=
-              "\n\n[Instagram 스타일로 작성: 내 개인적인 경험과 감정을 1인칭으로 감성적이고 시각적으로, 줄바꿈을 활용해서 스토리텔링하듯 작성해주세요. 사진은 내가 직접 찍은 것이라고 가정하고 작성해주세요. 해시태그는 내용과 직접 관련된 키워드만 3-5개 선택해서 자연스럽게 포함해주세요]";
+            platformPrompt += "\n\nInstagram: 1인칭 감성 스토리텔링, 줄바꿈 활용, 해시태그 3-5개";
           } else if (platformId === "facebook") {
-            platformPrompt +=
-              "\n\n[Facebook 스타일로 작성: 내가 직접 경험한 것처럼 1인칭으로 친근하고 대화형으로, 개인적인 경험을 공유하는 톤으로 한 문단으로 자연스럽게 작성해주세요]";
+            platformPrompt += "\n\nFacebook: 1인칭 친근한 대화형, 한 문단";
           } else if (platformId === "twitter") {
-            platformPrompt +=
-              "\n\n[Twitter 스타일로 작성: 내 경험을 1인칭으로 280자 이내로 간결하고 위트있게, 임팩트 있는 한 줄로 작성해주세요. 해시태그는 핵심 키워드 1-2개만 포함해주세요]";
+            platformPrompt += "\n\nTwitter: 1인칭 간결 280자 이내, 해시태그 1-2개";
           }
           
           console.log(`🔧 [AIServiceWrapper] Platform ${platformId} prompt length:`, platformPrompt.length, "characters");

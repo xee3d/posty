@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { DetailedUserProfile, calculateProfileCompleteness } from '../../types/userProfile';
 
 // 토큰 히스토리를 별도 타입으로 분리
 interface TokenHistory {
@@ -45,7 +46,10 @@ interface UserState {
   
   // 토큰 사용 내역 - 성능 최적화: 최대 20개만 유지
   tokenHistory: TokenHistory[];
-  
+
+  // 프로필 정보
+  detailedProfile: DetailedUserProfile | null;
+
   // 설정
   settings: {
     theme: 'light' | 'dark' | 'system';
@@ -78,6 +82,7 @@ const initialState: UserState = {
   freeTokens: 10,
   lastTokenResetDate: new Date().toISOString().split('T')[0],
   tokenHistory: [],
+  detailedProfile: null,
   settings: {
     theme: 'system',
     language: 'ko',
@@ -401,6 +406,21 @@ const userSlice = createSlice({
     updateSettings: (state, action: PayloadAction<Partial<UserState['settings']>>) => {
       Object.assign(state.settings, action.payload);
     },
+
+    // 프로필 정보 업데이트
+    updateDetailedProfile: (state, action: PayloadAction<Partial<DetailedUserProfile>>) => {
+      const updatedProfile = {
+        ...(state.detailedProfile || {}),
+        ...action.payload,
+      } as DetailedUserProfile;
+
+      // 프로필 완성도 자동 계산
+      updatedProfile.profileCompleteness = calculateProfileCompleteness(updatedProfile);
+      updatedProfile.lastUpdated = new Date().toISOString();
+
+      state.detailedProfile = updatedProfile;
+      console.log('[UserSlice] Profile updated, completeness:', updatedProfile.profileCompleteness);
+    },
   },
 });
 
@@ -416,6 +436,7 @@ export const {
   setUserData,
   updateTokens,
   updateSettings,
+  updateDetailedProfile,
 } = userSlice.actions;
 
 // 추가 액션들 - 호환성을 위해 유지
