@@ -75,14 +75,14 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Prompt or image is required" });
     }
 
-    // 토큰 수 계산
+    // 토큰 수 계산 (한국어는 더 많은 토큰 필요)
     const lengthTokens = {
-      short: 50,
-      medium: 100,
-      long: 200,
+      short: 150,
+      medium: 300,
+      long: 500,
     };
 
-    const finalMaxTokens = lengthTokens[length] || 100;
+    const finalMaxTokens = lengthTokens[length] || 300;
 
     // 시스템 메시지 구성
     const systemMessage = `당신은 전문적인 SNS 콘텐츠 크리에이터입니다. 
