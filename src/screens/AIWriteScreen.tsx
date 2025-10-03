@@ -40,6 +40,7 @@ import contentSaveService from "../services/contentSaveService";
 import userBehaviorAnalytics from "../services/userBehaviorAnalytics";
 import { soundManager } from "../utils/soundManager";
 import { Alert } from "../utils/customAlert";
+import { CustomAlert } from "../components/CustomAlert";
 import { imageAnalysisCache } from "../utils/imageAnalysisCache";
 import {
   getPlaceholderText,
@@ -1594,8 +1595,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   text: t("aiWrite.premium.watchAd"),
                                   onPress: async () => {
                                     try {
-                                      const success = await rewardAdService.showRewardedAd();
-                                      if (success) {
+                                      const result = await rewardAdService.showRewardedAd();
+                                      if (result && result.success) {
                                         // 광고 시청 성공 시 일회성 사용 허용
                                         setSelectedTone(tone.id);
                                         Alert.alert(
@@ -1613,7 +1614,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                                   onPress: () => onNavigate?.("subscription"),
                                 },
                                 { text: t("common.cancel") },
-                              ]
+                              ],
+                              tone.icon,
+                              tone.color
                             );
                           } else {
                             soundManager.playTap();

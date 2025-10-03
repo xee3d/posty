@@ -173,8 +173,12 @@ class RewardAdService {
 
       console.log("RewardAdService: 광고 표시 완료");
       
-      // 보상은 EARNED_REWARD 이벤트에서 처리됨
-      return null; // 실제 보상은 이벤트 리스너에서 처리
+      // 광고 시청 성공 시 보상 반환
+      return {
+        type: "tone_unlock",
+        amount: 1,
+        success: true
+      };
     } catch (error) {
       console.error("RewardAdService: 광고 표시 실패:", error);
       this.isAdShowing = false;

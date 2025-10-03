@@ -277,7 +277,7 @@ const en = {
       error: "Failed to load advertisement. Please try again.",
     },
     premium: {
-      title: "Premium Feature 🌟",
+      title: "Premium Feature",
       styleTitle: "Premium Style",
       lengthTitle: "Premium Length",
       viewPlans: "View Plans",

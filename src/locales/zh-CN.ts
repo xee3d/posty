@@ -552,7 +552,7 @@ const zhCN = {
     },
     
     premium: {
-      title: "高级功能 🌟",
+      title: "高级功能",
       styleTitle: "高级风格",
       lengthTitle: "高级长度",
       viewPlans: "查看计划",
