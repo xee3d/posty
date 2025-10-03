@@ -101,7 +101,11 @@ ${includeEmojis ? "적절한 이모지를 포함해주세요." : "이모지는 �
     let usageData = null;
     let actualModel = model;
 
-    if (model.startsWith('gemini') || model.includes('gemini')) {
+    // 이미지 분석은 항상 GPT 사용 (Gemini는 이미지 분석 미지원)
+    const hasImage = !!image;
+    const useGemini = (model.startsWith('gemini') || model.includes('gemini')) && !hasImage;
+
+    if (useGemini) {
       // Gemini API 호출
       console.log("Calling Gemini API with model:", model);
 
