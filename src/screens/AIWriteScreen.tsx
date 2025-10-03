@@ -1716,6 +1716,11 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             />
                           </View>
                         )}
+                        {!isLocked && adWatchedTones.has(tone.id) && !canAccessTone(userPlan, tone.id) && (
+                          <View style={styles.oneTimeUseBadge}>
+                            <Text style={styles.oneTimeUseText}>1회 사용</Text>
+                          </View>
+                        )}
                       </TouchableOpacity>
                     );
                   })}
@@ -2544,6 +2549,35 @@ const createStyles = (
       shadowOpacity: 0.2,
       shadowRadius: 4,
       elevation: 3,
+    },
+    oneTimeUseBadge: {
+      position: "absolute",
+      top: -8,
+      right: -8,
+      backgroundColor: "#10B981",
+      borderRadius: 12,
+      paddingHorizontal: 8,
+      paddingVertical: 4,
+      shadowColor: "#10B981",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.3,
+      shadowRadius: 4,
+      elevation: 4,
+    },
+    oneTimeUseText: {
+      color: "#FFFFFF",
+      fontSize: 10,
+      fontWeight: "700",
+    },
+    lockIcon: {
+      position: "absolute",
+      top: -6,
+      right: -6,
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      padding: 4,
+      borderWidth: 1,
+      borderColor: colors.border.primary,
     },
     tokenRequiredBadge: {
       flexDirection: "row",
