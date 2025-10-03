@@ -295,7 +295,8 @@ const ja = {
         ]
       }
     },
-    confirmSubscriptionMessage: "{{planName}}プランをご購読されますか？\n\n{{description}}\n現在のトークン: {{currentTokens}}個\n変更後: {{afterTokens}}個"
+    confirmSubscriptionMessage: "{{planName}}プランをご購読されますか？\n\n{{description}}\n現在のトークン: {{currentTokens}}個\n変更後: {{afterTokens}}個",
+    subscribePro: "Proを購読する"
   },
 
   aiWrite: {
@@ -2278,21 +2279,6 @@ const ja = {
       tokens_100: "100トークン",
       tokens_200: "200トークン",
       tokens_300: "300トークン"
-    },
-    subscription: {
-      title: "サブスクリプションプラン",
-      pro: {
-        title: "プロバージョン",
-        features: {
-          unlimitedTokens: "無制限トークン",
-          noAds: "すべての広告を削除",
-          aiAgents: "Gemini 2.5 / GPT-4o エージェント",
-          allStyles: "すべてのライティングスタイル利用可能"
-        }
-      },
-      subscribe: "購読する",
-      subscribePro: "Proを購読する",
-      monthly: "/月"
     },
     purchase: {
       title: "トークン購入",
