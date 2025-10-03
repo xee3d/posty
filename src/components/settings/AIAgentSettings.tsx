@@ -14,10 +14,11 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { SPACING, FONT_SIZES } from '../../utils/constants';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAppSelector } from '../../hooks/redux';
 
 const AI_AGENT_STORAGE_KEY = "@ai_agent_preference";
 
-export type AIAgent = "gpt-mini";
+export type AIAgent = "gpt-mini" | "gemini";
 
 interface AIAgentConfig {
   id: AIAgent;
@@ -29,6 +30,7 @@ interface AIAgentConfig {
   badge: string;
   isAvailable: boolean;
   fallbackInfo?: string;
+  requiresPro?: boolean;
 }
 
 interface AIAgentSettingsProps {
@@ -38,6 +40,7 @@ interface AIAgentSettingsProps {
 const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
   const { colors, isDark } = useAppTheme();
   const { t } = useTranslation();
+  const isPro = useAppSelector((state) => state.user.isPro);
   const [currentAgent, setCurrentAgent] = useState<AIAgent>('gpt-mini');
   const [showAgentModal, setShowAgentModal] = useState(false);
   const [availableAgents, setAvailableAgents] = useState<AIAgentConfig[]>([]);
@@ -47,11 +50,24 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
       id: "gpt-mini",
       name: "GPT-4o Mini",
       nativeName: "GPT-4o Mini",
-      description: "빠르고 효율적인 텍스트 생성",
+      description: "빠르고 안정적인 범용 모델",
       icon: "flash",
       color: "#10B981",
       badge: "GPT",
       isAvailable: true,
+      requiresPro: false,
+    },
+    {
+      id: "gemini",
+      name: "Gemini 2.5 Flash Lite",
+      nativeName: "Gemini 2.5 Flash Lite",
+      description: "Google의 차세대 초고속 모델",
+      icon: "sparkles",
+      color: "#8B5CF6",
+      badge: "GEM",
+      isAvailable: isPro,
+      requiresPro: true,
+      fallbackInfo: isPro ? undefined : "Pro 구독 필요",
     },
   ];
 
@@ -59,15 +75,26 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
     initializeAgentSettings();
   }, []);
 
+  useEffect(() => {
+    // isPro 상태 변경 시 에이전트 목록 업데이트
+    setAvailableAgents(aiAgentConfigs);
+  }, [isPro]);
+
   const initializeAgentSettings = async () => {
     try {
       const savedAgent = await AsyncStorage.getItem(AI_AGENT_STORAGE_KEY);
-      const current = (savedAgent === "gpt-mini") 
-        ? (savedAgent as AIAgent) 
+      const current = (savedAgent === "gpt-mini" || savedAgent === "gemini")
+        ? (savedAgent as AIAgent)
         : 'gpt-mini';
-      
-      setCurrentAgent(current);
-      
+
+      // gemini가 선택되어 있지만 Pro가 아니면 gpt-mini로 변경
+      if (current === "gemini" && !isPro) {
+        setCurrentAgent('gpt-mini');
+        await AsyncStorage.setItem(AI_AGENT_STORAGE_KEY, 'gpt-mini');
+      } else {
+        setCurrentAgent(current);
+      }
+
       // AI 에이전트 설정
       setAvailableAgents(aiAgentConfigs);
     } catch (error) {
@@ -130,15 +157,23 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
           <View style={styles.agentNames}>
             <View style={styles.agentNameRow}>
               <Text style={[
-                styles.agentName, 
+                styles.agentName,
                 { color: isSelected ? agentConfig?.color : colors.text.primary }
               ]}>
                 {item.nativeName}
               </Text>
-              {!item.isAvailable && (
+              {item.requiresPro && (
+                <View style={[styles.proBadge, { backgroundColor: colors.primary + '20', borderColor: colors.primary + '40' }]}>
+                  <SafeIcon name="star" size={10} color={colors.primary} />
+                  <Text style={[styles.proText, { color: colors.primary }]}>
+                    PRO
+                  </Text>
+                </View>
+              )}
+              {!item.isAvailable && item.requiresPro && (
                 <View style={[styles.unavailableBadge, { backgroundColor: colors.text.tertiary + '20' }]}>
                   <Text style={[styles.unavailableText, { color: colors.text.tertiary }]}>
-                    API 키 필요
+                    구독 필요
                   </Text>
                 </View>
               )}
@@ -314,23 +349,24 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   agentListContent: {
-    paddingVertical: 16,
+    paddingVertical: 20,
+    paddingHorizontal: 4,
   },
   agentItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 24,
-    paddingVertical: 18,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
     marginHorizontal: 16,
-    marginBottom: 8,
-    borderRadius: 12,
-    borderWidth: 1,
+    marginBottom: 12,
+    borderRadius: 16,
+    borderWidth: 1.5,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
   },
   agentInfo: {
     flexDirection: 'row',
@@ -338,16 +374,16 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   agentBadge: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 1,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    borderWidth: 1.5,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
   },
   agentBadgeText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '700',
   },
   agentNames: {
@@ -357,20 +393,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    marginBottom: 3,
+    marginBottom: 6,
+    flexWrap: 'wrap',
   },
   agentName: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
+    letterSpacing: -0.3,
+    flexShrink: 1,
+  },
+  proBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
+    borderWidth: 1,
+  },
+  proText: {
+    fontSize: 10,
+    fontWeight: '700',
   },
   agentDescription: {
     fontSize: 13,
-    opacity: 0.8,
+    lineHeight: 19,
+    opacity: 0.85,
   },
   fallbackInfo: {
     fontSize: 12,
+    lineHeight: 17,
     fontStyle: 'italic',
-    marginTop: 2,
+    marginTop: 4,
+    opacity: 0.7,
   },
   unavailableBadge: {
     paddingHorizontal: 8,

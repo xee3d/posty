@@ -22,7 +22,7 @@ class AIAgentService {
   private async loadAIAgent(): Promise<void> {
     try {
       const savedAgent = await AsyncStorage.getItem(AI_AGENT_STORAGE_KEY);
-      if (savedAgent && savedAgent === "gpt-mini") {
+      if (savedAgent && (savedAgent === "gpt-mini" || savedAgent === "gemini")) {
         this.currentAgent = savedAgent as AIAgent;
       }
     } catch (error) {
@@ -50,13 +50,24 @@ class AIAgentService {
 
   // AI 에이전트를 서버 모델명으로 변환
   public getModelName(agent: AIAgent): string {
-    return "gpt-4o-mini";
+    switch (agent) {
+      case "gpt-mini":
+        return "gpt-4o-mini";
+      case "gemini":
+        return "gemini-2.5-flash-lite";
+      default:
+        // 폴백 없음 - 명시적으로 설정된 모델만 사용
+        console.warn(`[AIAgentService] Unknown agent: ${agent}, using as-is`);
+        return agent;
+    }
   }
 
   // 현재 에이전트의 모델명 가져오기
   public async getCurrentModelName(): Promise<string> {
     const agent = await this.getCurrentAIAgent();
-    return this.getModelName(agent);
+    const modelName = this.getModelName(agent);
+    console.log(`[AIAgentService] Current agent: ${agent} → Model: ${modelName}`);
+    return modelName;
   }
 }
 

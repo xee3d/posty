@@ -45,6 +45,7 @@ import {
 } from "./documents";
 
 import TrendApiSettings from "./settings/TrendApiSettings";
+import AIAgentSettings, { AIAgent } from "../components/settings/AIAgentSettings";
 import { soundManager } from "../utils/soundManager";
 import tokenService from "../services/subscription/tokenService";
 import inAppPurchaseService from "../services/subscription/inAppPurchaseService";
@@ -121,6 +122,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const [showNewUserWelcome, setShowNewUserWelcome] = useState(false);
   const [showProfileDetailModal, setShowProfileDetailModal] = useState(false);
   const [showThemeDialog, setShowThemeDialog] = useState(false);
+  const [selectedAIAgent, setSelectedAIAgent] = useState<AIAgent>("gpt-mini");
   const [themeChangeKey, setThemeChangeKey] = useState(0);
 
   // 테마 변경 감지
@@ -1145,12 +1147,20 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
           <Text style={styles.sectionTitle}>{t('settings.appSettings')}</Text>
           
           {/* 언어 설정 */}
-          <LanguageSettings 
+          <LanguageSettings
             onLanguageChange={(language) => {
               console.log('[SettingsScreen] Language changed to:', language);
               // 언어 변경 후 강제 리렌더링을 위해 상태 업데이트
               setLoading(true);
               setTimeout(() => setLoading(false), 100);
+            }}
+          />
+
+          {/* AI 에이전트 설정 */}
+          <AIAgentSettings
+            onAgentChange={(agent) => {
+              console.log('[SettingsScreen] AI Agent changed to:', agent);
+              setSelectedAIAgent(agent);
             }}
           />
 
