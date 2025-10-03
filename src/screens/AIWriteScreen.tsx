@@ -1707,15 +1707,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         >
                           {tone.label}
                         </Text>
-                        {isLocked && (
-                          <View style={styles.lockIcon}>
-                            <SafeIcon
-                              name="lock-closed"
-                              size={16}
-                              color={colors.text.tertiary}
-                            />
-                          </View>
-                        )}
                         {!isLocked && adWatchedTones.has(tone.id) && !canAccessTone(userPlan, tone.id) && (
                           <View style={styles.oneTimeUseBadge}>
                             <Text style={styles.oneTimeUseText}>1회사용권</Text>
