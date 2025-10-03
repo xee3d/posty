@@ -97,39 +97,83 @@ ${includeEmojis ? "적절한 이모지를 포함해주세요." : "이모지는 �
     ];
 
     // AI 모델에 따른 API 호출 분기
-    let response;
+    let responseContent;
+    let usageData = null;
+    let actualModel = model;
 
-    // Gemini 모델 요청 시 GPT로 폴백
     if (model.startsWith('gemini') || model.includes('gemini')) {
-      console.log("Gemini model requested, falling back to GPT:", model);
+      // Gemini API 호출
+      console.log("Calling Gemini API with model:", model);
+
+      const geminiPrompt = `${systemMessage}\n\nUser: ${prompt}`;
+
+      const geminiResponse = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            contents: [
+              {
+                parts: [
+                  {
+                    text: geminiPrompt,
+                  },
+                ],
+              },
+            ],
+            generationConfig: {
+              temperature: generatePlatformVersions ? 0.5 : 0.8,
+              maxOutputTokens: finalMaxTokens,
+            },
+          }),
+        }
+      );
+
+      if (!geminiResponse.ok) {
+        const errorText = await geminiResponse.text();
+        console.error("Gemini API Error:", errorText);
+        throw new Error(`Gemini API error: ${geminiResponse.status}`);
+      }
+
+      const geminiData = await geminiResponse.json();
+      responseContent = geminiData.candidates[0].content.parts[0].text;
+      usageData = {
+        promptTokens: geminiData.usageMetadata?.promptTokenCount || 0,
+        completionTokens: geminiData.usageMetadata?.candidatesTokenCount || 0,
+        totalTokens: geminiData.usageMetadata?.totalTokenCount || 0,
+      };
+    } else {
+      // OpenAI API 호출
+      console.log("Calling OpenAI API with model:", model);
+
+      const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: messages,
+          max_tokens: finalMaxTokens,
+          temperature: generatePlatformVersions ? 0.5 : 0.8,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("OpenAI API Error:", errorText);
+        throw new Error(`OpenAI API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      responseContent = data.choices[0].message.content;
+      usageData = data.usage;
+      actualModel = data.model;
     }
-
-    console.log("Calling OpenAI API with model:", model);
-
-    response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: messages,
-        max_tokens: finalMaxTokens,
-        temperature: generatePlatformVersions ? 0.5 : 0.8,
-      }),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenAI API Error:", errorText);
-      throw new Error(`OpenAI API error: ${response.status}`);
-    }
-
-    const data = await response.json();
-
-    // AI 모델에 따른 응답 처리
-    let responseContent = data.choices[0].message.content;
 
     // 플랫폼별 버전 생성
     let platforms = null;
@@ -175,7 +219,7 @@ ${includeEmojis ? "적절한 이모지를 포함해주세요." : "이모지는 �
       success: true,
       content: responseContent,
       contentLength: responseContent.length,
-      usage: data.usage,
+      usage: usageData,
       platforms,
       metadata: {
         tone,
@@ -183,7 +227,7 @@ ${includeEmojis ? "적절한 이모지를 포함해주세요." : "이모지는 �
         includeEmojis,
         generatePlatformVersions,
         timestamp: new Date().toISOString(),
-        model: data.model,
+        model: actualModel,
       },
     });
   } catch (error) {
