@@ -305,6 +305,10 @@ const ja = {
       polish: "書いた文章をより素敵に仕上げさせていただきます！",
       photo: "お写真を見せていただければ、ぴったりの文章をお作りします！",
     },
+    profileBanner: {
+      title: "プロフィールを完成させるともっと自分らしく書けます",
+      completeness: "{{percent}}%",
+    },
     modes: {
       text: "新規作成",
       polish: "文章整理",
@@ -374,6 +378,7 @@ const ja = {
     },
     
     tones: {
+      style: "スタイル",
       casual: "カジュアル",
       professional: "プロフェッショナル",
       humorous: "ユーモラス",
@@ -468,6 +473,16 @@ const ja = {
         title: "お知らせ",
         message: "画像が大きすぎます。より小さい画像をお選びください。",
         analysisResult: "画像が大きすぎます。"
+      },
+      styleLock: {
+        loadFailed: "広告の読み込みに失敗しました",
+        loadFailedMessage: "しばらくしてからもう一度お試しください。",
+        incomplete: "広告視聴が完了していません",
+        incompleteMessage: "スタイルのロックを解除するには、広告を最後まで視聴する必要があります。",
+        error: "エラー",
+        errorMessage: "広告視聴中に問題が発生しました。\nしばらくしてからもう一度お試しください。",
+        unlockOption: "広告を見てロック解除",
+        proStyleMessage: "このスタイルはPROバージョンです。\n広告を視聴すると1回使用できます！"
       }
     },
     keywords: {
@@ -1171,6 +1186,24 @@ const ja = {
     soundEffects: "音響効果",
     vibration: "振動",
     themeAndColors: "テーマと色",
+    aiAgent: {
+      title: "AIエージェント",
+      description: "コンテンツ生成に使用するAIモデルを選択してください",
+      selectAgent: "AIエージェント選択",
+      note: "AIエージェントはコンテンツ生成時に使用されるAIモデルです。",
+      gpt: "GPT-4o Mini",
+      gemini: "Gemini 2.5 Flash Lite",
+      proRequired: "Pro購読が必要",
+      subscriptionRequired: "購読が必要",
+      agents: {
+        gptMini: {
+          description: "高速で安定した汎用モデル"
+        },
+        gemini: {
+          description: "Googleの次世代超高速モデル"
+        }
+      }
+    },
     themeDescription: "テーマ設定",
     theme: {
       title: "テーマ設定",
@@ -2258,6 +2291,7 @@ const ja = {
         }
       },
       subscribe: "購読する",
+      subscribePro: "Proを購読する",
       monthly: "/月"
     },
     purchase: {

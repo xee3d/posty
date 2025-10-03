@@ -326,6 +326,10 @@ const zhCN = {
       polish: "我会把你的文字打磨得更加出色！",
       photo: "给我看照片，我来写匹配的内容！"
     },
+    profileBanner: {
+      title: "完善个人资料，写得更像自己",
+      completeness: "{{percent}}%",
+    },
     subtitle_old: "想写什么故事呢？",
     placeholder: "在这里输入文本...",
     placeholderExamples: {
@@ -394,6 +398,7 @@ const zhCN = {
     },
 
     tones: {
+      style: "风格",
       casual: "随意",
       professional: "专业",
       humorous: "幽默",
@@ -535,7 +540,35 @@ const zhCN = {
       networkError: "网络错误",
       serverError: "服务器错误",
       rateLimitExceeded: "超过使用限制",
-      insufficientTokens: "代币不足"
+      insufficientTokens: "代币不足",
+      imageSelection: "图片选择失败",
+      cameraAccess: "相机访问失败"
+    },
+
+    alerts: {
+      noPrompt: "请告诉我要写什么！",
+      noPhoto: "请先选择照片！",
+      noTokens: "代币不足",
+      watchAdToWrite: "观看广告可获得1个代币并立即写作！",
+      watchAd: "观看广告并写作",
+      error: "出了点问题。请重试。",
+      waitAnalysis: "请等待照片分析完成。",
+      completeAnalysis: "请先完成照片分析。",
+      imageTooBig: {
+        title: "提示",
+        message: "图片太大。请选择较小的图片。",
+        analysisResult: "图片太大。"
+      },
+      styleLock: {
+        loadFailed: "广告加载失败",
+        loadFailedMessage: "请稍后重试。",
+        incomplete: "广告观看未完成",
+        incompleteMessage: "必须观看完整广告才能解锁风格。",
+        error: "错误",
+        errorMessage: "观看广告时发生问题。\n请稍后重试。",
+        unlockOption: "观看广告解锁",
+        proStyleMessage: "这是PRO风格。\n观看广告可使用一次！"
+      }
     },
     
     ads: {
@@ -1160,6 +1193,24 @@ const zhCN = {
     soundEffects: "音效",
     vibration: "振动",
     themeAndColors: "主题和颜色",
+    aiAgent: {
+      title: "AI代理",
+      description: "选择用于内容生成的AI模型",
+      selectAgent: "选择AI代理",
+      note: "AI代理是用于内容生成的AI模型。",
+      gpt: "GPT-4o Mini",
+      gemini: "Gemini 2.5 Flash Lite",
+      proRequired: "需要Pro订阅",
+      subscriptionRequired: "需要订阅",
+      agents: {
+        gptMini: {
+          description: "快速稳定的通用模型"
+        },
+        gemini: {
+          description: "Google的下一代超快速模型"
+        }
+      }
+    },
     themeDescription: "主题设置",
     theme: {
       title: "主题设置",
@@ -2322,6 +2373,7 @@ const zhCN = {
         }
       },
       subscribe: "订阅",
+      subscribePro: "订阅Pro",
       monthly: "/月"
     },
     purchase: {

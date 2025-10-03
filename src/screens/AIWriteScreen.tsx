@@ -499,7 +499,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
       const loaded = await rewardAdService.loadAd();
       if (!loaded) {
         soundManager.playError();
-        Alert.alert('광고 로드 실패', '잠시 후 다시 시도해주세요.');
+        Alert.alert(t("aiWrite.alerts.styleLock.loadFailed"), t("aiWrite.alerts.styleLock.loadFailedMessage"));
         return;
       }
 
@@ -530,9 +530,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
         InteractionManager.runAfterInteractions(() => {
           soundManager.playError();
           Alert.alert(
-            '광고 시청 미완료',
-            '광고를 끝까지 시청해야 스타일을 잠금 해제할 수 있어요.',
-            [{ text: '확인' }]
+            t("aiWrite.alerts.styleLock.incomplete"),
+            t("aiWrite.alerts.styleLock.incompleteMessage"),
+            [{ text: t("common.ok") }]
           );
         });
       }
@@ -542,9 +542,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
       InteractionManager.runAfterInteractions(() => {
         soundManager.playError();
         Alert.alert(
-          '오류',
-          '광고 시청 중 문제가 발생했습니다.\n잠시 후 다시 시도해주세요.',
-          [{ text: '확인' }]
+          t("aiWrite.alerts.styleLock.error"),
+          t("aiWrite.alerts.styleLock.errorMessage"),
+          [{ text: t("common.ok") }]
         );
       });
     }
@@ -1139,24 +1139,45 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                 <SlideInView direction="down" delay={50}>
                   <TouchableOpacity
                     style={[styles.profileCompleteBanner, {
-                      backgroundColor: colors.warning + '15',
-                      borderColor: colors.warning + '30'
+                      backgroundColor: isDark
+                        ? colors.primary + '15'
+                        : colors.primary + '08',
+                      borderColor: colors.primary + '30'
                     }]}
                     onPress={() => onNavigate?.("settings")}
                     activeOpacity={0.7}
                   >
-                    <View style={[styles.profileBannerIcon, { backgroundColor: colors.warning + '20' }]}>
-                      <SafeIcon name="person-outline" size={18} color={colors.warning} />
+                    <View style={[styles.profileBannerIconContainer, {
+                      backgroundColor: colors.primary + '20'
+                    }]}>
+                      <SafeIcon name="person" size={20} color={colors.primary} />
                     </View>
                     <View style={styles.profileBannerContent}>
                       <Text style={[styles.profileBannerTitle, { color: colors.text.primary }]}>
-                        💡 프로필을 완성하면 더 나에게 맞는 글을 생성해요
+                        {t("aiWrite.profileBanner.title")}
                       </Text>
-                      <Text style={[styles.profileBannerSubtitle, { color: colors.text.secondary }]}>
-                        완성도 {profileCompleteness}% → 설정에서 프로필 입력하기
-                      </Text>
+                      <View style={styles.profileProgressRow}>
+                        <View style={styles.profileProgressBar}>
+                          <View
+                            style={[
+                              styles.profileProgressFill,
+                              {
+                                width: `${profileCompleteness}%`,
+                                backgroundColor: colors.primary
+                              }
+                            ]}
+                          />
+                        </View>
+                        <Text style={[styles.profileProgressText, { color: colors.text.tertiary }]}>
+                          {t("aiWrite.profileBanner.completeness", { percent: profileCompleteness })}
+                        </Text>
+                      </View>
                     </View>
-                    <SafeIcon name="chevron-forward" size={20} color={colors.text.tertiary} />
+                    <View style={[styles.profileBannerArrow, {
+                      backgroundColor: colors.primary + '15'
+                    }]}>
+                      <SafeIcon name="chevron-forward" size={16} color={colors.primary} />
+                    </View>
                   </TouchableOpacity>
                 </SlideInView>
               );
@@ -1688,18 +1709,18 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           if (isLocked) {
                             // 잠긴 스타일 - 광고 시청으로 1회 해제
                             AlertManager.show(
-                              `${tone.label} 스타일`,
-                              `이 스타일은 프로 버전입니다.\n광고를 시청하면 1회 사용할 수 있어요!`,
+                              `${tone.label} ${t("aiWrite.tones.style")}`,
+                              t("aiWrite.alerts.styleLock.proStyleMessage"),
                               [
                                 {
-                                  text: '광고 보고 해제하기',
+                                  text: t("aiWrite.alerts.styleLock.unlockOption"),
                                   onPress: () => handleWatchAdForTone(tone.id),
                                 },
                                 {
-                                  text: 'Pro 구독하기',
+                                  text: t("subscription.subscribePro"),
                                   onPress: () => onNavigate?.("subscription", { scrollToPro: true }),
                                 },
-                                { text: '취소', style: 'cancel' },
+                                { text: t("common.cancel"), style: 'cancel' },
                               ],
                               {
                                 icon: tone.icon,
@@ -2433,17 +2454,22 @@ const createStyles = (
     profileCompleteBanner: {
       marginHorizontal: SPACING.lg,
       marginBottom: SPACING.md,
-      borderRadius: 12,
-      padding: SPACING.md,
+      borderRadius: 16,
+      padding: SPACING.md + 2,
       flexDirection: "row",
       alignItems: "center",
-      gap: SPACING.sm,
-      borderWidth: 1,
+      gap: SPACING.md,
+      borderWidth: 1.5,
+      shadowColor: colors.primary,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 2,
     },
-    profileBannerIcon: {
-      width: 32,
-      height: 32,
-      borderRadius: 16,
+    profileBannerIconContainer: {
+      width: 44,
+      height: 44,
+      borderRadius: 22,
       justifyContent: "center",
       alignItems: "center",
     },
@@ -2451,12 +2477,39 @@ const createStyles = (
       flex: 1,
     },
     profileBannerTitle: {
-      fontSize: 13,
+      fontSize: 14,
       fontWeight: "600",
-      marginBottom: 3,
+      marginBottom: 8,
+      letterSpacing: -0.2,
     },
-    profileBannerSubtitle: {
-      fontSize: 11,
+    profileProgressRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+    },
+    profileProgressBar: {
+      flex: 1,
+      height: 6,
+      backgroundColor: isDark ? colors.surface : colors.border + '40',
+      borderRadius: 3,
+      overflow: "hidden",
+    },
+    profileProgressFill: {
+      height: "100%",
+      borderRadius: 3,
+    },
+    profileProgressText: {
+      fontSize: 12,
+      fontWeight: "600",
+      minWidth: 32,
+      textAlign: "right",
+    },
+    profileBannerArrow: {
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      justifyContent: "center",
+      alignItems: "center",
     },
     styleGuideBanner: {
       ...horizontalPadding,

@@ -58,6 +58,10 @@ const ko = {
       polish: "작성하신 글을 더 멋지게 다듬어드릴게요!",
       photo: "사진을 보여주시면 어울리는 글을 만들어드려요!",
     },
+    profileBanner: {
+      title: "프로필을 완성하면 더 나답게 쓸 수 있어요",
+      completeness: "{{percent}}%",
+    },
     errors: {
       imageSelection: "이미지를 선택하는 중 문제가 발생했습니다.",
       cameraAccess: "카메라를 사용하는 중 문제가 발생했습니다."
@@ -130,6 +134,7 @@ const ko = {
       motivational: "명언"
     },
     tones: {
+      style: "스타일",
       casual: "캐주얼",
       professional: "전문적",
       humorous: "유머러스",
@@ -186,6 +191,16 @@ const ko = {
         title: "알림",
         message: "이미지가 너무 큽니다. 더 작은 이미지를 선택해주세요.",
         analysisResult: "이미지가 너무 큽니다."
+      },
+      styleLock: {
+        loadFailed: "광고 로드 실패",
+        loadFailedMessage: "잠시 후 다시 시도해주세요.",
+        incomplete: "광고 시청 미완료",
+        incompleteMessage: "광고를 끝까지 시청해야 스타일을 잠금 해제할 수 있어요.",
+        error: "오류",
+        errorMessage: "광고 시청 중 문제가 발생했습니다.\n잠시 후 다시 시도해주세요.",
+        unlockOption: "광고 보고 해제하기",
+        proStyleMessage: "이 스타일은 프로 버전입니다.\n광고를 시청하면 1회 사용할 수 있어요!"
       }
     },
     keywords: {
@@ -907,6 +922,16 @@ const ko = {
       note: "AI 에이전트는 콘텐츠 생성 시 사용되는 AI 모델입니다.",
       gpt: "GPT-4o Mini",
       gemini: "Gemini 2.5 Flash Lite",
+      proRequired: "Pro 구독 필요",
+      subscriptionRequired: "구독 필요",
+      agents: {
+        gptMini: {
+          description: "빠르고 안정적인 범용 모델"
+        },
+        gemini: {
+          description: "Google의 차세대 초고속 모델"
+        }
+      }
     },
     themeDescription: "테마 설정",
     theme: {
@@ -2231,6 +2256,7 @@ const ko = {
         }
       },
       subscribe: "구독하기",
+      subscribePro: "Pro 구독하기",
       monthly: "/월"
     },
     purchase: {

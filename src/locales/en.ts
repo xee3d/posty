@@ -71,6 +71,10 @@ const en = {
       polish: "I'll polish your text to make it shine!",
       photo: "Show me a photo and I'll create matching content!",
     },
+    profileBanner: {
+      title: "Complete your profile to write more like you",
+      completeness: "{{percent}}%",
+    },
     errors: {
       imageSelection: "An error occurred while selecting an image.",
       cameraAccess: "An error occurred while using the camera."
@@ -143,6 +147,7 @@ const en = {
       motivational: "Motivational"
     },
     tones: {
+      style: "Style",
       casual: "Casual",
       professional: "Professional",
       humorous: "Humorous",
@@ -199,6 +204,16 @@ const en = {
         title: "Notice",
         message: "Image is too large. Please select a smaller image.",
         analysisResult: "Image is too large."
+      },
+      styleLock: {
+        loadFailed: "Ad load failed",
+        loadFailedMessage: "Please try again later.",
+        incomplete: "Ad viewing incomplete",
+        incompleteMessage: "You must watch the ad to the end to unlock the style.",
+        error: "Error",
+        errorMessage: "An error occurred while watching the ad.\nPlease try again later.",
+        unlockOption: "Watch Ad to Unlock",
+        proStyleMessage: "This is a PRO style.\nWatch an ad to use it once!"
       }
     },
     keywords: {
@@ -1150,6 +1165,24 @@ const en = {
     soundEffects: "Sound Effects",
     vibration: "Vibration",
     themeAndColors: "Theme & Colors",
+    aiAgent: {
+      title: "AI Agent",
+      description: "Select the AI model to use for content generation",
+      selectAgent: "Select AI Agent",
+      note: "AI Agent is the AI model used for content generation.",
+      gpt: "GPT-4o Mini",
+      gemini: "Gemini 2.5 Flash Lite",
+      proRequired: "Pro subscription required",
+      subscriptionRequired: "Subscription required",
+      agents: {
+        gptMini: {
+          description: "Fast and reliable general-purpose model"
+        },
+        gemini: {
+          description: "Google's next-generation ultra-fast model"
+        }
+      }
+    },
     themeDescription: "Theme settings",
     theme: {
       title: "Theme Settings",
@@ -2550,6 +2583,7 @@ Personal Information Inquiry: getposty@gmail.com`
         }
       },
       subscribe: "Subscribe",
+      subscribePro: "Subscribe to Pro",
       monthly: "/month"
     },
     purchase: {

@@ -40,7 +40,8 @@ interface AIAgentSettingsProps {
 const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
   const { colors, isDark } = useAppTheme();
   const { t } = useTranslation();
-  const isPro = useAppSelector((state) => state.user.isPro);
+  const subscriptionPlan = useAppSelector((state) => state.user.subscriptionPlan);
+  const isPro = subscriptionPlan === 'pro';
   const [currentAgent, setCurrentAgent] = useState<AIAgent>('gpt-mini');
   const [showAgentModal, setShowAgentModal] = useState(false);
   const [availableAgents, setAvailableAgents] = useState<AIAgentConfig[]>([]);
@@ -50,7 +51,7 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
       id: "gpt-mini",
       name: "GPT-4o Mini",
       nativeName: "GPT-4o Mini",
-      description: "빠르고 안정적인 범용 모델",
+      description: t('settings.aiAgent.agents.gptMini.description'),
       icon: "flash",
       color: "#10B981",
       badge: "GPT",
@@ -61,13 +62,13 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
       id: "gemini",
       name: "Gemini 2.5 Flash Lite",
       nativeName: "Gemini 2.5 Flash Lite",
-      description: "Google의 차세대 초고속 모델",
+      description: t('settings.aiAgent.agents.gemini.description'),
       icon: "sparkles",
       color: "#8B5CF6",
       badge: "GEM",
-      isAvailable: true, // 임시로 모두 사용 가능
+      isAvailable: isPro, // Pro 사용자만 사용 가능
       requiresPro: true,
-      fallbackInfo: isPro ? undefined : "Pro 구독 필요",
+      fallbackInfo: isPro ? undefined : t('settings.aiAgent.proRequired'),
     },
   ];
 
@@ -87,14 +88,13 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
         ? (savedAgent as AIAgent)
         : 'gpt-mini';
 
-      // 임시로 Pro 체크 비활성화
-      // if (current === "gemini" && !isPro) {
-      //   setCurrentAgent('gpt-mini');
-      //   await AsyncStorage.setItem(AI_AGENT_STORAGE_KEY, 'gpt-mini');
-      // } else {
-      //   setCurrentAgent(current);
-      // }
-      setCurrentAgent(current);
+      // Pro가 아닌 사용자가 Gemini를 선택한 경우 GPT로 변경
+      if (current === "gemini" && !isPro) {
+        setCurrentAgent('gpt-mini');
+        await AsyncStorage.setItem(AI_AGENT_STORAGE_KEY, 'gpt-mini');
+      } else {
+        setCurrentAgent(current);
+      }
 
       // AI 에이전트 설정
       setAvailableAgents(aiAgentConfigs);
@@ -174,7 +174,7 @@ const AIAgentSettings: React.FC<AIAgentSettingsProps> = ({ onAgentChange }) => {
               {!item.isAvailable && item.requiresPro && (
                 <View style={[styles.unavailableBadge, { backgroundColor: colors.text.tertiary + '20' }]}>
                   <Text style={[styles.unavailableText, { color: colors.text.tertiary }]}>
-                    구독 필요
+                    {t('settings.aiAgent.subscriptionRequired')}
                   </Text>
                 </View>
               )}
