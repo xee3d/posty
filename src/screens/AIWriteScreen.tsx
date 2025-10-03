@@ -180,7 +180,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     | "simple"
     | "formal"
     | "emotion"
-    | "storytelling"
     | "engaging"
   >("engaging");
   const [selectedImageUri, setSelectedImageUri] = useState<string | null>(null);
@@ -366,18 +365,18 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
       color: "#95A3B3",
     },
     {
-      id: "storytelling",
-      label: t("aiWrite.tones.storytelling"),
-      icon: "book-outline",
-      iconType: "ionicon",
-      color: "#6C5B7B",
-    },
-    {
       id: "motivational",
       label: t("aiWrite.tones.motivational"),
       icon: "fitness-outline",
       iconType: "ionicon",
       color: "#4ECDC4",
+    },
+    {
+      id: "formal",
+      label: t("aiWrite.tones.formal"),
+      icon: "business-outline",
+      iconType: "ionicon",
+      color: "#8B5CF6",
     },
   ];
 
@@ -1427,36 +1426,6 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                         </Text>
                       </TouchableOpacity>
 
-                      <TouchableOpacity
-                        style={[
-                          styles.polishOptionButton,
-                          selectedPolishOption === "storytelling" &&
-                            styles.polishOptionButtonActive,
-                        ]}
-                        onPress={() => {
-                          setSelectedPolishOption("storytelling");
-                          soundManager.playTap();
-                        }}
-                      >
-                        <SafeIcon
-                          name="book-outline"
-                          size={18}
-                          color={
-                            selectedPolishOption === "storytelling"
-                              ? colors.primary
-                              : colors.text.secondary
-                          }
-                        />
-                        <Text
-                          style={[
-                            styles.polishOptionText,
-                            selectedPolishOption === "storytelling" &&
-                              styles.polishOptionTextActive,
-                          ]}
-                        >
-                          {t("aiWrite.polishOptions.storytelling")}
-                        </Text>
-                      </TouchableOpacity>
 
                       <TouchableOpacity
                         style={[

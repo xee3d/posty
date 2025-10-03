@@ -381,7 +381,7 @@ const ja = {
       genz: "Z世代",
       millennial: "ミレニアル世代",
       minimalist: "ミニマル",
-      storytelling: "文語体",
+      formal: "文語体",
       motivational: "名言",
     },
     
@@ -444,7 +444,7 @@ const ja = {
       upgrade: "プロプランに登録",
       oneTimeUse: "1回使用",
       styleMessage: "✨ {{styleName}}スタイルはプレミアム機能です！\n\n🎯 今すぐ利用する方法:\n• 🎬 広告視聴（無料お試し）\n• ⭐ プロプランにアップグレード",
-      toneMessage: "{tone}スタイルはプロプランでのみご利用いただけます。",
+      toneMessage: "{{tone}}スタイルはプロプランでのみご利用いただけます。",
       unlockedTitle: "スタイル解除！",
       unlockedMessage: "{tone}スタイルが1回使用可能になりました。",
     },

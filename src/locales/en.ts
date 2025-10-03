@@ -139,7 +139,7 @@ const en = {
       genz: "Trendy",
       millennial: "Lifestyle",
       minimalist: "Minimal",
-      storytelling: "Formal",
+      formal: "Formal",
       motivational: "Motivational"
     },
     tones: {
@@ -150,7 +150,7 @@ const en = {
       genz: "Gen Z",
       millennial: "Millennial",
       minimalist: "Minimalist",
-      storytelling: "Formal",
+      formal: "Formal",
       motivational: "Quotes",
       clean: "Clean",
       structured: "Organized",
@@ -244,7 +244,6 @@ const en = {
       simple: "Simplify", 
       formal: "Make Formal",
       emotion: "Add Emotion",
-      storytelling: "Make Formal",
       engaging: "Make Engaging",
       hashtag: "Extract Hashtags",
     },
@@ -286,9 +285,9 @@ const en = {
       upgrade: "Subscribe to Pro Plan",
       oneTimeUse: "1-time use",
       styleMessage: "✨ {{styleName}} style is a premium feature!\n\n🎯 Get access right now:\n• 🎬 Watch an ad (free trial)\n• ⭐ Upgrade to Pro plan",
-      toneMessage: "{tone} style is only available with Pro plan.",
+      toneMessage: "{{tone}} style is only available with Pro plan.",
       unlockedTitle: "Style Unlocked!",
-      unlockedMessage: "{tone} style is now available for one-time use.",
+      unlockedMessage: "{{tone}} style is now available for one-time use.",
     },
     tokenUsage: {
       photoWrite: "Photo Writing",
@@ -1190,7 +1189,7 @@ const en = {
       genz: "Gen Z",
       millennial: "Millennial",
       minimalist: "Minimalist",
-      storytelling: "Formal",
+      formal: "Formal",
       motivational: "Motivational"
     },
     time: {

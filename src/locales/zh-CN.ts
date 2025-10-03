@@ -370,9 +370,8 @@ const zhCN = {
     polishOptions: {
       summarize: "总结",
       simple: "简化表达",
-      formal: "正式文体",
+      formal: "文言体",
       emotion: "情感增强",
-      storytelling: "叙述体",
       engaging: "更有吸引力",
       hashtag: "提取话题标签",
     },
@@ -402,7 +401,6 @@ const zhCN = {
       genz: "Z世代",
       millennial: "千禧一代",
       minimalist: "极简",
-      storytelling: "叙事体",
       motivational: "名言"
     },
     
@@ -2156,7 +2154,6 @@ const zhCN = {
       genz: "GenZ",
       millennial: "千禧一代",
       minimalist: "极简主义",
-      storytelling: "叙事体",
       motivational: "励志"
     },
     time: {
