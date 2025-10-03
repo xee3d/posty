@@ -1568,7 +1568,7 @@ const createStyles = (
     recommendedTemplate: {
       borderWidth: 2,
       borderColor: colors.primary,
-      backgroundColor: isDark ? colors.primary + "10" : "#F3E8FF",
+      backgroundColor: colors.primary + (isDark ? "10" : "15"),
       transform: [{ scale: 1.02 }],
     },
     recommendedBadge: {
@@ -1801,7 +1801,7 @@ const createStyles = (
       width: 36,
       height: 36,
       borderRadius: 18,
-      backgroundColor: isDark ? colors.primary + "20" : "#F3E8FF",
+      backgroundColor: colors.primary + (isDark ? "20" : "15"),
       justifyContent: "center",
       alignItems: "center",
       borderWidth: 2,
