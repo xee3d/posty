@@ -2281,6 +2281,20 @@ const ja = {
       tokens_200: "200トークン",
       tokens_300: "300トークン"
     },
+    subscription: {
+      title: "サブスクリプションプラン",
+      pro: {
+        title: "プロバージョン",
+        features: {
+          unlimitedTokens: "無制限トークン",
+          noAds: "すべての広告を削除",
+          aiAgents: "Gemini 2.5 / GPT-4o エージェント",
+          allStyles: "すべてのスタイルが利用可能"
+        }
+      },
+      subscribe: "購読する",
+      monthly: "/月"
+    },
     purchase: {
       title: "トークン購入",
       message: "{{tokens}}個のトークンを{{price}}で\n購入しますか？",

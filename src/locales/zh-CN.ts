@@ -2363,6 +2363,20 @@ const zhCN = {
       tokens_200: "200代币",
       tokens_300: "300代币"
     },
+    subscription: {
+      title: "订阅计划",
+      pro: {
+        title: "专业版",
+        features: {
+          unlimitedTokens: "无限代币",
+          noAds: "移除所有广告",
+          aiAgents: "Gemini 2.5 / GPT-4o 代理",
+          allStyles: "所有写作风格可用"
+        }
+      },
+      subscribe: "订阅",
+      monthly: "/月"
+    },
     purchase: {
       title: "代币购买",
       message: "以{{price}}购买{{tokens}}个代币？",

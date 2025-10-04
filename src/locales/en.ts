@@ -2573,6 +2573,20 @@ Personal Information Inquiry: getposty@gmail.com`
       tokens_200: "200 Tokens",
       tokens_300: "300 Tokens"
     },
+    subscription: {
+      title: "Subscription Plans",
+      pro: {
+        title: "Pro Version",
+        features: {
+          unlimitedTokens: "Unlimited Tokens",
+          noAds: "Remove All Ads",
+          aiAgents: "Gemini 2.5 / GPT-4o Agents",
+          allStyles: "All Writing Styles Available"
+        }
+      },
+      subscribe: "Subscribe",
+      monthly: "/month"
+    },
     purchase: {
       title: "Token Purchase",
       message: "Purchase {{tokens}} tokens for {{price}}?",

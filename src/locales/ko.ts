@@ -2246,6 +2246,20 @@ const ko = {
       tokens_200: "200 토큰",
       tokens_300: "300 토큰"
     },
+    subscription: {
+      title: "구독 플랜",
+      pro: {
+        title: "프로 버전",
+        features: {
+          unlimitedTokens: "무한 토큰",
+          noAds: "모든 광고 제거",
+          aiAgents: "Gemini 2.5 / GPT-4o 에이전트",
+          allStyles: "모든 스타일 사용 가능"
+        }
+      },
+      subscribe: "구독하기",
+      monthly: "/월"
+    },
     purchase: {
       title: "토큰 구매",
       message: "{{tokens}}개 토큰을 {{price}}에\n구매하시겠습니까?",
