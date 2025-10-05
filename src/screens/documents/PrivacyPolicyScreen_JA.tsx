@@ -148,7 +148,7 @@ Tinrobot Studio（以下「当社」）は、利用者の個人情報を非常�
 
 • **職責：** [職責]
 
-• **連絡先：** privacy@getposty.ai
+• **連絡先：** getposty@gmail.com
 
 ## 10. プライバシーポリシーの変更
 

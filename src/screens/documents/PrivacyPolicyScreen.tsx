@@ -189,7 +189,7 @@ const KoreanPrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({
 
 • **직책:** [직책]
 
-• **연락처:** privacy@getposty.ai
+• **연락처:** getposty@gmail.com
 
 ## 10. 개인정보처리방침 변경
 

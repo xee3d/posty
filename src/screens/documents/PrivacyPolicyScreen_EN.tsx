@@ -148,7 +148,7 @@ The Company designates a Personal Information Protection Officer to oversee pers
 
 • **Position:** [Position]
 
-• **Contact:** privacy@getposty.ai
+• **Contact:** getposty@gmail.com
 
 ## 10. Changes to Privacy Policy
 

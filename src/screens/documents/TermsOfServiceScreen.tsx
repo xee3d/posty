@@ -161,7 +161,7 @@ AI가 생성한 콘텐츠는 이용자가 자유롭게 사용, 수정, 배포할
 
 연락처: getposty@gmail.com
 
-개인정보보호책임자: privacy@getposty.ai
+개인정보보호책임자: getposty@gmail.com
 
 ## 제12조 (인공지능 기술 사용)
 

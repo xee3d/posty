@@ -148,7 +148,7 @@ Tinrobot Studio（以下简称"公司"）非常重视您的个人信息，并遵
 
 • **职位：** [职位]
 
-• **联系方式：** privacy@getposty.ai
+• **联系方式：** getposty@gmail.com
 
 ## 10. 隐私政策变更
 

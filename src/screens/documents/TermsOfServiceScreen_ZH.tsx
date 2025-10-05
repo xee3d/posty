@@ -120,7 +120,7 @@ AI生成的内容可以由用户自由使用、修改和分发。
 
 联系方式：getposty@gmail.com
 
-个人信息保护负责人：privacy@getposty.ai
+个人信息保护负责人：getposty@gmail.com
 
 ## 第12条（人工智能技术使用）
 

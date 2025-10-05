@@ -2408,7 +2408,7 @@ Disputes arising from the use of the Service shall be subject to the exclusive j
 
 Contact: getposty@gmail.com
 
-Privacy Officer: privacy@getposty.ai`
+Privacy Officer: getposty@gmail.com`
     },
     privacyPolicy: {
       title: "Privacy Policy",
@@ -2542,7 +2542,7 @@ The Company has designated a Personal Information Protection Officer to oversee 
 
 • **Position:** [Position]
 
-• **Contact:** privacy@getposty.ai
+• **Contact:** getposty@gmail.com
 
 ## 10. Changes to Privacy Policy
 

@@ -120,7 +120,7 @@ AIが生成したコンテンツは、利用者が自由に使用、修正、配
 
 連絡先：getposty@gmail.com
 
-個人情報保護責任者：privacy@getposty.ai
+個人情報保護責任者：getposty@gmail.com
 
 ## 第12条（人工知能技術の使用）
 

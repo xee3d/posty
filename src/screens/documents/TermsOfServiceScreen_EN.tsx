@@ -120,7 +120,7 @@ Disputes arising from the use of the Service shall be subject to the exclusive j
 
 Contact: getposty@gmail.com
 
-Privacy Officer: privacy@getposty.ai
+Privacy Officer: getposty@gmail.com
 
 ## Article 12 (Use of Artificial Intelligence Technology)
 
