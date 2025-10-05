@@ -24,37 +24,26 @@
 3. **구독 상품 추가**
 
    ```
-   상품 ID: com.posty.premium.monthly
-   참조명: Premium Monthly
-   가격: ₩9,900 (Tier 10)
-
-   상품 ID: com.posty.premium.yearly
-   참조명: Premium Yearly
-   가격: ₩99,000 (Tier 63)
-
    상품 ID: com.posty.pro.monthly
    참조명: Pro Monthly
-   가격: ₩19,900 (Tier 20)
-
-   상품 ID: com.posty.pro.yearly
-   참조명: Pro Yearly
-   가격: ₩199,000 (Tier 87)
+   가격: ₩15,000 (Tier 15)
+   설명: 무제한 토큰 + 광고 제거 + GPT-4o & Gemini 2.5 Flash
    ```
 
 4. **소모품 추가 (토큰)**
 
    ```
-   상품 ID: com.posty.tokens.50
-   참조명: 50 Tokens
-   가격: ₩2,900 (Tier 3)
+   상품 ID: com.posty.tokens.app.100
+   참조명: 100 Tokens
+   가격: ₩3,000 (Tier 3)
 
-   상품 ID: com.posty.tokens.100
-   참조명: 100 Tokens (+20 Bonus)
-   가격: ₩4,900 (Tier 5)
+   상품 ID: com.posty.tokens.app.200
+   참조명: 200 Tokens (+20 Bonus)
+   가격: ₩6,000 (Tier 6)
 
-   상품 ID: com.posty.tokens.200
-   참조명: 200 Tokens (+50 Bonus)
-   가격: ₩8,900 (Tier 9)
+   상품 ID: com.posty.tokens.app.300
+   참조명: 300 Tokens (+30 Bonus)
+   가격: ₩9,000 (Tier 9)
    ```
 
 ### 1.3 iOS 프로젝트 설정
@@ -93,37 +82,26 @@
 2. **구독 상품 생성**
 
    ```
-   제품 ID: premium_monthly
-   이름: Premium 월간 구독
-   가격: ₩9,900
-
-   제품 ID: premium_yearly
-   이름: Premium 연간 구독
-   가격: ₩99,000
-
    제품 ID: pro_monthly
    이름: Pro 월간 구독
-   가격: ₩19,900
-
-   제품 ID: pro_yearly
-   이름: Pro 연간 구독
-   가격: ₩199,000
+   가격: ₩15,000
+   설명: 무제한 토큰 + 광고 제거 + GPT-4o & Gemini 2.5 Flash
    ```
 
 3. **인앱 상품 생성 (토큰)**
 
    ```
-   제품 ID: tokens_50
-   이름: 50 토큰
-   가격: ₩2,900
-
    제품 ID: tokens_100
-   이름: 100 토큰 (+20 보너스)
-   가격: ₩4,900
+   이름: 100 토큰
+   가격: ₩3,000
 
    제품 ID: tokens_200
-   이름: 200 토큰 (+50 보너스)
-   가격: ₩8,900
+   이름: 200 토큰 (+20 보너스)
+   가격: ₩6,000
+
+   제품 ID: tokens_300
+   이름: 300 토큰 (+30 보너스)
+   가격: ₩9,000
    ```
 
 ### 2.3 Android 프로젝트 설정

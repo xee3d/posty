@@ -151,12 +151,11 @@ class SubscriptionManager {
   // 플랜 ID를 제품 ID로 변환
   private getProductIdForPlan(planId: string): string {
     const productMap: { [key: string]: string } = {
-      'starter': Platform.OS === 'ios' ? 'com.posty.subscription.starter' : 'subscription_starter',
       'premium': Platform.OS === 'ios' ? 'com.posty.subscription.premium' : 'subscription_premium',
-      'pro': Platform.OS === 'ios' ? 'com.posty.subscription.pro' : 'subscription_pro'
+      'pro': Platform.OS === 'ios' ? 'com.posty.pro.monthly' : 'pro_monthly'
     };
 
-    return productMap[planId] || productMap['starter'];
+    return productMap[planId] || productMap['pro'];
   }
 
   // 구독 만료 확인

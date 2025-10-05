@@ -1627,7 +1627,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       />
                       <View style={styles.changePhotoButton}>
                         <SafeIcon name="camera" size={16} color="#FFFFFF" />
-                        <Text style={styles.changePhotoText}>사진 변경</Text>
+                        <Text style={styles.changePhotoText}>{t("aiWrite.photo.upload.change")}</Text>
                       </View>
                     </TouchableOpacity>
                   ) : (

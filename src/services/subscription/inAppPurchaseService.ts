@@ -32,14 +32,12 @@ import { store } from "../../store";
 const productIds = Platform.select({
   ios: [
     "com.posty.pro.monthly",
-    "com.posty.pro.yearly",
     "com.posty.tokens.app.100",
     "com.posty.tokens.app.200",
     "com.posty.tokens.app.300",
   ],
   android: [
     "pro_monthly",
-    "pro_yearly",
     "tokens_100",
     "tokens_200",
     "tokens_300",
@@ -50,11 +48,9 @@ const productIds = Platform.select({
 const subscriptionIds = Platform.select({
   ios: [
     "com.posty.pro.monthly",
-    "com.posty.pro.yearly",
   ],
   android: [
     "pro_monthly",
-    "pro_yearly",
   ],
   default: [],
 });

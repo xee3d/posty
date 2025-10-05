@@ -2358,6 +2358,7 @@ const zhCN = {
     buy: "购买",
     discount: "{{percent}}% 折扣",
     bestValue: "最佳价值",
+    tokenCount: "{{count}}个",
     packageNames: {
       tokens_100: "100代币",
       tokens_200: "200代币",

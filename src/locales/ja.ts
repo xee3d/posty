@@ -527,6 +527,23 @@ const ja = {
       ],
     },
     
+    photo: {
+      select: {
+        title: "写真選択",
+        message: "どの方法で写真を選択しますか？",
+        camera: "カメラで撮影",
+        gallery: "ギャラリーから選択",
+      },
+      upload: {
+        title: "写真を選択してください",
+        subtitle: "ギャラリーから選択するか、直接撮影してください",
+        button: "写真選択",
+        change: "変更",
+        camera: "カメラ",
+        gallery: "ギャラリー",
+      },
+      defaultPrompt: "写真に合う自然なSNS投稿を書いてください。",
+    },
     photoUpload: {
       title: "画像で書く",
       description: "写真をアップロードしてコンテンツを生成します",
@@ -2276,6 +2293,7 @@ const ja = {
     buy: "購入",
     discount: "{{percent}}%オフ",
     bestValue: "最高の価値",
+    tokenCount: "{{count}}個",
     packageNames: {
       tokens_100: "100トークン",
       tokens_200: "200トークン",

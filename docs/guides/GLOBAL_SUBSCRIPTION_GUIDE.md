@@ -27,16 +27,12 @@
 
 ### 주요 시장
 
-| 국가   | 통화 | 심볼 | Premium 월간 | Pro 월간 |
-| ------ | ---- | ---- | ------------ | -------- |
-| 한국   | KRW  | ₩    | ₩9,900       | ₩19,900  |
-| 미국   | USD  | $    | $9.99        | $19.99   |
-| 일본   | JPY  | ¥    | ¥1,200       | ¥2,400   |
-| 영국   | GBP  | £    | £7.99        | £15.99   |
-| EU     | EUR  | €    | €8.99        | €17.99   |
-| 중국   | CNY  | ¥    | ¥68          | ¥138     |
-| 인도   | INR  | ₹    | ₹449         | ₹899     |
-| 브라질 | BRL  | R$   | R$29.90      | R$59.90  |
+| 국가   | 통화 | 심볼 | Pro 월간 | 토큰 100개 | 토큰 200개 | 토큰 300개 |
+| ------ | ---- | ---- | -------- | ---------- | ---------- | ---------- |
+| 한국   | KRW  | ₩    | ₩15,000  | ₩3,000     | ₩6,000     | ₩9,000     |
+| 미국   | USD  | $    | $9.99    | $1.99      | $3.99      | $5.99      |
+| 일본   | JPY  | ¥    | ¥2,000   | ¥300       | ¥600       | ¥2,000     |
+| 중국   | CNY  | ¥    | ¥88.0    | ¥15.0      | ¥28.0      | ¥88.0      |
 
 ### 가격 자동 조정
 
@@ -122,10 +118,10 @@ GOOGLE_PLAY_PUBLIC_KEY=your-public-key
 
 1. **인앱 구매 상품 등록**
 
-   - com.posty.premium.monthly
-   - com.posty.premium.yearly
-   - com.posty.pro.monthly
-   - com.posty.pro.yearly
+   - com.posty.pro.monthly (구독)
+   - com.posty.tokens.app.100 (소모품)
+   - com.posty.tokens.app.200 (소모품)
+   - com.posty.tokens.app.300 (소모품)
 
 2. **지역별 가격 설정**
 
@@ -140,10 +136,10 @@ GOOGLE_PLAY_PUBLIC_KEY=your-public-key
 
 1. **구독 상품 생성**
 
-   - premium_monthly
-   - premium_yearly
-   - pro_monthly
-   - pro_yearly
+   - pro_monthly (구독)
+   - tokens_100 (소모품)
+   - tokens_200 (소모품)
+   - tokens_300 (소모품)
 
 2. **가격 템플릿**
 

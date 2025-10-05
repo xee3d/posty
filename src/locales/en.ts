@@ -2568,6 +2568,7 @@ Personal Information Inquiry: getposty@gmail.com`
     buy: "Buy",
     discount: "{{percent}}% off",
     bestValue: "Best Value",
+    tokenCount: "{{count}}",
     packageNames: {
       tokens_100: "100 Tokens",
       tokens_200: "200 Tokens",

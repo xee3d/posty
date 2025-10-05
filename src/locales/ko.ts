@@ -2241,6 +2241,7 @@ const ko = {
     buy: "구매",
     discount: "{{percent}}% 할인",
     bestValue: "최고 가치",
+    tokenCount: "{{count}}개",
     packageNames: {
       tokens_100: "100 토큰",
       tokens_200: "200 토큰",

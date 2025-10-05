@@ -456,13 +456,15 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
                   ]}>
                     <View style={styles.tokenLeft}>
                       <PrimaryIcon name="flash" size={24} />
-                      <Text style={styles.tokenCount}>{totalTokens}개</Text>
+                      <Text style={styles.tokenCount}>
+                        {t("tokenShop.tokenCount", { count: totalTokens })}
+                      </Text>
                     </View>
                     {/* 할인율 표시 - 토큰 오른쪽 */}
                     {index > 0 && (
                       <View style={styles.discountBadge}>
                         <Text style={styles.discountText}>
-                          {calculateDiscount(pkg)}% 할인
+                          {t("tokenShop.discount", { percent: calculateDiscount(pkg) })}
                         </Text>
                       </View>
                     )}
