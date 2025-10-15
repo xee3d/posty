@@ -80,7 +80,7 @@ android {
         applicationId "com.posty"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
+        versionCode 5
         versionName "1.0"
         multiDexEnabled true
         missingDimensionStrategy 'store', 'play'
@@ -151,9 +151,9 @@ apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
 configurations.all {
     resolutionStrategy {
         // Force specific Kotlin version for all modules
-        force "org.jetbrains.kotlin:kotlin-stdlib:1.9.22"
-        force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.22"
-        force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.22"
+        force "org.jetbrains.kotlin:kotlin-stdlib:1.9.25"
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.25"
+        force "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.25"
     }
 }
 

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, Platform } from 'react-nativ
 import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { SPACING } from '../utils/constants';
-import { AD_CONFIG } from '../config/adConfig';
+import { AD_CONFIG } from '../utils/adConfig';
 
 interface AdBannerProps {
   style?: any;

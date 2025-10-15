@@ -5,7 +5,7 @@ declare module "@env" {
   export const KAKAO_APP_KEY: string;
 
   export const API_URL: string;
-  export const NOTION_API_KEY: string;
+  export const IOS_SHARED_SECRET: string;
 }
 
 declare global {

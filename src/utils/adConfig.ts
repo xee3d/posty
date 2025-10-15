@@ -63,52 +63,6 @@ export const SUBSCRIPTION_PLANS = {
     },
   },
 
-  starter: {
-    id: "starter",
-    name: "STARTER",
-    price: 3300,
-    priceDisplay: "₩3,300",
-    features: {
-      monthlyTokens: 200, // 월 200개로 조정
-      dailyLimit: -1, // 일일 제한 없음
-      aiModel: "gpt-4o-mini", // 무료와 동일한 모델
-      hasAds: false,
-      platforms: ["instagram", "facebook", "twitter"],
-      rolloverTokens: 30, // 30개까지 이월
-      extraFeatures: [
-        "매월 200개 토큰 제공",
-        "일일 제한 없음",
-        "최대 30개 이월 가능",
-        "광고 완전 제거",
-        "GPT-4o mini AI 모델",
-      ],
-    },
-  },
-
-  premium: {
-    id: "premium",
-    name: "PREMIUM",
-    price: 5500,
-    priceDisplay: "₩5,500",
-    features: {
-      monthlyTokens: 500, // 100개 -> 500개로 증량
-      dailyLimit: -1, // 일일 제한 없음
-      aiModel: "gpt-4o", // 고급 모델
-      hasAds: false,
-      platforms: ["instagram", "facebook", "twitter", "linkedin", "blog"],
-      rolloverTokens: 100, // 이월 가능 토큰 추가
-      extraFeatures: [
-        "매월 500개 토큰 제공",
-        "최대 100개까지 다음 달 이월",
-        "광고 완전 제거",
-        "5가지 플랫폼 지원",
-        "프리미엄 템플릿",
-        "톤 & 스타일 커스터마이징",
-        "GPT-4o 최신 AI 모델",
-      ],
-    },
-  },
-
   pro: {
     id: "pro",
     name: "PRO",

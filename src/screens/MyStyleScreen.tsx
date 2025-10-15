@@ -53,7 +53,7 @@ import { createHeaderStyles, createSectionStyles } from "../styles/commonStyles"
 
 import { Alert } from "../utils/customAlert";
 import { useAppSelector } from "../hooks/redux";
-import { getUserPlan, getMyStyleAccess, PlanType } from "../config/adConfig";
+import { getUserPlan, getMyStyleAccess, PlanType } from "../utils/adConfig";
 import { CompactBanner, SmartAdPlacement } from "../components/ads";
 const { width } = Dimensions.get("window");
 

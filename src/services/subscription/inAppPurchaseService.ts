@@ -27,6 +27,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Alert } from "../../utils/customAlert";
 import { updateSubscription } from "../../store/slices/userSlice";
 import { store } from "../../store";
+import { IOS_SHARED_SECRET } from "@env";
 
 // 상품 ID 정의
 const productIds = Platform.select({
@@ -249,23 +250,32 @@ class InAppPurchaseService {
    */
   private async verifyPurchase(purchase: Purchase): Promise<boolean> {
     try {
-      // iOS의 경우 로컬 검증 먼저
-      if (Platform.OS === "ios") {
-        const receiptBody = await validateReceiptIos({
-          receiptBody: {
-            "receipt-data": await getReceiptIOS(),
-            password: process.env.IOS_SHARED_SECRET || "",
-          },
-          isTest: __DEV__,
-        });
+      // iOS의 경우 로컬 검증 (Shared Secret이 있을 때만)
+      if (Platform.OS === "ios" && IOS_SHARED_SECRET) {
+        try {
+          const receiptBody = await validateReceiptIos({
+            receiptBody: {
+              "receipt-data": await getReceiptIOS(),
+              password: IOS_SHARED_SECRET,
+            },
+            isTest: __DEV__,
+          });
 
-        if (receiptBody.status !== 0) {
-          console.error("iOS receipt validation failed:", receiptBody);
-          return false;
+          if (receiptBody.status !== 0) {
+            console.warn("iOS receipt validation failed:", receiptBody);
+            // 로컬 검증 실패해도 서버 검증으로 계속 진행
+          } else {
+            console.log("✅ iOS receipt validation successful");
+          }
+        } catch (receiptError) {
+          console.warn("iOS receipt validation error (continuing with server verification):", receiptError);
+          // 로컬 검증 에러 발생해도 서버 검증으로 계속 진행
         }
+      } else if (Platform.OS === "ios" && !IOS_SHARED_SECRET) {
+        console.warn("⚠️ iOS Shared Secret not configured - skipping local validation, using server verification only");
       }
 
-      // 서버 검증
+      // 서버 검증 (메인 검증 방법)
       const response = await serverSubscriptionService.purchaseSubscription(
         (purchase as any).productId,
         (purchase as any).purchaseToken || (purchase as any).transactionId || "",

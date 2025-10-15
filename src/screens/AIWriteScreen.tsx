@@ -85,7 +85,7 @@ import {
   TREND_ACCESS,
   PlanType,
   canAccessPolishOption,
-} from "../config/adConfig";
+} from "../utils/adConfig";
 
 type WriteMode = "text" | "photo" | "polish";
 

@@ -18,7 +18,7 @@ import SplashScreen from "react-native-splash-screen";
 (global as any).SafeIcon = SafeIcon;
 (global as any).Icon = IconComponent;
 import AnimatedSplashScreen from "./src/components/AnimatedSplashScreen";
-import { NotionSyncProvider } from "./src/context/NotionSyncContext";
+// import { NotionSyncProvider } from "./src/context/NotionSyncContext"; // Notion 사용 안 함
 import {
   View,
   StyleSheet,
@@ -756,11 +756,11 @@ const App: React.FC = () => {
         persistor={persistor}
       >
         <ThemeProvider>
-          <NotionSyncProvider>
+          {/* <NotionSyncProvider> Notion 사용 안 함 */}
             <TextRenderingErrorBoundary>
               <AppContent />
             </TextRenderingErrorBoundary>
-          </NotionSyncProvider>
+          {/* </NotionSyncProvider> */}
         </ThemeProvider>
       </PersistGate>
     </Provider>
