@@ -76,11 +76,19 @@ android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     namespace "com.posty"
+
+    lint {
+        checkReleaseBuilds true
+        abortOnError true
+        warningsAsErrors false
+        // Enable NewApi check for Android 15 compatibility
+        enable 'NewApi'
+    }
     defaultConfig {
         applicationId "com.posty"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 7
+        versionCode 15
         versionName "1.0"
         multiDexEnabled true
         missingDimensionStrategy 'store', 'play'

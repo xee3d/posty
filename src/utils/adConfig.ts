@@ -134,9 +134,78 @@ export interface NativeAd {
   store?: string;
 }
 
+// 플랜 타입
+export type PlanType = "free" | "pro";
+
+// 사용자 플랜 가져오기
+export const getUserPlan = (plan: string) => {
+  switch (plan) {
+    case "pro":
+      return SUBSCRIPTION_PLANS.pro;
+    case "free":
+    default:
+      return SUBSCRIPTION_PLANS.free;
+  }
+};
+
+// MyStyle 접근 권한 확인
+export const getMyStyleAccess = (plan?: string) => {
+  const planType = plan || "free";
+
+  switch (planType) {
+    case "pro":
+      return {
+        hasAccess: true,
+        templateLimit: 0, // 0 means unlimited
+      };
+    case "free":
+    default:
+      return {
+        hasAccess: false,
+        templateLimit: 0,
+      };
+  }
+};
+
+// 톤 접근 권한 확인
+export const canAccessTone = (plan?: string, toneId?: string) => {
+  const planType = plan || "free";
+
+  // Pro 플랜은 모든 톤에 접근 가능
+  if (planType === "pro") {
+    return true;
+  }
+
+  // 무료 플랜은 기본 톤만 접근 가능
+  const freeTones = ["casual", "professional", "friendly", "formal"];
+  if (planType === "free" && toneId && freeTones.includes(toneId)) {
+    return true;
+  }
+
+  return false;
+};
+
+// 글 길이 접근 권한 확인
+export const canAccessLength = (plan?: string, lengthOption?: string) => {
+  const planType = plan || "free";
+
+  // Pro 플랜은 모든 길이 옵션에 접근 가능
+  if (planType === "pro") {
+    return true;
+  }
+
+  // 무료 플랜은 기본 길이만 접근 가능
+  const freeLengths = ["short", "medium"];
+  if (planType === "free" && lengthOption && freeLengths.includes(lengthOption)) {
+    return true;
+  }
+
+  return false;
+};
+
 // 사용자 구독 상태
 export interface UserSubscription {
-  plan: "free" | "premium" | "pro";
+  plan: "free" | "pro";
   expiresAt?: Date;
   dailyTokens: number; // 남은 토큰 수
   lastResetDate: Date;

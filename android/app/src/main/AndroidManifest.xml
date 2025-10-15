@@ -16,8 +16,7 @@
       android:icon="@mipmap/ic_launcher"
       android:allowBackup="false"
       android:networkSecurityConfig="@xml/network_security_config"
-      android:theme="@style/AppTheme"
-      android:extractNativeLibs="true">
+      android:theme="@style/AppTheme">
       
       <!-- Google Mobile Ads App ID -->
       <meta-data
@@ -55,7 +54,7 @@
       </activity>
       
       <!-- 카카오 로그인 Redirect URI -->
-      <activity 
+      <activity
         android:name="com.kakao.sdk.auth.AuthCodeHandlerActivity"
         android:exported="true">
         <intent-filter>
@@ -66,7 +65,15 @@
                   android:host="oauth" />
         </intent-filter>
       </activity>
-      
+
+      <!-- Naver Login Activity - Override to remove orientation restriction for Android 16+ -->
+      <activity
+        android:name="com.navercorp.nid.oauth.activity.NidOAuthCustomTabActivity"
+        android:exported="true"
+        android:screenOrientation="unspecified"
+        tools:replace="android:screenOrientation,android:exported"
+        tools:node="merge" />
+
       <!-- Facebook SDK 설정 disabled for release -->
       <!--
       <meta-data 
