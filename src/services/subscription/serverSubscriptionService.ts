@@ -203,23 +203,31 @@ class ServerSubscriptionService {
     purchaseToken: string,
     platform: "ios" | "android"
   ): Promise<UserSubscription> {
+    // CRITICAL FIX: 30초 타임아웃 추가 (네트워크 오류 시 무한 대기 방지)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초
+
     try {
       const user = await vercelAuthService.getCurrentUser();
       if (!user) {
+        clearTimeout(timeoutId);
         throw new Error("User not authenticated");
       }
 
-      const response = await fetch(`${this.baseUrl}/subscriptions/purchase`, {
+      // CRITICAL FIX: 실제 서버 엔드포인트에 맞게 경로 수정
+      // /subscriptions/purchase (존재하지 않음) → /api/subscription/create (실제 엔드포인트)
+      const response = await fetch(`${this.baseUrl}/api/subscription/create`, {
         method: "POST",
+        signal: controller.signal, // 타임아웃 시그널 추가
         headers: {
           Authorization: `Bearer ${await vercelAuthService.getAuthToken()}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId: user.uid,
-          planId,
-          purchaseToken,
-          platform,
+          plan: planId, // planId → plan (서버 파라미터 매칭)
+          transactionId: purchaseToken, // purchaseToken → transactionId (서버 파라미터 매칭)
+          paymentMethod: platform, // 플랫폼 정보 추가
           metadata: {
             deviceId: (await DeviceInfo.getUniqueId()) || "unknown-device",
             country: "KR",
@@ -227,6 +235,8 @@ class ServerSubscriptionService {
           },
         }),
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const error = await response.json();
@@ -243,6 +253,14 @@ class ServerSubscriptionService {
 
       return subscription;
     } catch (error) {
+      clearTimeout(timeoutId);
+
+      // 타임아웃 에러 처리
+      if (error.name === 'AbortError') {
+        console.error("Purchase verification timeout (30s)");
+        throw new Error("서버 응답 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.");
+      }
+
       console.error("Purchase error:", error);
       throw error;
     }

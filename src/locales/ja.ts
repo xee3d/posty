@@ -146,12 +146,15 @@ const ja = {
     management: {
       title: "サブスクリプション管理",
       currentPlan: "現在のプラン",
+      currentPlanStatus: "現在{{plan}}プランをご利用中",
       monthlyFee: "月額料金",
       nextBilling: "次回請求日",
+      nextBillingDate: "次回請求日:",
       daysRemaining: "残り{{days}}日",
       activeUntil: "解約されても{{date}}まで現在のプランを継続してご利用いただけます。",
       canceledUntil: "サブスクリプションが解約されており、{{date}}に終了いたします。",
       cancelButton: "サブスクリプション解約",
+      cancelGuideButton: "解約ガイド",
       managePayment: "支払い方法を管理する",
       viewInvoices: "請求書を表示する",
       cancelPlan: "プランを解除する",
@@ -296,7 +299,13 @@ const ja = {
       }
     },
     confirmSubscriptionMessage: "{{planName}}プランをご購読されますか？\n\n{{description}}\n現在のトークン: {{currentTokens}}個\n変更後: {{afterTokens}}個",
-    subscribePro: "Proを購読する"
+    subscribePro: "Proを購読する",
+    cancelSubscriptionGuide: "購読解約ガイド",
+    cancelSubscriptionGuideMessage: "購読の解約はアプリストアから直接行う必要があります。\n\n• iOS: 設定 > Apple ID > サブスクリプション > Posty\n• Android: Google Play ストア > 定期購入 > Posty\n\n解約されても次回請求日まで現在のプランを継続してご利用いただけます。",
+    simulatorPurchaseTitle: "シミュレーター制限",
+    simulatorPurchaseMessage: "シミュレーターではアプリ内課金をテストできません。実機でテストしてください。",
+    subscriptionComplete: "購読完了",
+    subscriptionCompleteMessage: "{{plan}}プランの購読が完了しました！"
   },
 
   aiWrite: {
@@ -1239,6 +1248,7 @@ const ja = {
     contact: "お問い合わせ",
     terms: "利用規約",
     privacy: "プライバシーポリシー",
+    deleteAccount: "アカウント削除",
     notifications: {
       enabled: "通知が有効です",
       soundEnabled: "音が有効です",
@@ -1310,6 +1320,17 @@ const ja = {
         title: "ログアウト",
         message: "ログアウトされますか？",
         action: "ログアウトする"
+      },
+      deleteAccount: {
+        title: "アカウント削除",
+        message: "本当にアカウントを削除されますか？\n\nアカウントを削除すると、すべてのデータが永久に削除され復元できません。",
+        action: "アカウントを削除する",
+        confirmTitle: "最終確認",
+        confirmMessage: "本当にアカウントを削除されますか？\nこの操作は元に戻せません。",
+        confirm: "削除します",
+        successTitle: "アカウント削除完了",
+        successMessage: "アカウントが正常に削除されました。",
+        error: "アカウント削除中にエラーが発生しました。"
       }
     },
     rating: {
@@ -2315,6 +2336,11 @@ const ja = {
     },
     purchase: {
       title: "トークン購入",
+      subtitle: "トークンを購入しますか？",
+      subtitleWithBonus: "ボーナス付きトークンを購入しますか？",
+      tokenCount: "{{count}}個トークン",
+      bonusIncluded: "ボーナス{{bonus}}個含む",
+      processing: "処理中...",
       message: "{{tokens}}個のトークンを{{price}}で\n購入しますか？",
       messageWithBonus: "{{tokens}}個のトークンを{{price}}で\n購入しますか？\n\nボーナス{{bonus}}個含む",
       cancel: "キャンセル",
@@ -2340,6 +2366,16 @@ const ja = {
       unused: "購入後完全に未使用の状態でのみ返金が可能です。",
       contact: "返金お問い合わせ: getposty@gmail.com",
       terms: "詳細な返金ポリシーは利用規約をご参照ください。"
+    },
+    restore: {
+      button: "購入を復元",
+      description: "以前に購入したサブスクリプションやトークンを復元できます",
+      simulatorTitle: "シミュレーターの制限",
+      simulatorMessage: "シミュレーターでは購入の復元をテストできません。実機でテストしてください。",
+      processingTitle: "復元中",
+      processingMessage: "購入履歴を確認しています...",
+      errorTitle: "復元失敗",
+      errorMessage: "購入の復元中にエラーが発生しました。しばらくしてから再度お試しください。"
     }
   }
 };

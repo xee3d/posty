@@ -2,13 +2,13 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Platform } from "react-native";
 import logger from "../../utils/logger";
+import { API_SERVER_URL } from "@env"; // 환경 변수 import 추가
 
 // 소셜 로그인 라이브러리들
 import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
 import NaverLogin from "@react-native-seoul/naver-login";
 import * as KakaoLogin from "@react-native-seoul/kakao-login";
-// Apple and Facebook login disabled for release
-// import { appleAuth } from "@invertase/react-native-apple-authentication";
+import { appleAuth } from "@invertase/react-native-apple-authentication";
 
 // Facebook SDK completely removed for release
 // No Facebook SDK imports or initialization
@@ -26,11 +26,11 @@ GOOGLE_WEB_CLIENT_ID =
 NAVER_CONSUMER_KEY = "jXC0jUWPhSCotIWBrKrB";
 NAVER_CONSUMER_SECRET = "RND5w7pcJt";
 KAKAO_APP_KEY = "566cba5c08009852b6b5f1a31c3b28d8";
-// 서버 설정 - 자체 JWT 서버 사용 (Vercel 토큰 인증)
-SERVER_URL = "https://posty-api.vercel.app"; // 실제 운영 서버 (정상 작동 확인됨)
+// CRITICAL FIX: 서버 URL을 환경 변수에서 로드 (하드코딩 제거)
+SERVER_URL = API_SERVER_URL || "https://posty-api.vercel.app"; // 환경 변수 우선, fallback으로 기본 URL
 const VERCEL_TOKEN = "a5e2uJAe9LUKii74mL85eCY1"; // Vercel 접근 토큰
 
-logger.info("VercelAuthService: 환경변수 하드코딩 적용 - 서버 복구 완료");
+logger.info(`VercelAuthService: SERVER_URL = ${SERVER_URL}`);
 
 export interface UserProfile {
   uid: string;
@@ -526,9 +526,90 @@ class VercelAuthService {
     }
   }
 
-  // Apple login disabled for release
+  // Apple Sign-In (iOS only)
   async signInWithApple(): Promise<AuthResult> {
-    throw new Error("Apple 로그인이 출시 버전에서 비활성화되었습니다");
+    logger.info("🍎 실제 Apple 로그인 수행");
+
+    try {
+      // iOS가 아니면 에러
+      if (Platform.OS !== 'ios') {
+        throw new Error("Apple 로그인은 iOS에서만 지원됩니다");
+      }
+
+      // Perform Apple Sign-In request
+      const appleAuthRequestResponse = await appleAuth.performRequest({
+        requestedOperation: appleAuth.Operation.LOGIN,
+        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
+      });
+
+      console.log("🔍 Apple Sign-In 전체 응답:", JSON.stringify(appleAuthRequestResponse, null, 2));
+
+      // Get current authentication state
+      const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
+
+      // Use credentialState response to ensure the user is authenticated
+      if (credentialState === appleAuth.State.AUTHORIZED) {
+        const { user, email, fullName, identityToken, authorizationCode } = appleAuthRequestResponse;
+
+        // Apple은 첫 로그인 시에만 이름/이메일 제공
+        // 이후에는 user ID만 제공되므로 로컬에 저장된 정보 사용
+        const displayName = fullName?.givenName
+          ? `${fullName.givenName || ''} ${fullName.familyName || ''}`.trim()
+          : "Apple User";
+
+        const userEmail = email || `${user}@appleid.com`;
+
+        const localUser: UserProfile = {
+          uid: `apple_${user}`,
+          email: userEmail,
+          displayName: displayName,
+          photoURL: null, // Apple doesn't provide profile photos
+          provider: "apple",
+        };
+
+        // Generate local token
+        const localToken = `local_apple_${user}_${Date.now()}`;
+
+        // Save to local storage
+        await AsyncStorage.multiSet([
+          ["@auth_token", localToken],
+          ["@user_profile", JSON.stringify(localUser)],
+        ]);
+
+        logger.info("✅ 실제 Apple 사용자 정보로 로컬 인증 완료: " + localUser.displayName);
+
+        return {
+          user: localUser,
+          isNewUser: false,
+          token: localToken,
+        };
+      } else {
+        throw new Error("Apple 인증 상태가 유효하지 않습니다");
+      }
+    } catch (error: any) {
+      logger.error("Apple Sign-In 실패:", error);
+
+      console.log("🔍 Apple 에러 상세 정보:");
+      console.log("  - error.code:", error.code);
+      console.log("  - error.message:", error.message);
+
+      // User cancellation handling
+      const isUserCancellation =
+        error.code === appleAuth.Error.CANCELED ||
+        error.code === "1001" || // Apple cancellation code
+        error.message?.includes("cancel") ||
+        error.message?.includes("취소") ||
+        error.message?.includes("사용자 취소") ||
+        error.message?.includes("User cancelled");
+
+      if (isUserCancellation) {
+        console.log("ℹ️ Apple 로그인 취소됨 (사용자 액션)");
+        throw new Error("USER_CANCELLED");
+      }
+
+      console.log("❌ 실제 Apple 로그인 실패");
+      throw error;
+    }
   }
 
   // Facebook login disabled for release

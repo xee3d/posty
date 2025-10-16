@@ -150,10 +150,22 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
   };
 
   const formatExpiryDate = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-    const day = date.getDate();
-    return `${year}년 ${month}월 ${day}일`;
+    const { i18n } = useTranslation();
+    const locale = i18n.language;
+
+    // Map i18n language codes to locale strings for date formatting
+    const localeMap: { [key: string]: string } = {
+      'ko': 'ko-KR',
+      'en': 'en-US',
+      'ja': 'ja-JP',
+      'zh-CN': 'zh-CN'
+    };
+
+    return date.toLocaleDateString(localeMap[locale] || locale, {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
   };
 
   const calculateDaysRemaining = (expiryDate: Date) => {
@@ -166,13 +178,10 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
   // 구독 취소 안내 핸들러
   const handleCancelSubscription = () => {
     Alert.alert(
-      '구독 취소 안내',
-      '구독 취소는 앱스토어에서 직접 해야 합니다.\n\n' +
-      '• iOS: 설정 > Apple ID > 구독 > Posty\n' +
-      '• Android: Google Play 스토어 > 구독 > Posty\n\n' +
-      '취소해도 다음 결제일까지 현재 플랜을 이용할 수 있습니다.',
+      t('subscription.cancelSubscriptionGuide'),
+      t('subscription.cancelSubscriptionGuideMessage'),
       [
-        { text: '확인', style: 'default' }
+        { text: t('common.ok'), style: 'default' }
       ]
     );
   };
@@ -183,16 +192,16 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
       // 시뮬레이터에서는 구독 불가 메시지 표시
       if (Platform.OS === 'ios' && __DEV__) {
         Alert.alert(
-          '시뮬레이터 제한',
-          '시뮬레이터에서는 인앱 결제를 테스트할 수 없습니다. 실제 기기에서 테스트해주세요.',
-          [{ text: '확인' }]
+          t('subscription.simulatorPurchaseTitle'),
+          t('subscription.simulatorPurchaseMessage'),
+          [{ text: t('common.ok') }]
         );
         return;
       }
 
       // 구독 관리자 초기화 (사용자 ID 필요)
       const userId = 'current-user-id'; // 실제 사용자 ID로 교체 필요
-      
+
       await subscriptionManager.initialize({
         userId,
         onSubscriptionUpdate: (status) => {
@@ -200,24 +209,61 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
         },
         onError: (error) => {
           console.error('구독 오류:', error);
-          Alert.alert('오류', '구독 처리 중 오류가 발생했습니다.');
+          Alert.alert(
+            t('common.error'),
+            t('subscription.subscriptionFailedMessage')
+          );
         }
       });
 
       // Pro 플랜 구독 구매
       await subscriptionManager.purchaseSubscription('pro');
-      
+
       Alert.alert(
-        '구독 완료',
-        'Pro 플랜 구독이 완료되었습니다!',
-        [{ text: '확인' }]
+        t('subscription.subscriptionComplete'),
+        t('subscription.subscriptionCompleteMessage', { plan: 'Pro' }),
+        [{ text: t('common.ok') }]
       );
     } catch (error) {
       console.error('구독 구매 실패:', error);
       Alert.alert(
-        '구독 실패',
-        '구독 처리 중 오류가 발생했습니다. 다시 시도해주세요.',
-        [{ text: '확인' }]
+        t('subscription.subscriptionFailed'),
+        t('subscription.subscriptionFailedMessage'),
+        [{ text: t('common.ok') }]
+      );
+    }
+  };
+
+  // 구매 복원 핸들러 (Apple IAP 필수 요구사항)
+  const handleRestorePurchases = async () => {
+    try {
+      // 시뮬레이터에서는 복원 불가 메시지 표시
+      if (Platform.OS === 'ios' && __DEV__) {
+        Alert.alert(
+          t('tokenShop.restore.simulatorTitle') || '시뮬레이터 제한',
+          t('tokenShop.restore.simulatorMessage') || '시뮬레이터에서는 구매 복원을 테스트할 수 없습니다. 실제 기기에서 테스트해주세요.',
+          [{ text: t('common.confirm') || '확인' }]
+        );
+        return;
+      }
+
+      // 복원 진행 중 표시
+      Alert.alert(
+        t('tokenShop.restore.processingTitle') || '복원 중',
+        t('tokenShop.restore.processingMessage') || '구매 내역을 확인하고 있습니다...',
+        [],
+        { cancelable: false }
+      );
+
+      // IAP 서비스에서 구매 복원 실행
+      await inAppPurchaseService.restorePurchases();
+
+    } catch (error) {
+      console.error('구매 복원 실패:', error);
+      Alert.alert(
+        t('tokenShop.restore.errorTitle') || '복원 실패',
+        t('tokenShop.restore.errorMessage') || '구매 복원 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.',
+        [{ text: t('common.confirm') || '확인' }]
       );
     }
   };
@@ -567,7 +613,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
             <View style={styles.cancelTitleRow}>
               <WarningIcon size={22} />
               <Text style={[styles.cancelTitle, { color: colors.text.primary }]}>
-                구독 관리
+                {t('subscription.management.title')}
               </Text>
             </View>
             
@@ -575,21 +621,21 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
               <View style={styles.subscriptionStatusRow}>
                 <SuccessIcon />
                 <Text style={[styles.subscriptionStatus, { color: colors.text.secondary }]}>
-                  현재 {subscriptionPlan?.toUpperCase()} 플랜 구독 중
+                  {t('subscription.management.currentPlanStatus', { plan: subscriptionPlan?.toUpperCase() })}
                 </Text>
               </View>
               
               <View style={styles.expiryInfoRow}>
                 <PrimaryIcon name="calendar" size={16} />
                 <Text style={[styles.expiryInfo, { color: colors.text.secondary }]}>
-                  다음 결제일: {formatExpiryDate(getSubscriptionExpiryDate())}
+                  {t('subscription.management.nextBillingDate')} {formatExpiryDate(getSubscriptionExpiryDate())}
                 </Text>
               </View>
               
               <View style={styles.daysRemainingRow}>
                 <WarningIcon name="time" />
                 <Text style={[styles.daysRemaining, { color: colors.text.secondary }]}>
-                  {calculateDaysRemaining(getSubscriptionExpiryDate())}일 남음
+                  {t('subscription.management.daysRemaining', { days: calculateDaysRemaining(getSubscriptionExpiryDate()) })}
                 </Text>
               </View>
             </View>
@@ -599,15 +645,31 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
               onPress={handleCancelSubscription}
             >
               <PrimaryIcon name="information-circle" size={20} />
-              <Text style={styles.cancelButtonText}>구독 취소 안내</Text>
+              <Text style={styles.cancelButtonText}>{t('subscription.management.cancelGuideButton')}</Text>
             </TouchableOpacity>
             
             <Text style={[styles.cancelInfo, { color: colors.text.secondary }]}>
-              구독을 취소해도 {formatExpiryDate(getSubscriptionExpiryDate())}까지 
-              현재 플랜을 계속 이용할 수 있습니다.
+              {t('subscription.management.activeUntil', { date: formatExpiryDate(getSubscriptionExpiryDate()) })}
             </Text>
           </View>
         )}
+
+        {/* 구매 복원 버튼 (Apple IAP 필수) */}
+        <View style={[styles.restoreCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+          <TouchableOpacity
+            style={[styles.restoreButton, { backgroundColor: colors.primary + "15", borderColor: colors.primary + "30" }]}
+            onPress={handleRestorePurchases}
+            activeOpacity={0.7}
+          >
+            <Icon name="refresh-circle" size={getResponsiveSize(24)} color={colors.primary} />
+            <Text style={[styles.restoreButtonText, { color: colors.primary }]}>
+              {t('tokenShop.restore.button') || '구매 복원'}
+            </Text>
+          </TouchableOpacity>
+          <Text style={[styles.restoreDescription, { color: colors.text.secondary }]}>
+            {t('tokenShop.restore.description') || '이전에 구매한 구독이나 토큰을 복원할 수 있습니다'}
+          </Text>
+        </View>
 
         {/* 환불 정책 */}
         <View style={[styles.refundCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -1059,6 +1121,39 @@ const createStyles = (colors: any, isDark: boolean) => {
     ...getFontStyle("xs", "regular"),
     textAlign: "center",
     lineHeight: getResponsiveSize(18),
+  },
+  restoreCard: {
+    marginHorizontal: getResponsiveSize(SPACING.large),
+    marginBottom: getResponsiveSize(SPACING.large),
+    padding: getResponsiveSize(SPACING.large),
+    borderRadius: getResponsiveSize(16),
+    borderWidth: 1,
+  },
+  restoreButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: getResponsiveSize(16),
+    paddingHorizontal: getResponsiveSize(24),
+    borderRadius: getResponsiveSize(12),
+    gap: getResponsiveSize(12),
+    marginBottom: getResponsiveSize(SPACING.medium),
+    borderWidth: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: isDark ? 0.3 : 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  restoreButtonText: {
+    fontSize: getResponsiveSize(16),
+    fontWeight: "700",
+    letterSpacing: -0.3,
+  },
+  restoreDescription: {
+    ...getFontStyle("sm", "regular"),
+    textAlign: "center",
+    lineHeight: getResponsiveSize(20),
   },
   refundCard: {
     marginHorizontal: getResponsiveSize(SPACING.large),

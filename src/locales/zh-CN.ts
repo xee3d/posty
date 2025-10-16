@@ -115,12 +115,15 @@ const zhCN = {
     management: {
       title: "订阅管理",
       currentPlan: "当前计划",
+      currentPlanStatus: "当前订阅{{plan}}计划",
       monthlyFee: "月费",
       nextBilling: "下次计费日",
+      nextBillingDate: "下次计费日:",
       daysRemaining: "剩余{{days}}天",
       activeUntil: "即使取消订阅，也可以继续使用当前计划直到{{date}}。",
       canceledUntil: "订阅已取消，将于{{date}}到期。",
       cancelButton: "取消订阅",
+      cancelGuideButton: "取消指南",
       managePayment: "管理支付方式",
       viewInvoices: "查看账单",
       cancelPlan: "取消计划",
@@ -317,7 +320,13 @@ const zhCN = {
       }
     },
     confirmSubscriptionMessage: "要订阅{{planName}}计划吗？\n\n{{description}}\n当前代币：{{currentTokens}}个\n变更后：{{afterTokens}}个",
-    subscribePro: "订阅Pro"
+    subscribePro: "订阅Pro",
+    cancelSubscriptionGuide: "订阅取消指南",
+    cancelSubscriptionGuideMessage: "必须直接从应用商店取消订阅。\n\n• iOS: 设置 > Apple ID > 订阅 > Posty\n• Android: Google Play 商店 > 订阅 > Posty\n\n即使取消订阅，也可以继续使用当前计划直到下次计费日。",
+    simulatorPurchaseTitle: "模拟器限制",
+    simulatorPurchaseMessage: "无法在模拟器上测试应用内购买。请在真实设备上测试。",
+    subscriptionComplete: "订阅完成",
+    subscriptionCompleteMessage: "{{plan}}计划订阅完成！"
   },
 
   aiWrite: {
@@ -1229,6 +1238,7 @@ const zhCN = {
     contact: "联系",
     terms: "服务条款",
     privacy: "隐私政策",
+    deleteAccount: "删除账户",
     notifications: {
       enabled: "通知已启用",
       soundEnabled: "声音已启用",
@@ -1300,6 +1310,17 @@ const zhCN = {
         title: "退出登录",
         message: "确定要退出登录吗？",
         action: "退出登录"
+      },
+      deleteAccount: {
+        title: "删除账户",
+        message: "确定要删除账户吗？\n\n删除账户后，所有数据将被永久删除，无法恢复。",
+        action: "删除账户",
+        confirmTitle: "最终确认",
+        confirmMessage: "确定要删除账户吗？\n此操作无法撤销。",
+        confirm: "确认删除",
+        successTitle: "账户已删除",
+        successMessage: "您的账户已成功删除。",
+        error: "删除账户时发生错误。"
       }
     },
     rating: {
@@ -2380,6 +2401,11 @@ const zhCN = {
     },
     purchase: {
       title: "代币购买",
+      subtitle: "要购买代币吗？",
+      subtitleWithBonus: "要购买带奖励的代币吗？",
+      tokenCount: "{{count}}个代币",
+      bonusIncluded: "包含{{bonus}}个奖励",
+      processing: "处理中...",
       message: "以{{price}}购买{{tokens}}个代币？",
       messageWithBonus: "以{{price}}购买{{tokens}}个代币？\n\n包含{{bonus}}个奖励",
       cancel: "取消",
@@ -2405,6 +2431,16 @@ const zhCN = {
       unused: "仅限购买后完全未使用的代币可申请退款。",
       contact: "退款咨询: getposty@gmail.com",
       terms: "详细退款政策请参考服务条款。"
+    },
+    restore: {
+      button: "恢复购买",
+      description: "您可以恢复之前购买的订阅或代币",
+      simulatorTitle: "模拟器限制",
+      simulatorMessage: "无法在模拟器上测试购买恢复。请在真实设备上测试。",
+      processingTitle: "恢复中",
+      processingMessage: "正在检查购买历史...",
+      errorTitle: "恢复失败",
+      errorMessage: "恢复购买时发生错误。请稍后重试。"
     }
   }
 };

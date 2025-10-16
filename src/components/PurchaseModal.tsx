@@ -11,6 +11,7 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useAppTheme } from '../hooks/useAppTheme';
 import { getFontStyle } from '../utils/fonts';
+import { useTranslation } from 'react-i18next';
 
 interface PurchaseModalProps {
   visible: boolean;
@@ -34,6 +35,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   isLoading = false,
 }) => {
   const { colors, isDark } = useAppTheme();
+  const { t } = useTranslation();
   const scaleAnim = React.useRef(new Animated.Value(0)).current;
 
   React.useEffect(() => {
@@ -192,23 +194,23 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               <Icon name="flash" size={28} color={colors.primary} />
             </View>
             <Text style={styles.title}>
-              {bonus > 0 ? '토큰 구매' : '토큰 구매'}
+              {t('tokenShop.purchase.title')}
             </Text>
             <Text style={styles.subtitle}>
-              {bonus > 0 ? '보너스가 포함된 토큰을 구매하시겠습니까?' : '토큰을 구매하시겠습니까?'}
+              {bonus > 0 ? t('tokenShop.purchase.subtitleWithBonus') : t('tokenShop.purchase.subtitle')}
             </Text>
           </View>
 
           <View style={styles.content}>
             <View style={styles.tokenInfo}>
-              <Icon 
-                name="flash" 
-                size={24} 
-                color={colors.primary} 
+              <Icon
+                name="flash"
+                size={24}
+                color={colors.primary}
                 style={styles.tokenIcon}
               />
               <Text style={styles.tokenText}>
-                {totalTokens}개 토큰
+                {t('tokenShop.purchase.tokenCount', { count: totalTokens })}
               </Text>
             </View>
 
@@ -218,14 +220,14 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
             {bonus > 0 && (
               <View style={styles.bonusContainer}>
-                <Icon 
-                  name="gift" 
-                  size={16} 
-                  color={colors.primary} 
+                <Icon
+                  name="gift"
+                  size={16}
+                  color={colors.primary}
                   style={styles.bonusIcon}
                 />
                 <Text style={styles.bonusText}>
-                  보너스 {bonus}개 포함
+                  {t('tokenShop.purchase.bonusIncluded', { bonus })}
                 </Text>
               </View>
             )}
@@ -238,10 +240,10 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               disabled={isLoading}
             >
               <Text style={[styles.buttonText, styles.cancelButtonText]}>
-                취소
+                {t('tokenShop.purchase.cancel')}
               </Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={[
                 styles.button,
@@ -252,7 +254,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               disabled={isLoading}
             >
               <Text style={[styles.buttonText, styles.confirmButtonText]}>
-                {isLoading ? '처리중...' : '구매하기'}
+                {isLoading ? t('tokenShop.purchase.processing') : t('tokenShop.purchase.confirm')}
               </Text>
             </TouchableOpacity>
           </View>

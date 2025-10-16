@@ -42,76 +42,32 @@ class TokenService {
   async initialize(): Promise<void> {
     try {
       console.log('TokenService: Initializing...');
-      
+
       // 1. Redux persist에서 복원된 데이터 확인
       const state = store.getState().user;
       const persistedTokens = state.currentTokens;
-      
+
       if (persistedTokens !== undefined && persistedTokens !== null && persistedTokens !== 0) {
         console.log('TokenService: Using persisted tokens from Redux:', persistedTokens);
         // Redux persist에 이미 데이터가 있으면 그대로 사용
         return;
       }
-      
-      // 2. 로그인된 사용자가 있으면 Firestore에서 데이터 가져오기
-      const currentUser = auth().currentUser;
-      if (currentUser) {
-        console.log('TokenService: Fetching from Firestore for user:', currentUser.uid);
-        
-        // Firestore에서 사용자 데이터 가져오기
-        const userData = await firestoreService.getUser();
-        if (userData && userData.tokens) {
-          const firestoreTokens = userData.tokens.current;
-          console.log('TokenService: Got tokens from Firestore:', firestoreTokens);
-          
-          // Redux와 로컬 스토리지에 저장
-          store.dispatch(setTokens(firestoreTokens));
-          // subscriptionPlan 필드를 우선 사용, 없으면 subscription.plan 사용
-          const plan = userData.subscriptionPlan || userData.subscription?.plan || 'free';
-          store.dispatch(setSubscriptionPlan(plan));
-          
-          // 로컬 스토리지에도 저장 (백업)
-          await AsyncStorage.setItem(this.TOKEN_KEY, JSON.stringify({
-            current: firestoreTokens,
-            total: firestoreTokens,
-            lastUpdated: new Date().toISOString(),
-          }));
-          
-          await AsyncStorage.setItem(this.SUBSCRIPTION_KEY, JSON.stringify({
-            ...this.getDefaultSubscription(),
-            subscriptionPlan: plan,
-            dailyTokens: firestoreTokens,
-          }));
-          
-          return;
-        } else {
-          // Firestore에 데이터가 없으면 초기 사용자로 생성
-          console.log('TokenService: Creating new user in Firestore');
-          await firestoreService.createOrUpdateUser({
-            tokens: {
-              current: 10,
-              total: 0,
-              lastUpdated: new Date().toISOString(),
-            },
-          });
-          store.dispatch(setTokens(10));
-        }
+
+      // 2. CRITICAL FIX: Firebase 코드 제거됨 - Vercel 인증 기반으로 변경
+      // 로컬 스토리지에서 토큰 정보 확인
+      console.log('TokenService: Checking local storage for tokens');
+      const savedTokens = await AsyncStorage.getItem(this.TOKEN_KEY);
+
+      if (savedTokens) {
+        const tokenData = JSON.parse(savedTokens);
+        const tokens = tokenData.current || 10;
+        console.log('TokenService: Found tokens in local storage:', tokens);
+
+        store.dispatch(setTokens(tokens));
       } else {
-        // 3. 로그인하지 않은 상태면 로컬 스토리지 확인
-        console.log('TokenService: No user logged in, checking local storage');
-        const savedTokens = await AsyncStorage.getItem(this.TOKEN_KEY);
-        
-        if (savedTokens) {
-          const tokenData = JSON.parse(savedTokens);
-          const tokens = tokenData.current || 10;
-          console.log('TokenService: Found tokens in local storage:', tokens);
-          
-          store.dispatch(setTokens(tokens));
-        } else {
-          // 아무 데이터도 없으면 기본값
-          console.log('TokenService: No data found, using defaults');
-          await this.resetToDefault();
-        }
+        // 아무 데이터도 없으면 기본값
+        console.log('TokenService: No data found, using defaults');
+        await this.resetToDefault();
       }
       
       // 일일 리셋 체크

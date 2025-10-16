@@ -105,11 +105,12 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
           case "kakao":
             userProfile = await vercelAuthService.signInWithKakao();
             break;
-          // Facebook and Apple login disabled for release
+          case "apple":
+            userProfile = await vercelAuthService.signInWithApple();
+            break;
+          // Facebook login disabled for release
           case "facebook":
             throw new Error("Facebook 로그인이 출시 버전에서 비활성화되었습니다");
-          case "apple":
-            throw new Error("Apple 로그인이 출시 버전에서 비활성화되었습니다");
         }
 
         if (userProfile) {
@@ -235,7 +236,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
         case 'google': iconName = 'mail'; break;
         case 'naver': iconName = 'naver'; break;
         case 'kakao': iconName = 'chatbubble'; break;
-        // Facebook and Apple disabled for release
+        case 'apple': iconName = 'logo-apple'; break;
+        // Facebook disabled for release
         default: iconName = 'help-circle'; break;
       }
       const isThisLoading = loadingProvider === provider;
@@ -346,8 +348,8 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                   style={styles.expandedOptionsContainer}
                 >
                   {secondaryProviders.map((provider, index) => {
-                    // Facebook and Apple disabled for release
-                    if (provider === 'facebook' || provider === 'apple') {
+                    // Only Facebook disabled for release, Apple enabled for App Store compliance (4.8)
+                    if (provider === 'facebook') {
                       return null;
                     }
 

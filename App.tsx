@@ -10,6 +10,7 @@ import pricingService from "./src/services/localization/pricingService";
 import "./src/locales/i18n";
 import mobileAds from 'react-native-google-mobile-ads';
 import adConsentService from './src/services/adConsentService';
+import attService from './src/services/tracking/attService';
 import { SafeIcon } from "./src/utils/SafeIcon";
 import IconComponent from "react-native-vector-icons/Ionicons";
 import SplashScreen from "react-native-splash-screen";
@@ -126,17 +127,24 @@ const AppContent: React.FC = () => {
   // 앱 초기화
   useEffect(() => {
     console.log("[App] App initialization started");
-    
-    // AdMob 및 UMP 초기화
-    const initializeAds = async () => {
-      try {
-        console.log('[App] Starting AdMob and UMP initialization...');
 
-        // 1. UMP 동의 관리 먼저 초기화
+    // ATT, GDPR, AdMob 초기화 (순서 중요!)
+    const initializeTrackingAndAds = async () => {
+      try {
+        console.log('[App] Starting tracking and ad initialization...');
+
+        // 1️⃣ ATT 권한 요청 먼저 (iOS 14.5+)
+        console.log('[App] Step 1: Requesting ATT permission...');
+        const attResult = await attService.requestPermission();
+        console.log('[App] ATT Result:', attResult);
+
+        // 2️⃣ UMP/GDPR 동의 관리 (EU 사용자)
+        console.log('[App] Step 2: Initializing UMP consent...');
         const consentInfo = await adConsentService.initialize();
         console.log('[App] UMP consent initialized:', consentInfo);
 
-        // 2. 동의가 완료되었거나 광고 요청이 가능한 경우에만 AdMob 초기화
+        // 3️⃣ AdMob 초기화 (두 권한 모두 확인 후)
+        console.log('[App] Step 3: Initializing AdMob...');
         if (consentInfo.canRequestAds) {
           const adapterStatuses = await mobileAds().initialize();
           console.log('[App] AdMob initialized successfully');
@@ -144,8 +152,10 @@ const AppContent: React.FC = () => {
         } else {
           console.log('[App] AdMob initialization skipped - consent not obtained');
         }
+
+        console.log('✅ All tracking and ad services initialized');
       } catch (error) {
-        console.warn('[App] Ad initialization failed:', error);
+        console.warn('[App] Tracking/Ad initialization failed:', error);
 
         // 에러가 발생해도 기본 AdMob만 초기화 시도
         try {
@@ -157,7 +167,7 @@ const AppContent: React.FC = () => {
       }
     };
 
-    initializeAds();
+    initializeTrackingAndAds();
     
     // 언어 디버깅
     import('./src/utils/deviceLanguage').then(({ getDeviceLanguage, isKorean }) => {
@@ -425,6 +435,7 @@ const AppContent: React.FC = () => {
   }, []);
 
   // 로그인 상태 확인 (Vercel 기반 인증으로 변경)
+  // iPad 버그 수정: activeTab dependency 제거하여 탭 변경 시마다 인증 체크가 실행되지 않도록 함
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
@@ -440,7 +451,8 @@ const AppContent: React.FC = () => {
 
         // Vercel API에서 인증 상태 확인
         const user = await vercelAuthService.getCurrentUser();
-        setIsAuthenticated(!!user);
+        const authenticated = !!user;
+        setIsAuthenticated(authenticated);
 
         // Analytics 사용자 ID 설정
         if (user) {
@@ -449,8 +461,8 @@ const AppContent: React.FC = () => {
           analyticsService.setUserId(null);
         }
 
-        // 로그인된 경우 홈으로, 아니면 로그인 화면으로
-        if (!user && activeTab !== "login") {
+        // 인증되지 않은 경우에만 로그인 화면으로 이동 (초기 로드 시에만)
+        if (!authenticated && activeTab === "home") {
           setActiveTab("login");
         }
       } catch (error) {
@@ -462,7 +474,7 @@ const AppContent: React.FC = () => {
     };
 
     checkAuthStatus();
-  }, [activeTab]);
+  }, []); // iPad 버그 수정: dependency를 빈 배열로 변경하여 초기 마운트 시에만 실행
 
   // 단순화된 Reanimated animated style - opacity만 사용
   const animatedStyle = useAnimatedStyle(() => {

@@ -1,6 +1,7 @@
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 const NEWS_API_KEY = process.env.NEWS_API_KEY || 'development-key';
+import { TRENDS_API_URL } from "@env";
 import {
   getDeviceLanguage,
   getNewsAPICountry,
@@ -41,7 +42,7 @@ class TrendService {
   private USE_REAL_API = true; // 각 API 직접 호출 (언어별 데이터) - 실제 API 활성화
   private USE_NEWS_API = true; // 뉴스 API 활성화 (실제 뉴스 데이터)
   private USE_GOOGLE_TRENDS = true; // Google 트렌드 활성화
-  private API_BASE_URL = "https://posty-api.vercel.app/api"; // 새 API URL
+  private API_BASE_URL = TRENDS_API_URL || "https://posty-api.vercel.app/api"; // 환경 변수에서 로드
 
   // 각 나라별 특화 채널 설정
   private REGIONAL_CHANNELS = {

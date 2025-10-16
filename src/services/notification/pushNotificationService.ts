@@ -5,6 +5,7 @@
 
 import { Platform, PermissionsAndroid } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { AI_SERVER_URL } from "@env";
 import { badgeService } from "./badgeService";
 import i18next from "../../locales/i18n";
 
@@ -304,7 +305,7 @@ export class PushNotificationService {
   private async sendTokenToServer(token: string): Promise<void> {
     try {
       const response = await fetch(
-        "https://posty-ai-new.vercel.app/api/notifications/register-token",
+        `${AI_SERVER_URL || "https://posty-ai-new.vercel.app"}/api/notifications/register-token`,
         {
           method: "POST",
           headers: {

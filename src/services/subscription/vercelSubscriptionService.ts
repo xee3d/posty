@@ -1,7 +1,8 @@
 // Vercel 기반 구독 서비스
 import { Platform } from 'react-native';
+import { API_SERVER_URL } from '@env';
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || 'https://your-vercel-app.vercel.app';
+const API_BASE_URL = API_SERVER_URL || 'https://posty-api.vercel.app';
 
 export interface SubscriptionPlan {
   id: string;

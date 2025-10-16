@@ -598,6 +598,75 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
     ]);
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      t('alerts.auth.deleteAccount.title'),
+      t('alerts.auth.deleteAccount.message'),
+      [
+        { text: t('alerts.buttons.cancel'), style: "cancel" },
+        {
+          text: t('alerts.auth.deleteAccount.action'),
+          style: "destructive",
+          onPress: async () => {
+            // 두 번째 확인
+            Alert.alert(
+              t('alerts.auth.deleteAccount.confirmTitle'),
+              t('alerts.auth.deleteAccount.confirmMessage'),
+              [
+                { text: t('alerts.buttons.cancel'), style: "cancel" },
+                {
+                  text: t('alerts.auth.deleteAccount.confirm'),
+                  style: "destructive",
+                  onPress: async () => {
+                    try {
+                      setLoading(true);
+
+                      // 모든 데이터 삭제
+                      const allKeys = await AsyncStorage.getAllKeys();
+                      await AsyncStorage.multiRemove(allKeys);
+
+                      // Redux 상태 초기화
+                      dispatch(resetUser());
+
+                      // 테마 초기화
+                      resetThemeToDefault();
+
+                      // 로그인 화면으로 이동
+                      Alert.alert(
+                        t('alerts.auth.deleteAccount.successTitle'),
+                        t('alerts.auth.deleteAccount.successMessage'),
+                        [
+                          {
+                            text: t('alerts.buttons.ok'),
+                            onPress: () => {
+                              if (onNavigate) {
+                                timer.setTimeout(() => {
+                                  onNavigate("login");
+                                }, 100);
+                              }
+                            },
+                          },
+                        ]
+                      );
+                    } catch (error) {
+                      console.error("계정 삭제 중 에러:", error);
+                      Alert.alert(
+                        t('alerts.buttons.error'),
+                        t('alerts.auth.deleteAccount.error')
+                      );
+                    } finally {
+                      setLoading(false);
+                    }
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  };
+
 
   const handleRateApp = () => {
     Alert.alert(t('alerts.rating.title'), t('alerts.rating.message'), [
@@ -1341,6 +1410,12 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
           <Text style={styles.logoutText}>{t('alerts.auth.logout.action')}</Text>
         </TouchableOpacity>
 
+        {/* 계정 삭제 버튼 */}
+        <TouchableOpacity style={styles.deleteAccountButton} onPress={handleDeleteAccount}>
+          <SafeIcon name="trash-outline" size={20} color={colors.error} />
+          <Text style={styles.deleteAccountText}>{t('settings.deleteAccount')}</Text>
+        </TouchableOpacity>
+
         <View style={styles.bottomSpace} />
       </ScrollView>
 
@@ -1810,6 +1885,29 @@ const createStyles = (colors: any, cardTheme: any, isDark: boolean) => {
       alignSelf: "center",
     },
     logoutText: {
+      fontSize: 15,
+      fontWeight: "600",
+      color: colors.error,
+      letterSpacing: -0.3,
+      flexShrink: 0,
+    },
+    deleteAccountButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      marginHorizontal: SPACING.md * 2,
+      marginBottom: SPACING.lg,
+      paddingVertical: 14,
+      paddingHorizontal: 24,
+      borderRadius: 12,
+      backgroundColor: colors.error + "10",
+      borderWidth: 1,
+      borderColor: colors.error + "30",
+      minWidth: 150,
+      alignSelf: "center",
+    },
+    deleteAccountText: {
       fontSize: 15,
       fontWeight: "600",
       color: colors.error,

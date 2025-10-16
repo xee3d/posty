@@ -1,12 +1,13 @@
 // 서버 URL 동적 설정을 위한 설정 파일
 // src/config/serverConfig.js
+import { AI_SERVER_URL, API_SERVER_URL } from "@env";
 
 const SERVER_CONFIGS = {
-  // 가능한 서버 URL들 (우선순위 순)
+  // 가능한 서버 URL들 (우선순위 순) (환경 변수에서 로드)
   SERVERS: [
-    "https://posty-ai.vercel.app", // AI 서버 (작동 확인)
-    "https://posty-api.vercel.app", // API 서버 (작동 확인)
-    "https://posty-ai-server.vercel.app",
+    AI_SERVER_URL || "https://posty-ai-new.vercel.app", // AI 서버
+    API_SERVER_URL || "https://posty-api.vercel.app", // API 서버
+    "https://posty-ai-server.vercel.app", // Fallback
   ],
 
   // 현재 작동하는 서버 URL (동적으로 설정됨)

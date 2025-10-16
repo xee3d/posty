@@ -171,6 +171,19 @@ class InAppPurchaseService {
           }
         } catch (error) {
           console.error("Purchase processing error:", error);
+
+          // CRITICAL FIX: 에러 발생 시에도 트랜잭션 완료 처리
+          // 이렇게 하지 않으면 iOS/Android가 같은 구매를 계속 재시도하여 앱이 프리징됨
+          try {
+            await finishTransaction({
+              purchase,
+              isConsumable: this.isConsumable((purchase as any).productId),
+            });
+            console.log("Transaction finished despite error to prevent retry loop");
+          } catch (finishError) {
+            console.error("Failed to finish transaction:", finishError);
+          }
+
           Alert.alert(
             "구매 오류",
             "구매 처리 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.",
@@ -282,7 +295,9 @@ class InAppPurchaseService {
         Platform.OS as "ios" | "android"
       );
 
-      return response.status === "active";
+      // CRITICAL FIX: 서버 응답 형식에 맞게 검증
+      // 서버는 { success: true, subscription: {...} } 형식으로 응답
+      return response && (response.status === "active" || (response as any).success === true);
     } catch (error) {
       console.error("Verification error:", error);
       return false;

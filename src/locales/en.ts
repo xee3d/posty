@@ -613,12 +613,15 @@ const en = {
     management: {
       title: "Subscription Management",
       currentPlan: "Current Plan",
+      currentPlanStatus: "Currently subscribed to {{plan}} plan",
       monthlyFee: "Monthly Fee",
       nextBilling: "Next Billing Date",
+      nextBillingDate: "Next Billing Date:",
       daysRemaining: "{{days}} days remaining",
       activeUntil: "Even after cancellation, you can continue using the current plan until {{date}}.",
       canceledUntil: "Your subscription has been canceled and will expire on {{date}}.",
-      cancelButton: "Cancel"
+      cancelButton: "Cancel",
+      cancelGuideButton: "Cancellation Guide"
     },
     earnTokensSection: {
       title: "Earn Free Tokens",
@@ -669,6 +672,12 @@ const en = {
     subscriptionFailedMessage: "There was an issue processing your subscription. Please try again.",
     downgradeNotAllowed: "Downgrade Not Allowed",
     downgradeNotAllowedMessage: "You cannot change to a lower plan.\n\nPlease cancel your current subscription and sign up for a new one after expiration.",
+    cancelSubscriptionGuide: "Subscription Cancellation Guide",
+    cancelSubscriptionGuideMessage: "You must cancel your subscription directly from the app store.\n\n• iOS: Settings > Apple ID > Subscriptions > Posty\n• Android: Google Play Store > Subscriptions > Posty\n\nYou can continue using your current plan until the next billing date even after cancellation.",
+    simulatorPurchaseTitle: "Simulator Limitation",
+    simulatorPurchaseMessage: "In-app purchases cannot be tested on simulator. Please test on a real device.",
+    subscriptionComplete: "Subscription Complete",
+    subscriptionCompleteMessage: "{{plan}} plan subscription complete!",
     // Additional translation keys
     alerts: {
       adWatch: {
@@ -1201,6 +1210,7 @@ const en = {
     contact: "Contact",
     terms: "Terms of Service",
     privacy: "Privacy Policy",
+    deleteAccount: "Delete Account",
     notifications: {
       enabled: "Notifications enabled",
       soundEnabled: "Sound enabled",
@@ -1329,6 +1339,17 @@ const en = {
         title: "Logout",
         message: "Are you sure you want to logout?",
         action: "Logout"
+      },
+      deleteAccount: {
+        title: "Delete Account",
+        message: "Are you sure you want to delete your account?\n\nAll your data will be permanently deleted and cannot be recovered.",
+        action: "Delete Account",
+        confirmTitle: "Final Confirmation",
+        confirmMessage: "Are you really sure you want to delete your account?\nThis action cannot be undone.",
+        confirm: "Yes, Delete",
+        successTitle: "Account Deleted",
+        successMessage: "Your account has been successfully deleted.",
+        error: "An error occurred while deleting your account."
       }
     },
     rating: {
@@ -2590,6 +2611,11 @@ Personal Information Inquiry: getposty@gmail.com`
     },
     purchase: {
       title: "Token Purchase",
+      subtitle: "Would you like to purchase tokens?",
+      subtitleWithBonus: "Would you like to purchase tokens with bonus?",
+      tokenCount: "{{count}} tokens",
+      bonusIncluded: "Bonus {{bonus}} included",
+      processing: "Processing...",
       message: "Purchase {{tokens}} tokens for {{price}}?",
       messageWithBonus: "Purchase {{tokens}} tokens for {{price}}?\n\nBonus {{bonus}} tokens included",
       cancel: "Cancel",
@@ -2615,6 +2641,16 @@ Personal Information Inquiry: getposty@gmail.com`
       unused: "Refunds are only possible if tokens are completely unused after purchase.",
       contact: "Refund inquiries: getposty@gmail.com",
       terms: "Please refer to Terms of Service for detailed refund policy."
+    },
+    restore: {
+      button: "Restore Purchases",
+      description: "You can restore your previous subscriptions or tokens",
+      simulatorTitle: "Simulator Limitation",
+      simulatorMessage: "Purchase restoration cannot be tested on simulator. Please test on a real device.",
+      processingTitle: "Restoring",
+      processingMessage: "Checking purchase history...",
+      errorTitle: "Restore Failed",
+      errorMessage: "An error occurred while restoring purchases. Please try again later."
     }
   }
 };

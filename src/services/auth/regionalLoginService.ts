@@ -1,7 +1,7 @@
 import { getDeviceLanguage } from '../../utils/deviceLanguage';
 
 // 지원하는 소셜 로그인 타입
-export type SocialProvider = 'kakao' | 'naver' | 'google' | 'facebook' | 'apple'; // Facebook and Apple for future use
+export type SocialProvider = 'kakao' | 'naver' | 'google' | 'facebook' | 'apple';
 
 // 지역별 로그인 설정
 interface RegionalLoginConfig {
@@ -10,34 +10,34 @@ interface RegionalLoginConfig {
   priority: SocialProvider[];        // 전체 우선순위 순서
 }
 
-// 지역별 로그인 구성 (Facebook and Apple disabled for release)
+// 지역별 로그인 구성 (Facebook disabled for release, Apple enabled)
 const REGIONAL_LOGIN_CONFIGS: Record<string, RegionalLoginConfig> = {
   // 한국 - 카카오톡 97% 점유율
   ko: {
     primary: 'kakao',
-    secondary: ['naver', 'google'],
-    priority: ['kakao', 'naver', 'google']
+    secondary: ['naver', 'google', 'apple'],
+    priority: ['kakao', 'naver', 'google', 'apple']
   },
 
-  // 일본 - Google 우선 (Apple disabled)
+  // 일본 - Google 우선, Apple 추가
   ja: {
     primary: 'google',
-    secondary: [],
-    priority: ['google']
+    secondary: ['apple'],
+    priority: ['google', 'apple']
   },
 
-  // 중국 - Google 우선 (Apple disabled)
+  // 중국 - Google 우선, Apple 추가
   zh: {
     primary: 'google',
-    secondary: [],
-    priority: ['google']
+    secondary: ['apple'],
+    priority: ['google', 'apple']
   },
 
-  // 글로벌 기본값 - Google 우선 (Apple and Facebook disabled)
+  // 글로벌 기본값 - Google 우선, Apple 추가
   default: {
     primary: 'google',
-    secondary: [],
-    priority: ['google']
+    secondary: ['apple'],
+    priority: ['google', 'apple']
   }
 };
 
@@ -111,8 +111,15 @@ export const getRegionalProviderInfo = (provider: SocialProvider) => {
       marketShare: '전 세계 2위',
       color: '#FFFFFF',
       textColor: '#1F1F1F'
+    },
+    apple: {
+      name: 'Apple',
+      region: '글로벌',
+      marketShare: 'iOS 사용자',
+      color: '#000000',
+      textColor: '#FFFFFF'
     }
-    // Apple and Facebook disabled for release
+    // Facebook disabled for release
   };
 
   return configs[provider];

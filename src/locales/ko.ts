@@ -951,6 +951,7 @@ const ko = {
     contact: "문의하기",
     terms: "이용약관",
     privacy: "개인정보처리방침",
+    deleteAccount: "계정 삭제",
     notifications: {
       enabled: "알림이 활성화되었습니다",
       soundEnabled: "사운드가 활성화되었습니다",
@@ -1165,6 +1166,17 @@ const ko = {
         title: "로그아웃",
         message: "로그아웃 하시겠습니까?",
         action: "로그아웃"
+      },
+      deleteAccount: {
+        title: "계정 삭제",
+        message: "정말로 계정을 삭제하시겠습니까?\n\n계정을 삭제하면 모든 데이터가 영구적으로 삭제되며 복구할 수 없습니다.",
+        action: "계정 삭제",
+        confirmTitle: "최종 확인",
+        confirmMessage: "정말로 계정을 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.",
+        confirm: "삭제합니다",
+        successTitle: "계정 삭제 완료",
+        successMessage: "계정이 성공적으로 삭제되었습니다.",
+        error: "계정 삭제 중 오류가 발생했습니다."
       }
     },
     rating: {
@@ -1550,12 +1562,15 @@ const ko = {
     management: {
       title: "구독 관리",
       currentPlan: "현재 플랜",
+      currentPlanStatus: "현재 {{plan}} 플랜 구독 중",
       monthlyFee: "월 요금",
       nextBilling: "다음 결제일",
+      nextBillingDate: "다음 결제일:",
       daysRemaining: "{{days}}일 남음",
       activeUntil: "구독을 취소해도 {{date}}까지 현재 플랜을 계속 이용할 수 있습니다.",
       canceledUntil: "구독이 취소되었으며, {{date}}에 만료됩니다.",
-      cancelButton: "구독 취소"
+      cancelButton: "구독 취소",
+      cancelGuideButton: "구독 취소 안내"
     },
     earnTokensSection: {
       title: "무료 토큰 받기",
@@ -1608,6 +1623,12 @@ const ko = {
     downgradeNotAllowedMessage: "하위 플랜으로 변경할 수 없습니다.\n\n현재 구독을 취소하고 만료 후 새로 가입해주세요.",
     confirmSubscriptionMessage: "{{planName}} 플랜을 구독하시겠습니까?\n\n{{description}}\n현재 토큰: {{currentTokens}}개\n변경 후: {{afterTokens}}개",
     subscribePro: "Pro 구독하기",
+    cancelSubscriptionGuide: "구독 취소 안내",
+    cancelSubscriptionGuideMessage: "구독 취소는 앱스토어에서 직접 해야 합니다.\n\n• iOS: 설정 > Apple ID > 구독 > Posty\n• Android: Google Play 스토어 > 구독 > Posty\n\n취소해도 다음 결제일까지 현재 플랜을 이용할 수 있습니다.",
+    simulatorPurchaseTitle: "시뮬레이터 제한",
+    simulatorPurchaseMessage: "시뮬레이터에서는 인앱 결제를 테스트할 수 없습니다. 실제 기기에서 테스트해주세요.",
+    subscriptionComplete: "구독 완료",
+    subscriptionCompleteMessage: "{{plan}} 플랜 구독이 완료되었습니다!",
     // 추가 번역 키들
     alerts: {
       adWatch: {
@@ -2263,6 +2284,11 @@ const ko = {
     },
     purchase: {
       title: "토큰 구매",
+      subtitle: "토큰을 구매하시겠습니까?",
+      subtitleWithBonus: "보너스가 포함된 토큰을 구매하시겠습니까?",
+      tokenCount: "{{count}}개 토큰",
+      bonusIncluded: "보너스 {{bonus}}개 포함",
+      processing: "처리중...",
       message: "{{tokens}}개 토큰을 {{price}}에\n구매하시겠습니까?",
       messageWithBonus: "{{tokens}}개 토큰을 {{price}}에\n구매하시겠습니까?\n\n보너스 {{bonus}}개 포함",
       cancel: "취소",
@@ -2288,6 +2314,16 @@ const ko = {
       unused: "구매 후 사용하지 않은 상태에서만 환불이 가능합니다.",
       contact: "환불 문의: getposty@gmail.com",
       terms: "자세한 환불 정책은 이용약관을 참고해주세요."
+    },
+    restore: {
+      button: "구매 복원",
+      description: "이전에 구매한 구독이나 토큰을 복원할 수 있습니다",
+      simulatorTitle: "시뮬레이터 제한",
+      simulatorMessage: "시뮬레이터에서는 구매 복원을 테스트할 수 없습니다. 실제 기기에서 테스트해주세요.",
+      processingTitle: "복원 중",
+      processingMessage: "구매 내역을 확인하고 있습니다...",
+      errorTitle: "복원 실패",
+      errorMessage: "구매 복원 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
     }
   }
 };
