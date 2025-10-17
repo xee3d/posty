@@ -596,14 +596,17 @@ class VercelAuthService {
       // User cancellation handling
       const isUserCancellation =
         error.code === appleAuth.Error.CANCELED ||
+        error.code === "1000" || // Apple authorization error (simulator/user cancelled)
         error.code === "1001" || // Apple cancellation code
+        error.message?.includes("AuthorizationError") ||
+        error.message?.includes("작업을 완료할 수 없습니다") ||
         error.message?.includes("cancel") ||
         error.message?.includes("취소") ||
         error.message?.includes("사용자 취소") ||
         error.message?.includes("User cancelled");
 
       if (isUserCancellation) {
-        console.log("ℹ️ Apple 로그인 취소됨 (사용자 액션)");
+        console.log("ℹ️ Apple 로그인 취소됨 (사용자 액션 또는 시뮬레이터)");
         throw new Error("USER_CANCELLED");
       }
 
