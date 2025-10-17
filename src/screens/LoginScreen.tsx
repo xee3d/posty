@@ -349,8 +349,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
                   style={styles.expandedOptionsContainer}
                 >
                   {secondaryProviders.map((provider, index) => {
-                    // Only Facebook disabled for release, Apple enabled for App Store compliance (4.8)
+                    // Facebook disabled for release
                     if (provider === 'facebook') {
+                      return null;
+                    }
+
+                    // Apple Sign-In is iOS only (App Store compliance 4.8)
+                    if (provider === 'apple' && Platform.OS !== 'ios') {
                       return null;
                     }
 
