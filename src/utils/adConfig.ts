@@ -66,8 +66,8 @@ export const SUBSCRIPTION_PLANS = {
   pro: {
     id: "pro",
     name: "PRO",
-    price: 19000,
-    priceDisplay: "₩19,000",
+    price: 15000,
+    priceDisplay: "₩15,000",
     features: {
       monthlyTokens: -1, // 무제한
       dailyLimit: -1, // 무제한

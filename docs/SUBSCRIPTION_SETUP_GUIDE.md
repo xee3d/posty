@@ -76,7 +76,7 @@ GOOGLE_PLAY_SERVICE_ACCOUNT_KEY=your_google_service_account_json
 ### Pro Plan (₩15,000/월)
 - 무제한 토큰
 - 광고 제거
-- GPT-4o & Gemini 2.5 Flash
+- GPT-4o
 
 ## API 사용법
 
