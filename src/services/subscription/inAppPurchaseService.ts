@@ -260,15 +260,47 @@ class InAppPurchaseService {
     planId: string,
     isYearly: boolean = false
   ): Promise<void> {
-    // 시뮬레이터 환경에서는 구매 불가 메시지 표시
-    if (Platform.OS === "ios" && __DEV__) {
-      throw new Error(
-        "시뮬레이터에서는 인앱 결제를 테스트할 수 없습니다. 실제 기기에서 테스트해주세요."
-      );
-    }
-
     try {
       const sku = this.getSubscriptionSku(planId, isYearly);
+
+      // 시뮬레이터 환경에서는 Mock 구독 처리
+      if (Platform.OS === "ios" && __DEV__) {
+        console.log("🎭 [IAP] Simulator - Mock subscription processing");
+
+        // Redux를 통해 구독 업데이트
+        const expiryDate = new Date();
+        expiryDate.setMonth(expiryDate.getMonth() + 1); // 1달 후 만료
+
+        store.dispatch(
+          updateSubscription({
+            plan: planId as "free" | "pro",
+            expiresAt: expiryDate.toISOString(),
+            autoRenew: true,
+            isServerVerified: false, // Mock 구매는 서버 검증 없음
+          })
+        );
+
+        console.log(`🎭 [IAP] Mock subscription: ${planId} activated`);
+
+        // 성공 이벤트 발생
+        DeviceEventEmitter.emit("purchaseSuccess", {
+          type: "subscription",
+          planId,
+          planName: planId.toUpperCase(),
+          features: "무제한 토큰",
+        });
+
+        // 성공 알림 표시
+        Alert.alert(
+          "구독 성공! 🎉",
+          `${planId.toUpperCase()} 플랜이 활성화되었습니다.\n무제한 토큰을 사용할 수 있습니다. (시뮬레이터 테스트)`,
+          [{ text: "확인" }]
+        );
+
+        return;
+      }
+
+      // 실제 기기: 제품 확인
       const product = this.products.find((p) => (p as any).productId === sku);
 
       if (!product) {
@@ -277,6 +309,7 @@ class InAppPurchaseService {
 
       console.log("Purchasing subscription:", sku);
 
+      // 실제 기기: 구독 요청
       if (Platform.OS === "ios") {
         await requestSubscription({
           sku,
