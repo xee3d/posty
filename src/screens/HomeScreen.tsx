@@ -644,7 +644,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
           {userLevel === "new" && getPersonalizedGreeting().subMessage && (
             <View style={styles.welcomeSubMessage}>
               <Text style={styles.welcomeSubText}>
-                💡 {getPersonalizedGreeting().subMessage}
+                {getPersonalizedGreeting().subMessage}
               </Text>
             </View>
           )}
@@ -1912,17 +1912,17 @@ const createStyles = (
     },
     // 신규 사용자를 위한 추가 메시지
     welcomeSubMessage: {
-      backgroundColor: colors.warning + "15",
+      backgroundColor: colors.primary + "10",
       marginHorizontal: SPACING.lg,
       marginTop: SPACING.sm,
       padding: SPACING.md,
       borderRadius: 12,
       borderWidth: 1,
-      borderColor: colors.warning + "30",
+      borderColor: colors.primary + "30",
     },
     welcomeSubText: {
       fontSize: 14,
-      color: colors.warning,
+      color: theme?.colors.text.primary || colors.text.primary,
       fontWeight: "500",
       textAlign: "center",
     },
