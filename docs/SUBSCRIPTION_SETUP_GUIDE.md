@@ -72,20 +72,15 @@ GOOGLE_PLAY_SERVICE_ACCOUNT_KEY=your_google_service_account_json
 
 ## 구독 플랜
 
-### Starter Plan ($1.99/월)
-- 100 토큰/월
+### Free Plan
+- 10 토큰/일 (매일 자정 충전)
 - 광고 포함
 - 기본 AI 모델
 
-### Premium Plan ($3.99/월)
-- 200 토큰/월
-- 광고 제거
-- 기본 AI 모델
-
-### Pro Plan ($9.99/월)
+### Pro Plan (₩15,000/월)
 - 무제한 토큰
 - 광고 제거
-- Gemini 2.5 / GPT-4o 에이전트
+- GPT-4o & Gemini 2.5 Flash
 
 ## API 사용법
 

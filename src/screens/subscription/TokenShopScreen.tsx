@@ -5,11 +5,11 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   Dimensions,
   Platform,
   Animated,
 } from "react-native";
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from "react-native-vector-icons/Ionicons";
 import LinearGradient from "react-native-linear-gradient";
 import { SPACING } from "../../utils/constants";
@@ -331,21 +331,21 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
         // 50개 - 가장 연한 색상
         return {
           backgroundColor: baseColor + "08", // 매우 연한 색상
-          borderColor: baseColor + "40",    // 연한 테두리
+          borderColor: isDark ? baseColor + "80" : baseColor + "40",    // 다크모드에서 더 진한 테두리
           tokenSectionBg: baseColor + "12", // 연한 토큰 섹션 배경
         };
       case 'tokens_150':
         // 150개 - 중간 색상
         return {
           backgroundColor: baseColor + "15", // 중간 색상
-          borderColor: baseColor + "60",    // 중간 테두리
+          borderColor: isDark ? baseColor + "A0" : baseColor + "60",    // 다크모드에서 더 진한 테두리
           tokenSectionBg: baseColor + "20", // 중간 토큰 섹션 배경
         };
       case 'tokens_500':
         // 500개 - 가장 진한 색상
         return {
           backgroundColor: baseColor + "25", // 진한 색상
-          borderColor: baseColor + "80",    // 진한 테두리
+          borderColor: isDark ? baseColor + "C0" : baseColor + "80",    // 다크모드에서 더 진한 테두리
           tokenSectionBg: baseColor + "30", // 진한 토큰 섹션 배경
         };
       default:
@@ -375,8 +375,12 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
     setPurchaseModal(prev => ({ ...prev, isLoading: true }));
     
     try {
+      console.log("[TokenShop] Starting purchase for package:", purchaseModal.packageId);
+      
       await inAppPurchaseService.purchaseTokenPackage(purchaseModal.packageId);
       const totalTokens = purchaseModal.tokens + purchaseModal.bonus;
+      
+      console.log("[TokenShop] Purchase completed successfully");
       
       Alert.alert(
         t("tokenShop.purchase.successTitle"),
@@ -384,10 +388,20 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
       );
       
       setPurchaseModal(prev => ({ ...prev, visible: false, isLoading: false }));
-    } catch (error) {
+    } catch (error: any) {
+      console.error("[TokenShop] Purchase error:", error);
+      
+      // 에러 메시지 개선
+      let errorMessage = t("tokenShop.purchase.errorMessage");
+      if (error.message) {
+        errorMessage = error.message;
+      } else if (__DEV__) {
+        errorMessage = "개발 모드에서는 실제 구매가 불가능합니다.";
+      }
+      
       Alert.alert(
         t("tokenShop.purchase.errorTitle"),
-        t("tokenShop.purchase.errorMessage")
+        errorMessage
       );
       setPurchaseModal(prev => ({ ...prev, isLoading: false }));
     }
@@ -798,7 +812,7 @@ const createStyles = (colors: any, isDark: boolean) => {
     marginBottom: getResponsiveSize(SPACING.large),
   },
   sectionTitle: {
-    ...getFontStyle("xxl", "bold"),
+    ...getFontStyle("xl", "bold"),
     letterSpacing: -0.5,
   },
   packageCardWrapper: {
@@ -809,13 +823,14 @@ const createStyles = (colors: any, isDark: boolean) => {
     borderRadius: getResponsiveSize(16),
     overflow: "visible", // 스티커가 보이도록 변경
     shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: isDark ? 4 : 3 },
-    shadowOpacity: isDark ? 0.4 : 0.15,
-    shadowRadius: isDark ? 8 : 6,
-    elevation: isDark ? 6 : 4,
-    height: getResponsiveSize(220),
+    shadowOffset: { width: 0, height: isDark ? 2 : 1 },
+    shadowOpacity: isDark ? 0.2 : 0.1,
+    shadowRadius: isDark ? 4 : 3,
+    elevation: isDark ? 2 : 1,
+    height: getResponsiveSize(180), // 220에서 180으로 줄임
     width: "100%",
-    borderWidth: 3,
+    borderWidth: Platform.OS === 'ios' ? (isDark ? 1 : 0) : 0,
+    borderColor: Platform.OS === 'ios' && isDark ? colors.border + '40' : undefined,
     position: "relative",
     zIndex: 1, // 스티커보다 낮은 레이어
   },
@@ -824,9 +839,9 @@ const createStyles = (colors: any, isDark: boolean) => {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: getResponsiveSize(24),
-    paddingVertical: getResponsiveSize(20),
-    borderBottomWidth: 2,
+    paddingHorizontal: getResponsiveSize(20), // 24에서 20으로 줄임
+    paddingVertical: getResponsiveSize(16), // 20에서 16으로 줄임
+    borderBottomWidth: Platform.OS === 'android' ? 0.5 : 2,
     borderBottomColor: colors.border,
     zIndex: 2,
   },
@@ -839,13 +854,13 @@ const createStyles = (colors: any, isDark: boolean) => {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: getResponsiveSize(24),
-    paddingHorizontal: getResponsiveSize(24),
-    gap: getResponsiveSize(SPACING.large),
+    paddingVertical: getResponsiveSize(16), // 24에서 16으로 줄임
+    paddingHorizontal: getResponsiveSize(20), // 24에서 20으로 줄임
+    gap: getResponsiveSize(SPACING.md), // large에서 md로 줄임
     zIndex: 2,
   },
   tokenCount: {
-    fontSize: getResponsiveSize(isSmallDevice ? 20 : isMediumDevice ? 24 : 28),
+    fontSize: getResponsiveSize(isSmallDevice ? 16 : isMediumDevice ? 18 : 20),
     fontWeight: "bold",
     color: colors.text.primary,
     letterSpacing: -0.5,
@@ -875,7 +890,7 @@ const createStyles = (colors: any, isDark: boolean) => {
     letterSpacing: -0.2,
   },
   packagePrice: {
-    fontSize: getResponsiveSize(isSmallDevice ? 32 : isMediumDevice ? 40 : 48),
+    fontSize: getResponsiveSize(isSmallDevice ? 24 : isMediumDevice ? 28 : 32),
     fontWeight: "bold",
     color: colors.text.primary,
     letterSpacing: -0.5,
@@ -903,8 +918,8 @@ const createStyles = (colors: any, isDark: boolean) => {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: getResponsiveSize(12),
-    flexWrap: "wrap",
+    gap: getResponsiveSize(8),
+    flexWrap: "nowrap",
   },
   buyButtonText: {
     fontSize: getResponsiveSize(isSmallDevice ? 16 : isMediumDevice ? 18 : 20),
@@ -930,7 +945,7 @@ const createStyles = (colors: any, isDark: boolean) => {
     minWidth: getResponsiveSize(55),
     alignItems: "center",
     justifyContent: "center",
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: colors.surface,
   },
   discountStickerText: {
@@ -965,7 +980,7 @@ const createStyles = (colors: any, isDark: boolean) => {
   subscriptionCard: {
     borderRadius: getResponsiveSize(16),
     padding: getResponsiveSize(SPACING.large),
-    borderWidth: 2,
+    borderWidth: 1,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,

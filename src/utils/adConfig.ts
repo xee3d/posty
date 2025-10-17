@@ -220,3 +220,63 @@ export interface TokenUsage {
   description: string;
   tokensUsed: number;
 }
+
+// 이미지 분석 토큰 계산
+export const getImageAnalysisTokens = (userPlan: any) => {
+  if (!userPlan || !userPlan.features) {
+    return 1; // 기본값
+  }
+  // 모든 플랜에서 이미지 분석은 1토큰
+  return 1;
+};
+
+// 사용 가능한 톤 목록 가져오기
+export const getAvailableTones = (plan?: string) => {
+  const planType = plan || "free";
+  const allTones = [
+    { id: "casual", name: "캐주얼", description: "친근하고 편안한 톤" },
+    { id: "professional", name: "전문적", description: "정중하고 전문적인 톤" },
+    { id: "friendly", name: "친구같은", description: "따뜻하고 친근한 톤" },
+    { id: "formal", name: "격식있는", description: "정중하고 격식있는 톤" },
+    { id: "creative", name: "창의적", description: "독창적이고 상상력 풍부한 톤" },
+    { id: "humorous", name: "유머러스", description: "재미있고 유쾌한 톤" },
+    { id: "inspiring", name: "영감주는", description: "동기부여와 영감을 주는 톤" },
+  ];
+  if (planType === "pro") {
+    return allTones;
+  }
+  return allTones.slice(0, 4);
+};
+
+// 사용 가능한 길이 옵션 가져오기
+export const getAvailableLengths = (plan?: string) => {
+  const planType = plan || "free";
+  const allLengths = [
+    { id: "short", name: "짧게", description: "한 줄 요약", maxChars: 100 },
+    { id: "medium", name: "보통", description: "적당한 길이", maxChars: 300 },
+    { id: "long", name: "길게", description: "상세한 설명", maxChars: 600 },
+    { id: "very-long", name: "매우 길게", description: "완전한 분석", maxChars: 1000 },
+  ];
+  if (planType === "pro") {
+    return allLengths;
+  }
+  return allLengths.slice(0, 2);
+};
+
+// 트렌드 접근 권한
+export const TREND_ACCESS = {
+  free: {
+    hasAccess: false,
+    message: "PRO 플랜에서 트렌드 분석을 이용하세요",
+  },
+  pro: {
+    hasAccess: true,
+    message: "",
+  },
+};
+
+// 정리 옵션 접근 권한 확인
+export const canAccessPolishOption = (plan?: string) => {
+  const planType = plan || "free";
+  return planType === "pro";
+};

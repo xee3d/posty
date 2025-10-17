@@ -161,7 +161,7 @@ const NotificationBadge: React.FC<NotificationBadgeProps> = ({
         <Icon
           name="notifications-outline"
           size={sizeStyles.iconSize}
-          color={colors.text.primary}
+          color="rgba(255,255,255,0.95)"
         />
         {badgeCount > 0 && showCount && (
           <View style={styles.badge}>

@@ -45,6 +45,7 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./src/store";
 import { ThemeProvider } from "./src/contexts/ThemeContext";
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 // Auth removed - using Vercel-based social login instead
 
 // Import screens
@@ -615,8 +616,8 @@ const AppContent: React.FC = () => {
 
     console.log("[Render] Rendering main screen - activeTab:", activeTab);
 
-    // 각 스크린에 key prop 최적화
-    const screenKey = `${activeTab}-${photoMode ? "photo" : "text"}`;
+    // 각 스크린에 key prop - screenKey에서 photoMode 제거하여 화면 초기화 방지
+    const screenKey = activeTab;
 
     switch (activeTab) {
       case "login":
@@ -767,13 +768,15 @@ const App: React.FC = () => {
         }
         persistor={persistor}
       >
-        <ThemeProvider>
-          {/* <NotionSyncProvider> Notion 사용 안 함 */}
-            <TextRenderingErrorBoundary>
-              <AppContent />
-            </TextRenderingErrorBoundary>
-          {/* </NotionSyncProvider> */}
-        </ThemeProvider>
+        <SafeAreaProvider>
+          <ThemeProvider>
+            {/* <NotionSyncProvider> Notion 사용 안 함 */}
+              <TextRenderingErrorBoundary>
+                <AppContent />
+              </TextRenderingErrorBoundary>
+            {/* </NotionSyncProvider> */}
+          </ThemeProvider>
+        </SafeAreaProvider>
       </PersistGate>
     </Provider>
   );

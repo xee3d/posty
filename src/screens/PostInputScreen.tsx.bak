@@ -6,9 +6,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-
+  SafeAreaView,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
@@ -36,7 +35,6 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
 }) => {
   const { colors, cardTheme } = useAppTheme();
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
   const [content, setContent] = useState(initialContent);
   const [hashtags, setHashtags] = useState(initialHashtags.join(" "));
   const [platform, setPlatform] = useState<
@@ -126,7 +124,7 @@ const PostInputScreen: React.FC<PostInputScreenProps> = ({
   const styles = createStyles(colors, cardTheme);
 
   return (
-    <SafeAreaView style={[styles.container, { paddingTop: insets.top + 8 }]} edges={['left', 'right']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.modalHeader}>
         <TouchableOpacity onPress={onClose} style={styles.backButton}>
           <SafeIcon name="close" size={20} color={colors.text.primary} />

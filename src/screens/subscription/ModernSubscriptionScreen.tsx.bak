@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Linking, Share, Platform,  } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, SafeAreaView, Dimensions, Linking, Share, Platform,  } from 'react-native';
 import { COLORS, SPACING } from '../../utils/constants';
 import { SUBSCRIPTION_PLANS } from '../../config/adConfig';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -20,7 +20,7 @@ const { width: screenWidth } = Dimensions.get('window');
 interface SubscriptionScreenProps {
   navigation: any;
   route?: any;
-  currentPlan?: 'free' | 'pro';
+  currentPlan?: 'free' | 'premium' | 'pro';
 }
 
 export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
@@ -31,13 +31,13 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
   const { colors, isDark } = useAppTheme();
   const currentTokens = useAppSelector(selectCurrentTokens);
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
-  const [selectedPlan, setSelectedPlan] = useState<'free' | 'pro'>('pro');
+  const [selectedPlan, setSelectedPlan] = useState<'free' | 'starter' | 'premium' | 'pro'>('premium');
   const [activeTab, setActiveTab] = useState<'subscription' | 'tokens' | 'manage'>('subscription');
   const [showEarnTokenModal, setShowEarnTokenModal] = useState(false);
   const [stats, setStats] = useState({
     totalTokens: 0,
   });
-  const [realSubscriptionPlan, setRealSubscriptionPlan] = useState<'free' | 'pro'>('free');
+  const [realSubscriptionPlan, setRealSubscriptionPlan] = useState<'free' | 'starter' | 'premium' | 'pro'>('free');
   const [adStats, setAdStats] = useState({
     dailyCount: 0,
     remainingToday: 10,
@@ -355,29 +355,57 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
     );
   };
 
-  const calculateTokenChange = (newPlan: 'pro') => {
+  const calculateTokenChange = (newPlan: 'starter' | 'premium' | 'pro') => {
     let tokenChange = 0;
     let description = '';
-
-    if (subscriptionPlan === 'free' && newPlan === 'pro') {
-      tokenChange = 9999;
-      description = '무제한 토큰을 사용할 수 있습니다';
+    
+    if (subscriptionPlan === 'free') {
+      if (newPlan === 'starter') {
+        tokenChange = 300;
+        description = '가입 즉시 300개 토큰을 받게 됩니다';
+      } else if (newPlan === 'premium') {
+        tokenChange = 500;
+        description = '가입 즉시 500개 토큰을 받게 됩니다';
+      } else if (newPlan === 'pro') {
+        tokenChange = 9999;
+        description = '무제한 토큰을 사용할 수 있습니다';
+      }
+    } else if (subscriptionPlan === 'starter') {
+      if (newPlan === 'premium') {
+        tokenChange = 500;
+        description = '전액 500개 토큰을 추가로 받게 됩니다';
+      } else if (newPlan === 'pro') {
+        tokenChange = 9999;
+        description = '무제한 토큰을 사용할 수 있습니다';
+      }
+    } else if (subscriptionPlan === 'premium') {
+      if (newPlan === 'pro') {
+        tokenChange = 9999;
+        description = '무제한 토큰을 사용할 수 있습니다';
+      } else if (newPlan === 'starter') {
+        tokenChange = 0;
+        description = '경고: 무료 토큰이 300개로 제한됩니다';
+      }
     }
-
+    
     return { tokenChange, description };
   };
 
-  const handleSubscribe = async (planKey?: 'free' | 'pro') => {
+  const handleSubscribe = async (planKey?: 'free' | 'starter' | 'premium' | 'pro') => {
     const targetPlan = planKey || selectedPlan;
-
+    
     if (targetPlan === 'free') {
       navigation.goBack();
       return;
     }
-
-    // 다운그레이드 체크 (Pro → Free만 체크)
-    const isDowngrade = subscriptionPlan === 'pro' && targetPlan !== 'pro';
-
+    
+    // 다운그레이드 체크
+    const isDowngrade = (
+      (subscriptionPlan === 'pro' && targetPlan !== 'pro') ||
+      (subscriptionPlan === 'premium' && (targetPlan === 'starter' || targetPlan === 'free')) ||
+      (subscriptionPlan === 'starter' && targetPlan === 'free')
+    );
+    
     if (isDowngrade) {
       Alert.alert(
         '다운그레이드 불가',
@@ -386,19 +414,23 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
       );
       return;
     }
-
+    
     const { tokenChange, description } = calculateTokenChange(targetPlan);
-    const afterTokens = '무제한';
-
-    const message = `${SUBSCRIPTION_PLANS[targetPlan].name} 플랜을 구독하시겠습니까?\n\n${description}\n현재 토큰: ${currentTokens}개\n변경 후: ${afterTokens}`;
+    const afterTokens = targetPlan === 'pro' ? '무제한' : 
+                       targetPlan === 'starter' && subscriptionPlan === 'free' ? currentTokens + 300 :
+                       targetPlan === 'premium' && subscriptionPlan === 'free' ? currentTokens + 500 :
+                       targetPlan === 'premium' && subscriptionPlan === 'starter' ? currentTokens + 500 :
+                       currentTokens;
+    
+    const message = `${SUBSCRIPTION_PLANS[targetPlan].name} 플랜을 구독하시겠습니까?\n\n${description}\n현재 토큰: ${currentTokens}개\n변경 후: ${targetPlan === 'pro' ? '무제한' : afterTokens + '개'}`;
 
     Alert.alert(
       '구독 확인',
       message,
       [
         { text: '취소', style: 'cancel' },
-        {
-          text: '구독하기',
+        { 
+          text: '구독하기', 
           onPress: async () => {
             try {
               await inAppPurchaseService.purchaseSubscription(targetPlan, false);
@@ -422,23 +454,31 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
   const planColors = {
     free: '#6B7280',
-    pro: '#8B5CF6',      // PRO - 보라 색상
+    starter: '#10B981',  // STARTER - 그린 색상
+    premium: '#F59E0B',  // PRO - 골드 색상
+    pro: '#8B5CF6',      // MAX - 보라 색상
   };
 
   const planIcons = {
     free: 'account-circle',
+    starter: 'flight-takeoff',
+    premium: 'star',
     pro: 'workspace-premium',
   };
 
-  const renderPlanCard = (planKey: 'free' | 'pro') => {
+  const renderPlanCard = (planKey: 'free' | 'starter' | 'premium' | 'pro') => {
     const plan = SUBSCRIPTION_PLANS[planKey];
     const isSelected = selectedPlan === planKey;
     const isCurrent = subscriptionPlan === planKey;
-    const isPopular = planKey === 'pro';
+    const isPopular = planKey === 'premium';
     const planColor = planColors[planKey];
 
-    // 다운그레이드 체크 (Pro → Free만)
-    const isDowngrade = subscriptionPlan === 'pro' && planKey !== 'pro';
+    // 다운그레이드 체크
+    const isDowngrade = (
+      (subscriptionPlan === 'pro' && planKey !== 'pro') ||
+      (subscriptionPlan === 'premium' && (planKey === 'starter' || planKey === 'free')) ||
+      (subscriptionPlan === 'starter' && planKey === 'free')
+    );
 
     return (
       <TouchableOpacity
@@ -495,7 +535,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
           <Icon name="flash-on" size={18} color={isDowngrade ? colors.text.secondary : planColor} />
           <Text style={[styles.tokenText, { color: isDowngrade ? colors.text.secondary : planColor }]}>
           {isDowngrade ? '하위 플랜으로 변경 불가' :
-           planKey === 'free' ? '매일 10개 무료 충전' :
+           planKey === 'free' ? '매일 10개 무료 충전' : 
+           planKey === 'starter' ? '가입 시 300개 + 매일 10개' :
+           planKey === 'premium' ? '가입 시 500개 + 매일 20개' :
            '무제한 토큰'}
           </Text>
         </View>
@@ -637,6 +679,8 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
 
             <View style={styles.plansContainer}>
               {renderPlanCard('free')}
+              {renderPlanCard('starter')}
+              {renderPlanCard('premium')}
               {renderPlanCard('pro')}
             </View>
 
@@ -648,9 +692,9 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
                   <Icon name="flash-on" size={24} color="#8B5CF6" />
                 </View>
                 <View style={styles.benefitContent}>
-                  <Text style={styles.benefitTitle}>무제한 토큰</Text>
+                  <Text style={styles.benefitTitle}>더 많은 토큰</Text>
                   <Text style={styles.benefitDesc}>
-                  PRO 플랜은 무제한 토큰을 제공하여 걱정 없이 콘텐츠를 생성할 수 있습니다
+                  STARTER는 총 600개(초기 300 + 일일 10x30), PRO는 총 1,100개(초기 500 + 일일 20x30), MAX는 무제한 토큰을 제공합니다
                   </Text>
                 </View>
               </View>
@@ -865,8 +909,10 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               <View style={styles.premiumNotice}>
                 <Icon name="workspace-premium" size={20} color={colors.primary} />
                 <Text style={styles.premiumNoticeText}>
-                  {realSubscriptionPlan === 'free' ? '무료 회원은 매일 10개의 토큰이 자동 충전됩니다' :
-                   'PRO 회원은 무제한 토큰을 사용할 수 있습니다'}
+                  {realSubscriptionPlan === 'free' ? '무료 회원은 매일 10개의 토큰이 자동 충전됩니다' : 
+                   realSubscriptionPlan === 'starter' ? 'STARTER 회원은 가입 시 300개 + 매일 10개씩 추가 토큰을 받습니다' : 
+                   realSubscriptionPlan === 'premium' ? 'PRO 회원은 가입 시 500개 + 매일 20개씩 추가 토큰을 받습니다' : 
+                   'MAX 회원은 무제한 토큰을 사용할 수 있습니다'}
                 </Text>
               </View>
             </View>
@@ -1058,8 +1104,8 @@ const createStyles = (colors: any, isDark: boolean) => {
       borderRadius: 16,
       padding: SPACING.large,
       marginBottom: SPACING.medium,
-      borderWidth: Platform.OS === 'ios' ? (isDark ? 1 : 0) : 0,
-      borderColor: Platform.OS === 'ios' && isDark ? colors.border + '40' : undefined,
+      borderWidth: 2,
+      borderColor: colors.border,
       position: 'relative',
     },
     selectedPlanCard: {

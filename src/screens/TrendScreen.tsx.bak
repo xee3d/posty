@@ -5,12 +5,11 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-
+  SafeAreaView,
   RefreshControl,
   ActivityIndicator,
   Image,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   COLORS,
   FONTS,
@@ -53,7 +52,6 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   console.log("[TrendScreen] ===== Component Mounted/Rendered =====");
   const { colors, isDark } = useAppTheme();
   const { t, i18n } = useTranslation();
-  const insets = useSafeAreaInsets();
   
   // i18n 디버깅
   console.log("[TrendScreen] Current language:", i18n.language);
@@ -302,8 +300,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   if (isInitialLoading) {
     return (
       <SafeAreaView
-        style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top + 8 }]}
-        edges={['left', 'right']}
+        style={[styles.container, { backgroundColor: colors.background }]}
       >
         <TrendPageSkeleton />
       </SafeAreaView>
@@ -315,8 +312,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
   if (!hasAccess) {
     return (
       <SafeAreaView
-        style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top + 8 }]}
-        edges={['left', 'right']}
+        style={[styles.container, { backgroundColor: colors.background }]}
       >
         <View style={headerStyles.headerSection}>
           <View style={headerStyles.headerTop}>
@@ -356,8 +352,7 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
 
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top + 8 }]}
-      edges={['left', 'right']}
+      style={[styles.container, { backgroundColor: colors.background }]}
     >
       <ScrollView
         style={[styles.scrollView, { backgroundColor: colors.background }]}

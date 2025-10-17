@@ -18,6 +18,7 @@ import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { COLORS, FONTS, SPACING } from "../utils/constants";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get("window");
 const TAB_WIDTH = width / 4;
@@ -41,6 +42,7 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({
 }) => {
   const { colors } = useAppTheme();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const tabs: TabConfig[] = [
     { key: "home", icon: "home-outline", activeIcon: "home", label: t("navigation.home") },
@@ -132,7 +134,7 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({
     onTabPress(tabKey);
   };
 
-  const styles = useMemo(() => createStyles(colors), [colors]);
+  const styles = useMemo(() => createStyles(colors, insets.bottom), [colors, insets.bottom]);
 
   return (
     <View style={styles.container}>
@@ -189,14 +191,14 @@ const TabNavigator: React.FC<TabNavigatorProps> = ({
   );
 };
 
-const createStyles = (colors: typeof COLORS) =>
+const createStyles = (colors: typeof COLORS, bottomInset: number = 0) =>
   StyleSheet.create({
     container: {
       flexDirection: "row",
       backgroundColor: colors.surface || "#FFFFFF", // 기본 배경색 추가
       borderTopWidth: 1,
       borderTopColor: colors.border,
-      paddingBottom: 20,
+      paddingBottom: Math.max(bottomInset, 8), // Safe Area와 최소 패딩 중 더 큰 값 사용
       paddingTop: 8,
       elevation: 8,
       shadowColor: colors.background === "#000000" ? "#FFFFFF" : "#000000",

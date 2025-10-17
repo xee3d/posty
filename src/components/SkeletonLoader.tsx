@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, StyleSheet, Dimensions, useColorScheme } from "react-native";
+import { View, StyleSheet, Dimensions, useColorScheme, Platform } from "react-native";
 import { useAppTheme } from "../hooks/useAppTheme";
 import Animated, {
   useAnimatedStyle,
@@ -423,7 +423,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F8F9FF",
     padding: 16,
     borderRadius: 12,
-    borderWidth: 1,
+    borderWidth: Platform.OS === 'android' ? 0.5 : 1,
     borderColor: "#E8E8FF",
   },
   aiHeader: {
@@ -488,7 +488,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: SPACING.md,
     marginBottom: SPACING.sm,
-    borderWidth: 1,
+    borderWidth: Platform.OS === 'android' ? 0.5 : 1,
   },
   trendCardSkeletonLight: {
     backgroundColor: "#FFFFFF",

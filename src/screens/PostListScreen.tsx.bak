@@ -6,14 +6,13 @@ import {
   StyleSheet,
   TouchableOpacity,
   FlatList,
-
+  SafeAreaView,
   ActivityIndicator,
   RefreshControl,
   ListRenderItem,
   Clipboard,
   Share,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SafeIcon } from "../utils/SafeIcon";
 import Icon from "react-native-vector-icons/Ionicons";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
@@ -217,7 +216,6 @@ PostItemComponent.displayName = "PostItemComponent";
 const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
   const { colors, cardTheme } = useAppTheme();
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
   const [posts, setPosts] = useState<PostItem[]>([]);
   const [expandedPostId, setExpandedPostId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -350,7 +348,7 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
 
   if (isLoading) {
     return (
-      <SafeAreaView style={[styles.container, { paddingTop: insets.top + 8 }]} edges={['left', 'right']}>
+      <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose} style={styles.closeButton}>
             <SafeIcon name="close" size={24} color={colors.text.primary} />
@@ -366,7 +364,7 @@ const PostListScreen: React.FC<PostListScreenProps> = ({ onClose }) => {
   }
 
   return (
-    <SafeAreaView style={[styles.container, { paddingTop: insets.top + 8 }]} edges={['left', 'right']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <SafeIcon name="close" size={24} color={colors.text.primary} />

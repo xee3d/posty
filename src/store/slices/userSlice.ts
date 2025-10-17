@@ -114,52 +114,10 @@ const userSlice = createSlice({
       if (payload.provider !== undefined) state.provider = payload.provider;
     },
     
-    // 월간 토큰 리셋 (STARTER, PREMIUM 플랜)
+    // 월간 토큰 리셋 (사용 안함 - Free/Pro만 지원)
     resetMonthlyTokens: (state) => {
-      const today = new Date();
-      const currentMonth = today.getMonth();
-      const currentYear = today.getFullYear();
-      
-      // 마지막 월간 리셋 날짜 확인
-      const lastReset = state.lastMonthlyResetDate ? new Date(state.lastMonthlyResetDate) : null;
-      const lastResetMonth = lastReset ? lastReset.getMonth() : -1;
-      const lastResetYear = lastReset ? lastReset.getFullYear() : -1;
-      
-      // 다른 달이면 리셋
-      if (!lastReset || currentMonth !== lastResetMonth || currentYear !== lastResetYear) {
-        if (state.subscriptionPlan === 'starter') {
-          // STARTER: 월 200개 충전
-          state.freeTokens = 200;
-          state.currentTokens = state.purchasedTokens + 200;
-          
-          const newHistory: TokenHistory = {
-            id: Date.now().toString(),
-            date: new Date().toISOString(),
-            type: 'earn',
-            amount: 200,
-            description: 'STARTER 월간 토큰 충전',
-            balance: state.currentTokens,
-          };
-          state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
-          
-        } else if (state.subscriptionPlan === 'premium') {
-          // PREMIUM: 월 500개 충전
-          state.freeTokens = 500;
-          state.currentTokens = state.purchasedTokens + 500;
-          
-          const newHistory: TokenHistory = {
-            id: Date.now().toString(),
-            date: new Date().toISOString(),
-            type: 'earn',
-            amount: 500,
-            description: 'PRO 월간 토큰 충전',
-            balance: state.currentTokens,
-          };
-          state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
-        }
-        
-        state.lastMonthlyResetDate = today.toISOString();
-      }
+      // Free와 Pro 플랜만 지원하므로 월간 리셋 로직 제거
+      console.log('[UserSlice] resetMonthlyTokens is deprecated - only Free and Pro plans are supported');
     },
     
     // 구독 정보 업데이트 (FREE와 PRO만 지원)
@@ -245,16 +203,16 @@ const userSlice = createSlice({
       state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
     },
     
-    // 무료 토큰 리셋
+    // 무료 토큰 리셋 (Free 플랜만)
     resetDailyTokens: (state) => {
       const today = new Date().toISOString().split('T')[0];
-      
+
       if (state.lastTokenResetDate !== today) {
         if (state.subscriptionPlan === 'free') {
           // 무료: 매일 10개 충전
           state.freeTokens = 10;
           state.currentTokens = state.purchasedTokens + 10;
-          
+
           const newHistory: TokenHistory = {
             id: Date.now().toString(),
             date: new Date().toISOString(),
@@ -264,47 +222,13 @@ const userSlice = createSlice({
             balance: state.currentTokens,
           };
           state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
-          
-        } else if (state.subscriptionPlan === 'starter') {
-          // STARTER: 매일 10개 추가
-          const bonusTokens = 10;
-          state.freeTokens += bonusTokens;
-          state.currentTokens += bonusTokens;
-          state.tokens.current = state.currentTokens;
-          
-          const newHistory: TokenHistory = {
-            id: Date.now().toString(),
-            date: new Date().toISOString(),
-            type: 'earn',
-            amount: bonusTokens,
-            description: 'STARTER 일일 보너스 토큰',
-            balance: state.currentTokens,
-          };
-          state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
-          
-        } else if (state.subscriptionPlan === 'premium') {
-          // PREMIUM: 매일 20개 추가
-          const bonusTokens = 20;
-          state.freeTokens += bonusTokens;
-          state.currentTokens += bonusTokens;
-          state.tokens.current = state.currentTokens;
-          
-          const newHistory: TokenHistory = {
-            id: Date.now().toString(),
-            date: new Date().toISOString(),
-            type: 'earn',
-            amount: bonusTokens,
-            description: 'PREMIUM 일일 보너스 토큰',
-            balance: state.currentTokens,
-          };
-          state.tokenHistory = [newHistory, ...state.tokenHistory.slice(0, 19)];
-          
+
         } else if (state.subscriptionPlan === 'pro') {
-          // MAX: 무제한 (리셋 불필요)
+          // PRO: 무제한 (리셋 불필요)
           state.currentTokens = 9999;
           state.freeTokens = 9999;
         }
-        
+
         state.lastTokenResetDate = today;
       }
     },

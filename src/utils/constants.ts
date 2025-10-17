@@ -139,15 +139,17 @@ export const SPACING = {
 // 이 파일에서는 하위 호환을 위해 필요한 부분만 남김
 export { FONTS } from "./fonts";
 
-// 글꼴 크기 - 가독성 개선
+import { Platform } from 'react-native';
+
+// 글꼴 크기 - 가독성 개선 (Android는 2-3pt 더 크게)
 export const FONT_SIZES = {
-  tiny: 11, // 10 -> 11
-  small: 13, // 12 -> 13
-  medium: 15, // 14 -> 15
-  large: 17, // 16 -> 17
-  xlarge: 19, // 18 -> 19
-  xxlarge: 24,
-  xxxlarge: 32,
+  tiny: Platform.OS === 'android' ? 13 : 11,
+  small: Platform.OS === 'android' ? 15 : 13,
+  medium: Platform.OS === 'android' ? 17 : 15,
+  large: Platform.OS === 'android' ? 19 : 17,
+  xlarge: Platform.OS === 'android' ? 21 : 19,
+  xxlarge: Platform.OS === 'android' ? 27 : 24,
+  xxxlarge: Platform.OS === 'android' ? 35 : 32,
 };
 
 // 타이포그래피 스타일

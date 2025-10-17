@@ -5,12 +5,12 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   RefreshControl,
   Clipboard,
   Share,
   Dimensions,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Post, Platform } from "../types";
 import {
   COLORS,
@@ -77,6 +77,7 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme, isDark, theme } = useAppTheme();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   // 화면 추적
   useScreenTracking("HomeScreen");
@@ -554,9 +555,9 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
   }
 
   // console.log("🏠 [HomeScreen] Starting render"); // 무한 렌더 방지를 위해 제거
-  
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top + 8 }]} edges={['left', 'right']}>
       <ScrollView
         style={styles.content}
         refreshControl={
@@ -1286,7 +1287,7 @@ const createStyles = (
     },
     appSubtitle: {
       fontSize: 15,
-      color: isDark ? "rgba(255,255,255,0.95)" : colors.text.primary,
+      color: "rgba(255,255,255,0.95)",
       marginTop: 2,
       lineHeight: 22,
       fontWeight: "500",

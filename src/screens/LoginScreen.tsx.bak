@@ -10,7 +10,7 @@ import {
   Platform,
   KeyboardAvoidingView,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from "react-native-safe-area-context";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { SafeIcon } from "../utils/SafeIcon";
 import Animated, {
@@ -52,7 +52,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
   const { colors, isDark } = useAppTheme();
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
   const [isLoading, setIsLoading] = useState(false);
   const [loadingProvider, setLoadingProvider] = useState<string | null>(null);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
@@ -291,7 +290,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onNavigate }) => {
       end={{ x: 1, y: 1 }}
       style={styles.container}
     >
-      <SafeAreaView style={[styles.safeArea, { paddingTop: insets.top + 8 }]} edges={['left', 'right']}>
+      <SafeAreaView style={styles.safeArea}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={styles.keyboardAvoidingView}

@@ -4,13 +4,12 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-
+  SafeAreaView,
   Dimensions,
   Platform,
   Animated,
   ScrollView,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SafeIcon } from "../utils/SafeIcon";
 import { useAppTheme } from "../hooks/useAppTheme";
 import { SPACING } from "../utils/constants";
@@ -41,7 +40,6 @@ const ModernOnboardingScreen: React.FC<ModernOnboardingScreenProps> = ({
   onComplete,
 }) => {
   const { colors } = useAppTheme();
-  const insets = useSafeAreaInsets();
   const [currentStep, setCurrentStep] = useState(0);
   const [agreements, setAgreements] = useState<Agreements>({
     service: false,
@@ -412,8 +410,7 @@ const ModernOnboardingScreen: React.FC<ModernOnboardingScreenProps> = ({
 
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top + 8 }]}
-      edges={['left', 'right']}
+      style={[styles.container, { backgroundColor: colors.background }]}
     >
       {/* 헤더 */}
       <View style={styles.header}>

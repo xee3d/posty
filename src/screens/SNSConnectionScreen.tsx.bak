@@ -5,11 +5,10 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
-
+  SafeAreaView,
   Linking,
   ActivityIndicator,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SafeIcon } from "../utils/SafeIcon";
 import MaterialIcon from "react-native-vector-icons/MaterialIcons";
 import { COLORS, FONTS, SPACING, BORDER_RADIUS } from "../utils/constants";
@@ -33,7 +32,6 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
 }) => {
   const { colors, cardTheme } = useAppTheme();
   const { t } = useTranslation();
-  const insets = useSafeAreaInsets();
   const [connectedAccounts, setConnectedAccounts] = useState({
     instagram: false,
     facebook: false,
@@ -117,7 +115,7 @@ const SNSConnectionScreen: React.FC<SNSConnectionScreenProps> = ({
   const styles = createStyles(colors, cardTheme);
 
   return (
-    <SafeAreaView style={[styles.container, { paddingTop: insets.top + 8 }]} edges={['left', 'right']}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <SafeIcon name="close" size={24} color={colors.text.primary} />

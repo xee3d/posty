@@ -60,96 +60,103 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const styles = StyleSheet.create({
     overlay: {
       flex: 1,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      backgroundColor: 'rgba(0, 0, 0, 0.6)',
       justifyContent: 'center',
       alignItems: 'center',
-      paddingHorizontal: 20,
+      paddingHorizontal: 24,
     },
     modal: {
       backgroundColor: colors.surface,
-      borderRadius: 20,
-      padding: 24,
-      width: width * 0.9,
-      maxWidth: 400,
+      borderRadius: 16,
+      padding: 20,
+      width: width * 0.85,
+      maxWidth: 340,
+      borderWidth: 1,
+      borderColor: isDark ? colors.border + '80' : colors.border + '40',
       shadowColor: '#000',
       shadowOffset: {
         width: 0,
-        height: 10,
+        height: 8,
       },
-      shadowOpacity: 0.25,
-      shadowRadius: 20,
-      elevation: 10,
+      shadowOpacity: 0.3,
+      shadowRadius: 16,
+      elevation: 12,
     },
     header: {
       alignItems: 'center',
-      marginBottom: 24,
-    },
-    iconContainer: {
-      width: 60,
-      height: 60,
-      borderRadius: 30,
-      backgroundColor: colors.primary + '20',
-      justifyContent: 'center',
-      alignItems: 'center',
       marginBottom: 16,
     },
+    iconContainer: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: colors.primary + '15',
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: 12,
+    },
     title: {
-      ...getFontStyle('lg', 'bold'),
+      ...getFontStyle('md', 'bold'),
       color: colors.text.primary,
       textAlign: 'center',
-      marginBottom: 8,
+      marginBottom: 4,
     },
     subtitle: {
-      ...getFontStyle('sm', 'regular'),
+      ...getFontStyle('xs', 'regular'),
       color: colors.text.secondary,
       textAlign: 'center',
+      lineHeight: 16,
     },
     content: {
-      marginBottom: 24,
+      marginBottom: 20,
     },
     tokenInfo: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: 16,
+      marginBottom: 12,
+      backgroundColor: colors.primary + '08',
+      borderRadius: 10,
+      paddingVertical: 8,
+      paddingHorizontal: 12,
     },
     tokenIcon: {
-      marginRight: 8,
+      marginRight: 6,
     },
     tokenText: {
-      ...getFontStyle('xl', 'bold'),
-      color: colors.text.primary,
-    },
-    priceText: {
       ...getFontStyle('lg', 'bold'),
       color: colors.primary,
+    },
+    priceText: {
+      ...getFontStyle('md', 'bold'),
+      color: colors.text.primary,
       textAlign: 'center',
-      marginBottom: 16,
+      marginBottom: 12,
     },
     bonusContainer: {
-      backgroundColor: colors.primary + '15',
-      borderRadius: 12,
-      padding: 12,
+      backgroundColor: colors.primary + '12',
+      borderRadius: 8,
+      padding: 8,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: 16,
+      marginBottom: 12,
     },
     bonusIcon: {
-      marginRight: 6,
+      marginRight: 4,
     },
     bonusText: {
-      ...getFontStyle('sm', 'medium'),
+      ...getFontStyle('xs', 'medium'),
       color: colors.primary,
     },
     buttonContainer: {
       flexDirection: 'row',
-      gap: 12,
+      gap: 10,
     },
     button: {
       flex: 1,
-      paddingVertical: 14,
-      borderRadius: 12,
+      paddingVertical: 12,
+      borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
     },
@@ -160,7 +167,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
       backgroundColor: colors.primary,
     },
     buttonText: {
-      ...getFontStyle('md', 'semibold'),
+      ...getFontStyle('sm', 'semibold'),
     },
     cancelButtonText: {
       color: colors.text.secondary,
@@ -191,7 +198,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
         >
           <View style={styles.header}>
             <View style={styles.iconContainer}>
-              <Icon name="flash" size={28} color={colors.primary} />
+              <Icon name="flash" size={22} color={colors.primary} />
             </View>
             <Text style={styles.title}>
               {t('tokenShop.purchase.title')}
@@ -205,7 +212,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
             <View style={styles.tokenInfo}>
               <Icon
                 name="flash"
-                size={24}
+                size={18}
                 color={colors.primary}
                 style={styles.tokenIcon}
               />
@@ -222,7 +229,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               <View style={styles.bonusContainer}>
                 <Icon
                   name="gift"
-                  size={16}
+                  size={14}
                   color={colors.primary}
                   style={styles.bonusIcon}
                 />

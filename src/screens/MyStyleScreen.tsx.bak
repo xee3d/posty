@@ -5,13 +5,12 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-
+  SafeAreaView,
   ActivityIndicator,
   Animated,
   Dimensions,
   Platform,
 } from "react-native";
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   useSharedValue,
   useAnimatedStyle,
@@ -86,7 +85,6 @@ interface TemplateUsage {
 const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   const { colors, cardTheme, isDark } = useAppTheme();
   const { t, i18n } = useTranslation();
-  const insets = useSafeAreaInsets();
   
   // Helper function to get translated average length - simplified to avoid duplication
   const getTranslatedAvgLength = (avgLength: string): string => {
@@ -1180,8 +1178,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   if (loading) {
     return (
       <SafeAreaView
-        style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top + 8 }]}
-        edges={['left', 'right']}
+        style={[styles.container, { backgroundColor: colors.background }]}
       >
         <LoadingScreen message={t("myStyle.loading")} fullScreen={true} />
       </SafeAreaView>
@@ -1192,8 +1189,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
   if (!stats || stats.totalPosts === 0) {
     return (
       <SafeAreaView
-        style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top + 8 }]}
-        edges={['left', 'right']}
+        style={[styles.container, { backgroundColor: colors.background }]}
       >
         <View style={headerStyles.headerSection}>
           <View style={headerStyles.headerTop}>
@@ -1217,8 +1213,7 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
   return (
     <SafeAreaView
-      style={[styles.container, { backgroundColor: colors.background, paddingTop: insets.top + 8 }]}
-      edges={['left', 'right']}
+      style={[styles.container, { backgroundColor: colors.background }]}
     >
       <ScrollView
         style={styles.scrollView}

@@ -77,8 +77,6 @@ Google Auth → Redux Store ↔️ Firestore
 | 플랜    | 아이콘 | 토큰 제한 |
 | ------- | ------ | --------- |
 | FREE    | 🆓     | 10개/일   |
-| STARTER | ⭐     | 200개/월  |
-| PREMIUM | 💎     | 500개/월  |
 | PRO     | 👑     | 무제한    |
 
 ## 3. 기술 스택 (Tech Stack)

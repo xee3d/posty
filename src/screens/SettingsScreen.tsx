@@ -5,13 +5,13 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   Switch,
   Linking,
   Platform as RNPlatform,
   ActivityIndicator,
   Image,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SafeIcon } from "../utils/SafeIcon";
 import LanguageSettings from "../components/settings/LanguageSettings";
 import { User, Platform } from "../types";
@@ -66,7 +66,6 @@ import NewUserWelcome from "../components/NewUserWelcome";
 import MinimalWelcome from "../components/MinimalWelcome";
 import AppLogo from "../components/AppLogo";
 import ProfileDetailModal from "../components/ProfileDetailModal";
-import { getProfileGuideMessage } from "../types/userProfile";
 import ThemeDialog from "../components/ThemeDialog";
 import adConsentService from "../services/adConsentService";
 
@@ -82,6 +81,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   const { resetThemeToDefault } = useTheme();
   const dispatch = useAppDispatch();
   const timer = useTimer();
+  const insets = useSafeAreaInsets();
   const reduxUser = useAppSelector((state) => state.user);
   const reduxSubscriptionPlan = useAppSelector(
     (state) => state.user.subscriptionPlan
@@ -133,7 +133,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   // 프로필 완성도 관련
   const profileCompleteness =
     reduxUser.detailedProfile?.profileCompleteness || 0;
-  const profileGuideMessage = getProfileGuideMessage(profileCompleteness);
 
   // AI 토큰 및 통계
   const [stats, setStats] = useState({
@@ -987,7 +986,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
 
   if (loading) {
     return (
-      <SafeAreaView key={`settings-loading-${themeMode}-${isDark}-${themeChangeKey}`} style={styles.container}>
+      <SafeAreaView key={`settings-loading-${themeMode}-${isDark}-${themeChangeKey}`} style={[styles.container, { paddingTop: insets.top + 8 }]} edges={['left', 'right']}>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
         </View>
@@ -996,7 +995,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
   }
 
   return (
-    <SafeAreaView key={`settings-${themeMode}-${isDark}-${themeChangeKey}`} style={styles.container}>
+    <SafeAreaView key={`settings-${themeMode}-${isDark}-${themeChangeKey}`} style={[styles.container, { paddingTop: insets.top + 8 }]} edges={['left', 'right']}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* 헤더 */}
         <View style={headerStyles.headerSection}>
@@ -1177,28 +1176,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               )}
             </TouchableOpacity>
 
-            {profileCompleteness < 100 && (
-              <View
-                style={[
-                  styles.profileGuide,
-                  {
-                    backgroundColor: isDark
-                      ? colors.primary + "20"
-                      : colors.primary + "08",
-                    borderLeftColor: colors.primary,
-                  },
-                ]}
-              >
-                <Text
-                  style={[
-                    styles.profileGuideText,
-                    { color: colors.primary },
-                  ]}
-                >
-                  {profileGuideMessage || t('settings.profileGuideDefault')}
-                </Text>
-              </View>
-            )}
           </View>
         </View>
 
@@ -1949,24 +1926,6 @@ const createStyles = (colors: any, cardTheme: any, isDark: boolean) => {
       color: colors.white,
       fontSize: 10,
       fontWeight: "600",
-    },
-    profileGuide: {
-      marginTop: SPACING.sm,
-      padding: SPACING.sm,
-      backgroundColor: colors.primary + "10",
-      borderRadius: 12,
-      borderLeftWidth: 3,
-      borderLeftColor: colors.primary,
-      shadowColor: colors.primary,
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      elevation: 1,
-    },
-    profileGuideText: {
-      fontSize: FONT_SIZES.small,
-      color: colors.text.secondary,
-      lineHeight: 16,
     },
   });
 };
