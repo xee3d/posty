@@ -468,35 +468,62 @@ class InAppPurchaseService {
       console.log("[IAP] Connection status:", this.isConnected);
       console.log("[IAP] Products loaded:", this.products.length);
 
-      // 연결 상태 확인
-      if (!this.isConnected) {
-        console.log("[IAP] Not connected, attempting to connect...");
-        await this.connect();
-      }
-
-      // 제품 다시 로드 (최신 상태 확인)
-      if (this.products.length === 0) {
-        console.log("[IAP] No products loaded, attempting to load products...");
-        await this.loadProducts();
-      }
-
       // SKU 매핑
       const sku = Platform.select({
         ios: packageId.replace('tokens_', 'com.posty.tokens.app.'),
         android: packageId,
       });
 
-      console.log("[IAP] Mapped SKU:", sku, "Platform:", Platform.OS);
-      console.log("[IAP] Available products:", this.products.map(p => p.productId));
-
       if (!sku) {
         throw new Error("Invalid package ID");
       }
 
-      // 제품이 로드되었는지 확인
+      // 시뮬레이터 환경에서는 Mock 구매 처리
+      if (Platform.OS === "ios" && __DEV__) {
+        console.log("🎭 [IAP] Simulator - Mock purchase processing");
+
+        // 토큰 개수 계산 (보너스 포함)
+        const tokens = this.getTokensFromSku(sku);
+
+        // 토큰 지급
+        await tokenService.addPurchasedTokens(tokens);
+        console.log(`🎭 [IAP] Mock purchase: ${tokens} tokens added`);
+
+        // 성공 이벤트 발생
+        DeviceEventEmitter.emit("purchaseSuccess", {
+          type: "tokens",
+          amount: tokens,
+        });
+
+        // 성공 알림 표시
+        Alert.alert(
+          "구매 성공! 🎉",
+          `${tokens}개의 토큰이 지급되었습니다. (시뮬레이터 테스트)`,
+          [{ text: "확인" }]
+        );
+
+        return;
+      }
+
+      // 실제 기기: 연결 상태 확인
+      if (!this.isConnected) {
+        console.log("[IAP] Not connected, attempting to connect...");
+        await this.connect();
+      }
+
+      // 실제 기기: 제품 다시 로드
+      if (this.products.length === 0) {
+        console.log("[IAP] No products loaded, attempting to load products...");
+        await this.loadProducts();
+      }
+
+      console.log("[IAP] Mapped SKU:", sku, "Platform:", Platform.OS);
+      console.log("[IAP] Available products:", this.products.map(p => p.productId));
+
+      // 실제 기기: 제품 확인
       const product = this.products.find((p: Product) => p.productId === sku);
       console.log("[IAP] Product found:", product ? "YES" : "NO");
-      
+
       if (product) {
         console.log("[IAP] Product details:", {
           id: product.productId,
@@ -506,12 +533,6 @@ class InAppPurchaseService {
       }
 
       if (!product) {
-        // 시뮬레이터 환경에서는 실제 구매가 불가능하므로 다른 처리
-        if (__DEV__) {
-          console.log("[IAP] Development mode - simulating successful purchase");
-          // 개발 모드에서는 성공으로 처리
-          return;
-        }
         throw new Error(`Product not found: ${sku}. Available products: ${this.products.map(p => p.productId).join(', ')}`);
       }
 
@@ -528,12 +549,6 @@ class InAppPurchaseService {
       console.error("[IAP] Token purchase error:", error);
       console.error("[IAP] Error code:", error.code);
       console.error("[IAP] Error message:", error.message);
-
-      // 개발 모드에서는 에러를 무시하고 성공으로 처리
-      if (__DEV__) {
-        console.log("[IAP] Development mode - ignoring purchase error");
-        return;
-      }
 
       // 사용자에게 더 명확한 에러 메시지 제공
       if (error.code === 'E_ITEM_UNAVAILABLE') {
@@ -599,14 +614,15 @@ class InAppPurchaseService {
   }
 
   private getTokensFromSku(sku: string): number {
-    if (sku.includes("50")) {
-      return 50;
-    }
+    // 보너스 토큰 포함
     if (sku.includes("100")) {
-      return 100;
+      return 100; // 100개 (보너스 0)
     }
     if (sku.includes("200")) {
-      return 200;
+      return 220; // 200개 + 20 보너스
+    }
+    if (sku.includes("300")) {
+      return 330; // 300개 + 30 보너스
     }
     return 0;
   }
