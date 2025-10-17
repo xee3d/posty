@@ -178,12 +178,14 @@ class TokenService {
    */
   async addPurchasedTokens(amount: number): Promise<void> {
     try {
+      console.log(`[TokenService] Adding purchased tokens: ${amount}`);
+
       // Redux 상태 업데이트 (이것이 Firestore로 자동 동기화됨)
       store.dispatch(purchaseTokens({
         amount,
         price: 0, // 가격 정보는 별도로 처리
       }));
-      
+
       // 로컬 스토리지에도 저장
       const currentState = store.getState().user;
       const newTokenCount = currentState.currentTokens;
@@ -192,13 +194,11 @@ class TokenService {
         total: newTokenCount,
         lastUpdated: new Date().toISOString(),
       }));
-      
-      // 구독 정보도 업데이트
-      const subscription = await this.getSubscription();
-      subscription.purchasedTokens = currentState.purchasedTokens;
-      await this.saveSubscription(subscription);
+
+      console.log(`[TokenService] Tokens added successfully. New balance: ${newTokenCount}`);
     } catch (error) {
       console.error('Failed to add purchased tokens:', error);
+      throw error; // 에러를 상위로 전파하여 사용자에게 알림
     }
   }
 
