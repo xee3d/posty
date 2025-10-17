@@ -147,19 +147,28 @@ class InAppPurchaseService {
    */
   async loadProducts(): Promise<void> {
     try {
+      // 시뮬레이터에서는 상품 로드를 건너뛰고 빈 배열 반환
+      if (Platform.OS === "ios" && __DEV__) {
+        console.log("🎭 시뮬레이터 환경 - 상품 로드 건너뛰기");
+        this.products = [];
+        return;
+      }
+
+      console.log("[IAP] Loading products with SKUs:", productIds);
       const products = await getProducts({ skus: productIds });
       this.products = products;
-      console.log("Products loaded:", products.length);
+      console.log("[IAP] Products loaded:", products.length);
 
       // 로컬에 캐싱
       await AsyncStorage.setItem("@iap_products", JSON.stringify(products));
     } catch (error) {
-      console.error("Failed to load products:", error);
+      console.error("[IAP] Failed to load products:", error);
 
       // 캐시된 상품 정보 사용
       const cached = await AsyncStorage.getItem("@iap_products");
       if (cached) {
         this.products = JSON.parse(cached);
+        console.log("[IAP] Loaded products from cache:", this.products.length);
       }
     }
   }
@@ -168,6 +177,12 @@ class InAppPurchaseService {
    * 구매 리스너 설정
    */
   private setupPurchaseListeners(): void {
+    // 시뮬레이터에서는 리스너 설정을 건너뛰기
+    if (Platform.OS === "ios" && __DEV__) {
+      console.log("🎭 시뮬레이터 환경 - 구매 리스너 설정 건너뛰기");
+      return;
+    }
+
     // 구매 업데이트 리스너
     this.purchaseUpdateSubscription = purchaseUpdatedListener(
       async (purchase: Purchase) => {
