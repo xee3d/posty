@@ -81,7 +81,7 @@ export class ProfileBasedAIService {
   // 글쓰기 스타일 → 프롬프트 변환
   private convertWritingStyle(profile: DetailedUserProfile): string {
     const style = profile.writingStyle;
-    if (!style) return '';
+    if (!style) {return '';}
 
     const styleInstructions: string[] = [];
 
@@ -135,7 +135,7 @@ export class ProfileBasedAIService {
       'twitter': '간결/실시간',
       'linkedin': '전문/비즈니스'
     };
-    const platformChar = platformMap[platform] || platformMap['instagram'];
+    const platformChar = platformMap[platform] || platformMap.instagram;
 
     // 5. 길이 (간결화)
     const lengthMap = {
@@ -143,7 +143,7 @@ export class ProfileBasedAIService {
       'medium': '100-200자',
       'long': '300-400자'
     };
-    const lengthGuide = lengthMap[length] || lengthMap['medium'];
+    const lengthGuide = lengthMap[length] || lengthMap.medium;
 
     // 6. 최종 프롬프트 (토큰 효율적)
     const finalPrompt = `${platform} SNS 콘텐츠:

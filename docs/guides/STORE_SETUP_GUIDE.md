@@ -23,27 +23,31 @@
 
 3. **구독 상품 추가**
 
+   ⚠️ **중요**: 기존 구독 제품도 심사 거부되어 V2로 교체
+
    ```
-   상품 ID: com.posty.pro.monthly
-   참조명: Pro Monthly
+   상품 ID: com.posty.pro.monthly.v2
+   참조명: Pro Monthly V2
    가격: ₩15,000 (Tier 15)
    설명: 무제한 토큰 + 광고 제거 + GPT-4o
    ```
 
 4. **소모품 추가 (토큰)**
 
+   ⚠️ **중요**: 기존 제품(100, 200, 300)이 심사 거부되어 V2 제품으로 교체
+
    ```
-   상품 ID: com.posty.tokens.app.100
-   참조명: 100 Tokens
-   가격: ₩3,000 (Tier 3)
+   상품 ID: com.posty.tokens.app.100.v2
+   참조명: Posty 100 Tokens V2
+   가격: ₩1,200 (Tier 2)
 
-   상품 ID: com.posty.tokens.app.200
-   참조명: 200 Tokens (+20 Bonus)
-   가격: ₩6,000 (Tier 6)
+   상품 ID: com.posty.tokens.app.200.v2
+   참조명: Posty 200 Tokens V2
+   가격: ₩2,400 (Tier 4)
 
-   상품 ID: com.posty.tokens.app.300
-   참조명: 300 Tokens (+30 Bonus)
-   가격: ₩9,000 (Tier 9)
+   상품 ID: com.posty.tokens.app.300.v2
+   참조명: Posty 300 Tokens V2
+   가격: ₩3,600 (Tier 6)
    ```
 
 ### 1.3 iOS 프로젝트 설정

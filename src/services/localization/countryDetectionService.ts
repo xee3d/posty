@@ -275,7 +275,7 @@ class CountryDetectionService {
   // 가격 포맷팅
   formatPrice(price: number, currency: string): string {
     const symbol = CURRENCY_SYMBOLS[currency] || currency;
-    const formatting = CURRENCY_FORMATTING[currency] || CURRENCY_FORMATTING['USD'];
+    const formatting = CURRENCY_FORMATTING[currency] || CURRENCY_FORMATTING.USD;
 
     // 숫자 포맷팅
     let formattedNumber: string;

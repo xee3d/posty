@@ -244,7 +244,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
             <TouchableOpacity
               style={[styles.button, styles.cancelButton]}
               onPress={onClose}
-              disabled={isLoading}
+              disabled={false}
             >
               <Text style={[styles.buttonText, styles.cancelButtonText]}>
                 {t('tokenShop.purchase.cancel')}

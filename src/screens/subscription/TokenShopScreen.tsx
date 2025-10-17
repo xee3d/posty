@@ -91,8 +91,8 @@ const ShimmerEffect: React.FC<{ colors: any; isDark: boolean }> = ({ colors, isD
 
 // 디바이스별 최적화된 스케일링 함수 (사이즈와 스페이싱 통합)
 const getResponsiveSize = (baseSize: number, smallFactor = 0.8, largeFactor = 1.2) => {
-  if (isSmallDevice) return baseSize * smallFactor;
-  if (isLargeDevice) return baseSize * largeFactor;
+  if (isSmallDevice) {return baseSize * smallFactor;}
+  if (isLargeDevice) {return baseSize * largeFactor;}
   return baseSize;
 };
 
@@ -355,7 +355,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
 
   const handlePurchase = (packageId: string) => {
     const pkg = TOKEN_PACKAGES.find(p => p.id === packageId);
-    if (!pkg) return;
+    if (!pkg) {return;}
 
     setPurchaseModal({
       visible: true,

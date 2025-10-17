@@ -39,10 +39,11 @@ const isTestFlight = (): boolean => {
 // 상품 ID 정의
 const productIds = Platform.select({
   ios: [
-    "com.posty.pro.monthly",
-    "com.posty.tokens.app.100",
-    "com.posty.tokens.app.200",
-    "com.posty.tokens.app.300",
+    // CRITICAL FIX: V2 제품 ID 사용 (기존 제품이 심사 거부되어 새 제품으로 교체)
+    "com.posty.pro.monthly.v2",
+    "com.posty.tokens.app.100.v2",
+    "com.posty.tokens.app.200.v2",
+    "com.posty.tokens.app.300.v2",
   ],
   android: [
     "pro_monthly",
@@ -55,7 +56,7 @@ const productIds = Platform.select({
 
 const subscriptionIds = Platform.select({
   ios: [
-    "com.posty.pro.monthly",
+    "com.posty.pro.monthly.v2",
   ],
   android: [
     "pro_monthly",
@@ -828,7 +829,7 @@ class InAppPurchaseService {
     // CRITICAL FIX: 이미 구매 중이면 중복 방지
     if (this.isPurchasing) {
       console.warn("[IAP] Purchase already in progress, ignoring duplicate request");
-      return;
+      throw new Error("이미 다른 구매가 진행 중입니다.\n잠시 후 다시 시도해주세요.");
     }
 
     // CRITICAL FIX: 플래그 설정 (중복 클릭 방지)

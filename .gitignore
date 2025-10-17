@@ -67,6 +67,9 @@ yarn-error.log
 # testing
 /coverage
 
+# Device logs
+/logs/
+
 # Yarn
 .yarn/*
 !.yarn/patches

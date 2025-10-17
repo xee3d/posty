@@ -83,12 +83,18 @@
 ### 인앱 상품
 
 1. **토큰 패키지**
-   - **100 토큰**: ₩3,000 (tokens_100 / com.posty.tokens.app.100)
-   - **200 토큰 + 20 보너스**: ₩6,000 (tokens_200 / com.posty.tokens.app.200)
-   - **300 토큰 + 30 보너스**: ₩9,000 (tokens_300 / com.posty.tokens.app.300)
+
+   ⚠️ **업데이트**: 기존 제품이 심사 거부되어 V2 제품으로 교체
+
+   - **100 토큰**: ₩1,200 (tokens_100 / com.posty.tokens.app.100.v2)
+   - **200 토큰 + 20 보너스**: ₩2,400 (tokens_200 / com.posty.tokens.app.200.v2)
+   - **300 토큰 + 30 보너스**: ₩3,600 (tokens_300 / com.posty.tokens.app.300.v2)
 
 2. **구독 상품**
-   - **Pro 월간**: ₩15,000 (pro_monthly / com.posty.pro.monthly)
+
+   ⚠️ **업데이트**: 기존 구독 제품도 심사 거부되어 V2로 교체
+
+   - **Pro 월간**: ₩15,000 (pro_monthly / com.posty.pro.monthly.v2)
    - 무제한 토큰 + 광고 제거 + GPT-4o
 
 3. **가격 전략**

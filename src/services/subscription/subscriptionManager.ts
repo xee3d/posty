@@ -36,7 +36,7 @@ class SubscriptionManager {
 
   // 구독 상태 동기화
   async syncSubscriptionStatus() {
-    if (!this.config) return;
+    if (!this.config) {return;}
 
     try {
       const status = await vercelSubscriptionService.getSubscriptionStatus(this.config.userId);
@@ -104,7 +104,7 @@ class SubscriptionManager {
 
   // 구독 기능 확인
   async hasFeature(feature: string): Promise<boolean> {
-    if (!this.config) return false;
+    if (!this.config) {return false;}
 
     try {
       return await vercelSubscriptionService.hasFeature(this.config.userId, feature);
@@ -116,7 +116,7 @@ class SubscriptionManager {
 
   // 토큰 사용 가능 여부 확인
   async canUseTokens(tokenCount: number): Promise<boolean> {
-    if (!this.config) return false;
+    if (!this.config) {return false;}
 
     try {
       return await vercelSubscriptionService.canUseTokens(this.config.userId, tokenCount);
@@ -138,7 +138,7 @@ class SubscriptionManager {
 
   // 구독 상태 조회
   async getSubscriptionStatus() {
-    if (!this.config) return null;
+    if (!this.config) {return null;}
 
     try {
       return await vercelSubscriptionService.getSubscriptionStatus(this.config.userId);
@@ -155,12 +155,12 @@ class SubscriptionManager {
       'pro': Platform.OS === 'ios' ? 'com.posty.pro.monthly' : 'pro_monthly'
     };
 
-    return productMap[planId] || productMap['pro'];
+    return productMap[planId] || productMap.pro;
   }
 
   // 구독 만료 확인
   async checkExpiry(): Promise<boolean> {
-    if (!this.config) return false;
+    if (!this.config) {return false;}
 
     try {
       return await vercelSubscriptionService.checkSubscriptionExpiry(this.config.userId);

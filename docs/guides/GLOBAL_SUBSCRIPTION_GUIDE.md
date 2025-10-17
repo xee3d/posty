@@ -118,10 +118,10 @@ GOOGLE_PLAY_PUBLIC_KEY=your-public-key
 
 1. **인앱 구매 상품 등록**
 
-   - com.posty.pro.monthly (구독)
-   - com.posty.tokens.app.100 (소모품)
-   - com.posty.tokens.app.200 (소모품)
-   - com.posty.tokens.app.300 (소모품)
+   - com.posty.pro.monthly.v2 (구독) ⚠️ V2: 기존 제품 심사 거부로 교체
+   - com.posty.tokens.app.100.v2 (소모품) ⚠️ V2: 기존 제품 심사 거부로 교체
+   - com.posty.tokens.app.200.v2 (소모품) ⚠️ V2: 기존 제품 심사 거부로 교체
+   - com.posty.tokens.app.300.v2 (소모품) ⚠️ V2: 기존 제품 심사 거부로 교체
 
 2. **지역별 가격 설정**
 

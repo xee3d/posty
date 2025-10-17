@@ -108,10 +108,10 @@ const userSlice = createSlice({
       if (payload.uid !== undefined || payload.userId !== undefined) {
         state.userId = payload.uid || payload.userId || state.userId;
       }
-      if (payload.email !== undefined) state.email = payload.email;
-      if (payload.displayName !== undefined) state.displayName = payload.displayName;
-      if (payload.photoURL !== undefined) state.photoURL = payload.photoURL;
-      if (payload.provider !== undefined) state.provider = payload.provider;
+      if (payload.email !== undefined) {state.email = payload.email;}
+      if (payload.displayName !== undefined) {state.displayName = payload.displayName;}
+      if (payload.photoURL !== undefined) {state.photoURL = payload.photoURL;}
+      if (payload.provider !== undefined) {state.provider = payload.provider;}
     },
     
     // 월간 토큰 리셋 (사용 안함 - Free/Pro만 지원)
@@ -153,7 +153,7 @@ const userSlice = createSlice({
     
     // 토큰 사용 - 최적화: 토큰 히스토리 관리 개선
     useTokens: (state, action: PayloadAction<number>) => {
-      if (state.subscriptionPlan === 'pro') return;
+      if (state.subscriptionPlan === 'pro') {return;}
       
       const amount = action.payload;
       if (state.currentTokens >= amount) {
