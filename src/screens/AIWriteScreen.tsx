@@ -2334,8 +2334,8 @@ const createStyles = (
       shadowRadius: 3,
     },
     polishOptionButtonActive: {
-      backgroundColor: isDark ? colors.primary + "20" : "#FFFFFF",
-      borderColor: colors.primary,
+      backgroundColor: isDark ? "#2C2C2E" : "#FFFFFF",
+      borderColor: isDark ? "#48484A" : "#9CA3AF",
       borderWidth: Platform.OS === 'android' ? 1 : 1.5,
       elevation: isDark ? 0 : 4,
       shadowOpacity: isDark ? 0 : 0.15,
@@ -2348,7 +2348,7 @@ const createStyles = (
       fontWeight: "600",
     },
     polishOptionTextActive: {
-      color: colors.primary,
+      color: isDark ? "#E5E7EB" : "#374151",
       fontWeight: "700",
     },
     polishOptionButtonLocked: {
