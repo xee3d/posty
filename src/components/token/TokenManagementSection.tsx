@@ -42,19 +42,11 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
     total:
       subscriptionPlan === "pro"
         ? t("tokens.unlimited")
-        : subscriptionPlan === "premium"
-        ? "500"
-        : subscriptionPlan === "starter"
-        ? "200"
         : "10",
     currentNumber: currentTokens, // 숫자값 (프로그레스 바용)
     totalNumber:
       subscriptionPlan === "pro"
         ? 999
-        : subscriptionPlan === "premium"
-        ? 500
-        : subscriptionPlan === "starter"
-        ? 200
         : 10, // 숫자값
     plan: subscriptionPlan,
     todayUsed,
@@ -91,10 +83,6 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
     switch (tokenInfo.plan) {
       case "pro":
         return "#8B5CF6";
-      case "premium":
-        return "#F59E0B";
-      case "starter":
-        return "#10B981";
       default:
         return colors.primary;
     }
@@ -104,10 +92,6 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
     switch (tokenInfo.plan) {
       case "pro":
         return "PRO";
-      case "premium":
-        return "PREMIUM";
-      case "starter":
-        return "STARTER";
       default:
         return t("subscription.plans.free.name");
     }
@@ -208,13 +192,9 @@ const TokenManagementSection: React.FC<TokenManagementSectionProps> = ({
           color={colors.text.tertiary}
         />
         <Text style={styles.quickInfoText}>
-          {tokenInfo.plan === "free"
-            ? t("tokens.info.free")
-            : tokenInfo.plan === "starter"
-            ? t("tokens.info.starter")
-            : tokenInfo.plan === "premium"
-            ? t("tokens.info.premium")
-            : t("tokens.info.pro")}
+          {tokenInfo.plan === "pro"
+            ? t("tokens.info.pro")
+            : t("tokens.info.free")}
         </Text>
       </View>
     </View>

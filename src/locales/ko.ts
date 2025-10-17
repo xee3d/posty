@@ -275,23 +275,10 @@ const ko = {
       },
       complete: {
         title: "광고 시청 완료",
-        messageStyle: "프리미엄 스타일을 1회 사용할 수 있습니다!",
-        messageLength: "프리미엄 길이를 1회 사용할 수 있습니다!",
+        messageStyle: "프로 스타일을 1회 사용할 수 있습니다!",
+        messageLength: "긴 길이를 1회 사용할 수 있습니다!",
       },
       error: "광고 시청에 실패했습니다. 다시 시도해 주세요.",
-    },
-    premium: {
-      title: "프리미엄 기능",
-      styleTitle: "프리미엄 스타일",
-      lengthTitle: "프리미엄 길이",
-      viewPlans: "플랜 보기",
-      watchAd: "광고 시청으로 1회 사용",
-      upgrade: "PRO 플랜 구독",
-      oneTimeUse: "1회사용",
-      styleMessage: "{{styleName}} 스타일은 프리미엄 기능이에요!\n\n지금 바로 사용하려면:\n• 광고 시청 (1회 무료 체험)\n• 프로 플랜으로 업그레이드",
-      toneMessage: "{{tone}} 스타일은 PRO 플랜에서만 사용할 수 있습니다.",
-      unlockedTitle: "스타일 해금!",
-      unlockedMessage: "{{tone}} 스타일이 1회 사용 가능합니다.",
     },
     tokenUsage: {
       photoWrite: "사진 글쓰기",
@@ -719,8 +706,6 @@ const ko = {
     watch: "광고 시청하기",
     reward: {
       tokens: "{{amount}}개 토큰을 받으세요!",
-      premiumTone: "프리미엄 톤 스타일을 사용하세요!",
-      premiumLength: "긴 글쓰기를 사용하세요!",
       default: "보상을 받으세요!"
     }
   },
@@ -728,7 +713,7 @@ const ko = {
   // My Style Screen
   myStyle: {
     access: {
-      freeMessage: "STARTER 플랜부터 내 스타일 분석을 사용할 수 있습니다.",
+      freeMessage: "PRO 플랜부터 내 스타일 분석을 사용할 수 있습니다.",
     },
     tabs: {
       overview: "개요",
@@ -801,16 +786,10 @@ const ko = {
       eveningLabel: "저녁 시간대",
       nightLabel: "밤 시간대"
     },
-    premium: {
-      title: "프리미엄 기능",
-      subtitle: "더 자세한 분석을 위해 업그레이드하세요",
-      upgradeButton: "업그레이드"
-    },
     templates: {
       title: "스타일 템플릿",
       subtitle: "다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요",
       emojiPrefix: "📝",
-      starterLimit: "STARTER 플랜: {{limit}}개 템플릿만 사용 가능",
       bulletPoint: "•",
       averageLength: "평균 길이",
       keywords: "키워드",
@@ -851,10 +830,10 @@ const ko = {
     alerts: {
       challengeStart: "챌린지 시작!",
       challengeStarted: "{{name}} 챌린지가 시작되었습니다!",
-      premiumTemplate: "프리미엄 템플릿",
-      premiumTemplateMessage: "이 템플릿은 프리미엄 플랜에서 사용할 수 있습니다",
+      templateSaved: "템플릿이 저장되었습니다",
+      templateUsed: "템플릿이 적용되었습니다",
       cancel: "취소",
-      upgrade: "업그레이드"
+      confirm: "확인"
     },
     profileCompletion: "프로필 완성도 {{completeness}}%",
     title: "내 스타일",
@@ -1552,7 +1531,7 @@ const ko = {
       title: "프리미엄 혜택",
       moreTokens: {
         title: "더 많은 토큰",
-        description: "STARTER는 총 600개(초기 300 + 일일 10x30), PRO는 총 1,100개(초기 500 + 일일 20x30), MAX는 무제한 토큰을 제공합니다"
+        description: "PRO는 무제한 토큰을 제공합니다"
       },
       noAds: {
         title: "광고 제거",
@@ -1671,24 +1650,16 @@ const ko = {
     },
   membershipNotices: {
     free: "무료 회원은 매일 10개의 토큰이 자동 충전됩니다",
-    starter: "STARTER 회원은 가입 시 200개 토큰을 받고, 소진 시 매일 10개 충전됩니다",
-    premium: "PRO 회원은 가입 시 500개 토큰을 받고, 소진 시 매일 10개 충전됩니다",
-      pro: "MAX 회원은 무제한 토큰을 사용할 수 있습니다"
+      pro: "PRO 회원은 무제한 토큰을 사용할 수 있습니다"
   },
     planDescriptions: {
       free: "매일 10개 무료 충전",
-      starter: "가입 시 200개 + 소진 시 매일 10개 충전", 
-      premium: "가입 시 500개 + 소진 시 매일 10개 충전",
       pro: "무제한 토큰",
       downgradeBlocked: "하위 플랜으로 변경 불가"
     },
     upgradeDescriptions: {
-      starterImmediate: "가입 즉시 200개 토큰을 받게 됩니다",
-      premiumImmediate: "가입 즉시 500개 토큰을 받게 됩니다",
       proImmediate: "가입 즉시 1500개 토큰을 받게 됩니다",
-      premiumUpgrade: "전액 500개 토큰을 추가로 받게 됩니다",
-      proUpgrade: "가입 즉시 1500개 토큰을 받게 됩니다",
-      starterDowngrade: "경고: 무료 토큰이 300개로 제한됩니다"
+      proUpgrade: "가입 즉시 1500개 토큰을 받게 됩니다"
     },
     plans: {
       free: {
@@ -1702,29 +1673,6 @@ const ko = {
           "3가지 톤 스타일",
           "짧은/중간 길이",
           "광고 포함",
-        ],
-      },
-      starter: {
-        name: "STARTER",
-        features: [
-          "가입 시 300개 토큰 즉시 지급",
-          "매일 10개씩 추가 충전",
-          "4가지 톤 스타일",
-          "긴 글 작성 가능",
-          "광고 제거",
-          "MyStyle 분석",
-        ],
-      },
-      premium: {
-        name: "PREMIUM",
-        features: [
-          "가입 시 500개 토큰 즉시 지급",
-          "매일 20개씩 추가 충전",
-          "6가지 톤 스타일",
-          "모든 글 길이",
-          "광고 제거",
-          "MyStyle 분석",
-          "우선순위 처리",
         ],
       },
       pro: {
@@ -1827,15 +1775,6 @@ const ko = {
       networkError: "네트워크 연결을 확인해주세요",
       retryButton: "다시 시도"
     },
-    premium: {
-      title: "프리미엄 기능입니다",
-      subtitle: "PRO 플랜부터 실시간 트렌드를 확인할 수 있습니다.",
-      upgradeButton: "업그레이드",
-      preview: {
-        title: "트렌드 미리보기",
-        subtitle: "트렌드를 분석하여 트래픽을 높이고,\n실시간 이슈에 맞춰 콘텐츠를 작성해보세요."
-      }
-    },
     tips: {
       title: "트렌드 활용 팁",
       content: "트렌드를 클릭하면 AI가 해당 주제로 글을 작성해드려요. 키워드를 바탕으로 나만의 스타일로 수정해보세요!",
@@ -1880,8 +1819,6 @@ const ko = {
     },
     info: {
       free: "매일 자정에 10개의 무료 토큰이 충전됩니다",
-      starter: "STARTER 플랜으로 매월 200개의 토큰을 사용할 수 있습니다",
-      premium: "PREMIUM 플랜으로 매월 500개의 토큰을 사용할 수 있습니다",
       pro: "PRO 플랜으로 무제한 토큰을 사용 중입니다"
     },
     descriptions: {
@@ -1923,7 +1860,7 @@ const ko = {
       whenToPurchase: "어떤 경우 토큰 구매가 좋나요?",
       whenToPurchaseDesc: "• 불규칙하게 사용하시는 분 • 특정 프로젝트를 위해 집중적으로 사용하시는 분 • 구독 부담 없이 필요할 때만 사용하고 싶으신 분",
       subscriptionAdvantages: "구독 플랜의 장점",
-      subscriptionAdvantagesDesc: "• STARTER: {{starterPrice}}으로 총 600개 (가입 300 + 매일 10) • PREMIUM: {{premiumPrice}}으로 총 1,100개 (가입 500 + 매일 20) • 광고 제거 + 고급 기능 사용 가능",
+      subscriptionAdvantagesDesc: "• PRO: 무제한 토큰 • 광고 제거 + 고급 기능 사용 가능",
       trust: {
         securePayment: "안전한 결제",
         instantRefund: "즉시 환불",

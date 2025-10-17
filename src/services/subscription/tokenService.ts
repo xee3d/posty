@@ -74,11 +74,7 @@ class TokenService {
       const subscription = await this.getSubscription();
       await this.checkDailyReset(subscription);
       
-      // 월간 리셋 체크 (STARTER, PREMIUM 플랜)
-      const subscriptionPlan = store.getState().user.subscriptionPlan;
-      if (subscriptionPlan === 'starter' || subscriptionPlan === 'premium') {
-        store.dispatch(resetMonthlyTokens());
-      }
+      // 월간 리셋 체크 제거 (starter, premium 플랜 제거됨)
       
     } catch (error) {
       console.error('TokenService: Initialization error:', error);
@@ -318,10 +314,7 @@ class TokenService {
     const daily = subscription.dailyTokens || 0;
     let total = purchased + daily;
     
-    // Premium 플랜은 월간 토큰 추가
-    if (subscription.subscriptionPlan === 'premium' && subscription.monthlyTokensRemaining) {
-      total += (subscription.monthlyTokensRemaining || 0);
-    }
+    // Premium 플랜 제거됨 (현재 사용 안함)
 
     // NaN 체크
     return isNaN(total) ? 0 : total;

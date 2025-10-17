@@ -42,13 +42,13 @@ const SmartAdPlacement: React.FC<SmartAdPlacementProps> = ({
       return;
     }
 
-    // 프리미엄 이상 구독자는 광고 없음
-    if (subscriptionPlan === "premium" || subscriptionPlan === "pro") {
+    // 프로 구독자는 광고 없음
+    if (subscriptionPlan === "pro") {
       setShouldShowAd(false);
       return;
     }
 
-    // 무료 사용자 또는 스타터 플랜은 광고 표시
+    // 무료 사용자는 광고 표시
     const showAd = AdIntegrationService.shouldShowNativeAd(position, context);
     setShouldShowAd(showAd);
 

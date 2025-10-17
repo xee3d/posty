@@ -292,17 +292,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
         // 프로 플랜은 무제한
         tokensTotal = 999;
         remainingTokens = 999;
-      } else if (currentPlan === "premium") {
-        // 프리미엄 플랜
-        tokensTotal = 500;
-        remainingTokens =
-          reduxTokens !== undefined
-            ? reduxTokens
-            : subscription.monthlyTokensRemaining || 0;
-      } else if (currentPlan === "starter") {
-        // 스타터 플랜
-        tokensTotal = 200;
-        remainingTokens = reduxTokens !== undefined ? reduxTokens : 200;
       } else {
         // Free 플랜
         tokensTotal = 10;
@@ -877,10 +866,6 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
           color: colors.primary,
           icon: "workspace-premium",
         };
-      case "premium":
-        return { text: "PRO", color: colors.warning, icon: "star" };
-      case "starter":
-        return { text: "STARTER", color: colors.success, icon: "flash" };
       default:
         return { text: "FREE", color: colors.text.secondary, icon: "person" };
     }

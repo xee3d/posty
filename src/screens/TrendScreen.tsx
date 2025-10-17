@@ -332,21 +332,21 @@ const TrendScreen: React.FC<TrendScreenProps> = ({ onNavigate }) => {
           <View style={styles.accessDeniedIcon}>
             <SafeIcon name="lock-closed" size={48} color={colors.text.tertiary} />
           </View>
-          <Text style={styles.accessDeniedTitle}>{t("trends.premium.title")}</Text>
+          <Text style={styles.accessDeniedTitle}>{t("trends.proOnly.title", "프로 전용 기능")}</Text>
           <Text style={styles.accessDeniedSubtitle}>
-            {t("trends.premium.subtitle")}
+            {t("trends.proOnly.subtitle", "실시간 트렌드 분석은 PRO 플랜 사용자만 이용할 수 있습니다")}
           </Text>
           <TouchableOpacity
             style={styles.upgradeButton}
             onPress={() => onNavigate?.("subscription")}
           >
-            <Text style={styles.upgradeButtonText}>{t("trends.premium.upgradeButton")}</Text>
+            <Text style={styles.upgradeButtonText}>{t("trends.proOnly.upgradeButton", "PRO로 업그레이드")}</Text>
           </TouchableOpacity>
 
           <View style={styles.trendPreview}>
-            <Text style={styles.trendPreviewTitle}>{t("trends.premium.preview.title")}</Text>
+            <Text style={styles.trendPreviewTitle}>{t("trends.proOnly.preview.title", "트렌드 미리보기")}</Text>
             <Text style={styles.trendPreviewSubtitle}>
-              {t("trends.premium.preview.subtitle")}
+              {t("trends.proOnly.preview.subtitle", "실시간으로 업데이트되는 트렌드를 PRO 플랜에서 만나보세요")}
             </Text>
           </View>
         </View>

@@ -38,33 +38,13 @@ const TokenDisplay: React.FC<TokenDisplayProps> = ({
   const subscriptionPlan = useAppSelector(selectSubscriptionPlan);
   const { t } = useTranslation();
 
-  // 플랜별 월간 토큰 제한 계산
-  const getMonthlyLimit = () => {
-    switch (subscriptionPlan) {
-      case "starter":
-        return 600; // 300 + 10*30
-      case "premium":
-        return 1100; // 500 + 20*30
-      case "pro":
-        return -1; // 무제한
-      default:
-        return 300; // 무료 플랜 월간 최대 (10*30)
-    }
-  };
-
-  const monthlyLimit = getMonthlyLimit();
-
   // 표시 텍스트 결정
   const getDisplayText = () => {
     if (subscriptionPlan === "pro") {
       return t("tokens.unlimited");
     }
 
-    if (subscriptionPlan === "starter" || subscriptionPlan === "premium") {
-      return `${currentTokens}/${monthlyLimit}`;
-    }
-
-    // 무료 플랜은 그냥 현재 토큰만
+    // 무료 플랜은 현재 토큰만 표시
     return `${currentTokens}`;
   };
 

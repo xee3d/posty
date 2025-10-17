@@ -9,35 +9,25 @@ interface PriceConfig {
 
 interface LocalizedPrices {
   free: PriceConfig;
-  starter: PriceConfig;
-  premium: PriceConfig;
   pro: PriceConfig;
 }
 
-// 각 언어별/지역별 가격 설정
+// 각 언어별/지역별 가격 설정 (starter, premium 제거)
 const LOCALIZED_PRICING: Record<string, LocalizedPrices> = {
   ko: {
     free: { currency: 'KRW', symbol: '₩', price: 0, format: 'before' },
-    starter: { currency: 'KRW', symbol: '₩', price: 4900, format: 'before' },
-    premium: { currency: 'KRW', symbol: '₩', price: 9900, format: 'before' },
     pro: { currency: 'KRW', symbol: '₩', price: 19900, format: 'before' },
   },
   en: {
     free: { currency: 'USD', symbol: '$', price: 0, format: 'before' },
-    starter: { currency: 'USD', symbol: '$', price: 3.99, format: 'before' },
-    premium: { currency: 'USD', symbol: '$', price: 7.99, format: 'before' },
     pro: { currency: 'USD', symbol: '$', price: 14.99, format: 'before' },
   },
   ja: {
     free: { currency: 'JPY', symbol: '¥', price: 0, format: 'before' },
-    starter: { currency: 'JPY', symbol: '¥', price: 490, format: 'before' },
-    premium: { currency: 'JPY', symbol: '¥', price: 990, format: 'before' },
     pro: { currency: 'JPY', symbol: '¥', price: 1990, format: 'before' },
   },
   'zh-CN': {
     free: { currency: 'CNY', symbol: '¥', price: 0, format: 'before' },
-    starter: { currency: 'CNY', symbol: '¥', price: 25, format: 'before' },
-    premium: { currency: 'CNY', symbol: '¥', price: 50, format: 'before' },
     pro: { currency: 'CNY', symbol: '¥', price: 99, format: 'before' },
   },
 };
@@ -46,7 +36,7 @@ class PriceLocalizationService {
   /**
    * 현재 언어에 따라 가격을 포맷팅합니다
    */
-  formatPrice(planType: 'free' | 'starter' | 'premium' | 'pro'): string {
+  formatPrice(planType: 'free' | 'pro'): string {
     const currentLang = i18next.language || 'ko';
     const prices = LOCALIZED_PRICING[currentLang] || LOCALIZED_PRICING.ko;
     const priceConfig = prices[planType];
@@ -89,7 +79,7 @@ class PriceLocalizationService {
   /**
    * 가격 정보를 가져옵니다
    */
-  getPriceConfig(planType: 'free' | 'starter' | 'premium' | 'pro'): PriceConfig {
+  getPriceConfig(planType: 'free' | 'pro'): PriceConfig {
     const currentLang = i18next.language || 'ko';
     const prices = LOCALIZED_PRICING[currentLang] || LOCALIZED_PRICING.ko;
     return prices[planType];

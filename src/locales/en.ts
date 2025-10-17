@@ -287,23 +287,10 @@ const en = {
       },
       complete: {
         title: "Ad Complete",
-        messageStyle: "You can now use premium style once for free!",
-        messageLength: "You can now use premium length once for free!",
+        messageStyle: "You can now use pro style once for free!",
+        messageLength: "You can now use long length once for free!",
       },
       error: "Failed to load advertisement. Please try again.",
-    },
-    premium: {
-      title: "Premium Feature",
-      styleTitle: "Premium Style",
-      lengthTitle: "Premium Length",
-      viewPlans: "View Plans",
-      watchAd: "Watch Ad for 1-time use",
-      upgrade: "Subscribe to Pro Plan",
-      oneTimeUse: "1-time use",
-      styleMessage: "✨ {{styleName}} style is a premium feature!\n\n🎯 Get access right now:\n• 🎬 Watch an ad (free trial)\n• ⭐ Upgrade to Pro plan",
-      toneMessage: "{{tone}} style is only available with Pro plan.",
-      unlockedTitle: "Style Unlocked!",
-      unlockedMessage: "{{tone}} style is now available for one-time use.",
     },
     tokenUsage: {
       photoWrite: "Photo Writing",
@@ -599,7 +586,7 @@ const en = {
       title: "Premium Benefits",
       moreTokens: {
         title: "More Tokens",
-        description: "STARTER provides 600 tokens total (300 initial + 10×30 daily), PRO provides 1,100 tokens total (500 initial + 20×30 daily), MAX provides unlimited tokens"
+        description: "PRO provides unlimited tokens"
       },
       advancedAI: {
         title: "Advanced AI Models",
@@ -720,24 +707,16 @@ const en = {
     },
     planDescriptions: {
       free: "10 free tokens daily",
-      starter: "200 tokens on signup", 
-      premium: "500 tokens on signup",
       pro: "Unlimited tokens",
       downgradeBlocked: "Cannot downgrade to lower plan"
     },
     membershipNotices: {
       free: "Free members get 10 tokens automatically recharged daily",
-      starter: "STARTER members get 200 tokens on signup",
-      premium: "PRO members get 500 tokens on signup", 
-      pro: "MAX members get unlimited tokens"
+      pro: "PRO members get unlimited tokens"
     },
     upgradeDescriptions: {
-      starterImmediate: "You'll receive 200 tokens immediately upon signup",
-      premiumImmediate: "You'll receive 500 tokens immediately upon signup",
       proImmediate: "You'll receive 1500 tokens immediately upon signup",
-      premiumUpgrade: "You'll receive an additional 500 tokens in total",
-      proUpgrade: "You'll receive 1500 tokens immediately upon signup",
-      starterDowngrade: "Warning: Free tokens will be limited to 300"
+      proUpgrade: "You'll receive 1500 tokens immediately upon signup"
     },
     plans: {
       free: {
@@ -751,29 +730,6 @@ const en = {
           "3 tone styles",
           "Short/medium length",
           "Ads included",
-        ],
-      },
-      starter: {
-        name: "Starter",
-        features: [
-          "300 tokens immediately upon signup",
-          "Additional 10 tokens daily",
-          "4 tone styles",
-          "Long content creation available",
-          "Ad-free experience",
-          "MyStyle analysis",
-        ],
-      },
-      premium: {
-        name: "Pro",
-        features: [
-          "500 tokens immediately upon signup",
-          "Additional 20 tokens daily",
-          "6 tone styles",
-          "All content lengths",
-          "Ad-free experience",
-          "MyStyle analysis",
-          "Priority processing",
         ],
       },
       pro: {
@@ -980,8 +936,6 @@ const en = {
     watch: "Watch Ad",
     reward: {
       tokens: "Get {{amount}} tokens!",
-      premiumTone: "Use premium tone style!",
-      premiumLength: "Use long writing!",
       default: "Get your reward!"
     }
   },
@@ -1061,7 +1015,6 @@ const en = {
       subtitle: "Try various styles and find your own style",
       recommended: "Recommended",
       usageCount: "{{count}} used",
-      starterLimit: "STARTER Plan: Only {{limit}} templates available",
       emojiPrefix: "📝",
       bulletPoint: "•",
       averageLength: "Average Length",
@@ -1121,18 +1074,13 @@ const en = {
         rules: ["Discover new hashtags", "Include trend analysis", "Share with other users"]
       }
     },
-    premium: {
-      title: "Premium Feature",
-      subtitle: "Use more detailed analysis and templates",
-      upgradeButton: "Upgrade"
-    },
     alerts: {
       challengeStart: "Challenge Started!",
       challengeStarted: "{{name}} challenge has started!",
       templateSaved: "Template saved successfully",
       templateUsed: "Template applied",
-      premiumTemplate: "Premium Template",
-      premiumTemplateMessage: "All templates are available in PRO plan.",
+      templateSaved: "Template saved successfully",
+      templateUsed: "Template applied",
       cancel: "Cancel",
       upgrade: "Upgrade",
       confirm: "Confirm"
@@ -1795,15 +1743,6 @@ const en = {
       networkError: "Please check your network connection",
       retryButton: "Try Again"
     },
-    premium: {
-      title: "Premium Feature",
-      subtitle: "Real-time trends are available from PRO plan.",
-      upgradeButton: "Upgrade",
-      preview: {
-        title: "Trend Preview",
-        subtitle: "Analyze trends to increase traffic and create content based on real-time issues."
-      }
-    },
     tips: {
       title: "Trend Usage Tips",
       content: "Click on trends to have AI write articles on that topic. Modify with keywords to match your style!",
@@ -1844,8 +1783,6 @@ const en = {
     },
     info: {
       free: "10 free tokens are recharged daily at midnight",
-      starter: "STARTER plan allows 200 tokens per month",
-      premium: "PREMIUM plan allows 500 tokens per month",
       pro: "Using unlimited tokens with PRO plan"
     },
     alerts: {
@@ -1884,7 +1821,7 @@ const en = {
       whenToPurchase: "Best for occasional users",
       whenToPurchaseDesc: "• Irregular usage • Project-based work • No subscription commitment",
       subscriptionAdvantages: "Subscription Benefits",
-      subscriptionAdvantagesDesc: "• STARTER: {{starterPrice}} = 600 tokens • PREMIUM: {{premiumPrice}} = 1,100 tokens • Ad-free + premium features",
+      subscriptionAdvantagesDesc: "• PRO: Unlimited tokens • Ad-free + premium features",
       trust: {
         securePayment: "Secure",
         instantRefund: "Refunds",

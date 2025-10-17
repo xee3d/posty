@@ -26,7 +26,7 @@
    ```
    상품 ID: com.posty.pro.monthly
    참조명: Pro Monthly
-   가격: ₩15,000 (Tier 15)
+   가격: ₩19,000 (Tier 19)
    설명: 무제한 토큰 + 광고 제거 + GPT-4o & Gemini 2.5 Flash
    ```
 

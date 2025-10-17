@@ -59,16 +59,12 @@ GOOGLE_PLAY_SERVICE_ACCOUNT_KEY=your_google_service_account_json
 ### 4. App Store Connect 설정
 1. App Store Connect에서 인앱 구매 제품 생성
 2. 제품 ID 설정:
-   - `com.posty.subscription.starter`
-   - `com.posty.subscription.premium`
-   - `com.posty.subscription.pro`
+   - `com.posty.pro.monthly` (Pro 월간 구독)
 
 ### 5. Google Play Console 설정
 1. Google Play Console에서 구독 제품 생성
 2. 제품 ID 설정:
-   - `subscription_starter`
-   - `subscription_premium`
-   - `subscription_pro`
+   - `pro_monthly` (Pro 월간 구독)
 
 ## 구독 플랜
 

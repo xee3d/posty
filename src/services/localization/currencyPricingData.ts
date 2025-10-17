@@ -1,13 +1,12 @@
 // CSV 데이터를 기반으로 한 전 세계 가격 정보
+// starter, premium 플랜 제거됨 (현재 사용 안함)
 export interface CountryPricing {
   country: string;
   currency: string;
   price: number; // Pro 플랜 가격 (하위 호환성)
   firstYear: number;
   secondYear: number;
-  // 각 플랜별 가격
-  starter?: number;
-  premium?: number;
+  // 각 플랜별 가격 (starter, premium 제거)
   pro?: number;
 }
 
@@ -32,7 +31,7 @@ export const GLOBAL_PRICING_DATA: CountryPricing[] = [
   { country: "니제르", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04 },
   { country: "니카라과", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04 },
   { country: "대만", currency: "TWD", price: 390, firstYear: 306, secondYear: 306 },
-  { country: "대한민국", currency: "KRW", price: 19000, firstYear: 14682, secondYear: 14682, starter: 3300, premium: 5500, pro: 19000 },
+  { country: "대한민국", currency: "KRW", price: 19000, firstYear: 14682, secondYear: 14682, pro: 19000 },
   { country: "덴마크", currency: "DKK", price: 99.0, firstYear: 67.32, secondYear: 67.32 },
   { country: "도미니카 공화국", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04 },
   { country: "도미니카", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04 },
@@ -63,7 +62,7 @@ export const GLOBAL_PRICING_DATA: CountryPricing[] = [
   { country: "몰디브", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04 },
   { country: "몰타", currency: "EUR", price: 14.99, firstYear: 10.8, secondYear: 10.8 },
   { country: "몽골", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04 },
-  { country: "미국", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04, starter: 1.99, premium: 3.99, pro: 12.99 },
+  { country: "미국", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04, pro: 12.99 },
   { country: "미얀마", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04 },
   { country: "미크로네시아", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04 },
   { country: "바누아투", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04 },
@@ -138,11 +137,11 @@ export const GLOBAL_PRICING_DATA: CountryPricing[] = [
   { country: "이탈리아", currency: "EUR", price: 14.99, firstYear: 10.4, secondYear: 10.4 },
   { country: "인도", currency: "INR", price: 1299.0, firstYear: 935.72, secondYear: 935.72 },
   { country: "인도네시아", currency: "IDR", price: 229000, firstYear: 175360, secondYear: 175360 },
-  { country: "일본", currency: "JPY", price: 2000, firstYear: 1545, secondYear: 1545, starter: 300, premium: 600, pro: 2000 },
+  { country: "일본", currency: "JPY", price: 2000, firstYear: 1545, secondYear: 1545, pro: 2000 },
   { country: "자메이카", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04 },
   { country: "잠비아", currency: "USD", price: 14.99, firstYear: 10.98, secondYear: 10.98 },
   { country: "조지아", currency: "USD", price: 14.99, firstYear: 10.8, secondYear: 10.8 },
-  { country: "중국 본토", currency: "CNY", price: 88.0, firstYear: 74.13, secondYear: 74.13, starter: 15.0, premium: 28.0, pro: 88.0 },
+  { country: "중국 본토", currency: "CNY", price: 88.0, firstYear: 74.13, secondYear: 74.13, pro: 88.0 },
   { country: "짐바브웨", currency: "USD", price: 14.99, firstYear: 10.53, secondYear: 10.53 },
   { country: "차드", currency: "USD", price: 12.99, firstYear: 11.04, secondYear: 11.04 },
   { country: "체코", currency: "CZK", price: 349.0, firstYear: 245.17, secondYear: 245.17 },

@@ -1,6 +1,10 @@
 # 구독 플랜 업데이트 (2025년 1월)
 
-## 변경 사항
+> ⚠️ **DEPRECATED (2025년 10월)**: 이 문서는 구형 4-tier 구독 시스템 (Free/Starter/Premium/Pro)을 설명합니다.
+> **현재 시스템**: 2-tier (Free/Pro) 구독 시스템 사용 중
+> **참고**: SUBSCRIPTION_UPDATE.md 문서를 참조하세요.
+
+## 변경 사항 (역사적 기록)
 
 ### 1. PRO 플랜 개선
 

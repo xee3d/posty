@@ -124,7 +124,7 @@ const ja = {
       title: "プレミアム特典",
       moreTokens: {
         title: "より多くのトークン",
-        description: "STARTERは総600個(初期300 + 日次10x30)、PROは総1,100個(初期500 + 日次20x30)、MAXは無制限トークンを提供します"
+        description: "PROは無制限トークンを提供します"
       },
       noAds: {
         title: "広告除去",
@@ -231,24 +231,16 @@ const ja = {
     },
     membershipNotices: {
       free: "無料会員の方は毎日10個のトークンが自動チャージされます",
-      starter: "STARTERメンバーの方はご登録時に200個のトークンをお受け取りいただけます",
-      premium: "PROメンバーの方はご登録時に500個のトークンをお受け取りいただけます",
-      pro: "MAXメンバーの方は無制限でトークンをご利用いただけます"
+      pro: "PROメンバーの方は無制限でトークンをご利用いただけます"
     },
     planDescriptions: {
       free: "毎日10個無料チャージされます",
-      starter: "ご登録時200個トークン支給",
-      premium: "ご登録時500個トークン支給",
       pro: "無制限トークン",
       downgradeBlocked: "下位プランへの変更はできません"
     },
     upgradeDescriptions: {
-      starterImmediate: "ご登録と同時に200個のトークンをお受け取りいただけます",
-      premiumImmediate: "ご登録と同時に500個のトークンをお受け取りいただけます",
       proImmediate: "ご登録と同時に1500個のトークンをお受け取りいただけます",
-      premiumUpgrade: "合計500個のトークンを追加でお受け取りいただけます",
-      proUpgrade: "ご登録と同時に1500個のトークンをお受け取りいただけます",
-      starterDowngrade: "ご注意：無料トークンが300個に制限されます"
+      proUpgrade: "ご登録と同時に1500個のトークンをお受け取りいただけます"
     },
     plans: {
       free: {
@@ -262,29 +254,6 @@ const ja = {
           "3つのトーンスタイル",
           "短い/中程度の長さ",
           "広告あり"
-        ]
-      },
-      starter: {
-        name: "スターター",
-        features: [
-          "ご登録時に300個のトークンを即時お渡し",
-          "毎日10個ずつ追加チャージ",
-          "4つのトーンスタイル",
-          "長い文章作成が可能",
-          "広告を削除",
-          "MyStyle分析"
-        ]
-      },
-      premium: {
-        name: "プロ",
-        features: [
-          "ご登録時に500個のトークンを即時お渡し",
-          "毎日20個ずつ追加チャージ",
-          "6つのトーンスタイル",
-          "すべての文章の長さ",
-          "広告を削除",
-          "MyStyle分析",
-          "優先処理"
         ]
       },
       pro: {
@@ -445,23 +414,10 @@ const ja = {
       },
       complete: {
         title: "広告視聴が完了しました",
-        messageStyle: "プレミアムスタイルを1回無料でお使いいただけます！",
-        messageLength: "プレミアム長さを1回無料でお使いいただけます！",
+        messageStyle: "プロスタイルを1回無料でお使いいただけます！",
+        messageLength: "長い長さを1回無料でお使いいただけます！",
       },
       error: "広告のご視聴に失敗しました。もう一度お試しください。",
-    },
-    premium: {
-      title: "プレミアム機能",
-      styleTitle: "プレミアムスタイル",
-      lengthTitle: "プレミアム長さ",
-      viewPlans: "プランを表示する",
-      watchAd: "広告視聴で1回使用",
-      upgrade: "プロプランに登録",
-      oneTimeUse: "1回使用",
-      styleMessage: "✨ {{styleName}}スタイルはプレミアム機能です！\n\n🎯 今すぐ利用する方法:\n• 🎬 広告視聴（無料お試し）\n• ⭐ プロプランにアップグレード",
-      toneMessage: "{{tone}}スタイルはプロプランでのみご利用いただけます。",
-      unlockedTitle: "スタイル解除！",
-      unlockedMessage: "{tone}スタイルが1回使用可能になりました。",
     },
     tokenUsage: {
       photoWrite: "写真投稿",
@@ -651,7 +607,7 @@ const ja = {
     subtitle: "あなただけのコンテンツブランドを構築しましょう",
     loading: "スタイルを分析しています...",
     access: {
-      freeMessage: "マイスタイル分析はSTARTERプランからご利用いただけます。",
+      freeMessage: "マイスタイル分析はPROプランからご利用いただけます。",
       upgradeButton: "プランをアップグレードする"
     },
     empty: {
@@ -730,7 +686,6 @@ const ja = {
       duplicate: "複製する",
       recommended: "おすすめ",
       usageCount: "{{count}}回使用",
-      starterLimit: "STARTERプラン：{{limit}}個のテンプレートのみご利用いただけます",
       bulletPoint: "•",
       averageLength: "平均長さ",
       keywords: "キーワード",
@@ -789,20 +744,12 @@ const ja = {
         rules: ["新しいハッシュタグを発見", "トレンド分析を含む", "他のユーザーと共有"]
       }
     },
-    premium: {
-      title: "プレミアム機能",
-      subtitle: "より詳細な分析とテンプレートをご利用ください",
-      upgradeButton: "変更"
-    },
     alerts: {
       challengeStart: "チャレンジを開始します！",
       challengeStarted: "{{name}}チャレンジが開始されました！",
       templateSaved: "テンプレートが保存されました",
       templateUsed: "テンプレートが適用されました",
-      premiumTemplate: "プレミアムテンプレート",
-      premiumTemplateMessage: "PROプランですべてのテンプレートをご使用いただけます。",
       cancel: "キャンセル",
-      upgrade: "変更",
       confirm: "確認する"
     },
     weekdays: {
@@ -868,15 +815,6 @@ const ja = {
       networkError: "ネットワーク接続をご確認ください",
       retryButton: "もう一度試す"
     },
-    premium: {
-      title: "プレミアム機能",
-      subtitle: "リアルタイムトレンドはPROプランからご利用いただけます。",
-      upgradeButton: "変更",
-      preview: {
-        title: "トレンドプレビュー",
-        subtitle: "トレンドを分析してトラフィックを増やし、\nリアルタイムの話題に合わせてコンテンツを作成してみませんか。"
-      }
-    },
     tips: {
       title: "トレンド活用のコツ",
       content: "トレンドをクリックすると、AIがその話題で記事を書いてくれます。キーワードを使ってご自分のスタイルに修正してみてください！",
@@ -932,8 +870,6 @@ const ja = {
     },
     info: {
       free: "毎日深夜0時に10個の無料トークンが補充されます",
-      starter: "STARTERプランで月200個のトークンをご利用いただけます",
-      premium: "PREMIUMプランで月500個のトークンをご利用いただけます",
       pro: "PROプランで無制限トークンをご利用中です"
     },
     alerts: {
@@ -1429,7 +1365,7 @@ const ja = {
       whenToPurchase: "どのような場合にトークン購入がお得ですか？",
       whenToPurchaseDesc: "• 不定期にご利用される方 • 特定プロジェクトで集中的にご利用される方 • サブスクの負担なく必要な時だけご利用されたい方",
       subscriptionAdvantages: "サブスクリプションプランのメリット",
-      subscriptionAdvantagesDesc: "• STARTER: {{starterPrice}}で合計600個 (初回300 + 毎日10) • PREMIUM: {{premiumPrice}}で合計1,100個 (初回500 + 毎日20) • 広告削除 + 高級機能利用可能",
+      subscriptionAdvantagesDesc: "• PRO: 無制限トークン • 広告削除 + 高級機能利用可能",
       trust: {
         securePayment: "安全な決済",
         instantRefund: "即時返金",

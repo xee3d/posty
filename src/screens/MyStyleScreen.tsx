@@ -403,51 +403,25 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
 
         similarTemplates.forEach((t) => {
           if (recommendations.length < 3) {
-            // Starter 플랜은 처음 3개 템플릿만 사용 가능
-            const templateIndex = UNIFIED_STYLES.findIndex(
-              (style) => style.id === t.id
-            );
-            const isAccessible =
-              userPlan !== "starter" ||
-              styleAccess?.templateLimit === 0 ||
-              templateIndex < (styleAccess?.templateLimit || 0);
-
-            if (isAccessible) {
-              recommendations.push(t.id);
-            }
+            recommendations.push(t.id);
           }
         });
       }
     }
 
-    // 2. 분석 결과 기반 추천 (사용 가능한 템플릿만)
+    // 2. 분석 결과 기반 추천
     if (analysis?.dominantStyle && recommendations.length < 3) {
       const dominantTemplate = UNIFIED_STYLES.find(
         (t) => t.id === analysis.dominantStyle
       );
-      if (dominantTemplate) {
-        const templateIndex = UNIFIED_STYLES.findIndex(
-          (style) => style.id === dominantTemplate.id
-        );
-        const isAccessible =
-          userPlan !== "starter" ||
-          styleAccess?.templateLimit === 0 ||
-          templateIndex < (styleAccess?.templateLimit || 0);
-
-        if (isAccessible && !recommendations.includes(dominantTemplate.id)) {
-          recommendations.push(dominantTemplate.id);
-        }
+      if (dominantTemplate && !recommendations.includes(dominantTemplate.id)) {
+        recommendations.push(dominantTemplate.id);
       }
     }
 
     // 3. 사용하지 않은 템플릿 중 추천 (다양성 확보)
-    const unusedTemplates = UNIFIED_STYLES.filter((t, index) => {
-      const isAccessible =
-        userPlan !== "starter" ||
-        styleAccess?.templateLimit === 0 ||
-        index < (styleAccess?.templateLimit || 0);
+    const unusedTemplates = UNIFIED_STYLES.filter((t) => {
       return (
-        isAccessible &&
         !usedTemplates.includes(t.id) &&
         !recommendations.includes(t.id)
       );
@@ -965,20 +939,6 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           <Text style={styles.sectionSubtitle}>
             {t("myStyle.templates.subtitle", "다양한 스타일을 시도해보고 나만의 스타일을 찾아보세요")}
           </Text>
-          {userPlan === "starter" &&
-            styleAccess?.templateLimit &&
-            styleAccess.templateLimit > 0 && (
-              <View style={styles.templateLimitBadge}>
-                <SafeIcon
-                  name="information-circle"
-                  size={16}
-                  color={colors.primary}
-                />
-                <Text style={styles.templateLimitText}>
-{t("myStyle.templates.starterLimit", "STARTER 플랜: {{limit}}개 템플릿만 사용 가능", { limit: styleAccess.templateLimit })}
-                </Text>
-              </View>
-            )}
         </Animated.View>
 
         {templates.map((template, index) => {
@@ -989,13 +949,6 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
           const iconBgOpacity = isDark ? "40" : "30";
           const iconSize = width < 380 ? 28 : 32;
 
-          // 템플릿 제한 확인
-          const isLocked =
-            userPlan === "starter" &&
-            styleAccess?.templateLimit &&
-            styleAccess.templateLimit > 0 &&
-            index >= styleAccess.templateLimit;
-
           return (
             <TouchableOpacity
               key={template.id}
@@ -1004,28 +957,11 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 cardTheme.default,
                 isRecommended && styles.recommendedTemplate,
                 pressedTemplateId === template.id && styles.templateCardPressed,
-                isLocked && styles.lockedTemplate,
               ]}
-              onPressIn={() => !isLocked && setPressedTemplateId(template.id)}
+              onPressIn={() => setPressedTemplateId(template.id)}
               onPressOut={() => setPressedTemplateId(null)}
-              onPress={() => {
-                if (isLocked) {
-                  Alert.alert(
-                    t("myStyle.alerts.premiumTemplate"),
-                    t("myStyle.alerts.premiumTemplateMessage"),
-                    [
-                      { text: t("myStyle.alerts.cancel"), style: "cancel" },
-                      {
-                        text: t("myStyle.alerts.upgrade"),
-                        onPress: () => onNavigate?.("subscription"),
-                      },
-                    ]
-                  );
-                  return;
-                }
-                handleTemplateUse(template);
-              }}
-              activeOpacity={isLocked ? 1 : 0.7}
+              onPress={() => handleTemplateUse(template)}
+              activeOpacity={0.7}
             >
               {isRecommended && (
                 <Animated.View
@@ -1081,17 +1017,11 @@ const MyStyleScreen: React.FC<MyStyleScreenProps> = ({ onNavigate }) => {
                 </View>
               </View>
 
-              {isLocked ? (
-                <View style={styles.lockIconContainer}>
-                  <SafeIcon name="lock-closed" size={20} color={colors.primary} />
-                </View>
-              ) : (
-                <Icon
-                  name="arrow-forward"
-                  size={20}
-                  color={colors.text.secondary}
-                />
-              )}
+              <Icon
+                name="arrow-forward"
+                size={20}
+                color={colors.text.secondary}
+              />
             </TouchableOpacity>
           );
         })}

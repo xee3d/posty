@@ -247,7 +247,7 @@ npm list --depth=0
 ```bash
 # App Store Connect 설정 필요
 1. App Store Connect에 앱 등록
-2. 구독 상품 생성 (Starter, Premium, Pro)
+2. 구독 상품 생성 (Pro)
 3. 테스트 사용자 계정 생성
 4. Sandbox 환경 테스트
 

@@ -18,7 +18,7 @@ interface RewardAdModalProps {
   visible: boolean;
   onClose: () => void;
   onRewardEarned: (amount: number) => void;
-  rewardType: 'tokens' | 'premium_tone' | 'premium_length';
+  rewardType: 'tokens';
   rewardAmount?: number;
   rewardDescription?: string;
 }
@@ -126,25 +126,10 @@ const RewardAdModal: React.FC<RewardAdModalProps> = ({
 
   const getRewardDescription = () => {
     if (rewardDescription) {return rewardDescription;}
-    
-    switch (rewardType) {
-      case 'tokens':
-        return t('ads.reward.tokens', { 
-          defaultValue: `${rewardAmount}개 토큰을 받으세요!` 
-        });
-      case 'premium_tone':
-        return t('ads.reward.premiumTone', { 
-          defaultValue: '프리미엄 톤 스타일을 사용하세요!' 
-        });
-      case 'premium_length':
-        return t('ads.reward.premiumLength', { 
-          defaultValue: '긴 글쓰기를 사용하세요!' 
-        });
-      default:
-        return t('ads.reward.default', { 
-          defaultValue: '보상을 받으세요!' 
-        });
-    }
+
+    return t('ads.reward.tokens', {
+      defaultValue: `${rewardAmount}개 토큰을 받으세요!`
+    });
   };
 
   return (

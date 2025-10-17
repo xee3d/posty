@@ -33,8 +33,8 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'KRW',
     symbol: '₩',
     tokens: {
-      small: 2900,    // 30 토큰 - 2,900원 (Starter 플랜과 동일)
-      medium: 5900,   // 100 토큰 - 5,900원 (Premium 플랜과 동일)
+      small: 2900,    // 30 토큰 - 2,900원
+      medium: 5900,   // 100 토큰 - 5,900원
       large: 11900,   // 300 토큰 - 11,900원 (대량 구매 할인)
       extra: 19900,   // 1000 토큰 - 19,900원 (초대량 특별가)
     },
@@ -55,8 +55,8 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'USD',
     symbol: '$',
     tokens: {
-      small: 1.99,    // 30 토큰 - $1.99 (Starter 플랜과 동일)
-      medium: 3.99,   // 100 토큰 - $3.99 (Premium 플랜과 동일)
+      small: 1.99,    // 30 토큰 - $1.99
+      medium: 3.99,   // 100 토큰 - $3.99
       large: 7.99,    // 300 토큰 - $7.99 (대량 구매 할인)
       extra: 14.99,   // 1000 토큰 - $14.99 (초대량 특별가)
     },
@@ -77,8 +77,8 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'JPY',
     symbol: '¥',
     tokens: {
-      small: 300,     // 30 토큰 - ¥300 (Starter 플랜과 동일)
-      medium: 600,    // 100 토큰 - ¥600 (Premium 플랜과 동일)
+      small: 300,     // 30 토큰 - ¥300
+      medium: 600,    // 100 토큰 - ¥600
       large: 1200,    // 300 토큰 - ¥1,200 (대량 구매 할인)
       extra: 2000,    // 1000 토큰 - ¥2,000 (초대량 특별가)
     },
@@ -99,8 +99,8 @@ export const LOCALE_PRICING: Record<SupportedLanguage, LocalePricing> = {
     currency: 'CNY',
     symbol: '¥',
     tokens: {
-      small: 15.0,    // 30 토큰 - ¥15.0 (Starter 플랜과 동일)
-      medium: 28.0,   // 100 토큰 - ¥28.0 (Premium 플랜과 동일)
+      small: 15.0,    // 30 토큰 - ¥15.0
+      medium: 28.0,   // 100 토큰 - ¥28.0
       large: 56.0,    // 300 토큰 - ¥56.0 (대량 구매 할인)
       extra: 88.0,    // 1000 토큰 - ¥88.0 (초대량 특별가)
     },
@@ -158,10 +158,10 @@ class PricingService {
     return pricing.tokens[tokenType];
   }
 
-  // 구독 가격 가져오기
-  getSubscriptionPrice(plan: 'starter' | 'premium' | 'pro'): number {
+  // 구독 가격 가져오기 (현재 Pro만 사용)
+  getSubscriptionPrice(plan: 'pro'): number {
     const pricing = this.getCurrentPricing();
-    return pricing.subscription[plan];
+    return pricing.subscription.pro;
   }
 
   // 가격 포맷팅
@@ -272,37 +272,15 @@ class PricingService {
     ];
   }
 
-  // 구독 플랜 정보 가져오기 (언어 기반)
+  // 구독 플랜 정보 가져오기 (언어 기반) - Pro만 사용
   getSubscriptionPlans() {
     // 현재 언어 정보 업데이트
     this.updateLanguage();
     const pricing = this.getCurrentPricing();
-    
+
     console.log('[PricingService] Current language:', this.currentLanguage, 'Currency:', pricing.currency);
 
     return [
-      {
-        id: 'starter',
-        name: 'Starter',
-        tokens: 600,
-        price: pricing.subscription.starter,
-        formattedPrice: this.formatPrice(pricing.subscription.starter),
-        priceDisplay: this.formatPrice(pricing.subscription.starter),
-        period: '/월',
-        popular: false,
-        currency: pricing.currency,
-      },
-      {
-        id: 'premium',
-        name: 'Premium',
-        tokens: 1100,
-        price: pricing.subscription.premium,
-        formattedPrice: this.formatPrice(pricing.subscription.premium),
-        priceDisplay: this.formatPrice(pricing.subscription.premium),
-        period: '/월',
-        popular: true,
-        currency: pricing.currency,
-      },
       {
         id: 'pro',
         name: 'Pro',
@@ -311,13 +289,13 @@ class PricingService {
         formattedPrice: this.formatPrice(pricing.subscription.pro),
         priceDisplay: this.formatPrice(pricing.subscription.pro),
         period: '/월',
-        popular: false,
+        popular: true,
         currency: pricing.currency,
       },
     ];
   }
 
-  // 새로운 방식: 국가별 구독 플랜 정보 가져오기
+  // 새로운 방식: 국가별 구독 플랜 정보 가져오기 - Pro만 사용
   async getGlobalSubscriptionPlans() {
     if (!this.useGlobalPricing) {
       return this.getSubscriptionPlans();
@@ -326,34 +304,10 @@ class PricingService {
     const countryPricing = await this.getCurrentCountryPricing();
     const currency = countryPricing.currency;
 
-    // CSV 데이터에 각 플랜별 가격이 있으면 사용, 없으면 계산
-    const starterPrice = countryPricing.starter || countryPricing.price * 0.15; // Pro의 15%
-    const premiumPrice = countryPricing.premium || countryPricing.price * 0.29; // Pro의 29%
-    const proPrice = countryPricing.pro || countryPricing.price;                // Pro 가격
+    // Pro 가격
+    const proPrice = countryPricing.pro || countryPricing.price;
 
     return [
-      {
-        id: 'starter',
-        name: 'Starter',
-        tokens: 600,
-        price: starterPrice,
-        formattedPrice: countryDetectionService.formatPrice(starterPrice, currency),
-        priceDisplay: countryDetectionService.formatPrice(starterPrice, currency),
-        period: '/월',
-        popular: false,
-        currency: currency,
-      },
-      {
-        id: 'premium',
-        name: 'Premium',
-        tokens: 1100,
-        price: premiumPrice,
-        formattedPrice: countryDetectionService.formatPrice(premiumPrice, currency),
-        priceDisplay: countryDetectionService.formatPrice(premiumPrice, currency),
-        period: '/월',
-        popular: true,
-        currency: currency,
-      },
       {
         id: 'pro',
         name: 'Pro',
@@ -362,7 +316,7 @@ class PricingService {
         formattedPrice: countryDetectionService.formatPrice(proPrice, currency),
         priceDisplay: countryDetectionService.formatPrice(proPrice, currency),
         period: '/월',
-        popular: false,
+        popular: true,
         currency: currency,
       },
     ];
@@ -413,7 +367,7 @@ export const getTokenPrice = (tokenType: 'small' | 'medium' | 'large' | 'extra')
   return pricingService.getTokenPrice(tokenType);
 };
 
-export const getSubscriptionPrice = (plan: 'starter' | 'premium' | 'pro'): number => {
+export const getSubscriptionPrice = (plan: 'pro'): number => {
   return pricingService.getSubscriptionPrice(plan);
 };
 
