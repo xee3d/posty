@@ -325,34 +325,30 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
   // 패키지별 단계적 색상 (토큰 개수에 따라 진해짐)
   const getPackageColor = (packageId: string, isDark: boolean) => {
     const baseColor = colors.primary;
-    
+
     switch (packageId) {
-      case 'tokens_50':
-        // 50개 - 가장 연한 색상
+      case 'tokens_100':
+        // 100개 - 가장 연한 색상
         return {
-          backgroundColor: baseColor + "08", // 매우 연한 색상
-          borderColor: isDark ? baseColor + "80" : baseColor + "40",    // 다크모드에서 더 진한 테두리
-          tokenSectionBg: baseColor + "12", // 연한 토큰 섹션 배경
+          backgroundColor: isDark ? baseColor + "15" : baseColor + "08",
+          borderColor: isDark ? baseColor + "40" : baseColor + "30",
         };
-      case 'tokens_150':
-        // 150개 - 중간 색상
+      case 'tokens_200':
+        // 200개 - 중간 색상 (인기)
         return {
-          backgroundColor: baseColor + "15", // 중간 색상
-          borderColor: isDark ? baseColor + "A0" : baseColor + "60",    // 다크모드에서 더 진한 테두리
-          tokenSectionBg: baseColor + "20", // 중간 토큰 섹션 배경
+          backgroundColor: isDark ? baseColor + "20" : baseColor + "10",
+          borderColor: isDark ? baseColor + "60" : baseColor + "40",
         };
-      case 'tokens_500':
-        // 500개 - 가장 진한 색상
+      case 'tokens_300':
+        // 300개 - 진한 색상
         return {
-          backgroundColor: baseColor + "25", // 진한 색상
-          borderColor: isDark ? baseColor + "C0" : baseColor + "80",    // 다크모드에서 더 진한 테두리
-          tokenSectionBg: baseColor + "30", // 진한 토큰 섹션 배경
+          backgroundColor: isDark ? baseColor + "25" : baseColor + "15",
+          borderColor: isDark ? baseColor + "80" : baseColor + "50",
         };
       default:
         return {
-          backgroundColor: baseColor + "10",
-          borderColor: baseColor,
-          tokenSectionBg: baseColor + "15",
+          backgroundColor: isDark ? baseColor + "18" : baseColor + "0C",
+          borderColor: isDark ? baseColor + "50" : baseColor + "35",
         };
     }
   };
@@ -510,10 +506,7 @@ export const TokenShopScreen: React.FC<TokenShopScreenProps> = ({ navigation, on
                   <ShimmerEffect colors={colors} isDark={isDark} />
                   
                   {/* 토큰 개수 - 상단 */}
-                  <View style={[
-                    styles.tokenSection,
-                    { backgroundColor: packageColors.tokenSectionBg }
-                  ]}>
+                  <View style={styles.tokenSection}>
                     <View style={styles.tokenLeft}>
                       <PrimaryIcon name="flash" size={24} />
                       <Text style={styles.tokenCount}>
@@ -821,28 +814,26 @@ const createStyles = (colors: any, isDark: boolean) => {
   },
   packageCard: {
     borderRadius: getResponsiveSize(16),
-    overflow: "visible", // 스티커가 보이도록 변경
+    overflow: "hidden",
     shadowColor: colors.shadow,
-    shadowOffset: { width: 0, height: isDark ? 2 : 1 },
-    shadowOpacity: isDark ? 0.2 : 0.1,
-    shadowRadius: isDark ? 4 : 3,
-    elevation: isDark ? 2 : 1,
-    height: getResponsiveSize(180), // 220에서 180으로 줄임
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: isDark ? 0.15 : 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+    height: getResponsiveSize(180),
     width: "100%",
-    borderWidth: Platform.OS === 'ios' ? (isDark ? 1 : 0) : 0,
-    borderColor: Platform.OS === 'ios' && isDark ? colors.border + '40' : undefined,
+    borderWidth: 1,
     position: "relative",
-    zIndex: 1, // 스티커보다 낮은 레이어
   },
   // 새로운 간단한 구조
   tokenSection: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: getResponsiveSize(20), // 24에서 20으로 줄임
-    paddingVertical: getResponsiveSize(16), // 20에서 16으로 줄임
-    borderBottomWidth: Platform.OS === 'android' ? 0.5 : 2,
-    borderBottomColor: colors.border,
+    paddingHorizontal: getResponsiveSize(20),
+    paddingVertical: getResponsiveSize(16),
+    borderBottomWidth: 1,
+    borderBottomColor: isDark ? colors.border + "40" : colors.border + "20",
     zIndex: 2,
   },
   tokenLeft: {
