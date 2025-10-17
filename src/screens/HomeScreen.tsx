@@ -63,8 +63,6 @@ import NewUserWelcome from "../components/NewUserWelcome";
 import improvedStyleService from "../services/improvedStyleService";
 import { soundManager } from "../utils/soundManager";
 import AppLogo from "../components/AppLogo";
-import NotificationBadge from "../components/NotificationBadge";
-import NotificationTestButtons from "../components/NotificationTestButtons";
 import { useTranslation } from "react-i18next";
 import AdBanner from "../components/AdBanner";
 import { updateSubscription } from "../store/slices/userSlice";
@@ -579,9 +577,6 @@ const HomeScreen: React.FC<HomeScreenProps> = ({ onNavigate }) => {
 
               {/* 우측 헤더 컨트롤 */}
               <View style={styles.headerControls}>
-                {/* 알림 배지 */}
-                <NotificationBadge size="medium" />
-
                 {/* 토큰 잔액 표시 - TokenBadge 컴포넌트 사용 */}
                 <TokenBadge
                   tokens={currentTokens}

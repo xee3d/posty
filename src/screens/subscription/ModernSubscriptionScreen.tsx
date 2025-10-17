@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Linking, Share, Platform,  } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Dimensions, Linking, Share, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { COLORS, SPACING } from '../../utils/constants';
 import { SUBSCRIPTION_PLANS } from '../../config/adConfig';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -406,11 +407,13 @@ export const ModernSubscriptionScreen: React.FC<SubscriptionScreenProps> = ({
               setTimeout(() => {
                 loadTokenStats();
               }, 1000);
-            } catch (error) {
+            } catch (error: any) {
               console.error('Subscription error:', error);
+              // CRITICAL FIX: 실제 에러 메시지 표시
+              const errorMessage = error?.message || '구독 처리 중 문제가 발생했습니다. 다시 시도해주세요.';
               Alert.alert(
                 '구독 실패',
-                '구독 처리 중 문제가 발생했습니다. 다시 시도해주세요.',
+                errorMessage,
                 [{ text: '확인' }]
               );
             }

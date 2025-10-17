@@ -68,6 +68,7 @@ import AppLogo from "../components/AppLogo";
 import ProfileDetailModal from "../components/ProfileDetailModal";
 import ThemeDialog from "../components/ThemeDialog";
 import adConsentService from "../services/adConsentService";
+import NotificationBadge from "../components/NotificationBadge";
 
 interface SettingsScreenProps {
   onNavigate?: (tab: string) => void;
@@ -989,6 +990,10 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               <Text style={styles.mollyBadgeText}>P</Text>
             </View>
             <Text style={headerStyles.headerTitle}>{t('settings.title')}</Text>
+            {/* 알림 아이콘 */}
+            <View style={{ marginLeft: 'auto' }}>
+              <NotificationBadge size="medium" />
+            </View>
           </View>
         </View>
 
