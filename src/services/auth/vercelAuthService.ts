@@ -542,8 +542,6 @@ class VercelAuthService {
         requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
       });
 
-      console.log("🔍 Apple Sign-In 전체 응답:", JSON.stringify(appleAuthRequestResponse, null, 2));
-
       // Get current authentication state
       const credentialState = await appleAuth.getCredentialStateForUser(appleAuthRequestResponse.user);
 
@@ -588,10 +586,6 @@ class VercelAuthService {
       }
     } catch (error: any) {
       logger.error("Apple Sign-In 실패:", error);
-
-      console.log("🔍 Apple 에러 상세 정보:");
-      console.log("  - error.code:", error.code);
-      console.log("  - error.message:", error.message);
 
       // User cancellation handling
       const isUserCancellation =
