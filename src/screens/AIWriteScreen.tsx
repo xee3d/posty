@@ -5,7 +5,6 @@ import {
   ScrollView,
   TouchableOpacity,
   StyleSheet,
-  SafeAreaView,
   TextInput,
   KeyboardAvoidingView,
   Image,
@@ -14,6 +13,7 @@ import {
   InteractionManager,
   Modal,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   COLORS,
   SPACING,
@@ -113,10 +113,12 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   const { colors, cardTheme, isDark } = useAppTheme();
   const { t } = useTranslation();
   const timer = useTimer();
+  const insets = useSafeAreaInsets();
 
   // 토큰 관리 훅 사용
   const {
     currentTokens,
+    subscriptionPlan,
     showLowTokenPrompt,
     setShowLowTokenPrompt,
     checkTokenAvailability,
@@ -125,6 +127,15 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     handleLowToken,
     handleUpgrade,
   } = useTokenManagement({ onNavigate });
+
+  // 프리버전에서 허용되는 정리 옵션들
+  const freeVersionPolishOptions = ['summarize', 'simple'];
+  
+  // 정리 옵션이 프리버전에서 사용 가능한지 확인
+  const isPolishOptionAvailable = (option: string) => {
+    return subscriptionPlan === 'pro' || 
+           freeVersionPolishOptions.includes(option);
+  };
 
   const [writeMode, setWriteMode] = useState<WriteMode>(initialMode);
   const [prompt, setPrompt] = useState(initialText || "");
@@ -193,12 +204,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   // 광고 시청으로 얻은 일회성 프리미엄 액세스 상태 관리
   const [adWatchedTones, setAdWatchedTones] = useState<Set<string>>(new Set());
   const [adWatchedLengths, setAdWatchedLengths] = useState<Set<string>>(new Set());
+  const [adWatchedPolishOptions, setAdWatchedPolishOptions] = useState<Set<string>>(new Set());
   const [isLoadingAd, setIsLoadingAd] = useState(false);
 
-  // 구독 플랜 정보 가져오기
-  const subscriptionPlan = useAppSelector(
-    (state) => state.user.subscriptionPlan
-  );
+  // 구독 플랜 정보 가져오기 (useTokenManagement에서 이미 가져옴)
   const userPlan = (subscriptionPlan || "free") as PlanType;
 
   // generatedContent 상태 모니터링 및 자동 스크롤
@@ -209,40 +218,10 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     );
     console.log("[AIWriteScreen] isGenerating:", isGenerating);
     
-    // 콘텐츠가 생성되고 로딩이 완료되면 자동으로 스크롤
-    if (generatedContent && !isGenerating && scrollViewRef.current) {
-      // 생성 버튼이 상단에 보이도록 스크롤
-      setTimeout(() => {
-        if (scrollViewRef.current && generateButtonRef.current) {
-          generateButtonRef.current.measureLayout(
-            scrollViewRef.current as any,
-            (x, y) => {
-              // 생성 버튼이 화면 상단에서 약간 아래에 위치하도록 스크롤
-              const offsetY = Math.max(0, y - 100); // 100px 여유 공간
-              scrollViewRef.current?.scrollTo({
-                y: offsetY,
-                animated: true
-              });
-              console.log(`[AIWriteScreen] Auto-scrolled to show generate button at y: ${offsetY}`);
-            },
-            () => {
-              // measureLayout 실패 시 기본적으로 맨 위로 스크롤
-              scrollViewRef.current?.scrollTo({
-                y: 0,
-                animated: true
-              });
-              console.log("[AIWriteScreen] Fallback: Auto-scrolled to top");
-            }
-          );
-        } else {
-          // ref가 없는 경우 기본적으로 맨 위로 스크롤
-          scrollViewRef.current?.scrollTo({
-            y: 0,
-            animated: true
-          });
-          console.log("[AIWriteScreen] Default: Auto-scrolled to top");
-        }
-      }, 300);
+    // 콘텐츠 생성 완료 시 자동 스크롤 비활성화 (사용자 경험 개선)
+    // 사용자가 원할 때만 스크롤하도록 변경
+    if (generatedContent && !isGenerating) {
+      console.log("[AIWriteScreen] Content generated, auto-scroll disabled for better UX");
     }
   }, [generatedContent, isGenerating]);
 
@@ -492,6 +471,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
     setShowStyleGuide(false);
   };
 
+
   // 광고 시청 후 프리미엄 스타일 1회 해제
   const handleWatchAdForTone = async (toneId: string) => {
     try {
@@ -582,6 +562,79 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   // 광고 시청 후 프리미엄 길이 일회성 액세스 처리 (더 이상 필요 없음)
   const handleWatchAdForLength = async (lengthId: string) => {
     // 모든 길이가 프리버전에서 사용 가능하므로 더 이상 필요 없음
+  };
+
+  // 광고 시청 후 프리미엄 문장정리 옵션 1회 해제
+  const handleWatchAdForPolishOption = async (optionId: string) => {
+    try {
+      console.log('광고 시청으로 문장정리 옵션 잠금 해제:', optionId);
+
+      // 로딩 시작
+      setIsLoadingAd(true);
+
+      // 1. 광고 로드
+      const loaded = await rewardAdService.loadAd();
+
+      // 로딩 종료
+      setIsLoadingAd(false);
+
+      if (!loaded) {
+        soundManager.playError();
+        Alert.alert(
+          t("aiWrite.alerts.styleLock.error"),
+          t("aiWrite.alerts.styleLock.errorMessage"),
+          [{ text: t("common.ok") }]
+        );
+        return;
+      }
+
+      // 2. 광고 표시 (옵션 잠금 해제용 - 토큰 지급 안함)
+      const adResult = await rewardAdService.showAd({ skipTokenReward: true });
+
+      console.log('광고 표시 결과:', adResult);
+
+      // 3. 광고 표시 성공 확인
+      if (adResult?.success) {
+        // 광고 시청 성공 - 옵션 1회 사용 가능하도록 설정
+        console.log('문장정리 옵션 활성화 중:', optionId);
+        setAdWatchedPolishOptions(prev => {
+          const newSet = new Set(prev);
+          newSet.add(optionId);
+          console.log('업데이트된 adWatchedPolishOptions:', Array.from(newSet));
+          return newSet;
+        });
+
+        // 팝업 없이 바로 옵션 자동 선택
+        InteractionManager.runAfterInteractions(() => {
+          setSelectedPolishOption(optionId as any);
+          soundManager.playSuccess();
+        });
+      } else {
+        // 광고 시청 미완료
+        InteractionManager.runAfterInteractions(() => {
+          soundManager.playError();
+          Alert.alert(
+            t("aiWrite.alerts.styleLock.incomplete"),
+            t("aiWrite.alerts.styleLock.incompleteMessage"),
+            [{ text: t("common.ok") }]
+          );
+        });
+      }
+    } catch (error) {
+      console.error('광고 시청 실패:', error);
+
+      // 로딩 종료
+      setIsLoadingAd(false);
+
+      InteractionManager.runAfterInteractions(() => {
+        soundManager.playError();
+        Alert.alert(
+          t("aiWrite.alerts.styleLock.error"),
+          t("aiWrite.alerts.styleLock.errorMessage"),
+          [{ text: t("common.ok") }]
+        );
+      });
+    }
   };
 
   // 예시 placeholder 가져오기
@@ -1101,7 +1154,7 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
   const styles = createStyles(colors, cardTheme, isDark);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top + 8 }]} edges={['left', 'right']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
@@ -1111,6 +1164,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
           style={styles.content}
           showsVerticalScrollIndicator={false}
           keyboardShouldPersistTaps="handled"
+          scrollEventThrottle={16}
+          decelerationRate="normal"
           contentContainerStyle={[
             styles.scrollContent,
             { paddingBottom: generatedContent ? 200 : 100 },
@@ -1154,7 +1209,9 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       backgroundColor: isDark
                         ? colors.primary + '15'
                         : colors.primary + '08',
-                      borderColor: colors.primary + '30'
+                      borderColor: isDark 
+                        ? colors.primary + '60'
+                        : colors.primary + '30'
                     }]}
                     onPress={() => onNavigate?.("settings")}
                     activeOpacity={0.7}
@@ -1382,10 +1439,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       multiline
                       maxLength={100}
                       onFocus={() => {
-                        // 키보드가 올라올 때 하단으로 스크롤
-                        setTimeout(() => {
-                          scrollViewRef.current?.scrollToEnd({ animated: true });
-                        }, 300);
+                        // 키보드 포커스 시 자동 스크롤 비활성화 (사용자 경험 개선)
+                        console.log("[AIWriteScreen] TextInput focused, auto-scroll disabled");
                       }}
                     />
                     <CharacterCount current={prompt.length} max={100} />
@@ -1414,10 +1469,8 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                       multiline
                       maxLength={500}
                       onFocus={() => {
-                        // 키보드가 올라올 때 하단으로 스크롤
-                        setTimeout(() => {
-                          scrollViewRef.current?.scrollToEnd({ animated: true });
-                        }, 300);
+                        // 키보드 포커스 시 자동 스크롤 비활성화 (사용자 경험 개선)
+                        console.log("[AIWriteScreen] TextInput focused, auto-scroll disabled");
                       }}
                     />
                     <CharacterCount current={prompt.length} max={500} />
@@ -1495,18 +1548,45 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           styles.polishOptionButton,
                           selectedPolishOption === "formal" &&
                             styles.polishOptionButtonActive,
+                          !isPolishOptionAvailable("formal") && styles.polishOptionButtonLocked,
                         ]}
                         onPress={() => {
-                          setSelectedPolishOption("formal");
-                          soundManager.playTap();
+                          if (isPolishOptionAvailable("formal")) {
+                            setSelectedPolishOption("formal");
+                            soundManager.playTap();
+                          } else {
+                            // 잠긴 옵션 - 광고 시청으로 1회 해제
+                            AlertManager.show(
+                              t("aiWrite.polishOptions.formal"),
+                              t("aiWrite.alerts.styleLock.proStyleMessage"),
+                              [
+                                {
+                                  text: t("aiWrite.alerts.styleLock.unlockOption"),
+                                  onPress: () => handleWatchAdForPolishOption("formal"),
+                                },
+                                {
+                                  text: t("subscription.subscribePro"),
+                                  onPress: () => onNavigate?.("subscription", { scrollToPro: true }),
+                                },
+                                { text: t("common.cancel"), style: 'cancel' },
+                              ],
+                              {
+                                icon: "business-outline",
+                                iconColor: "#3B82F6",
+                              }
+                            );
+                            soundManager.playTap();
+                          }
                         }}
                       >
                         <SafeIcon
-                          name="business-outline"
+                          name={isPolishOptionAvailable("formal") ? "business-outline" : "lock-closed-outline"}
                           size={18}
                           color={
                             selectedPolishOption === "formal"
                               ? colors.primary
+                              : !isPolishOptionAvailable("formal")
+                              ? isDark ? colors.text.tertiary : colors.text.disabled
                               : colors.text.secondary
                           }
                         />
@@ -1515,10 +1595,17 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             styles.polishOptionText,
                             selectedPolishOption === "formal" &&
                               styles.polishOptionTextActive,
+                            !isPolishOptionAvailable("formal") &&
+                              styles.polishOptionTextLocked,
                           ]}
                         >
                           {t("aiWrite.polishOptions.formal")}
                         </Text>
+                        {isPolishOptionAvailable("formal") && adWatchedPolishOptions.has("formal") && subscriptionPlan !== 'pro' && (
+                          <View style={styles.oneTimeUseBadge}>
+                            <Text style={styles.oneTimeUseText}>1회사용권</Text>
+                          </View>
+                        )}
                       </TouchableOpacity>
                     </View>
 
@@ -1534,18 +1621,45 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           styles.polishOptionButton,
                           selectedPolishOption === "emotion" &&
                             styles.polishOptionButtonActive,
+                          !isPolishOptionAvailable("emotion") && styles.polishOptionButtonLocked,
                         ]}
                         onPress={() => {
-                          setSelectedPolishOption("emotion");
-                          soundManager.playTap();
+                          if (isPolishOptionAvailable("emotion")) {
+                            setSelectedPolishOption("emotion");
+                            soundManager.playTap();
+                          } else {
+                            // 잠긴 옵션 - 광고 시청으로 1회 해제
+                            AlertManager.show(
+                              t("aiWrite.polishOptions.emotion"),
+                              t("aiWrite.alerts.styleLock.proStyleMessage"),
+                              [
+                                {
+                                  text: t("aiWrite.alerts.styleLock.unlockOption"),
+                                  onPress: () => handleWatchAdForPolishOption("emotion"),
+                                },
+                                {
+                                  text: t("subscription.subscribePro"),
+                                  onPress: () => onNavigate?.("subscription", { scrollToPro: true }),
+                                },
+                                { text: t("common.cancel"), style: 'cancel' },
+                              ],
+                              {
+                                icon: "heart-outline",
+                                iconColor: "#EF4444",
+                              }
+                            );
+                            soundManager.playTap();
+                          }
                         }}
                       >
                         <SafeIcon
-                          name="heart-outline"
+                          name={isPolishOptionAvailable("emotion") ? "heart-outline" : "lock-closed-outline"}
                           size={18}
                           color={
                             selectedPolishOption === "emotion"
                               ? colors.primary
+                              : !isPolishOptionAvailable("emotion")
+                              ? isDark ? colors.text.tertiary : colors.text.disabled
                               : colors.text.secondary
                           }
                         />
@@ -1554,10 +1668,17 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             styles.polishOptionText,
                             selectedPolishOption === "emotion" &&
                               styles.polishOptionTextActive,
+                            !isPolishOptionAvailable("emotion") &&
+                              styles.polishOptionTextLocked,
                           ]}
                         >
                           {t("aiWrite.polishOptions.emotion")}
                         </Text>
+                        {isPolishOptionAvailable("emotion") && adWatchedPolishOptions.has("emotion") && subscriptionPlan !== 'pro' && (
+                          <View style={styles.oneTimeUseBadge}>
+                            <Text style={styles.oneTimeUseText}>1회사용권</Text>
+                          </View>
+                        )}
                       </TouchableOpacity>
 
 
@@ -1566,18 +1687,45 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                           styles.polishOptionButton,
                           selectedPolishOption === "engaging" &&
                             styles.polishOptionButtonActive,
+                          !isPolishOptionAvailable("engaging") && styles.polishOptionButtonLocked,
                         ]}
                         onPress={() => {
-                          setSelectedPolishOption("engaging");
-                          soundManager.playTap();
+                          if (isPolishOptionAvailable("engaging")) {
+                            setSelectedPolishOption("engaging");
+                            soundManager.playTap();
+                          } else {
+                            // 잠긴 옵션 - 광고 시청으로 1회 해제
+                            AlertManager.show(
+                              t("aiWrite.polishOptions.engaging"),
+                              t("aiWrite.alerts.styleLock.proStyleMessage"),
+                              [
+                                {
+                                  text: t("aiWrite.alerts.styleLock.unlockOption"),
+                                  onPress: () => handleWatchAdForPolishOption("engaging"),
+                                },
+                                {
+                                  text: t("subscription.subscribePro"),
+                                  onPress: () => onNavigate?.("subscription", { scrollToPro: true }),
+                                },
+                                { text: t("common.cancel"), style: 'cancel' },
+                              ],
+                              {
+                                icon: "sparkles-outline",
+                                iconColor: "#F59E0B",
+                              }
+                            );
+                            soundManager.playTap();
+                          }
                         }}
                       >
                         <SafeIcon
-                          name="sparkles-outline"
+                          name={isPolishOptionAvailable("engaging") ? "sparkles-outline" : "lock-closed-outline"}
                           size={18}
                           color={
                             selectedPolishOption === "engaging"
                               ? colors.primary
+                              : !isPolishOptionAvailable("engaging")
+                              ? isDark ? colors.text.tertiary : colors.text.disabled
                               : colors.text.secondary
                           }
                         />
@@ -1586,10 +1734,17 @@ const AIWriteScreen: React.FC<AIWriteScreenProps> = ({
                             styles.polishOptionText,
                             selectedPolishOption === "engaging" &&
                               styles.polishOptionTextActive,
+                            !isPolishOptionAvailable("engaging") &&
+                              styles.polishOptionTextLocked,
                           ]}
                         >
                           {t("aiWrite.polishOptions.engaging")}
                         </Text>
+                        {isPolishOptionAvailable("engaging") && adWatchedPolishOptions.has("engaging") && subscriptionPlan !== 'pro' && (
+                          <View style={styles.oneTimeUseBadge}>
+                            <Text style={styles.oneTimeUseText}>1회사용권</Text>
+                          </View>
+                        )}
                       </TouchableOpacity>
                     </View>
 
@@ -2168,20 +2323,24 @@ const createStyles = (
       gap: 6,
       paddingVertical: 10,
       paddingHorizontal: 8,
-      backgroundColor: isDark ? "#1C1C1E" : "#FFFFFF",
+      backgroundColor: isDark ? "#1C1C1E" : "#F8F9FA",
       borderRadius: 12,
-      borderWidth: 1,
-      borderColor: isDark ? "#3A3A3C" : "#F3F4F6",
-      elevation: isDark ? 0 : 1,
+      borderWidth: 1.5,
+      borderColor: isDark ? "#3A3A3C" : "#E5E7EB",
+      elevation: isDark ? 0 : 2,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: isDark ? 0 : 0.03,
-      shadowRadius: 2,
+      shadowOpacity: isDark ? 0 : 0.08,
+      shadowRadius: 3,
     },
     polishOptionButtonActive: {
-      backgroundColor: colors.primary + (isDark ? "20" : "15"),
+      backgroundColor: isDark ? colors.primary + "20" : "#FFFFFF",
       borderColor: colors.primary,
-      borderWidth: 1.5,
+      borderWidth: Platform.OS === 'android' ? 1 : 1.5,
+      elevation: isDark ? 0 : 4,
+      shadowOpacity: isDark ? 0 : 0.15,
+      shadowRadius: 6,
+      transform: [{ scale: 1.02 }],
     },
     polishOptionText: {
       fontSize: 12,
@@ -2191,6 +2350,14 @@ const createStyles = (
     polishOptionTextActive: {
       color: colors.primary,
       fontWeight: "700",
+    },
+    polishOptionButtonLocked: {
+      opacity: 0.5,
+      position: "relative",
+    },
+    polishOptionTextLocked: {
+      color: isDark ? colors.text.secondary : colors.text.disabled,
+      fontWeight: "500",
     },
     photoSection: {
       paddingHorizontal: SPACING.lg,
@@ -2346,7 +2513,7 @@ const createStyles = (
       overflow: "visible",
     },
     toneCardActive: {
-      borderWidth: 2.5,
+      borderWidth: Platform.OS === 'android' ? 1 : 1.5,
       backgroundColor: isDark ? colors.primary + "20" : "#FFFFFF",
       elevation: isDark ? 0 : 4,
       shadowOpacity: isDark ? 0 : 0.15,
@@ -2388,7 +2555,7 @@ const createStyles = (
     lengthCardActive: {
       borderColor: colors.primary,
       backgroundColor: isDark ? colors.primary + "20" : "#FFFFFF",
-      borderWidth: 2.5,
+      borderWidth: Platform.OS === 'android' ? 1 : 1.5,
       elevation: isDark ? 0 : 4,
       shadowOpacity: isDark ? 0 : 0.15,
       shadowRadius: 6,
@@ -2483,7 +2650,7 @@ const createStyles = (
       flexDirection: "row",
       alignItems: "center",
       gap: SPACING.md,
-      borderWidth: 1.5,
+      borderWidth: 1,
       shadowColor: colors.primary,
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
@@ -2513,9 +2680,9 @@ const createStyles = (
     },
     profileProgressBar: {
       flex: 1,
-      height: 6,
-      backgroundColor: isDark ? colors.surface : colors.border + '40',
-      borderRadius: 3,
+      height: 8,
+      backgroundColor: isDark ? colors.border + '60' : colors.border + '60',
+      borderRadius: 4,
       overflow: "hidden",
     },
     profileProgressFill: {
