@@ -72,34 +72,52 @@ class InAppPurchaseService {
   private isPurchasing = false; // CRITICAL FIX: 구매 중복 방지 플래그
 
   /**
-   * IAP 연결
+   * IAP 연결 (재시도 로직 포함)
    */
   async connect(): Promise<void> {
-    try {
-      if (this.isConnected) {
-        return;
-      }
+    if (this.isConnected) {
+      return;
+    }
 
-      // 시뮬레이터에서는 연결을 건너뛰고 로그만 출력
-      if (Platform.OS === "ios" && __DEV__) {
-        console.log("🎭 시뮬레이터 환경 - IAP 연결 건너뛰기");
+    // 시뮬레이터에서는 연결을 건너뛰고 로그만 출력
+    if (Platform.OS === "ios" && __DEV__) {
+      console.log("🎭 시뮬레이터 환경 - IAP 연결 건너뛰기");
+      this.isConnected = true;
+      return;
+    }
+
+    // TestFlight 환경 로깅
+    if (isTestFlight()) {
+      console.log("🧪 TestFlight 환경 감지 - 샌드박스 IAP 연결");
+    }
+
+    // CRITICAL FIX: 재시도 로직 추가 (TestFlight E_IAP_NOT_AVAILABLE 방지)
+    const maxRetries = 3;
+    let lastError: any;
+
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`[IAP] Connection attempt ${attempt}/${maxRetries}...`);
+        const result = await initConnection();
+        console.log("[IAP] ✅ Connection successful:", result);
         this.isConnected = true;
         return;
-      }
+      } catch (error: any) {
+        lastError = error;
+        console.warn(`[IAP] ⚠️ Connection attempt ${attempt} failed:`, error.message);
 
-      // TestFlight 환경 로깅
-      if (isTestFlight()) {
-        console.log("🧪 TestFlight 환경 감지 - 샌드박스 IAP 연결");
+        // 마지막 시도가 아니면 1초 대기 후 재시도
+        if (attempt < maxRetries) {
+          console.log(`[IAP] Retrying in 1 second...`);
+          await new Promise(resolve => setTimeout(resolve, 1000));
+        }
       }
-
-      const result = await initConnection();
-      console.log("IAP Connection result:", result);
-      this.isConnected = true;
-    } catch (error) {
-      console.error("IAP Connection failed:", error);
-      this.isConnected = false;
-      throw error;
     }
+
+    // 모든 재시도 실패
+    console.error(`[IAP] 🚨 Connection failed after ${maxRetries} attempts:`, lastError);
+    this.isConnected = false;
+    throw lastError;
   }
 
   /**
@@ -386,9 +404,21 @@ class InAppPurchaseService {
 
         // IAP 사용 불가
         if (error.code === "E_IAP_NOT_AVAILABLE") {
+          // CRITICAL FIX: TestFlight 환경에서 더 자세한 안내
+          const errorMessage = isTestFlight()
+            ? "🧪 TestFlight 인앱 구매를 사용할 수 없습니다.\n\n" +
+              "다음을 확인해주세요:\n\n" +
+              "1️⃣ Settings > App Store > SANDBOX ACCOUNT 섹션에서 샌드박스 계정으로 로그인했는지 확인\n" +
+              "2️⃣ 인터넷 연결 상태 확인 (Wi-Fi 또는 셀룰러 데이터)\n" +
+              "3️⃣ 앱을 완전히 종료 후 재시작\n" +
+              "4️⃣ 기기 재부팅 시도\n\n" +
+              "문제가 지속되면 고객 지원에 문의해주세요."
+            : "현재 인앱 구매를 사용할 수 없습니다.\n\n" +
+              "설정 > 스크린 타임 > 콘텐츠 및 개인정보 보호 제한에서 인앱 구매가 허용되어 있는지 확인해주세요.";
+
           Alert.alert(
-            "구매 불가",
-            "현재 인앱 구매를 사용할 수 없습니다.\n\n설정 > 스크린 타임 > 콘텐츠 및 개인정보 보호 제한에서 인앱 구매가 허용되어 있는지 확인해주세요.",
+            isTestFlight() ? "TestFlight 구매 불가" : "구매 불가",
+            errorMessage,
             [{ text: "확인" }]
           );
           return;

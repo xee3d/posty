@@ -378,6 +378,13 @@ const AppContent: React.FC = () => {
       InteractionManager.runAfterInteractions(() => {
         const initializeServices = async () => {
           try {
+            // CRITICAL FIX: IAP 초기화를 앱 시작 시 즉시 실행 (인증 여부와 무관)
+            // TestFlight에서 로그인 직후 토큰 구매 시 E_IAP_NOT_AVAILABLE 방지
+            console.log("[App] Initializing IAP early...");
+            inAppPurchaseService.initialize().catch((error) => {
+              console.warn("⚠️ IAP 초기화 실패 (재시도 가능):", error.message);
+            });
+
             await Promise.all([
               adService.initialize(),
               subscriptionService.initialize(),
@@ -397,24 +404,8 @@ const AppContent: React.FC = () => {
     }
   }, [showSplash]);
 
-  // 인앱 결제 초기화 최적화
-  useEffect(() => {
-    if (isAuthenticated && !isCheckingAuth) {
-      InteractionManager.runAfterInteractions(() => {
-        inAppPurchaseService.initialize().catch((error) => {
-          // IAP 초기화 실패 시 로그만 출력하고 앱은 계속 실행
-          console.warn(
-            "IAP 초기화 실패 (정상 - 시뮬레이터 환경):",
-            error.message
-          );
-        });
-      });
-
-      return () => {
-        inAppPurchaseService.disconnect();
-      };
-    }
-  }, [isAuthenticated, isCheckingAuth]);
+  // REMOVED: IAP 초기화는 이제 앱 시작 시 (showSplash useEffect) 즉시 실행됨
+  // 로그인 여부와 무관하게 초기화되어 TestFlight E_IAP_NOT_AVAILABLE 방지
 
   // 앱 종료 시 서비스 정리 및 메모리 최적화
   useEffect(() => {
