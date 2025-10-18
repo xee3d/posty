@@ -342,6 +342,11 @@ export class PushNotificationService {
    * 스케줄된 로컬 알림 예약
    */
   async scheduleLocalNotifications(): Promise<void> {
+    // 🔴 중복 방지: 기존 예약된 알림 모두 취소
+    await this.cancelAllScheduledNotifications();
+
+    console.log("📱 Scheduling local notifications...");
+
     // 일일 미션 알림 (매일 오전 9시)
     this.scheduleNotification(
       {
@@ -566,6 +571,29 @@ export class PushNotificationService {
   unsubscribeFromTopic(topic: string): void {
     console.log("📱 Unsubscribing from topic:", topic);
     // Firebase 없이는 구현하지 않음
+  }
+
+  /**
+   * 모든 예약된 알림 취소 (중복 방지)
+   */
+  async cancelAllScheduledNotifications(): Promise<void> {
+    try {
+      if (Platform.OS === "ios") {
+        // iOS: 모든 로컬 알림 취소
+        PushNotificationIOS.removeAllDeliveredNotifications();
+        console.log("📱 iOS: All scheduled notifications cancelled");
+      } else if (
+        Platform.OS === "android" &&
+        PushNotification &&
+        typeof PushNotification.cancelAllLocalNotifications === "function"
+      ) {
+        // Android: 모든 로컬 알림 취소
+        PushNotification.cancelAllLocalNotifications();
+        console.log("📱 Android: All scheduled notifications cancelled");
+      }
+    } catch (error) {
+      console.error("📱 Failed to cancel scheduled notifications:", error);
+    }
   }
 }
 

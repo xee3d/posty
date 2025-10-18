@@ -3,6 +3,8 @@
  * react-native-push-notification 기반 Firebase 대체 시스템
  */
 
+import { FEATURES } from "../../config/environment";
+
 // pushNotificationService import를 안전하게 처리
 let pushNotificationService: any = null;
 try {
@@ -37,6 +39,19 @@ class NotificationService {
           "⚠️ Push notification service not available, running in fallback mode"
         );
         return true; // fallback 모드로 계속 진행
+      }
+
+      // 🔴 USE_ANALYTICS가 false인 경우 모든 예약된 알림 취소
+      if (!FEATURES.USE_ANALYTICS) {
+        console.log("📱 Push notifications disabled (USE_ANALYTICS: false)");
+        console.log("📱 Cancelling all scheduled notifications...");
+
+        if (pushNotificationService.cancelAllScheduledNotifications) {
+          await pushNotificationService.cancelAllScheduledNotifications();
+          console.log("✅ All scheduled notifications cancelled");
+        }
+
+        return true; // 초기화 성공으로 반환 (알림만 비활성화)
       }
 
       // 푸시 알림 서비스 초기화

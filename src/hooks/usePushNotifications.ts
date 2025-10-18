@@ -43,10 +43,19 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
     error: null,
   });
 
+  // 🔴 중복 초기화 방지 플래그
+  const [hasInitialized, setHasInitialized] = useState(false);
+
   /**
    * 푸시 알림 초기화
    */
   const initializePushNotifications = useCallback(async () => {
+    // 🔴 중복 초기화 방지
+    if (hasInitialized) {
+      console.log("📱 Push notifications already initialized, skipping");
+      return;
+    }
+
     if (!FEATURES.USE_ANALYTICS) {
       setState((prev) => ({
         ...prev,
@@ -72,7 +81,7 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
       }));
 
       if (success) {
-        // 스마트 알림 스케줄링
+        // 스마트 알림 스케줄링 (중복 방지 로직 포함)
         await pushNotificationService.scheduleLocalNotifications();
 
         // 토큰 새로고침 핸들러 등록
@@ -81,6 +90,10 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
         // 기본 토픽 구독
         await pushNotificationService.subscribeToTopic("general");
         await pushNotificationService.subscribeToTopic("trends");
+
+        // 🔴 초기화 완료 플래그 설정
+        setHasInitialized(true);
+        console.log("✅ Push notifications initialized successfully");
       }
     } catch (error) {
       console.error("📱 Push notification initialization error:", error);
@@ -90,7 +103,7 @@ export const usePushNotifications = (): UsePushNotificationsReturn => {
         error: error instanceof Error ? error.message : "Unknown error",
       }));
     }
-  }, []);
+  }, [hasInitialized]);
 
   /**
    * 권한 요청
