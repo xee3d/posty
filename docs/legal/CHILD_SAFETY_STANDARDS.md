@@ -88,8 +88,7 @@ Posty AI(이하 "회사")는 모든 사용자, 특히 아동의 안전을 최우
    - 신고 카테고리에서 "아동 안전" 선택
 
 2. **이메일 신고**
-   - 아동 안전 전담 이메일: childsafety@getposty.com
-   - 일반 지원 이메일: getposty@gmail.com
+   - 아동 안전 전담 이메일: getposty@gmail.com
 
 3. **긴급 상황**
    - 즉각적인 위험이 있는 경우: 즉시 현지 법 집행 기관(112, 119)에 신고
@@ -134,8 +133,7 @@ Posty AI(이하 "회사")는 모든 사용자, 특히 아동의 안전을 최우
 
 **아동 안전 담당 책임자**
 - 직책: 아동 안전 및 신뢰 책임자 (Child Safety & Trust Officer)
-- 이메일: childsafety@getposty.com
-- 일반 문의: getposty@gmail.com
+- 이메일: getposty@gmail.com
 - 운영시간: 연중무휴 24시간 (긴급 사안 우선 처리)
 
 **담당 업무**
@@ -259,9 +257,8 @@ Posty AI(이하 "회사")는 모든 사용자, 특히 아동의 안전을 최우
 ### 12.1 회사 연락처
 
 **Posty AI 아동 안전팀**
-- 전담 이메일: childsafety@getposty.com
-- 일반 지원: getposty@gmail.com
-- 웹사이트: [향후 추가 예정]
+- 이메일: getposty@gmail.com
+- 웹사이트: https://tinrobot.co.kr/posty/
 
 ### 12.2 외부 리소스
 
@@ -292,7 +289,7 @@ Posty AI(이하 "회사")는 모든 사용자, 특히 아동의 안전을 최우
 **최종 업데이트**: 2025년 10월 21일
 **시행일**: 2025년 10월 21일
 
-**본 표준에 대한 문의사항은 childsafety@getposty.com 또는 getposty@gmail.com으로 연락해주시기 바랍니다.**
+**본 표준에 대한 문의사항은 getposty@gmail.com으로 연락해주시기 바랍니다.**
 
 ---
 
