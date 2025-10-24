@@ -86,8 +86,7 @@ Posty 앱이 이미 Vercel을 사용하는 것 같습니다:
 
 5. **아동 안전 담당자 정보 입력**
    - 이름: [담당자 이름 입력]
-   - 이메일: `childsafety@getposty.com`
-   - 또는: `getposty@gmail.com`
+   - 이메일: `getposty@gmail.com`
 
 6. **추가 질문에 답변**
    Play Console이 요구하는 추가 질문에 답변:
@@ -167,7 +166,14 @@ const reportCategories = [
 자세한 내용은 [아동 안전 표준](./CHILD_SAFETY_STANDARDS.md)을 참조하세요.
 ```
 
-### 3. 개인정보 처리방침 업데이트
+### 3. tinrobot.co.kr 도메인에 문서 호스팅 (선택사항)
+
+현재 웹사이트(https://tinrobot.co.kr/posty/)가 있으므로, 여기에 아동 안전 표준 문서를 호스팅하면 더 전문적입니다:
+
+- 추천 URL: `https://tinrobot.co.kr/posty/child-safety-standards.html`
+- 또는 Vercel 사용: `https://posty-ai-new.vercel.app/child-safety-standards.html`
+
+### 4. 개인정보 처리방침 업데이트
 
 `docs/legal/PRIVACY_POLICY.md`의 제8조(아동의 개인정보 보호)에 아동 안전 표준 참조 추가:
 
@@ -211,9 +217,9 @@ const reportCategories = [
 ### Q3: 아동 안전 담당자 이메일이 작동하지 않는다고 나옵니다
 
 **해결방법**:
-1. `childsafety@getposty.com` 이메일 주소를 실제로 생성
-2. 또는 기존 `getposty@gmail.com`만 사용하고 문서에서 일관되게 유지
-3. 이메일 전달 규칙 설정하여 즉시 응답 가능하도록 구성
+1. `getposty@gmail.com` 이메일이 실제로 작동하는지 확인
+2. 이메일 수신함을 정기적으로 확인하여 즉시 응답 가능하도록 구성
+3. 필요시 자동 응답 메시지 설정
 
 ---
 
