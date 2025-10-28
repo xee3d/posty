@@ -1182,7 +1182,7 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               }}
               activeOpacity={0.7}
             >
-              <View style={[styles.cardIcon, { backgroundColor: colors.primary + "20" }]}>
+              <View style={[styles.cardIcon, { backgroundColor: colors.primary }]}>
                 <Image
                   source={require('../../logo/Cheez_logo.png')}
                   style={{ width: 32, height: 32 }}
@@ -1214,8 +1214,8 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
               }}
               activeOpacity={0.7}
             >
-              <View style={[styles.cardIcon, { backgroundColor: colors.primary + "20" }]}>
-                <SafeIcon name="star" size={28} color={colors.primary} />
+              <View style={[styles.cardIcon, { backgroundColor: colors.primary }]}>
+                <SafeIcon name="star" size={28} color="#FFFFFF" />
               </View>
               <View style={styles.cardContent}>
                 <Text style={styles.cardLabel}>Posty Pro</Text>
