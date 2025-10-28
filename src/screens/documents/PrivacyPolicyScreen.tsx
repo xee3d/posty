@@ -58,12 +58,12 @@ const KoreanPrivacyPolicyScreen: React.FC<PrivacyPolicyScreenProps> = ({
   const { t } = useTranslation();
   const styles = createStyles(colors);
 
-  const lastUpdated = "2024년 1월 1일";
+  const lastUpdated = "2025년 10월 1일";
 
   // Notion 연동 제거 - 실제 컨텐츠를 직접 포함
   const staticContent = `# 개인정보처리방침
 
-시행일: 2024년 1월 1일
+시행일: 2025년 10월 1일
 
 법인명: 틴로봇스튜디오(Tinrobot Studio)
 

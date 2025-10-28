@@ -1436,6 +1436,73 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
           <Text style={styles.deleteAccountText}>{t('settings.deleteAccount')}</Text>
         </TouchableOpacity>
 
+        {/* 회사 정보 */}
+        <View style={styles.companyInfoSection}>
+          <Text style={styles.companyName}>Posty AI</Text>
+          <Text style={styles.companyDetails}>주식회사 틴로봇</Text>
+          <Text style={styles.companyDetails}>
+            서울시 서초구 강남대로 53길 8, 8층 12-1호 (스타크 강남타워)
+          </Text>
+          <Text style={styles.companyDetails}>
+            대표이사: 최상열  I  사업자등록번호: 120-87-41039
+          </Text>
+          <Text style={styles.companyDetails}>
+            통신판매업신고번호: 2025-서울서초-3363호
+          </Text>
+          <Text style={styles.companyDetails}>
+            전화번호: 031-8016-5242  I  이메일: getposty@gmail.com
+          </Text>
+
+          {/* 링크 섹션 */}
+          <View style={styles.companyLinksContainer}>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://rustic-english-07b.notion.site/KO-26cdc2bce21c81658456c2e687bf1a87').catch(() =>
+                Alert.alert("Error", "링크를 열 수 없습니다.")
+              )}
+            >
+              <Text style={styles.companyLink}>개인정보처리방침</Text>
+            </TouchableOpacity>
+            <Text style={styles.linkSeparator}>  I  </Text>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://rustic-english-07b.notion.site/KO-26cdc2bce21c81d6b4ecf69d2a3de8c1').catch(() =>
+                Alert.alert("Error", "링크를 열 수 없습니다.")
+              )}
+            >
+              <Text style={styles.companyLink}>이용약관</Text>
+            </TouchableOpacity>
+            <Text style={styles.linkSeparator}>  I  </Text>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://rustic-english-07b.notion.site/KO-26cdc2bce21c817fad4bc24dd1aef208').catch(() =>
+                Alert.alert("Error", "링크를 열 수 없습니다.")
+              )}
+            >
+              <Text style={styles.companyLink}>운영정책</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.companyLinksContainer}>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://rustic-english-07b.notion.site/Posty-AI-ccb51ba48a3047eb9797fca32d5bc9f3').catch(() =>
+                Alert.alert("Error", "링크를 열 수 없습니다.")
+              )}
+            >
+              <Text style={styles.companyLink}>청소년보호정책</Text>
+            </TouchableOpacity>
+            <Text style={styles.linkSeparator}>  I  </Text>
+            <TouchableOpacity
+              onPress={() => Linking.openURL('https://tinrobot.co.kr').catch(() =>
+                Alert.alert("Error", "링크를 열 수 없습니다.")
+              )}
+            >
+              <Text style={styles.companyLink}>About Tinrobot</Text>
+            </TouchableOpacity>
+            <Text style={styles.linkSeparator}>  I  </Text>
+            <TouchableOpacity onPress={() => setShowContact(true)}>
+              <Text style={styles.companyLink}>고객센터</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+
         <View style={styles.bottomSpace} />
       </ScrollView>
 
@@ -2024,6 +2091,43 @@ const createStyles = (colors: any, cardTheme: any, isDark: boolean) => {
       color: colors.white,
       fontSize: 10,
       fontWeight: "600",
+    },
+    // 회사 정보 스타일
+    companyInfoSection: {
+      alignItems: "flex-start",
+      paddingVertical: SPACING.xl,
+      paddingHorizontal: SPACING.lg,
+      marginHorizontal: SPACING.md,
+      marginBottom: SPACING.md,
+    },
+    companyName: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: colors.text.tertiary,
+      marginBottom: SPACING.xs,
+    },
+    companyDetails: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      textAlign: "left",
+      marginBottom: 4,
+      lineHeight: 18,
+    },
+    companyLinksContainer: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      justifyContent: "flex-start",
+      alignItems: "center",
+      marginTop: SPACING.sm,
+    },
+    companyLink: {
+      fontSize: 12,
+      color: colors.text.tertiary,
+      fontWeight: "500",
+    },
+    linkSeparator: {
+      fontSize: 12,
+      color: colors.text.tertiary,
     },
   });
 };
