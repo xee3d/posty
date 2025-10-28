@@ -80,7 +80,7 @@ const ko = {
       originalLength: "원본 길이",
       convertedLength: "변환 후",
       characters: "자",
-      platformChangeNotice: "플랫폼 변경은 토큰을 사용하지 않아요",
+      platformChangeNotice: "플랫폼 변경은 치즈를 사용하지 않아요",
       originalContent: "생성된 원본",
       emojiOn: "이모지ON",
       emojiOff: "이모지OFF",
@@ -181,8 +181,8 @@ const ko = {
     alerts: {
       noPrompt: "무엇에 대해 쓸지 알려주세요!",
       noPhoto: "사진을 먼저 선택해주세요!",
-      noTokens: "토큰이 부족합니다",
-      watchAdToWrite: "광고를 시청하면 토큰 1개를 받고 바로 글을 작성할 수 있어요!",
+      noTokens: "치즈가 부족합니다",
+      watchAdToWrite: "광고를 시청하면 치즈 1개를 받고 바로 글을 작성할 수 있어요!",
       watchAd: "광고 보고 작성하기",
       error: "앗! 뭔가 문제가 생겼어요. 다시 시도해주세요",
       waitAnalysis: "사진 분석이 완료될 때까지 기다려주세요.",
@@ -705,7 +705,7 @@ const ko = {
     showError: "광고를 표시할 수 없습니다. 다시 시도해주세요.",
     watch: "광고 시청하기",
     reward: {
-      tokens: "{{amount}}개 토큰을 받으세요!",
+      tokens: "{{amount}}개 치즈를 받으세요!",
       default: "보상을 받으세요!"
     }
   },
@@ -889,7 +889,7 @@ const ko = {
     achievements: "업적",
     profileDetails: "프로필 상세",
     profileGuideDefault: "프로필을 설정해보세요",
-    tokenManagement: "토큰 관리",
+    tokenManagement: "치즈 관리",
     appSettings: "앱 설정",
     pushNotifications: "푸시 알림",
     soundEffects: "사운드 효과",
@@ -1141,6 +1141,10 @@ const ko = {
       }
     },
     auth: {
+      loginRequired: {
+        title: "로그인 필요",
+        message: "이 기능을 사용하려면 로그인이 필요합니다."
+      },
       logout: {
         title: "로그아웃",
         message: "로그아웃 하시겠습니까?",
@@ -1168,11 +1172,11 @@ const ko = {
     tokenAlerts: {
       dailyLimitExceeded: {
         title: "일일 한도 초과",
-        message: "일일 획득 가능한 토큰 한도({{limit}}개)를 초과했습니다"
+        message: "일일 획득 가능한 치즈 한도({{limit}}개)를 초과했습니다"
       },
       partialGrant: {
-        title: "일부 토큰 지급",
-        message: "{{tokens}}개의 토큰이 지급되었습니다"
+        title: "일부 치즈 지급",
+        message: "{{tokens}}개의 치즈가 지급되었습니다"
       }
     },
     buttons: {
@@ -1200,7 +1204,7 @@ const ko = {
       message: "어떤 알림을 테스트하시겠어요?",
       mission: "미션 알림",
       trend: "트렌드 알림",
-      token: "토큰 알림",
+      token: "치즈 알림",
       achievement: "업적 알림",
       tips: "팁 알림",
       send: "테스트 알림 보내기"
@@ -1518,9 +1522,35 @@ const ko = {
     alreadyShared: "오늘은 이미 SNS 공유를 했어요!",
     alreadyRated: "이미 앱을 평가해주셨어요. 감사합니다!",
     title: "구독 플랜",
-    tokenPurchase: "토큰 구매",
-    tokenPurchaseTab: "토큰 구매",
-    freeTokens: "무료 토큰",
+    enjoyAdFree: "광고 없이 즐기기",
+    proCard: {
+      title: "Posty Pro",
+      description: "광고 없이 즐기기",
+      button: "구매하기"
+    },
+    actions: {
+      subscribe: "구매하기"
+    },
+    plans: {
+      daily: {
+        name: "1일권",
+        duration: "1일",
+        price: "₩1,100"
+      },
+      weekly: {
+        name: "7일권",
+        duration: "7일",
+        price: "₩6,500"
+      },
+      monthly: {
+        name: "월간",
+        duration: "1개월",
+        price: "₩9,900"
+      }
+    },
+    tokenPurchase: "치즈 구매",
+    tokenPurchaseTab: "치즈 구매",
+    freeTokens: "무료 치즈",
     popular: "인기",
     perMonth: "/월",
     hero: {
@@ -1530,8 +1560,8 @@ const ko = {
     benefits: {
       title: "프리미엄 혜택",
       moreTokens: {
-        title: "더 많은 토큰",
-        description: "PRO는 무제한 토큰을 제공합니다"
+        title: "더 많은 치즈",
+        description: "PRO는 무제한 치즈를 제공합니다"
       },
       noAds: {
         title: "광고 제거",
@@ -1552,41 +1582,41 @@ const ko = {
       cancelGuideButton: "구독 취소 안내"
     },
     earnTokensSection: {
-      title: "무료 토큰 받기",
-      subtitle: "다양한 활동으로 무료 토큰을 획득하세요",
-      currentTokens: "현재 {{tokens}}개의 토큰을 보유하고 있습니다",
+      title: "무료 치즈 받기",
+      subtitle: "다양한 활동으로 무료 치즈를 획득하세요",
+      currentTokens: "현재 {{tokens}}개의 치즈를 보유하고 있습니다",
       watchAd: {
         title: "광고 보기",
-        description: "+2 토큰 ({{remaining}}/{{limit}}회 남음)"
+        description: "+2 치즈 ({{remaining}}/{{limit}}회 남음)"
       },
       dailyCheckin: {
         title: "일일 출석",
-        description: "+1 토큰 (오늘 가능)"
+        description: "+1 치즈 (오늘 가능)"
       },
       socialShare: {
         title: "SNS 공유",
-        description: "+3 토큰 (1/1회 남음)"
+        description: "+3 치즈 (1/1회 남음)"
       },
       inviteFriend: {
         title: "친구 초대",
-        description: "+5 토큰 (친구당)"
+        description: "+5 치즈 (친구당)"
       },
       rateApp: {
         title: "앱 평가하기",
-        description: "+10 토큰 (1회)"
+        description: "+10 치즈 (1회)"
       },
       dailyMission: {
         title: "미션 완료",
-        description: "+3 토큰 (일일 미션)"
+        description: "+3 치즈 (일일 미션)"
       },
-      autoRefill: "무료 플랜 사용자는 매일 자정에 10개의 토큰이 자동 충전됩니다"
+      autoRefill: "무료 플랜 사용자는 매일 자정에 15개의 치즈가 자동 충전됩니다"
     },
-    earnTokens: "토큰 획득!",
-    earnTokensMessage: "{{tokens}}개의 토큰을 받았어요!",
+    earnTokens: "치즈 획득!",
+    earnTokensMessage: "{{tokens}}개의 치즈를 받았어요!",
     watchAd: "광고 시청",
-    watchAdMessage: "30초 광고를 시청하고 2개의 토큰을 받으시겠어요?",
+    watchAdMessage: "30초 광고를 시청하고 2개의 치즈를 받으시겠어요?",
     inviteFriends: "초대 전송",
-    inviteFriendsMessage: "친구가 가입하면 5개의 토큰을 받을 수 있어요!",
+    inviteFriendsMessage: "친구가 가입하면 5개의 치즈를 받을 수 있어요!",
     cancelSubscription: "구독 취소",
     cancelSubscriptionMessage: "{{planName}} 플랜 구독을 취소하시겠습니까?\n\n취소해도 다음 결제일까지 현재 플랜을 이용할 수 있습니다.",
     cancelSubscriptionAction: "구독 취소",
@@ -1600,7 +1630,7 @@ const ko = {
     subscriptionFailedMessage: "구독 처리 중 문제가 발생했습니다. 다시 시도해주세요.",
     downgradeNotAllowed: "다운그레이드 불가",
     downgradeNotAllowedMessage: "하위 플랜으로 변경할 수 없습니다.\n\n현재 구독을 취소하고 만료 후 새로 가입해주세요.",
-    confirmSubscriptionMessage: "{{planName}} 플랜을 구독하시겠습니까?\n\n{{description}}\n현재 토큰: {{currentTokens}}개\n변경 후: {{afterTokens}}개",
+    confirmSubscriptionMessage: "{{planName}} 플랜을 구독하시겠습니까?\n\n{{description}}\n현재 치즈: {{currentTokens}}개\n변경 후: {{afterTokens}}개",
     subscribePro: "Pro 구독하기",
     cancelSubscriptionGuide: "구독 취소 안내",
     cancelSubscriptionGuideMessage: "구독 취소는 앱스토어에서 직접 해야 합니다.\n\n• iOS: 설정 > Apple ID > 구독 > Posty\n• Android: Google Play 스토어 > 구독 > Posty\n\n취소해도 다음 결제일까지 현재 플랜을 이용할 수 있습니다.",
@@ -1642,24 +1672,24 @@ const ko = {
       autoRenewCanceled: "자동 갱신 취소됨"
     },
     descriptions: {
-      signup300: "가입 즉시 300개 토큰을 받게 됩니다",
-      signup500: "가입 즉시 500개 토큰을 받게 됩니다",
-      unlimitedAccess: "무제한 토큰을 사용할 수 있습니다",
-      upgrade500: "전액 500개 토큰을 추가로 받게 됩니다",
-      downgradeWarning: "경고: 무료 토큰이 300개로 제한됩니다"
+      signup300: "가입 즉시 300개 치즈를 받게 됩니다",
+      signup500: "가입 즉시 500개 치즈를 받게 됩니다",
+      unlimitedAccess: "무제한 치즈를 사용할 수 있습니다",
+      upgrade500: "전액 500개 치즈를 추가로 받게 됩니다",
+      downgradeWarning: "경고: 무료 치즈가 300개로 제한됩니다"
     },
   membershipNotices: {
-    free: "무료 회원은 매일 10개의 토큰이 자동 충전됩니다",
-      pro: "PRO 회원은 무제한 토큰을 사용할 수 있습니다"
+    free: "무료 회원은 매일 15개의 치즈가 자동 충전됩니다",
+      pro: "PRO 회원은 무제한 치즈를 사용할 수 있습니다"
   },
     planDescriptions: {
-      free: "매일 10개 무료 충전",
-      pro: "무제한 토큰",
+      free: "매일 15개 무료 충전",
+      pro: "무제한 치즈",
       downgradeBlocked: "하위 플랜으로 변경 불가"
     },
     upgradeDescriptions: {
-      proImmediate: "가입 즉시 1500개 토큰을 받게 됩니다",
-      proUpgrade: "가입 즉시 1500개 토큰을 받게 됩니다"
+      proImmediate: "가입 즉시 1500개 치즈를 받게 됩니다",
+      proUpgrade: "가입 즉시 1500개 치즈를 받게 됩니다"
     },
     plans: {
       free: {
@@ -1669,7 +1699,7 @@ const ko = {
         name: "무료",
         priceDisplay: "무료",
         features: [
-          "일일 10개 토큰",
+          "일일 10개 치즈",
           "3가지 톤 스타일",
           "짧은/중간 길이",
           "광고 포함",
@@ -1678,8 +1708,8 @@ const ko = {
       pro: {
         name: "PRO",
         features: [
-          "가입 시 500개 토큰 즉시 지급",
-          "무제한 토큰 (Fair Use)",
+          "가입 시 500개 치즈 즉시 지급",
+          "무제한 치즈 (Fair Use)",
           "모든 톤 스타일",
           "우선순위 처리",
           "광고 완전 제거",
@@ -1687,7 +1717,7 @@ const ko = {
       },
       proDetails: {
         features: [
-          "무제한 토큰",
+          "무제한 치즈",
           "최고급 AI 모델",
           "광고 완전 제거",
           "1:1 프리미엄 지원",
@@ -1697,24 +1727,24 @@ const ko = {
     },
     // 플랜별 기능 번역 키
     features: {
-      dailyTokens10: "일일 10개 토큰",
+      dailyTokens10: "일일 10개 치즈",
       tones2: "2가지 톤 스타일",
       tones3: "3가지 톤 스타일",
       lengthShortMedium: "짧은/중간 길이",
       hasAds: "광고 포함",
-      signup300: "가입 시 300개 토큰 즉시 지급",
-      daily10: "매일 10개씩 추가 충전",
+      signup300: "가입 시 300개 치즈 즉시 지급",
+      daily10: "매일 15개씩 추가 충전",
       tones4: "4가지 톤 스타일",
       longLength: "긴 글 작성 가능",
       noAds: "광고 제거",
       myStyleAnalysis: "MyStyle 분석",
-      signup500: "가입 시 500개 토큰 즉시 지급",
+      signup500: "가입 시 500개 치즈 즉시 지급",
       daily20: "매일 20개씩 추가 충전",
       tones6: "6가지 톤 스타일",
       allLengths: "모든 글 길이",
       fastImageAnalysis: "빠른 이미지 분석",
       gpt4Model: "GPT-4 모델",
-      unlimitedTokens: "무제한 토큰",
+      unlimitedTokens: "무제한 치즈",
       allTones: "모든 톤 스타일",
       instantImageAnalysis: "즉시 이미지 분석",
       gpt4TurboModel: "GPT-4 Turbo",
@@ -1796,37 +1826,45 @@ const ko = {
   missions: {
     completed: {
       title: "미션 완료! 🎯",
-      message: "콘텐츠 생성 미션을 완료하여 {{tokens}}개의 토큰을 받았습니다!"
+      message: "콘텐츠 생성 미션을 완료하여 {{tokens}}개의 치즈를 받았습니다!"
     }
   },
 
-  // 토큰 관련
+  // 치즈 관련
   tokens: {
-    badge: "토큰",
+    badge: "치즈",
     count: "{{count}}개",
-    current: "보유 토큰",
+    current: "보유 치즈",
+    my: "내 치즈",
     unlimited: "무제한",
-    label: "토큰",
-    noTokens: "토큰이 부족해요",
-    earnTokens: "무료 토큰 받기",
-    subscribe: "토큰이 부족해요. 구독하시겠어요?",
+    label: "치즈",
+    noTokens: "치즈가 부족해요",
+    earnTokens: "무료 치즈 받기",
+    subscribe: "치즈가 부족해요. 구독하시겠어요?",
+    freeComingSoon: "무료 충전 기능은 준비 중입니다.",
+    bonus: "+{{count}}개 보너스",
+    free: "보유 치즈",
+    unit: "개",
     usage: {
       today: "오늘 {{count}}개 사용",
     },
     actions: {
-      getFree: "무료 토큰 받기",
-      charge: "토큰 충전하기"
+      getFree: "무료 치즈 받기",
+      charge: "충전하기",
+      purchase: "치즈 구매",
+      freeCharge: "무료 충전",
+      chargeAction: "충전하기"
     },
     info: {
-      free: "매일 자정에 10개의 무료 토큰이 충전됩니다",
-      pro: "PRO 플랜으로 무제한 토큰을 사용 중입니다"
+      free: "매일 자정에 15개의 무료 치즈가 충전됩니다",
+      pro: "PRO 플랜으로 무제한 치즈를 사용 중입니다"
     },
     descriptions: {
-      dailyFree: "일일 무료 토큰 충전",
+      dailyFree: "일일 무료 치즈 충전",
     },
     alerts: {
       proTitle: "PRO 플랜 사용 중",
-      proMessage: "현재 PRO 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다. 🚀"
+      proMessage: "현재 PRO 플랜을 사용 중이시므로 무제한으로 치즈를 사용하실 수 있습니다. 🚀"
     }
   },
   plans: {
@@ -1836,31 +1874,31 @@ const ko = {
     },
   },
 
-  // 토큰 구매
+  // 치즈 구매
   tokenPurchase: {
-    title: "토큰 구매",
+    title: "치즈 구매",
     sections: {
       planBenefit: "플랜 혜택",
-      planBenefitDesc: "{{bonusRate}}% 보너스 토큰",
+      planBenefitDesc: "{{bonusRate}}% 보너스 치즈",
       planDiscountDesc: "{{discount}}% 할인",
       firstPurchase: "첫 구매 특별 혜택",
       firstPurchaseDesc: "30개 이상 구매 시 추가 30% 할인!",
       maxPlanNotice: "MAX 플랜 사용 중",
-      maxPlanNoticeDesc: "무제한 토큰을 사용하실 수 있어 추가 구매가 필요하지 않습니다",
-      advantages: "토큰 구매의 장점",
+      maxPlanNoticeDesc: "무제한 치즈를 사용하실 수 있어 추가 구매가 필요하지 않습니다",
+      advantages: "치즈 구매의 장점",
       bulkDiscount: "대량 구매 혜택",
       bulkDiscountDesc: "최대 50% 기본 할인 + 플랜별 추가 할인",
       flexibleUse: "유연한 사용",
       flexibleUseDesc: "필요할 때만 구매 구독 부담 없음",
       permanentOwnership: "영구 소유",
-      permanentOwnershipDesc: "구매한 토큰은 만료 없이 영원히 사용 가능",
+      permanentOwnershipDesc: "구매한 치즈은 만료 없이 영원히 사용 가능",
       planBenefits: "플랜 혜택",
-      planBenefitsDesc: "구독 플랜별 보너스 토큰 제공",
-      comparison: "토큰 구매 vs 구독 플랜",
-      whenToPurchase: "어떤 경우 토큰 구매가 좋나요?",
+      planBenefitsDesc: "구독 플랜별 보너스 치즈 제공",
+      comparison: "치즈 구매 vs 구독 플랜",
+      whenToPurchase: "어떤 경우 치즈 구매가 좋나요?",
       whenToPurchaseDesc: "• 불규칙하게 사용하시는 분 • 특정 프로젝트를 위해 집중적으로 사용하시는 분 • 구독 부담 없이 필요할 때만 사용하고 싶으신 분",
       subscriptionAdvantages: "구독 플랜의 장점",
-      subscriptionAdvantagesDesc: "• PRO: 무제한 토큰 • 광고 제거 + 고급 기능 사용 가능",
+      subscriptionAdvantagesDesc: "• PRO: 무제한 치즈 • 광고 제거 + 고급 기능 사용 가능",
       trust: {
         securePayment: "안전한 결제",
         instantRefund: "즉시 환불",
@@ -1886,7 +1924,7 @@ const ko = {
       }
     },
     pricing: {
-      tokens: "{{count}}개 토큰",
+      tokens: "{{count}}개 치즈",
       bonus: "+{{count}}개 보너스",
       price: "₩{{price:number}}",
       originalPrice: "₩{{price:number}}",
@@ -1895,7 +1933,7 @@ const ko = {
     },
     alerts: {
       maxPlanTitle: "MAX 플랜 사용 중",
-      maxPlanMessage: "현재 MAX 플랜을 사용 중이시므로 무제한으로 토큰을 사용하실 수 있습니다.\n\n추가 토큰 구매가 필요하지 않습니다. 🚀",
+      maxPlanMessage: "현재 MAX 플랜을 사용 중이시므로 무제한으로 치즈를 사용하실 수 있습니다.\n\n추가 치즈 구매가 필요하지 않습니다. 🚀",
       confirm: "확인"
     },
     currency: {
@@ -1906,8 +1944,8 @@ const ko = {
     },
     faq: {
       tokenCarryover: {
-        question: "토큰은 다음 달로 이월되나요?",
-        answer: "아니요, 매월 토큰은 초기화됩니다. 프로 플랜은 무제한입니다."
+        question: "치즈은 다음 달로 이월되나요?",
+        answer: "아니요, 매월 치즈은 초기화됩니다. 프로 플랜은 무제한입니다."
       }
     }
   },
@@ -2187,13 +2225,13 @@ const ko = {
     noNotificationsSubtext: "포스티가 새로운 소식을 전해드릴게요!"
   },
 
-  // 토큰 상점
+  // 치즈 상점
   tokenShop: {
     title: "상점",
     subtitle: "필요한 만큼 구매하고 무제한으로 사용하세요",
-    currentTokens: "보유 토큰",
-    dailyRefill: "매일 자정에 10개 무료 충전",
-    packagesTitle: "토큰 패키지",
+    currentTokens: "보유 치즈",
+    dailyRefill: "매일 자정에 15개 무료 충전",
+    packagesTitle: "치즈 패키지",
     popular: "인기",
     bonus: "보너스 +{{count}}",
     buy: "구매",
@@ -2201,18 +2239,18 @@ const ko = {
     bestValue: "최고 가치",
     tokenCount: "{{count}}개",
     packageNames: {
-      tokens_100: "100 토큰",
-      tokens_200: "200 토큰",
-      tokens_300: "300 토큰"
+      tokens_100: "100 치즈",
+      tokens_200: "200 치즈",
+      tokens_300: "300 치즈"
     },
     subscription: {
       title: "구독 플랜",
       pro: {
         title: "프로 버전",
         features: {
-          unlimitedTokens: "무한 토큰",
+          unlimitedTokens: "치즈 제한 없음",
           noAds: "모든 광고 제거",
-          aiAgents: "Gemini 2.5 / GPT-4o 에이전트",
+          aiAgents: "최신 AI 에이전트 (Gemini 2.5, GPT-4o)",
           allStyles: "모든 스타일 사용 가능"
         }
       },
@@ -2220,47 +2258,139 @@ const ko = {
       monthly: "/월"
     },
     purchase: {
-      title: "토큰 구매",
-      subtitle: "토큰을 구매하시겠습니까?",
-      subtitleWithBonus: "보너스가 포함된 토큰을 구매하시겠습니까?",
-      tokenCount: "{{count}}개 토큰",
+      title: "치즈 구매",
+      subtitle: "치즈를 구매하시겠습니까?",
+      subtitleWithBonus: "보너스가 포함된 치즈를 구매하시겠습니까?",
+      tokenCount: "{{count}}개 치즈",
       bonusIncluded: "보너스 {{bonus}}개 포함",
       processing: "처리중...",
-      message: "{{tokens}}개 토큰을 {{price}}에\n구매하시겠습니까?",
-      messageWithBonus: "{{tokens}}개 토큰을 {{price}}에\n구매하시겠습니까?\n\n보너스 {{bonus}}개 포함",
+      message: "{{tokens}}개 치즈를 {{price}}에\n구매하시겠습니까?",
+      messageWithBonus: "{{tokens}}개 치즈를 {{price}}에\n구매하시겠습니까?\n\n보너스 {{bonus}}개 포함",
       cancel: "취소",
       confirm: "구매하기",
       successTitle: "구매 완료!",
-      successMessage: "{{tokens}}개 토큰이 지급되었습니다!",
+      successMessage: "{{tokens}}개 치즈가 지급되었습니다!",
       errorTitle: "구매 실패",
-      errorMessage: "토큰 구매에 실패했습니다.\n다시 시도해주세요.",
+      errorMessage: "치즈 구매에 실패했습니다.\n다시 시도해주세요.",
     },
     notice: {
-      title: "토큰 시스템",
-      freeTokens: "무료 토큰:",
-      freeTokensDesc: "토큰이 0개일 때만 10개 충전",
-      purchasedTokens: "구매 토큰:",
+      title: "치즈 시스템",
+      freeTokens: "무료 치즈:",
+      freeTokensDesc: "치즈가 0개일 때만 15개 충전",
+      purchasedTokens: "구매 치즈:",
       purchasedTokensDesc: "영구 보관, 소멸 없음",
       usageOrder: "사용 순서:",
       usageOrderDesc: "무료 → 구매",
-      adReward: "토큰 부족 시 광고로 획득 가능"
+      adReward: "치즈 부족 시 광고로 획득 가능"
+    },
+    freeEarn: {
+      watchAd: {
+        title: "광고 시청하기",
+        description: "30초 광고 시청"
+      },
+      dailyMission: {
+        title: "일일 미션",
+        description: "매일 완료 가능"
+      },
+      inviteFriend: {
+        title: "친구 초대",
+        description: "친구 1명당"
+      },
+      rateApp: {
+        title: "앱 리뷰 작성",
+        description: "1회 제한"
+      }
     },
     refund: {
       title: "환불 정책",
-      policy: "토큰은 구매 후 즉시 사용 가능하며, 1회라도 사용하면 환불이 불가능합니다.",
+      policy: "치즈은 구매 후 즉시 사용 가능하며, 1회라도 사용하면 환불이 불가능합니다.",
       unused: "구매 후 사용하지 않은 상태에서만 환불이 가능합니다.",
       contact: "환불 문의: getposty@gmail.com",
       terms: "자세한 환불 정책은 이용약관을 참고해주세요."
     },
+    faq: {
+      title: "자주 묻는 질문",
+      what: {
+        question: "Q. 치즈는 무엇인가요?",
+        answer: "치즈는 Posty에서 AI 글 생성에 사용하는 크레딧입니다. 글 1개 생성에 치즈 1개가 사용됩니다."
+      },
+      expiry: {
+        question: "Q. 구매한 치즈는 언제까지 사용 가능한가요?",
+        answer: "구매한 치즈는 유효기간이 없습니다. 언제든지 사용 가능합니다."
+      },
+      proVsPurchase: {
+        question: "Q. 프로 플랜과 치즈 구매 중 어떤 게 나을까요?",
+        answer: "하루 10개 이상 사용하신다면 프로 플랜(무제한)이 경제적입니다. 가끔 사용하신다면 필요할 때 치즈 구매를 추천드립니다."
+      },
+      refund: {
+        question: "Q. 환불이 가능한가요?",
+        answer: "치즈 사용 전에는 환불이 가능합니다. 사용 후에는 제한될 수 있습니다."
+      },
+      savedTokens: {
+        question: "Q. 프로 플랜 구매 시 기존 치즈는 어떻게 되나요?",
+        answer: "기존 치즈는 안전하게 보관됩니다. 프로 플랜 만료 후 다시 사용하실 수 있습니다."
+      }
+    },
     restore: {
       button: "구매 복원",
-      description: "이전에 구매한 구독이나 토큰을 복원할 수 있습니다",
+      description: "이전에 구매한 구독이나 치즈를 복원할 수 있습니다",
       simulatorTitle: "시뮬레이터 제한",
       simulatorMessage: "시뮬레이터에서는 구매 복원을 테스트할 수 없습니다. 실제 기기에서 테스트해주세요.",
       processingTitle: "복원 중",
       processingMessage: "구매 내역을 확인하고 있습니다...",
       errorTitle: "복원 실패",
       errorMessage: "구매 복원 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요."
+    },
+    pro: {
+      header: "Posty Pro",
+      mainTitle: "Posty Pro",
+      mainSubtitle: "광고를 제거하고 콘텐츠 제작에 집중하세요",
+      benefitsTitle: "프리미엄 혜택",
+      benefits: [
+        "치즈 제한 없음",
+        "최신 AI 에이전트 (Gemini 2.5, GPT-4o)",
+        "모든 스타일 사용 가능",
+        "광고 제거"
+      ],
+      plansTitle: "요금제 선택",
+      buyButton: "구매하기",
+      plans: {
+        daily: "1일권",
+        weekly: "7일권",
+        monthly: "30일권"
+      },
+      discount: {
+        weekly: "57% 할인",
+        monthly: "55% 할인"
+      },
+      popularBadge: "인기",
+      faq: {
+        title: "자주 묻는 질문",
+        savedTokens: {
+          question: "Q. 프로 구매 시 기존 치즈는 어떻게 되나요?",
+          answer: "기존 치즈는 안전하게 보관됩니다. 프로 플랜 사용 중에는 무제한으로 이용하고, 플랜 만료 시 보관된 치즈를 다시 사용하실 수 있습니다."
+        },
+        autoRenewal: {
+          question: "Q. 프로 플랜은 자동 갱신되나요?",
+          answer: "아니요, 자동 갱신되지 않습니다. 기간 만료 후 다시 구매하셔야 합니다."
+        },
+        planChange: {
+          question: "Q. 플랜 변경이 가능한가요?",
+          answer: "네, 가능합니다. 새 플랜 구매 시 남은 기간이 추가됩니다."
+        },
+        refund: {
+          question: "Q. 환불이 가능한가요?",
+          answer: "프로 플랜 사용 전에는 환불이 가능합니다. 사용 후에는 제한될 수 있습니다."
+        },
+        multiDevice: {
+          question: "Q. 여러 기기에서 사용할 수 있나요?",
+          answer: "네, 같은 계정으로 로그인하면 모든 기기에서 프로 혜택을 이용하실 수 있습니다."
+        },
+        dailyDuration: {
+          question: "Q. 1일권은 24시간인가요?",
+          answer: "네, 구매 시점부터 정확히 24시간 동안 이용 가능합니다."
+        }
+      }
     }
   }
 };

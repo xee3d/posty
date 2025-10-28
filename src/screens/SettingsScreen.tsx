@@ -1169,13 +1169,66 @@ const SettingsScreen: React.FC<SettingsScreenProps> = ({ onNavigate }) => {
           </View>
         </View>
 
-        {/* 토큰 관리 섹션 */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t('settings.tokenManagement')}</Text>
-          <TokenManagementSection
-            onNavigateToSubscription={handleUpgradePlan}
-            onTokensUpdated={loadStats}
-          />
+        {/* 치즈 및 구독 통합 카드 */}
+        <View style={styles.unifiedCardContainer}>
+          <View style={styles.unifiedCard}>
+            {/* 보유 치즈 */}
+            <TouchableOpacity
+              style={styles.cardRow}
+              onPress={() => {
+                if (onNavigate) {
+                  onNavigate("token-shop");
+                }
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.cardIcon, { backgroundColor: colors.primary + "20" }]}>
+                <Image
+                  source={require('../../logo/Cheez_logo.png')}
+                  style={{ width: 32, height: 32 }}
+                  resizeMode="contain"
+                />
+              </View>
+              <View style={styles.cardContent}>
+                <Text style={styles.cardLabel}>{t('tokens.free')}</Text>
+                <Text style={styles.cardValue}>{stats.aiTokensRemaining}{t('tokens.unit')}</Text>
+              </View>
+              <View style={styles.cardAction}>
+                <Text style={[styles.cardActionText, { color: colors.primary }]}>
+                  {t('tokens.actions.charge')}
+                </Text>
+                <SafeIcon name="chevron-forward" size={20} color={colors.primary} />
+              </View>
+            </TouchableOpacity>
+
+            {/* 구분선 */}
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+
+            {/* Posty Pro */}
+            <TouchableOpacity
+              style={styles.cardRow}
+              onPress={() => {
+                if (onNavigate) {
+                  onNavigate("subscription");
+                }
+              }}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.cardIcon, { backgroundColor: colors.primary + "20" }]}>
+                <SafeIcon name="star" size={28} color={colors.primary} />
+              </View>
+              <View style={styles.cardContent}>
+                <Text style={styles.cardLabel}>Posty Pro</Text>
+                <Text style={styles.cardSubtext}>{t('subscription.enjoyAdFree')}</Text>
+              </View>
+              <View style={styles.cardAction}>
+                <Text style={[styles.cardActionText, { color: colors.primary }]}>
+                  {t('subscription.actions.subscribe')}
+                </Text>
+                <SafeIcon name="chevron-forward" size={20} color={colors.primary} />
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* 앱 설정 섹션 */}
@@ -1883,6 +1936,61 @@ const createStyles = (colors: any, cardTheme: any, isDark: boolean) => {
     },
     bottomSpace: {
       height: SPACING.xxl * 2,
+    },
+    // Unified Card (치즈 및 구독)
+    unifiedCardContainer: {
+      paddingHorizontal: SPACING.lg,
+      marginBottom: SPACING.xl,
+    },
+    unifiedCard: {
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.border,
+      overflow: "hidden",
+    },
+    cardRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      padding: SPACING.lg,
+    },
+    divider: {
+      height: 1,
+      marginHorizontal: SPACING.lg,
+    },
+    cardIcon: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      justifyContent: "center",
+      alignItems: "center",
+      marginRight: SPACING.md,
+    },
+    cardContent: {
+      flex: 1,
+    },
+    cardLabel: {
+      fontSize: 14,
+      color: colors.text.tertiary,
+      marginBottom: 4,
+    },
+    cardValue: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: colors.text.primary,
+    },
+    cardSubtext: {
+      fontSize: 14,
+      color: colors.text.secondary,
+    },
+    cardAction: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+    },
+    cardActionText: {
+      fontSize: 15,
+      fontWeight: "600",
     },
     testButton: {
       flexDirection: "row",

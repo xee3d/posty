@@ -93,7 +93,7 @@ const en = {
       originalLength: "Original Length",
       convertedLength: "Converted",
       characters: "chars",
-      platformChangeNotice: "Platform changes don't use tokens",
+      platformChangeNotice: "Platform changes don't use cheeses",
       originalContent: "Generated Original",
       emojiOn: "Emoji ON",
       emojiOff: "Emoji OFF",
@@ -194,8 +194,8 @@ const en = {
     alerts: {
       noPrompt: "Tell me what to write about!",
       noPhoto: "Please select a photo first!",
-      noTokens: "Insufficient tokens",
-      watchAdToWrite: "Watch an ad to get 1 token and write immediately!",
+      nocheeses: "Insufficient cheeses",
+      watchAdToWrite: "Watch an ad to get 1 cheese and write immediately!",
       watchAd: "Watch Ad & Write",
       error: "Something went wrong. Please try again.",
       waitAnalysis: "Please wait for photo analysis to complete.",
@@ -292,7 +292,7 @@ const en = {
       },
       error: "Failed to load advertisement. Please try again.",
     },
-    tokenUsage: {
+    cheeseUsage: {
       photoWrite: "Photo Writing",
       polish: "Text Polish",
       newPost: "New Post",
@@ -573,9 +573,35 @@ const en = {
     alreadyShared: "You've already shared on social media today!",
     alreadyRated: "You've already rated the app. Thank you!",
     title: "Subscription Plans",
-    tokenPurchase: "Token Purchase",
-    tokenPurchaseTab: "Token Purchase", 
-    freeTokens: "Free Tokens",
+    enjoyAdFree: "Enjoy ad-free experience",
+    proCard: {
+      title: "Posty Pro",
+      description: "Enjoy ad-free experience",
+      button: "Subscribe"
+    },
+    actions: {
+      subscribe: "Subscribe"
+    },
+    plans: {
+      daily: {
+        name: "1-Day Pass",
+        duration: "1 day",
+        price: "$0.99"
+      },
+      weekly: {
+        name: "7-Day Pass",
+        duration: "7 days",
+        price: "$4.99"
+      },
+      monthly: {
+        name: "Monthly",
+        duration: "1 month",
+        price: "$7.99"
+      }
+    },
+    cheesePurchase: "cheese Purchase",
+    cheesePurchaseTab: "cheese Purchase", 
+    freecheeses: "Free cheeses",
     popular: "Popular",
     perMonth: "/month",
     hero: {
@@ -584,9 +610,9 @@ const en = {
     },
     benefits: {
       title: "Premium Benefits",
-      moreTokens: {
-        title: "More Tokens",
-        description: "PRO provides unlimited tokens"
+      morecheeses: {
+        title: "More cheeses",
+        description: "PRO provides unlimited cheeses"
       },
       advancedAI: {
         title: "Advanced AI Models",
@@ -610,42 +636,42 @@ const en = {
       cancelButton: "Cancel",
       cancelGuideButton: "Cancellation Guide"
     },
-    earnTokensSection: {
-      title: "Earn Free Tokens",
-      subtitle: "Get free tokens through various activities",
-      currentTokens: "You currently have {{tokens}} tokens",
+    earncheesesSection: {
+      title: "Earn Free cheeses",
+      subtitle: "Get free cheeses through various activities",
+      currentcheeses: "You currently have {{cheeses}} cheeses",
       watchAd: {
         title: "Watch Ads",
-        description: "+2 tokens ({{remaining}}/{{limit}} remaining)"
+        description: "+2 cheeses ({{remaining}}/{{limit}} remaining)"
       },
       dailyCheckin: {
         title: "Daily Check-in",
-        description: "+1 token (available today)"
+        description: "+1 cheese (available today)"
       },
       socialShare: {
         title: "Social Share",
-        description: "+3 tokens (1/1 remaining)"
+        description: "+3 cheeses (1/1 remaining)"
       },
       inviteFriend: {
         title: "Invite Friends",
-        description: "+5 tokens (per friend)"
+        description: "+5 cheeses (per friend)"
       },
       rateApp: {
         title: "Rate App",
-        description: "+10 tokens (one time)"
+        description: "+10 cheeses (one time)"
       },
       dailyMission: {
         title: "Complete Mission",
-        description: "+3 tokens (daily mission)"
+        description: "+3 cheeses (daily mission)"
       },
-      autoRefill: "Free plan users get 10 tokens automatically recharged every day at midnight"
+      autoRefill: "Free plan users get 15 cheeses automatically recharged every day at midnight"
     },
-    earnTokens: "Tokens Earned!",
-    earnTokensMessage: "You received {{tokens}} tokens!",
+    earncheeses: "cheeses Earned!",
+    earncheesesMessage: "You received {{cheeses}} cheeses!",
     watchAd: "Watch Ad",
-    watchAdMessage: "Watch a 30-second ad to get 2 tokens?",
+    watchAdMessage: "Watch a 30-second ad to get 2 cheeses?",
     inviteFriends: "Invite Sent",
-    inviteFriendsMessage: "You'll get 5 tokens when your friend signs up!",
+    inviteFriendsMessage: "You'll get 5 cheeses when your friend signs up!",
     cancelSubscription: "Cancel Subscription",
     cancelSubscriptionMessage: "Are you sure you want to cancel your {{planName}} plan subscription?\n\nYou can continue using the current plan until the next billing date even after cancellation.",
     cancelSubscriptionAction: "Cancel",
@@ -699,24 +725,24 @@ const en = {
       autoRenewCanceled: "Auto-renewal Canceled"
     },
     descriptions: {
-      signup300: "You will receive 300 tokens immediately upon signup",
-      signup500: "You will receive 500 tokens immediately upon signup",
-      unlimitedAccess: "You can use unlimited tokens",
-      upgrade500: "You will receive an additional 500 tokens in total",
-      downgradeWarning: "Warning: Free tokens will be limited to 300"
+      signup300: "You will receive 300 cheeses immediately upon signup",
+      signup500: "You will receive 500 cheeses immediately upon signup",
+      unlimitedAccess: "You can use unlimited cheeses",
+      upgrade500: "You will receive an additional 500 cheeses in total",
+      downgradeWarning: "Warning: Free cheeses will be limited to 300"
     },
     planDescriptions: {
-      free: "10 free tokens daily",
-      pro: "Unlimited tokens",
+      free: "15 free cheeses daily",
+      pro: "Unlimited cheeses",
       downgradeBlocked: "Cannot downgrade to lower plan"
     },
     membershipNotices: {
-      free: "Free members get 10 tokens automatically recharged daily",
-      pro: "PRO members get unlimited tokens"
+      free: "Free members get 15 cheeses automatically recharged daily",
+      pro: "PRO members get unlimited cheeses"
     },
     upgradeDescriptions: {
-      proImmediate: "You'll receive 1500 tokens immediately upon signup",
-      proUpgrade: "You'll receive 1500 tokens immediately upon signup"
+      proImmediate: "You'll receive 1500 cheeses immediately upon signup",
+      proUpgrade: "You'll receive 1500 cheeses immediately upon signup"
     },
     plans: {
       free: {
@@ -726,7 +752,7 @@ const en = {
         name: "Free",
         priceDisplay: "Free",
         features: [
-          "10 daily tokens",
+          "15 daily cheeses",
           "3 tone styles",
           "Short/medium length",
           "Ads included",
@@ -735,8 +761,8 @@ const en = {
       pro: {
         name: "Max",
         features: [
-          "500 tokens immediately upon signup",
-          "Unlimited tokens (Fair Use)",
+          "500 cheeses immediately upon signup",
+          "Unlimited cheeses (Fair Use)",
           "All tone styles",
           "Priority processing",
           "Completely ad-free",
@@ -745,31 +771,31 @@ const en = {
     },
     // Plan features translation keys
     features: {
-      dailyTokens10: "10 daily tokens",
+      dailycheeses10: "15 daily cheeses",
       tones2: "2 tone styles",
       tones3: "3 tone styles",
       lengthShortMedium: "Short/medium length",
       hasAds: "Includes ads",
-      signup300: "300 tokens immediately upon signup",
-      daily10: "10 additional tokens daily",
+      signup300: "300 cheeses immediately upon signup",
+      daily10: "15 additional cheeses daily",
       tones4: "4 tone styles",
       longLength: "Long content creation",
       noAds: "Ad-free",
       myStyleAnalysis: "MyStyle analysis",
-      signup500: "500 tokens immediately upon signup",
-      daily20: "20 additional tokens daily",
+      signup500: "500 cheeses immediately upon signup",
+      daily20: "20 additional cheeses daily",
       tones6: "6 tone styles",
       allLengths: "All content lengths",
       fastImageAnalysis: "Fast image analysis",
       gpt4Model: "GPT-4 model",
-      unlimitedTokens: "Unlimited tokens",
+      unlimitedcheeses: "Unlimited cheeses",
       allTones: "All tone styles",
       instantImageAnalysis: "Instant image analysis",
       gpt4TurboModel: "GPT-4 Turbo",
       apiAccess: "API access",
       prioritySupport: "Priority support",
     },
-    confirmSubscriptionMessage: "Do you want to subscribe to the {{planName}} plan?\n\n{{description}}\nCurrent tokens: {{currentTokens}}\nAfter change: {{afterTokens}}",
+    confirmSubscriptionMessage: "Do you want to subscribe to the {{planName}} plan?\n\n{{description}}\nCurrent cheeses: {{currentcheeses}}\nAfter change: {{aftercheeses}}",
     subscribePro: "Subscribe to Pro"
   },
 
@@ -935,7 +961,7 @@ const en = {
     showError: "Unable to show ad. Please try again.",
     watch: "Watch Ad",
     reward: {
-      tokens: "Get {{amount}} tokens!",
+      cheeses: "Get {{amount}} cheeses!",
       default: "Get your reward!"
     }
   },
@@ -1118,7 +1144,7 @@ const en = {
     achievements: "Achievements",
     profileDetails: "Profile Details",
     profileGuideDefault: "Set up your profile",
-    tokenManagement: "Token Management",
+    cheeseManagement: "cheese Management",
     appSettings: "App Settings",
     pushNotifications: "Push Notifications",
     soundEffects: "Sound Effects",
@@ -1283,6 +1309,10 @@ const en = {
       }
     },
     auth: {
+      loginRequired: {
+        title: "Login Required",
+        message: "Please log in to use this feature."
+      },
       logout: {
         title: "Logout",
         message: "Are you sure you want to logout?",
@@ -1307,14 +1337,14 @@ const en = {
       rate: "Rate",
       error: "Cannot open rating page"
     },
-    tokenAlerts: {
+    cheeseAlerts: {
       dailyLimitExceeded: {
         title: "Daily Limit Exceeded",
-        message: "Daily token limit ({{limit}}) exceeded"
+        message: "Daily cheese limit ({{limit}}) exceeded"
       },
       partialGrant: {
-        title: "Partial Token Grant",
-        message: "{{tokens}} tokens granted"
+        title: "Partial cheese Grant",
+        message: "{{cheeses}} cheeses granted"
       }
     },
     aiPrompts: {
@@ -1379,7 +1409,7 @@ const en = {
       message: "Which notification would you like to test?",
       mission: "Mission Notification",
       trend: "Trend Notification", 
-      token: "Token Notification",
+      cheese: "cheese Notification",
       achievement: "Achievement Notification",
       tips: "Tips Notification",
       send: "Send Test Notification"
@@ -1764,30 +1794,39 @@ const en = {
   missions: {
     completed: {
       title: "Mission Complete! 🎯",
-      message: "You've completed the content creation mission and earned {{tokens}} tokens!"
+      message: "You've completed the content creation mission and earned {{cheeses}} cheeses!"
     }
   },
 
-  // Tokens
+  // tokens
   tokens: {
+    badge: "Cheez",
     count: "{{count}}",
-    current: "Current Tokens",
+    current: "Current Cheez",
+    my: "My Cheez",
     unlimited: "Unlimited",
-    label: "tokens",
+    label: "Cheez",
+    freeComingSoon: "Free charge feature coming soon.",
+    bonus: "+{{count}} Bonus",
+    free: "Current Cheez",
+    unit: "",
     usage: {
       today: "Used {{count}} today",
     },
     actions: {
       getFree: "Get Free",
-      charge: "Buy More"
+      charge: "Charge",
+      purchase: "Buy Cheez",
+      freeCharge: "Free Charge",
+      chargeAction: "Charge"
     },
     info: {
-      free: "10 free tokens are recharged daily at midnight",
-      pro: "Using unlimited tokens with PRO plan"
+      free: "15 free cheeses are recharged daily at midnight",
+      pro: "Using unlimited cheeses with PRO plan"
     },
     alerts: {
       proTitle: "PRO Plan Active",
-      proMessage: "You're currently using PRO plan with unlimited tokens. 🚀"
+      proMessage: "You're currently using PRO plan with unlimited cheeses. 🚀"
     }
   },
   plans: {
@@ -1797,31 +1836,31 @@ const en = {
     },
   },
 
-  // Token Purchase
-  tokenPurchase: {
-    title: "Token Purchase",
+  // cheese Purchase
+  cheesePurchase: {
+    title: "cheese Purchase",
     sections: {
       planBenefit: "Plan Benefit",
-      planBenefitDesc: "{{bonusRate}}% bonus tokens",
+      planBenefitDesc: "{{bonusRate}}% bonus cheeses",
       planDiscountDesc: "{{discount}}% discount",
       firstPurchase: "First Purchase Special Offer",
-      firstPurchaseDesc: "Additional 30% discount for purchases of 30 or more tokens!",
+      firstPurchaseDesc: "Additional 30% discount for purchases of 30 or more cheeses!",
       maxPlanNotice: "MAX Plan Active",
-      maxPlanNoticeDesc: "You have unlimited tokens, so no additional purchase needed",
-      advantages: "Token Purchase",
+      maxPlanNoticeDesc: "You have unlimited cheeses, so no additional purchase needed",
+      advantages: "cheese Purchase",
       bulkDiscount: "Bulk Benefits",
       bulkDiscountDesc: "Up to 50% off + plan discounts",
       flexibleUse: "Flexible Use",
       flexibleUseDesc: "Buy when needed, no subscription",
       permanentOwnership: "Keep Forever",
-      permanentOwnershipDesc: "No expiration on purchased tokens",
+      permanentOwnershipDesc: "No expiration on purchased cheeses",
       planBenefits: "Plan Perks",
-      planBenefitsDesc: "Extra tokens with subscription",
-      comparison: "Tokens vs Subscriptions",
+      planBenefitsDesc: "Extra cheeses with subscription",
+      comparison: "cheeses vs Subscriptions",
       whenToPurchase: "Best for occasional users",
       whenToPurchaseDesc: "• Irregular usage • Project-based work • No subscription commitment",
       subscriptionAdvantages: "Subscription Benefits",
-      subscriptionAdvantagesDesc: "• PRO: Unlimited tokens • Ad-free + premium features",
+      subscriptionAdvantagesDesc: "• PRO: Unlimited cheeses • Ad-free + premium features",
       trust: {
         securePayment: "Secure",
         instantRefund: "Refunds",
@@ -1847,16 +1886,16 @@ const en = {
       }
     },
     pricing: {
-      tokens: "{{count}} tokens",
+      cheeses: "{{count}} cheeses",
       bonus: "+{{count}} bonus",
       price: "${{price:number}}",
       originalPrice: "${{price:number}}",
       discount: "{{percent}}% off",
-      perToken: "${{price}} per token"
+      percheese: "${{price}} per cheese"
     },
     alerts: {
       maxPlanTitle: "MAX Plan Active",
-      maxPlanMessage: "You're currently using MAX plan with unlimited tokens.\n\nNo additional token purchase needed. 🚀",
+      maxPlanMessage: "You're currently using MAX plan with unlimited cheeses.\n\nNo additional cheese purchase needed. 🚀",
       confirm: "Confirm"
     },
     currency: {
@@ -2390,7 +2429,7 @@ The Company collects the following personal information for service provision:
 
 • **At registration:** Name, email address
 
-• **When linking SNS accounts:** SNS account information, access tokens
+• **When linking SNS accounts:** SNS account information, access cheeses
 
 • **When using the service:** Generated content, usage records
 
@@ -2518,28 +2557,28 @@ Personal Information Inquiry: getposty@gmail.com`
   tokenShop: {
     title: "Shop",
     subtitle: "Buy what you need and use it unlimitedly",
-    currentTokens: "Current Tokens",
-    dailyRefill: "Daily auto-refill: 10 tokens at midnight",
-    packagesTitle: "Token Packages",
+    currentcheeses: "Current cheeses",
+    dailyRefill: "Daily auto-refill: 15 cheeses at midnight",
+    packagesTitle: "cheese Packages",
     popular: "Popular",
     bonus: "Bonus +{{count}}",
     buy: "Buy",
     discount: "{{percent}}% off",
     bestValue: "Best Value",
-    tokenCount: "{{count}}",
+    cheeseCount: "{{count}}",
     packageNames: {
-      tokens_100: "100 Tokens",
-      tokens_200: "200 Tokens",
-      tokens_300: "300 Tokens"
+      cheeses_100: "100 cheeses",
+      cheeses_200: "200 cheeses",
+      cheeses_300: "300 cheeses"
     },
     subscription: {
       title: "Subscription Plans",
       pro: {
         title: "Pro Version",
         features: {
-          unlimitedTokens: "Unlimited Tokens",
+          unlimitedcheeses: "No cheese Limit",
           noAds: "Remove All Ads",
-          aiAgents: "Gemini 2.5 / GPT-4o Agents",
+          aiAgents: "Latest AI Agents (Gemini 2.5, GPT-4o)",
           allStyles: "All Writing Styles Available"
         }
       },
@@ -2547,47 +2586,139 @@ Personal Information Inquiry: getposty@gmail.com`
       monthly: "/month"
     },
     purchase: {
-      title: "Token Purchase",
-      subtitle: "Would you like to purchase tokens?",
-      subtitleWithBonus: "Would you like to purchase tokens with bonus?",
-      tokenCount: "{{count}} tokens",
+      title: "cheese Purchase",
+      subtitle: "Would you like to purchase cheeses?",
+      subtitleWithBonus: "Would you like to purchase cheeses with bonus?",
+      cheeseCount: "{{count}} cheeses",
       bonusIncluded: "Bonus {{bonus}} included",
       processing: "Processing...",
-      message: "Purchase {{tokens}} tokens for {{price}}?",
-      messageWithBonus: "Purchase {{tokens}} tokens for {{price}}?\n\nBonus {{bonus}} tokens included",
+      message: "Purchase {{cheeses}} cheeses for {{price}}?",
+      messageWithBonus: "Purchase {{cheeses}} cheeses for {{price}}?\n\nBonus {{bonus}} cheeses included",
       cancel: "Cancel",
       confirm: "Purchase",
       successTitle: "Purchase Complete!",
-      successMessage: "{{tokens}} tokens have been added!",
+      successMessage: "{{cheeses}} cheeses have been added!",
       errorTitle: "Purchase Failed",
-      errorMessage: "Failed to purchase tokens.\nPlease try again.",
+      errorMessage: "Failed to purchase cheeses.\nPlease try again.",
     },
     notice: {
-      title: "Token System",
-      freeTokens: "Free Tokens:",
-      freeTokensDesc: "10 tokens only when balance is 0",
-      purchasedTokens: "Purchased Tokens:",
-      purchasedTokensDesc: "Permanent, never expire",
+      title: "cheese System",
+      freecheeses: "Free cheeses:",
+      freecheesesDesc: "15 cheeses only when balance is 0",
+      purchasedcheeses: "Purchased cheeses:",
+      purchasedcheesesDesc: "Permanent, never expire",
       usageOrder: "Usage Order:",
       usageOrderDesc: "Free → Purchased",
-      adReward: "Watch ads when tokens run out"
+      adReward: "Watch ads when cheeses run out"
+    },
+    freeEarn: {
+      watchAd: {
+        title: "Watch Ad",
+        description: "Watch 30s ad"
+      },
+      dailyMission: {
+        title: "Daily Mission",
+        description: "Can be completed daily"
+      },
+      inviteFriend: {
+        title: "Invite Friend",
+        description: "Per friend"
+      },
+      rateApp: {
+        title: "Write App Review",
+        description: "One-time only"
+      }
     },
     refund: {
       title: "Refund Policy",
-      policy: "Tokens are available immediately after purchase. Any usage makes refund impossible.",
-      unused: "Refunds are only possible if tokens are completely unused after purchase.",
+      policy: "cheeses are available immediately after purchase. Any usage makes refund impossible.",
+      unused: "Refunds are only possible if cheeses are completely unused after purchase.",
       contact: "Refund inquiries: getposty@gmail.com",
       terms: "Please refer to Terms of Service for detailed refund policy."
     },
+    faq: {
+      title: "Frequently Asked Questions",
+      what: {
+        question: "Q. What are cheeses?",
+        answer: "cheeses are credits used for AI content generation in Posty. 1 cheese is used per content generation."
+      },
+      expiry: {
+        question: "Q. When do purchased cheeses expire?",
+        answer: "Purchased cheeses have no expiration date. You can use them anytime."
+      },
+      proVsPurchase: {
+        question: "Q. Which is better: Pro plan or cheese purchase?",
+        answer: "If you use more than 15 per day, the Pro plan (unlimited) is more economical. For occasional use, we recommend purchasing cheeses as needed."
+      },
+      refund: {
+        question: "Q. Are refunds available?",
+        answer: "Refunds are possible before using cheeses. After use, refunds may be restricted."
+      },
+      savedTokens: {
+        question: "Q. What happens to my existing cheeses when I buy Pro?",
+        answer: "Your existing cheeses are safely stored. You can use them again after the Pro plan expires."
+      }
+    },
     restore: {
       button: "Restore Purchases",
-      description: "You can restore your previous subscriptions or tokens",
+      description: "You can restore your previous subscriptions or cheeses",
       simulatorTitle: "Simulator Limitation",
       simulatorMessage: "Purchase restoration cannot be tested on simulator. Please test on a real device.",
       processingTitle: "Restoring",
       processingMessage: "Checking purchase history...",
       errorTitle: "Restore Failed",
       errorMessage: "An error occurred while restoring purchases. Please try again later."
+    },
+    pro: {
+      header: "Posty Pro",
+      mainTitle: "Posty Pro",
+      mainSubtitle: "Remove ads and focus on content creation",
+      benefitsTitle: "Premium Benefits",
+      benefits: [
+        "Unlimited Cheese",
+        "Latest AI Agents (Gemini 2.5, GPT-4o)",
+        "All Styles Available",
+        "Ad-Free"
+      ],
+      plansTitle: "Choose a Plan",
+      buyButton: "Purchase",
+      plans: {
+        daily: "1-Day Pass",
+        weekly: "7-Day Pass",
+        monthly: "30-Day Pass"
+      },
+      discount: {
+        weekly: "57% OFF",
+        monthly: "55% OFF"
+      },
+      popularBadge: "Popular",
+      faq: {
+        title: "Frequently Asked Questions",
+        savedTokens: {
+          question: "Q. What happens to my existing cheeses when I purchase Pro?",
+          answer: "Your existing cheeses will be safely stored. You can use them again after the Pro plan expires."
+        },
+        autoRenewal: {
+          question: "Q. Does the Pro plan auto-renew?",
+          answer: "No, it doesn't auto-renew. You'll need to purchase again after the period expires."
+        },
+        planChange: {
+          question: "Q. Can I change my plan?",
+          answer: "Yes, you can. When purchasing a new plan, the remaining period will be added."
+        },
+        refund: {
+          question: "Q. Can I get a refund?",
+          answer: "Refunds are available before using the Pro plan. After use, they may be limited."
+        },
+        multiDevice: {
+          question: "Q. Can I use it on multiple devices?",
+          answer: "Yes, you can enjoy Pro benefits on all devices when logged in with the same account."
+        },
+        dailyDuration: {
+          question: "Q. Is the 1-day pass for 24 hours?",
+          answer: "Yes, it's available for exactly 24 hours from the time of purchase."
+        }
+      }
     }
   }
 };
